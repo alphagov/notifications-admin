@@ -114,7 +114,6 @@ def test_can_show_notifications(
     expected_page_argument,
     to_argument,
     expected_to_argument,
-    mocker,
     mock_cache_search_query,
 ):
     client_request.login(user)
@@ -343,13 +342,13 @@ def test_download_not_available_to_users_if_invalid_message_type(
 
 
 def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
-    mocker,
     client_request,
     service_one,
     mock_get_service_statistics,
     mock_get_service_data_retention,
     mock_get_notifications_count_for_service,
     mock_get_api_keys,
+    mocker,
 ):
     notifications = create_notifications(
         template_type="letter",
@@ -372,7 +371,6 @@ def test_letters_with_status_virus_scan_failed_shows_a_failure_description(
 
 @pytest.mark.parametrize("letter_status", ["pending-virus-check", "virus-scan-failed"])
 def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
-    mocker,
     client_request,
     service_one,
     mock_get_service_statistics,
@@ -380,6 +378,7 @@ def test_should_not_show_preview_link_for_precompiled_letters_in_virus_states(
     mock_get_no_api_keys,
     mock_get_notifications_count_for_service,
     letter_status,
+    mocker,
 ):
     notifications = create_notifications(
         template_type="letter", status=letter_status, is_precompiled_letter=True, client_reference="ref"

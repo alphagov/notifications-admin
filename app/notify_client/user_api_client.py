@@ -1,5 +1,11 @@
-from notifications_python_client.errors import HTTPError
+from contextvars import ContextVar
 
+from flask import current_app
+from notifications_python_client.errors import HTTPError
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient, cache
 from app.utils.user_permissions import translate_permissions_from_ui_to_db
 
@@ -17,8 +23,9 @@ ALLOWED_ATTRIBUTES = {
 
 
 class UserApiClient(NotifyAdminAPIClient):
-    def init_app(self, app):
-        super().init_app(app)
+    def __init__(self, app):
+        super().__init__(app)
+
         self.admin_url = app.config["ADMIN_BASE_URL"]
 
     def register_user(self, name, email_address, mobile_number, password, auth_type):
@@ -232,4 +239,10 @@ class UserApiClient(NotifyAdminAPIClient):
         return self.delete(endpoint)
 
 
-user_api_client = UserApiClient()
+_user_api_client_context_var: ContextVar[UserApiClient] = ContextVar("user_api_client")
+get_user_api_client: LazyLocalGetter[UserApiClient] = LazyLocalGetter(
+    _user_api_client_context_var,
+    lambda: UserApiClient(current_app),
+)
+memo_resetters.append(lambda: get_user_api_client.clear())
+user_api_client = LocalProxy(get_user_api_client)

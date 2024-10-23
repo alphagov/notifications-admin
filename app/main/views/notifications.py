@@ -30,10 +30,10 @@ from app import (
     format_date_numeric,
     job_api_client,
     notification_api_client,
+    template_preview_client,
 )
 from app.main import json_updates, main
 from app.notify_client.api_key_api_client import KEY_TYPE_TEST
-from app.template_previews import TemplatePreview
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -209,11 +209,12 @@ def get_preview_error_image():
 def view_letter_notification_as_preview(service_id, notification_id, filetype, with_metadata=False):
     notification = notification_api_client.get_notification(service_id, notification_id)
     if not notification["template"]["is_precompiled_letter"]:
-        return TemplatePreview.get_preview_for_templated_letter(
+        return template_preview_client.get_preview_for_templated_letter(
             db_template=notification["template"],
             filetype=filetype,
             values=notification["personalisation"],
             page=request.args.get("page"),
+            service=current_service,
         )
 
     image_data = get_letter_file_data(service_id, notification_id, filetype, with_metadata)

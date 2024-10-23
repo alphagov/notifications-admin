@@ -93,8 +93,11 @@ class UnsubscribeRequestsReport(JSONModel):
 
 
 class UnsubscribeRequestsReports(ModelList):
-    client_method = service_api_client.get_unsubscribe_reports_summary
     model = UnsubscribeRequestsReport
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return service_api_client.get_unsubscribe_reports_summary(*args, **kwargs)
 
     def __getitem__(self, index):
         instance = super().__getitem__(index)

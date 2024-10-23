@@ -6,7 +6,7 @@ from tests import organisation_json, service_json
 from tests.conftest import ORGANISATION_ID, create_folder, create_template
 
 
-def test_organisation_type_when_services_organisation_has_no_org_type(mocker, service_one):
+def test_organisation_type_when_services_organisation_has_no_org_type(notify_admin, mocker, service_one):
     service = Service(service_one)
     service._dict["organisation_id"] = ORGANISATION_ID
     org = organisation_json(organisation_type=None)
@@ -16,7 +16,7 @@ def test_organisation_type_when_services_organisation_has_no_org_type(mocker, se
     assert service.organisation_type == "central"
 
 
-def test_organisation_type_when_service_and_its_org_both_have_an_org_type(mocker, service_one):
+def test_organisation_type_when_service_and_its_org_both_have_an_org_type(notify_admin, mocker, service_one):
     # service_one has an organisation_type of 'central'
     service = Service(service_one)
     service._dict["organisation"] = ORGANISATION_ID
@@ -26,7 +26,7 @@ def test_organisation_type_when_service_and_its_org_both_have_an_org_type(mocker
     assert service.organisation_type == "local"
 
 
-def test_organisation_name_comes_from_cache(mocker, service_one):
+def test_organisation_name_comes_from_cache(notify_admin, mocker, service_one):
     mock_redis_get = mocker.patch(
         "app.extensions.RedisClient.get",
         return_value=b'"Borchester Council"',
@@ -40,7 +40,7 @@ def test_organisation_name_comes_from_cache(mocker, service_one):
     assert mock_get_organisation.called is False
 
 
-def test_organisation_name_goes_into_cache(mocker, service_one):
+def test_organisation_name_goes_into_cache(notify_admin, mocker, service_one):
     mocker.patch(
         "app.extensions.RedisClient.get",
         return_value=None,
@@ -63,7 +63,7 @@ def test_organisation_name_goes_into_cache(mocker, service_one):
     )
 
 
-def test_service_without_organisation_doesnt_need_org_api(mocker, service_one):
+def test_service_without_organisation_doesnt_need_org_api(notify_admin, mocker, service_one):
     mock_redis_get = mocker.patch("app.extensions.RedisClient.get")
     mock_get_organisation = mocker.patch("app.organisations_client.get_organisation")
     service = Service(service_one)
@@ -93,9 +93,9 @@ def test_service_billing_details(purchase_order_number, expected_result):
 
 
 def test_has_templates_of_type_includes_folders(
-    mocker,
     service_one,
     mock_get_template_folders,
+    mocker,
 ):
     mocker.patch(
         "app.service_api_client.get_service_templates",

@@ -69,7 +69,7 @@ SAMPLE_DATA = {
 
 
 @pytest.fixture
-def mock_get_orgs_and_services(mocker):
+def mock_get_orgs_and_services(notify_admin, mocker):
     return mocker.patch("app.user_api_client.get_organisations_and_services_for_user", return_value=SAMPLE_DATA)
 
 
@@ -158,8 +158,8 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
 
 
 def test_choose_account_should_show_join_service_button(
-    mocker,
     client_request,
+    mocker,
     mock_get_non_empty_organisations_and_services_for_user,
 ):
     mocker.patch(

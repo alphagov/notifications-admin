@@ -5,37 +5,44 @@ import freezegun.config
 import pytest
 from flask import Flask, session, url_for
 
-from app import create_app
+from app import create_app, reset_memos
 from tests.conftest import SERVICE_ONE_ID
 
 
 class TestNotifyAdminSessionInterface:
     @pytest.fixture
-    def clean_app(self):
+    def notify_admin(self):
+        # override the global notify_admin fixture with a known-clean one
         from tests import TestClient
 
         app = Flask("app")
         create_app(app)
         app.test_client_class = TestClient
+
+        reset_memos()
+
         with app.app_context():
             yield app
 
+        reset_memos()
+
     @pytest.fixture
-    def clean_app_client(self, clean_app):
-        with clean_app.test_request_context(), clean_app.test_client() as client:
+    def basic_client(self, notify_admin):
+        with notify_admin.test_request_context(), notify_admin.test_client() as client:
             yield client
 
     def test_logged_user_session_expiration(
         self,
-        request,
+        notify_admin,
+        basic_client,
         active_user_with_permissions,
         mock_get_service,
         mock_has_permissions,
         mock_get_notifications,
         mock_get_service_data_retention,
     ):
-        app = request.getfixturevalue("clean_app")
-        client = request.getfixturevalue("clean_app_client")
+        app = notify_admin
+        client = basic_client
 
         # Set absolute session lifetime to 20 hours
         app.permanent_session_lifetime = datetime.timedelta(hours=20)
@@ -67,19 +74,20 @@ class TestNotifyAdminSessionInterface:
 
     def test_logged_platform_user_session_full_expiration(
         self,
-        request,
+        notify_admin,
+        basic_client,
         platform_admin_user,
         mock_get_service,
         mock_has_permissions,
         mock_get_notifications,
         mock_get_service_data_retention,
     ):
+        app = notify_admin
+        client = basic_client
+
         # webauthn auth needs some more complex mocking/patching not relevant to the code under test, so let's bypass it
         platform_admin_user["auth_type"] = "sms_auth"
         platform_admin_user["can_use_webauthn"] = False
-
-        app = request.getfixturevalue("clean_app")
-        client = request.getfixturevalue("clean_app_client")
 
         # Set absolute session lifetime to 1 hour
         app.permanent_session_lifetime = datetime.timedelta(minutes=60)
@@ -125,8 +133,9 @@ class TestNotifyAdminSessionInterface:
 
     def test_platform_admin_session_not_renewed_by_json_views(
         self,
+        notify_admin,
+        basic_client,
         platform_admin_user,
-        request,
         service_one,
         mock_get_service,
         mock_get_service_templates,
@@ -137,12 +146,12 @@ class TestNotifyAdminSessionInterface:
         mock_get_free_sms_fragment_limit,
         mock_get_returned_letter_statistics_with_no_returned_letters,
     ):
+        app = notify_admin
+        client = basic_client
+
         # webauthn auth needs some more complex mocking/patching not relevant to the code under test, so let's bypass it
         platform_admin_user["auth_type"] = "sms_auth"
         platform_admin_user["can_use_webauthn"] = False
-
-        app = request.getfixturevalue("clean_app")
-        client = request.getfixturevalue("clean_app_client")
 
         # Set absolute session lifetime to 1 hour
         app.permanent_session_lifetime = datetime.timedelta(minutes=60)

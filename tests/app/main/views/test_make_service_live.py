@@ -76,7 +76,6 @@ test_user_auth_combinations = (
 
 @pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_start(
-    mocker,
     client_request,
     service_one,
     organisation_one,
@@ -84,6 +83,7 @@ def test_get_org_member_make_service_live_start(
     organisation_can_approve_own_go_live_requests,
     service_has_active_go_live_request,
     expected_status,
+    mocker,
 ):
     organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
 
@@ -119,6 +119,7 @@ def test_get_org_member_make_service_live_start(
 def test_make_service_live_start_with_no_organisation(
     client_request,
     service_one,
+    mocker,
 ):
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = None
@@ -134,6 +135,7 @@ def test_make_service_live_start_with_no_organisation_platform_admin(
     client_request,
     service_one,
     platform_admin_user,
+    mocker,
 ):
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = None
@@ -154,7 +156,6 @@ def test_make_service_live_start_with_no_organisation_platform_admin(
 
 @pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_service_name(
-    mocker,
     client_request,
     service_one,
     organisation_one,
@@ -162,6 +163,7 @@ def test_get_org_member_make_service_live_service_name(
     organisation_can_approve_own_go_live_requests,
     service_has_active_go_live_request,
     expected_status,
+    mocker,
 ):
     organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
 
@@ -189,10 +191,10 @@ def test_get_org_member_make_service_live_service_name(
 
 
 def test_post_org_member_make_service_live_service_name_error_summary(
-    mocker,
     client_request,
     service_one,
     organisation_one,
+    mocker,
 ):
     user = create_user(
         id=sample_uuid(),
@@ -288,7 +290,6 @@ def test_post_org_member_make_service_live_service_name_error_summary(
     ),
 )
 def test_post_org_member_make_service_live_service_name(
-    mocker,
     client_request,
     service_one,
     organisation_one,
@@ -296,6 +297,7 @@ def test_post_org_member_make_service_live_service_name(
     query_args,
     expected_redirect_url,
     expected_notify_calls,
+    mocker,
 ):
     user = create_user(
         id=sample_uuid(),
@@ -326,7 +328,6 @@ def test_post_org_member_make_service_live_service_name(
 
 @pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_unique_service(
-    mocker,
     client_request,
     service_one,
     organisation_one,
@@ -334,6 +335,7 @@ def test_get_org_member_make_service_live_unique_service(
     organisation_can_approve_own_go_live_requests,
     service_has_active_go_live_request,
     expected_status,
+    mocker,
 ):
     organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
 
@@ -360,10 +362,10 @@ def test_get_org_member_make_service_live_unique_service(
 
 
 def test_post_org_member_make_service_live_unique_service_error_summary(
-    mocker,
     client_request,
     service_one,
     organisation_one,
+    mocker,
 ):
     user = create_user(
         id=sample_uuid(),
@@ -413,7 +415,13 @@ def test_post_org_member_make_service_live_unique_service_error_summary(
     ),
 )
 def test_post_org_member_make_service_live_unique_service(
-    mocker, client_request, service_one, organisation_one, request_url, data, expected_redirect_url
+    client_request,
+    service_one,
+    organisation_one,
+    request_url,
+    data,
+    expected_redirect_url,
+    mocker,
 ):
     user = create_user(
         id=sample_uuid(),
@@ -451,7 +459,6 @@ def test_post_org_member_make_service_live_unique_service(
 )
 @pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_contact_user(
-    mocker,
     client_request,
     service_one,
     organisation_one,
@@ -461,6 +468,7 @@ def test_get_org_member_make_service_live_contact_user(
     expected_status,
     data,
     expected_redirect,
+    mocker,
 ):
     organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
 
@@ -488,7 +496,6 @@ def test_get_org_member_make_service_live_contact_user(
 
 @pytest.mark.parametrize(*test_user_auth_combinations)
 def test_get_org_member_make_service_live_decision(
-    mocker,
     client_request,
     service_one,
     organisation_one,
@@ -496,6 +503,7 @@ def test_get_org_member_make_service_live_decision(
     organisation_can_approve_own_go_live_requests,
     service_has_active_go_live_request,
     expected_status,
+    mocker,
 ):
     organisation_one["can_approve_own_go_live_requests"] = organisation_can_approve_own_go_live_requests
 
@@ -533,7 +541,12 @@ def test_get_org_member_make_service_live_decision(
     ),
 )
 def test_post_org_member_make_service_live_decision_error_summary(
-    mocker, client_request, service_one, organisation_one, post_data, expected_error_message
+    client_request,
+    service_one,
+    organisation_one,
+    post_data,
+    expected_error_message,
+    mocker,
 ):
     user = create_user(
         id=sample_uuid(),
@@ -597,7 +610,6 @@ def test_post_org_member_make_service_live_decision_error_summary(
 )
 @freeze_time("2022-12-22 12:12:12")
 def test_post_org_member_make_service_live_decision(
-    mocker,
     client_request,
     platform_admin_user,
     service_one,
@@ -607,6 +619,7 @@ def test_post_org_member_make_service_live_decision(
     post_data,
     expected_arguments_to_update_service,
     should_notify,
+    mocker,
 ):
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID

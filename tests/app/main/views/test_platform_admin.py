@@ -236,9 +236,9 @@ def test_platform_admin_show_submit_returned_letters_page(
 
 
 def test_platform_admin_submit_returned_letters(
-    mocker,
     client_request,
     platform_admin_user,
+    mocker,
 ):
     mock_client = mocker.patch("app.letter_jobs_client.submit_returned_letters")
 
@@ -255,9 +255,9 @@ def test_platform_admin_submit_returned_letters(
 
 
 def test_platform_admin_submit_empty_returned_letters(
-    mocker,
     client_request,
     platform_admin_user,
+    mocker,
 ):
     mock_client = mocker.patch("app.letter_jobs_client.submit_returned_letters")
 
@@ -358,10 +358,10 @@ def test_clear_cache_shows_form(
 def test_clear_cache_submits_and_tells_you_how_many_things_were_deleted(
     client_request,
     platform_admin_user,
-    mocker,
     model_type,
     expected_calls,
     expected_confirmation,
+    mocker,
 ):
     redis = mocker.patch("app.main.views.platform_admin.redis_client")
     redis.delete_by_pattern.return_value = 2
@@ -483,9 +483,9 @@ def test_get_notifications_sent_by_service_shows_date_form(
 
 
 def test_get_notifications_sent_by_service_validates_form(
-    mocker,
     client_request,
     platform_admin_user,
+    mocker,
 ):
     mock_get_stats_from_api = mocker.patch("app.main.views.platform_admin.notification_api_client")
 
@@ -645,11 +645,11 @@ class TestGetDvlaBillingReport:
 
 
 def test_get_notifications_sent_by_service_calls_api_and_downloads_data(
-    mocker,
     client_request,
     platform_admin_user,
     service_one,
     service_two,
+    mocker,
 ):
     api_data = [
         ["2019-01-01", SERVICE_ONE_ID, service_one["name"], "email", 191, 0, 0, 14, 0, 0],
@@ -842,7 +842,7 @@ class TestPlatformAdminSearch:
         client_request.login(platform_admin_user)
         client_request.get(".platform_admin_search")
 
-    def test_can_search_for_user(self, mocker, client_request, platform_admin_user, active_caseworking_user):
+    def test_can_search_for_user(self, client_request, platform_admin_user, active_caseworking_user, mocker):
         mocker.patch(
             "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
             return_value={"data": [active_caseworking_user]},
@@ -866,7 +866,7 @@ class TestPlatformAdminSearch:
         assert found_user_links[0].text == "caseworker@example.gov.uk"
         assert found_user_links[0].get("href") == "/users/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6"
 
-    def test_can_search_for_services(self, mocker, client_request, platform_admin_user, service_one, service_two):
+    def test_can_search_for_services(self, client_request, platform_admin_user, service_one, service_two, mocker):
         mocker.patch(
             "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
             return_value={"data": []},
@@ -892,7 +892,7 @@ class TestPlatformAdminSearch:
         assert found_service_links[1].text == "service two"
         assert found_service_links[1].get("href") == "/services/147ad62a-2951-4fa1-9ca0-093cd1a52c52"
 
-    def test_can_search_for_organisations(self, mocker, client_request, platform_admin_user, organisation_one):
+    def test_can_search_for_organisations(self, client_request, platform_admin_user, organisation_one, mocker):
         mocker.patch(
             "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
             return_value={"data": []},
@@ -918,13 +918,13 @@ class TestPlatformAdminSearch:
 
     def test_shows_results_from_all_categories(
         self,
-        mocker,
         client_request,
         platform_admin_user,
         active_caseworking_user,
         service_one,
         service_two,
         organisation_one,
+        mocker,
     ):
         mocker.patch(
             "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
@@ -1017,7 +1017,7 @@ class TestPlatformAdminSearch:
             ),
         ),
     )
-    def test_find_uuid_redirects(self, mocker, client_request, platform_admin_user, api_response, expected_redirect):
+    def test_find_uuid_redirects(self, client_request, platform_admin_user, api_response, expected_redirect, mocker):
         mocker.patch(
             "app.main.views.platform_admin.user_api_client.find_users_by_full_or_partial_email",
             return_value={"data": []},
@@ -1037,7 +1037,7 @@ class TestPlatformAdminSearch:
             _expected_redirect=expected_redirect,
         )
 
-    def test_error_summary(self, mocker, client_request, platform_admin_user):
+    def test_error_summary(self, client_request, platform_admin_user, mocker):
         client_request.login(platform_admin_user)
 
         page = client_request.post(".platform_admin_search", _data={"search": ""}, _expected_status=200)

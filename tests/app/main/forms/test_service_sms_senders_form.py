@@ -59,6 +59,7 @@ from app.models.service import Service
     ],
 )
 def test_sms_sender_form_validation(
+    notify_admin,
     sms_sender,
     error_expected,
     error_message,
@@ -112,7 +113,7 @@ def test_sms_validation_logs_and_creates_ticket_for_phishing_sender(client_reque
     mock_send_zendesk_ticket.assert_called_once()
 
 
-def test_sms_validation_does_not_log_or_create_ticket_for_safe_sender(caplog, mocker):
+def test_sms_validation_does_not_log_or_create_ticket_for_safe_sender(notify_admin, caplog, mocker):
     mocker.patch("app.protected_sender_id_api_client.get_check_sender_id", return_value=False)
     form = ServiceSmsSenderForm(sms_sender="UK&GOV")
 

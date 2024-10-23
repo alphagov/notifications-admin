@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
 from app.utils.user_permissions import (
     all_ui_permissions,
@@ -6,8 +13,8 @@ from app.utils.user_permissions import (
 
 
 class InviteApiClient(NotifyAdminAPIClient):
-    def init_app(self, app):
-        super().init_app(app)
+    def __init__(self, app):
+        super().__init__(app)
 
         self.admin_url = app.config["ADMIN_BASE_URL"]
 
@@ -75,4 +82,10 @@ class InviteApiClient(NotifyAdminAPIClient):
         self.post(url=f"/service/{service_id}/invite/{invited_user_id}", data=data)
 
 
-invite_api_client = InviteApiClient()
+_invite_api_client_context_var: ContextVar[InviteApiClient] = ContextVar("invite_api_client")
+get_invite_api_client: LazyLocalGetter[InviteApiClient] = LazyLocalGetter(
+    _invite_api_client_context_var,
+    lambda: InviteApiClient(current_app),
+)
+memo_resetters.append(lambda: get_invite_api_client.clear())
+invite_api_client = LocalProxy(get_invite_api_client)

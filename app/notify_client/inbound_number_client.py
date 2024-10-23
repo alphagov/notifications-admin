@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient, cache
 
 
@@ -22,4 +29,10 @@ class InboundNumberClient(NotifyAdminAPIClient):
         return self.post(f"inbound-number/service/{service_id}", data=data)
 
 
-inbound_number_client = InboundNumberClient()
+_inbound_number_client_context_var: ContextVar[InboundNumberClient] = ContextVar("inbound_number_client")
+get_inbound_number_client: LazyLocalGetter[InboundNumberClient] = LazyLocalGetter(
+    _inbound_number_client_context_var,
+    lambda: InboundNumberClient(current_app),
+)
+memo_resetters.append(lambda: get_inbound_number_client.clear())
+inbound_number_client = LocalProxy(get_inbound_number_client)

@@ -340,10 +340,10 @@ def test_upload_csv_shows_ok_page(client_request, mock_get_live_service, fake_uu
 
 
 def test_save_contact_list(
-    mocker,
     client_request,
     fake_uuid,
     mock_create_contact_list,
+    mocker,
 ):
     mock_get_metadata = mocker.patch(
         "app.models.contact_list.get_csv_metadata",
@@ -374,10 +374,10 @@ def test_save_contact_list(
 
 
 def test_cant_save_bad_contact_list(
-    mocker,
     client_request,
     fake_uuid,
     mock_create_contact_list,
+    mocker,
 ):
     mocker.patch(
         "app.models.contact_list.get_csv_metadata",
@@ -401,7 +401,6 @@ def test_cant_save_bad_contact_list(
 )
 @freeze_time("2020-06-13 16:51:56")
 def test_view_contact_list(
-    mocker,
     client_request,
     mock_get_contact_list,
     mock_get_no_jobs,
@@ -409,6 +408,7 @@ def test_view_contact_list(
     fake_uuid,
     has_jobs,
     expected_empty_message,
+    mocker,
 ):
     mocker.patch(
         "app.models.contact_list.contact_list_api_client.get_contact_list",
@@ -467,11 +467,11 @@ def test_view_contact_list(
 
 @freeze_time("2015-12-31 16:51:56")
 def test_view_jobs_for_contact_list(
-    mocker,
     client_request,
     mock_get_jobs,
     mock_get_service_data_retention,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.models.contact_list.contact_list_api_client.get_contact_list",
@@ -527,10 +527,10 @@ def test_view_contact_list_404s_for_non_existing_list(
 
 
 def test_download_contact_list(
-    mocker,
     client_request,
     fake_uuid,
     mock_get_contact_list,
+    mocker,
 ):
     mocker.patch("app.models.contact_list.s3download", return_value="phone number\n07900900321")
     response = client_request.get_response(
@@ -544,12 +544,12 @@ def test_download_contact_list(
 
 
 def test_confirm_delete_contact_list(
-    mocker,
     client_request,
     fake_uuid,
     mock_get_jobs,
     mock_get_service_data_retention,
     mock_get_contact_list,
+    mocker,
 ):
     mocker.patch("app.models.contact_list.s3download", return_value="phone number\n07900900321")
     page = client_request.get(
@@ -565,10 +565,10 @@ def test_confirm_delete_contact_list(
 
 
 def test_delete_contact_list(
-    mocker,
     client_request,
     fake_uuid,
     mock_get_contact_list,
+    mocker,
 ):
     mock_delete = mocker.patch("app.models.contact_list.contact_list_api_client.delete_contact_list")
     client_request.post(

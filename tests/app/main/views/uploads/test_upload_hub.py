@@ -78,13 +78,13 @@ def test_all_users_have_upload_contact_list(
     ),
 )
 def test_get_upload_hub_with_no_uploads(
-    mocker,
     client_request,
     service_one,
     mock_get_no_uploads,
     mock_get_no_contact_lists,
     extra_permissions,
     expected_empty_message,
+    mocker,
 ):
     mocker.patch("app.job_api_client.get_jobs", return_value={"data": []})
     service_one["permissions"] += extra_permissions
@@ -95,11 +95,11 @@ def test_get_upload_hub_with_no_uploads(
 
 @freeze_time("2017-10-10 10:10:10")
 def test_get_upload_hub_page(
-    mocker,
     client_request,
     service_one,
     mock_get_uploads,
     mock_get_no_contact_lists,
+    mocker,
 ):
     mocker.patch("app.job_api_client.get_jobs", return_value={"data": []})
     service_one["permissions"] += ["letter", "upload_letters"]
@@ -142,6 +142,7 @@ def test_get_uploaded_letters(
     client_request,
     service_one,
     mock_get_uploaded_letters,
+    mocker,
 ):
     page = client_request.get("main.uploaded_letters", service_id=SERVICE_ONE_ID, letter_print_day="2020-02-02")
     assert page.select_one(".govuk-back-link")["href"] == url_for(
@@ -195,6 +196,7 @@ def test_get_empty_uploaded_letters_page(
     client_request,
     service_one,
     mock_get_no_uploaded_letters,
+    mocker,
 ):
     page = client_request.get("main.uploaded_letters", service_id=SERVICE_ONE_ID, letter_print_day="2020-02-02")
     page.select_one("main table")
@@ -209,6 +211,7 @@ def test_get_uploaded_letters_passes_through_page_argument(
     client_request,
     service_one,
     mock_get_uploaded_letters,
+    mocker,
 ):
     client_request.get(
         "main.uploaded_letters",
@@ -225,6 +228,7 @@ def test_get_uploaded_letters_passes_through_page_argument(
 
 def test_get_uploaded_letters_404s_for_bad_page_arguments(
     client_request,
+    mocker,
 ):
     client_request.get(
         "main.uploaded_letters",
@@ -237,6 +241,7 @@ def test_get_uploaded_letters_404s_for_bad_page_arguments(
 
 def test_get_uploaded_letters_404s_for_invalid_date(
     client_request,
+    mocker,
 ):
     client_request.get(
         "main.uploaded_letters",
@@ -260,6 +265,7 @@ def test_uploads_page_shows_scheduled_jobs(
     mock_get_jobs,
     mock_get_no_contact_lists,
     user,
+    mocker,
 ):
     client_request.login(user)
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
@@ -279,6 +285,7 @@ def test_uploads_page_shows_contact_lists_first(
     mock_get_jobs,
     mock_get_contact_lists,
     mock_get_service_data_retention,
+    mocker,
 ):
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
 

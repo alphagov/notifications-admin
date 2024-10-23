@@ -27,6 +27,7 @@ from app import (
     nl2br,
     notification_api_client,
     service_api_client,
+    template_preview_client,
 )
 from app.main import main, no_cookie
 from app.main.forms import (
@@ -44,7 +45,6 @@ from app.s3_client.s3_csv_client import (
     s3upload,
     set_metadata_on_csv_upload,
 )
-from app.template_previews import TemplatePreview
 from app.utils import PermanentRedirect, should_skip_template_page, unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.user import user_has_permissions
@@ -540,11 +540,12 @@ def send_test_preview(service_id, template_id, filetype):
         ),
     )
 
-    return TemplatePreview.get_preview_for_templated_letter(
+    return template_preview_client.get_preview_for_templated_letter(
         db_template=template._template,
         filetype=filetype,
         values=get_normalised_placeholders_from_session(),
         page=request.args.get("page"),
+        service=current_service,
     )
 
 
@@ -742,8 +743,12 @@ def check_messages_preview(service_id, template_id, upload_id, filetype, row_ind
         page = request.args.get("page", 1)
 
     template = _check_messages(service_id, template_id, upload_id, row_index)["template"]
-    return TemplatePreview.get_preview_for_templated_letter(
-        db_template=template._template, filetype=filetype, values=template.values, page=page
+    return template_preview_client.get_preview_for_templated_letter(
+        db_template=template._template,
+        filetype=filetype,
+        values=template.values,
+        page=page,
+        service=current_service,
     )
 
 
@@ -762,8 +767,12 @@ def check_notification_preview(service_id, template_id, filetype):
         service_id,
         template_id,
     )["template"]
-    return TemplatePreview.get_preview_for_templated_letter(
-        db_template=template._template, filetype=filetype, values=template.values, page=page
+    return template_preview_client.get_preview_for_templated_letter(
+        db_template=template._template,
+        filetype=filetype,
+        values=template.values,
+        page=page,
+        service=current_service,
     )
 
 

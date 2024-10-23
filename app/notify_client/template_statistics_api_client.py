@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient
 
 
@@ -16,4 +23,12 @@ class TemplateStatisticsApiClient(NotifyAdminAPIClient):
         return self.get(url=f"/service/{service_id}/template-statistics/last-used/{template_id}")["last_date_used"]
 
 
-template_statistics_client = TemplateStatisticsApiClient()
+_template_statistics_client_context_var: ContextVar[TemplateStatisticsApiClient] = ContextVar(
+    "template_statistics_client"
+)
+get_template_statistics_client: LazyLocalGetter[TemplateStatisticsApiClient] = LazyLocalGetter(
+    _template_statistics_client_context_var,
+    lambda: TemplateStatisticsApiClient(current_app),
+)
+memo_resetters.append(lambda: get_template_statistics_client.clear())
+template_statistics_client = LocalProxy(get_template_statistics_client)

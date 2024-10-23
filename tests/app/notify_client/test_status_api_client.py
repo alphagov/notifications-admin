@@ -3,7 +3,7 @@ from app.notify_client.status_api_client import StatusApiClient
 
 def test_get_count_of_live_services_and_organisations(mocker):
     mocker.patch("app.extensions.RedisClient.get", return_value=None)
-    client = StatusApiClient()
+    client = StatusApiClient(mocker.MagicMock())
     mock = mocker.patch.object(client, "get", return_value={})
 
     client.get_count_of_live_services_and_organisations()
@@ -12,7 +12,7 @@ def test_get_count_of_live_services_and_organisations(mocker):
 
 
 def test_sets_value_in_cache(mocker):
-    client = StatusApiClient()
+    client = StatusApiClient(mocker.MagicMock())
 
     mock_redis_get = mocker.patch("app.extensions.RedisClient.get", return_value=None)
     mock_api_get = mocker.patch(
@@ -31,7 +31,7 @@ def test_sets_value_in_cache(mocker):
 
 
 def test_returns_value_from_cache(mocker):
-    client = StatusApiClient()
+    client = StatusApiClient(mocker.MagicMock())
 
     mock_redis_get = mocker.patch(
         "app.extensions.RedisClient.get",

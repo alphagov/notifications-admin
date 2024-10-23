@@ -200,8 +200,11 @@ class AllBranding(ModelList):
 
 
 class AllEmailBranding(AllBranding):
-    client_method = email_branding_client.get_all_email_branding
     model = EmailBranding
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return email_branding_client.get_all_email_branding(*args, **kwargs)
 
     @property
     def example_government_identity_branding(self):
@@ -211,26 +214,35 @@ class AllEmailBranding(AllBranding):
 
 
 class EmailBrandingPool(AllEmailBranding):
-    client_method = organisations_client.get_email_branding_pool
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return organisations_client.get_email_branding_pool(*args, **kwargs)
 
     def __init__(self, id):
         self.items = ()
         if id:
-            self.items = self.client_method(id)
+            self.items = self._get_items(id)
 
 
 class AllLetterBranding(AllBranding):
-    client_method = letter_branding_client.get_all_letter_branding
     model = LetterBranding
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return letter_branding_client.get_all_letter_branding(*args, **kwargs)
 
 
 class LetterBrandingPool(AllLetterBranding):
-    client_method = organisations_client.get_letter_branding_pool
+
+    @staticmethod
+    def _get_items(*args, **kwargs):
+        return organisations_client.get_letter_branding_pool(*args, **kwargs)
 
     def __init__(self, id):
         self.items = ()
         if id:
-            self.items = self.client_method(id)
+            self.items = self._get_items(id)
 
 
 GOVERNMENT_IDENTITY_SYSTEM_COLOURS = {

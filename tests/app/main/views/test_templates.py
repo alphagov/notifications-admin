@@ -452,7 +452,6 @@ def test_should_show_page_for_email_template(
     ),
 )
 def test_should_show_page_for_sms_template(
-    mocker,
     client_request,
     mock_get_service_template,
     service_one,
@@ -461,6 +460,7 @@ def test_should_show_page_for_sms_template(
     permissions,
     template_content,
     expected_hint_text,
+    mocker,
 ):
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -530,10 +530,10 @@ def test_should_show_page_for_one_template(
     ),
 )
 def test_edit_email_template_should_have_unsubscribe_checkbox(
-    mocker,
     client_request,
     fake_uuid,
     template_type,
+    mocker,
 ):
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -567,13 +567,13 @@ def test_edit_email_template_should_have_unsubscribe_checkbox(
     ),
 )
 def test_edit_email_template_should_update_unsubscribe(
-    mocker,
     client_request,
     platform_admin_user,
     mock_update_service_template,
     post_data,
     expected_unsubscribeable,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -621,6 +621,7 @@ def test_add_email_template_should_add_unsubscribe(
     client_request,
     platform_admin_user,
     mock_create_service_template,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     client_request.post(
@@ -1281,7 +1282,11 @@ def test_GET_letter_template_attach_pages_404s_if_invalid_template_id(client_req
 
 
 def test_post_attach_pages_errors_when_content_outside_printable_area(
-    mocker, client_request, fake_uuid, service_one, mock_get_service_letter_template
+    client_request,
+    fake_uuid,
+    service_one,
+    mock_get_service_letter_template,
+    mocker,
 ):
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
@@ -1293,7 +1298,7 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
-    mocker.patch("app.template_previews.TemplatePreview.sanitise_letter", return_value=mock_sanitise_response)
+    mocker.patch("app.template_preview_client.sanitise_letter", return_value=mock_sanitise_response)
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         file_contents = file.read()
@@ -1335,11 +1340,11 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
 
 
 def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
-    mocker,
     client_request,
     api_user_active,
     fake_uuid,
     service_one,
+    mocker,
 ):
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
@@ -1350,7 +1355,7 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
             "data": template_version_json(SERVICE_ONE_ID, fake_uuid, api_user_active, version=1, type_="letter")
         },
     )
-    mocker.patch("app.template_previews.TemplatePreview.sanitise_letter")
+    mocker.patch("app.template_preview_client.sanitise_letter")
     do_mock_get_page_counts_for_letter(mocker, count=9)
 
     with open("tests/test_pdf_files/multi_page_pdf.pdf", "rb") as file:
@@ -1375,11 +1380,16 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
 
 @pytest.mark.parametrize("page_count", [1, 2])
 def test_post_attach_pages_redirects_to_template_view_when_validation_successful(
-    mocker, client_request, service_one, mock_get_service_letter_template, page_count, mock_get_page_counts_for_letter
+    client_request,
+    service_one,
+    mock_get_service_letter_template,
+    page_count,
+    mock_get_page_counts_for_letter,
+    mocker,
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
-    mock_sanitise = mocker.patch("app.template_previews.TemplatePreview.sanitise_letter")
+    mock_sanitise = mocker.patch("app.template_preview_client.sanitise_letter")
 
     # page count for the attachment
     mocker.patch("app.main.views.templates.pdf_page_count", return_value=page_count)
@@ -1415,16 +1425,16 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
 
 
 def test_post_attach_pages_archives_existing_attachment_when_it_exists(
-    mocker,
     client_request,
     service_one,
     active_user_with_permissions,
     mock_get_service_letter_template_with_attachment,
     mock_get_page_counts_for_letter,
+    mocker,
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
 
-    mock_sanitise = mocker.patch("app.template_previews.TemplatePreview.sanitise_letter")
+    mock_sanitise = mocker.patch("app.template_preview_client.sanitise_letter")
 
     # page count for the attachment
     mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
@@ -1468,11 +1478,11 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
 
 
 def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_errors(
-    mocker,
     client_request,
     fake_uuid,
     service_one,
     mock_get_service_letter_template_with_attachment,
+    mocker,
 ):
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
@@ -1480,7 +1490,7 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
-    mocker.patch("app.template_previews.TemplatePreview.sanitise_letter", return_value=mock_sanitise_response)
+    mocker.patch("app.template_preview_client.sanitise_letter", return_value=mock_sanitise_response)
 
     mocker.patch("app.main.views.templates.upload_letter_to_s3")
     mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
@@ -1747,6 +1757,7 @@ def test_should_be_able_to_view_a_letter_template_with_links(
     single_letter_contact_block,
     fake_uuid,
     mock_get_page_counts_for_letter,
+    mocker,
 ):
     page = client_request.get(
         "main.view_template",
@@ -1808,11 +1819,11 @@ def test_should_be_able_to_view_a_letter_template_with_links(
 
 
 def test_should_not_be_able_to_view_edit_links_for_an_archived_letter_template(
-    mocker,
     client_request,
     single_letter_contact_block,
     fake_uuid,
     mock_get_page_counts_for_letter,
+    mocker,
 ):
     archived_letter_template = template_json(
         service_id=SERVICE_ONE_ID,
@@ -1871,12 +1882,12 @@ def test_should_not_be_able_to_view_edit_links_for_an_archived_letter_template(
 
 
 def test_should_be_able_to_view_a_letter_template_with_bilingual_content(
-    mocker,
     client_request,
     service_one,
     mock_get_service_letter_template_welsh_language,
     single_letter_contact_block,
     fake_uuid,
+    mocker,
 ):
     service_one["permissions"].append("extra_letter_formatting")
     do_mock_get_page_counts_for_letter(mocker, count=5, welsh_page_count=3)
@@ -1978,7 +1989,6 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
     ),
 )
 def test_should_let_letter_contact_block_be_changed_for_the_template(
-    mocker,
     mock_get_service_letter_template,
     client_request,
     service_one,
@@ -1986,6 +1996,7 @@ def test_should_let_letter_contact_block_be_changed_for_the_template(
     contact_block_data,
     expected_partial_url,
     mock_get_page_counts_for_letter,
+    mocker,
 ):
     mocker.patch("app.service_api_client.get_letter_contacts", return_value=contact_block_data)
 
@@ -2029,9 +2040,7 @@ def test_should_show_message_with_prefix_hint_if_enabled_for_service(
 def test_should_show_preview_letter_templates(
     view, extra_view_args, filetype, client_request, mock_get_service_email_template, service_one, fake_uuid, mocker
 ):
-    mocked_preview = mocker.patch(
-        "app.main.views.templates.TemplatePreview.get_preview_for_templated_letter", return_value="foo"
-    )
+    mocked_preview = mocker.patch("app.template_preview_client.get_preview_for_templated_letter", return_value="foo")
 
     service_id, template_id = service_one["id"], fake_uuid
 
@@ -2044,6 +2053,7 @@ def test_should_show_preview_letter_templates(
     assert mocked_preview.call_args_list[0].kwargs["db_template"]["id"] == template_id
     assert mocked_preview.call_args_list[0].kwargs["db_template"]["service"] == service_id
     assert mocked_preview.call_args_list[0].kwargs["filetype"] == filetype
+    assert mocked_preview.call_args_list[0].kwargs["service"].id == service_id
 
     if "page" in extra_view_args:
         assert mocked_preview.call_args[1]["page"] == extra_view_args["page"]
@@ -2052,9 +2062,7 @@ def test_should_show_preview_letter_templates(
 
 
 def test_should_show_preview_letter_attachment(client_request, service_one, fake_uuid, mocker):
-    mocked_preview = mocker.patch(
-        "app.main.views.templates.TemplatePreview.get_png_for_letter_attachment_page", return_value="foo"
-    )
+    mocked_preview = mocker.patch("app.template_preview_client.get_png_for_letter_attachment_page", return_value="foo")
 
     service_id, attachment_id = service_one["id"], fake_uuid
 
@@ -2066,6 +2074,7 @@ def test_should_show_preview_letter_attachment(client_request, service_one, fake
 
     assert response.get_data(as_text=True) == "foo"
     assert mocked_preview.call_args[0][0] == attachment_id
+    assert mocked_preview.call_args[1]["service"].id == service_id
 
 
 def test_dont_show_preview_letter_templates_for_bad_filetype(
@@ -2082,16 +2091,16 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 
 
 def test_letter_branding_preview_image(
-    mocker,
     client_request,
     mock_onwards_request_headers,
+    mocker,
 ):
     class MockedResponse:
         content = "foo"
         status_code = 200
         headers = {}
 
-    mocked_preview = mocker.patch("app.template_previews.requests.post", return_value=MockedResponse())
+    mocked_preview = mocker.patch("app.template_preview_client.requests_session.post", return_value=MockedResponse())
     response = client_request.get_response(
         "no_cookie.letter_branding_preview_image",
         filename="example",
@@ -2121,28 +2130,28 @@ def test_letter_branding_preview_image(
 @pytest.mark.parametrize("filename", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
 @pytest.mark.parametrize("branding_style", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
 def test_letter_template_preview_handles_no_branding_style_or_filename_correctly(
-    mocker,
     client_request,
     branding_style,
     filename,
+    mocker,
 ):
-    mocked_preview = mocker.patch("app.template_previews.TemplatePreview.get_preview_for_templated_letter")
+    mocked_preview = mocker.patch("app.template_preview_client.get_preview_for_templated_letter")
     client_request.get_response(
         "no_cookie.letter_branding_preview_image",
         branding_style=branding_style,
         filename=filename,
     )
-    mocked_preview.assert_called_once_with(ANY, branding_filename=None, filetype="png")
+    mocked_preview.assert_called_once_with(ANY, branding_filename=None, filetype="png", service=ANY)
 
 
 @pytest.mark.parametrize("filename", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
 def test_letter_template_preview_links_to_the_correct_image_when_passed_existing_branding(
-    mocker,
     client_request,
     mock_get_letter_branding_by_id,
     filename,
+    mocker,
 ):
-    mocked_preview = mocker.patch("app.template_previews.TemplatePreview.get_preview_for_templated_letter")
+    mocked_preview = mocker.patch("app.template_preview_client.get_preview_for_templated_letter")
     client_request.get_response(
         "no_cookie.letter_branding_preview_image",
         branding_style="12341234-1234-1234-1234-123412341234",
@@ -2150,22 +2159,22 @@ def test_letter_template_preview_links_to_the_correct_image_when_passed_existing
     )
 
     mock_get_letter_branding_by_id.assert_called_once_with("12341234-1234-1234-1234-123412341234")
-    mocked_preview.assert_called_once_with(ANY, branding_filename="hm-government", filetype="png")
+    mocked_preview.assert_called_once_with(ANY, branding_filename="hm-government", filetype="png", service=ANY)
 
 
 @pytest.mark.parametrize("branding_style", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
 def test_letter_template_preview_links_to_the_correct_image_when_passed_a_filename(
-    mocker,
     client_request,
     branding_style,
+    mocker,
 ):
-    mocked_preview = mocker.patch("app.template_previews.TemplatePreview.get_preview_for_templated_letter")
+    mocked_preview = mocker.patch("app.template_preview_client.get_preview_for_templated_letter")
     client_request.get_response(
         "no_cookie.letter_branding_preview_image",
         branding_style=branding_style,
         filename="foo.svg",
     )
-    mocked_preview.assert_called_once_with(ANY, branding_filename="foo.svg", filetype="png")
+    mocked_preview.assert_called_once_with(ANY, branding_filename="foo.svg", filetype="png", service=ANY)
 
 
 def test_letter_template_preview_returns_400_if_both_branding_style_and_filename_provided(
@@ -2405,11 +2414,11 @@ def test_choose_a_template_to_copy_when_user_has_one_service(
 
 
 def test_choose_a_template_to_copy_from_folder_within_service(
-    mocker,
     client_request,
     mock_get_template_folders,
     mock_get_non_empty_organisations_and_services_for_user,
     mock_get_no_api_keys,
+    mocker,
 ):
     mock_get_template_folders.return_value = [
         _folder("Parent folder", PARENT_FOLDER_ID),
@@ -2505,7 +2514,6 @@ def test_choose_a_template_to_copy_from_folder_within_service(
     ),
 )
 def test_copy_template_page_renders_preview(
-    mocker,
     client_request,
     active_user_with_permission_to_two_services,
     multiple_sms_senders,
@@ -2514,6 +2522,7 @@ def test_copy_template_page_renders_preview(
     mock_get_non_empty_organisations_and_services_for_user,
     existing_template_names,
     expected_name,
+    mocker,
 ):
     mock_get_service_templates.side_effect = lambda service_id: {
         "data": [
@@ -2583,11 +2592,11 @@ def test_copy_template_loads_template_from_within_subfolder(
 
 
 def test_copy_letter_template_across_service_boundary(
-    mocker,
     client_request,
     active_user_with_permission_to_two_services,
     mock_get_service_templates,
     multiple_sms_senders,
+    mocker,
 ):
     template = template_json(service_id=SERVICE_TWO_ID, id_=TEMPLATE_ONE_ID, name="foo", folder=None, type_="letter")
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": template})
@@ -2595,7 +2604,7 @@ def test_copy_letter_template_across_service_boundary(
     request_mock_returns = Mock(
         content=b'{"count": 4, "welsh_page_count": 1, "attachment_page_count": 2}', status_code=200
     )
-    mocker.patch("app.template_previews.requests.post", return_value=request_mock_returns)
+    mocker.patch("app.template_preview_client.requests_session.post", return_value=request_mock_returns)
 
     page = client_request.get(
         "main.copy_template",
@@ -2624,7 +2633,6 @@ def test_cant_copy_template_from_non_member_service(
 
 
 def test_post_copy_template(
-    mocker,
     client_request,
     active_user_with_permissions,
     mock_get_service,
@@ -2633,6 +2641,7 @@ def test_post_copy_template(
     mock_get_service_templates,
     mock_get_organisations_and_services_for_user,
     mock_create_service_template,
+    mocker,
 ):
     active_user_with_permissions["services"].append(SERVICE_TWO_ID)
     active_user_with_permissions["permissions"][SERVICE_TWO_ID] = active_user_with_permissions["permissions"][
@@ -2666,7 +2675,6 @@ def test_post_copy_template(
 
 
 def test_post_copy_template_into_folder(
-    mocker,
     client_request,
     active_user_with_permissions,
     mock_get_service,
@@ -2675,6 +2683,7 @@ def test_post_copy_template_into_folder(
     mock_get_service_templates,
     mock_get_organisations_and_services_for_user,
     mock_create_service_template,
+    mocker,
 ):
     active_user_with_permissions["services"].append(SERVICE_TWO_ID)
     active_user_with_permissions["permissions"][SERVICE_TWO_ID] = active_user_with_permissions["permissions"][
@@ -2709,7 +2718,6 @@ def test_post_copy_template_into_folder(
 
 
 def test_post_copy_letter_template(
-    mocker,
     client_request,
     mock_get_service_letter_template,
     mock_get_service_templates,
@@ -2717,6 +2725,7 @@ def test_post_copy_letter_template(
     mock_get_organisations_and_services_for_user,
     mock_create_service_template,
     service_one,
+    mocker,
 ):
     service_one["permissions"].append("letter")
 
@@ -2749,7 +2758,6 @@ def test_post_copy_letter_template(
 
 @pytest.mark.parametrize("from_service", (SERVICE_ONE_ID, SERVICE_TWO_ID))
 def test_copy_letter_template_with_letter_attachment(
-    mocker,
     client_request,
     active_user_with_permission_to_two_services,
     mock_get_service_templates,
@@ -2757,6 +2765,7 @@ def test_copy_letter_template_with_letter_attachment(
     mock_create_service_template,
     multiple_sms_senders,
     from_service,
+    mocker,
 ):
     client_request.login(active_user_with_permission_to_two_services)
     mocker.patch(
@@ -3034,10 +3043,10 @@ def test_name_required_to_rename_template(
 
 @pytest.mark.parametrize("template_type", ("email", "sms"))
 def test_only_letters_can_be_renamed_through_rename_page(
-    mocker,
     client_request,
     fake_uuid,
     template_type,
+    mocker,
 ):
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -3614,12 +3623,12 @@ def test_update_template_for_welsh_language_content(
 
 
 def test_update_template_for_english_content_in_welsh_letter(
-    mocker,
     client_request,
     mock_update_service_template,
     mock_get_service_letter_template_welsh_language,
     fake_uuid,
     service_one,
+    mocker,
 ):
     do_mock_get_page_counts_for_letter(mocker, count=1, welsh_page_count=1)
     service_one["permissions"].append("letter")
@@ -3767,11 +3776,11 @@ def test_should_show_delete_template_page_with_escaped_template_name(client_requ
 
 @pytest.mark.parametrize("parent", (PARENT_FOLDER_ID, None))
 def test_should_redirect_when_deleting_a_template(
-    mocker,
     client_request,
     mock_delete_service_template,
     mock_get_template_folders,
     parent,
+    mocker,
 ):
     mock_get_template_folders.return_value = [
         {"id": PARENT_FOLDER_ID, "name": "Folder", "parent": None, "users_with_permission": [ANY]}
@@ -3832,7 +3841,6 @@ def test_should_show_page_for_a_deleted_template(
 )
 def test_route_permissions(
     route,
-    mocker,
     notify_admin,
     client_request,
     api_user_active,
@@ -3840,6 +3848,7 @@ def test_route_permissions(
     mock_get_service_template,
     mock_get_template_folders,
     fake_uuid,
+    mocker,
 ):
     mocker.patch("app.template_statistics_client.get_last_used_date_for_template", return_value="2012-01-01 12:00:00")
     validate_route_permission(
@@ -3855,7 +3864,6 @@ def test_route_permissions(
 
 
 def test_route_permissions_for_choose_template(
-    mocker,
     notify_admin,
     client_request,
     api_user_active,
@@ -3863,6 +3871,7 @@ def test_route_permissions_for_choose_template(
     service_one,
     mock_get_service_templates,
     mock_get_no_api_keys,
+    mocker,
 ):
     mocker.patch("app.job_api_client.get_job")
     validate_route_permission(
@@ -3885,13 +3894,13 @@ def test_route_permissions_for_choose_template(
 )
 def test_route_invalid_permissions(
     route,
-    mocker,
     notify_admin,
     client_request,
     api_user_active,
     service_one,
     mock_get_service_template,
     fake_uuid,
+    mocker,
 ):
     validate_route_permission(
         mocker,
@@ -3969,11 +3978,11 @@ def test_should_not_create_sms_template_with_emoji(
 
 
 def test_should_not_update_sms_template_with_emoji(
-    mocker,
     client_request,
     service_one,
     mock_update_service_template,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -4358,12 +4367,12 @@ def test_content_count_json_endpoint_for_unsupported_template_types(
     ),
 )
 def test_letter_attachment_preview_image_shows_overlay_when_content_outside_printable_area(
-    mocker,
     client_request,
     fake_uuid,
     invalid_pages,
     page_requested,
     overlay_expected,
+    mocker,
 ):
     mocker.patch(
         "app.main.views.templates.get_attachment_pdf_and_metadata",
@@ -4376,11 +4385,11 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
         ),
     )
     template_preview_mock_valid = mocker.patch(
-        "app.main.views.templates.TemplatePreview.get_png_for_valid_pdf_page",
+        "app.template_preview_client.get_png_for_valid_pdf_page",
         return_value=make_response("page.html", 200),
     )
     template_preview_mock_invalid = mocker.patch(
-        "app.main.views.templates.TemplatePreview.get_png_for_invalid_pdf_page",
+        "app.template_preview_client.get_png_for_invalid_pdf_page",
         return_value=make_response("page.html", 200),
     )
 

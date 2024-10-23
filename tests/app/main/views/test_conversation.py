@@ -19,7 +19,7 @@ INV_PARENT_FOLDER_ID = "7e979e79-d970-43a5-ac69-b625a8d147b0"
 VIS_PARENT_FOLDER_ID = "bbbb222b-2b22-2b22-222b-b222b22b2222"
 
 
-def test_get_user_phone_number_when_only_inbound_exists(mocker):
+def test_get_user_phone_number_when_only_inbound_exists(notify_admin, mocker):
     mock_get_inbound_sms = mocker.patch(
         "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
         return_value={"user_number": "4407900900123", "notify_number": "07900000002"},
@@ -33,7 +33,7 @@ def test_get_user_phone_number_when_only_inbound_exists(mocker):
     assert mock_get_notification.called is False
 
 
-def test_get_user_phone_number_when_only_outbound_exists(mocker):
+def test_get_user_phone_number_when_only_outbound_exists(notify_admin, mocker):
     mock_get_inbound_sms = mocker.patch(
         "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
         side_effect=HTTPError(response=Mock(status_code=404)),
@@ -46,7 +46,7 @@ def test_get_user_phone_number_when_only_outbound_exists(mocker):
     mock_get_notification.assert_called_once_with("service", "notification")
 
 
-def test_get_user_phone_number_raises_if_both_api_requests_fail(mocker):
+def test_get_user_phone_number_raises_if_both_api_requests_fail(notify_admin, mocker):
     mock_get_inbound_sms = mocker.patch(
         "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
         side_effect=HTTPError(response=Mock(status_code=404)),
@@ -369,7 +369,7 @@ def test_conversation_reply_redirects_with_phone_number_from_notification(
         assert normalize_spaces(page.select_one(element).text) == expected_text
 
 
-def test_get_user_phone_number_when_not_a_standard_phone_number(mocker):
+def test_get_user_phone_number_when_not_a_standard_phone_number(notify_admin, mocker):
     mocker.patch(
         "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
         return_value={"user_number": "ALPHANUM3R1C", "notify_number": "07900000002"},

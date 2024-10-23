@@ -30,6 +30,7 @@ from xlrd.xldate import XLDateError
 from app import (
     current_service,
     notification_api_client,
+    template_preview_client,
     upload_api_client,
 )
 from app.main import main
@@ -43,7 +44,6 @@ from app.s3_client.s3_letter_upload_client import (
     get_transient_letter_file_location,
     upload_letter_to_s3,
 )
-from app.template_previews import TemplatePreview
 from app.utils import unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.letters import (
@@ -160,7 +160,7 @@ def upload_letter(service_id):
             file_location = get_transient_letter_file_location(service_id, upload_id)
 
             try:
-                response = TemplatePreview.sanitise_letter(
+                response = template_preview_client.sanitise_letter(
                     BytesIO(pdf_file_bytes),
                     upload_id=upload_id,
                     allow_international_letters=current_service.has_permission("international_letters"),
@@ -284,9 +284,9 @@ def view_letter_upload_as_preview(service_id, file_id):
     invalid_pages = json.loads(metadata.get("invalid_pages", "[]"))
 
     if metadata.get("message") == "content-outside-printable-area" and page in invalid_pages:
-        return TemplatePreview.get_png_for_invalid_pdf_page(pdf_file, page)
+        return template_preview_client.get_png_for_invalid_pdf_page(pdf_file, page)
     else:
-        return TemplatePreview.get_png_for_valid_pdf_page(pdf_file, page)
+        return template_preview_client.get_png_for_valid_pdf_page(pdf_file, page)
 
 
 @main.route("/services/<uuid:service_id>/upload-letter/send/<uuid:file_id>", methods=["POST"])

@@ -47,7 +47,7 @@ def test_overview_page_change_links_for_regular_user(client_request):
 
 
 def test_overview_page_shows_disable_for_platform_admin(client_request, platform_admin_user, mocker):
-    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials.client_method")
+    mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items")
     client_request.login(platform_admin_user)
     page = client_request.get("main.user_profile")
     assert page.select_one("h1").text.strip() == "Your profile"
@@ -67,17 +67,17 @@ def test_overview_page_shows_disable_for_platform_admin(client_request, platform
     ],
 )
 def test_overview_page_shows_security_keys_if_user_they_can_use_webauthn(
-    mocker,
     client_request,
     platform_admin_user,
     webauthn_credential,
     key_count,
     expected_row_text,
+    mocker,
 ):
     client_request.login(platform_admin_user)
     credentials = [webauthn_credential for _ in range(key_count)]
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=credentials,
     )
     page = client_request.get("main.user_profile")
@@ -495,16 +495,16 @@ def test_user_doesnt_see_security_keys_unless_they_can_use_webauthn(client_reque
 
 @freeze_time("2022-10-10")
 def test_should_show_security_keys_page(
-    mocker,
     client_request,
     platform_admin_user,
     webauthn_credential,
     webauthn_credential_2,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=[webauthn_credential, webauthn_credential_2],
     )
 
@@ -527,28 +527,28 @@ def test_should_show_security_keys_page(
 
 
 def test_get_key_from_list_of_keys(
-    mocker,
     webauthn_credential,
     webauthn_credential_2,
     fake_uuid,
+    mocker,
 ):
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=[webauthn_credential, webauthn_credential_2],
     )
     assert WebAuthnCredentials(fake_uuid).by_id(webauthn_credential["id"]) == WebAuthnCredential(webauthn_credential)
 
 
 def test_should_show_manage_security_key_page(
-    mocker,
     client_request,
     platform_admin_user,
     webauthn_credential,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=[webauthn_credential],
     )
 
@@ -562,12 +562,16 @@ def test_should_show_manage_security_key_page(
 
 
 def test_manage_security_key_page_404s_when_key_not_found(
-    mocker, client_request, platform_admin_user, webauthn_credential, webauthn_credential_2
+    client_request,
+    platform_admin_user,
+    webauthn_credential,
+    webauthn_credential_2,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=[webauthn_credential_2],
     )
     client_request.get(
@@ -614,7 +618,7 @@ def test_should_redirect_after_change_of_security_key_name(
     client_request.login(platform_admin_user)
 
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=[webauthn_credential],
     )
 
@@ -641,7 +645,7 @@ def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_
     client_request.login(platform_admin_user)
 
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=[webauthn_credential],
     )
 
@@ -661,15 +665,15 @@ def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_
 
 
 def test_shows_delete_link_for_security_key(
-    mocker,
     client_request,
     platform_admin_user,
     webauthn_credential,
+    mocker,
 ):
     client_request.login(platform_admin_user)
 
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=[webauthn_credential],
     )
 
@@ -685,7 +689,7 @@ def test_confirm_delete_security_key(client_request, platform_admin_user, webaut
     client_request.login(platform_admin_user)
 
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=[webauthn_credential],
     )
 
@@ -724,7 +728,7 @@ def test_delete_security_key_handles_last_credential_error(
 ):
     client_request.login(platform_admin_user)
     mocker.patch(
-        "app.models.webauthn_credential.WebAuthnCredentials.client_method",
+        "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=[webauthn_credential],
     )
 

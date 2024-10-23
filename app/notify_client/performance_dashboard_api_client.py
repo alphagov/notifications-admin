@@ -1,3 +1,10 @@
+from contextvars import ContextVar
+
+from flask import current_app
+from notifications_utils.local_vars import LazyLocalGetter
+from werkzeug.local import LocalProxy
+
+from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient, cache
 
 
@@ -18,4 +25,12 @@ class PerformanceDashboardAPIClient(NotifyAdminAPIClient):
         )
 
 
-performance_dashboard_api_client = PerformanceDashboardAPIClient()
+_performance_dashboard_api_client_context_var: ContextVar[PerformanceDashboardAPIClient] = ContextVar(
+    "performance_dashboard_api_client"
+)
+get_performance_dashboard_api_client: LazyLocalGetter[PerformanceDashboardAPIClient] = LazyLocalGetter(
+    _performance_dashboard_api_client_context_var,
+    lambda: PerformanceDashboardAPIClient(current_app),
+)
+memo_resetters.append(lambda: get_performance_dashboard_api_client.clear())
+performance_dashboard_api_client = LocalProxy(get_performance_dashboard_api_client)

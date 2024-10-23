@@ -16,8 +16,8 @@ from tests.conftest import (
 
 
 def test_choose_service_to_join(
-    mocker,
     client_request,
+    mocker,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation_by_domain",
@@ -62,11 +62,11 @@ def test_cannot_join_service_without_organisation(client_request):
     ),
 )
 def test_cannot_join_service_without_organisation_permission(
-    mocker,
     client_request,
     service_one,
     fake_uuid,
     can_ask_to_join_a_service,
+    mocker,
 ):
     service_one["organisation"] = fake_uuid
     mocker.patch(
@@ -89,10 +89,10 @@ def test_cannot_join_service_without_organisation_permission(
 
 
 def test_cannot_join_service_for_different_organisation(
-    mocker,
     client_request,
     service_one,
     fake_uuid,
+    mocker,
 ):
     service_one["organisation"] = fake_uuid
     mocker.patch(
@@ -112,10 +112,10 @@ def test_cannot_join_service_for_different_organisation(
 
 @freeze_time("2023-02-03 01:00")
 def test_page_lists_team_members_of_service(
-    mocker,
     client_request,
     service_one,
     mock_get_organisation_by_domain,
+    mocker,
 ):
     service_one["organisation"] = ORGANISATION_ID
     mocker.patch(
@@ -131,7 +131,7 @@ def test_page_lists_team_members_of_service(
     manage_service_user_2["logged_in_at"] = "2023-02-03 01:00"
 
     mock_get_users = mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[
             # These three users should not appear on the page
             create_active_user_empty_permissions(),
@@ -184,11 +184,11 @@ def test_page_lists_team_members_of_service(
 
 
 def test_page_redirects_on_post(
-    mocker,
     client_request,
     mock_request_invite_for,
     service_one,
     mock_get_organisation_by_domain,
+    mocker,
 ):
     service_one["organisation"] = ORGANISATION_ID
     mocker.patch(
@@ -202,7 +202,7 @@ def test_page_redirects_on_post(
     manage_service_user_2["logged_in_at"] = "2023-02-03 01:00"
 
     mocker.patch(
-        "app.models.user.Users.client_method",
+        "app.models.user.Users._get_items",
         return_value=[
             manage_service_user_1,
             manage_service_user_2,

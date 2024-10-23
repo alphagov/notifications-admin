@@ -5,7 +5,7 @@ from tests.conftest import set_config_values
 
 
 class TestOrderableFieldsForm:
-    def test_can_reorder_fields(self):
+    def test_can_reorder_fields(self, notify_admin):
         class TestForm(OrderableFieldsForm):
             field1 = StripWhitespaceStringField()
             field2 = StripWhitespaceStringField()
@@ -15,7 +15,7 @@ class TestOrderableFieldsForm:
         form = TestForm()
         assert [field.name for field in form] == ["field2", "field1"]
 
-    def test_all_fields_must_be_listed(self):
+    def test_all_fields_must_be_listed(self, notify_admin):
         class TestForm(OrderableFieldsForm):
             field1 = StripWhitespaceStringField()
             field2 = StripWhitespaceStringField()

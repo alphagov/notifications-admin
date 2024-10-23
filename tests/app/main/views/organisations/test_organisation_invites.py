@@ -154,7 +154,12 @@ def test_accepted_invite_when_other_user_already_logged_in(client_request, mock_
 
 
 def test_cancelled_invite_opened_by_user(
-    mocker, client_request, api_user_active, mock_check_org_cancelled_invite_token, mock_get_organisation, fake_uuid
+    client_request,
+    api_user_active,
+    mock_check_org_cancelled_invite_token,
+    mock_get_organisation,
+    fake_uuid,
+    mocker,
 ):
     client_request.logout()
     mock_get_user = mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
@@ -478,7 +483,7 @@ class TestEditOrganisationUser:
         _get_user_fn,
         mocker,
     ):
-        mocker.patch("app.models.user.OrganisationUsers.client_method", return_value=[_other_user])
+        mocker.patch("app.models.user.OrganisationUsers._get_items", return_value=[_other_user])
         client_request.login(platform_admin_user)
 
         # Override the `get_user` mock from `login` because we need to be able to get multiple users
@@ -505,7 +510,7 @@ class TestEditOrganisationUser:
         mocker,
     ):
         self._mock_get_organistion_can_approve_go_live(mocker)
-        mocker.patch("app.models.user.OrganisationUsers.client_method", return_value=[_other_user])
+        mocker.patch("app.models.user.OrganisationUsers._get_items", return_value=[_other_user])
         mock_set_org_permissions = mocker.patch(
             "app.notify_client.user_api_client.UserApiClient.set_organisation_permissions"
         )
@@ -553,7 +558,7 @@ class TestEditOrganisationUser:
         _get_user_fn,
         mocker,
     ):
-        mocker.patch("app.models.user.OrganisationUsers.client_method", return_value=[_other_user])
+        mocker.patch("app.models.user.OrganisationUsers._get_items", return_value=[_other_user])
         mocker.patch("app.notify_client.user_api_client.UserApiClient.set_organisation_permissions")
         mocker.patch("app.models.user.create_set_organisation_user_permissions_event")
         client_request.login(platform_admin_user)
