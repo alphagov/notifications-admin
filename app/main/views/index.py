@@ -368,7 +368,7 @@ def historical_redirects(new_endpoint, **kwargs):
 REDIRECTS = {
     "/accounts": "main.your_services",
     "/callbacks": "main.guidance_api_documentation",
-    "/choose-service-to-join": "main.choose_service_to_join",
+    "/choose-service-to-join": "main.join_a_service_choose_service",
     "/delivery-and-failure": "main.guidance_message_status",
     "/documentation": "main.guidance_api_documentation",
     "/features/email": "main.guidance_features",

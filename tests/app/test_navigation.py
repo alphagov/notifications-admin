@@ -55,7 +55,7 @@ EXCLUDED_ENDPOINTS = set(
             "your_services",
             "choose_from_contact_list",
             "choose_service",
-            "choose_service_to_join",
+            "join_a_service_choose_service",
             "choose_template_to_copy",
             "choose_template",
             "clear_cache",

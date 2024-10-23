@@ -15,7 +15,7 @@ from tests.conftest import (
 )
 
 
-def test_choose_service_to_join(
+def test_join_a_service_choose_service(
     client_request,
     mocker,
 ):
@@ -32,7 +32,7 @@ def test_choose_service_to_join(
         ],
     )
     page = client_request.get(
-        "main.choose_service_to_join",
+        "main.join_a_service_choose_service",
         service_to_join_id=SERVICE_ONE_ID,
     )
     assert normalize_spaces(page.select_one("main p").text) == "Test Organisation has 2 live services"
@@ -78,7 +78,7 @@ def test_cannot_join_service_without_organisation_permission(
         return_value=organisation_json(can_ask_to_join_a_service=can_ask_to_join_a_service),
     )
     client_request.get(
-        "main.choose_service_to_join",
+        "main.join_a_service_choose_service",
         _expected_status=403,
     )
     client_request.get(
