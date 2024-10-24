@@ -31,7 +31,7 @@ def _get_notifications_csv(
             "notifications": [
                 {
                     "id": sample_uuid(),
-                    "row_number": row_number + i,
+                    "row_number": (row_number + i) if row_number else "",
                     "to": recipient,
                     "recipient": recipient,
                     "client_reference": "ref 1234",
@@ -102,6 +102,7 @@ def test_generate_notifications_csv_without_job(
             job_id=None,
             job_name=None,
             api_key_name=api_key_name,
+            row_number="",
         ),
     )
     assert (
