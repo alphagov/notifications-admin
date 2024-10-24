@@ -23,7 +23,6 @@ class Notification(JSONModel):
     created_at: datetime
     created_by: Any
     updated_at: datetime
-    row_number: int
     job_row_number: int
     service: Any
     template_version: int
@@ -117,6 +116,7 @@ class Notifications(ModelList):
 
 
 class NotificationForCSV(Notification):
+    row_number: Any  # Can be an empty string so can’t cast to `int`
     created_at: str  # API returns this field pre-formatted in Europe/London timezone
     template_name: str
     template_type: str
