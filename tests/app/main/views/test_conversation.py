@@ -84,7 +84,7 @@ def test_view_conversation(
         personalisation={"name": "Jo"},
         redact_personalisation=outbound_redacted,
     )
-    mock = mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mock = mocker.patch("app.models.notification.Notifications._get_items", return_value=notifications)
 
     page = client_request.get(
         "main.conversation",
@@ -202,7 +202,7 @@ def test_view_conversation_with_empty_inbound(
     fake_uuid,
 ):
     mock_get_inbound_sms = mocker.patch(
-        "app.main.views.conversation.service_api_client.get_inbound_sms",
+        "app.models.notification.InboundSMSMessages._get_items",
         return_value={
             "has_next": False,
             "data": [

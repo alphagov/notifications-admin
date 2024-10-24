@@ -6,11 +6,11 @@ from notifications_utils.safe_string import make_string_safe
 from app import (
     api_key_api_client,
     current_service,
-    notification_api_client,
     service_api_client,
 )
 from app.main import main
 from app.main.forms import CallbackForm, CreateKeyForm, GuestList
+from app.models.notification import APINotifications
 from app.notify_client.api_key_api_client import (
     KEY_TYPE_NORMAL,
     KEY_TYPE_TEAM,
@@ -28,7 +28,7 @@ def api_integration(service_id):
     return render_template(
         "views/api/index.html",
         callbacks_link=callbacks_link,
-        api_notifications=notification_api_client.get_api_notifications_for_service(service_id),
+        api_notifications=APINotifications(service_id),
     )
 
 

@@ -207,7 +207,7 @@ def test_letter_notifications_should_have_link_to_view_letter(
     link_text,
 ):
     notifications = create_notifications(template_type=template_type)
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch("app.models.notification.Notifications._get_items", return_value=notifications)
     page = client_request.get(
         "main.api_integration",
         service_id=SERVICE_ONE_ID,
@@ -226,7 +226,7 @@ def test_should_not_have_link_to_view_letter_for_precompiled_letters_in_virus_st
     status,
 ):
     notifications = create_notifications(status=status)
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch("app.models.notification.Notifications._get_items", return_value=notifications)
 
     page = client_request.get(
         "main.api_integration",
@@ -253,7 +253,7 @@ def test_letter_notifications_should_show_client_reference(
     shows_ref,
 ):
     notifications = create_notifications(client_reference=client_reference)
-    mocker.patch("app.notification_api_client.get_notifications_for_service", return_value=notifications)
+    mocker.patch("app.models.notification.Notifications._get_items", return_value=notifications)
 
     page = client_request.get(
         "main.api_integration",

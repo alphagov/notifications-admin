@@ -11,6 +11,7 @@ from notifications_utils.letter_timings import (
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList, PaginatedModelList
+from app.models.notification import Notifications
 from app.notify_client.job_api_client import JobApiClient, job_api_client
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
@@ -156,18 +157,18 @@ class Job(JSONModel):
 
     @cached_property
     def all_notifications(self):
-        return self.get_notifications(set_status_filters({}))["notifications"]
+        return self.get_notifications(set_status_filters({}))
 
     @property
     def uncancellable_notifications(self):
-        return (n for n in self.all_notifications if n["status"] not in CANCELLABLE_JOB_LETTER_STATUSES)
+        return (n for n in self.all_notifications if n.status not in CANCELLABLE_JOB_LETTER_STATUSES)
 
     @cached_property
     def postage(self):
         # There might be no notifications if the job has only just been
         # created and the tasks haven't run yet
         try:
-            return self.all_notifications[0]["postage"]
+            return self.all_notifications[0].postage
         except IndexError:
             return self.template["postage"]
 
@@ -186,7 +187,7 @@ class Job(JSONModel):
         return self.failure_rate > 30
 
     def get_notifications(self, status):
-        return notification_api_client.get_notifications_for_service(
+        return Notifications(
             self.service,
             self.id,
             status=status,

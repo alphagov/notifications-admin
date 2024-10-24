@@ -3,6 +3,7 @@ from collections import namedtuple
 
 import pytest
 
+from app.models.notification import APINotifications
 from app.notify_client.notification_api_client import NotificationApiClient
 from tests import notification_json, single_notification_json
 
@@ -178,16 +179,16 @@ def test_get_api_notifications_changes_letter_statuses(mocker, letter_status, ex
     notis = notification_json(service_id=service_id, rows=0)
     notis["notifications"] = [sms_notification, email_notification, letter_notification]
 
-    mocker.patch("app.notify_client.notification_api_client.NotificationApiClient.get", return_value=notis)
+    mocker.patch("app.models.notification.Notifications._get_items", return_value=notis)
 
-    ret = NotificationApiClient(mocker.MagicMock()).get_api_notifications_for_service(service_id)
+    ret = APINotifications(service_id)
 
-    assert ret["notifications"][0]["notification_type"] == "sms"
-    assert ret["notifications"][1]["notification_type"] == "email"
-    assert ret["notifications"][2]["notification_type"] == "letter"
-    assert ret["notifications"][0]["status"] == "created"
-    assert ret["notifications"][1]["status"] == "created"
-    assert ret["notifications"][2]["status"] == expected_status
+    assert ret[0].notification_type == "sms"
+    assert ret[1].notification_type == "email"
+    assert ret[2].notification_type == "letter"
+    assert ret[0].status == "created"
+    assert ret[1].status == "created"
+    assert ret[2].status == expected_status
 
 
 def test_update_notification_to_cancelled(mocker):

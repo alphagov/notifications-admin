@@ -16,7 +16,7 @@ def _get_notifications_csv(
     template_type="sms",
     job_name="bar.csv",
     status="Delivered",
-    created_at="1943-04-19 12:00:00",
+    created_at="2023-04-19 12:00:00",
     rows=1,
     job_id=fake_uuid,
     created_by_name=None,
@@ -63,9 +63,7 @@ def _get_notifications_csv_mock(
     mocker,
     api_user_active,
 ):
-    return mocker.patch(
-        "app.notification_api_client.get_notifications_for_service_for_csv", side_effect=_get_notifications_csv()
-    )
+    return mocker.patch("app.models.notification.NotificationsForCSV._get_items", side_effect=_get_notifications_csv())
 
 
 @pytest.mark.parametrize(
@@ -76,7 +74,7 @@ def _get_notifications_csv_mock(
             "my-key-name",
             [
                 "Recipient,Reference,Template,Type,Sent by,Sent by email,Job,Status,Time,API key name\n",
-                "foo@bar.com,ref 1234,foo,sms,,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00,my-key-name\r\n",
+                "foo@bar.com,ref 1234,foo,sms,,sender@email.gov.uk,,Delivered,2023-04-19 12:00:00,my-key-name\r\n",
             ],
         ),
         (
@@ -84,7 +82,7 @@ def _get_notifications_csv_mock(
             None,
             [
                 "Recipient,Reference,Template,Type,Sent by,Sent by email,Job,Status,Time,API key name\n",
-                "foo@bar.com,ref 1234,foo,sms,Anne Example,sender@email.gov.uk,,Delivered,1943-04-19 12:00:00,\r\n",
+                "foo@bar.com,ref 1234,foo,sms,Anne Example,sender@email.gov.uk,,Delivered,2023-04-19 12:00:00,\r\n",
             ],
         ),
     ],
@@ -97,7 +95,7 @@ def test_generate_notifications_csv_without_job(
     expected_content,
 ):
     mocker.patch(
-        "app.notification_api_client.get_notifications_for_service_for_csv",
+        "app.models.notification.NotificationsForCSV._get_items",
         side_effect=_get_notifications_csv(
             created_by_name=created_by_name,
             created_by_email_address="sender@email.gov.uk",
@@ -126,7 +124,7 @@ def test_generate_notifications_csv_without_job(
             07700900123
         """,
             ["Row number", "phone_number", "Template", "Type", "Job", "Status", "Time"],
-            ["1", "07700900123", "foo", "sms", "bar.csv", "Delivered", "1943-04-19 12:00:00"],
+            ["1", "07700900123", "foo", "sms", "bar.csv", "Delivered", "2023-04-19 12:00:00"],
         ),
         (
             """
@@ -134,7 +132,7 @@ def test_generate_notifications_csv_without_job(
             07700900123,  🐜,🐝,🦀
         """,
             ["Row number", "phone_number", "a", "b", "c", "Template", "Type", "Job", "Status", "Time"],
-            ["1", "07700900123", "🐜", "🐝", "🦀", "foo", "sms", "bar.csv", "Delivered", "1943-04-19 12:00:00"],
+            ["1", "07700900123", "🐜", "🐝", "🦀", "foo", "sms", "bar.csv", "Delivered", "2023-04-19 12:00:00"],
         ),
         (
             """
@@ -142,7 +140,7 @@ def test_generate_notifications_csv_without_job(
             "07700900123","🐜,🐜","🐝,🐝","🦀"
         """,
             ["Row number", "phone_number", "a", "b", "c", "Template", "Type", "Job", "Status", "Time"],
-            ["1", "07700900123", "🐜,🐜", "🐝,🐝", "🦀", "foo", "sms", "bar.csv", "Delivered", "1943-04-19 12:00:00"],
+            ["1", "07700900123", "🐜,🐜", "🐝,🐝", "🦀", "foo", "sms", "bar.csv", "Delivered", "2023-04-19 12:00:00"],
         ),
     ],
 )
@@ -203,7 +201,7 @@ def test_generate_notifications_csv_calls_twice_if_notifications_batch_equals_pa
     response_2 = _get_notifications_csv(rows=3, row_number=8)
 
     mock_get_notifications = mocker.patch(
-        "app.notification_api_client.get_notifications_for_service_for_csv",
+        "app.models.notification.NotificationsForCSV._get_items",
         side_effect=[
             response_1(service_id),
             response_2(service_id),
