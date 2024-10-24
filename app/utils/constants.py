@@ -2,3 +2,9 @@ SIGN_IN_METHOD_TEXT = "text"
 SIGN_IN_METHOD_TEXT_OR_EMAIL = "text-or-email"
 
 JSON_UPDATES_BLUEPRINT_NAME = "json_updates"
+
+# Service Join Request statuses
+SERVICE_JOIN_REQUEST_PENDING = "pending"
+SERVICE_JOIN_REQUEST_APPROVED = "approved"
+SERVICE_JOIN_REQUEST_REJECTED = "rejected"
+SERVICE_JOIN_REQUEST_CANCELLED = "cancelled"

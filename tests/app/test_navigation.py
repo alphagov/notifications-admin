@@ -171,6 +171,7 @@ EXCLUDED_ENDPOINTS = set(
             "invite_org_user",
             "invite_user",
             "service_join_request_approve",
+            "service_join_request_set_permissions",
             "json_updates.conversation_updates",
             "json_updates.get_notifications_page_partials_as_json",
             "json_updates.inbox_updates",

@@ -543,8 +543,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
         return None
 
+    @cache.set("service_join_request-{request_id}")
     def get_service_join_requests(self, request_id):
         return self.get(f"/service/service-join-request/{request_id}")
+
+    @cache.delete("service_join_request-{request_id}")
+    def update_service_join_requests(self, request_id, **kwargs):
+        data = dict(**kwargs)
+        return self.post(f"/service/update-service-join-request-status/{request_id}", data)
 
 
 _service_api_client_context_var: ContextVar[ServiceAPIClient] = ContextVar("service_api_client")
