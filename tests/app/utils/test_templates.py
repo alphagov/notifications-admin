@@ -910,8 +910,8 @@ def test_email_preview_shows_from_name(extra_args):
     template = EmailPreviewTemplate(
         {"content": "content", "subject": "subject", "template_type": "email"}, **extra_args
     )
-    assert '<th scope="row">From</th>' in str(template)
-    assert "Example service" in str(template)
+    assert '<dt class="govuk-summary-list__key">\n      From\n    </dt>' in str(template)
+    assert '<dd class="govuk-summary-list__value">\n      Example service\n    </dd>' in str(template)
 
 
 def test_email_preview_escapes_html_in_from_name():
@@ -933,8 +933,12 @@ def test_email_preview_shows_reply_to_address(extra_args):
     template = EmailPreviewTemplate(
         {"content": "content", "subject": "subject", "template_type": "email"}, **extra_args
     )
-    assert '<th scope="row">Reply&nbsp;to</th>' in str(template)
-    assert "test@example.com" in str(template)
+    assert '<dt class="govuk-summary-list__key">\n      Reply&nbsp;to\n    </dt>' in str(template)
+    assert (
+        '    <dd class="govuk-summary-list__value email-message-meta__reply-to">\n'
+        "      test@example.com\n"
+        "    </dd>"
+    ) in str(template)
 
 
 @pytest.mark.parametrize(

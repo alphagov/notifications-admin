@@ -410,8 +410,8 @@ def test_should_show_page_for_email_template(
     )
 
     assert [
-        (normalize_spaces(row.select_one("th").text), normalize_spaces(row.select_one("td").text))
-        for row in page.select("table.email-message-meta tr")
+        (normalize_spaces(row.select_one("dt").text), normalize_spaces(row.select_one("dd").text))
+        for row in page.select(".email-message-meta .govuk-summary-list__row")
     ] == [
         ("From", expected_email_from),
         ("To", "email address"),
