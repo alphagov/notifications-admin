@@ -58,18 +58,22 @@ a {
 .template-list {
 
   &-item {
+    display: block;
     margin-bottom: 0;
 
     &-with-checkbox {
+      padding-left: $govuk-touch-target-size + $govuk-checkboxes-label-padding-left-right;
+      min-height: $govuk-touch-target-size;
 
       .template-list-item-hint {
+        width: 100%;
         margin-top: 0;
-        padding-left: ($govuk-checkboxes-label-padding-left-right + $govuk-touch-target-size);
       }
 
       input {
-        margin-right: $govuk-checkboxes-label-padding-left-right;
-        height: 1px;
+        position: absolute;
+        top: 0;
+        left: 0;
       }
     }
 
@@ -84,7 +88,7 @@ a {
         display: block;
         // block focus state for items that have no ancestors
         // our version of dart-sass (< 1.4.0 still parses calc() as a special function
-        // so we need to interpolate it 
+        // so we need to interpolate it
         // https://sass-lang.com/documentation/syntax/special-functions/#element-progid-and-expression
         width: calc(100% - #{$govuk-touch-target-size + $govuk-checkboxes-label-padding-left-right});
 
@@ -194,6 +198,11 @@ a {
 
     @include govuk-media-query($from: tablet) {
       padding-left: 40px;
+    }
+
+    &:focus {
+      -webkit-box-decoration-break: inherit;
+      box-decoration-break: inherit;
     }
 
     &__icon {
