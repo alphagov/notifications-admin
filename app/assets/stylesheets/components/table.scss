@@ -39,13 +39,6 @@
       display: table-cell;
       width: 52.5%;
       font-weight: normal;
-
-      .hint,
-      p {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
     }
   }
 
@@ -75,13 +68,6 @@
       display: table-cell;
       width: 52.5%;
       font-weight: normal;
-
-      .hint,
-      p {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
     }
   }
 
@@ -89,22 +75,6 @@
 
     @include govuk-font(24, $weight: bold);
     display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 10px 0 32px 0;
-    margin: -10px 0 -32px 0;
-
-    &:focus {
-
-      color: $govuk-text-colour;
-
-      & + .template-statistics-table-hint {
-        color: $govuk-text-colour;
-      }
-
-    }
-
   }
 
   &-hint {
@@ -435,9 +405,6 @@ a.table-show-more-link {
 .wide-left-hand-column {
   display: block;
   max-width: 560px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .truncate-text {
