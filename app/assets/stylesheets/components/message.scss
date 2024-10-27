@@ -255,7 +255,7 @@ a {
 
   .govuk-grid-row & {
     margin: govuk-spacing(3) 0 20px 0;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   a,
@@ -273,25 +273,6 @@ a {
     padding: 0 0 0 40px;
   }
 
-  &-folder-truncated {
-    width: 0;
-    padding: 0 0 0 30px;
-    white-space: nowrap;
-    overflow: hidden;
-    top: -2px; // adjust for effect of inline-block on content-height
-
-    @include govuk-media-query($from: tablet) {
-      top: auto;
-    }
-  }
-
-  &-folder-root-truncated {
-    max-width: 1.4em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
   a {
 
     display: inline-block;
@@ -300,13 +281,8 @@ a {
     &.folder-heading-folder {
 
       display: inline;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      overflow-wrap: break-word;
 
-    }
-
-    &.folder-heading-folder-truncated {
-      display: inline-block;
     }
 
     &:hover {
