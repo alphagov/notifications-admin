@@ -146,12 +146,6 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
   color: $govuk-secondary-text-colour;
 }
 
-.govuk-summary-list__value--truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .notify-hint--paragraph {
   color: $govuk-text-colour;
   padding-top: govuk-spacing(3);

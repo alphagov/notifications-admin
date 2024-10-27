@@ -28,8 +28,7 @@
               "text": "Service name"
             },
             "value": {
-              "text": current_service.name,
-              "classes": "govuk-summary-list__value--truncate"
+              "text": current_service.name
             },
             "actions": {
               "items": [
@@ -130,8 +129,7 @@
               "text": "Email sender name"
             },
             "value": {
-              "html": email_sender_html,
-              "classes": "govuk-summary-list__value--truncate"
+              "html": email_sender_html
             },
             "actions": {
               "items": [
@@ -150,7 +148,7 @@
               "text": "Reply-to email addresses"
             },
             "value": {
-              "classes": "govuk-summary-list__value--default" if current_service.default_email_reply_to_address is none else "govuk-summary-list__value--truncate",
+              "classes": "govuk-summary-list__value--default" if current_service.default_email_reply_to_address is none,
               "html": reply_to_email_addresses_html
             },
             "actions": {
@@ -190,7 +188,7 @@
             },
             "value": {
               "text": current_service.contact_link or 'Not set up',
-              "classes": "govuk-summary-list__value--default" if current_service.contact_link is none else "govuk-summary-list__value--truncate"
+              "classes": "govuk-summary-list__value--default" if current_service.contact_link is none
             },
             "actions": {
               "items": [
@@ -259,8 +257,7 @@
               "text": "Text message sender IDs"
             },
             "value": {
-              "text": text_message_sender_ids_html,
-              "classes": "govuk-summary-list__value--truncate"
+              "text": text_message_sender_ids_html
             },
             "actions": {
               "items": [
@@ -411,7 +408,7 @@
             },
             "value": {
               "html": sender_addresses_html,
-              "classes": "govuk-summary-list__value--default" if current_service.count_letter_contact_details == 0 else "govuk-summary-list__value--truncate"
+              "classes": "govuk-summary-list__value--default" if current_service.count_letter_contact_details == 0
             },
             "actions": {
               "items": [
