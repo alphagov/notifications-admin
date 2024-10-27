@@ -139,8 +139,7 @@
             "text": "Data processing and financial agreement"
           },
           "value": {
-            "text": "Not signed (but we have some service-specific agreements in place)" if current_org.agreement_signed is none else "Signed" if current_org.agreement_signed else "Not signed",
-            "classes": "govuk-summary-list__value--truncate" if current_org.agreement_signed is none
+            "text": "Not signed (but we have some service-specific agreements in place)" if current_org.agreement_signed is none else "Signed" if current_org.agreement_signed else "Not signed"
           },
           "actions": {
             "items": [
@@ -160,7 +159,7 @@
           },
           "value": {
             "text": current_org.request_to_go_live_notes or "None",
-            "classes": "govuk-summary-list__value--default" if current_org.request_to_go_live_notes is none else "govuk-summary-list__value--truncate"
+            "classes": "govuk-summary-list__value--default" if current_org.request_to_go_live_notes is none
           },
           "actions": {
             "items": [
