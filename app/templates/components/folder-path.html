@@ -22,7 +22,7 @@
       {% else %}
         {% if folder.id %}
           {% if current_user.has_template_folder_permission(folder, service=service) %}
-            <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type, template_folder_id=folder.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder {% if loop.index < (loop.length - 1) %}folder-heading-folder-truncated{% endif %}" title="{{ folder.name }}">
+            <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type, template_folder_id=folder.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder" title="{{ folder.name }}">
               {{ svgs.folder(classes="folder-heading-folder__icon") }}
               {{ folder.name }}
             </a>
@@ -33,7 +33,7 @@
             </span>
           {% endif %}
         {% else %}
-          <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type) }}" title="Templates" class="govuk-link govuk-link--no-visited-state {% if loop.length > 2 %}folder-heading-folder-root-truncated{% endif %}">Templates</a>
+          <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type) }}" title="Templates" class="govuk-link govuk-link--no-visited-state">Templates</a>
         {% endif %}
         {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
       {% endif %}
