@@ -495,10 +495,6 @@ def test_letter_image_renderer_knows_if_letter_is_too_long(
     assert template.max_sheet_count == 5
 
 
-def test_subject_line_gets_applied_to_email_preview_template():
-    assert issubclass(EmailPreviewTemplate, SubjectMixin)
-
-
 def test_subject_line_gets_applied_to_correct_template_types():
     for cls in [
         EmailPreviewTemplate,
