@@ -52,8 +52,6 @@ var/
 .installed.cfg
 *.egg
 venv/
-pyproject.toml
-.pre-commit-config.yaml
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
