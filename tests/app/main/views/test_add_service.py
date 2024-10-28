@@ -502,7 +502,7 @@ def test_join_or_add_service_page(
         ),
         (
             "main.choose_service_to_join",
-            "Join an existing service",
+            "Choose the service you want to join",
             "2 teams from Test Organisation are using Notify already",
         ),
     ]
