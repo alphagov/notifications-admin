@@ -1,5 +1,5 @@
 {% from "components/live-search.html" import live_search %}
-{% from "components/folder-path.html" import folder_path %}
+{% from "components/folder-path.html" import folder_path, format_template_name %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% import "components/svgs.html" as svgs %}
 
@@ -50,7 +50,7 @@
           {% if item.is_folder %}
             <a href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
               {{ svgs.folder(classes="template-list-folder__icon") }}
-              <span class="live-search-relevant">{{ item.name }}</span>
+              <span class="live-search-relevant">{{ format_template_name(item.name) }}</span>
             </a>
           {% else %}
             <a class="govuk-link govuk-link--no-visited-state template-list-template" href="{{ url_for('main.conversation_reply_with_template', service_id=current_service.id, template_id=item.id, notification_id=notification_id) }}">
