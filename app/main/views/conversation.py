@@ -42,6 +42,17 @@ def conversation_reply(
     notification_id,
     from_folder=None,
 ):
+    if from_folder:
+        parent_folder_id = current_service.get_template_folder(from_folder)["parent_id"]
+        back_link = url_for(
+            "main.conversation_reply",
+            service_id=service_id,
+            notification_id=notification_id,
+            from_folder=parent_folder_id,
+        )
+    else:
+        back_link = url_for("main.conversation", service_id=service_id, notification_id=notification_id)
+
     return render_template(
         "views/templates/choose-reply.html",
         templates_and_folders=UserTemplateList(
@@ -51,6 +62,7 @@ def conversation_reply(
         _search_form=SearchByNameForm(),
         notification_id=notification_id,
         template_type="sms",
+        back_link=back_link,
     )
 
 

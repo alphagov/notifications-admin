@@ -1,4 +1,5 @@
 import json
+import uuid
 from datetime import datetime
 from unittest.mock import Mock
 
@@ -367,6 +368,75 @@ def test_conversation_reply_redirects_with_phone_number_from_notification(
         (".sms-message-wrapper", "service one: Template <em>content</em> with & entity"),
     ]:
         assert normalize_spaces(page.select_one(element).text) == expected_text
+
+
+def test_conversation_reply_back_link_when_viewing_top_level_templates(
+    client_request,
+    fake_uuid,
+    mock_get_template_folders,
+    mock_get_service_templates,
+):
+    page = client_request.get(
+        "main.conversation_reply",
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+    )
+
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.conversation", service_id=SERVICE_ONE_ID, notification_id=fake_uuid
+    )
+
+
+def test_conversation_reply_back_link_when_viewing_nested_templates(
+    client_request,
+    fake_uuid,
+    active_user_with_permissions,
+    mock_get_template_folders,
+    mock_get_service_templates,
+):
+    sub_folder_id = uuid.uuid4()
+    parent_folder_id = uuid.uuid4()
+    template_folders = [
+        {
+            "id": str(parent_folder_id),
+            "name": "Parent folder",
+            "service_id": SERVICE_ONE_ID,
+            "parent_id": None,
+            "users_with_permission": [active_user_with_permissions["id"]],
+        },
+        {
+            "id": str(sub_folder_id),
+            "name": "Sub-folder",
+            "service_id": SERVICE_ONE_ID,
+            "parent_id": str(parent_folder_id),
+            "users_with_permission": [active_user_with_permissions["id"]],
+        },
+    ]
+    mock_get_template_folders.return_value = template_folders
+
+    # The back link when viewing a sub-folder takes you to the parent folder
+    page = client_request.get(
+        "main.conversation_reply",
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        from_folder=str(sub_folder_id),
+    )
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.conversation_reply",
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        from_folder=str(parent_folder_id),
+    )
+    # The back link when viewing a top-level folder takes you to the top-level templates page
+    page = client_request.get(
+        "main.conversation_reply",
+        service_id=SERVICE_ONE_ID,
+        notification_id=fake_uuid,
+        from_folder=str(parent_folder_id),
+    )
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.conversation_reply", service_id=SERVICE_ONE_ID, notification_id=fake_uuid
+    )
 
 
 def test_get_user_phone_number_when_not_a_standard_phone_number(notify_admin, mocker):
