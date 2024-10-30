@@ -131,14 +131,14 @@ def format_delta(date):
     return naturaltime_without_indefinite_article(delta)
 
 
-def format_delta_days(date):
+def format_delta_days(date, numeric_prefix=""):
     now = datetime.now(UTC)
     date = utc_string_to_aware_gmt_datetime(date)
     if date.strftime("%Y-%m-%d") == now.strftime("%Y-%m-%d"):
         return "today"
     if date.strftime("%Y-%m-%d") == (now - timedelta(days=1)).strftime("%Y-%m-%d"):
         return "yesterday"
-    return naturaltime_without_indefinite_article(now - date)
+    return numeric_prefix + naturaltime_without_indefinite_article(now - date)
 
 
 def valid_phone_number(phone_number):
