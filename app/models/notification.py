@@ -3,7 +3,6 @@ from typing import Any
 
 from markupsafe import Markup
 from notifications_utils.template import (
-    EmailPreviewTemplate,
     LetterPreviewTemplate,
     SMSBodyPreviewTemplate,
 )
@@ -11,6 +10,7 @@ from notifications_utils.template import (
 from app.models import JSONModel, ModelList
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
+from app.utils.templates import EmailPreviewTemplate
 
 
 class Notification(JSONModel):
