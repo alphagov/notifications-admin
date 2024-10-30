@@ -413,6 +413,11 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
             )
         )
 
+    # Clear the session variable which indicates we've come from the inbound SMS flow if step_index is 0.
+    # If step_index is 0, the message was not sent from the inbound SMS flow, which starts at step_index 1.
+    if step_index == 0:
+        session.pop("from_inbound_sms_details", None)
+
     template = current_service.get_template_with_user_permission_or_403(
         template_id,
         current_user,

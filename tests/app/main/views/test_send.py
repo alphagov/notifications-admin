@@ -1249,6 +1249,35 @@ def test_send_one_off_step_redirects_to_start_if_session_not_setup(
     )
 
 
+def test_send_one_off_step_removes_from_inbound_sms_details_key_from_session_on_step_0(
+    client_request,
+    mock_get_no_contact_lists,
+    multiple_sms_senders,
+    fake_uuid,
+    mocker,
+):
+    template_data = create_template(template_type="sms", content="Hi ((name))")
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
+
+    with client_request.session_transaction() as session:
+        session["recipient"] = "07900900900"
+        session["placeholders"] = {"phone number": "07900900900"}
+        session["from_inbound_sms_details"] = {
+            "notification_id": "1234",
+            "from_folder": None,
+        }
+
+    client_request.get(
+        "main.send_one_off_step",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=0,
+    )
+
+    with client_request.session_transaction() as session:
+        assert "from_inbound_sms_details" not in session
+
+
 def test_send_one_off_does_not_send_without_the_correct_permissions(
     client_request,
     mock_get_service_template,
