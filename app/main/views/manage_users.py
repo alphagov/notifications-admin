@@ -149,7 +149,7 @@ def service_join_request_approve(service_id, request_id):
         if form.join_service_approve_request.data == SERVICE_JOIN_REQUEST_APPROVED:
             return redirect(
                 url_for(
-                    "main.service_join_request_set_permissions",
+                    "main.service_join_request_choose_permissions",
                     service_id=service_id,
                     request_id=request_id,
                 )
@@ -175,9 +175,9 @@ def service_join_request_approve(service_id, request_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/join-request/<uuid:request_id>/set-permissions", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/join-request/<uuid:request_id>/choose-permissions", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
-def service_join_request_set_permissions(service_id, request_id):
+def service_join_request_choose_permissions(service_id, request_id):
     join_request_validation = validate_service_join_request(service_id, request_id)
     if join_request_validation:
         return join_request_validation
@@ -190,12 +190,12 @@ def service_join_request_set_permissions(service_id, request_id):
         service_join_request.update(
             status=SERVICE_JOIN_REQUEST_APPROVED,
             status_changed_by_id=current_user.id,
-            permissions=translate_permissions_from_ui_to_db(form.join_service_request_set_permissions_field.data),
+            permissions=translate_permissions_from_ui_to_db(form.join_service_request_choose_permissions_field.data),
         )
         return redirect(url_for("main.choose_account"))
 
     return render_template(
-        "views/join-service-request-set-permissions.html",
+        "views/join-service-request-choose-permissions.html",
         form=form,
         request_id=request_id,
         requester=requested_by,

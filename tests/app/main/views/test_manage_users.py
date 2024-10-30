@@ -1970,7 +1970,7 @@ def test_service_join_request_pending(
             SERVICE_JOIN_REQUEST_APPROVED,
         ),
         (
-            "main.service_join_request_set_permissions",
+            "main.service_join_request_choose_permissions",
             create_active_user_empty_permissions(True),
             create_active_user_with_permissions(True),
             SERVICE_JOIN_REQUEST_APPROVED,
@@ -2016,7 +2016,7 @@ def test_service_join_request_approved(
             SERVICE_JOIN_REQUEST_REJECTED,
         ),
         (
-            "main.service_join_request_set_permissions",
+            "main.service_join_request_choose_permissions",
             create_active_user_empty_permissions(True),
             create_active_user_with_permissions(True),
             SERVICE_JOIN_REQUEST_REJECTED,
@@ -2063,7 +2063,7 @@ def test_service_join_request_rejected(
             SERVICE_ONE_ID,
         ),
         (
-            "main.service_join_request_set_permissions",
+            "main.service_join_request_choose_permissions",
             SERVICE_ONE_ID,
         ),
     ],
@@ -2101,7 +2101,7 @@ def test_service_join_request_already_joined(
             SERVICE_ONE_ID,
         ),
         (
-            "main.service_join_request_set_permissions",
+            "main.service_join_request_choose_permissions",
             SERVICE_ONE_ID,
         ),
     ],
@@ -2139,7 +2139,7 @@ def test_service_join_request_should_return_403_when_approver_is_not_logged_in_u
         ),
     ],
 )
-def test_service_join_request_redirects_to_set_permissions_on_approve(
+def test_service_join_request_redirects_to_choose_permissions_on_approve(
     client_request,
     mocker,
     mock_requester,
@@ -2165,7 +2165,7 @@ def test_service_join_request_redirects_to_set_permissions_on_approve(
         },
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.service_join_request_set_permissions",
+            "main.service_join_request_choose_permissions",
             service_id=SERVICE_ONE_ID,
             request_id=request_id,
         ),
@@ -2233,7 +2233,7 @@ def test_service_join_request_shows_rejected_message_on_reject(
     "mock_requester, mock_service_user, status",
     [(create_active_user_empty_permissions(True), create_active_user_with_permissions(True), "pending")],
 )
-def test_service_join_request_set_permissions(
+def test_service_join_request_choose_permissions(
     client_request,
     mocker,
     mock_requester,
@@ -2252,7 +2252,7 @@ def test_service_join_request_set_permissions(
     )
 
     page = client_request.get(
-        "main.service_join_request_set_permissions",
+        "main.service_join_request_choose_permissions",
         service_id=SERVICE_ONE_ID,
         request_id=request_id,
     )
@@ -2263,7 +2263,7 @@ def test_service_join_request_set_permissions(
 
     permission_checkboxes = page.select("input[type=checkbox]")
     for idx in range(len(permission_checkboxes)):
-        assert permission_checkboxes[idx]["name"] == "join_service_request_set_permissions_field"
+        assert permission_checkboxes[idx]["name"] == "join_service_request_choose_permissions_field"
     assert permission_checkboxes[0]["value"] == "view_activity"
     assert permission_checkboxes[1]["value"] == "send_messages"
     assert permission_checkboxes[2]["value"] == "manage_templates"
@@ -2277,7 +2277,7 @@ def test_service_join_request_set_permissions(
     "mock_requester, mock_service_user, status",
     [(create_active_user_empty_permissions(True), create_active_user_with_permissions(True), "pending")],
 )
-def test_service_join_request_set_permissions_on_save(
+def test_service_join_request_choose_permissions_on_save(
     client_request,
     mocker,
     mock_requester,
@@ -2301,11 +2301,11 @@ def test_service_join_request_set_permissions_on_save(
     )
 
     client_request.post(
-        "main.service_join_request_set_permissions",
+        "main.service_join_request_choose_permissions",
         service_id=SERVICE_ONE_ID,
         request_id=request_id,
         _data={
-            "join_service_request_set_permissions_field": selected_permissions,
+            "join_service_request_choose_permissions_field": selected_permissions,
         },
         _expected_status=302,
         _expected_redirect=url_for("main.choose_account"),

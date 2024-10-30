@@ -1038,7 +1038,7 @@ class JoinServiceRequestApproveForm(StripWhitespaceForm):
 
 
 class JoinServiceRequestSetPermissionsForm(StripWhitespaceForm):
-    join_service_request_set_permissions_field = GovukCheckboxesField(
+    join_service_request_choose_permissions_field = GovukCheckboxesField(
         "Permissions",
         filters=[partial(filter_by_permissions, permissions=permission_options)],
         choices=list(permission_options),
