@@ -136,9 +136,9 @@ def validate_service_join_request(service_id, request_id):
 @main.route("/services/<uuid:service_id>/join-request/<uuid:request_id>/approve", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_join_request_approve(service_id, request_id):
-    is_redirect = validate_service_join_request(service_id, request_id)
-    if is_redirect:
-        return is_redirect
+    join_request_validation = validate_service_join_request(service_id, request_id)
+    if join_request_validation:
+        return join_request_validation
 
     form = JoinServiceRequestApproveForm()
     service_join_request = ServiceJoinRequest.from_id(request_id)
@@ -154,16 +154,14 @@ def service_join_request_approve(service_id, request_id):
                     request_id=request_id,
                 )
             )
+
         if form.join_service_approve_request.data == SERVICE_JOIN_REQUEST_REJECTED:
-            service_join_request.update(
-                status=SERVICE_JOIN_REQUEST_REJECTED,
-                status_changed_by_id=current_user.id,
-            )
-            return render_template(
-                "views/join-service-request-rejected.html",
-                form=form,
-                requester=requested_by,
-                error_summary_enabled=True,
+            return redirect(
+                url_for(
+                    "main.service_join_request_refused",
+                    service_id=service_id,
+                    request_id=request_id,
+                )
             )
 
     return render_template(
@@ -180,9 +178,9 @@ def service_join_request_approve(service_id, request_id):
 @main.route("/services/<uuid:service_id>/join-request/<uuid:request_id>/set-permissions", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_join_request_set_permissions(service_id, request_id):
-    is_redirect = validate_service_join_request(service_id, request_id)
-    if is_redirect:
-        return is_redirect
+    join_request_validation = validate_service_join_request(service_id, request_id)
+    if join_request_validation:
+        return join_request_validation
 
     form = JoinServiceRequestSetPermissionsForm()
     service_join_request = ServiceJoinRequest.from_id(request_id)
@@ -199,6 +197,29 @@ def service_join_request_set_permissions(service_id, request_id):
     return render_template(
         "views/join-service-request-set-permissions.html",
         form=form,
+        request_id=request_id,
+        requester=requested_by,
+        error_summary_enabled=True,
+    )
+
+
+@main.route("/services/<uuid:service_id>/join-request/<uuid:request_id>/refused", methods=["GET"])
+@user_has_permissions("manage_service")
+def service_join_request_refused(service_id, request_id):
+    join_request_validation = validate_service_join_request(service_id, request_id)
+    if join_request_validation:
+        return join_request_validation
+
+    service_join_request = ServiceJoinRequest.from_id(request_id)
+    requested_by = service_join_request.requester
+
+    service_join_request.update(
+        status=SERVICE_JOIN_REQUEST_REJECTED,
+        status_changed_by_id=current_user.id,
+    )
+
+    return render_template(
+        "views/join-service-request-refused.html",
         request_id=request_id,
         requester=requested_by,
         error_summary_enabled=True,

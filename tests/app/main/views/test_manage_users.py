@@ -2210,7 +2210,7 @@ def test_service_join_request_shows_rejected_message_on_reject(
         _data={
             "join_service_approve_request": SERVICE_JOIN_REQUEST_REJECTED,
         },
-        _expected_status=200,
+        _follow_redirects=True,
     )
 
     assert f"Tell {mock_requester['name']} you have refused their request" in page.text.strip()
@@ -2319,3 +2319,97 @@ def test_service_join_request_set_permissions_on_save(
         status_changed_by_id=current_user.id,
     )
     assert mock_update_service_join_requests.called
+
+
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [(create_active_user_empty_permissions(True), create_active_user_with_permissions(True), "pending")],
+)
+def test_service_join_request_refused(
+    client_request,
+    mocker,
+    mock_requester,
+    mock_service_user,
+    service_one,
+    mock_get_organisation_by_domain,
+    status,
+    mock_get_service_join_request_status_data,
+):
+    request_id = sample_uuid()
+    mock_update_service_join_requests = mocker.patch(
+        "app.service_api_client.update_service_join_requests",
+        return_value={},
+    )
+
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
+    page = client_request.get(
+        "main.service_join_request_refused",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+    )
+
+    mock_update_service_join_requests.assert_called_once_with(
+        request_id,
+        mock_requester["id"],
+        status=SERVICE_JOIN_REQUEST_REJECTED,
+        status_changed_by_id=current_user.id,
+    )
+
+    assert mock_update_service_join_requests.called
+
+    assert f"Tell {mock_requester['name']} you have refused their request" in page.text.strip()
+    assert f"Tell {mock_requester['name']} you have refused their request" in page.select_one("h1").text.strip()
+    assert (
+        f"To let {mock_requester['name']} know that they cannot join your service, "
+        f"email them directly at {mock_requester['email_address']}" in page.select_one("p.govuk-body").text.strip()
+    )
+
+
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [
+        (
+            create_active_user_empty_permissions(True),
+            create_active_user_with_permissions(True),
+            "pending",
+        ),
+    ],
+)
+def test_service_join_request_redirects_to_refused_on_reject(
+    client_request,
+    mocker,
+    mock_requester,
+    mock_service_user,
+    service_one,
+    mock_get_organisation_by_domain,
+    status,
+    mock_get_service_join_request_status_data,
+):
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
+    request_id = sample_uuid()
+
+    client_request.post(
+        "main.service_join_request_approve",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+        _data={
+            "join_service_approve_request": SERVICE_JOIN_REQUEST_REJECTED,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.service_join_request_refused",
+            _method="GET",
+            service_id=SERVICE_ONE_ID,
+            request_id=request_id,
+        ),
+    )
