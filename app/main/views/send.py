@@ -864,6 +864,20 @@ def get_back_link(service_id, template, step_index, placeholders=None):
         else:
             return _get_set_sender_back_link(service_id, template)
 
+    if step_index == 1 and template.template_type == "sms" and "from_inbound_sms_details" in session:
+        notification_id = session["from_inbound_sms_details"]["notification_id"]
+        from_folder = session["from_inbound_sms_details"]["from_folder"]
+
+        if from_folder:
+            return url_for(
+                "main.conversation_reply",
+                service_id=service_id,
+                notification_id=notification_id,
+                from_folder=from_folder,
+            )
+        else:
+            return url_for("main.conversation_reply", service_id=service_id, notification_id=notification_id)
+
     if template.template_type == "letter" and placeholders:
         # Make sure we’re not redirecting users to a page which will
         # just redirect them forwards again
@@ -1026,6 +1040,7 @@ def send_notification(service_id, template_id):
     session.pop("placeholders")
     session.pop("recipient")
     session.pop("sender_id", None)
+    session.pop("from_inbound_sms_details", None)
 
     return redirect(
         url_for(

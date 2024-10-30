@@ -1,4 +1,4 @@
-from flask import jsonify, redirect, render_template, session, url_for
+from flask import jsonify, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
@@ -59,6 +59,7 @@ def conversation_reply(
             service=current_service, template_folder_id=from_folder, user=current_user, template_type="sms"
         ),
         template_folder_path=current_service.get_template_folder_path(from_folder),
+        from_folder=from_folder,
         _search_form=SearchByNameForm(),
         notification_id=notification_id,
         template_type="sms",
@@ -75,6 +76,10 @@ def conversation_reply_with_template(
 ):
     session["recipient"] = get_user_number(service_id, notification_id)
     session["placeholders"] = {"phone number": session["recipient"]}
+    session["from_inbound_sms_details"] = {
+        "notification_id": notification_id,
+        "from_folder": request.args.get("from_folder"),
+    }
 
     return redirect(
         url_for(

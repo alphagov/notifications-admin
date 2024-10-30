@@ -59,7 +59,7 @@
               <span class="live-search-relevant">{{ format_template_name(item.name) }}</span>
             </a>
           {% else %}
-            <a class="govuk-link govuk-link--no-visited-state template-list-template" href="{{ url_for('main.conversation_reply_with_template', service_id=current_service.id, template_id=item.id, notification_id=notification_id) }}">
+            <a class="govuk-link govuk-link--no-visited-state template-list-template" href="{{ url_for('main.conversation_reply_with_template', service_id=current_service.id, template_id=item.id, notification_id=notification_id, from_folder=from_folder)  }}">
               <span class="live-search-relevant">{{ item.name }}</span>
             </a>
           {% endif %}
