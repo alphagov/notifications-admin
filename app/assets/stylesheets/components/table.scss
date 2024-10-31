@@ -1,6 +1,28 @@
 .table {
   margin-bottom: govuk-spacing(6);
   width: 100%;
+
+  th, td {
+    position: relative;
+  }
+
+  th:has(.govuk-link:focus), td:has(.govuk-link:focus) {
+    background-color: $govuk-focus-colour;
+    box-shadow: inset 0 -4px 0 0 $govuk-focus-text-colour;
+    .govuk-link:focus {
+      box-shadow: none;
+    }
+  }
+
+  .table-row th .govuk-link::before,
+  .table-row td .govuk-link::before {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .table-heading {
