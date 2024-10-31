@@ -1249,6 +1249,35 @@ def test_send_one_off_step_redirects_to_start_if_session_not_setup(
     )
 
 
+def test_send_one_off_step_removes_from_inbound_sms_details_key_from_session_on_step_0(
+    client_request,
+    mock_get_no_contact_lists,
+    multiple_sms_senders,
+    fake_uuid,
+    mocker,
+):
+    template_data = create_template(template_type="sms", content="Hi ((name))")
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": template_data})
+
+    with client_request.session_transaction() as session:
+        session["recipient"] = "07900900900"
+        session["placeholders"] = {"phone number": "07900900900"}
+        session["from_inbound_sms_details"] = {
+            "notification_id": "1234",
+            "from_folder": None,
+        }
+
+    client_request.get(
+        "main.send_one_off_step",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=0,
+    )
+
+    with client_request.session_transaction() as session:
+        assert "from_inbound_sms_details" not in session
+
+
 def test_send_one_off_does_not_send_without_the_correct_permissions(
     client_request,
     mock_get_service_template,
@@ -1992,6 +2021,35 @@ def test_send_one_off_sms_message_back_link_with_multiple_placeholders(
         service_id=SERVICE_ONE_ID,
         template_id=unchanging_fake_uuid,
         step_index=1,
+    )
+
+
+@pytest.mark.parametrize(
+    "from_folder_id, url_kwargs",
+    [
+        (None, {}),
+        ("abc", {"from_folder": "abc"}),
+    ],
+)
+def test_send_one_off_sms_message_back_link_to_inbound_sms_flow(
+    client_request,
+    mock_get_service_template_with_multiple_placeholders,
+    from_folder_id,
+    url_kwargs,
+):
+    with client_request.session_transaction() as session:
+        session["recipient"] = "07900900123"
+        session["placeholders"] = {"phone number": "07900900123", "one": "bar"}
+        session["from_inbound_sms_details"] = {"notification_id": "123", "from_folder": from_folder_id}
+
+    page = client_request.get(
+        "main.send_one_off_step",
+        service_id=SERVICE_ONE_ID,
+        template_id=unchanging_fake_uuid,
+        step_index=1,
+    )
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.conversation_reply", service_id=SERVICE_ONE_ID, notification_id="123", **url_kwargs
     )
 
 
@@ -3975,6 +4033,8 @@ def test_send_notification_clears_session(
     with client_request.session_transaction() as session:
         assert "recipient" not in session
         assert "placeholders" not in session
+        assert "sender_id" not in session
+        assert "from_inbound_sms_details" not in session
 
 
 @pytest.mark.parametrize(

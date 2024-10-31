@@ -106,3 +106,18 @@
 {% macro folder_path_separator() %}
   <span class="folder-heading-separator"></span>
 {% endmacro %}
+
+
+{% macro format_template_name(name, separators=True) -%}
+  {%- if name is string -%}
+    {{- name -}}
+  {%- else -%}
+    {%- for part in name -%}
+      {{- format_template_name(part, separators) -}}
+      {%- if not loop.last -%}
+        {%- if separators %}
+        <span class="message-name-separator"></span>{%- else %} {% endif -%}
+      {% endif -%}
+    {%- endfor -%}
+  {% endif %}
+{%- endmacro %}

@@ -1,18 +1,6 @@
-{% import "components/svgs.html" as svgs %}
+{% from "components/folder-path.html" import format_template_name %}
 
-{% macro format_item_name(name, separators=True) -%}
-  {%- if name is string -%}
-    {{- name -}}
-  {%- else -%}
-    {%- for part in name -%}
-      {{- format_item_name(part, separators) -}}
-      {%- if not loop.last -%}
-        {%- if separators %}
-        <span class="message-name-separator"></span>{%- else %} {% endif -%}
-      {% endif -%}
-    {%- endfor -%}
-  {% endif %}
-{%- endmacro %}
+{% import "components/svgs.html" as svgs %}
 
 {% if template_list.template_folder_id and not template_list.templates_to_show %}
   <p class="template-list-empty">
@@ -32,13 +20,13 @@
         {% for ancestor in item.ancestors %}
           <a href="{{ url_for('main.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
             {{ svgs.folder(classes="template-list-folder__icon") }}
-            {{- format_item_name(ancestor.name) -}}
+            {{- format_template_name(ancestor.name) -}}
           </a> <span class="message-name-separator"></span>
         {% endfor %}
         {% if item.is_folder %}
           <a href="{{ url_for('main.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
             {{ svgs.folder(classes="template-list-folder__icon") }}
-            <span class="live-search-relevant">{{- format_item_name(item.name) -}}</span>
+            <span class="live-search-relevant">{{- format_template_name(item.name) -}}</span>
           </a>
         {% else %}
           <a href="{{ url_for('main.view_template', service_id=current_service.id, template_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-template">
@@ -46,7 +34,7 @@
               {%- if current_service.api_keys -%}
                 <span class="govuk-!-display-none">{{ item.id }} </span>
               {%- endif -%}
-              {{- format_item_name(item.name) -}}
+              {{- format_template_name(item.name) -}}
             </span>
           </a>
         {% endif %}
@@ -54,8 +42,8 @@
 
       {% set label_content %}
         <span class="govuk-visually-hidden">
-          {%- for ancestor in item.ancestors %}{{ format_item_name(ancestor.name, separators=False) }} {% endfor -%}
-          {{ format_item_name(item.name, separators=False) -}}
+          {%- for ancestor in item.ancestors %}{{ format_template_name(ancestor.name, separators=False) }} {% endfor -%}
+          {{ format_template_name(item.name, separators=False) -}}
         </span>
       {% endset %}
 

@@ -413,6 +413,11 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
             )
         )
 
+    # Clear the session variable which indicates we've come from the inbound SMS flow if step_index is 0.
+    # If step_index is 0, the message was not sent from the inbound SMS flow, which starts at step_index 1.
+    if step_index == 0:
+        session.pop("from_inbound_sms_details", None)
+
     template = current_service.get_template_with_user_permission_or_403(
         template_id,
         current_user,
@@ -864,6 +869,20 @@ def get_back_link(service_id, template, step_index, placeholders=None):
         else:
             return _get_set_sender_back_link(service_id, template)
 
+    if step_index == 1 and template.template_type == "sms" and "from_inbound_sms_details" in session:
+        notification_id = session["from_inbound_sms_details"]["notification_id"]
+        from_folder = session["from_inbound_sms_details"]["from_folder"]
+
+        if from_folder:
+            return url_for(
+                "main.conversation_reply",
+                service_id=service_id,
+                notification_id=notification_id,
+                from_folder=from_folder,
+            )
+        else:
+            return url_for("main.conversation_reply", service_id=service_id, notification_id=notification_id)
+
     if template.template_type == "letter" and placeholders:
         # Make sure we’re not redirecting users to a page which will
         # just redirect them forwards again
@@ -1026,6 +1045,7 @@ def send_notification(service_id, template_id):
     session.pop("placeholders")
     session.pop("recipient")
     session.pop("sender_id", None)
+    session.pop("from_inbound_sms_details", None)
 
     return redirect(
         url_for(
