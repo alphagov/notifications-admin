@@ -211,14 +211,27 @@ def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocke
 
 
 @freeze_time("2024-06-22 12:00")
-def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_request, mocker):
+@pytest.mark.parametrize(
+    "will_be_archived_at, expected_deletion_message",
+    (
+        ("2024-06-29 23:59", "This report will be deleted in 7 days from now."),
+        ("2024-06-23 12:00", "This report will be deleted in a day from now."),
+        ("2024-06-22 13:59", "This report will be deleted today."),
+    ),
+)
+def test_unsubscribe_request_report_for_unprocessed_batched_reports(
+    client_request,
+    mocker,
+    will_be_archived_at,
+    expected_deletion_message,
+):
     test_data = [
         create_unsubscribe_request_report(
             count=200,
             earliest_timestamp="2024-06-15",
             latest_timestamp="2024-06-21",
             batch_id="a8a526f9-84be-44a6-b751-62c95c4b9329",
-            will_be_archived_at="2024-06-29 23:59",
+            will_be_archived_at=will_be_archived_at,
         ),
     ]
 
@@ -246,7 +259,7 @@ def test_unsubscribe_request_report_for_unprocessed_batched_reports(client_reque
     assert normalize_spaces(checkbox_hint) == "I have unsubscribed these recipients from our mailing list"
     assert normalize_spaces(unsubscribe_requests_count_text) == "200 new unsubscribe requests"
     assert len(update_button) == 1
-    assert normalize_spaces(availability_date) == "This report will be deleted in 7 days from now."
+    assert normalize_spaces(availability_date) == expected_deletion_message
 
 
 @freeze_time("2024-07-02")

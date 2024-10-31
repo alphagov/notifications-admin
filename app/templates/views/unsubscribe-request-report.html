@@ -57,7 +57,7 @@
 <div id="unsubscribe_report_availability">
     {% if report.is_a_batched_report %}
         This <span id="unsubscribe_report_availability">
-            report will be deleted in {{ report.will_be_archived_at|format_delta_days}}.
+            report will be deleted {{ report.will_be_archived_at|format_delta_days(numeric_prefix="in ")}}.
         </span>
     {% else %}
         <p class="govuk-body">
