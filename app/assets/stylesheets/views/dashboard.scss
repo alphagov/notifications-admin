@@ -95,25 +95,13 @@
   &-filename {
     @include govuk-font(19, $weight: bold);
     display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-bottom: 30px;
-    padding-top: 10px;
-    margin-bottom: -30px;
-    margin-top: -10px;
+    overflow-wrap: break-word;
   }
 
   &-filename-large {
     @include govuk-font(24, $weight: bold);
     display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-bottom: 30px;
-    padding-top: 10px;
-    margin-bottom: -30px;
-    margin-top: -10px;
+    overflow-wrap: break-word;
   }
 
   &-filename-large-no-hint {
@@ -132,45 +120,20 @@
     @include govuk-font(16);
     display: block;
     color: $govuk-secondary-text-colour;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     max-width: 580px;
+    overflow-wrap: break-word;
   }
 
   &-hint-large {
     @include govuk-font(19);
     display: block;
     color: $govuk-secondary-text-colour;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     max-width: 580px;
+    overflow-wrap: break-word;
   }
 
   &-status {
     text-align: right;
-  }
-
-}
-
-/* The focus state for sibling links overlaps the hint so the hint's text colour needs to adapt */
-.govuk-link:focus {
-
-  &.file-list-filename,
-  &.file-list-filename-large {
-    /* override box-shadow to push underline down a bit */
-    box-shadow: 0 -2px $govuk-focus-colour, 0 5px $govuk-focus-text-colour;
-
-    // File-list items contained by keyline-blocks have more spacing at the top so adapt to cover it
-    .keyline-block > .file-list & {
-      box-shadow: 0 -5px $govuk-focus-colour, 0 5px $govuk-focus-text-colour;
-    }
-  }
-
-  & + .file-list-hint,
-  & + .file-list-hint-large {
-    color: $govuk-focus-text-colour;
   }
 
 }
