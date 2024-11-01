@@ -295,6 +295,7 @@ def test_clear_cache_shows_form(
         "organisation",
         "text_message_and_letter_rates",
         "unsubscribe_request_reports",
+        "service_join_request",
     }
 
 
@@ -352,6 +353,13 @@ def test_clear_cache_shows_form(
                 call("service-????????-????-????-????-????????????-unsubscribe-request-statistics"),
             ],
             "Removed 4 objects across 2 key formats for unsubscribe request reports",
+        ),
+        (
+            ["service_join_request"],
+            [
+                call("service-join-request-????????-????-????-????-????????????"),
+            ],
+            "Removed 2 objects across 1 key formats for service join request",
         ),
     ),
 )

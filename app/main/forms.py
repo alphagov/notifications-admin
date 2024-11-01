@@ -91,7 +91,12 @@ from app.models.branding import (
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.utils import branding
-from app.utils.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
+from app.utils.constants import (
+    SERVICE_JOIN_REQUEST_APPROVED,
+    SERVICE_JOIN_REQUEST_REJECTED,
+    SIGN_IN_METHOD_TEXT,
+    SIGN_IN_METHOD_TEXT_OR_EMAIL,
+)
 from app.utils.govuk_frontend_field import (
     GovukFrontendWidgetMixin,
     render_govuk_frontend_macro,
@@ -1023,12 +1028,21 @@ class JoinServiceRequestApproveForm(StripWhitespaceForm):
     join_service_approve_request = GovukRadiosField(
         "",
         choices=[
-            ("approved", "Yes"),
-            ("rejected", "No"),
+            (SERVICE_JOIN_REQUEST_APPROVED, "Yes"),
+            (SERVICE_JOIN_REQUEST_REJECTED, "No"),
         ],
         thing="an option",
         param_extensions={"fieldset": {"legend": {"classes": ""}}},
-        default="approved",
+        default=SERVICE_JOIN_REQUEST_APPROVED,
+    )
+
+
+class JoinServiceRequestSetPermissionsForm(StripWhitespaceForm):
+    join_service_request_choose_permissions_field = GovukCheckboxesField(
+        "Permissions",
+        filters=[partial(filter_by_permissions, permissions=permission_options)],
+        choices=list(permission_options),
+        param_extensions={"hint": {"text": "All team members can see sent messages."}},
     )
 
 
