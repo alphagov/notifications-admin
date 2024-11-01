@@ -1,22 +1,21 @@
+import { isSupported } from 'govuk-frontend';
+
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
-// that uses ES 015 Classes - 
+// that uses ES 015 Classes -
 // https://github.com/alphagov/govuk-frontend/blob/main/docs/contributing/coding-standards/js.md#skeleton
 //
 // It replaces the previously used way of setting methods on the component's `prototype`.
-// We use a class declaration way of defining classes - 
+// We use a class declaration way of defining classes -
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class
 //
 // More on ES2015 Classes at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
 
 class CollapsibleCheckboxes  {
   constructor($module) {
-    if (
-      !($module instanceof HTMLElement) ||
-      !document.body.classList.contains('govuk-frontend-supported')
-    ) {
+    if (!isSupported()) {
       return this;
     }
-  
+
     this.toggleButtonClass = 'notify-button--with-chevron';
     this.toggleButtonChevronClass = 'notify-button--with-chevron__chevron';
     this.toggleButtonChevronActiveClass = 'notify-button--with-chevron__chevron--active';
@@ -28,7 +27,7 @@ class CollapsibleCheckboxes  {
     this.$checkboxesContainer = this.$fieldset.querySelector('.govuk-checkboxes');
     this.$checkboxesArray = this.$fieldset.querySelectorAll('input[type=checkbox]');
     this.legendText = this.$fieldset.querySelector('legend').textContent.trim();
-  
+
     this.total = this.$checkboxesArray.length;
     this.selectionSummaryContent = {
       all: (selection, total, field) => `All ${field}s`,
@@ -47,7 +46,7 @@ class CollapsibleCheckboxes  {
 
     // insert toggle button
     this.constructToggleButton();
-  
+
     // add custom classes
     this.$fieldset.classList.add('selection-wrapper');
     this.$checkboxesContainer.classList.add('selection-content', 'govuk-!-margin-top-3');
@@ -65,7 +64,7 @@ class CollapsibleCheckboxes  {
     $toggleButton.setAttribute('aria-expanded', 'false');
     $toggleButton.textContent = `Choose ${this.fieldLabel}s`;
     $toggleButton.classList.add('govuk-button', 'govuk-button--secondary', this.toggleButtonClass);
-    // visually hidden text 
+    // visually hidden text
     const $visuallyHiddenButtonContent = document.createElement('span');
     $visuallyHiddenButtonContent.classList.add('govuk-visually-hidden');
     $visuallyHiddenButtonContent.textContent = this.legendText.toLowerCase().replace(`${this.fieldLabel}s`,'');
@@ -87,7 +86,7 @@ class CollapsibleCheckboxes  {
       $button.querySelector(`.${this.toggleButtonChevronClass}`).classList.toggle(this.toggleButtonChevronActiveClass);
       this.$fieldset.hidden = expanded;
     });
-   
+
   }
 
   handleCheckboxClick() {
@@ -98,7 +97,7 @@ class CollapsibleCheckboxes  {
     });
   }
 
-  getSelectionCount() { 
+  getSelectionCount() {
     return Array.from(this.$checkboxesArray).filter((checkbox) => checkbox.checked).length;
   }
 
@@ -107,7 +106,7 @@ class CollapsibleCheckboxes  {
     const $summaryText = document.createElement('p');
     $summaryText.classList.add('selection-summary__text');
 
-    if (this.fieldLabel === 'folder') { 
+    if (this.fieldLabel === 'folder') {
       $summaryText.classList.add('selection-summary__text--folders');
     }
 
@@ -130,7 +129,7 @@ class CollapsibleCheckboxes  {
     } else {
       template = 'none';
     }
-  
+
     $selectionSummaryTextContainer.textContent = this.selectionSummaryContent[template](count, this.total, this.fieldLabel);
   }
 
