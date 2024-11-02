@@ -25,7 +25,7 @@
       >
         {{ item.user_number | format_phone_number_human_readable }}
       </a>
-      <span class="file-list-hint">{{ item.content }}</span>
+      <span class="file-list-hint file-list-hint--flow-text">{{ item.content }}</span>
     {% endcall %}
     {% call field(align='right') %}
       <span class="align-with-message-body">
