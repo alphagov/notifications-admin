@@ -1,3 +1,5 @@
+import { isSupported } from 'govuk-frontend';
+
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
 // that uses ES 015 Classes -
 // https://github.com/alphagov/govuk-frontend/blob/main/docs/contributing/coding-standards/js.md#skeleton
@@ -12,7 +14,7 @@
 // match its behaviour when they appear
 class FocusBanner {
   constructor() {
-    if (!document.body.classList.contains('govuk-frontend-supported')) {
+    if (!isSupported()) {
       return this;
     }
 
