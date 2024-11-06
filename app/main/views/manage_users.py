@@ -182,15 +182,23 @@ def service_join_request_choose_permissions(service_id, request_id):
     if join_request_validation:
         return join_request_validation
 
-    form = JoinServiceRequestSetPermissionsForm()
+    form = JoinServiceRequestSetPermissionsForm(
+        all_template_folders=current_service.all_template_folders,
+        folder_permissions=[f["id"] for f in current_service.all_template_folders],
+    )
+
     service_join_request = ServiceJoinRequest.from_id(request_id)
     requested_by = service_join_request.requester
+
+    if not current_service.has_permission("email_auth"):
+        form.login_authentication.data = "sms_auth"
 
     if form.validate_on_submit():
         service_join_request.update(
             status=SERVICE_JOIN_REQUEST_APPROVED,
             status_changed_by_id=current_user.id,
-            permissions=translate_permissions_from_ui_to_db(form.join_service_request_choose_permissions_field.data),
+            permissions=translate_permissions_from_ui_to_db(form.permissions_field.data),
+            folder_permissions=form.folder_permissions.data,
         )
         return redirect(url_for("main.choose_account"))
 

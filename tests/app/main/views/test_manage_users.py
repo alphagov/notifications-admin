@@ -2223,6 +2223,7 @@ def test_service_join_request_shows_rejected_message_on_reject(
     mock_update_service_join_requests.assert_called_once_with(
         request_id,
         mock_requester["id"],
+        SERVICE_ONE_ID,
         status=SERVICE_JOIN_REQUEST_REJECTED,
         status_changed_by_id=current_user.id,
     )
@@ -2242,8 +2243,14 @@ def test_service_join_request_choose_permissions(
     mock_get_organisation_by_domain,
     status,
     mock_get_service_join_request_status_data,
+    mock_get_template_folders,
 ):
     request_id = sample_uuid()
+
+    mock_get_template_folders.return_value = [
+        {"id": "folder-id-1", "name": "f1", "parent_id": None, "users_with_permission": []},
+        {"id": "folder-id-2", "name": "f2", "parent_id": None, "users_with_permission": []},
+    ]
 
     service_one["organisation"] = ORGANISATION_ID
     mocker.patch(
@@ -2261,14 +2268,19 @@ def test_service_join_request_choose_permissions(
     assert f"Choose permissions for {mock_requester['name']}" in page.select_one("h1").text.strip()
     assert f"{mock_requester['email_address']}" in page.select_one("p").text.strip()
 
-    permission_checkboxes = page.select("input[type=checkbox]")
-    for idx in range(len(permission_checkboxes)):
-        assert permission_checkboxes[idx]["name"] == "join_service_request_choose_permissions_field"
+    permission_checkboxes = page.select("input[name='permissions_field']")
     assert permission_checkboxes[0]["value"] == "view_activity"
     assert permission_checkboxes[1]["value"] == "send_messages"
     assert permission_checkboxes[2]["value"] == "manage_templates"
     assert permission_checkboxes[3]["value"] == "manage_service"
     assert permission_checkboxes[4]["value"] == "manage_api_keys"
+
+    folder_checkboxes = page.select("input[name='folder_permissions']")
+    assert len(folder_checkboxes) == 2
+    assert [item["value"] for item in page.select("input[name=folder_permissions]")] == [
+        "folder-id-1",
+        "folder-id-2",
+    ]
 
     assert normalize_spaces(page.select("form button")[0].text) == "Save"
 
@@ -2286,9 +2298,17 @@ def test_service_join_request_choose_permissions_on_save(
     mock_get_organisation_by_domain,
     status,
     mock_get_service_join_request_status_data,
+    mock_get_template_folders,
 ):
     request_id = sample_uuid()
+
     selected_permissions = ["send_messages", "view_activity", "manage_service"]
+
+    mock_get_template_folders.return_value = [
+        {"id": "folder-id-1", "name": "f1", "parent_id": None, "users_with_permission": []},
+        {"id": "folder-id-2", "name": "f2", "parent_id": None, "users_with_permission": []},
+    ]
+
     mock_update_service_join_requests = mocker.patch(
         "app.service_api_client.update_service_join_requests",
         return_value={},
@@ -2304,9 +2324,7 @@ def test_service_join_request_choose_permissions_on_save(
         "main.service_join_request_choose_permissions",
         service_id=SERVICE_ONE_ID,
         request_id=request_id,
-        _data={
-            "join_service_request_choose_permissions_field": selected_permissions,
-        },
+        _data={"permissions_field": selected_permissions, "folder_permissions": ["folder-id-1", "folder-id-2"]},
         _expected_status=302,
         _expected_redirect=url_for("main.choose_account"),
     )
@@ -2314,9 +2332,11 @@ def test_service_join_request_choose_permissions_on_save(
     mock_update_service_join_requests.assert_called_once_with(
         request_id,
         mock_requester["id"],
+        SERVICE_ONE_ID,
         permissions=translate_permissions_from_ui_to_db(selected_permissions),
         status=SERVICE_JOIN_REQUEST_APPROVED,
         status_changed_by_id=current_user.id,
+        folder_permissions=["folder-id-1", "folder-id-2"],
     )
     assert mock_update_service_join_requests.called
 
@@ -2356,6 +2376,7 @@ def test_service_join_request_refused(
     mock_update_service_join_requests.assert_called_once_with(
         request_id,
         mock_requester["id"],
+        SERVICE_ONE_ID,
         status=SERVICE_JOIN_REQUEST_REJECTED,
         status_changed_by_id=current_user.id,
     )
