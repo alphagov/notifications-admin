@@ -388,6 +388,7 @@ REDIRECTS = {
     "/performance": "main.performance",
     "/pricing/trial-mode": "main.guidance_trial_mode",
     "/roadmap": "main.guidance_roadmap",
+    "/services/<uuid:service_to_join_id>/join/requested": "join_service_you_have_asked",
     "/terms": "main.terms_of_use",
     "/trial-mode": "main.guidance_trial_mode",
     "/using-notify/delivery-status": "main.guidance_message_status",

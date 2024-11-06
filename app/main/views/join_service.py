@@ -43,7 +43,7 @@ def join_service(service_to_join_id):
         )
         return redirect(
             url_for(
-                "main.join_service_requested",
+                "main.join_service_you_have_asked",
                 service_to_join_id=service.id,
                 number_of_users_emailed=len(form.users.data),
             )
@@ -56,12 +56,12 @@ def join_service(service_to_join_id):
     )
 
 
-@main.route("/services/<uuid:service_to_join_id>/join/requested", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_to_join_id>/join/you-have-asked", methods=["GET", "POST"])
 @user_is_logged_in
 @user_is_gov_user
-def join_service_requested(service_to_join_id):
+def join_service_you_have_asked(service_to_join_id):
     service = Service.from_id(service_to_join_id)
     return render_template(
-        "views/join-service-requested.html",
+        "views/join-a-service/you-have-asked.html",
         service=service,
     )

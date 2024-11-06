@@ -214,7 +214,7 @@ def test_page_redirects_on_post(
         "main.join_service",
         service_to_join_id=SERVICE_ONE_ID,
         _expected_redirect=url_for(
-            "main.join_service_requested",
+            "main.join_service_you_have_asked",
             service_to_join_id=SERVICE_ONE_ID,
             number_of_users_emailed=1,
         ),
@@ -238,7 +238,7 @@ def test_confirmation_page(
     client_request,
 ):
     page = client_request.get(
-        "main.join_service_requested",
+        "main.join_service_you_have_asked",
         service_to_join_id=SERVICE_ONE_ID,
         number_of_users_emailed=1,
     )
