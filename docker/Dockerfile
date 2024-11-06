@@ -81,9 +81,7 @@ FROM production as test
 # If bumping this node version, also bump:
 #   `.nvmrc` in notifications-admin
 #   `concourse/docker/unit-tests-image.Dockerfile` in notifications-aws
-# Keep NVM_VERSION in sync as well.
-ARG NVM_VERSION=0.39.7
-ARG NODE_VERSION=20.10.0
+ARG NODE_VERSION=20
 
 USER root
 
@@ -97,20 +95,17 @@ RUN echo "Install OS dependencies for test build" && \
       git && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
+
+RUN \
+    echo "Installing Node v${NODE_VERSION}" \
+    && curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
+    && apt-get install -y nodejs
+
 RUN usermod -aG sudo notify
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER notify
 
 ENV HOME=/home/vcap
-ENV NVM_DIR /home/vcap/.nvm
-ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
-ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
-
-COPY .nvmrc .nvmrc
-RUN echo "Installing nvm and NodeJS v${NODE_VERSION}" && \
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh | bash && \
-    . ${NVM_DIR}/nvm.sh && \
-    nvm install
 
 # Copying to overwrite is faster than RUN chown notify:notify ...
 COPY --from=python_build --chown=notify:notify /opt/venv /opt/venv

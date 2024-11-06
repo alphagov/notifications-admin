@@ -14,8 +14,8 @@ NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 .PHONY: bootstrap
 bootstrap: generate-version-file ## Set up everything to run the app
 	uv pip install -r requirements_for_test.txt
-	source $(HOME)/.nvm/nvm.sh && nvm install && npm ci --no-audit
-	. environment.sh; source $(HOME)/.nvm/nvm.sh && npm run build
+	npm ci --no-audit
+	. environment.sh; npm run build
 
 .PHONY: bootstrap-with-docker
 bootstrap-with-docker: generate-version-file ## Build the image to run the app in Docker
@@ -35,7 +35,7 @@ run-flask-with-docker: ## Run flask
 
 .PHONY: npm-audit
 npm-audit:  ## Check for vulnerabilities in NPM packages
-	source $(HOME)/.nvm/nvm.sh && npm run audit
+	npm run audit
 
 .PHONY: help
 help:
@@ -49,7 +49,7 @@ generate-version-file: ## Generates the app version file
 test: ## Run tests
 	ruff check .
 	black --check .
-	source $(HOME)/.nvm/nvm.sh && npm test
+	npm test
 	py.test -n auto --maxfail=10 tests/
 
 .PHONY: watch-tests
@@ -67,10 +67,8 @@ fix-imports: ## Fix imports using ruff
 .PHONY: freeze-requirements
 freeze-requirements: ## create static requirements.txt
 	uv pip compile requirements.in -o requirements.txt
-	uv pip sync requirements.txt
 	python -c "from notifications_utils.version_tools import copy_config; copy_config()"
 	uv pip compile requirements_for_test.in -o requirements_for_test.txt
-	uv pip sync requirements_for_test.txt
 
 .PHONY: bump-utils
 bump-utils:  # Bump notifications-utils package to latest version
