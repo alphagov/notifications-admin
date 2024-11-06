@@ -180,7 +180,7 @@ EXCLUDED_ENDPOINTS = set(
             "json_updates.service_verify_reply_to_address_updates",
             "json_updates.view_job_updates",
             "json_updates.view_notification_updates",
-            "join_service",
+            "join_service_ask",
             "join_service_you_have_asked",
             "letter_branding_options",
             "letter_branding_request",

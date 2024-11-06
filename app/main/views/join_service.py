@@ -20,10 +20,10 @@ def join_a_service_choose_service():
     )
 
 
-@main.route("/services/<uuid:service_to_join_id>/join", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_to_join_id>/join/ask", methods=["GET", "POST"])
 @user_is_logged_in
 @user_is_gov_user
-def join_service(service_to_join_id):
+def join_service_ask(service_to_join_id):
     service = Service.from_id(service_to_join_id)
 
     if not service.organisation.can_ask_to_join_a_service:
@@ -50,7 +50,7 @@ def join_service(service_to_join_id):
         )
 
     return render_template(
-        "views/join-service.html",
+        "views/join-a-service/ask.html",
         service=service,
         form=form,
     )

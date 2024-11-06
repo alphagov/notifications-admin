@@ -35,7 +35,7 @@
     <ul>
       {% for service in current_user.default_organisation.live_services | sort %}
         <li class="browse-list-item">
-          <a href="{{ url_for('main.join_service', service_to_join_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
+          <a href="{{ url_for('main.join_service_ask', service_to_join_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
           <p class="browse-list-hint">
               {% if current_user.belongs_to_service(service.id) %}
                 You are already a team member of this service

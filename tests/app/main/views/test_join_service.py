@@ -41,14 +41,14 @@ def test_join_a_service_choose_service(
         "service two",
     ]
     assert [link["href"] for link in page.select(".browse-list-item a")] == [
-        url_for("main.join_service", service_to_join_id=SERVICE_ONE_ID),
-        url_for("main.join_service", service_to_join_id=SERVICE_TWO_ID),
+        url_for("main.join_service_ask", service_to_join_id=SERVICE_ONE_ID),
+        url_for("main.join_service_ask", service_to_join_id=SERVICE_TWO_ID),
     ]
 
 
 def test_cannot_join_service_without_organisation(client_request):
     client_request.get(
-        "main.join_service",
+        "main.join_service_ask",
         service_to_join_id=SERVICE_ONE_ID,
         _expected_status=403,
     )
@@ -82,7 +82,7 @@ def test_cannot_join_service_without_organisation_permission(
         _expected_status=403,
     )
     client_request.get(
-        "main.join_service",
+        "main.join_service_ask",
         service_to_join_id=SERVICE_ONE_ID,
         _expected_status=403,
     )
@@ -104,7 +104,7 @@ def test_cannot_join_service_for_different_organisation(
         return_value=organisation_json(id_="4321", can_ask_to_join_a_service=True),
     )
     client_request.get(
-        "main.join_service",
+        "main.join_service_ask",
         service_to_join_id=SERVICE_ONE_ID,
         _expected_status=403,
     )
@@ -143,7 +143,7 @@ def test_page_lists_team_members_of_service(
         ],
     )
 
-    page = client_request.get("main.join_service", service_to_join_id=SERVICE_ONE_ID)
+    page = client_request.get("main.join_service_ask", service_to_join_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one("h1").text) == "Ask to join this service"
     assert normalize_spaces(page.select_one("main p").text) == "You’re asking to join ‘service one’."
@@ -211,7 +211,7 @@ def test_page_redirects_on_post(
 
     client_request.login(current_user)
     client_request.post(
-        "main.join_service",
+        "main.join_service_ask",
         service_to_join_id=SERVICE_ONE_ID,
         _expected_redirect=url_for(
             "main.join_service_you_have_asked",
