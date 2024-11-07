@@ -501,7 +501,7 @@ def test_join_or_add_service_page(
             "You can invite your team members later",
         ),
         (
-            "main.join_a_service_choose_service",
+            "main.join_service_choose_service",
             "Join an existing service",
             "2 teams from Test Organisation are using Notify already",
         ),
@@ -512,7 +512,7 @@ def test_join_or_add_service_page(
     "choice",
     (
         ("main.add_service"),
-        ("main.join_a_service_choose_service"),
+        ("main.join_service_choose_service"),
     ),
 )
 def test_post_join_or_add_service_page(
