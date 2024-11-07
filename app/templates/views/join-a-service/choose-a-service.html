@@ -1,6 +1,7 @@
 {% extends "withoutnav_template.html" %}
 {% from "components/live-search.html" import live_search %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {% set heading = 'Choose the service you want to join' %}
 
@@ -24,6 +25,17 @@
     </h1>
     <p class="govuk-body govuk-!-margin-bottom-6">
       {{ current_user.default_organisation.name }} has {{ current_user.default_organisation.live_services | length }} live service{{ '' if current_user.default_organisation.live_services | length == 1 else 's' }}</p>
+
+    {% set wrongOrganisationCallout %}
+      <p class="govuk-body">GOV.UK Notify uses your email address to decide which services to show you.</p>
+      <p class="govuk-body">If the organisation you work for has changed, <a class="govuk-link govuk-link--no-visited-state"
+          href="{{ url_for('main.support') }}">contact us</a>.</p>
+    {% endset %}
+
+    {{ govukDetails({
+      "summaryText": "I do not work for " + current_user.default_organisation.name,
+      "html": wrongOrganisationCallout
+    }) }}
 
     {{ live_search(
       target_selector='.browse-list-item',
