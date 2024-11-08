@@ -21,15 +21,19 @@
     > .govuk-details__summary {
       display: block;
       margin-bottom: govuk-spacing(3);
+      width: auto;
 
       &::before {
         top: -1.3em;
       }
-
       // stretch focus style to fill containing row
       &:focus {
         box-shadow: 0 -10px $govuk-focus-colour, 0 11px $govuk-focus-colour, 0 15px $govuk-focus-text-colour;
       }
+    }
+    
+    &__recipient {
+      overflow-wrap: anywhere;
     }
 
     &__meta {
@@ -57,6 +61,7 @@
       }
 
     }
+
 
     // We can't assign classes to the div.govuk-details__text element so we have to target it as a
     // child of details.api-notifications-item instead
