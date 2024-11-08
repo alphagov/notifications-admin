@@ -73,13 +73,13 @@ def mock_get_orgs_and_services(notify_admin, mocker):
     return mocker.patch("app.user_api_client.get_organisations_and_services_for_user", return_value=SAMPLE_DATA)
 
 
-def test_choose_account_should_show_choose_accounts_page(
+def test_your_services_should_show_your_servicess_page(
     client_request,
     mock_get_non_empty_organisations_and_services_for_user,
     mock_get_organisation,
     mock_get_organisation_by_domain,
 ):
-    resp = client_request.get("main.choose_account")
+    resp = client_request.get("main.your_services")
     page = resp.select_one("main#main-content")
 
     assert normalize_spaces(page.select_one("h1").text) == "Your organisations and services"
@@ -122,7 +122,7 @@ def test_choose_account_should_show_choose_accounts_page(
     assert service_list_items[4].a.text == "service two (org 2)"
     assert service_list_items[4].a["href"] == url_for(".service_dashboard", service_id="67890")
 
-    assert normalize_spaces(headings[2].text) == "Trial mode services"
+    assert normalize_spaces(headings[2].text) == "Trial services"
 
     # trial services
     assert len(trial_services_list_items) == 3
@@ -134,7 +134,7 @@ def test_choose_account_should_show_choose_accounts_page(
     assert mock_get_organisation.call_args_list == []
 
 
-def test_choose_account_should_show_choose_accounts_page_if_no_services(
+def test_your_services_should_show_your_servicess_page_if_no_services(
     client_request,
     mock_get_orgs_and_services,
     mock_get_organisation,
@@ -142,7 +142,7 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     mock_get_organisation_by_domain,
 ):
     mock_get_orgs_and_services.return_value = {"organisations": [], "services": []}
-    page = client_request.get("main.choose_account")
+    page = client_request.get("main.your_services")
     no_live_service = page.select("nav ul")[1].select("li")
     no_live_trial_mode = page.select("nav ul")[2].select("li")
 
@@ -152,12 +152,12 @@ def test_choose_account_should_show_choose_accounts_page_if_no_services(
     assert normalize_spaces(page.select_one("h1").text) == "Your services"
     assert normalize_spaces(add_service_link.text) == "Add a new service"
     assert add_service_link["href"] == url_for("main.add_service")
-    assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == ["Live services", "Trial mode services"]
+    assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == ["Live services", "Trial services"]
     assert normalize_spaces(no_live_service[0].text) == "No live services"
-    assert normalize_spaces(no_live_trial_mode[0].text) == "No trial mode services"
+    assert normalize_spaces(no_live_trial_mode[0].text) == "No trial services"
 
 
-def test_choose_account_should_show_join_service_button(
+def test_your_services_should_show_join_service_button(
     client_request,
     mocker,
     mock_get_non_empty_organisations_and_services_for_user,
@@ -166,7 +166,7 @@ def test_choose_account_should_show_join_service_button(
         "app.organisations_client.get_organisation_by_domain",
         return_value=organisation_json(can_ask_to_join_a_service=True),
     )
-    page = client_request.get("main.choose_account")
+    page = client_request.get("main.your_services")
 
     assert [
         (normalize_spaces(button.text), button["href"]) for button in page.select("main a.govuk-button--secondary")
@@ -177,7 +177,7 @@ def test_choose_account_should_show_join_service_button(
         ),
         (
             "Join a live service",
-            url_for("main.choose_service_to_join"),
+            url_for("main.join_service_choose_service"),
         ),
     ]
 
@@ -190,7 +190,7 @@ def test_choose_account_should_show_join_service_button(
             [
                 "Platform admin",
                 "Live services",
-                "Trial mode services",
+                "Trial services",
             ],
         ),
         (
@@ -199,7 +199,7 @@ def test_choose_account_should_show_join_service_button(
                 "Platform admin",
                 "Organisations",
                 "Live services",
-                "Trial mode services",
+                "Trial services",
             ],
         ),
         (
@@ -233,12 +233,12 @@ def test_choose_account_should_show_join_service_button(
             },
             [
                 "Platform admin",
-                "Trial mode services",
+                "Trial services",
             ],
         ),
     ),
 )
-def test_choose_account_should_show_organisations_link_for_platform_admin(
+def test_your_services_should_show_organisations_link_for_platform_admin(
     client_request,
     platform_admin_user,
     mock_get_organisations,
@@ -252,7 +252,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
     mock_get_orgs_and_services.return_value = orgs_and_services
     client_request.login(platform_admin_user)
 
-    page = client_request.get("main.choose_account")
+    page = client_request.get("main.your_services")
 
     first_item = page.select_one(".browse-list-item")
     first_link = first_item.select_one("a")
@@ -271,7 +271,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
             {"organisations": [], "services": []},
             [
                 "Live services",
-                "Trial mode services",
+                "Trial services",
             ],
             "Your services",
         ),
@@ -280,7 +280,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
             [
                 "Organisations",
                 "Live services",
-                "Trial mode services",
+                "Trial services",
             ],
             "Your organisations and services",
         ),
@@ -298,7 +298,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
             },
             [
                 "Live services",
-                "Trial mode services",
+                "Trial services",
             ],
             "Your organisations and services",
         ),
@@ -336,7 +336,7 @@ def test_choose_account_should_show_organisations_link_for_platform_admin(
         ),
     ),
 )
-def test_choose_account_should_show_organisations_link_for_org_user(
+def test_your_services_should_show_organisations_link_for_org_user(
     client_request,
     mock_get_organisations,
     mock_get_orgs_and_services,
@@ -349,21 +349,21 @@ def test_choose_account_should_show_organisations_link_for_org_user(
 ):
     mock_get_orgs_and_services.return_value = orgs_and_services
 
-    page = client_request.get("main.choose_account")
+    page = client_request.get("main.your_services")
 
     assert normalize_spaces(page.select_one("h1").text) == expected_h1
 
     assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == expected_headings
 
 
-def test_choose_account_should_show_back_to_service_link(
+def test_your_services_should_show_back_to_service_link(
     client_request,
     mock_get_orgs_and_services,
     mock_get_organisation,
     mock_get_organisation_services,
     mock_get_organisation_by_domain,
 ):
-    resp = client_request.get("main.choose_account")
+    resp = client_request.get("main.your_services")
 
     back_to_service_link = resp.select_one("div.navigation-service a")
 
@@ -371,7 +371,7 @@ def test_choose_account_should_show_back_to_service_link(
     assert back_to_service_link.text == "Back to service one"
 
 
-def test_choose_account_should_not_show_back_to_service_link_if_no_service_in_session(
+def test_your_services_should_not_show_back_to_service_link_if_no_service_in_session(
     client_request,
     mock_get_orgs_and_services,
     mock_get_organisation,
@@ -380,12 +380,12 @@ def test_choose_account_should_not_show_back_to_service_link_if_no_service_in_se
 ):
     with client_request.session_transaction() as session:
         session["service_id"] = None
-    page = client_request.get("main.choose_account")
+    page = client_request.get("main.your_services")
 
     assert len(page.select(".navigation-service a")) == 0
 
 
-def test_choose_account_should_not_show_back_to_service_link_if_not_signed_in(
+def test_your_services_should_not_show_back_to_service_link_if_not_signed_in(
     client_request,
     mock_get_service,
 ):
@@ -406,7 +406,7 @@ def test_choose_account_should_not_show_back_to_service_link_if_not_signed_in(
         pytest.param(True, marks=pytest.mark.xfail(raises=AssertionError)),
     ),
 )
-def test_choose_account_should_not_show_back_to_service_link_if_service_archived(
+def test_your_services_should_not_show_back_to_service_link_if_service_archived(
     client_request,
     service_one,
     mock_get_orgs_and_services,
@@ -418,7 +418,7 @@ def test_choose_account_should_not_show_back_to_service_link_if_service_archived
     service_one["active"] = active
     with client_request.session_transaction() as session:
         session["service_id"] = service_one["id"]
-    page = client_request.get("main.choose_account")
+    page = client_request.get("main.your_services")
 
     assert normalize_spaces(page.select_one("h1").text) == "Your organisations and services"
     assert page.select_one(".navigation-service a") is None

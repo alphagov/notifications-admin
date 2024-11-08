@@ -35,10 +35,10 @@ def test_non_logged_in_user_can_see_homepage(
     assert page.select_one("#whos-using-notify a")["href"] == url_for("main.performance")
 
 
-def test_logged_in_user_redirects_to_choose_account(client_request):
+def test_logged_in_user_redirects_to_your_services(client_request):
     client_request.get(
         "main.index",
-        _expected_redirect=url_for("main.choose_account"),
+        _expected_redirect=url_for("main.your_services"),
     )
     client_request.get(
         "main.sign_in",

@@ -17,7 +17,7 @@ def test_non_gov_user_cannot_see_add_service_button(
     mock_get_organisations_and_services_for_user,
 ):
     client_request.login(api_nongov_user_active)
-    page = client_request.get("main.choose_account")
+    page = client_request.get("main.your_services")
     assert "Add a new service" not in page.text
 
 
@@ -501,7 +501,7 @@ def test_join_or_add_service_page(
             "You can invite your team members later",
         ),
         (
-            "main.choose_service_to_join",
+            "main.join_service_choose_service",
             "Join an existing service",
             "2 teams from Test Organisation are using Notify already",
         ),
@@ -512,7 +512,7 @@ def test_join_or_add_service_page(
     "choice",
     (
         ("main.add_service"),
-        ("main.choose_service_to_join"),
+        ("main.join_service_choose_service"),
     ),
 )
 def test_post_join_or_add_service_page(

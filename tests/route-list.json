@@ -51,6 +51,7 @@
     "/integration-testing",
     "/integration_testing",
     "/invitation/<string:token>",
+    "/join-a-service/choose",
     "/letter-branding",
     "/letter-branding/<uuid:branding_id>",
     "/letter-branding/<uuid:branding_id>/edit",
@@ -334,7 +335,9 @@
     "/services/<uuid:service_id>/users/invite",
     "/services/<uuid:service_id>/users/invite/<uuid:user_id>",
     "/services/<uuid:service_to_join_id>/join",
+    "/services/<uuid:service_to_join_id>/join/ask",
     "/services/<uuid:service_to_join_id>/join/requested",
+    "/services/<uuid:service_to_join_id>/join/you-have-asked",
     "/sign-in",
     "/sign-out",
     "/static/<path:filename>",
@@ -431,5 +434,6 @@
     "/verify",
     "/verify-email/<string:token>",
     "/webauthn/authenticate",
-    "/webauthn/register"
+    "/webauthn/register",
+    "/your-services"
 ]
