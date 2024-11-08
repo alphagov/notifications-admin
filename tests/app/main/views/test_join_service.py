@@ -125,10 +125,13 @@ def test_page_lists_team_members_of_service(
 
     manage_service_user_1 = create_active_user_with_permissions()
     manage_service_user_2 = create_active_user_with_permissions()
+    manage_service_user_3 = create_active_user_with_permissions()
     manage_service_user_1["name"] = "Manage service user 1"
     manage_service_user_2["name"] = "Manage service user 2"
+    manage_service_user_3["name"] = "Manage service user 3"
     manage_service_user_1["logged_in_at"] = "2023-01-02 01:00"
     manage_service_user_2["logged_in_at"] = "2023-02-03 01:00"
+    manage_service_user_3["logged_in_at"] = None
 
     mock_get_users = mocker.patch(
         "app.models.user.Users._get_items",
@@ -140,6 +143,7 @@ def test_page_lists_team_members_of_service(
             # These two users should appear on the page
             manage_service_user_1,
             manage_service_user_2,
+            manage_service_user_3,
         ],
     )
 
@@ -170,6 +174,11 @@ def test_page_lists_team_members_of_service(
             manage_service_user_2["id"],
             "Manage service user 2",
             "Last used Notify today",
+        ),
+        (
+            manage_service_user_3["id"],
+            "Manage service user 3",
+            "Never used Notify",
         ),
     ]
 
