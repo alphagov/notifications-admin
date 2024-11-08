@@ -28,25 +28,28 @@
       ) }}
       <div id="template-list">
         {% for item in services_templates_and_folders %}
+          {% set item_num = loop.index %}
           <div class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
             {% for ancestor in item.ancestors %}
+              {% set folder_id = 'folder_' ~ item_num ~ '_ancestor_' ~ loop.index %}
               {% if ancestor.is_service %}
                 <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service.id, from_service=ancestor.service_id, to_folder_id=to_folder_id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
               {% else %}
                 <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service.id, from_folder=ancestor.id, to_folder_id=to_folder_id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
               {% endif %}
-                {{ svgs.folder(classes="template-list-folder__icon") }}
+                {{ svgs.folder('Folder', classes="template-list-folder__icon", id=folder_id) }}
                 {{ ancestor.name }}
               </a> <span class="message-name-separator"></span>
             {% endfor %}
+            {% set folder_id = 'folder_' ~ item_num %}
             {% if item.is_service %}
               <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service.id, from_service=item.service_id, to_folder_id=to_folder_id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-                {{ svgs.folder(classes="template-list-folder__icon") }}
+                {{ svgs.folder('Folder', classes="template-list-folder__icon", id=folder_id) }}
                 <span class="live-search-relevant">{{ item.name }}</span>
               </a>
             {% elif item.is_folder %}
               <a href="{{ url_for('main.choose_template_to_copy', service_id=current_service.id, from_service=item.service_id, from_folder=item.id, to_folder_id=to_folder_id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-                {{ svgs.folder(classes="template-list-folder__icon") }}
+                {{ svgs.folder('Folder', classes="template-list-folder__icon", id=folder_id) }}
                 <span class="live-search-relevant">{{ item.name }}</span>
               </a>
             {% else %}

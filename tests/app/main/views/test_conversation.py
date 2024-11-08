@@ -303,7 +303,7 @@ def test_conversation_reply_shows_templates(
     )
 
     link = page.select(".template-list-item-without-ancestors")
-    assert normalize_spaces(link[0].text) == "Parent 2 - visible 1 template"
+    assert normalize_spaces(link[0].text) == "Folder Parent 2 - visible 1 template"
     assert normalize_spaces(link[1].text) == "sms_template_two Text message template"
 
     assert link[0].select_one("a")["href"] == url_for(
