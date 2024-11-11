@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
+from app.main.views.index import REDIRECTS
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
 
 
@@ -196,6 +197,12 @@ def test_redirect_blueprint(client_request, old_url, expected_endpoint, expected
         _expected_status=301,
         _expected_redirect=url_for(expected_endpoint, **expected_endpoint_kwargs),
     )
+
+
+def test_redirect_blueprint_contains_valid_urls(_client):
+    endpoints = {rule.endpoint for rule in _client.application.url_map.iter_rules()}
+    invalid_redirects = set(REDIRECTS.values()) - endpoints
+    assert not invalid_redirects, "historical_redirects redirects to invalid endpoint name"
 
 
 def test_message_status_page_redirects_without_notification_type_specified(client_request):
