@@ -257,9 +257,9 @@ def test_confirmation_page(
         "We have sent your request to 1 member of ‘service one’.",
         "We’ve also sent you a confirmation email.",
         "You’ll get another email if your request is approved.",
-        "Sign out of GOV.UK Notify",
+        "Back to your services",
     ]
 
     assert [(normalize_spaces(link.text), link["href"]) for link in page.select("main a")] == [
-        ("Sign out of GOV.UK Notify", url_for("main.sign_out"))
+        ("Back to your services", url_for("main.your_services"))
     ]
