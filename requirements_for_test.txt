@@ -13,9 +13,9 @@ attrs==24.2.0
 awscrt==0.20.11
     # via botocore
 beautifulsoup4==4.11.1
-    # via -r requirements_for_test_common.txt
+    # via -r requirements_for_test_common.in
 black==24.4.0
-    # via -r requirements_for_test_common.txt
+    # via -r requirements_for_test_common.in
 blinker==1.6.3
     # via
     #   flask
@@ -84,7 +84,7 @@ flask-wtf==1.2.1
     # via -r requirements.in
 freezegun==1.2.2
     # via
-    #   -r requirements_for_test_common.txt
+    #   -r requirements_for_test_common.in
     #   pytest-freezegun
 gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
     # via -r requirements.in
@@ -142,7 +142,7 @@ mypy-extensions==1.0.0
     # via black
 notifications-python-client==10.0.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@88.1.1
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@89.0.0
     # via -r requirements.in
 openpyxl==3.0.10
     # via pyexcel-xlsx
@@ -192,7 +192,7 @@ pypdf==3.13.0
     # via notifications-utils
 pytest==7.2.0
     # via
-    #   -r requirements_for_test_common.txt
+    #   -r requirements_for_test_common.in
     #   pytest-env
     #   pytest-freezegun
     #   pytest-mock
@@ -200,17 +200,17 @@ pytest==7.2.0
     #   pytest-watch
     #   pytest-xdist
 pytest-env==0.8.1
-    # via -r requirements_for_test_common.txt
+    # via -r requirements_for_test_common.in
 pytest-freezegun==0.4.2
     # via -r requirements_for_test.in
 pytest-mock==3.9.0
-    # via -r requirements_for_test_common.txt
+    # via -r requirements_for_test_common.in
 pytest-testmon==2.1.0
-    # via -r requirements_for_test_common.txt
+    # via -r requirements_for_test_common.in
 pytest-watch==4.2.0
-    # via -r requirements_for_test_common.txt
+    # via -r requirements_for_test_common.in
 pytest-xdist==3.0.2
-    # via -r requirements_for_test_common.txt
+    # via -r requirements_for_test_common.in
 python-dateutil==2.8.2
     # via
     #   botocore
@@ -237,11 +237,11 @@ requests==2.32.0
     #   requests-mock
     #   responses
 requests-mock==1.10.0
-    # via -r requirements_for_test_common.txt
+    # via -r requirements_for_test_common.in
 responses==0.25.3
     # via moto
 ruff==0.3.7
-    # via -r requirements_for_test_common.txt
+    # via -r requirements_for_test_common.in
 s3transfer==0.10.1
     # via boto3
 segno==1.5.2
