@@ -17,6 +17,17 @@
     > .govuk-details__text {
       font-family: monospace;
     }
+    // override underline styling as in our case, where we have additional content in the
+    // details summray text, the link underline appears in the gap when the link wraps
+    // only apply that for non-legacy browser, like Design System does
+    .govuk-details__summary-text {
+      @supports not (-ms-ime-align:auto) {
+        text-decoration: none;
+        .api-notifications-item__recipient {
+          @include govuk-link-decoration;
+        }
+      }
+    }
 
     > .govuk-details__summary {
       display: block;
@@ -29,6 +40,18 @@
       // stretch focus style to fill containing row
       &:focus {
         box-shadow: 0 -10px $govuk-focus-colour, 0 11px $govuk-focus-colour, 0 15px $govuk-focus-text-colour;
+        // don't show underline if focused
+        @supports not (-ms-ime-align:auto) {
+          .api-notifications-item__recipient {
+            text-decoration: none;
+          }
+        }
+      }
+      // apply underline to the child element when parent focussed
+      &:hover .api-notifications-item__recipient {
+        @supports not (-ms-ime-align:auto) {
+          @include govuk-link-hover-decoration;
+        }
       }
     }
     
