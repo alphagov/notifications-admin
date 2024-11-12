@@ -301,6 +301,19 @@ a {
     text-overflow: ellipsis;
   }
 
+  &-breadcrumb-container {
+    margin: -1 * govuk-spacing(1) 0 govuk-spacing(3);
+  }
+
+  &-breadcrumb {
+    list-style: none;
+    display: inline-block;
+
+    li {
+      display: inline;
+    }
+  }
+
   a {
 
     display: inline-block;
