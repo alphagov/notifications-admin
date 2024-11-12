@@ -5,7 +5,6 @@ from itertools import groupby
 
 from flask import Response, abort, jsonify, render_template, request, session, url_for
 from flask_login import current_user
-from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
 from werkzeug.utils import redirect
 
 from app import (
@@ -36,6 +35,7 @@ from app.utils.csv import Spreadsheet
 from app.utils.pagination import generate_next_dict, generate_previous_dict, get_page_from_request
 from app.utils.time import get_current_financial_year
 from app.utils.user import user_has_permissions
+from app.utils.validation import format_phone_number_human_readable
 
 
 @main.route("/services/<uuid:service_id>/dashboard")

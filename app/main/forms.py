@@ -18,7 +18,7 @@ from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
-from notifications_utils.recipient_validation.phone_number import normalise_phone_number
+from notifications_utils.recipient_validation.phone_number import PhoneNumber as PhoneNumberUtils
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
 from ordered_set import OrderedSet
@@ -1805,7 +1805,8 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
             # and disallow emergency 3-digit numbers
             def valid_non_emergency_phone_number(self, num):
                 try:
-                    normalised_number = normalise_phone_number(num.data)
+                    number = PhoneNumberUtils(num.data)
+                    normalised_number = number.get_normalised_format()
                 except InvalidPhoneError as e:
                     raise ValidationError("Enter a phone number in the correct format") from e
 
