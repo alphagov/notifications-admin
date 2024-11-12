@@ -34,7 +34,7 @@ def test_should_return_verify_template(
     "can_ask_to_join_a_service, expected_redirect, extra_args",
     (
         (False, "main.add_service", {"first": "first"}),
-        (True, "main.add_or_join_service", {}),
+        (True, "main.your_services", {}),
     ),
 )
 def test_should_redirect_to_add_service_when_sms_code_is_correct(
