@@ -301,13 +301,12 @@ a {
     text-overflow: ellipsis;
   }
 
-  &-breadcrumb-container {
-    margin: -1 * govuk-spacing(1) 0 govuk-spacing(3);
+  &-container {
+    margin: govuk-spacing(3) 0 govuk-spacing(4);
   }
 
   &-breadcrumb {
     list-style: none;
-    display: inline-block;
 
     li {
       display: inline;
