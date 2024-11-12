@@ -40,9 +40,9 @@ def test_get_user_phone_number_when_only_outbound_exists(notify_admin, mocker):
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     mock_get_notification = mocker.patch(
-        "app.main.views.conversation.notification_api_client.get_notification", return_value={"to": "15550000000"}
+        "app.main.views.conversation.notification_api_client.get_notification", return_value={"to": "14157711401"}
     )
-    assert get_user_number("service", "notification") == "+1 555-000-0000"
+    assert get_user_number("service", "notification") == "+1 415-771-1401"
     mock_get_inbound_sms.assert_called_once_with("service", "notification")
     mock_get_notification.assert_called_once_with("service", "notification")
 
