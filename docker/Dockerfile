@@ -115,7 +115,7 @@ COPY --from=python_build --chown=notify:notify /opt/venv /opt/venv
 RUN mkdir -p app
 
 # Install dev/test requirements
-COPY --chown=notify:notify Makefile requirements.txt requirements_for_test.txt requirements_for_test_common.txt package-lock.json package.json rollup.config.mjs ./
+COPY --chown=notify:notify Makefile requirements_for_test.txt package-lock.json package.json rollup.config.mjs ./
 RUN make bootstrap
 
 COPY --chown=notify:notify . .
