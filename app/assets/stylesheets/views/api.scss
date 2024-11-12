@@ -8,7 +8,6 @@
   &-item {
 
     border-top: 1px solid $govuk-border-colour;
-    padding: 10px 0 0 0;
 
     // We can't assign classes to the summary.govuk-details__summary or div.govuk-details__text
     // elements so we have to target them as children of details.api-notifications-item
@@ -31,7 +30,8 @@
 
     > .govuk-details__summary {
       display: block;
-      margin-bottom: govuk-spacing(3);
+      padding-bottom: govuk-spacing(3);
+      padding-top: govuk-spacing(2);
       width: auto;
 
       &::before {
@@ -39,7 +39,9 @@
       }
       // stretch focus style to fill containing row
       &:focus {
-        box-shadow: 0 -10px $govuk-focus-colour, 0 11px $govuk-focus-colour, 0 15px $govuk-focus-text-colour;
+        background-color: $govuk-focus-colour;
+        box-shadow: inset 0 -4px 0 0 $govuk-focus-text-colour;
+        // box-shadow: 0 -10px $govuk-focus-colour, 0 11px $govuk-focus-colour, 0 15px $govuk-focus-text-colour;
         // don't show underline if focused
         @supports not (-ms-ime-align:auto) {
           .api-notifications-item__recipient {
@@ -47,7 +49,7 @@
           }
         }
       }
-      // apply underline to the child element when parent focussed
+      // apply underline to the child element when
       &:hover .api-notifications-item__recipient {
         @supports not (-ms-ime-align:auto) {
           @include govuk-link-hover-decoration;
