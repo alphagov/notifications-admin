@@ -10,11 +10,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {% if request.args.get("back") == "add_or_join" %}
-    {{ govukBackLink({ "href": url_for('main.add_or_join_service') }) }}
-  {% else %}
     {{ govukBackLink({ "href": url_for('main.your_services') }) }}
-  {% endif %}
 {% endblock %}
 
 {% block maincolumn_content %}
