@@ -14,7 +14,7 @@
   {%- endfor -%}
 {%- endmacro -%}
 
-{% macro errorSummary(form) %}
+{% macro errorSummary(form, error_summary_extra_params=false) %}
   {% if form.errors %}
     {% set errors = [] %}
     {% for field_name, error_list in form.errors.items() %}
@@ -35,9 +35,12 @@
       {% endif %}
     {% endfor %}
 
-    {{ govukErrorSummary({
+    {% set extra_params = error_summary_extra_params if error_summary_extra_params else {} %}
+    {% set required_params =  {
       "titleText": "There is a problem",
       "errorList": errors
-    }) }}
+    }%}
+    {% set all_params = dict(required_params, **extra_params) %}
+    {{ govukErrorSummary(all_params) }}
   {% endif %}
 {% endmacro %}

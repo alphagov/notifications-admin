@@ -217,6 +217,13 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
   }
 }
 
+// mobile only variant of the static spacing class
+.govuk-\!-margin-top-3--mobile-only {
+  @include govuk-media-query($until: tablet) {
+    margin-top: govuk-spacing(6);
+  }
+}
+
 // variants of govuk-frontend width override classes 
 // that remains static across all breakpoiunts
 
