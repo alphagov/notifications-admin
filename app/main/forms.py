@@ -1037,12 +1037,11 @@ class JoinServiceRequestApproveForm(StripWhitespaceForm):
     )
 
 
-class JoinServiceRequestSetPermissionsForm(StripWhitespaceForm):
-    join_service_request_choose_permissions_field = GovukCheckboxesField(
-        "Permissions",
-        filters=[partial(filter_by_permissions, permissions=permission_options)],
-        choices=list(permission_options),
-        param_extensions={"hint": {"text": "All team members can see sent messages."}},
+class JoinServiceRequestSetPermissionsForm(PermissionsForm):
+    custom_field_order: tuple = (
+        "permissions_field",
+        "folder_permissions",
+        "login_authentication",
     )
 
 
