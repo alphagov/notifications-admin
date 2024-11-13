@@ -6,11 +6,13 @@
     <thead class="table-field-headings{% if field_headings_visible %}-visible{% endif %}">
       <tr>
         {% for field_heading in field_headings %}
-          <th scope="col" class="table-field-heading{% if loop.first %}-first{% endif %}" width="{% if equal_length %}{{ (100 / field_headings|length)|int }}%{% endif %}">
+        {% set fieldHeadingText = field_heading.text if field_heading.text else field_heading %}
+        {% set fieldHeadingClasses = field_heading.classes if field_heading.classes %}
+          <th scope="col" class="table-field-heading{% if loop.first %}-first{% endif %} {{ fieldHeadingClasses }}" width="{% if equal_length %}{{ (100 / field_headings|length)|int }}%{% endif %}">
             {% if field_headings_visible %}
-              {{ field_heading }}
+              {{ fieldHeadingText }}
             {% else %}
-              <span class="govuk-visually-hidden">{{ field_heading }}</span>
+              <span class="govuk-visually-hidden">{{ fieldHeadingText }}</span>
             {% endif %}
           </th>
         {% endfor %}
