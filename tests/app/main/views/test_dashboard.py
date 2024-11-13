@@ -299,6 +299,8 @@ def test_inbox_showing_inbound_messages(
         "main.inbox_download",
         service_id=SERVICE_ONE_ID,
     )
+    assert len(page.select("thead th:first-child.govuk-\\!-width-two-thirds--static")) == 1
+    assert len(page.select("thead th:last-child.govuk-\\!-width-one-third--static")) == 1
 
 
 def test_get_inbound_sms_shows_page_links(

@@ -216,3 +216,16 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
     transition: background 0.3s ease-out;
   }
 }
+
+// variants of govuk-frontend width override classes 
+// that remains static across all breakpoiunts
+
+/* stylelint-disable declaration-no-important */
+.govuk-\!-width-one-third--static {
+  width: 33.33% !important;
+}
+
+.govuk-\!-width-two-thirds--static {
+  width: 66.66% !important;
+}
+/* stylelint-enable declaration-no-important */

@@ -5,25 +5,26 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  {{ 'Choose permissions for {}'.format(requester.name) }}
+    {{ 'Choose permissions for {}'.format(requester.name) }}
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.service_join_request_approve', service_id=current_service.id, request_id=request_id) }) }}
+    {{ govukBackLink({ "href": url_for('main.service_join_request_approve', service_id=current_service.id, request_id=request_id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('Choose permissions for {}'.format(requester.name)) }}
+    {{ page_header('Choose permissions for {}'.format(requester.name)) }}
 
-  {% call form_wrapper() %}
-    <p class="govuk-body">
-      {{ requester.email_address }}
-    </p>
-    {{ form.join_service_request_choose_permissions_field }}
+    {% call form_wrapper() %}
+        <p class="govuk-body">
+            {{ requester.email_address }}
+        </p>
 
-    {{ page_footer('Save') }}
+        {% include 'views/manage-users/permissions.html' %}
 
-  {% endcall %}
+        {{ page_footer('Save') }}
+
+    {% endcall %}
 
 {% endblock %}
