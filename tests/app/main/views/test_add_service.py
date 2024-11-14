@@ -5,8 +5,8 @@ from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 from app.utils.user import is_gov_user
-from tests import organisation_json, service_json
-from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
+from tests import organisation_json
+from tests.conftest import normalize_spaces
 
 
 def test_non_gov_user_cannot_see_add_service_button(
@@ -96,12 +96,12 @@ def test_show_different_page_content_based_on_user_org_type(client_request, mock
     assert not page.select(".govuk-back-link")
 
 
-def test_shows_back_link_if_come_from_join_service_page(
+def test_shows_back_link_if_come_from_your_services_page(
     client_request,
     mock_get_no_organisation_by_domain,
 ):
-    page = client_request.get("main.add_service", back="add_or_join")
-    assert page.select_one(".govuk-back-link")["href"] == url_for("main.add_or_join_service")
+    page = client_request.get("main.add_service", back="your_services")
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.your_services")
 
 
 @pytest.mark.parametrize(
@@ -444,91 +444,3 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
     assert mock_create_service.called
     assert mock_update_service.call_args[0][0] == 101
     assert "email_auth" in mock_update_service.call_args[1]["permissions"]
-
-
-@pytest.mark.parametrize(
-    "organisation",
-    (
-        None,
-        organisation_json(ORGANISATION_ID),
-    ),
-)
-def test_join_or_add_service_page_403s_without_permission(
-    client_request,
-    organisation,
-    mocker,
-):
-    mocker.patch(
-        "app.organisations_client.get_organisation_by_domain",
-        return_value=organisation,
-    )
-    client_request.get(
-        "main.add_or_join_service",
-        _expected_status=403,
-    )
-
-
-def test_join_or_add_service_page(
-    client_request,
-    mocker,
-):
-    mocker.patch(
-        "app.organisations_client.get_organisation_by_domain",
-        return_value=organisation_json(ORGANISATION_ID, can_ask_to_join_a_service=True),
-    )
-    mocker.patch(
-        "app.organisations_client.get_organisation_services",
-        return_value=[
-            service_json(SERVICE_ONE_ID, "service one", restricted=False),
-            service_json(SERVICE_TWO_ID, "service two", restricted=False),
-            service_json("1234", "service three (trial mode)"),
-        ],
-    )
-    page = client_request.get(
-        "main.add_or_join_service",
-    )
-    assert [
-        (
-            radio["value"],
-            normalize_spaces(page.select_one(f"label[for={radio['id']}]")),
-            normalize_spaces(page.select_one(f"#{radio['aria-describedby']}.govuk-hint")),
-        )
-        for radio in page.select("input[type=radio][name=add_or_join]")
-    ] == [
-        (
-            "main.add_service",
-            "Add a new service",
-            "You can invite your team members later",
-        ),
-        (
-            "main.join_service_choose_service",
-            "Join an existing service",
-            "2 teams from Test Organisation are using Notify already",
-        ),
-    ]
-
-
-@pytest.mark.parametrize(
-    "choice",
-    (
-        ("main.add_service"),
-        ("main.join_service_choose_service"),
-    ),
-)
-def test_post_join_or_add_service_page(
-    client_request,
-    mock_get_organisation_services,
-    choice,
-    mocker,
-):
-    mocker.patch(
-        "app.organisations_client.get_organisation_by_domain",
-        return_value=organisation_json(ORGANISATION_ID, can_ask_to_join_a_service=True),
-    )
-    client_request.post(
-        "main.add_or_join_service",
-        _data={
-            "add_or_join": choice,
-        },
-        _expected_redirect=url_for(choice, back="add_or_join"),
-    )

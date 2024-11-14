@@ -26,7 +26,6 @@ EXCLUDED_ENDPOINTS = set(
             "add_organisation_from_nhs_local_service",
             "add_organisation_letter_branding_options",
             "add_organisation",
-            "add_or_join_service",
             "add_service_template",
             "add_service",
             "api_callbacks",
