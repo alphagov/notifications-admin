@@ -301,6 +301,30 @@ a {
     text-overflow: ellipsis;
   }
 
+  &-breadcrumb,
+  & {
+    display: inline-block;
+  }
+
+  &-container {
+    margin: govuk-spacing(3) 0 govuk-spacing(4);
+
+    & > .folder-heading {
+      margin: 0;
+    }
+  }
+
+  &-breadcrumb {
+    list-style: none;
+    display: inline-block;
+    min-height: 30px; // set min-height to line-height with folder icons
+    @include govuk-font(24, $weight: "bold");
+
+    li {
+      display: inline;
+    }
+  }
+
   a {
 
     display: inline-block;
