@@ -61,4 +61,5 @@
       V{{ 4 + border_inset }} H{{ 12 - diag_join_adjustment }}z"
       stroke="currentColor" stroke-width="{{ border_width }}" stroke-linecap="butt" fill="transparent"/>
   </svg>
+  {% if not alt %}<span class="govuk-visually-hidden">Folder </span>{% endif %}
 {%- endmacro %}
