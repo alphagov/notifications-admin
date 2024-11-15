@@ -182,13 +182,16 @@ def service_join_request_choose_permissions(service_id, request_id):
     if join_request_validation:
         return join_request_validation
 
+    service_join_request = ServiceJoinRequest.from_id(request_id)
+
+    requested_by = service_join_request.requester
+    requested_by_user = User.from_id(requested_by["id"])
+
     form = JoinServiceRequestSetPermissionsForm(
         all_template_folders=current_service.all_template_folders,
         folder_permissions=[f["id"] for f in current_service.all_template_folders],
+        disable_sms_auth=False if requested_by_user.mobile_number else True,
     )
-
-    service_join_request = ServiceJoinRequest.from_id(request_id)
-    requested_by = service_join_request.requester
 
     if not current_service.has_permission("email_auth"):
         form.login_authentication.data = "sms_auth"
@@ -199,6 +202,7 @@ def service_join_request_choose_permissions(service_id, request_id):
             status_changed_by_id=current_user.id,
             permissions=translate_permissions_from_ui_to_db(form.permissions_field.data),
             folder_permissions=form.folder_permissions.data,
+            auth_type=form.login_authentication.data,
         )
         return redirect(url_for("main.your_services"))
 
