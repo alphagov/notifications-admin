@@ -1258,7 +1258,7 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
             "main.view_template",
             service_id=current_service.id,
             template_id=template.id,
-            _anchor="first-page-of-attachment",
+            upload_successful="yes",
         )
     )
 

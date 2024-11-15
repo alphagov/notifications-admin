@@ -4,6 +4,8 @@
 {% from "components/folder-path.html" import folder_path, page_title_folder_path %}
 {% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
+
 
 {% block service_page_title %}
   {{ page_title_folder_path(current_service.get_template_path(template._template)) }}
@@ -29,6 +31,19 @@
       {% endcall %}
     </div>
   {% else %}
+    {% if request.args.get("upload_successful") == 'yes' %}
+      {% set notification_banner_html %}
+        <h3 class="govuk-notification-banner__heading">
+          PDF attachment successfully uploaded
+        </h3>
+        <p class="govuk-body"><a class="govuk-notification-banner__link" href="#first-page-of-attachment">Go to the attachment</a></p>
+      {% endset %}
+    
+      {{ govukNotificationBanner({
+        "html": notification_banner_html,
+        "type": "success"
+      }) }}
+    {% endif %}
     <div class="govuk-grid-row">
       <div class="{% if current_user.has_permissions('manage_templates') and template.template_type == 'letter' %} govuk-grid-column-five-sixths {% else %} govuk-grid-column-full {% endif %}">
         {{ folder_path(
