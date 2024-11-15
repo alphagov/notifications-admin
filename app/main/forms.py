@@ -1805,13 +1805,16 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
             # and disallow emergency 3-digit numbers
             def valid_non_emergency_phone_number(self, num):
                 try:
-                    number = PhoneNumberUtils(num.data)
-                    normalised_number = number.get_normalised_format()
+                    PhoneNumberUtils(num.data, is_service_contact_number=True)
                 except InvalidPhoneError as e:
-                    raise ValidationError("Enter a phone number in the correct format") from e
+                    if e.code == InvalidPhoneError.Codes.UNSUPPORTED_EMERGENCY_NUMBER:
+                        raise ValidationError(str(e)) from e
+                    elif e.code == InvalidPhoneError.Codes.TOO_LONG:
+                        # assume the number is an extension and return the number with minimal normalisation
+                        return True
 
-                if normalised_number in {"999", "112"}:
-                    raise ValidationError("Phone number cannot be an emergency number")
+                    else:
+                        raise ValidationError("Enter a phone number in the correct format") from e
 
                 return True
 
