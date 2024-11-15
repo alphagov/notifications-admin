@@ -29,7 +29,7 @@
       {% else %}
         <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type) }}" title="Templates" class="govuk-link govuk-link--no-visited-state {% if loop.length > 2 %}folder-heading-folder-root-truncated{% endif %}">Templates</a>
       {% endif %}
-      {% if not loop.last %}{{ folder_path_separator() }}{% endif %}
+      {{ folder_path_separator() }}
       </li>
     {% endfor %}
     </ol>
