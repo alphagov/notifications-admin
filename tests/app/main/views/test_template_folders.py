@@ -1478,6 +1478,7 @@ def test_radio_button_with_no_value_shows_custom_error_message(
     assert mock_move_to_template_folder.called is False
     assert mock_create_template_folder.called is False
 
+    assert "govuk-!-margin-top-3--mobile-only" in page.select_one(".govuk-error-summary").get("class")
     assert page.select_one(".govuk-error-message").text.strip() == "Error: Select the type of template you want to add"
 
 

@@ -208,6 +208,9 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
         single_notification_channel=single_notification_channel,
         option_hints=option_hints,
         error_summary_enabled=True,
+        error_summary_extra_params={
+            "classes": "govuk-!-margin-top-3--mobile-only",
+        },
     )
 
 
