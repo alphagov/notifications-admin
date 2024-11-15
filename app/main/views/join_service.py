@@ -53,6 +53,10 @@ def join_service_ask(service_to_join_id):
         "views/join-a-service/ask.html",
         service=service,
         form=form,
+        error_summary_enabled=True,
+        error_summary_extra_params={
+            "classes": "govuk-!-width-two-thirds",
+        },
     )
 
 
