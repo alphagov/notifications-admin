@@ -1407,7 +1407,7 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
                 "main.view_template",
                 service_id=SERVICE_ONE_ID,
                 template_id=template_id,
-                _anchor="first-page-of-attachment",
+                upload_successful="yes",
             ),
         )
 
@@ -1454,7 +1454,7 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
                 "main.view_template",
                 service_id=SERVICE_ONE_ID,
                 template_id=template_id,
-                _anchor="first-page-of-attachment",
+                upload_successful="yes",
             ),
         )
 
