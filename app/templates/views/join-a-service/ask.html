@@ -1,5 +1,5 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
@@ -15,18 +15,18 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    {{ page_header(heading) }}
-    <p class="govuk-body">
-      You’re asking to join ‘{{ service.name }}’.
-    </p>
-    {% call form_wrapper() %}
-      {{ form.users }}
-      {{ form.reason }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govuk_page_header(heading) }}
+      <p class="govuk-body">
+        You’re asking to join ‘{{ service.name }}’.
+      </p>
+      {% call form_wrapper() %}
+        {{ form.users }}
+        {{ form.reason }}
       {{ page_footer('Ask to join this service') }}
-    {% endcall %}
+      {% endcall %}
+    </div>
   </div>
-</div>
 
 {% endblock %}
