@@ -9,9 +9,31 @@
 </p>
 <pre class="formatting-example"><code class="lang-md">[Apply now](https://www.gov.uk/example)
 </code></pre>
-<h3 class="govuk-heading-m">Unsubscribe links</h3>
+<h2 class="govuk-heading-m">Unsubscribe links</h2>
 <p class="govuk-body">Subscription emails must include an unsubscribe link.</p>
 <p class="govuk-body">Select the ‘Add an unsubscribe link’ checkbox to let recipients request to opt out. </p>
+<h3 class="gov-uk-heading">Add a custom unsubscribe link</h3>
 <p class="govuk-body">Use the Notify API to add your own unsubscribe link. Follow the instructions in our <a class="govuk-link govuk-link--no-visited-state"
     href="https://www.notifications.service.gov.uk/using-notify/api-documentation">API documentation</a>.</p>
+<p class="govuk-body">You should also add a link to the bottom of the email.</p>
+<p class="govuk-body">Use this example if you have a webpage for users to manage their email subscriptions:</p>
+<pre class="formatting-example"><code class="lang-md">
+[Unsubscribe](https://www.example.gov.uk/unsubscribe)</code></pre>
+<p class="govuk-body">Your webpage should ask the recipients to confirm that they want to unsubscribe.</p>
+<p class=govuk-body">If you do not have your own webpage, you can add a ‘mailto’ link to let users send an email to your team instead. For example:
+</p>
+<pre class="formatting-example"><code class="lang-md">
+[Unsubscribe](mailto:example@gov.uk?subject=unsubscribe)
+</code></pre>
+<p class="govuk-body">The email address should be a shared inbox managed by your team, not your own email address.
+</p>
+<p class="govuk-body">Find out why you need to add an <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.notifications.service.gov.uk/using-notify/unsubscribe-links">unsubscribe link</a>.</p>
+
+
+
+
+
+
+
 <p class="govuk-body">Find out why you need to add <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_unsubscribe_links') }}">unsubscribe links</a>.</p>
