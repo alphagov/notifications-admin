@@ -19,7 +19,7 @@ class FocusBanner {
     }
 
     // focus any error banners when the page loads
-    this.focusBanner($('.banner-dangerous'));
+    this.focusBanner($('.banner-dangerous, .banner-default-with-tick'));
 
     // focus success and error banners when they appear in any content updates
     $(document).on("updateContent.onafterupdate", function(evt, el) {
