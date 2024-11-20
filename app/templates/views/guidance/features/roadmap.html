@@ -15,8 +15,8 @@
 
   {{ content_metadata(
     data={
-      "Last updated": "15 August 2024",
-      "Next review due": "15 November 2024"
+      "Last updated": "20 November 2024",
+      "Next review due": "20 February 2025"
     }
   ) }}
 
@@ -27,51 +27,45 @@
   <h2 class="heading-medium" id="things-we-are-working-on">Things we’re working on now</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>Let recipients ask to unsubscribe from emails with just one click</li>
-    <li>Test Rich Communication Services (RCS) messages</li>
-    <li>Make it easier to start using Notify</li>
-    <li>Let users ask to join an existing service</li>
+    <li>Add a new environment and deployment pipeline so developers can update code more efficiently</li>
+    <li>Carry out our annual IT health check</li>
+    <li>Improve how we measure our performance</li>
+    <li>Let users join an existing service</li>
+    <li>Make it easier for new users to start using Notify</li>
     <li>Improve our front-end code to meet <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> targets for accessibility</li>
-    <li>Use <a class="govuk-link govuk-link--no-visited-state" href="https://design-system.service.gov.uk/components/">GOV.UK Design System version 5 components</a></li>
-    <li>Update Notify’s deployment pipeline so our developers can update code more efficiently</li>
+    <li>Explore new ways to increase our capacity</li>
+    <li>Let website users send files by email</li>
+    <li>Improve the Notify API</li>
   </ul>
 
   <h2 class="heading-medium" id="things-we-will-do-later">Things we’ll do later</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>Launch RCS messaging (private <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/agile-delivery/how-the-beta-phase-works">beta</a>)</li>
+    <li>Launch a private <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/agile-delivery/how-the-beta-phase-works">beta</a> for Rich Business Messaging (RBM)</li>
     <li>Make it easier to understand how text message pricing works</li>
-    <li>Explore new ways to increase our capacity</li>
-    <li>Improve the Notify API</li>
     <li>Explore ways to help services write better messages</li>
     <li>Improve the billing and payment process</li>
-    <li>Let website users send files by email</li>
+    <li>Review our process for identifying text message fraud</li>
+    <li>Make it easier for services to see the usage data they need</li>
+    <li>Review <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">our security</a> in line with the Cyber Assessment Framework</li>
   </ul>
 
   <h2 class="heading-medium" id="things-we-have-done">Things we’ve done</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>Reduced the risk of sending letters to addresses that do not exist</li>
-    <li>Taken steps to protect recipients from fraudulent text message sender IDs</li>
-    <li>Made detailed billing data available through the Notify API</li>
+    <li>Met NCSC guidelines for NHS services by making sure they use a consistent <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_text_message_sender') }}">text message sender ID</a></li>
+    <li>Moved our design components to version 5 of the <a class="govuk-link govuk-link--no-visited-state" href="https://design-system.service.gov.uk/components/">GOV.UK Design System</a></li>
+    <li>Let recipients ask to unsubscribe from emails in one click</li>
+    <li>Let services manage <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_unsubscribe_links') }}">unsubscribe requests</a></li>
+    <li>Added JPG and PNG to the list of file formats a service can send by email</li>
+    <li>Made it harder to send letters to addresses that do not exist</li>
+    <li>Found new ways to protect recipients from text message fraud</li>
+    <li>Let services that use the Notify API see their billing data</li>
     <li>Announced an update to our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a></li>
     <li>Fixed several issues listed on our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.accessibility_statement') }}">accessibility statement</a></li>
     <li>Identified and prioritised API improvements (discovery)</li>
-    <li>Changed the crown logo to reflect the King’s new chosen crown</li>
-    <li>Migrated our applications from <a class="govuk-link govuk-link--no-visited-state" href="https://gds.blog.gov.uk/2022/07/12/why-weve-decided-to-decommission-gov-uk-paas-platform-as-a-service/">GOV.UK PaaS</a> to Amazon ECS</li>
+    <li>Migrated our applications from GOV.UK PaaS to <a class="govuk-link govuk-link--no-visited-state" href="https://gds.blog.gov.uk/2024/08/14/how-we-migrated-gov-uk-notify-to-aws-elastic-container-service">Amazon Elastic Container Service</a></li>
     <li>Explored new channels for notifications (discovery)</li>
-    <li>Let services set a custom sender name and email address</li>
-    <li>Let services create letter templates that comply with the <a class="govuk-link govuk-link--no-visited-state" href="https://law.gov.wales/culture/welsh-language/welsh-language-act-1993">Welsh Language Act 1993</a></li>
-    <li>Launched a regular email about new features and improvements to GOV.UK Notify</li>
-    <li>Let services <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_qr_codes') }}">add a QR code to a letter template</a></li>
-    <li>Let services <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_attach_pages') }}">attach pages to a letter template</a></li>
-    <li>Added more <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_formatting') }}">formatting options for email and letter templates</a></li>
-    <li>Integrated with our letter provider’s API to improve the letter sending process</li>
-    <li>Gave users the option to set a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_data_retention_period') }}">custom data retention period</a></li>
-    <li>Migrated our database from GOV.UK PaaS to one hosted using Amazon RDS</li>
-    <li>Made choosing the date and time to send a message easier for screen reader users</li>
-    <li>Let users opt in to emails about taking part in user research</li>
-    <li>Conducted user research around data and reporting needs</li>
   </ul>
 
 {% endblock %}
