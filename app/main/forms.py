@@ -1292,7 +1292,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
 
 class CreateServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
-        "Service name",
+        "Enter a service name",
         validators=[
             DataRequired(message="Enter a service name"),
             MustContainAlphanumericCharacters(),
