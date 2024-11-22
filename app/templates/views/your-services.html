@@ -1,5 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
 
 {% macro service_list(
   heading,
@@ -68,6 +69,14 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+  {% if new_user_account == 'yes' %}
+    {{ govukNotificationBanner({
+      "titleText": "You have created a GOV.UK Notify account",
+      "text": "Add or join a service to start sending messages.",
+      "classes": "govuk-!-margin-top-7",
+    }) }}
+  {% endif %}
+
   <h1 class="heading-large">
     Your {{ thing_to_choose_between }}
   </h1>
