@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set heading = 'Email sender name' %}
+{% set heading = 'Choose an email sender name' %}
 
 {% block service_page_title %}
     {{ heading }}
@@ -19,16 +19,17 @@
         <div class="govuk-grid-column-five-sixths">
             {{ page_header(heading) }}
 
-            <p class="govuk-body">You should choose a sender name that tells people:</p>
+            <p class="govuk-body">This is the name your emails will come from.</p>
 
-            <ul class="govuk-list govuk-list--bullet">
-                <li>who the email is from</li>
+            <p class="govuk-body">We will convert your sender name into an email address for you.</p>
+
+            <p class="govuk-body">Your sender name should make it easy to tell:</p>
+                <ul class="govuk-list govuk-list--bullet">
                 <li>what the email is about</li>
-            </ul>
+                <li>which service, team or organisation sent it</li>
+                </ul>
 
-            <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
-
-            <p class="govuk-body">Adding a custom sender name will also change the email address for your service.</p>
+            <p class="govuk-body">Do not use acronyms, initialisms or abbreviations unless your recipients already know them.</p>
 
             {% set default_email_sender_name_hint %}
                 {% with email_sender_name = current_service.name %}
@@ -55,13 +56,13 @@
                 {{ form.use_custom_email_sender_name(param_extensions={
                     "items": [
                         {
-                            "hint": {
-                                "html": default_email_sender_name_hint,
+                            "conditional": {
+                                "html": custom_email_sender_name_field_html,
                             },
                         },
                         {
                             "conditional": {
-                                "html": custom_email_sender_name_field_html,
+                                "html": default_email_sender_name_hint,
                             },
                         },
                     ]

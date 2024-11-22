@@ -132,7 +132,7 @@ def service_name_change(service_id):
 @user_has_permissions("manage_service")
 def service_email_sender_change(service_id):
     form = ServiceEmailSenderForm(
-        use_custom_email_sender_name=current_service.custom_email_sender_name is not None,
+        use_custom_email_sender_name=True,
         custom_email_sender_name=current_service.custom_email_sender_name,
     )
 
