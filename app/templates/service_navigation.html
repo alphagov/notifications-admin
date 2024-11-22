@@ -1,3 +1,5 @@
+{% from "govuk_frontend_jinja/components/tag/macro.html" import govukTag %}
+
 {% macro navigation_service_name(service) %}
   <div class="navigation-service-name govuk-!-font-weight-bold">
     {{ service.name }}
@@ -17,6 +19,16 @@
       {% endif %}
     {% endif %}
     {{ navigation_service_name(service) }}
+      {% if service.trial_mode %}
+        {% set html %}
+          <a href="{{ url_for('main.guidance_trial_mode')}}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline">Trial</a>
+        {% endset %}
+
+        {{ govukTag({
+          "html": html,
+          "classes": "navigation-trial-tag",
+        }) }}
+      {% endif %}
   </div>
   <a href="{{ url_for('main.your_services') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-service-switch">Switch service</a>
 </div>

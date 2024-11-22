@@ -7,8 +7,13 @@
   $padding-bottom: 11px;
 
   &-service-name,
-  &-organisation-link {
+  &-organisation-link,
+  &-trial-tag {
     float: left;
+  }
+
+  &-trial-tag {
+    margin-left: govuk-spacing(2);
   }
 
   &-service-type {
@@ -74,7 +79,7 @@
 
     box-sizing: border-box;
     margin-bottom: govuk-spacing(1);
-    
+
     &:focus:before {
       border-color: $govuk-focus-text-colour;
     }
@@ -105,6 +110,10 @@
         top: 10px;
       }
     }
+  }
+
+  &-service-name {
+    margin-bottom: govuk-spacing(1);
   }
 
 
