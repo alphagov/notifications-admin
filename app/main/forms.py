@@ -1922,11 +1922,11 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
     }
 
     use_custom_email_sender_name = OnOffField(
-        "Choose a sender name",
+        "",
         choices_for_error_message="same or custom",
         choices=[
+            (True, "Enter an email sender name"),
             (False, "Use the name of your service"),
-            (True, "Enter a custom sender name"),
         ],
     )
 
