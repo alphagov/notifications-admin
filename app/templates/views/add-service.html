@@ -4,12 +4,10 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set heading = 'Enter a service name' %}
+{% set heading = 'Add a new service' %}
 
 {% block backLink %}
-  {% if request.args.get("back") == "your_services" %}
-    {{ govukBackLink({ "href": url_for('main.your_services') }) }}
-  {% endif %}
+  {{ govukBackLink({ "href": url_for('main.your_services') }) }}
 {% endblock %}
 
 {% block per_page_title %}
@@ -20,39 +18,30 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
        {{ govuk_page_header(heading) }}
-      <p class="govuk-body">This is the name your emails will come from.</p>
-      <p class="govuk-body">You can also display it at the start of every text message you send.</p>
-
-    {% if default_organisation_type == 'central' or default_organisation_type == 'local'  %}
-      <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
-
+      <p class="govuk-body">Give your service a name that describes the purpose of your messages.</p>
+      <p class="govuk-body">You can change this later if you need to.</p>
+      <p class="govuk-body">Do not include:</p>
       <ul class="govuk-list govuk-list--bullet">
-        {% if default_organisation_type == 'central' %}
-          <li>Register to vote</li>
-          <li>Renew your Passport</li>
-          <li>Check your state pension</li>
-        {% elif default_organisation_type == 'local' %}
-          <li>School admissions - {{ current_user.default_organisation.name }}</li>
-          <li>Electoral services - {{ current_user.default_organisation.name }}</li>
-          <li>Blue Badge - {{ current_user.default_organisation.name }}</li>
-        {% endif %}
+        <li>acronyms, initialisms or abbreviations</li>
+        <li>your own name or the name of someone in your team</li>
+        <li>the name of a web application or back office system</li>
       </ul>
-    {% else %}
-      <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from.</p>
-    {% endif %}
-
-    <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
 
     {% call form_wrapper() %}
-      {{ form.name(param_extensions={"hint": {"text": "You can change this later"} }) }}
+      {{ form.name }}
 
       {% if not default_organisation_type %}
         {{ form.organisation_type }}
       {% endif %}
 
-      {{ page_footer('Add service') }}
+      {{ page_footer('Add a new service') }}
     {% endcall %}
 
+    {% if current_user.default_organisation.can_ask_to_join_a_service %}
+      <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.join_service_choose_service') }}">Check if you need to join an existing service instead</a>
+      </p>
+    {% endif %}
     </div>
   </div>
 
