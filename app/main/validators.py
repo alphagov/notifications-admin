@@ -227,7 +227,9 @@ def create_phishing_senderid_zendesk_ticket(senderID=None):
 class IsNotAPotentiallyMaliciousSenderID:
 
     def __call__(self, form, field):
-        if protected_sender_id_api_client.get_check_sender_id(sender_id=field.data):
+        organisation_id = current_service.organisation_id
+
+        if protected_sender_id_api_client.get_check_sender_id(sender_id=field.data, organisation_id=organisation_id):
 
             create_phishing_senderid_zendesk_ticket(senderID=field.data)
             current_app.logger.warning("User tried to set sender id to potentially malicious one: %s", field.data)

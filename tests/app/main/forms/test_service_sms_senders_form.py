@@ -65,9 +65,14 @@ def test_sms_sender_form_validation(
     error_message,
     sends_zendesk_ticket,
     protected_sender_id_return,
+    service_one,
+    organisation_one,
     mocker,
 ):
-    mocker.patch(
+    service_one["organisation"] = organisation_one["id"]
+    g.current_service = Service(service_one)
+
+    mock_get_check_sender_id = mocker.patch(
         "app.protected_sender_id_api_client.get_check_sender_id",
         return_value=protected_sender_id_return,
     )
@@ -88,10 +93,18 @@ def test_sms_sender_form_validation(
     if sends_zendesk_ticket:
         mock_create_phishing_zendesk_ticket.assert_called_once_with(senderID=sms_sender)
 
+        mock_get_check_sender_id.assert_called_once_with(
+            sender_id=sms_sender,
+            organisation_id=service_one.get("organisation"),
+        )
 
-def test_sms_validation_logs_and_creates_ticket_for_phishing_sender(client_request, service_one, caplog, mocker):
+
+def test_sms_validation_logs_and_creates_ticket_for_phishing_sender(
+    client_request, service_one, organisation_one, caplog, mocker
+):
     mocker.patch("app.protected_sender_id_api_client.get_check_sender_id", return_value=True)
     form = ServiceSmsSenderForm(sms_sender="Evri")
+    service_one["organisation"] = organisation_one["id"]
     g.current_service = Service(service_one)
 
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
@@ -113,7 +126,8 @@ def test_sms_validation_logs_and_creates_ticket_for_phishing_sender(client_reque
     mock_send_zendesk_ticket.assert_called_once()
 
 
-def test_sms_validation_does_not_log_or_create_ticket_for_safe_sender(notify_admin, caplog, mocker):
+def test_sms_validation_does_not_log_or_create_ticket_for_safe_sender(notify_admin, caplog, service_one, mocker):
+    g.current_service = Service(service_one)
     mocker.patch("app.protected_sender_id_api_client.get_check_sender_id", return_value=False)
     form = ServiceSmsSenderForm(sms_sender="UK&GOV")
 

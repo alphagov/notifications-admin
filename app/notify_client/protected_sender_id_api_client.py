@@ -10,8 +10,13 @@ from app.notify_client import NotifyAdminAPIClient
 
 class ProtectedSenderIDApiClient(NotifyAdminAPIClient):
 
-    def get_check_sender_id(self, sender_id):
-        return self.get(url="/protected-sender-id/check", params={"sender_id": sender_id})
+    def get_check_sender_id(self, sender_id, organisation_id=None):
+        params = {"sender_id": sender_id}
+
+        if organisation_id:
+            params["organisation_id"] = organisation_id
+
+        return self.get(url="/protected-sender-id/check", params=params)
 
 
 _protected_sender_id_api_client_context_var: ContextVar[ProtectedSenderIDApiClient] = ContextVar(
