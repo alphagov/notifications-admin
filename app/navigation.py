@@ -338,6 +338,7 @@ class MainNavigation(Navigation):
             "service_agreement",
             "service_accept_agreement",
             "service_confirm_agreement",
+            "service_confirm_unique",
         },
     }
 
