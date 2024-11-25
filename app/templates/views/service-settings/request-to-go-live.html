@@ -3,41 +3,50 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/task-list.html" import task_list_wrapper, task_list_item %}
-{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Before you request to go live
-{% endblock %}
-
-{% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+  Get ready to go live
 {% endblock %}
 
 {% block maincolumn_content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {{ page_header('Before you request to go live') }}
+      {{ page_header('Get ready to go live') }}
+
+      <p class="govuk-body">Your service is in <a href="{{ url_for('main.guidance_trial_mode') }}" class="govuk-link govuk-link--no-visited-state">trial mode</a>.</p>
+      <p class="govuk-body">Before you can go live you must:</p>
+      <ol class="govuk-list govuk-list--number">
+        <li>Review your <a href="{{ url_for('main.service_settings', service_id=current_service.id) }}" class="govuk-link govuk-link--no-visited-state">settings</a>.</li>
+        <li>Complete the tasks on this page.</li>
+      </ol>
+
+      <p class="govuk-body">When you’re ready, we’ll check that your service meets our <a href="{{ url_for('main.terms_of_use') }}" class="govuk-link govuk-link--no-visited-state">terms of use</a>.</p>
+
+      <p class="govuk-body">If it does, we’ll make your service live within one working day.</p>
+
+      <h2 class="heading-medium">Set up your service</h2>
+
       {% call task_list_wrapper() %}
         {{ task_list_item(
           current_service.has_estimated_usage,
-          'Tell us how many messages you expect to send',
+          'Tell us what you expect to send',
           url_for('main.estimate_usage', service_id=current_service.id),
         ) }}
         {{ task_list_item(
           current_service.has_team_members_with_manage_service_permission,
-          'Add a team member who can manage settings, team and usage',
+          'Add a team member with the ‘manage settings’ permission',
           url_for('main.manage_users', service_id=current_service.id),
         ) }}
         {{ task_list_item(
           current_service.has_templates,
-          'Add templates with examples of the content you plan to send',
+          'Add templates with examples of your content',
           url_for('main.choose_template', service_id=current_service.id),
         ) }}
         {% if current_service.intending_to_send_email %}
           {{ task_list_item(
             current_service.has_email_reply_to_address,
             'Add a reply-to email address',
-            url_for('main.service_email_reply_to', service_id=current_service.id),
+            url_for('main.service_add_email_reply_to', service_id=current_service.id),
           ) }}
         {% endif %}
         {% if (
@@ -50,14 +59,17 @@
             url_for('main.service_sms_senders', service_id=current_service.id),
           ) }}
         {% endif %}
-        {% if current_service.able_to_accept_agreement %}
-          {{ task_list_item(
-            current_service.organisation.agreement_signed,
-            'Accept our data processing and financial agreement',
-            url_for('main.service_agreement', service_id=current_service.id),
-          ) }}
-        {% endif %}
       {% endcall %}
+      {% if current_service.able_to_accept_agreement %}
+      <h2 class="heading-medium">Make sure your organisation can use GOV.UK Notify</h2>
+      {% call task_list_wrapper() %}
+      {{ task_list_item(
+        current_service.organisation.agreement_signed,
+        'Accept our data processing and financial agreement',
+        url_for('main.service_agreement', service_id=current_service.id),
+      ) }}
+      {% endcall %}
+      {% endif %}
       {% if not current_user.is_gov_user %}
         <p class="govuk-body">
           Only team members with a government email address can request to go live.
@@ -71,11 +83,8 @@
           Your team has already sent a request to go live for this service.
         </p>
       {% else %}
-        <p class="govuk-body">
-          When we receive your request we’ll get back to you by the end of the next working day.
-        </p>
         {% call form_wrapper() %}
-          {{ page_footer('Request to go live') }}
+          {{ page_footer('Ready to go live') }}
         {% endcall %}
       {% endif %}
     </div>
