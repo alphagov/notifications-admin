@@ -28,6 +28,11 @@
 
       {% call task_list_wrapper() %}
         {{ task_list_item(
+          current_service.is_unique,
+          'Confirm that your service is unique',
+          url_for('main.service_confirm_unique', service_id=current_service.id),
+        ) }}
+        {{ task_list_item(
           current_service.has_estimated_usage,
           'Tell us what you expect to send',
           url_for('main.estimate_usage', service_id=current_service.id),

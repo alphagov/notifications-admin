@@ -128,6 +128,27 @@ def service_name_change(service_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/get-ready-to-go-live/confirm-your-service-is-unique", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def service_confirm_unique(service_id):
+    form = RenameServiceForm(name=current_service.name)
+
+    if form.validate_on_submit():
+        try:
+            current_service.update(name=form.name.data)
+        except HTTPError as http_error:
+            if http_error.status_code == 400 and (
+                error_message := service_api_client.parse_edit_service_http_error(http_error)
+            ):
+                form.name.errors.append(error_message)
+            else:
+                raise http_error
+        else:
+            return redirect(url_for(".request_to_go_live", service_id=service_id))
+
+    return render_template("views/service-settings/confirm-your-service-is-unique.html", form=form)
+
+
 @main.route("/services/<uuid:service_id>/service-settings/email-sender", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_email_sender_change(service_id):
