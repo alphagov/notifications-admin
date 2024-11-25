@@ -1,17 +1,24 @@
 {% macro task_list_item(completed, label, link) %}
-  <li class="task-list-item">
-    {% set status_id = label | make_string_safe_for_id %}
-    <span aria-describedby="{{ status_id }}"><a class="govuk-link govuk-link--no-visited-state" href="{{ link }}">{{ label }}</a></span>
-    {% if completed %}
-      <strong class="task-list-indicator-completed" id="{{ status_id }}">Completed</strong>
-    {% else %}
-      <strong class="task-list-indicator-not-completed" id="{{ status_id }}">Not completed</strong>
-    {% endif %}
+  <li class="govuk-task-list__item govuk-task-list__item--with-link">
+    <div class="govuk-task-list__name-and-hint">
+      {% set status_id = label | make_string_safe_for_id %}
+      <a class="govuk-link govuk-task-list__link govuk-link--no-visited-state" href="{{ link }}" aria-describedby="{{ status_id }}">
+        {{ label }}
+      </a>
+    </span>
+    </div>
+    <div class="govuk-task-list__status" id="{{ status_id }}">
+      {% if completed %}
+        Completed
+      {% else %}
+        <strong class="govuk-tag govuk-tag--blue">Incomplete</strong>
+      {% endif %}
+    </div>
   </li>
 {% endmacro %}
 
 {% macro task_list_wrapper() %}
-  <ul class="govuk-list task-list">
+  <ul class="govuk-task-list">
     {{ caller() }}
   </ul>
 {% endmacro %}
