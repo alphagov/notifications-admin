@@ -5,6 +5,7 @@ from flask import abort, current_app
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
+from app.extensions import redis_client
 from app.models import JSONModel
 from app.models.branding import EmailBranding, LetterBranding
 from app.models.contact_list import ContactLists
@@ -408,9 +409,16 @@ class Service(JSONModel):
         return {channel: getattr(self, f"volume_{channel}") for channel in ("email", "sms", "letter")}
 
     @property
+    def is_unique(self):
+        if redis_client.get(f"{self.id}_is_unique"):
+            return True
+        return False
+
+    @property
     def go_live_checklist_completed(self):
         return all(
             (
+                self.is_unique,
                 any(self.volumes_by_channel.values()),
                 self.has_team_members_with_manage_service_permission,
                 self.has_templates,
