@@ -28,7 +28,7 @@ from app.event_handlers import (
     create_archive_service_event,
     create_set_inbound_sms_on_event,
 )
-from app.extensions import zendesk_client
+from app.extensions import redis_client, zendesk_client
 from app.main import json_updates, main
 from app.main.forms import (
     AdminBillingDetailsForm,
@@ -71,6 +71,7 @@ from app.models.branding import (
 from app.models.letter_rates import LetterRates
 from app.models.organisation import Organisation
 from app.models.sms_rate import SMSRate
+from app.notify_client import cache
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
@@ -144,6 +145,7 @@ def service_confirm_unique(service_id):
             else:
                 raise http_error
         else:
+            redis_client.set(f"{service_id}_is_unique", b"true", ex=cache.DEFAULT_TTL)
             return redirect(url_for(".request_to_go_live", service_id=service_id))
 
     return render_template("views/service-settings/confirm-your-service-is-unique.html", form=form)
