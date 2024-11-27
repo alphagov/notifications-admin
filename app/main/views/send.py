@@ -249,6 +249,7 @@ def set_sender(service_id, template_id):
         template_id=template_id,
         sender_context={"title": sender_context["title"], "description": sender_context["description"]},
         option_hints=option_hints,
+        template_type=template.template_type,
         back_link=_get_set_sender_back_link(service_id, template),
     )
 
