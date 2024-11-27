@@ -1,5 +1,5 @@
 // GOVUK Frontend modules
-import { createAll, Header, Button, Radios, ErrorSummary, SkipLink, Tabs, NotificationBanner } from 'govuk-frontend';
+import { createAll, Header, Button, Radios, ErrorSummary, SkipLink, Tabs, NotificationBanner, Checkboxes } from 'govuk-frontend';
 
 import CollapsibleCheckboxes from './collapsible-checkboxes.mjs';
 import FocusBanner from './focus-banner.mjs';
@@ -21,6 +21,7 @@ createAll(ErrorSummary);
 createAll(SkipLink);
 createAll(Tabs);
 createAll(NotificationBanner);
+createAll(Checkboxes);
 
 const $collapsibleCheckboxes = document.querySelector('[data-notify-module="collapsible-checkboxes"]');
 if ($collapsibleCheckboxes) {
