@@ -237,6 +237,7 @@ def estimate_usage(service_id):
     return render_template(
         "views/service-settings/estimate-usage.html",
         form=form,
+        error_summary_enabled=True,
     )
 
 
