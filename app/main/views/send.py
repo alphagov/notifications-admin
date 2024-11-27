@@ -187,6 +187,13 @@ def _should_show_set_sender_page(service_id, template) -> bool:
 
     sender_details = get_sender_details(service_id, template.template_type)
 
+    if (
+        len(sender_details) == 0
+        and template.template_type == "email"
+        and current_user.has_permissions("manage_service")
+    ):
+        return True
+
     if len(sender_details) <= 1:
         return False
 
@@ -211,6 +218,17 @@ def set_sender(service_id, template_id):
 
     if len(sender_details) == 1:
         session["sender_id"] = sender_details[0]["id"]
+
+    if (
+        len(sender_details) == 0
+        and template.template_type == "email"
+        and current_user.has_permissions("manage_service")
+    ):
+        return render_template(
+            "views/templates/set-first-email-sender.html",
+            template_id=template_id,
+            back_link=_get_set_sender_back_link(service_id, template),
+        )
 
     if len(sender_details) <= 1:
         return redirect_to_one_off
