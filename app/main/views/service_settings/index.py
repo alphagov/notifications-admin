@@ -163,6 +163,7 @@ def service_email_sender_change(service_id):
         new_sender = form.custom_email_sender_name.data if form.use_custom_email_sender_name.data else None
 
         current_service.update(custom_email_sender_name=new_sender)
+        redis_client.set(f"{service_id}_has_confirmed_email_sender", b"true", ex=cache.DEFAULT_TTL)
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
