@@ -1,0 +1,43 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Where should replies come back to?
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header('Where should replies come back to?') }}
+
+  <p class="govuk-body">
+    Before you go live, you need to add at least one reply-to address so recipients can reply to your messages.
+  </p>
+  <p class="govuk-body">
+    Emails with a reply-to address:
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>are less likely to be labelled as spam</li>
+    <li>appear more trustworthy</li>
+  </ul>
+  <p class="govuk-body">
+    You can manage your reply-to email addresses at any time in settings.
+  </p>
+
+  <p class="govuk-body">
+    {{ govukButton({
+      "element": "a",
+      "text": "Add a reply-to email address",
+      "href": url_for('main.service_add_email_reply_to', service_id=current_service.id)
+    }) }}
+  </p>
+
+  <p class="govuk-body">
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.send_one_off', service_id=current_service.id, template_id=template_id) }}">I’ll do this later</a>
+  </p>
+
+  {% endblock %}
