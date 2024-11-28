@@ -1,3 +1,5 @@
+import time
+
 from notifications_utils.recipients import RecipientCSV
 
 from app.formatters import recipient_count
@@ -72,9 +74,8 @@ def generate_notifications_csv(**kwargs):
             "API key name",
         ]
 
-    yield ",".join(fieldnames) + "\n"
-
     while True:
+        time.sleep(40)
         notifications_batch = NotificationsForCSV(**kwargs)
 
         for notification in notifications_batch:
@@ -109,7 +110,7 @@ def generate_notifications_csv(**kwargs):
                     notification.created_at,
                     notification.api_key_name or "",
                 ]
-            yield Spreadsheet.from_rows([map(str, values)]).as_csv_data
+            return Spreadsheet.from_rows([fieldnames] + [map(str, values)]).as_csv_data
 
         if len(notifications_batch) == kwargs["page_size"]:
             kwargs["page"] += 1

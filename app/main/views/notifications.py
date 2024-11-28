@@ -14,7 +14,6 @@ from flask import (
     render_template,
     request,
     send_file,
-    stream_with_context,
     url_for,
 )
 from notifications_python_client.errors import APIError, HTTPError
@@ -288,23 +287,26 @@ def download_notifications_csv(service_id):
         abort(404)
 
     service_data_retention_days = current_service.get_days_of_retention(message_type)
-    return Response(
-        stream_with_context(
-            generate_notifications_csv(
-                service_id=service_id,
-                status=filter_args.get("status"),
-                page=request.args.get("page", 1),
-                page_size=10000,
-                template_type=message_type,
-                limit_days=service_data_retention_days,
-            )
-        ),
-        mimetype="text/csv",
-        headers={
-            "Content-Disposition": 'inline; filename="{} - {} - {} report.csv"'.format(
-                format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
-                message_type,
-                current_service.name,
-            )
-        },
+    data = generate_notifications_csv(
+        service_id=service_id,
+        status=filter_args.get("status"),
+        page=request.args.get("page", 1),
+        page_size=10000,
+        template_type=message_type,
+        limit_days=service_data_retention_days,
     )
+
+    if data:
+        return Response(
+            data,
+            mimetype="text/csv",
+            headers={
+                "Content-Disposition": 'inline; filename="{} - {} - {} report.csv"'.format(
+                    format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
+                    message_type,
+                    current_service.name,
+                ),
+            },
+        )
+    else:
+        return abort(400)

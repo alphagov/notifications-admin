@@ -16,5 +16,5 @@ create_app(application)
 if using_eventlet:
     application.wsgi_app = EventletTimeoutMiddleware(
         application.wsgi_app,
-        timeout_seconds=int(os.getenv("HTTP_SERVE_TIMEOUT_SECONDS", 30)),
+        timeout_seconds=int(os.getenv("HTTP_SERVE_TIMEOUT_SECONDSS", 30)),
     )
