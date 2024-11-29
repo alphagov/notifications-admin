@@ -37,8 +37,7 @@ class Config:
     INVITATION_EXPIRY_SECONDS = 3600 * 24 * 2  # 2 days - also set on api
     EMAIL_2FA_EXPIRY_SECONDS = 1800  # 30 Minutes
 
-    # mix(govuk-colour("dark-grey"), govuk-colour("mid-grey"))
-    HEADER_COLOUR = os.environ.get("HEADER_COLOUR", "#81878b")
+    HEADER_COLOUR = "#1d70b8"
     HTTP_PROTOCOL = os.environ.get("HTTP_PROTOCOL", "http")
     NOTIFY_APP_NAME = "admin"
     NOTIFY_LOG_LEVEL = "DEBUG"
