@@ -8,48 +8,52 @@
   link_current_item=False,
   root_element='h1'
 ) %}
-  <ol class="folder-heading-breadcrumb">
-  {% for folder in folders %}
-    {% if not loop.last %}
-    <li>
-      {% if folder.id %}
-        {% if current_user.has_template_folder_permission(folder, service=service) %}
-          <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type, template_folder_id=folder.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder {% if loop.index < (loop.length - 1) %}folder-heading-folder-truncated{% endif %}" title="{{ folder.name }}">
-            {{ svgs.folder(classes="folder-heading-folder__icon") }}
-            {{ folder.name }}
-          </a>
+  <div class="folder-heading-container">
+  {% if folders | length > 1 %}
+    <ol class="folder-heading-breadcrumb">
+    {% for folder in folders %}
+      {% if not loop.last %}
+      <li>
+        {% if folder.id %}
+          {% if current_user.has_template_folder_permission(folder, service=service) %}
+            <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type, template_folder_id=folder.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder{% if loop.index < (loop.length - 1) %} folder-heading-folder-truncated{% endif %}" title="{{ folder.name }}">
+              {{ svgs.folder(classes="folder-heading-folder__icon") }}
+              {{ folder.name }}
+            </a>
+          {% else %}
+            <span class="folder-heading-folder">
+              {{ svgs.folder(classes="folder-heading-folder__icon") }}
+              {{ folder.name }}
+            </span>
+          {% endif %}
+        {% else %}
+          <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type) }}" title="Templates" class="govuk-link govuk-link--no-visited-state {% if loop.length > 2 %}folder-heading-folder-root-truncated{% endif %}">Templates</a>
+        {% endif %}
+        {{ folder_path_separator() }}
+      </li>
+      {% endif %}
+    {% endfor %}
+    </ol>
+  {% endif %}
+    {% set folder = folders | last %}
+    <{{ root_element }} class="heading-medium folder-heading"{% if root_element == 'h1' %} id="page-header"{% endif %}>
+      {% if link_current_item and current_user.has_template_folder_permission(folder, service=service) %}
+        <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type, template_folder_id=folder.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder" title="{{ folder.name }}">
+          {{ svgs.folder(classes="folder-heading-folder__icon") }}
+          {{ folder.name }}
+        </a>
+      {% else %}
+        {% if folder.template_type or not folder.id %}
+          <span class="folder-heading-template">{{ folder.name }}</span>
         {% else %}
           <span class="folder-heading-folder">
             {{ svgs.folder(classes="folder-heading-folder__icon") }}
             {{ folder.name }}
           </span>
         {% endif %}
-      {% else %}
-        <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type) }}" title="Templates" class="govuk-link govuk-link--no-visited-state {% if loop.length > 2 %}folder-heading-folder-root-truncated{% endif %}">Templates</a>
       {% endif %}
-      {{ folder_path_separator() }}
-    </li>
-    {% endif %}
-  {% endfor %}
-  </ol>
-  {% set folder = folders | last %}
-  <{{ root_element }} class="heading-medium folder-heading"{% if root_element == 'h1' %} id="page-header"{% endif %}>
-    {% if link_current_item and current_user.has_template_folder_permission(folder, service=service) %}
-      <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type, template_folder_id=folder.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder" title="{{ folder.name }}">
-        {{ svgs.folder(classes="folder-heading-folder__icon") }}
-        {{ folder.name }}
-      </a>
-    {% else %}
-      {% if folder.template_type or not folder.id %}
-        <span class="folder-heading-template">{{ folder.name }}</span>
-      {% else %}
-        <span class="folder-heading-folder">
-          {{ svgs.folder(classes="folder-heading-folder__icon") }}
-          {{ folder.name }}
-        </span>
-      {% endif %}
-    {% endif %}
-  </{{ root_element }}>
+    </{{ root_element }}>
+  </div>
 {% endmacro %}
 
 
@@ -61,12 +65,13 @@
   to_folder_id
 ) %}
   {% if folder_path %}
+  <div class="folder-heading-container">
     <ol class="folder-heading-breadcrumb">
     {% if folder_path|length == 1 %}
       <li>
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id, to_folder_id=to_folder_id) }}">Services</a>
+        {{ folder_path_separator() }}
       </li>
-      {{ folder_path_separator() }}
     {% endif %}
     {% for folder in folder_path %}
       {% if not loop.last %}
@@ -106,12 +111,13 @@
         {{ folder.name if folder.id else from_service.name }}
       </span>
     </h2>
+  </div>
   {% endif %}
 {% endmacro %}
 
 
 {% macro page_title_folder_path(folders) %}
-{{ folders[-1].name }}{% if folders | length > 1 %} - {{ folders[-2].name }}{% endif %}
+{{ folders[-1].name }}{% if folders | length > 1 %} – {{ folders[-2].name }}{% endif %}
 {% endmacro %}
 
 
