@@ -111,12 +111,7 @@
 
 
 {% macro page_title_folder_path(folders) %}
-  {% for folder in folders|reverse %}
-    {{ folder.name }}
-    {% if not loop.last %}
-      –
-    {% endif %}
-  {% endfor %}
+{{ folders[-1].name }}{% if folders | length > 1 %} - {{ folders[-2].name }}{% endif %}
 {% endmacro %}
 
 
