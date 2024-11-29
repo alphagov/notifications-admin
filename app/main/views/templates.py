@@ -636,6 +636,16 @@ def add_service_template(service_id, template_type, template_folder_id=None):
             )
         )
 
+    if _should_show_choose_email_sender_name_page(template_type, current_service, current_user):
+        return redirect(
+            url_for(
+                "main.service_email_sender_change",
+                service_id=service_id,
+                came_from_template_page="yes",
+                from_template_folder_id=template_folder_id,
+            )
+        )
+
     form = get_template_form(template_type)()
     if form.validate_on_submit():
         try:
@@ -671,6 +681,18 @@ def add_service_template(service_id, template_type, template_folder_id=None):
         back_link=url_for("main.choose_template", service_id=current_service.id, template_folder_id=template_folder_id),
         error_summary_enabled=True,
     )
+
+
+def _should_show_choose_email_sender_name_page(template_type, service, user):
+    if (
+        template_type == "email"
+        and not service.has_email_templates
+        and user.has_permissions("manage_service")
+        and not service.has_confirmed_email_sender
+    ):
+        return True
+
+    return False
 
 
 def abort_403_if_not_admin_user():
