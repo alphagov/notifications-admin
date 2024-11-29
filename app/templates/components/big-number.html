@@ -6,9 +6,9 @@
         <span class="big-number-number">
           {% if number is number %}
             {% if currency %}
-              {{ "{}{:,.2f}".format(currency, number) }}
+              {{ "{}{:,.2f}".format(currency, number).replace(',',',<wbr />') | safe }}
             {% else %}
-              {{ "{:,}".format(number) }}
+              {{ "{:,}".format(number).replace(',',',<wbr />') | safe }}
             {% endif %}
           {% else %}
             {{ number }}
@@ -43,11 +43,11 @@
         {% if failures %}
           {% if failure_link %}
             <a class="govuk-link govuk-link--inverse" href="{{ failure_link }}">
-              {{ "{:,}".format(failures) }}
+              {{ "{:,}".format(failures).replace(',',',<wbr />') | safe  }}
               failed – {{ failure_percentage }}%
             </a>
           {% else %}
-            {{ "{:,}".format(failures) }}
+            {{ "{:,}".format(failures).replace(',',',<wbr />') | safe  }}
             failed – {{ failure_percentage }}%
           {% endif %}
         {% else %}
@@ -63,7 +63,7 @@
   <span class="big-number-dark bottom-gutter-2-3">
     <span class="big-number-number">
       {% if number is number %}
-        {{ "{:,}".format(number) }}
+        {{ "{:,}".format(number).replace(',',',<wbr />') | safe  }}
       {% else %}
         {{ number }}
       {% endif %}
