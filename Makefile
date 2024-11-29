@@ -16,8 +16,7 @@ PYTHON_EXECUTABLE_PREFIX := $(shell test -d "$${VIRTUALENV_ROOT}" && echo "$${VI
 
 .PHONY: bootstrap
 bootstrap: generate-version-file ## Set up everything to run the app
-	${PYTHON_EXECUTABLE_PREFIX}pip3 install -r requirements_for_test.txt
-
+	uv pip install -r requirements_for_test.txt
 	source $(HOME)/.nvm/nvm.sh && nvm install && npm ci --no-audit
 	. environment.sh; source $(HOME)/.nvm/nvm.sh && npm run build
 
@@ -78,10 +77,9 @@ fix-imports: ## Fix imports using ruff
 
 .PHONY: freeze-requirements
 freeze-requirements: ## create static requirements.txt
-	${PYTHON_EXECUTABLE_PREFIX}pip3 install --upgrade pip-tools
-	${PYTHON_EXECUTABLE_PREFIX}pip-compile requirements.in
-	${PYTHON_EXECUTABLE_PREFIX}python -c "from notifications_utils.version_tools import copy_config; copy_config()"
-	${PYTHON_EXECUTABLE_PREFIX}pip-compile requirements_for_test.in
+	uv pip compile requirements.in -o requirements.txt
+	python -c "from notifications_utils.version_tools import copy_config; copy_config()"
+	uv pip compile requirements_for_test.in -o requirements_for_test.txt
 
 .PHONY: bump-utils
 bump-utils:  # Bump notifications-utils package to latest version
