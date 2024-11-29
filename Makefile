@@ -9,9 +9,6 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD 2> /dev/null || echo "")
 
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 
-VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$VIRTUAL_ENV)
-PYTHON_EXECUTABLE_PREFIX := $(shell test -d "$${VIRTUALENV_ROOT}" && echo "$${VIRTUALENV_ROOT}/bin/" || echo "")
-
 ## DEVELOPMENT
 
 .PHONY: bootstrap
@@ -44,14 +41,6 @@ npm-audit:  ## Check for vulnerabilities in NPM packages
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: virtualenv
-virtualenv:
-	[ -z $$VIRTUAL_ENV ] && [ ! -d venv ] && python3 -m venv venv || true
-
-.PHONY: upgrade-pip
-upgrade-pip: virtualenv
-	${PYTHON_EXECUTABLE_PREFIX}pip3 install --upgrade pip
-
 .PHONY: generate-version-file
 generate-version-file: ## Generates the app version file
 	@echo -e "__git_commit__ = \"${GIT_COMMIT}\"\n__time__ = \"${DATE}\"" > ${APP_VERSION_FILE}
@@ -83,7 +72,7 @@ freeze-requirements: ## create static requirements.txt
 
 .PHONY: bump-utils
 bump-utils:  # Bump notifications-utils package to latest version
-	${PYTHON_EXECUTABLE_PREFIX}python -c "from notifications_utils.version_tools import upgrade_version; upgrade_version()"
+	python -c "from notifications_utils.version_tools import upgrade_version; upgrade_version()"
 
 .PHONY: clean
 clean:
