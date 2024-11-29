@@ -154,6 +154,18 @@ def service_confirm_unique(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-sender", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_email_sender_change(service_id):
+    came_from_template_page = request.args.get("came_from_template_page")
+    from_template_folder_id = request.args.get("from_template_folder_id")
+
+    if came_from_template_page:
+        back_link = url_for(
+            "main.choose_template",
+            service_id=service_id,
+            template_folder_id=from_template_folder_id,
+        )
+    else:
+        back_link = url_for("main.service_settings", service_id=service_id)
+
     form = ServiceEmailSenderForm(
         use_custom_email_sender_name=True,
         custom_email_sender_name=current_service.custom_email_sender_name,
@@ -165,10 +177,21 @@ def service_email_sender_change(service_id):
         current_service.update(custom_email_sender_name=new_sender)
         redis_client.set(f"{service_id}_has_confirmed_email_sender", b"true", ex=cache.DEFAULT_TTL)
 
-        return redirect(url_for(".service_settings", service_id=service_id))
+        if came_from_template_page:
+            return redirect(
+                url_for(
+                    "main.add_service_template",
+                    service_id=service_id,
+                    template_type="email",
+                    template_folder_id=from_template_folder_id,
+                )
+            )
+
+        return redirect(url_for("main.service_settings", service_id=service_id))
 
     return render_template(
         "views/service-settings/custom-email-sender-name.html",
+        back_link=back_link,
         form=form,
         organisation_type=current_service.organisation_type,
         error_summary_enabled=True,
