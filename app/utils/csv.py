@@ -76,7 +76,7 @@ def generate_notifications_csv(**kwargs):
 
     while True:
         notifications_batch = NotificationsForCSV(**kwargs)
-        time.sleep(40)
+        time.sleep(10)
         for notification in notifications_batch:
             if kwargs.get("job_id"):
                 values = (
