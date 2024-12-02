@@ -6,11 +6,11 @@ from flask import (
     redirect,
     render_template,
     request,
-    stream_with_context,
     url_for,
 )
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
+from notifications_utils.eventlet import EventletTimeout
 from notifications_utils.recipients import RecipientCSV
 
 from app import (
@@ -86,24 +86,29 @@ def view_job_csv(service_id, job_id):
     filter_args = parse_filter_args(request.args)
     filter_args["status"] = set_status_filters(filter_args)
 
-    return Response(
-        stream_with_context(
-            generate_notifications_csv(
-                service_id=service_id,
-                job_id=job_id,
-                status=filter_args.get("status"),
-                page=request.args.get("page", 1),
-                page_size=5000,
-                template_type=job.template_type,
-            )
-        ),
-        mimetype="text/csv",
-        headers={
-            "Content-Disposition": 'inline; filename="{} - {}.csv"'.format(
-                job.template["name"], format_datetime_short(job.created_at)
-            )
-        },
-    )
+    try:
+        data = generate_notifications_csv(
+            service_id=service_id,
+            job_id=job_id,
+            status=filter_args.get("status"),
+            page=request.args.get("page", 1),
+            page_size=5000,
+            template_type=job.template_type,
+        )
+        return Response(
+            list(data),
+            mimetype="text/csv",
+            headers={
+                "Content-Disposition": 'inline; filename="{} - {}.csv"'.format(
+                    job.template["name"], format_datetime_short(job.created_at)
+                )
+            },
+        )
+    except Exception as e:
+        if isinstance(e, EventletTimeout):
+            abort(504)
+        else:
+            abort(400)
 
 
 @main.route("/services/<uuid:service_id>/jobs/<uuid:job_id>/original.csv")
