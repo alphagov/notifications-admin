@@ -26,7 +26,7 @@ from tests.conftest import normalize_spaces
                 ("Features", ".guidance_features"),
                 ("Pricing", ".guidance_pricing"),
                 ("Using Notify", ".guidance_using_notify"),
-                ("Your profile", ".user_profile"),
+                ("Your account", ".user_profile"),
             ),
         ),
         (
@@ -38,7 +38,7 @@ from tests.conftest import normalize_spaces
                 ("Pricing", ".guidance_pricing"),
                 ("Using Notify", ".guidance_using_notify"),
                 ("Platform admin", ".platform_admin_search"),
-                ("Your profile", ".user_profile"),
+                ("Your account", ".user_profile"),
             ),
         ),
     ),
