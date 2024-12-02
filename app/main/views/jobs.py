@@ -6,7 +6,6 @@ from flask import (
     redirect,
     render_template,
     request,
-    stream_with_context,
     url_for,
 )
 from markupsafe import Markup
@@ -86,17 +85,16 @@ def view_job_csv(service_id, job_id):
     filter_args = parse_filter_args(request.args)
     filter_args["status"] = set_status_filters(filter_args)
 
+    data = generate_notifications_csv(
+        service_id=service_id,
+        job_id=job_id,
+        status=filter_args.get("status"),
+        page=request.args.get("page", 1),
+        page_size=5000,
+        template_type=job.template_type,
+    )
     return Response(
-        stream_with_context(
-            generate_notifications_csv(
-                service_id=service_id,
-                job_id=job_id,
-                status=filter_args.get("status"),
-                page=request.args.get("page", 1),
-                page_size=5000,
-                template_type=job.template_type,
-            )
-        ),
+        list(data),
         mimetype="text/csv",
         headers={
             "Content-Disposition": 'inline; filename="{} - {}.csv"'.format(

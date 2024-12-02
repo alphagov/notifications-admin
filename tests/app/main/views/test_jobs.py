@@ -104,7 +104,7 @@ def test_should_show_page_for_one_job(
         job_id=fake_uuid,
         status=status_argument,
     )
-    csv_link = page.select_one("a[download]")
+    csv_link = page.select_one("a[id=download-job-report]")
     assert csv_link["href"] == url_for(
         "main.view_job_csv", service_id=SERVICE_ONE_ID, job_id=fake_uuid, status=status_argument
     )
@@ -322,7 +322,7 @@ def test_should_show_letter_job(
     )
     assert normalize_spaces(page.select(".keyline-block")[0].text) == "1 Letter"
     assert normalize_spaces(page.select(".keyline-block")[1].text) == "6 January Estimated delivery date"
-    assert page.select_one("a[download]")["href"] == url_for(
+    assert page.select_one("a[id=download-job-report]")["href"] == url_for(
         "main.view_job_csv",
         service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
