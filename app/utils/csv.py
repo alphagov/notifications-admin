@@ -1,5 +1,5 @@
 from notifications_utils.recipients import RecipientCSV
-
+import time
 from app.formatters import recipient_count
 from app.models.notification import NotificationsForCSV
 from app.models.spreadsheet import Spreadsheet
@@ -76,7 +76,7 @@ def generate_notifications_csv(**kwargs):
 
     while True:
         notifications_batch = NotificationsForCSV(**kwargs)
-
+        time.sleep(40)
         for notification in notifications_batch:
             if kwargs.get("job_id"):
                 values = (

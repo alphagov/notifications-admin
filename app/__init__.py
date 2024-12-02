@@ -479,7 +479,6 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             raise error
         return _error_response(500)
 
-    @application.errorhandler(504)
     @application.errorhandler(EventletTimeout)
     def eventlet_timeout(error):
         application.logger.exception(error)
