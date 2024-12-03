@@ -24,8 +24,8 @@
         </h1>
         <p class="govuk-body">
           Notify can store files up to
-          {{ "{:,}".format(recipients.max_rows) }} rows in size. Your
-          file has {{ "{:,}".format(recipients|length) }} rows.
+          {{ recipients.max_rows|format_thousands }} rows in size. Your
+          file has {{ recipients|length|format_thousands }} rows.
         </p>
 
       {% elif not recipients.allowed_to_send_to %}
