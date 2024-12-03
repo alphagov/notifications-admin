@@ -1,3 +1,25 @@
+// mixin for fluid typoghraphy using clamp
+// accepts values from the DS typography scale
+// https://design-system.service.gov.uk/styles/type-scale/
+@mixin fluid-font-size($min-size, $cqi-size, $max-size, $tabular: true, $bold: true) {
+  $min-size-rem: govuk-px-to-rem($min-size);
+  $max-size-rem: govuk-px-to-rem($max-size);
+  // for IE11 let's set it to smaller size so that it
+  // will not break out
+  font-size: #{$min-size}px;
+  font-size: #{clamp(#{$min-size-rem}, #{$cqi-size}, #{$max-size-rem})};
+  @if $tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  @if $bold {
+    font-weight: $govuk-font-weight-bold;
+  }
+
+  @include govuk-media-query($until: tablet) {
+    font-size: govuk-px-to-rem($min-size);
+  }
+}
+
 %big-number,
 .big-number {
 
@@ -9,7 +31,7 @@
   }
 
   &-number {
-    @include govuk-font(48, $weight: bold, $tabular: true);
+    @include fluid-font-size(32, 18cqi, 48);
   }
 
   &-label {
@@ -32,22 +54,24 @@
 
 .big-number-dark {
   @extend %big-number;
+  container-type: inline-size;
   padding: govuk-spacing(3);
   position: relative;
   background: govuk-colour("black");
   color: govuk-colour("white");
 
   .big-number-number {
-    @include govuk-font(36, $weight: bold, $tabular: true);
+    @include fluid-font-size(24, 18cqi, 36);
   }
 }
 
 .big-number-smaller {
 
   @extend %big-number;
+  container-type: inline-size;
 
   .big-number-number {
-    @include govuk-font(36, $weight: bold, $tabular: true);
+    @include fluid-font-size(24, 18cqi, 36);
   }
 
 }
@@ -55,9 +79,10 @@
 .big-number-smallest {
 
   @extend %big-number;
+  container-type: inline-size;
 
   .big-number-number {
-    @include govuk-font(24, $weight: bold, $tabular: true);
+    @include fluid-font-size(18, 18cqi, 24);
   }
 
 }

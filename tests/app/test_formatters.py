@@ -1,4 +1,4 @@
-from app.formatters import message_count_label, sentence_case
+from app.formatters import insert_wbr, message_count_label, sentence_case
 
 
 def test_sentence_case():
@@ -14,3 +14,7 @@ def test_message_count_label_for_unsubscribe_requests():
     assert message_count_label(count=2, message_type="unsubscribe request", suffix="") == "unsubscribe requests"
     assert message_count_label(count=1, message_type="request", suffix="") == "request"
     assert message_count_label(count=2, message_type="request", suffix="") == "requests"
+
+
+def test_insert_wbr():
+    assert insert_wbr("1,352,456") == "1,<wbr />352,<wbr />456"
