@@ -1019,8 +1019,14 @@ def service_delete_letter_contact(service_id, letter_contact_id):
 @main.route("/services/<uuid:service_id>/service-settings/sms-sender", methods=["GET"])
 @user_has_permissions("manage_service", "manage_api_keys")
 def service_sms_senders(service_id):
+    if request.args.get("back") == "go-live":
+        back_link = url_for("main.request_to_go_live", service_id=service_id)
+    else:
+        back_link = url_for("main.service_settings", service_id=service_id)
+
     return render_template(
         "views/service-settings/sms-senders.html",
+        back_link=back_link,
     )
 
 
