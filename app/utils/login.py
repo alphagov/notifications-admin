@@ -36,11 +36,7 @@ def log_in_user(user_id):
 
 
 def redirect_when_logged_in(platform_admin):
-    next_url = request.args.get("next")
-    if next_url and is_safe_redirect_url(next_url):
-        return redirect(next_url)
-
-    return redirect(url_for("main.show_accounts_or_dashboard"))
+    return safe_redirect(request.args.get("next"))
 
 
 def email_needs_revalidating(user):
@@ -57,3 +53,12 @@ def is_safe_redirect_url(target):
     host_url = urlparse(request.host_url)
     redirect_url = urlparse(urljoin(request.host_url, target))
     return redirect_url.scheme in ("http", "https") and host_url.netloc == redirect_url.netloc
+
+
+def safe_redirect(target):
+    if is_safe_redirect_url(target):
+        return redirect(target)
+
+    return redirect(url_for("main.show_accounts_or_dashboard"))
+
+

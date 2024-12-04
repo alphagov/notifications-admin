@@ -19,7 +19,7 @@ from app.main.forms import LoginForm
 from app.models.user import InvitedUser, User
 from app.utils import hide_from_search_engines
 from app.utils.constants import JSON_UPDATES_BLUEPRINT_NAME
-from app.utils.login import is_safe_redirect_url
+from app.utils.login import redirect_when_logged_in
 
 
 @main.route("/sign-in", methods=(["GET", "POST"]))
@@ -27,12 +27,10 @@ from app.utils.login import is_safe_redirect_url
 def sign_in():
     redirect_url = request.args.get("next")
     if current_user.is_authenticated:
-        if is_safe_redirect_url(redirect_url):
-            return redirect(redirect_url)
-        return redirect(url_for("main.show_accounts_or_dashboard"))
+        return redirect_when_logged_in()
 
     form = LoginForm()
-    password_reset_url = url_for(".forgot_password", next=request.args.get("next"))
+    password_reset_url = url_for(".forgot_password", next=redirect_url)
 
     if form.validate_on_submit():
         user = User.from_email_address_and_password_or_none(form.email_address.data, form.password.data)
