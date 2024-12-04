@@ -25,7 +25,7 @@ from app.utils.login import redirect_if_logged_in
 @main.route("/sign-in", methods=(["GET", "POST"]))
 @hide_from_search_engines
 @redirect_if_logged_in
-def sign_in():  # noqa: C901
+def sign_in():
     redirect_url = request.args.get("next")
 
     form = LoginForm()
