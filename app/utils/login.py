@@ -49,6 +49,9 @@ def email_needs_revalidating(user):
 
 # see https://stackoverflow.com/questions/60532973/how-do-i-get-a-is-safe-url-function-to-use-with-flask-and-how-does-it-work  # noqa
 def is_safe_redirect_url(target):
+    if not target:
+        return False
+
     from urllib.parse import urljoin, urlparse
 
     host_url = urlparse(request.host_url)

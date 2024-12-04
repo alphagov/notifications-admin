@@ -27,7 +27,7 @@ from app.utils.login import is_safe_redirect_url
 def sign_in():
     redirect_url = request.args.get("next")
     if current_user.is_authenticated:
-        if redirect_url and is_safe_redirect_url(redirect_url):
+        if is_safe_redirect_url(redirect_url):
             return redirect(redirect_url)
         return redirect(url_for("main.show_accounts_or_dashboard"))
 
