@@ -95,6 +95,8 @@ class User(BaseUser, UserMixin):
             return None
         if user.locked:
             return None
+        if not user.is_active:
+            return None
         if not user_api_client.verify_password(user.id, password):
             return None
         return user

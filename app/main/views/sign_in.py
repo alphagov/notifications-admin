@@ -42,23 +42,22 @@ def sign_in():
             if user.state == "pending":
                 return redirect(url_for("main.resend_email_verification", next=redirect_url))
 
-            if user.is_active:
-                if session.get("invited_user_id"):
-                    invited_user = InvitedUser.from_session()
-                    if user.email_address.lower() != invited_user.email_address.lower():
-                        flash("You cannot accept an invite for another person.")
-                        session.pop("invited_user_id", None)
-                        abort(403)
-                    invited_user.accept_invite()
+            invited_user = InvitedUser.from_session()
+            if invited_user:
+                if user.email_address.lower() != invited_user.email_address.lower():
+                    flash("You cannot accept an invite for another person.")
+                    session.pop("invited_user_id", None)
+                    abort(403)
+                invited_user.accept_invite()
 
-                user.send_login_code()
+            user.send_login_code()
 
-                if user.sms_auth:
-                    return redirect(url_for(".two_factor_sms", next=redirect_url))
-                if user.email_auth:
-                    return redirect(url_for(".two_factor_email_sent", next=redirect_url))
-                if user.webauthn_auth:
-                    return redirect(url_for(".two_factor_webauthn", next=redirect_url))
+            if user.sms_auth:
+                return redirect(url_for(".two_factor_sms", next=redirect_url))
+            if user.email_auth:
+                return redirect(url_for(".two_factor_email_sent", next=redirect_url))
+            if user.webauthn_auth:
+                return redirect(url_for(".two_factor_webauthn", next=redirect_url))
 
         # Vague error message for login in case of user not known, locked, inactive or password not verified
         flash(
