@@ -18,7 +18,7 @@
 
     {% if again %}
       {{ govuk_page_header("You need to sign in again") }}
-      {% if other_device %}
+      {% if current_user.logged_in_elsewhere() %}
         <p class="govuk-body">
           We signed you out because you logged in to Notify on another device.
         </p>
