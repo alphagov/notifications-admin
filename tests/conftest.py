@@ -9,7 +9,7 @@ from uuid import UUID, uuid4
 
 import html5lib
 import pytest
-from flask import Flask, url_for
+from flask import Flask, current_app, url_for
 from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
@@ -2899,7 +2899,7 @@ def os_environ():
 
 
 @pytest.fixture  # noqa (C901 too complex)
-def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C901 too complex)
+def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):  # noqa (C901 too complex)
     def block_method(object, method_name, preferred_method_name):
         def blocked_method(*args, **kwargs):
             raise AttributeError(
@@ -2934,6 +2934,7 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             _test_for_elements_without_class=True,
             _test_forms_have_an_action_set=True,
             _test_for_non_smart_quotes=True,
+            _test_for_script_csp_nonce=True,
             _optional_args="",
             **endpoint_kwargs,
         ):
@@ -2946,8 +2947,10 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
                 _test_for_elements_without_class=_test_for_elements_without_class,
                 _test_forms_have_an_action_set=_test_forms_have_an_action_set,
                 _test_for_non_smart_quotes=_test_for_non_smart_quotes,
+                _test_for_script_csp_nonce=_test_for_script_csp_nonce,
             )
 
+        # ruff: noqa: C901
         @staticmethod
         def get_url(
             url,
@@ -2958,9 +2961,12 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             _test_for_elements_without_class=True,
             _test_forms_have_an_action_set=True,
             _test_for_non_smart_quotes=True,
+            _test_for_script_csp_nonce=True,
             **endpoint_kwargs,
         ):
             from flask.templating import _render
+
+            mocker.patch("secrets.token_urlsafe", return_value=fake_nonce)
 
             with mock.patch("flask.templating._render", wraps=_render) as mock_render:
                 resp = _logged_in_client.get(
@@ -3006,6 +3012,9 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
 
             if _test_for_non_smart_quotes:
                 ClientRequest.test_for_non_smart_quotes(page)
+
+            if _test_for_script_csp_nonce:
+                ClientRequest.test_for_script_csp_nonce(page)
 
             return page
 
@@ -3148,6 +3157,16 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
                 assert not (
                     "'" in el.text or '"' in el.text
                 ), f"Non-smart quote or apostrophe found in <{el.name}>: {normalize_spaces(el.text)}"
+
+        @staticmethod
+        def test_for_script_csp_nonce(page):
+            for script_tag in page.select("script"):
+                src = script_tag.get("src")
+                nonce = script_tag.get("nonce")
+                if src and current_app.config["ASSET_DOMAIN"] in src:
+                    assert nonce is None
+                else:
+                    assert nonce == fake_nonce
 
     return ClientRequest
 
@@ -4374,3 +4393,8 @@ def mock_get_notifications_count_for_service(mocker):
         "app.notification_api_client.get_notifications_count_for_service",
         return_value=100,
     )
+
+
+@pytest.fixture(scope="function")
+def fake_nonce():
+    return "TESTs5Vr8v3jgRYLoQuVwA"
