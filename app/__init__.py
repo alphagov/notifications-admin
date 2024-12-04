@@ -338,7 +338,6 @@ def load_user_id_before_request():
 
 #  https://www.owasp.org/index.php/List_of_useful_HTTP_headers
 def useful_headers_after_request(response):
-    response.headers.add("X-Frame-Options", "deny")
     response.headers.add("X-Content-Type-Options", "nosniff")
     response.headers.add("X-XSS-Protection", "1; mode=block")
     response.headers.add(
@@ -351,6 +350,8 @@ def useful_headers_after_request(response):
             "font-src 'self' {asset_domain} data:;"
             "img-src 'self' {asset_domain}"
             " *.notifications.service.gov.uk {logo_domain} data:;"
+            "style-src 'self' {asset_domain} 'unsafe-inline';"
+            "frame-ancestors 'self';"
             "frame-src 'self';".format(
                 asset_domain=current_app.config["ASSET_DOMAIN"],
                 logo_domain=current_app.config["LOGO_CDN_DOMAIN"],
@@ -370,6 +371,25 @@ def useful_headers_after_request(response):
     response.headers.add("Cache-Control", "no-store, no-cache, private, must-revalidate")
     for key, value in response.headers:
         response.headers[key] = SanitiseASCII.encode(value)
+    response.headers.add("Strict-Transport-Security", "max-age=31536000; preload")
+    response.headers.add("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.add(
+        "Cross-Origin-Embedder-Policy",
+        "require-corp {asset_domain};".format(asset_domain=current_app.config["ASSET_DOMAIN"]),
+    )
+    response.headers.add(
+        "Cross-Origin-Opener-Policy",
+        "same-origin {asset_domain};".format(asset_domain=current_app.config["ASSET_DOMAIN"]),
+    )
+    response.headers.add(
+        "Cross-Origin-Resource-Policy",
+        "same-origin {asset_domain};".format(asset_domain=current_app.config["ASSET_DOMAIN"]),
+    )
+    response.headers.add(
+        "Permissions-Policy",
+        "geolocation=(), microphone=(), camera=(), autoplay=(), payment=(), sync-xhr=()",
+    )
+    response.headers.add("Server", "Cloudfront")
     return response
 
 
