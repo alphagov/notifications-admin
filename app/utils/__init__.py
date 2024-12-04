@@ -10,6 +10,9 @@ from ordered_set import OrderedSet
 from werkzeug.datastructures import MultiDict
 from werkzeug.routing import RequestRedirect
 
+# if changing these, note there may be database indexes corresponding to some of
+# these status sets in -api which may also need updating to prevent a
+# performance degradation
 SENDING_STATUSES = ["created", "pending", "sending", "pending-virus-check"]
 DELIVERED_STATUSES = ["delivered", "sent", "returned-letter"]
 FAILURE_STATUSES = [
