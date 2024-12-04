@@ -25,7 +25,7 @@ def guidance_pricing_text_messages():
         "views/guidance/pricing/text-message-pricing.html",
         sms_rate=SMSRate(),
         international_sms_rates=sorted(
-            [(cc, country["names"], country["billable_units"]) for cc, country in INTERNATIONAL_BILLING_RATES.items()],
+            [(cc, country["names"], country["rate_multiplier"]) for cc, country in INTERNATIONAL_BILLING_RATES.items()],
             key=lambda x: x[0],
         ),
         _search_form=SearchByNameForm(),
