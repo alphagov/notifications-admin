@@ -9,15 +9,11 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD 2> /dev/null || echo "")
 
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 
-VIRTUALENV_ROOT := $(shell [ -z $$VIRTUAL_ENV ] && echo $$(pwd)/venv || echo $$VIRTUAL_ENV)
-PYTHON_EXECUTABLE_PREFIX := $(shell test -d "$${VIRTUALENV_ROOT}" && echo "$${VIRTUALENV_ROOT}/bin/" || echo "")
-
 ## DEVELOPMENT
 
 .PHONY: bootstrap
 bootstrap: generate-version-file ## Set up everything to run the app
-	${PYTHON_EXECUTABLE_PREFIX}pip3 install -r requirements_for_test.txt
-
+	uv pip install -r requirements_for_test.txt
 	source $(HOME)/.nvm/nvm.sh && nvm install && npm ci --no-audit
 	. environment.sh; source $(HOME)/.nvm/nvm.sh && npm run build
 
@@ -45,14 +41,6 @@ npm-audit:  ## Check for vulnerabilities in NPM packages
 help:
 	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: virtualenv
-virtualenv:
-	[ -z $$VIRTUAL_ENV ] && [ ! -d venv ] && python3 -m venv venv || true
-
-.PHONY: upgrade-pip
-upgrade-pip: virtualenv
-	${PYTHON_EXECUTABLE_PREFIX}pip3 install --upgrade pip
-
 .PHONY: generate-version-file
 generate-version-file: ## Generates the app version file
 	@echo -e "__git_commit__ = \"${GIT_COMMIT}\"\n__time__ = \"${DATE}\"" > ${APP_VERSION_FILE}
@@ -78,14 +66,13 @@ fix-imports: ## Fix imports using ruff
 
 .PHONY: freeze-requirements
 freeze-requirements: ## create static requirements.txt
-	${PYTHON_EXECUTABLE_PREFIX}pip3 install --upgrade pip-tools
-	${PYTHON_EXECUTABLE_PREFIX}pip-compile requirements.in
-	${PYTHON_EXECUTABLE_PREFIX}python -c "from notifications_utils.version_tools import copy_config; copy_config()"
-	${PYTHON_EXECUTABLE_PREFIX}pip-compile requirements_for_test.in
+	uv pip compile requirements.in -o requirements.txt
+	python -c "from notifications_utils.version_tools import copy_config; copy_config()"
+	uv pip compile requirements_for_test.in -o requirements_for_test.txt
 
 .PHONY: bump-utils
 bump-utils:  # Bump notifications-utils package to latest version
-	${PYTHON_EXECUTABLE_PREFIX}python -c "from notifications_utils.version_tools import upgrade_version; upgrade_version()"
+	python -c "from notifications_utils.version_tools import upgrade_version; upgrade_version()"
 
 .PHONY: clean
 clean:

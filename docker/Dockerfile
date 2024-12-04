@@ -2,6 +2,7 @@ FROM python:3.11-slim-bookworm as base
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
+ENV UV_COMPILE_BYTECODE=1
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -40,9 +41,12 @@ RUN echo "Install OS dependencies for python app requirements" &&  \
 
 COPY requirements.txt .
 
+RUN pip install uv
+
+ENV UV_CACHE_DIR='/tmp/uv-cache/'
 RUN echo "Installing python requirements" && \
     python3 -m venv /opt/venv && \
-    /opt/venv/bin/pip install -r requirements.txt
+    uv pip sync --python /opt/venv/bin/python requirements.txt
 
 COPY . .
 RUN make generate-version-file  # This file gets copied across
@@ -115,7 +119,9 @@ COPY --from=python_build --chown=notify:notify /opt/venv /opt/venv
 RUN mkdir -p app
 
 # Install dev/test requirements
+RUN pip install uv
 COPY --chown=notify:notify Makefile requirements_for_test.txt package-lock.json package.json rollup.config.mjs ./
+ENV UV_CACHE_DIR='/tmp/uv-cache/'
 RUN make bootstrap
 
 COPY --chown=notify:notify . .
