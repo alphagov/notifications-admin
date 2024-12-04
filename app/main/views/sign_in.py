@@ -51,8 +51,7 @@ def sign_in():
                         flash("You cannot accept an invite for another person.")
                         session.pop("invited_user_id", None)
                         abort(403)
-                    else:
-                        invited_user.accept_invite()
+                    invited_user.accept_invite()
 
                 user.send_login_code()
 
