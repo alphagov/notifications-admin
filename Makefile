@@ -18,8 +18,8 @@ PYTHON_EXECUTABLE_PREFIX := $(shell test -d "$${VIRTUALENV_ROOT}" && echo "$${VI
 bootstrap: generate-version-file ## Set up everything to run the app
 	${PYTHON_EXECUTABLE_PREFIX}pip3 install -r requirements_for_test.txt
 
-	source $(HOME)/.nvm/nvm.sh && nvm install && npm ci --no-audit
-	. environment.sh; source $(HOME)/.nvm/nvm.sh && npm run build
+	npm ci --no-audit
+	. environment.sh; npm run build
 
 .PHONY: bootstrap-with-docker
 bootstrap-with-docker: generate-version-file ## Build the image to run the app in Docker
@@ -39,7 +39,7 @@ run-flask-with-docker: ## Run flask
 
 .PHONY: npm-audit
 npm-audit:  ## Check for vulnerabilities in NPM packages
-	source $(HOME)/.nvm/nvm.sh && npm run audit
+	npm run audit
 
 .PHONY: help
 help:
@@ -61,7 +61,7 @@ generate-version-file: ## Generates the app version file
 test: ## Run tests
 	ruff check .
 	black --check .
-	source $(HOME)/.nvm/nvm.sh && npm test
+	npm test
 	py.test -n auto --maxfail=10 tests/
 
 .PHONY: watch-tests
