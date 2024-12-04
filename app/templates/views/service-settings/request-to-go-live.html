@@ -66,7 +66,7 @@
           {{ task_list_item(
             not current_service.sms_sender_is_govuk,
             'Change your Text message sender ID',
-            url_for('main.service_sms_senders', service_id=current_service.id),
+            url_for('main.service_sms_senders', service_id=current_service.id, back="go-live"),
           ) }}
         {% endif %}
       {% endcall %}
