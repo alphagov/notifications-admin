@@ -47,6 +47,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "letter_message_limit": letter_message_limit,
             "user_id": user_id,
             "restricted": restricted,
+            "prefix_sms": False,
         }
         data = _attach_current_user(data)
         return self.post("/service", data)["data"]["id"]
