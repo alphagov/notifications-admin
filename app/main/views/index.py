@@ -27,7 +27,7 @@ main.register_blueprint(redirects)
 
 @main.route("/")
 def index():
-    if current_user and current_user.is_authenticated:
+    if current_user.is_authenticated:
         return redirect(url_for("main.your_services"))
 
     return render_template(

@@ -17,7 +17,7 @@ from app.utils import hide_from_search_engines
 @main.route("/register", methods=["GET", "POST"])
 @hide_from_search_engines
 def register():
-    if current_user and current_user.is_authenticated:
+    if current_user.is_authenticated:
         return redirect(url_for("main.show_accounts_or_dashboard"))
 
     form = RegisterUserForm()
