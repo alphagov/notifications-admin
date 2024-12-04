@@ -674,7 +674,7 @@
             "text": "Rate limit"
           },
           "value": {
-            "text": "{:,} per minute".format(current_service.rate_limit)
+            "text": "{} per minute".format(current_service.rate_limit|format_thousands)
           },
           "actions": {
             "items": [
@@ -693,7 +693,7 @@
             "text": "{} limit".format('email'|format_notification_type)
           },
           "value": {
-            "text": "{:,} per day".format(current_service.get_message_limit('email'))
+            "text": "{} per day".format(current_service.get_message_limit('email')|format_thousands)
           },
           "actions": {
             "items": [
@@ -712,7 +712,7 @@
             "text": "{} limit".format('sms'|format_notification_type)
           },
           "value": {
-            "text": "{:,} per day".format(current_service.get_message_limit('sms'))
+            "text": "{} per day".format(current_service.get_message_limit('sms')|format_thousands)
           },
           "actions": {
             "items": [
@@ -731,7 +731,7 @@
             "text": "{} limit".format('letter'|format_notification_type)
           },
           "value": {
-            "text": "{:,} per day".format(current_service.get_message_limit('letter'))
+            "text": "{} per day".format(current_service.get_message_limit('letter')|format_thousands)
           },
           "actions": {
             "items": [
@@ -750,7 +750,7 @@
             "text": "Free text message allowance"
           },
           "value": {
-            "text": "{:,} per year".format(current_service.free_sms_fragment_limit)
+            "text": "{} per year".format(current_service.free_sms_fragment_limit|format_thousands)
           },
           "actions": {
             "items": [

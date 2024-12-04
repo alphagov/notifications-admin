@@ -53,7 +53,7 @@
               ) }}
               {% if counts.requested %}
                 <span class="{{ 'failure-highlight' if counts.show_warning else '' }}">
-                  {{ "{:,}".format(counts.failed) }} failed
+                  {{ counts.failed|format_thousands }} failed
                 </span>
               {% else %}
                 –

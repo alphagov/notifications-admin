@@ -55,7 +55,7 @@
     {% for noti_type in global_stats %}
       <div class="govuk-grid-column-one-third">
         <div class="bordered-text-box">
-          <span class="big-number-number">{{ "{:,}".format(noti_type.test_data.number) }}</span>
+          <span class="big-number-number">{{ noti_type.test_data.number|format_thousands }}</span>
           {{ noti_type.test_data.label }}
         </div>
       </div>

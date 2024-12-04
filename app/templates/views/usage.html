@@ -116,7 +116,7 @@
               {% endfor %}
               {% for letter in item.letter_breakdown %}
                 {% if letter.sent %}
-                  <li class="tabular-numbers">{{ "{:,} {}".format(letter.sent, letter.postage_description) }} {{ letter.sent|message_count_label('letter', suffix='') }} at
+                  <li class="tabular-numbers">{{ letter.sent|format_thousands}} {{ letter.postage_description }} {{ letter.sent|message_count_label('letter', suffix='') }} at
                   {{ letter.rate | format_pounds_as_currency }}</li>
                 {% endif %}
               {% endfor %}
