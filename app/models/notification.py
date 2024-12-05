@@ -10,6 +10,7 @@ from notifications_utils.template import (
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
+from app.notify_client.api_key_api_client import KEY_TYPE_TEST
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
 from app.utils.letters import get_letter_printing_statement
@@ -60,6 +61,10 @@ class Notification(JSONModel):
     @property
     def key_type(self):
         return self._dict.get("key_type")
+
+    @property
+    def sent_with_test_key(self):
+        return self.key_type == KEY_TYPE_TEST
 
     @property
     def sent_by(self):

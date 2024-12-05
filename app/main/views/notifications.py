@@ -27,7 +27,6 @@ from app import (
 )
 from app.main import json_updates, main
 from app.models.notification import Notification
-from app.notify_client.api_key_api_client import KEY_TYPE_TEST
 from app.utils import (
     DELIVERED_STATUSES,
     FAILURE_STATUSES,
@@ -138,7 +137,6 @@ def view_notification(service_id, notification_id):  # noqa: C901
         partials=get_single_notification_partials(notification),
         help=get_help_argument(),
         can_receive_inbound=(current_service.has_permission("inbound_sms")),
-        sent_with_test_key=(notification.key_type == KEY_TYPE_TEST),
         back_link=back_link,
     )
 
@@ -218,7 +216,6 @@ def get_single_notification_partials(notification):
         "status": render_template(
             "partials/notifications/status.html",
             notification=notification,
-            sent_with_test_key=(notification.key_type == KEY_TYPE_TEST),
         ),
     }
 
