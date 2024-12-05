@@ -50,7 +50,7 @@ def view_notification(service_id, notification_id):  # noqa: C901
     error_message = None
     page_count = None
 
-    if notification.template["is_precompiled_letter"]:
+    if notification.is_precompiled_letter:
         try:
             file_contents, metadata = get_letter_file_data(service_id, notification_id, "pdf", with_metadata=True)
             page_count = (
@@ -144,7 +144,7 @@ def view_notification(service_id, notification_id):  # noqa: C901
         estimated_letter_delivery_date=notification.estimated_letter_delivery_date,
         notification_id=notification.id,
         can_receive_inbound=(current_service.has_permission("inbound_sms")),
-        is_precompiled_letter=notification.template["is_precompiled_letter"],
+        is_precompiled_letter=notification.is_precompiled_letter,
         letter_print_day=notification.letter_print_day,
         show_cancel_button=notification.letter_can_be_cancelled,
         sent_with_test_key=(notification.key_type == KEY_TYPE_TEST),
@@ -180,7 +180,7 @@ def get_preview_error_image():
 @user_has_permissions("view_activity", "send_messages")
 def view_letter_notification_as_preview(service_id, notification_id, filetype, with_metadata=False):
     notification = Notification.from_id_and_service_id(notification_id, service_id)
-    if not notification.template["is_precompiled_letter"]:
+    if not notification.is_precompiled_letter:
         return template_preview_client.get_preview_for_templated_letter(
             db_template=notification.template,
             filetype=filetype,
