@@ -37,6 +37,12 @@ class Notification(JSONModel):
 
     __sort_attribute__ = "created_at"
 
+    @classmethod
+    def from_id_and_service_id(cls, id, service_id):
+        instance = cls(notification_api_client.get_notification(service_id, str(id)))
+        instance.template["reply_to_text"] = instance.reply_to_text
+        return instance
+
     @property
     def status(self):
         return self._dict["status"]
@@ -50,10 +56,28 @@ class Notification(JSONModel):
         return self.template.get("redact_personalisation")
 
     @property
-    def personalisation(self):
+    def key_type(self):
+        return self._dict.get("key_type")
+
+    @property
+    def sent_by(self):
+        return self._dict.get("sent_by")
+
+    @property
+    def _personalisation(self):
         if self.redact_personalisation:
             return {}
         return self._dict["personalisation"]
+
+    @property
+    def personalisation(self):
+        if self.template["template_type"] == "email":
+            return self._personalisation | {"email_address": self.to}
+
+        if self.template["template_type"] == "sms":
+            return self._personalisation | {"phone_number": self.to}
+
+        return self._personalisation
 
     @property
     def preview_of_content(self):

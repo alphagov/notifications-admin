@@ -4,7 +4,6 @@ import json
 import os
 from datetime import datetime
 
-from dateutil import parser
 from flask import (
     Response,
     abort,
@@ -32,6 +31,7 @@ from app import (
     template_preview_client,
 )
 from app.main import json_updates, main
+from app.models.notification import Notification
 from app.notify_client.api_key_api_client import KEY_TYPE_TEST
 from app.utils import (
     DELIVERED_STATUSES,
@@ -50,30 +50,28 @@ from app.utils.user import user_has_permissions
 @main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>")
 @user_has_permissions("view_activity", "send_messages")
 def view_notification(service_id, notification_id):  # noqa: C901
-    notification = notification_api_client.get_notification(service_id, str(notification_id))
-    notification["template"].update({"reply_to_text": notification["reply_to_text"]})
+    notification = Notification.from_id_and_service_id(str(notification_id), service_id)
 
-    personalisation = get_all_personalisation_from_notification(notification)
     error_message = None
     page_count = None
 
-    if notification["template"]["is_precompiled_letter"]:
+    if notification.template["is_precompiled_letter"]:
         try:
             file_contents, metadata = get_letter_file_data(service_id, notification_id, "pdf", with_metadata=True)
             page_count = (
                 int(metadata["page_count"]) if metadata.get("page_count") else pdf_page_count(io.BytesIO(file_contents))
             )
-            if notification["status"] == "validation-failed":
+            if notification.status == "validation-failed":
                 invalid_pages = metadata.get("invalid_pages")
                 invalid_pages = json.loads(invalid_pages) if invalid_pages else invalid_pages
                 error_message = get_letter_validation_error(metadata.get("message"), invalid_pages, page_count)
         except PdfReadError:
             return render_template(
-                "views/notifications/invalid_precompiled_letter.html", created_at=notification["created_at"]
+                "views/notifications/invalid_precompiled_letter.html", created_at=notification.created_at
             )
 
     template = get_template(
-        notification["template"],
+        notification.template,
         current_service,
         letter_preview_url=url_for(
             ".view_letter_notification_as_preview",
@@ -84,11 +82,11 @@ def view_notification(service_id, notification_id):  # noqa: C901
         page_count=page_count,
         show_recipient=True,
         redact_missing_personalisation=True,
-        sms_sender=notification["reply_to_text"],
-        email_reply_to=notification["reply_to_text"],
+        sms_sender=notification.reply_to_text,
+        email_reply_to=notification.reply_to_text,
     )
-    template.values = personalisation
-    template.postage = None if notification["status"] == "validation-failed" else notification.get("postage")
+    template.values = notification.personalisation
+    template.postage = None if notification.status == "validation-failed" else notification.postage
 
     if template.template_type == "letter" and template.too_many_pages:
         # We check page count here to show the right error message for a letter that is too long.
@@ -102,17 +100,15 @@ def view_notification(service_id, notification_id):  # noqa: C901
         # fully processed yet.
         error_message = get_letter_validation_error("letter-too-long", [1], template.page_count)
 
-    if notification["job"]:
-        job = job_api_client.get_job(service_id, notification["job"]["id"])["data"]
+    if notification.job:
+        job = job_api_client.get_job(service_id, notification.job["id"])["data"]
     else:
         job = None
 
-    letter_print_day = get_letter_printing_statement(notification["status"], notification["created_at"])
+    letter_print_day = get_letter_printing_statement(notification.status, notification.created_at)
 
-    notification_created = parser.parse(notification["created_at"]).replace(tzinfo=None)
-
-    show_cancel_button = notification["notification_type"] == "letter" and letter_can_be_cancelled(
-        notification["status"], notification_created
+    show_cancel_button = notification.notification_type == "letter" and letter_can_be_cancelled(
+        notification.status, notification.created_at.replace(tzinfo=None)
     )
 
     if get_help_argument() or request.args.get("help") == "0":
@@ -141,17 +137,17 @@ def view_notification(service_id, notification_id):  # noqa: C901
             search_query=request.args.get("from_search_query", None),
         )
 
-    if notification["notification_type"] == "letter":
+    if notification.notification_type == "letter":
         estimated_letter_delivery_date = get_letter_timings(
-            notification["created_at"], postage=notification["postage"]
+            notification.created_at.replace(tzinfo=None), postage=notification.postage
         ).earliest_delivery
     else:
         estimated_letter_delivery_date = None
 
     return render_template(
         "views/notifications/notification.html",
-        finished=(notification["status"] in (DELIVERED_STATUSES + FAILURE_STATUSES)),
-        notification_status=notification["status"],
+        finished=(notification.status in (DELIVERED_STATUSES + FAILURE_STATUSES)),
+        notification_status=notification.status,
         message=error_message,
         uploaded_file_name="Report",
         template=template,
@@ -159,22 +155,22 @@ def view_notification(service_id, notification_id):  # noqa: C901
         updates_url=url_for(
             "json_updates.view_notification_updates",
             service_id=service_id,
-            notification_id=notification["id"],
+            notification_id=notification.id,
             status=request.args.get("status"),
             help=get_help_argument(),
         ),
         partials=get_single_notification_partials(notification),
-        created_by=notification.get("created_by"),
-        created_at=notification["created_at"],
-        updated_at=notification["updated_at"],
+        created_by=notification.created_by,
+        created_at=notification.created_at,
+        updated_at=notification.updated_at,
         help=get_help_argument(),
         estimated_letter_delivery_date=estimated_letter_delivery_date,
-        notification_id=notification["id"],
+        notification_id=notification.id,
         can_receive_inbound=(current_service.has_permission("inbound_sms")),
-        is_precompiled_letter=notification["template"]["is_precompiled_letter"],
+        is_precompiled_letter=notification.template["is_precompiled_letter"],
         letter_print_day=letter_print_day,
         show_cancel_button=show_cancel_button,
-        sent_with_test_key=(notification.get("key_type") == KEY_TYPE_TEST),
+        sent_with_test_key=(notification.key_type == KEY_TYPE_TEST),
         back_link=back_link,
     )
 
@@ -206,12 +202,12 @@ def get_preview_error_image():
 @main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>.<letter_file_extension:filetype>")
 @user_has_permissions("view_activity", "send_messages")
 def view_letter_notification_as_preview(service_id, notification_id, filetype, with_metadata=False):
-    notification = notification_api_client.get_notification(service_id, notification_id)
-    if not notification["template"]["is_precompiled_letter"]:
+    notification = Notification.from_id_and_service_id(notification_id, service_id)
+    if not notification.template["is_precompiled_letter"]:
         return template_preview_client.get_preview_for_templated_letter(
-            db_template=notification["template"],
+            db_template=notification.template,
             filetype=filetype,
-            values=notification["personalisation"],
+            values=notification.personalisation,
             page=request.args.get("page"),
             service=current_service,
         )
@@ -246,9 +242,7 @@ def get_letter_file_data(service_id, notification_id, filetype, with_metadata=Fa
 @json_updates.route("/services/<uuid:service_id>/notification/<uuid:notification_id>.json")
 @user_has_permissions("view_activity", "send_messages")
 def view_notification_updates(service_id, notification_id):
-    return jsonify(
-        **get_single_notification_partials(notification_api_client.get_notification(service_id, notification_id))
-    )
+    return jsonify(**get_single_notification_partials(Notification.from_id_and_service_id(notification_id, service_id)))
 
 
 def get_single_notification_partials(notification):
@@ -256,22 +250,9 @@ def get_single_notification_partials(notification):
         "status": render_template(
             "partials/notifications/status.html",
             notification=notification,
-            sent_with_test_key=(notification.get("key_type") == KEY_TYPE_TEST),
+            sent_with_test_key=(notification.key_type == KEY_TYPE_TEST),
         ),
     }
-
-
-def get_all_personalisation_from_notification(notification):
-    if notification["template"].get("redact_personalisation"):
-        notification["personalisation"] = {}
-
-    if notification["template"]["template_type"] == "email":
-        notification["personalisation"]["email_address"] = notification["to"]
-
-    if notification["template"]["template_type"] == "sms":
-        notification["personalisation"]["phone_number"] = notification["to"]
-
-    return notification["personalisation"]
 
 
 @main.route("/services/<uuid:service_id>/download-notifications.csv")
