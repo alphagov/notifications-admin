@@ -63,7 +63,7 @@
           fixed the problem
         </p>
       {% else %}
-        {% if sent_with_test_key %}
+        {% if notification.sent_with_test_key %}
           {% if notification.is_precompiled_letter %}
             <p class="govuk-body">
               This letter passed our checks, but we will not print it because you used a test key.
