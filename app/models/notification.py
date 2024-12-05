@@ -12,6 +12,7 @@ from werkzeug.utils import cached_property
 from app.models import JSONModel, ModelList
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
+from app.utils.letters import get_letter_printing_statement
 from app.utils.templates import EmailPreviewTemplate
 
 
@@ -126,6 +127,10 @@ class Notification(JSONModel):
     def letter_can_be_cancelled(self):
         if self.notification_type == "letter":
             return letter_can_be_cancelled(self.status, self.created_at.replace(tzinfo=None))
+
+    @property
+    def letter_print_day(self):
+        return get_letter_printing_statement(self.status, self.created_at)
 
     @property
     def displayed_postage(self):
