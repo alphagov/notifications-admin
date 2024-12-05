@@ -37,7 +37,7 @@ from app.utils import (
     set_status_filters,
 )
 from app.utils.csv import generate_notifications_csv
-from app.utils.letters import get_letter_printing_statement, get_letter_validation_error
+from app.utils.letters import get_letter_validation_error
 from app.utils.templates import get_template
 from app.utils.user import user_has_permissions
 
@@ -95,8 +95,6 @@ def view_notification(service_id, notification_id):  # noqa: C901
         # fully processed yet.
         error_message = get_letter_validation_error("letter-too-long", [1], template.page_count)
 
-    letter_print_day = get_letter_printing_statement(notification.status, notification.created_at)
-
     if get_help_argument() or request.args.get("help") == "0":
         # help=0 is set when you’ve just sent a notification. We
         # only want to show the back link when you’ve navigated to a
@@ -147,7 +145,7 @@ def view_notification(service_id, notification_id):  # noqa: C901
         notification_id=notification.id,
         can_receive_inbound=(current_service.has_permission("inbound_sms")),
         is_precompiled_letter=notification.template["is_precompiled_letter"],
-        letter_print_day=letter_print_day,
+        letter_print_day=notification.letter_print_day,
         show_cancel_button=notification.letter_can_be_cancelled,
         sent_with_test_key=(notification.key_type == KEY_TYPE_TEST),
         back_link=back_link,
