@@ -255,7 +255,6 @@ def init_app(application):
     def inject_global_template_variables():
         return {
             "asset_path": application.config["ASSET_PATH"],
-            "header_colour": application.config["HEADER_COLOUR"],
             "asset_url": asset_fingerprinter.get_url,
             "font_paths": font_paths,
         }

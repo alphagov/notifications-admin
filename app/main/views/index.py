@@ -14,7 +14,7 @@ from notifications_utils.template import HTMLEmailTemplate
 
 from app import status_api_client
 from app.formatters import message_count
-from app.main import main
+from app.main import main, no_cookie
 from app.main.forms import FieldWithNoneOption
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
 from app.models.branding import EmailBranding
@@ -36,6 +36,14 @@ def index():
         counts=status_api_client.get_count_of_live_services_and_organisations(),
         one_page_second_class_letter_cost=LetterRates().get(sheet_count=1, post_class="second"),
     )
+
+@main.route("/header.css")
+def no_cookie():
+    response = make_response(
+        ".govuk-header__container { border-color: " + current_app.config["HEADER_COLOUR"] + "}"
+    )
+    response.headers['Content-Type'] = 'text/css'
+    return response
 
 
 @main.route("/error/<int:status_code>")

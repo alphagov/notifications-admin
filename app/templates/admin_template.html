@@ -13,12 +13,11 @@
   <link rel="preload" href="{{ asset_url(font, with_querystring_hash=False) }}" as="font" type="font/woff2" crossorigin>
   {%- endfor %}
   <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main.css') }}" />
+
   <link rel="stylesheet" media="print" href="{{ asset_url('stylesheets/print.css') }}" />
   {% block extra_stylesheets %}
   {% endblock %}
-  <style>
-      .govuk-header__container { border-color: {{header_colour}} }
-  </style>
+  <link rel="stylesheet" media="screen" href="/header.css" />
   {% if g.hide_from_search_engines %}
     <meta name="robots" content="noindex" />
   {% endif %}
