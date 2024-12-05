@@ -122,7 +122,6 @@ def view_notification(service_id, notification_id):
         "views/notifications/notification.html",
         notification=notification,
         message=error_message,
-        uploaded_file_name="Report",
         template=template,
         updates_url=url_for(
             "json_updates.view_notification_updates",
