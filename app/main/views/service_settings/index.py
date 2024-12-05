@@ -452,9 +452,12 @@ def service_email_reply_to(service_id):
 @user_has_permissions("manage_service")
 def service_add_email_reply_to(service_id):
     route = request.args.get("route")
+    template_id = request.args.get("template_id")
 
     if route == "go_live":
         back_link = url_for("main.request_to_go_live", service_id=service_id)
+    elif route == "send":
+        back_link = url_for("main.set_sender", service_id=service_id, template_id=template_id)
     else:
         back_link = url_for("main.service_email_reply_to", service_id=service_id)
 
@@ -491,6 +494,7 @@ def service_add_email_reply_to(service_id):
                         notification_id=notification_id,
                         is_default=is_default,
                         route=route,
+                        template_id=template_id,
                     )
                 )
 
@@ -511,6 +515,7 @@ def service_verify_reply_to_address(service_id, notification_id):
     replace = request.args.get("replace", False)
     is_default = request.args.get("is_default", False)
     route = request.args.get("route")
+    template_id = request.args.get("template_id")
 
     return render_template(
         "views/service-settings/email-reply-to/verify.html",
@@ -520,6 +525,7 @@ def service_verify_reply_to_address(service_id, notification_id):
         replace=replace,
         is_default=is_default,
         route=route,
+        template_id=template_id,
     )
 
 
@@ -537,9 +543,12 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
     replace = False if replace == "False" else replace
     existing_is_default = False
     route = request.args.get("route")
+    template_id = request.args.get("template_id")
 
     if route == "go_live":
         continue_url = url_for("main.request_to_go_live", service_id=service_id)
+    elif route == "send":
+        continue_url = url_for("main.set_sender", service_id=service_id, template_id=template_id)
     else:
         continue_url = url_for("main.service_email_reply_to", service_id=service_id)
 
