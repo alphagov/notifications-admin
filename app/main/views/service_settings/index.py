@@ -518,11 +518,24 @@ def service_verify_reply_to_address(service_id, notification_id):
     route = request.args.get("route")
     template_id = request.args.get("template_id")
 
+    if replace:
+        back_link = url_for("main.service_edit_email_reply_to", service_id=service_id, reply_to_email_id=replace)
+    elif route:
+        back_link = url_for(
+            "main.service_add_email_reply_to",
+            service_id=service_id,
+            route=route,
+            template_id=template_id,
+        )
+    else:
+        back_link = url_for("main.service_add_email_reply_to", service_id=service_id, route=route)
+
     return render_template(
         "views/service-settings/email-reply-to/verify.html",
         service_id=service_id,
         notification_id=notification_id,
         partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
+        back_link=back_link,
         replace=replace,
         is_default=is_default,
         route=route,
