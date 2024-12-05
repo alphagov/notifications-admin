@@ -41,7 +41,7 @@ from app.utils.user import user_has_permissions
 
 @main.route("/services/<uuid:service_id>/notification/<uuid:notification_id>")
 @user_has_permissions("view_activity", "send_messages")
-def view_notification(service_id, notification_id):  # noqa: C901
+def view_notification(service_id, notification_id):
     notification = Notification.from_id_and_service_id(str(notification_id), service_id)
 
     error_message = None
