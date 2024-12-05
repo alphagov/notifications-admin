@@ -43,9 +43,7 @@ class Notification(JSONModel):
 
     @classmethod
     def from_id_and_service_id(cls, id, service_id):
-        instance = cls(notification_api_client.get_notification(service_id, str(id)))
-        instance.template["reply_to_text"] = instance.reply_to_text
-        return instance
+        return cls(notification_api_client.get_notification(service_id, str(id)))
 
     @property
     def status(self):
