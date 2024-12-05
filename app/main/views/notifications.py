@@ -17,7 +17,6 @@ from flask import (
 )
 from notifications_python_client.errors import APIError, HTTPError
 from notifications_utils.letter_timings import (
-    get_letter_timings,
     letter_can_be_cancelled,
 )
 from notifications_utils.pdf import pdf_page_count
@@ -131,13 +130,6 @@ def view_notification(service_id, notification_id):  # noqa: C901
             search_query=request.args.get("from_search_query", None),
         )
 
-    if notification.notification_type == "letter":
-        estimated_letter_delivery_date = get_letter_timings(
-            notification.created_at.replace(tzinfo=None), postage=notification.postage
-        ).earliest_delivery
-    else:
-        estimated_letter_delivery_date = None
-
     return render_template(
         "views/notifications/notification.html",
         finished=(notification.status in (DELIVERED_STATUSES + FAILURE_STATUSES)),
@@ -158,7 +150,7 @@ def view_notification(service_id, notification_id):  # noqa: C901
         created_at=notification.created_at,
         updated_at=notification.updated_at,
         help=get_help_argument(),
-        estimated_letter_delivery_date=estimated_letter_delivery_date,
+        estimated_letter_delivery_date=notification.estimated_letter_delivery_date,
         notification_id=notification.id,
         can_receive_inbound=(current_service.has_permission("inbound_sms")),
         is_precompiled_letter=notification.template["is_precompiled_letter"],

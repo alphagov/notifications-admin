@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any
 
 from markupsafe import Markup
+from notifications_utils.letter_timings import get_letter_timings
 from notifications_utils.template import (
     LetterPreviewTemplate,
     SMSBodyPreviewTemplate,
@@ -115,6 +116,11 @@ class Notification(JSONModel):
 
         if self._dict["job"]:
             return Job.from_id(self._dict["job"]["id"], self.service_id)
+
+    @property
+    def estimated_letter_delivery_date(self):
+        if self.notification_type == "letter":
+            return get_letter_timings(self.created_at.replace(tzinfo=None), postage=self.postage).earliest_delivery
 
 
 class APINotification(Notification):
