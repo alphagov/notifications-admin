@@ -32,7 +32,7 @@
     {{ govukButton({
       "element": "a",
       "text": "Add a reply-to email address",
-      "href": url_for('main.service_add_email_reply_to', service_id=current_service.id)
+      "href": url_for('main.service_add_email_reply_to', service_id=current_service.id, route='send', template_id=template_id)
     }) }}
   </p>
 
