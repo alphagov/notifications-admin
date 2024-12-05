@@ -19,7 +19,7 @@
 {% block maincolumn_content %}
   {{ ajax_block(
       partials,
-      url_for('json_updates.service_verify_reply_to_address_updates', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace),
+      url_for('json_updates.service_verify_reply_to_address_updates', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace, route=route),
       'status',
       finished=finished
     ) }}
