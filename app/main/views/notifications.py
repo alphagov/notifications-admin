@@ -123,12 +123,11 @@ def view_notification(service_id, notification_id):  # noqa: C901
 
     return render_template(
         "views/notifications/notification.html",
+        notification=notification,
         finished=(notification.status in (DELIVERED_STATUSES + FAILURE_STATUSES)),
-        notification_status=notification.status,
         message=error_message,
         uploaded_file_name="Report",
         template=template,
-        job=notification.job,
         updates_url=url_for(
             "json_updates.view_notification_updates",
             service_id=service_id,
@@ -137,16 +136,8 @@ def view_notification(service_id, notification_id):  # noqa: C901
             help=get_help_argument(),
         ),
         partials=get_single_notification_partials(notification),
-        created_by=notification.created_by,
-        created_at=notification.created_at,
-        updated_at=notification.updated_at,
         help=get_help_argument(),
-        estimated_letter_delivery_date=notification.estimated_letter_delivery_date,
-        notification_id=notification.id,
         can_receive_inbound=(current_service.has_permission("inbound_sms")),
-        is_precompiled_letter=notification.is_precompiled_letter,
-        letter_print_day=notification.letter_print_day,
-        show_cancel_button=notification.letter_can_be_cancelled,
         sent_with_test_key=(notification.key_type == KEY_TYPE_TEST),
         back_link=back_link,
     )
