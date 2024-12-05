@@ -6,6 +6,7 @@ from notifications_utils.template import (
     LetterPreviewTemplate,
     SMSBodyPreviewTemplate,
 )
+from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
 from app.notify_client.notification_api_client import notification_api_client
@@ -18,7 +19,6 @@ class Notification(JSONModel):
     to: str
     recipient: str
     template: Any
-    job: Any
     sent_at: datetime
     created_at: datetime
     created_by: Any
@@ -108,6 +108,13 @@ class Notification(JSONModel):
                     self.personalisation,
                 ).subject
             )
+
+    @cached_property
+    def job(self):
+        from app.models.job import Job
+
+        if self._dict["job"]:
+            return Job.from_id(self._dict["job"]["id"], self.service_id)
 
 
 class APINotification(Notification):
