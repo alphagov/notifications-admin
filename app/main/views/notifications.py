@@ -133,7 +133,6 @@ def view_notification(service_id, notification_id):
         ),
         partials=get_single_notification_partials(notification),
         help=get_help_argument(),
-        can_receive_inbound=(current_service.has_permission("inbound_sms")),
         back_link=back_link,
     )
 

@@ -109,7 +109,7 @@
       {{ ajax_block(partials, updates_url, 'status', finished=notification.finished) }}
     {% endif %}
 
-    {% if current_user.has_permissions('send_messages') and current_user.has_permissions('view_activity') and template.template_type == 'sms' and can_receive_inbound %}
+    {% if current_user.has_permissions('send_messages') and current_user.has_permissions('view_activity') and template.template_type == 'sms' and current_service.has_permission("inbound_sms") %}
       <p class="govuk-body">
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.conversation', service_id=current_service.id, notification_id=notification.id, _anchor='n{}'.format(notification.id)) }}">See all text messages sent to this phone number</a>
       </p>
