@@ -81,7 +81,7 @@ def view_notification(service_id, notification_id):  # noqa: C901
         email_reply_to=notification.reply_to_text,
     )
     template.values = notification.personalisation
-    template.postage = None if notification.status == "validation-failed" else notification.postage
+    template.postage = notification.displayed_postage
 
     if template.template_type == "letter" and template.too_many_pages:
         # We check page count here to show the right error message for a letter that is too long.

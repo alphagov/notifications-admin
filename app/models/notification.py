@@ -127,6 +127,12 @@ class Notification(JSONModel):
         if self.notification_type == "letter":
             return letter_can_be_cancelled(self.status, self.created_at.replace(tzinfo=None))
 
+    @property
+    def displayed_postage(self):
+        if self.status == "validation-failed":
+            return None
+        return self.postage
+
 
 class APINotification(Notification):
     key_name: str
