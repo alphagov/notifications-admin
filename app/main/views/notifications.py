@@ -26,7 +26,6 @@ from pypdf.errors import PdfReadError
 from app import (
     current_service,
     format_date_numeric,
-    job_api_client,
     notification_api_client,
     template_preview_client,
 )
@@ -100,11 +99,6 @@ def view_notification(service_id, notification_id):  # noqa: C901
         # fully processed yet.
         error_message = get_letter_validation_error("letter-too-long", [1], template.page_count)
 
-    if notification.job:
-        job = job_api_client.get_job(service_id, notification.job["id"])["data"]
-    else:
-        job = None
-
     letter_print_day = get_letter_printing_statement(notification.status, notification.created_at)
 
     show_cancel_button = notification.notification_type == "letter" and letter_can_be_cancelled(
@@ -151,7 +145,7 @@ def view_notification(service_id, notification_id):  # noqa: C901
         message=error_message,
         uploaded_file_name="Report",
         template=template,
-        job=job,
+        job=notification.job,
         updates_url=url_for(
             "json_updates.view_notification_updates",
             service_id=service_id,
