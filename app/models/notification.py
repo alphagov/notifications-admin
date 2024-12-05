@@ -133,6 +133,10 @@ class Notification(JSONModel):
         return get_letter_printing_statement(self.status, self.created_at)
 
     @property
+    def is_precompiled_letter(self):
+        return self.template["is_precompiled_letter"]
+
+    @property
     def displayed_postage(self):
         if self.status == "validation-failed":
             return None
