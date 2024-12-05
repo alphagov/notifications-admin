@@ -16,9 +16,6 @@ from flask import (
     url_for,
 )
 from notifications_python_client.errors import APIError, HTTPError
-from notifications_utils.letter_timings import (
-    letter_can_be_cancelled,
-)
 from notifications_utils.pdf import pdf_page_count
 from pypdf.errors import PdfReadError
 
@@ -100,10 +97,6 @@ def view_notification(service_id, notification_id):  # noqa: C901
 
     letter_print_day = get_letter_printing_statement(notification.status, notification.created_at)
 
-    show_cancel_button = notification.notification_type == "letter" and letter_can_be_cancelled(
-        notification.status, notification.created_at.replace(tzinfo=None)
-    )
-
     if get_help_argument() or request.args.get("help") == "0":
         # help=0 is set when you’ve just sent a notification. We
         # only want to show the back link when you’ve navigated to a
@@ -155,7 +148,7 @@ def view_notification(service_id, notification_id):  # noqa: C901
         can_receive_inbound=(current_service.has_permission("inbound_sms")),
         is_precompiled_letter=notification.template["is_precompiled_letter"],
         letter_print_day=letter_print_day,
-        show_cancel_button=show_cancel_button,
+        show_cancel_button=notification.letter_can_be_cancelled,
         sent_with_test_key=(notification.key_type == KEY_TYPE_TEST),
         back_link=back_link,
     )

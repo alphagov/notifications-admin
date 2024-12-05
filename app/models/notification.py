@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any
 
 from markupsafe import Markup
-from notifications_utils.letter_timings import get_letter_timings
+from notifications_utils.letter_timings import get_letter_timings, letter_can_be_cancelled
 from notifications_utils.template import (
     LetterPreviewTemplate,
     SMSBodyPreviewTemplate,
@@ -121,6 +121,11 @@ class Notification(JSONModel):
     def estimated_letter_delivery_date(self):
         if self.notification_type == "letter":
             return get_letter_timings(self.created_at.replace(tzinfo=None), postage=self.postage).earliest_delivery
+
+    @property
+    def letter_can_be_cancelled(self):
+        if self.notification_type == "letter":
+            return letter_can_be_cancelled(self.status, self.created_at.replace(tzinfo=None))
 
 
 class APINotification(Notification):
