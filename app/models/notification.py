@@ -13,6 +13,7 @@ from app.models import JSONModel, ModelList
 from app.notify_client.api_key_api_client import KEY_TYPE_TEST
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
+from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES
 from app.utils.letters import get_letter_printing_statement
 from app.utils.templates import EmailPreviewTemplate
 
@@ -146,6 +147,10 @@ class Notification(JSONModel):
         if self.status == "validation-failed":
             return None
         return self.postage
+
+    @property
+    def finished(self):
+        return self.status in (DELIVERED_STATUSES + FAILURE_STATUSES)
 
 
 class APINotification(Notification):

@@ -28,8 +28,6 @@ from app import (
 from app.main import json_updates, main
 from app.models.notification import Notification
 from app.utils import (
-    DELIVERED_STATUSES,
-    FAILURE_STATUSES,
     NOTIFICATION_TYPES,
     get_help_argument,
     parse_filter_args,
@@ -123,7 +121,6 @@ def view_notification(service_id, notification_id):  # noqa: C901
     return render_template(
         "views/notifications/notification.html",
         notification=notification,
-        finished=(notification.status in (DELIVERED_STATUSES + FAILURE_STATUSES)),
         message=error_message,
         uploaded_file_name="Report",
         template=template,
