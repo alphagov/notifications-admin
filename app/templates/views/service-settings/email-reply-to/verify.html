@@ -7,13 +7,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {% if replace %}
-    {% set back_link_href = url_for('main.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
-  {% else %}
-    {% set back_link_href = url_for('main.service_add_email_reply_to', service_id=service_id) %}
-  {% endif %}
-
-  {{ govukBackLink({ "href": back_link_href }) }}
+  {{ govukBackLink({ "href": back_link }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
