@@ -34,7 +34,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <p class="govuk-body">
-        <a href="{{ url_for('main.service_add_email_reply_to', service_id=current_service.id) }}" class="govuk-link govuk-link--no-visited-state">Add a new reply-to email address</a>
+        <a href="{{ url_for('main.service_add_email_reply_to', service_id=current_service.id, route='send', template_id=template_id) }}" class="govuk-link govuk-link--no-visited-state">Add a new reply-to email address</a>
       </p>
     </div>
   </div>
