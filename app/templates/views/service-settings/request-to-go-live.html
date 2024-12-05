@@ -56,7 +56,7 @@
          {{ task_list_item(
             current_service.has_email_reply_to_address,
             'Add a reply-to email address',
-            url_for('main.service_add_email_reply_to', service_id=current_service.id),
+            url_for('main.service_add_email_reply_to', service_id=current_service.id, route='go_live'),
           ) }}
         {% endif %}
         {% if (
