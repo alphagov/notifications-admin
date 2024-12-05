@@ -452,6 +452,13 @@ def service_email_reply_to(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-reply-to/add", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_add_email_reply_to(service_id):
+    route = request.args.get("route")
+
+    if route == "go_live":
+        back_link = url_for("main.request_to_go_live", service_id=service_id)
+    else:
+        back_link = url_for("main.service_email_reply_to", service_id=service_id)
+
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
     is_default = first_email_address if first_email_address else form.is_default.data
@@ -484,6 +491,7 @@ def service_add_email_reply_to(service_id):
                         service_id=service_id,
                         notification_id=notification_id,
                         is_default=is_default,
+                        route=route,
                     )
                 )
 
@@ -492,6 +500,7 @@ def service_add_email_reply_to(service_id):
         form=form,
         first_email_address=first_email_address,
         error_summary_enabled=True,
+        back_link=back_link,
     )
 
 
@@ -502,6 +511,8 @@ def service_add_email_reply_to(service_id):
 def service_verify_reply_to_address(service_id, notification_id):
     replace = request.args.get("replace", False)
     is_default = request.args.get("is_default", False)
+    route = request.args.get("route")
+
     return render_template(
         "views/service-settings/email-reply-to/verify.html",
         service_id=service_id,
@@ -509,6 +520,7 @@ def service_verify_reply_to_address(service_id, notification_id):
         partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
         replace=replace,
         is_default=is_default,
+        route=route,
     )
 
 
@@ -525,6 +537,13 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
     replace = request.args.get("replace", False)
     replace = False if replace == "False" else replace
     existing_is_default = False
+    route = request.args.get("route")
+
+    if route == "go_live":
+        continue_url = url_for("main.request_to_go_live", service_id=service_id)
+    else:
+        continue_url = url_for("main.service_email_reply_to", service_id=service_id)
+
     if replace:
         existing = current_service.get_email_reply_to_address(replace)
         existing_is_default = existing["is_default"]
@@ -564,6 +583,7 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
             form=form,
             first_email_address=first_email_address,
             replace=replace,
+            continue_url=continue_url,
         ),
         "stop": 0 if verification_status == "pending" else 1,
     }
