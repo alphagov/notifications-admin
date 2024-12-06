@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 from flask import abort, redirect, render_template, session, url_for
-from flask_login import current_user
 
 from app.main import main
 from app.main.forms import (
@@ -12,14 +11,13 @@ from app.main.forms import (
 from app.main.views.verify import activate_user
 from app.models.user import InvitedOrgUser, InvitedUser, User
 from app.utils import hide_from_search_engines
+from app.utils.login import redirect_if_logged_in
 
 
 @main.route("/register", methods=["GET", "POST"])
 @hide_from_search_engines
+@redirect_if_logged_in
 def register():
-    if current_user and current_user.is_authenticated:
-        return redirect(url_for("main.show_accounts_or_dashboard"))
-
     form = RegisterUserForm()
     if form.validate_on_submit():
         _do_registration(form, send_sms=False)
