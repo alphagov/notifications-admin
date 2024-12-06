@@ -3,6 +3,7 @@ import { createAll, Header, Button, Radios, ErrorSummary, SkipLink, Tabs } from 
 
 import CollapsibleCheckboxes from './collapsible-checkboxes.mjs';
 import FocusBanner from './focus-banner.mjs';
+import ColourPreview from './colour-preview.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -19,9 +20,14 @@ if ($collapsibleCheckboxes) {
   new CollapsibleCheckboxes($collapsibleCheckboxes);
 }
 
+const $colourPreview = document.querySelector('[data-notify-module="colour-preview"]');
+if ($colourPreview) {
+  new ColourPreview($colourPreview);
+}
+
 const focusBanner = new FocusBanner();
 
-// ES modu;es do not export to global so in order to
+// ES modules do not export to global so in order to
 // reuse some of teh import here in our other
 // global functions, we need to explicitly attach them to window
 // this will be removed when we migrate out files
