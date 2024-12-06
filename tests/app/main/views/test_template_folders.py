@@ -38,6 +38,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
 @pytest.mark.parametrize(
     (
         "expected_title_tag,"
+        "expected_page_breadcrumb,"
         "expected_page_title,"
         "expected_parent_link_args,"
         "extra_args,"
@@ -50,6 +51,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
     [
         (
             "Templates – service one – GOV.UK Notify",
+            [],
             "Templates",
             [],
             {},
@@ -110,6 +112,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             "Templates – service one – GOV.UK Notify",
+            [],
             "Templates",
             [],
             {"template_type": "all"},
@@ -170,6 +173,7 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             "Templates – service one – GOV.UK Notify",
+            [],
             "Templates",
             [],
             {"template_type": "sms"},
@@ -207,7 +211,8 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             "folder_one – Templates – service one – GOV.UK Notify",
-            "Templates Folder folder_one",
+            ["Templates"],
+            "Folder folder_one",
             [{"template_type": "all"}],
             {"template_folder_id": PARENT_FOLDER_ID},
             ["Email", "Text message", "Letter"],
@@ -237,7 +242,8 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             "folder_one – Templates – service one – GOV.UK Notify",
-            "Templates Folder folder_one",
+            ["Templates"],
+            "Folder folder_one",
             [{"template_type": "sms"}],
             {"template_type": "sms", "template_folder_id": PARENT_FOLDER_ID},
             ["All", "Email", "Letter"],
@@ -262,7 +268,8 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             "folder_one – Templates – service one – GOV.UK Notify",
-            "Templates Folder folder_one",
+            ["Templates"],
+            "Folder folder_one",
             [{"template_type": "email"}],
             {"template_type": "email", "template_folder_id": PARENT_FOLDER_ID},
             ["All", "Text message", "Letter"],
@@ -272,8 +279,9 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             "There are no email templates in this folder",
         ),
         (
-            "folder_one_one – folder_one – Templates – service one – GOV.UK Notify",
-            "Templates Folder folder_one Folder folder_one_one",
+            "folder_one_one – folder_one – service one – GOV.UK Notify",
+            ["Templates", "Folder folder_one"],
+            "Folder folder_one_one",
             [
                 {"template_type": "all"},
                 {"template_type": "all", "template_folder_id": PARENT_FOLDER_ID},
@@ -301,8 +309,9 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             None,
         ),
         (
-            "folder_one_one_one – folder_one_one – folder_one – Templates – service one – GOV.UK Notify",
-            "Templates Folder folder_one Folder folder_one_one Folder folder_one_one_one",
+            "folder_one_one_one – folder_one_one – service one – GOV.UK Notify",
+            ["Templates", "Folder folder_one", "Folder folder_one_one"],
+            "Folder folder_one_one_one",
             [
                 {"template_type": "all"},
                 {"template_type": "all", "template_folder_id": PARENT_FOLDER_ID},
@@ -322,8 +331,9 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
             None,
         ),
         (
-            "folder_one_one_one – folder_one_one – folder_one – Templates – service one – GOV.UK Notify",
-            "Templates Folder folder_one Folder folder_one_one Folder folder_one_one_one",
+            "folder_one_one_one – folder_one_one – service one – GOV.UK Notify",
+            ["Templates", "Folder folder_one", "Folder folder_one_one"],
+            "Folder folder_one_one_one",
             [
                 {"template_type": "email"},
                 {"template_type": "email", "template_folder_id": PARENT_FOLDER_ID},
@@ -341,7 +351,8 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             "folder_two – Templates – service one – GOV.UK Notify",
-            "Templates Folder folder_two",
+            ["Templates"],
+            "Folder folder_two",
             [{"template_type": "all"}],
             {"template_folder_id": FOLDER_TWO_ID},
             ["Email", "Text message", "Letter"],
@@ -352,7 +363,8 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             "folder_two – Templates – service one – GOV.UK Notify",
-            "Templates Folder folder_two",
+            ["Templates"],
+            "Folder folder_two",
             [{"template_type": "sms"}],
             {"template_folder_id": FOLDER_TWO_ID, "template_type": "sms"},
             ["All", "Email", "Letter"],
@@ -363,7 +375,8 @@ def _folder(name, folder_id=None, parent=None, users_with_permission=None):
         ),
         (
             "folder_two – Templates – service one – GOV.UK Notify",
-            "Templates Folder folder_two",
+            ["Templates"],
+            "Folder folder_two",
             [{"template_type": "all"}],
             {"template_folder_id": FOLDER_TWO_ID, "template_type": "all"},
             ["Email", "Text message", "Letter"],
@@ -381,6 +394,7 @@ def test_should_show_templates_folder_page(
     service_one,
     mocker,
     expected_title_tag,
+    expected_page_breadcrumb,
     expected_page_title,
     expected_parent_link_args,
     extra_args,
@@ -416,11 +430,13 @@ def test_should_show_templates_folder_page(
     service_one["permissions"] += ["letter"]
 
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID, _test_page_title=False, **extra_args)
+    breadcrumb_links = page.select(".folder-heading-breadcrumb a")
 
     assert normalize_spaces(page.select_one("title").text) == expected_title_tag
+    assert [normalize_spaces(link.text) for link in breadcrumb_links] == expected_page_breadcrumb
     assert normalize_spaces(page.select_one("h1").text) == expected_page_title
 
-    assert len(page.select("h1 a")) == len(expected_parent_link_args)
+    assert len(breadcrumb_links) == len(expected_parent_link_args)
 
     for index, parent_link in enumerate(page.select("h1 a")):
         assert parent_link["href"] == url_for(
@@ -1545,23 +1561,20 @@ def test_show_custom_error_message(
             ],
             [
                 ["folder_A", "Folder", "folder_A", "1 template, 2 folders"],
-                ["folder_A folder_C", "Folder", "folder_A", "Folder", "folder_C", "1 template"],
+                ["folder_A folder_C", "Folder folder_A", "Folder", "folder_C", "1 template"],
                 [
                     "folder_A folder_C sms_template_C",
-                    "Folder",
-                    "folder_A",
-                    "Folder",
-                    "folder_C",
+                    "Folder folder_A",
+                    "Folder folder_C",
                     "sms_template_C",
                     "Text message template",
                 ],
-                ["folder_A folder_D", "Folder", "folder_A", "Folder", "folder_D", "Empty"],
-                ["folder_A sms_template_A", "Folder", "folder_A", "sms_template_A", "Text message template"],
+                ["folder_A folder_D", "Folder folder_A", "Folder", "folder_D", "Empty"],
+                ["folder_A sms_template_A", "Folder folder_A", "sms_template_A", "Text message template"],
                 ["folder_E folder_F folder_G", "Folder", "folder_E", "folder_F", "folder_G", "1 template"],
                 [
                     "folder_E folder_F folder_G email_template_G",
-                    "Folder",
-                    "folder_E",
+                    "Folder folder_E",
                     "folder_F",
                     "folder_G",
                     "email_template_G",
@@ -1581,8 +1594,7 @@ def test_show_custom_error_message(
                 ["folder_E folder_F folder_G", "Folder", "folder_E", "folder_F", "folder_G", "1 template"],
                 [
                     "folder_E folder_F folder_G email_template_G",
-                    "Folder",
-                    "folder_E",
+                    "Folder folder_E",
                     "folder_F",
                     "folder_G",
                     "email_template_G",
@@ -1599,17 +1611,15 @@ def test_show_custom_error_message(
             ],
             [
                 ["folder_A", "Folder", "folder_A", "1 template, 1 folder"],
-                ["folder_A folder_C", "Folder", "folder_A", "Folder", "folder_C", "1 template"],
+                ["folder_A folder_C", "Folder folder_A", "Folder", "folder_C", "1 template"],
                 [
                     "folder_A folder_C sms_template_C",
-                    "Folder",
-                    "folder_A",
-                    "Folder",
-                    "folder_C",
+                    "Folder folder_A",
+                    "Folder folder_C",
                     "sms_template_C",
                     "Text message template",
                 ],
-                ["folder_A sms_template_A", "Folder", "folder_A", "sms_template_A", "Text message template"],
+                ["folder_A sms_template_A", "Folder folder_A", "sms_template_A", "Text message template"],
             ],
             None,
         ),

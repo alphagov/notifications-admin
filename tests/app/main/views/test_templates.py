@@ -821,7 +821,8 @@ def test_user_with_only_send_and_view_sees_letter_page(
         template_id=fake_uuid,
         _test_page_title=False,
     )
-    assert normalize_spaces(page.select_one("h1").text) == "Templates Two week reminder"
+    assert normalize_spaces(page.select_one(".folder-heading-breadcrumb").text) == "Templates"
+    assert normalize_spaces(page.select_one("h1").text) == "Two week reminder"
     assert normalize_spaces(page.select_one("title").text) == (
         "Two week reminder – Templates – service one – GOV.UK Notify"
     )
@@ -1731,7 +1732,8 @@ def test_should_be_able_to_view_a_template_with_links(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one("h1").text) == "Templates Two week reminder"
+    assert normalize_spaces(page.select_one(".folder-heading-breadcrumb").text) == "Templates"
+    assert normalize_spaces(page.select_one("h1").text) == "Two week reminder"
     assert normalize_spaces(page.select_one("title").text) == (
         "Two week reminder – Templates – service one – GOV.UK Notify"
     )
@@ -2454,8 +2456,8 @@ def test_choose_a_template_to_copy_from_folder_within_service(
         from_folder=PARENT_FOLDER_ID,
     )
 
-    assert normalize_spaces(page.select_one(".folder-heading").text) == "Folder service one Folder Parent folder"
-    breadcrumb_links = page.select(".folder-heading a")
+    assert normalize_spaces(page.select_one(".folder-heading").text) == "Folder Parent folder"
+    breadcrumb_links = page.select(".folder-heading-breadcrumb a")
     assert len(breadcrumb_links) == 1
     assert breadcrumb_links[0]["href"] == url_for(
         "main.choose_template_to_copy",
