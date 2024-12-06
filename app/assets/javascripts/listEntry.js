@@ -27,39 +27,46 @@
     this.bindEvents();
   };
   ListEntry.optionalAttributes = ['aria-describedby'];
-  ListEntry.prototype.entryTemplate = window.Hogan.compile(
-    '<div class="list-entry">' +
-      '<div class="govuk-form-group{{#error}} govuk-form-group--error{{/error}}">' +
-        '<label for="{{{id}}}" class="govuk-label govuk-input--numbered__label{{#error}} govuk-input--numbered__label--error{{/error}}">' +
-          '<span class="govuk-visually-hidden">{{listItemName}} number </span>{{number}}.' +
-        '</label>' +
-        '{{#error}}' +
-        '<p id="{{{id}}}-error" class="govuk-error-message" data-notify-module="track-error" data-error-type="{{{error}}}" data-error-label="{{{name}}}">' +
-          '<span class="govuk-visually-hidden">Error: </span>{{{error}}}' +
-        '</p>' +
-        '{{/error}}' +
-        '<input' +
-        ' name="{{name}}"' +
-        ' id="{{id}}"' +
-        ' {{#value}}value="{{value}}{{/value}}"' +
-        ' class="{{{sharedInputClasses}}}{{#customClasses}} {{{customClasses}}}{{/customClasses}}{{#error}} govuk-input--error{{/error}}"' +
-        ' {{#error}}aria-describedby="{{{id}}}-error"{{/error}}' +
-        ' {{{sharedAttributes}}}' +
-        '/>' +
-        '{{#button}}' +
-        '<button type="button" class="govuk-button govuk-button--secondary input-list__button--remove">' +
-        'Remove<span class="govuk-visually-hidden"> {{listItemName}} number {{number}}</span>' +
-        '</button>' +
-        '{{/button}}' +
-      '</div>' +
-    '</div>'
-  );
-  ListEntry.prototype.addButtonTemplate = window.Hogan.compile(
-    '<button type="button" class="govuk-button govuk-button--secondary input-list__button--add">Add another {{listItemName}} ({{entriesLeft}} remaining)</button>'
-  );
+  ListEntry.prototype.entryTemplate = dataObj => {
+    const { error, id, name, listItemName, number, value, customClasses, button, sharedInputClasses, sharedAttributes } = dataObj;
+
+    return `
+      <div class="list-entry">
+        <div class="govuk-form-group${error ? ' govuk-form-group--error' : ''}">
+          <label for="${id}" class="govuk-label govuk-input--numbered__label${error ? ' govuk-input--numbered__label--error' : ''}">
+           <span class="govuk-visually-hidden">${listItemName} number </span>${number}.
+          </label>
+          ${error ?
+          `<p id="${id}-error" class="govuk-error-message" data-notify-module="track-error" data-error-type="${error}" data-error-label="${name}">
+           <span class="govuk-visually-hidden">Error: </span>${error}
+          </p>` : ''}
+          <input
+           name="${name}"
+           id="${id}"
+           ${value ? `value="${value}"` : ''}
+           class="${sharedInputClasses}${customClasses ? ` ${customClasses}` : ''}${error ? ' govuk-input--error' : ''}"
+           ${error ? `aria-describedby="${id}-error"` : ''}
+           ${sharedAttributes}
+          />
+          ${button ? `
+          <button type="button" class="govuk-button govuk-button--secondary input-list__button--remove">
+          Remove<span class="govuk-visually-hidden"> ${listItemName} number ${number}</span>
+          </button>` : ''}
+        </div>
+      </div>`;
+  };
+  ListEntry.prototype.addButtonTemplate = dataObj => {
+    const { listItemName, entriesLeft } = dataObj;
+
+    return `<button type="button" class="govuk-button govuk-button--secondary input-list__button--add">Add another ${listItemName} (${entriesLeft} remaining)</button>`;
+  };
   ListEntry.prototype.getSharedAttributes = function () {
     var $inputs = this.$wrapper.find('input'),
-        attributeTemplate = window.Hogan.compile(' {{name}}="{{value}}"'),
+        attributeTemplate = dataObj => {
+          const { name, value } = dataObj;
+
+          return ` ${name}="${value}"`;
+        },
         protectedAttributes = ['id', 'name', 'value', 'class', 'aria-describedby'],
         attributes = [],
         attrIdx,
@@ -79,7 +86,7 @@
         while (attrIdx--) {
           // prevent duplicates
           if ($.inArray(elmAttrs[attrIdx].name, existingAttributes) === -1) {
-            attrStr += attributeTemplate.render({ 'name': elmAttrs[attrIdx].name, 'value': elmAttrs[attrIdx].value });
+            attrStr += attributeTemplate({ 'name': elmAttrs[attrIdx].name, 'value': elmAttrs[attrIdx].value });
             existingAttributes.push(elmAttrs[attrIdx].name);
           }
         }
@@ -225,10 +232,10 @@
       if (customClasses !== null) {
         dataObj.customClasses = ' ' + customClasses.join(' ');
       }
-      this.$wrapper.append(this.entryTemplate.render(dataObj));
+      this.$wrapper.append(this.entryTemplate(dataObj));
     }.bind(this));
     if (this.entries.length < this.maxEntries) {
-      this.$wrapper.append(this.addButtonTemplate.render({
+      this.$wrapper.append(this.addButtonTemplate({
         'listItemName' : this.listItemName,
         'entriesLeft' : (this.maxEntries - this.entries.length)
       }));

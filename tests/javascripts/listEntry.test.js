@@ -1,6 +1,4 @@
 beforeAll(() => {
-  Hogan = require('hogan.js');
-
   require('../../app/assets/javascripts/listEntry.js');
 });
 
