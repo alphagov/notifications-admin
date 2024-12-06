@@ -98,7 +98,6 @@ export default [
       paths.src + 'javascripts/fullscreenTable.js',
       paths.src + 'javascripts/radios-with-images.js',
       paths.src + 'javascripts/previewPane.js',
-      paths.src + 'javascripts/colourPreview.js',
       paths.src + 'javascripts/liveCheckboxControls.js',
       paths.src + 'javascripts/templateFolderForm.js',
       paths.src + 'javascripts/addBrandingOptionsForm.js',
