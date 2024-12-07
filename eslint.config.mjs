@@ -37,7 +37,10 @@ export default [
   {
     files: ["**/*.mjs"],
     languageOptions: {
-      sourceType: "module"
+      sourceType: "module",
+      globals: {
+        ...globals.browser
+      }
     }
   },
   {
