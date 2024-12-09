@@ -174,7 +174,7 @@ mypy-extensions==1.0.0
     # via black
 notifications-python-client==10.0.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@91.0.1
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@d4d07fd31dc65cbcfba3850cea3b05ee8d3e2e62
     # via -r requirements.in
 openpyxl==3.0.10
     # via
@@ -274,6 +274,8 @@ pyyaml==6.0.2
     #   notifications-utils
     #   responses
 redis==4.5.4
+    # via flask-redis
+requests==2.32.3
     # via
     #   -r requirements.txt
     #   flask-redis
