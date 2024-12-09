@@ -301,6 +301,31 @@ a {
     text-overflow: ellipsis;
   }
 
+  &-breadcrumb,
+  & {
+    display: inline;
+  }
+
+  &-container {
+    margin: govuk-spacing(3) 0 govuk-spacing(4);
+  }
+
+  &-breadcrumb {
+    list-style: none;
+    @include govuk-font(24, $weight: "bold");
+
+    > li {
+      display: inline-block;
+      vertical-align: top;
+      // contains the first <a> when it has overflow:hidden and so gets extra height compared to the others
+      max-height: 30px;
+
+      > a {
+        display: inline-block;
+      }
+    }
+  }
+
   a {
 
     display: inline-block;

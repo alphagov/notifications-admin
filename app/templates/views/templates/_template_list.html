@@ -18,16 +18,14 @@
       {% set item_num = loop.index %}
       {% set item_link_content %}
         {% for ancestor in item.ancestors %}
-          {% set folder_id = 'folder_' ~ item_num ~ '_ancestor_' ~ loop.index %}
           <a href="{{ url_for('main.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-            {{ svgs.folder('Folder', classes="template-list-folder__icon", id=folder_id) }}
+            {{ svgs.folder(classes="template-list-folder__icon") }}
             {{- format_template_name(ancestor.name) -}}
           </a> <span class="message-name-separator"></span>
         {% endfor %}
-        {% set folder_id = 'folder_' ~ item_num ~ '_ancestor_' ~ loop.index %}
         {% if item.is_folder %}
           <a href="{{ url_for('main.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-            {{ svgs.folder('Folder', classes="template-list-folder__icon", id=folder_id) }}
+            {{ svgs.folder(classes="template-list-folder__icon") }}
             <span class="live-search-relevant">{{- format_template_name(item.name) -}}</span>
           </a>
         {% else %}
