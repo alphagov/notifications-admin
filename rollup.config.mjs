@@ -124,10 +124,7 @@ export default [
         entryFileName: 'all.js'
       }),
       terser({
-        ecma: '5',
-        mangle: {
-          reserved: ["Hogan"]
-        }
+        ecma: '5'
       }),
     ]
   }
