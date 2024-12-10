@@ -1,0 +1,23 @@
+{% extends "content_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+{% set page_title = "You have been sent a link to GOV.UK Notify API documentation" %}
+
+
+{% block per_page_title %}
+{{page_title}}
+{% endblock %}
+
+{% block content_column_content %}
+
+<h1 class="heading-large">{{page_title}}</h1>
+
+{% call form_wrapper() %}
+{{ form.docs_version }}
+{{ page_footer("Let's go!") }}
+{% endcall %}
+
+{% endblock %}
