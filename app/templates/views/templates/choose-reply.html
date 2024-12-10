@@ -49,16 +49,14 @@
         {% set item_num = loop.index %}
         <div class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
           {% for ancestor in item.ancestors %}
-              {% set folder_id = 'folder_' ~ item_num ~ '_ancestor_' ~ loop.index %}
               <a href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-              {{ svgs.folder('Folder', classes="template-list-folder__icon", id=folder_id) }}
+              {{ svgs.folder(classes="template-list-folder__icon") }}
               {{ ancestor.name }}
             </a> <span class="message-name-separator"></span>
           {% endfor %}
-          {% set folder_id = 'folder_' ~ item_num %}
           {% if item.is_folder %}
             <a href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
-              {{ svgs.folder('Folder', classes="template-list-folder__icon", id=folder_id) }}
+              {{ svgs.folder(classes="template-list-folder__icon") }}
               <span class="live-search-relevant">{{ format_template_name(item.name) }}</span>
             </a>
           {% else %}
