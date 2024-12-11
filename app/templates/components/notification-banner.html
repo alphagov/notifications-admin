@@ -1,0 +1,12 @@
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
+{% macro notificationBanner(type=None, message=None) %}
+
+  {{ govukNotificationBanner({
+  "type": type,
+  "role": "region",
+  "text": message if message is not none else 'File sucessfully uploaded',
+  "attributes": {
+    "aria-live": "polite"
+  }
+  }) }}
+{% endmacro %}
