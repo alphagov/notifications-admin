@@ -3016,6 +3016,8 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
             if _test_for_script_csp_nonce:
                 ClientRequest.test_for_script_csp_nonce(page)
 
+            ClientRequest._test_for_duplicate_ids(page)
+
             return page
 
         @staticmethod
@@ -3167,6 +3169,14 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
                     assert nonce is None
                 else:
                     assert nonce == fake_nonce
+
+        @staticmethod
+        def _test_for_duplicate_ids(page):
+            ids = [element["id"] for element in page.select("*[id]")]
+            for id in ids:
+                assert ids.count(id) == 1, f"Duplicate id `{id}` found on these elements:\n    " + ", ".join(
+                    f"<{element.name}>" for element in page.select(f"*[id='{id}']")
+                )
 
     return ClientRequest
 
