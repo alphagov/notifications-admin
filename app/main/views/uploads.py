@@ -465,6 +465,8 @@ def check_contact_list(service_id, upload_id):
         recipients=recipients,
         original_file_name=original_file_name,
         upload_id=upload_id,
+        notification_banner_enabled=True,
+        notification_banner_type='success'
     )
 
 
