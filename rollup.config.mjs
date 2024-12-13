@@ -88,7 +88,6 @@ export default [
       paths.src + 'javascripts/copyToClipboard.js',
       paths.src + 'javascripts/autofocus.js',
       paths.src + 'javascripts/enhancedTextbox.js',
-      paths.src + 'javascripts/fileUpload.js',
       paths.src + 'javascripts/radioSelect.js',
       paths.src + 'javascripts/updateContent.js',
       paths.src + 'javascripts/listEntry.js',
