@@ -1,5 +1,6 @@
 import uuid
 from datetime import UTC, datetime, timedelta
+from itertools import repeat
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
@@ -552,10 +553,17 @@ def notification_json(  # noqa: C901
     if job:
         job_payload = {"id": job["id"], "original_file_name": job["original_file_name"]}
 
+    def _get_notification_id(index):
+        if index < 16:
+            return "{}{}{}{}{}{}{}{}-{}{}{}{}-{}{}{}{}-{}{}{}{}-{}{}{}{}{}{}{}{}{}{}{}{}".format(
+                *repeat(hex(index)[2:], 32)
+            )
+        return str(uuid.uuid4())
+
     data = {
         "notifications": [
             {
-                "id": sample_uuid(),
+                "id": _get_notification_id(i),
                 "to": to,
                 "template": template,
                 "job": job_payload,
