@@ -7,7 +7,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.jobs import get_time_left
-from tests import NotifyBeautifulSoup, job_json, notification_json, sample_uuid, user_json
+from tests import NotifyBeautifulSoup, job_json, notification_json, user_json
 from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
@@ -117,7 +117,7 @@ def test_should_show_page_for_one_job(
     assert page.select_one("tbody tr a")["href"] == url_for(
         "main.view_notification",
         service_id=SERVICE_ONE_ID,
-        notification_id=sample_uuid(),
+        notification_id="00000000-0000-0000-0000-000000000000",
         from_job=fake_uuid,
     )
 
