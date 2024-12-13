@@ -19,7 +19,8 @@ Providers
       caption_visible=False,
       empty_message='No domestic sms providers',
       field_headings=['Provider', 'Priority', '% monthly traffic', 'Active', 'Last Updated', 'Updated By'],
-      field_headings_visible=True
+      field_headings_visible=True,
+      give_rows_ids=False,
   ) %}
 
       {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}

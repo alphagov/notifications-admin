@@ -3007,6 +3007,8 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
             if _test_for_non_smart_quotes:
                 ClientRequest.test_for_non_smart_quotes(page)
 
+            ClientRequest._test_for_duplicate_ids(page)
+
             return page
 
         @staticmethod
@@ -3148,6 +3150,14 @@ def client_request(request, _logged_in_client, mocker, service_one):  # noqa (C9
                 assert not (
                     "'" in el.text or '"' in el.text
                 ), f"Non-smart quote or apostrophe found in <{el.name}>: {normalize_spaces(el.text)}"
+
+        @staticmethod
+        def _test_for_duplicate_ids(page):
+            ids = [element["id"] for element in page.select("*[id]")]
+            for id in ids:
+                assert ids.count(id) == 1, f"Duplicate id `{id}` found on these elements:\n    " + ", ".join(
+                    f"<{element.name}>" for element in page.select(f"*[id='{id}']")
+                )
 
     return ClientRequest
 
