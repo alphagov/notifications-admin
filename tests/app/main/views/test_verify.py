@@ -33,8 +33,8 @@ def test_should_return_verify_template(
 @pytest.mark.parametrize(
     "can_ask_to_join_a_service, expected_redirect, extra_args",
     (
-        (False, "main.add_service", {"first": "first"}),
-        (True, "main.add_or_join_service", {}),
+        (False, "main.add_service", {}),
+        (True, "main.your_services", {}),
     ),
 )
 def test_should_redirect_to_add_service_when_sms_code_is_correct(
@@ -150,7 +150,7 @@ def test_verify_email_doesnt_verify_sms_if_user_on_email_auth(
     client_request.get(
         "main.verify_email",
         token="notreal",
-        _expected_redirect=url_for("main.add_service", first="first"),
+        _expected_redirect=url_for("main.add_service"),
     )
 
     assert not mock_check_verify_code.called

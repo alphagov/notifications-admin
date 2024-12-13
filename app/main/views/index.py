@@ -28,7 +28,7 @@ main.register_blueprint(redirects)
 @main.route("/")
 def index():
     if current_user and current_user.is_authenticated:
-        return redirect(url_for("main.choose_account"))
+        return redirect(url_for("main.your_services"))
 
     return render_template(
         "views/signedout.html",
@@ -366,7 +366,9 @@ def historical_redirects(new_endpoint, **kwargs):
 
 
 REDIRECTS = {
+    "/accounts": "main.your_services",
     "/callbacks": "main.guidance_api_documentation",
+    "/choose-service-to-join": "main.join_service_choose_service",
     "/delivery-and-failure": "main.guidance_message_status",
     "/documentation": "main.guidance_api_documentation",
     "/features/email": "main.guidance_features",
@@ -386,6 +388,8 @@ REDIRECTS = {
     "/performance": "main.performance",
     "/pricing/trial-mode": "main.guidance_trial_mode",
     "/roadmap": "main.guidance_roadmap",
+    "/services/<uuid:service_to_join_id>/join": "main.join_service_ask",
+    "/services/<uuid:service_to_join_id>/join/requested": "main.join_service_you_have_asked",
     "/terms": "main.terms_of_use",
     "/trial-mode": "main.guidance_trial_mode",
     "/using-notify/delivery-status": "main.guidance_message_status",
@@ -414,6 +418,7 @@ REDIRECTS = {
     "/using-notify/trial-mode": "main.guidance_trial_mode",
     "/using-notify/who-can-use-notify": "main.guidance_who_can_use_notify",
     "/using-notify/who-its-for": "main.guidance_who_can_use_notify",
+    "/add-or-join-service": "main.your_services",
 }
 
 for old_url, new_endpoint in REDIRECTS.items():

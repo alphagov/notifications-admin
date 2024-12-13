@@ -303,7 +303,7 @@ def test_link_to_download_notifications(
 
     client_request.login(user)
     page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID, **query_parameters)
-    download_link = page.select_one("a[download=download]")
+    download_link = page.select_one("a[href*='download-notifications.csv']")
     assert (download_link["href"] if download_link else None) == expected_download_link(service_id=SERVICE_ONE_ID)
 
 
@@ -924,7 +924,7 @@ def test_view_notifications_can_download(
     page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID)
 
     # check download link
-    download_link = page.select_one("a[download=download]")
+    download_link = page.select_one("a[href*='download-notifications.csv']")
     if test_case.expected_download_link_present:
         assert download_link is not None
     else:

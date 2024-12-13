@@ -15,7 +15,7 @@ from tests.conftest import (
 )
 
 
-def test_choose_service_to_join(
+def test_join_service_choose_service(
     client_request,
     mocker,
 ):
@@ -32,7 +32,7 @@ def test_choose_service_to_join(
         ],
     )
     page = client_request.get(
-        "main.choose_service_to_join",
+        "main.join_service_choose_service",
         service_to_join_id=SERVICE_ONE_ID,
     )
     assert normalize_spaces(page.select_one("main p").text) == "Test Organisation has 2 live services"
@@ -41,14 +41,14 @@ def test_choose_service_to_join(
         "service two",
     ]
     assert [link["href"] for link in page.select(".browse-list-item a")] == [
-        url_for("main.join_service", service_to_join_id=SERVICE_ONE_ID),
-        url_for("main.join_service", service_to_join_id=SERVICE_TWO_ID),
+        url_for("main.join_service_ask", service_to_join_id=SERVICE_ONE_ID),
+        url_for("main.join_service_ask", service_to_join_id=SERVICE_TWO_ID),
     ]
 
 
 def test_cannot_join_service_without_organisation(client_request):
     client_request.get(
-        "main.join_service",
+        "main.join_service_ask",
         service_to_join_id=SERVICE_ONE_ID,
         _expected_status=403,
     )
@@ -78,11 +78,11 @@ def test_cannot_join_service_without_organisation_permission(
         return_value=organisation_json(can_ask_to_join_a_service=can_ask_to_join_a_service),
     )
     client_request.get(
-        "main.choose_service_to_join",
+        "main.join_service_choose_service",
         _expected_status=403,
     )
     client_request.get(
-        "main.join_service",
+        "main.join_service_ask",
         service_to_join_id=SERVICE_ONE_ID,
         _expected_status=403,
     )
@@ -104,7 +104,7 @@ def test_cannot_join_service_for_different_organisation(
         return_value=organisation_json(id_="4321", can_ask_to_join_a_service=True),
     )
     client_request.get(
-        "main.join_service",
+        "main.join_service_ask",
         service_to_join_id=SERVICE_ONE_ID,
         _expected_status=403,
     )
@@ -125,10 +125,13 @@ def test_page_lists_team_members_of_service(
 
     manage_service_user_1 = create_active_user_with_permissions()
     manage_service_user_2 = create_active_user_with_permissions()
+    manage_service_user_3 = create_active_user_with_permissions()
     manage_service_user_1["name"] = "Manage service user 1"
     manage_service_user_2["name"] = "Manage service user 2"
+    manage_service_user_3["name"] = "Manage service user 3"
     manage_service_user_1["logged_in_at"] = "2023-01-02 01:00"
     manage_service_user_2["logged_in_at"] = "2023-02-03 01:00"
+    manage_service_user_3["logged_in_at"] = None
 
     mock_get_users = mocker.patch(
         "app.models.user.Users._get_items",
@@ -140,10 +143,11 @@ def test_page_lists_team_members_of_service(
             # These two users should appear on the page
             manage_service_user_1,
             manage_service_user_2,
+            manage_service_user_3,
         ],
     )
 
-    page = client_request.get("main.join_service", service_to_join_id=SERVICE_ONE_ID)
+    page = client_request.get("main.join_service_ask", service_to_join_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one("h1").text) == "Ask to join this service"
     assert normalize_spaces(page.select_one("main p").text) == "You’re asking to join ‘service one’."
@@ -170,6 +174,11 @@ def test_page_lists_team_members_of_service(
             manage_service_user_2["id"],
             "Manage service user 2",
             "Last used Notify today",
+        ),
+        (
+            manage_service_user_3["id"],
+            "Manage service user 3",
+            "Never used Notify",
         ),
     ]
 
@@ -211,10 +220,10 @@ def test_page_redirects_on_post(
 
     client_request.login(current_user)
     client_request.post(
-        "main.join_service",
+        "main.join_service_ask",
         service_to_join_id=SERVICE_ONE_ID,
         _expected_redirect=url_for(
-            "main.join_service_requested",
+            "main.join_service_you_have_asked",
             service_to_join_id=SERVICE_ONE_ID,
             number_of_users_emailed=1,
         ),
@@ -238,7 +247,7 @@ def test_confirmation_page(
     client_request,
 ):
     page = client_request.get(
-        "main.join_service_requested",
+        "main.join_service_you_have_asked",
         service_to_join_id=SERVICE_ONE_ID,
         number_of_users_emailed=1,
     )
@@ -248,9 +257,9 @@ def test_confirmation_page(
         "We have sent your request to 1 member of ‘service one’.",
         "We’ve also sent you a confirmation email.",
         "You’ll get another email if your request is approved.",
-        "Sign out of GOV.UK Notify",
+        "Back to your services",
     ]
 
     assert [(normalize_spaces(link.text), link["href"]) for link in page.select("main a")] == [
-        ("Sign out of GOV.UK Notify", url_for("main.sign_out"))
+        ("Back to your services", url_for("main.your_services"))
     ]

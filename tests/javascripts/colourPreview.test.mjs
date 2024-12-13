@@ -1,18 +1,15 @@
-const helpers = require('./support/helpers.js');
-
-beforeAll(() => {
-  require('../../app/assets/javascripts/colourPreview.js');
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
-});
+import ColourPreview from '../../app/assets/javascripts/esm/colour-preview.mjs'
+import * as helpers from './support/helpers.js'
 
 describe('Colour preview', () => {
 
   let textbox;
+  let swatchEl; 
 
   beforeEach(() => {
+
+    // add class to mimic IRL 
+    document.body.classList.add('govuk-frontend-supported')
 
     // set up DOM
     document.body.innerHTML = `
@@ -41,7 +38,7 @@ describe('Colour preview', () => {
     test("It should add a swatch element for the preview", () => {
 
       // start the module
-      window.GOVUK.notifyModules.start();
+      new ColourPreview(document.querySelector('[data-notify-module="colour-preview"]'))
       swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       expect(swatchEl).not.toBeNull();
@@ -51,7 +48,7 @@ describe('Colour preview', () => {
     test("If the textbox is empty it should make the swatch white", () => {
 
       // start the module
-      window.GOVUK.notifyModules.start();
+      new ColourPreview(document.querySelector('[data-notify-module="colour-preview"]'))
       swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // textbox defaults to empty
@@ -64,7 +61,7 @@ describe('Colour preview', () => {
       textbox.setAttribute('value', '#00FF00');
 
       // start the module
-      window.GOVUK.notifyModules.start();
+      new ColourPreview(document.querySelector('[data-notify-module="colour-preview"]'))
       swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // textbox defaults to empty
@@ -77,7 +74,7 @@ describe('Colour preview', () => {
       textbox.setAttribute('value', '#0F0');
 
       // start the module
-      window.GOVUK.notifyModules.start();
+      new ColourPreview(document.querySelector('[data-notify-module="colour-preview"]'))
       swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // colours are output in RGB
@@ -90,7 +87,7 @@ describe('Colour preview', () => {
       textbox.setAttribute('value', '00FF00');
 
       // start the module
-      window.GOVUK.notifyModules.start();
+      new ColourPreview(document.querySelector('[data-notify-module="colour-preview"]'))
       swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // colours are output in RGB
@@ -103,7 +100,7 @@ describe('Colour preview', () => {
       textbox.setAttribute('value', '0F0');
 
       // start the module
-      window.GOVUK.notifyModules.start();
+      new ColourPreview(document.querySelector('[data-notify-module="colour-preview"]'))
       swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // colours are output in RGB
@@ -116,7 +113,7 @@ describe('Colour preview', () => {
       textbox.setAttribute('value', 'green');
 
       // start the module
-      window.GOVUK.notifyModules.start();
+      new ColourPreview(document.querySelector('[data-notify-module="colour-preview"]'))
       swatchEl = document.querySelector('.govuk-input__colour-preview');
 
       // colours are output in RGB
@@ -131,7 +128,7 @@ describe('Colour preview', () => {
     beforeEach(() => {
 
       // start the module
-      window.GOVUK.notifyModules.start();
+      new ColourPreview(document.querySelector('[data-notify-module="colour-preview"]'))
       swatchEl = document.querySelector('.govuk-input__colour-preview');
 
     });

@@ -76,7 +76,6 @@ export default [
   // ES5 JS compilation
   {
     input: [
-      paths.npm + 'hogan.js/dist/hogan-3.0.2.js',
       paths.npm + 'jquery/dist/jquery.min.js',
       paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
       paths.npm + 'timeago/jquery.timeago.js',
@@ -89,7 +88,6 @@ export default [
       paths.src + 'javascripts/copyToClipboard.js',
       paths.src + 'javascripts/autofocus.js',
       paths.src + 'javascripts/enhancedTextbox.js',
-      paths.src + 'javascripts/fileUpload.js',
       paths.src + 'javascripts/radioSelect.js',
       paths.src + 'javascripts/updateContent.js',
       paths.src + 'javascripts/listEntry.js',
@@ -98,7 +96,6 @@ export default [
       paths.src + 'javascripts/fullscreenTable.js',
       paths.src + 'javascripts/radios-with-images.js',
       paths.src + 'javascripts/previewPane.js',
-      paths.src + 'javascripts/colourPreview.js',
       paths.src + 'javascripts/liveCheckboxControls.js',
       paths.src + 'javascripts/templateFolderForm.js',
       paths.src + 'javascripts/addBrandingOptionsForm.js',
@@ -125,10 +122,7 @@ export default [
         entryFileName: 'all.js'
       }),
       terser({
-        ecma: '5',
-        mangle: {
-          reserved: ["Hogan"]
-        }
+        ecma: '5'
       }),
     ]
   }

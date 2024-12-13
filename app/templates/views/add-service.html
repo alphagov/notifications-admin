@@ -7,8 +7,8 @@
 {% set heading = 'Enter a service name' %}
 
 {% block backLink %}
-  {% if request.args.get("back") == "add_or_join" %}
-    {{ govukBackLink({ "href": url_for('main.add_or_join_service') }) }}
+  {% if request.args.get("back") == "your_services" %}
+    {{ govukBackLink({ "href": url_for('main.your_services') }) }}
   {% endif %}
 {% endblock %}
 

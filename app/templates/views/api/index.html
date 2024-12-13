@@ -35,7 +35,7 @@
   </div>
   <div class="api-notifications">
     {% if not api_notifications.notifications %}
-      <div class="api-notifications-item">
+      <div class="api-notifications-item govuk-!-padding-top-2">
         <p class="api-notifications-item__meta">
           When you send messages via the API they’ll appear here.
         </p>
@@ -88,7 +88,7 @@
       }) }}
     {% endfor %}
     {% if api_notifications %}
-      <div class="api-notifications-item">
+      <div class="api-notifications-item govuk-!-padding-top-2">
         {% if api_notifications|length == 50 %}
           <p class="api-notifications-item__meta">
             Only showing the first 50 messages.

@@ -619,3 +619,28 @@ def test_deletes_unsubscribe_request_summary_when_batching(
 
     mock_redis_delete.assert_called_with_subset_of_args(f"service-{fake_uuid}-unsubscribe-request-reports-summary")
     assert len(mock_request.call_args_list) == 1
+
+
+def test_update_service_join_requests(notify_admin, mocker):
+    requester_id = uuid4()
+    request_id = uuid4()
+    service_id = SERVICE_ONE_ID
+
+    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
+    mock_request = mocker.patch("notifications_python_client.base.BaseAPIClient.request", return_value={})
+
+    service_api_client.update_service_join_requests(
+        request_id=str(request_id), requester_id=str(requester_id), service_id=str(service_id), status="approved"
+    )
+
+    expected_cache_deletes = [
+        f"service-join-request-{request_id}",
+        f"user-{requester_id}",
+        f"service-{service_id}-template-folders",
+    ]
+
+    mock_redis_delete.assert_called_with_args(*expected_cache_deletes)
+
+    mock_request.assert_called_once_with(
+        "POST", f"/service/update-service-join-request-status/{request_id}", data={"status": "approved"}
+    )

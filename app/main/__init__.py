@@ -10,7 +10,6 @@ from app.main.views import (  # noqa
     add_service,
     agreement,
     api_keys,
-    choose_account,
     code_not_received,
     conversation,
     dashboard,
@@ -47,6 +46,7 @@ from app.main.views import (  # noqa
     user_profile,
     verify,
     webauthn_credentials,
+    your_services,
 )
 from app.main.views.organisations import branding, index  # noqa
 from app.main.views.service_settings import branding, index  # noqa

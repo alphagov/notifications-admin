@@ -15,7 +15,7 @@
     {% set checkboxes_data = [] %}
 
     {% for item in template_list %}
-
+      {% set item_num = loop.index %}
       {% set item_link_content %}
         {% for ancestor in item.ancestors %}
           <a href="{{ url_for('main.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">

@@ -19,7 +19,7 @@
       {{ page_header('Send text messages') }}
       <p class="govuk-body">
         You have a free allowance of
-        {{ '{:,}'.format(current_service.free_sms_fragment_limit) }} text messages each
+        {{ current_service.free_sms_fragment_limit|format_thousands }} text messages each
         financial year.
       </p>
       <p class="govuk-body">

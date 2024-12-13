@@ -46,6 +46,7 @@
 
     <div id="template-list">
       {% for item in templates_and_folders %}
+        {% set item_num = loop.index %}
         <div class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
           {% for ancestor in item.ancestors %}
               <a href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">

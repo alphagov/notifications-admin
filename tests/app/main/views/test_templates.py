@@ -821,7 +821,8 @@ def test_user_with_only_send_and_view_sees_letter_page(
         template_id=fake_uuid,
         _test_page_title=False,
     )
-    assert normalize_spaces(page.select_one("h1").text) == "Templates Two week reminder"
+    assert normalize_spaces(page.select_one(".folder-heading-breadcrumb").text) == "Templates"
+    assert normalize_spaces(page.select_one("h1").text) == "Two week reminder"
     assert normalize_spaces(page.select_one("title").text) == (
         "Two week reminder – Templates – service one – GOV.UK Notify"
     )
@@ -1731,7 +1732,8 @@ def test_should_be_able_to_view_a_template_with_links(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one("h1").text) == "Templates Two week reminder"
+    assert normalize_spaces(page.select_one(".folder-heading-breadcrumb").text) == "Templates"
+    assert normalize_spaces(page.select_one("h1").text) == "Two week reminder"
     assert normalize_spaces(page.select_one("title").text) == (
         "Two week reminder – Templates – service one – GOV.UK Notify"
     )
@@ -2275,20 +2277,20 @@ def test_choose_a_template_to_copy(
     assert page.select(".folder-heading") == []
 
     expected = [
-        "Service 1 6 templates",
-        "Service 1 sms_template_one Text message template",
-        "Service 1 sms_template_two Text message template",
-        "Service 1 email_template_one Email template",
-        "Service 1 email_template_two Email template",
-        "Service 1 letter_template_one Letter template",
-        "Service 1 letter_template_two Letter template",
-        "Service 2 6 templates",
-        "Service 2 sms_template_one Text message template",
-        "Service 2 sms_template_two Text message template",
-        "Service 2 email_template_one Email template",
-        "Service 2 email_template_two Email template",
-        "Service 2 letter_template_one Letter template",
-        "Service 2 letter_template_two Letter template",
+        "Folder Service 1 6 templates",
+        "Folder Service 1 sms_template_one Text message template",
+        "Folder Service 1 sms_template_two Text message template",
+        "Folder Service 1 email_template_one Email template",
+        "Folder Service 1 email_template_two Email template",
+        "Folder Service 1 letter_template_one Letter template",
+        "Folder Service 1 letter_template_two Letter template",
+        "Folder Service 2 6 templates",
+        "Folder Service 2 sms_template_one Text message template",
+        "Folder Service 2 sms_template_two Text message template",
+        "Folder Service 2 email_template_one Email template",
+        "Folder Service 2 email_template_two Email template",
+        "Folder Service 2 letter_template_one Letter template",
+        "Folder Service 2 letter_template_two Letter template",
     ]
     actual = page.select(".template-list-item")
 
@@ -2332,20 +2334,20 @@ def test_choose_a_template_to_copy_passes_through_folder_id(
     assert page.select(".folder-heading") == []
 
     expected = [
-        "Service 1 6 templates",
-        "Service 1 sms_template_one Text message template",
-        "Service 1 sms_template_two Text message template",
-        "Service 1 email_template_one Email template",
-        "Service 1 email_template_two Email template",
-        "Service 1 letter_template_one Letter template",
-        "Service 1 letter_template_two Letter template",
-        "Service 2 6 templates",
-        "Service 2 sms_template_one Text message template",
-        "Service 2 sms_template_two Text message template",
-        "Service 2 email_template_one Email template",
-        "Service 2 email_template_two Email template",
-        "Service 2 letter_template_one Letter template",
-        "Service 2 letter_template_two Letter template",
+        "Folder Service 1 6 templates",
+        "Folder Service 1 sms_template_one Text message template",
+        "Folder Service 1 sms_template_two Text message template",
+        "Folder Service 1 email_template_one Email template",
+        "Folder Service 1 email_template_two Email template",
+        "Folder Service 1 letter_template_one Letter template",
+        "Folder Service 1 letter_template_two Letter template",
+        "Folder Service 2 6 templates",
+        "Folder Service 2 sms_template_one Text message template",
+        "Folder Service 2 sms_template_two Text message template",
+        "Folder Service 2 email_template_one Email template",
+        "Folder Service 2 email_template_two Email template",
+        "Folder Service 2 letter_template_one Letter template",
+        "Folder Service 2 letter_template_two Letter template",
     ]
     actual = page.select(".template-list-item")
 
@@ -2454,8 +2456,8 @@ def test_choose_a_template_to_copy_from_folder_within_service(
         from_folder=PARENT_FOLDER_ID,
     )
 
-    assert normalize_spaces(page.select_one(".folder-heading").text) == "service one Parent folder"
-    breadcrumb_links = page.select(".folder-heading a")
+    assert normalize_spaces(page.select_one(".folder-heading").text) == "Folder Parent folder"
+    breadcrumb_links = page.select(".folder-heading-breadcrumb a")
     assert len(breadcrumb_links) == 1
     assert breadcrumb_links[0]["href"] == url_for(
         "main.choose_template_to_copy",
@@ -2464,9 +2466,9 @@ def test_choose_a_template_to_copy_from_folder_within_service(
     )
 
     expected = [
-        "Child folder empty Empty",
-        "Child folder non-empty 1 template",
-        "Child folder non-empty Should appear in list (nested) Text message template",
+        "Folder Child folder empty Empty",
+        "Folder Child folder non-empty 1 template",
+        "Folder Child folder non-empty Should appear in list (nested) Text message template",
         "Should appear in list (at same level) Text message template",
     ]
     actual = page.select(".template-list-item")

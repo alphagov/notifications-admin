@@ -30,10 +30,9 @@
   </svg>
 {%- endmacro %}
 
-{% macro folder(alt, classes, id="folder", border_width=2.5) -%}
+{% macro folder(alt, classes, border_width=2.5) -%}
   <svg xmlns="http://www.w3.org/2000/svg" width="26" height="20" viewBox="0 0 26 20"
-    {%- if alt %} aria-labeledby="{{ id }}" role="img"
-    {%- else %} aria-hidden="true" focusable="false"{% endif %}
+    role="img" aria-hidden="true" focusable="false"
     class="svg-folder-icon{%- if classes %} {{ classes }}{% endif -%}"
   >
     <style><![CDATA[
@@ -47,7 +46,6 @@
         }
       }
     ]]></style>
-    {% if alt %}<title id="{{ id }}">{{ alt }}</title>{% endif %}
     {# We need to position the path in the centre of the required border to have a changable
        border (really stroke) width without altering the size of the shape.
        Because of this, we need to always move each of its coordinates inwards by half the
@@ -61,4 +59,5 @@
       V{{ 4 + border_inset }} H{{ 12 - diag_join_adjustment }}z"
       stroke="currentColor" stroke-width="{{ border_width }}" stroke-linecap="butt" fill="transparent"/>
   </svg>
+  <span class="govuk-visually-hidden">{% if alt %}{{ alt }}{% else %}Folder{% endif %} </span>
 {%- endmacro %}

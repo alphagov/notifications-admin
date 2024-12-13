@@ -1,22 +1,17 @@
-const helpers = require('./support/helpers.js');
+import FileUpload from '../../app/assets/javascripts/esm/file-upload.mjs';
+import * as helpers from './support/helpers.js';
+import { jest } from '@jest/globals';
 
 beforeAll(() => {
-
-  // Stub out JS from window.GOVUKFrontendButton used by this component
-  window.GOVUKFrontendButton = jest.fn();
-
-  require('../../app/assets/javascripts/fileUpload.js');
-
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
+  document.body.classList.add('govuk-frontend-supported');
 });
 
 describe('File upload', () => {
 
   let form;
-  let fileUpload;
+  let uploadLabel;
+  let uploadControl;
+  let uploadSubmit;
 
   beforeEach(() => {
 
@@ -48,7 +43,7 @@ describe('File upload', () => {
     form.reset = jest.fn(() => {});
 
     // start module
-    window.GOVUK.notifyModules.start();
+    new FileUpload(document.querySelector('[data-notify-module="file-upload"]'));
 
     helpers.triggerEvent(window, 'pageshow');
 
@@ -58,16 +53,15 @@ describe('File upload', () => {
 
   describe("An 'upload' button should visually replace the file field", () => {
 
-    var uploadButton;
-    var uploadButtonLabel;
-    var originalControlId;
+    let uploadButton;
+    let originalControlId;
 
     beforeEach(() => {
 
       originalControlId = uploadControl.id;
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FileUpload(document.querySelector('[data-notify-module="file-upload"]'));
 
       uploadButton = form.querySelector('button');
 
@@ -83,7 +77,7 @@ describe('File upload', () => {
     // We generate links in the error summary to the original field, by id, so our new elements need to match this
     test("The file field's id should be copied to the it and the original rewritten", () => {
 
-      var rewrittenId = `hidden-${originalControlId}`;
+      const rewrittenId = `hidden-${originalControlId}`;
 
       expect(uploadButton.id).toEqual(originalControlId);
 
@@ -98,12 +92,12 @@ describe('File upload', () => {
 
   test("If the page loads with validation errors, they should be added to the 'upload' button", () => {
 
-    var buttonLabel;
+    let buttonLabel;
 
     uploadLabel.innerHTML += '<span class="error-message">The logo must be a PNG file</span>';
 
     // start module
-    window.GOVUK.notifyModules.start();
+    new FileUpload(document.querySelector('[data-notify-module="file-upload"]'));
 
     buttonLabel = form.querySelector('label.file-upload-button-label');
 
@@ -123,7 +117,7 @@ describe('File upload', () => {
   */
   describe("If the 'upload' button is clicked", () => {
 
-    var fileUploadClickCallback;
+    let fileUploadClickCallback;
 
     beforeEach(() => {
 
@@ -131,7 +125,7 @@ describe('File upload', () => {
       form.submit = jest.fn(() => {});
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FileUpload(document.querySelector('[data-notify-module="file-upload"]'));
 
       uploadControl.addEventListener('click', fileUploadClickCallback);
 
@@ -157,7 +151,7 @@ describe('File upload', () => {
 
     test("It should replace the upload button with one for cancelling the upload", () => {
 
-      var cancelLink = form.querySelector("a.file-upload-button");
+      const cancelLink = form.querySelector("a.file-upload-button");
 
       expect(cancelLink).not.toBeNull();
 

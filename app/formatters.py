@@ -300,6 +300,10 @@ def format_thousands(value):
     return value
 
 
+def insert_wbr(string):
+    return Markup(string.replace(",", ",<wbr />"))
+
+
 def redact_mobile_number(mobile_number, spacing=""):
     indices = [-4, -5, -6, -7]
     redact_character = spacing + "•" + spacing

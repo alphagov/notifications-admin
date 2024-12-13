@@ -7,7 +7,6 @@ def test_owasp_useful_headers_set(
     client_request.logout()
     response = client_request.get_response(".index")
 
-    assert response.headers["X-Frame-Options"] == "deny"
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert response.headers["X-XSS-Protection"] == "1; mode=block"
     assert response.headers["Content-Security-Policy"] == (
@@ -19,11 +18,23 @@ def test_owasp_useful_headers_set(
         "img-src "
         "'self' static.example.com"
         " *.notifications.service.gov.uk static-logos.test.com data:;"
+        "style-src 'self' static.example.com 'unsafe-inline';"
+        "frame-ancestors 'self';"
         "frame-src 'self';"
     )
     assert response.headers["Link"] == (
         "<https://static.example.com>; rel=dns-prefetch, <https://static.example.com>; rel=preconnect"
     )
+    assert response.headers["Strict-Transport-Security"] == "max-age=31536000; preload"
+    assert response.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
+    assert response.headers["Cross-Origin-Embedder-Policy"] == "require-corp static.example.com;"
+    assert response.headers["Cross-Origin-Opener-Policy"] == "same-origin static.example.com;"
+    assert response.headers["Cross-Origin-Resource-Policy"] == "same-origin static.example.com;"
+    assert (
+        response.headers["Permissions-Policy"]
+        == "geolocation=(), microphone=(), camera=(), autoplay=(), payment=(), sync-xhr=()"
+    )
+    assert response.headers["Server"] == "Cloudfront"
 
 
 def test_headers_non_ascii_characters_are_replaced(
@@ -50,5 +61,7 @@ def test_headers_non_ascii_characters_are_replaced(
         "img-src"
         " 'self' static.example.com"
         " *.notifications.service.gov.uk static-logos??.test.com data:;"
+        "style-src 'self' static.example.com 'unsafe-inline';"
+        "frame-ancestors 'self';"
         "frame-src 'self';"
     )

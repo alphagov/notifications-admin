@@ -47,6 +47,14 @@ export WERKZEUG_DEBUG_PIN=off
 
 To run parts of the app, such as uploading letters, you will need appropriate AWS credentials. See the [Wiki](https://github.com/alphagov/notifications-manuals/wiki/aws-accounts#how-to-set-up-local-development) for more details.
 
+### uv
+
+We use [uv](https://github.com/astral-sh/uv) for Python dependency management. Follow the [install instructions](https://github.com/astral-sh/uv?tab=readme-ov-file#installation) or run:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
 ### Pre-commit
 
 We use [pre-commit](https://pre-commit.com/) to ensure that committed code meets basic standards for formatting, and will make basic fixes for you to save time and aggravation.

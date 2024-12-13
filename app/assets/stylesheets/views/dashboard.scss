@@ -148,6 +148,11 @@
     max-width: 580px;
   }
 
+  &-hint--flow-text {
+    white-space: wrap;
+    overflow-wrap: break-word;
+  }
+
   &-status {
     text-align: right;
   }

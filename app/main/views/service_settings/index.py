@@ -343,7 +343,7 @@ def archive_service(service_id):
             f"‘{current_service.name}’ was deleted",
             "default_with_tick",
         )
-        return redirect(url_for(".choose_account"))
+        return redirect(url_for(".your_services"))
     else:
         flash(
             Markup(

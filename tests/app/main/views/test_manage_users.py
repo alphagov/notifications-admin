@@ -21,6 +21,7 @@ from tests.conftest import (
     create_active_user_manage_template_permissions,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
+    create_user,
     normalize_spaces,
     sample_uuid,
 )
@@ -2223,6 +2224,7 @@ def test_service_join_request_shows_rejected_message_on_reject(
     mock_update_service_join_requests.assert_called_once_with(
         request_id,
         mock_requester["id"],
+        SERVICE_ONE_ID,
         status=SERVICE_JOIN_REQUEST_REJECTED,
         status_changed_by_id=current_user.id,
     )
@@ -2242,8 +2244,14 @@ def test_service_join_request_choose_permissions(
     mock_get_organisation_by_domain,
     status,
     mock_get_service_join_request_status_data,
+    mock_get_template_folders,
 ):
     request_id = sample_uuid()
+
+    mock_get_template_folders.return_value = [
+        {"id": "folder-id-1", "name": "f1", "parent_id": None, "users_with_permission": []},
+        {"id": "folder-id-2", "name": "f2", "parent_id": None, "users_with_permission": []},
+    ]
 
     service_one["organisation"] = ORGANISATION_ID
     mocker.patch(
@@ -2261,16 +2269,123 @@ def test_service_join_request_choose_permissions(
     assert f"Choose permissions for {mock_requester['name']}" in page.select_one("h1").text.strip()
     assert f"{mock_requester['email_address']}" in page.select_one("p").text.strip()
 
-    permission_checkboxes = page.select("input[type=checkbox]")
-    for idx in range(len(permission_checkboxes)):
-        assert permission_checkboxes[idx]["name"] == "join_service_request_choose_permissions_field"
+    permission_checkboxes = page.select("input[name='permissions_field']")
     assert permission_checkboxes[0]["value"] == "view_activity"
     assert permission_checkboxes[1]["value"] == "send_messages"
     assert permission_checkboxes[2]["value"] == "manage_templates"
     assert permission_checkboxes[3]["value"] == "manage_service"
     assert permission_checkboxes[4]["value"] == "manage_api_keys"
 
+    folder_checkboxes = page.select("input[name='folder_permissions']")
+    assert len(folder_checkboxes) == 2
+    assert [item["value"] for item in page.select("input[name=folder_permissions]")] == [
+        "folder-id-1",
+        "folder-id-2",
+    ]
+
     assert normalize_spaces(page.select("form button")[0].text) == "Save"
+
+
+@pytest.mark.parametrize(
+    "service_has_email_auth, auth_options_hidden",
+    [
+        (False, True),
+        (True, False),
+    ],
+)
+def test_join_a_service_with_no_email_auth_hides_auth_type_options(
+    client_request,
+    service_has_email_auth,
+    auth_options_hidden,
+    service_one,
+    mock_get_template_folders,
+    mock_get_organisation_by_domain,
+    fake_uuid,
+    mocker,
+):
+    requester = create_active_user_empty_permissions(True)
+
+    mocker.patch(
+        "app.service_api_client.get_service_join_requests",
+        return_value=service_join_request_get_data(fake_uuid, "pending", requester, None, [fake_uuid]),
+    )
+
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
+    if service_has_email_auth:
+        service_one["permissions"].append("email_auth")
+
+    page = client_request.get(
+        "main.service_join_request_choose_permissions",
+        service_id=service_one["id"],
+        request_id=fake_uuid,
+    )
+    assert (page.select_one("input[name=login_authentication]") is None) == auth_options_hidden
+
+
+@pytest.mark.parametrize(
+    "sms_option_disabled, mobile_number, expected_label",
+    [
+        (
+            True,
+            None,
+            """
+            Text message code
+            Not available because this team member has not added a phone number to their profile
+            """,
+        ),
+        (
+            False,
+            "07700 900762",
+            """
+            Text message code
+            """,
+        ),
+    ],
+)
+def test_join_a_service_user_with_no_mobile_number_cant_be_set_to_sms_auth(
+    client_request,
+    mock_get_template_folders,
+    sms_option_disabled,
+    mobile_number,
+    expected_label,
+    service_one,
+    fake_uuid,
+    mock_get_organisation_by_domain,
+    mocker,
+):
+    requester = create_user(mobile_number=mobile_number)
+
+    mocker.patch(
+        "app.service_api_client.get_service_join_requests",
+        return_value=service_join_request_get_data(fake_uuid, "pending", {}, None, [fake_uuid]),
+    )
+
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["permissions"].append("email_auth")
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
+    mocker.patch("app.user_api_client.get_user", return_value=requester)
+
+    page = client_request.get(
+        "main.service_join_request_choose_permissions",
+        service_id=SERVICE_ONE_ID,
+        request_id=fake_uuid,
+    )
+
+    sms_auth_radio_button = page.select_one('input[value="sms_auth"]')
+    assert sms_auth_radio_button.has_attr("disabled") == sms_option_disabled
+    assert normalize_spaces(page.select_one("label[for=login_authentication-0]").parent.text) == normalize_spaces(
+        expected_label
+    )
 
 
 @pytest.mark.parametrize(
@@ -2286,9 +2401,17 @@ def test_service_join_request_choose_permissions_on_save(
     mock_get_organisation_by_domain,
     status,
     mock_get_service_join_request_status_data,
+    mock_get_template_folders,
 ):
     request_id = sample_uuid()
+
     selected_permissions = ["send_messages", "view_activity", "manage_service"]
+
+    mock_get_template_folders.return_value = [
+        {"id": "folder-id-1", "name": "f1", "parent_id": None, "users_with_permission": []},
+        {"id": "folder-id-2", "name": "f2", "parent_id": None, "users_with_permission": []},
+    ]
+
     mock_update_service_join_requests = mocker.patch(
         "app.service_api_client.update_service_join_requests",
         return_value={},
@@ -2304,21 +2427,80 @@ def test_service_join_request_choose_permissions_on_save(
         "main.service_join_request_choose_permissions",
         service_id=SERVICE_ONE_ID,
         request_id=request_id,
-        _data={
-            "join_service_request_choose_permissions_field": selected_permissions,
-        },
+        _data={"permissions_field": selected_permissions, "folder_permissions": ["folder-id-1", "folder-id-2"]},
         _expected_status=302,
-        _expected_redirect=url_for("main.choose_account"),
+        _expected_redirect=url_for("main.your_services"),
     )
 
     mock_update_service_join_requests.assert_called_once_with(
         request_id,
         mock_requester["id"],
+        SERVICE_ONE_ID,
         permissions=translate_permissions_from_ui_to_db(selected_permissions),
         status=SERVICE_JOIN_REQUEST_APPROVED,
         status_changed_by_id=current_user.id,
+        folder_permissions=["folder-id-1", "folder-id-2"],
+        auth_type="sms_auth",
     )
     assert mock_update_service_join_requests.called
+
+
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status, auth_type",
+    [
+        (
+            create_active_user_empty_permissions(True),
+            create_active_user_with_permissions(True),
+            "pending",
+            "email_auth",
+        ),
+        (create_active_user_empty_permissions(True), create_active_user_with_permissions(True), "pending", "sms_auth"),
+    ],
+)
+def test_service_join_request_choose_auth_type_on_save(
+    client_request,
+    service_one,
+    mock_get_organisation_by_domain,
+    mock_requester,
+    mock_service_user,
+    status,
+    auth_type,
+    mock_get_service_join_request_status_data,
+    mock_get_template_folders,
+    mocker,
+):
+    request_id = sample_uuid()
+
+    selected_permissions = ["send_messages", "view_activity", "manage_service"]
+
+    mock_update_service_join_requests = mocker.patch("app.service_api_client.update_service_join_requests")
+
+    service_one["permissions"].append("email_auth")
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
+    client_request.post(
+        "main.service_join_request_choose_permissions",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+        _data={"permissions_field": selected_permissions, "folder_permissions": [], "login_authentication": auth_type},
+        _expected_status=302,
+        _expected_redirect=url_for("main.your_services"),
+    )
+
+    mock_update_service_join_requests.assert_called_once_with(
+        request_id,
+        mock_requester["id"],
+        SERVICE_ONE_ID,
+        permissions=translate_permissions_from_ui_to_db(selected_permissions),
+        status=SERVICE_JOIN_REQUEST_APPROVED,
+        status_changed_by_id=current_user.id,
+        folder_permissions=[],
+        auth_type=auth_type,
+    )
 
 
 @pytest.mark.parametrize(
@@ -2356,6 +2538,7 @@ def test_service_join_request_refused(
     mock_update_service_join_requests.assert_called_once_with(
         request_id,
         mock_requester["id"],
+        SERVICE_ONE_ID,
         status=SERVICE_JOIN_REQUEST_REJECTED,
         status_changed_by_id=current_user.id,
     )

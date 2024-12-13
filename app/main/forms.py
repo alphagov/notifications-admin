@@ -1037,12 +1037,11 @@ class JoinServiceRequestApproveForm(StripWhitespaceForm):
     )
 
 
-class JoinServiceRequestSetPermissionsForm(StripWhitespaceForm):
-    join_service_request_choose_permissions_field = GovukCheckboxesField(
-        "Permissions",
-        filters=[partial(filter_by_permissions, permissions=permission_options)],
-        choices=list(permission_options),
-        param_extensions={"hint": {"text": "All team members can see sent messages."}},
+class JoinServiceRequestSetPermissionsForm(PermissionsForm):
+    custom_field_order: tuple = (
+        "permissions_field",
+        "folder_permissions",
+        "login_authentication",
     )
 
 
@@ -2877,8 +2876,18 @@ class JoinServiceForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
 
         self.users.choices = [(user.id, user.name) for user in users]
+
         self.users.param_extensions["items"] = [
-            {"hint": {"text": f"Last used Notify {format_date_human(user.logged_in_at)}"}} for user in users
+            {
+                "hint": {
+                    "text": (
+                        f"Last used Notify {format_date_human(user.logged_in_at)}"
+                        if user.logged_in_at
+                        else "Never used Notify"
+                    )
+                }
+            }
+            for user in users
         ]
 
     users = GovukCheckboxesField(
@@ -2902,36 +2911,6 @@ class CopyTemplateForm(StripWhitespaceForm, TemplateNameMixin):
         "The template ID to copy", validators=[NotifyDataRequired(thing="the template ID to copy")]
     )
     parent_folder_id = HiddenField("The folder ID to copy the template into")
-
-
-class AddOrJoinServiceForm(StripWhitespaceForm):
-    def __init__(self, *args, organisation, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        count_of_live_services = len(organisation.live_services)
-        plural = "" if count_of_live_services == 1 else "s"
-        count_of_live_services = format_thousands(count_of_live_services)
-
-        self.add_or_join.param_extensions["items"] = [
-            {
-                "hint": {
-                    "text": "You can invite your team members later",
-                }
-            },
-            {
-                "hint": {
-                    "text": f"{count_of_live_services} team{plural} from {organisation.name} are using Notify already",
-                }
-            },
-        ]
-
-    add_or_join = GovukRadiosField(
-        "Start using Notify",
-        choices=(
-            ("main.add_service", "Add a new service"),
-            ("main.choose_service_to_join", "Join an existing service"),
-        ),
-    )
 
 
 class ProcessUnsubscribeRequestForm(StripWhitespaceForm):

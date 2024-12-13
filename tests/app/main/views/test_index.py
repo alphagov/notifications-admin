@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
+from app.main.views.index import REDIRECTS
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
 
 
@@ -35,10 +36,10 @@ def test_non_logged_in_user_can_see_homepage(
     assert page.select_one("#whos-using-notify a")["href"] == url_for("main.performance")
 
 
-def test_logged_in_user_redirects_to_choose_account(client_request):
+def test_logged_in_user_redirects_to_your_services(client_request):
     client_request.get(
         "main.index",
-        _expected_redirect=url_for("main.choose_account"),
+        _expected_redirect=url_for("main.your_services"),
     )
     client_request.get(
         "main.sign_in",
@@ -186,6 +187,7 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
         ("/using-notify/guidance/message-status", "main.guidance_message_status", {}),
         ("/using-notify/guidance/message-status/sms", "main.guidance_message_status", {"notification_type": "sms"}),
         ("/using-notify/who-its-for", "main.guidance_who_can_use_notify", {}),
+        ("/add-or-join-service", "main.your_services", {}),
     ],
     ids=(lambda arg: arg if isinstance(arg, str) and arg.startswith("/") else ""),
 )
@@ -196,6 +198,12 @@ def test_redirect_blueprint(client_request, old_url, expected_endpoint, expected
         _expected_status=301,
         _expected_redirect=url_for(expected_endpoint, **expected_endpoint_kwargs),
     )
+
+
+def test_redirect_blueprint_contains_valid_urls(_client):
+    endpoints = {rule.endpoint for rule in _client.application.url_map.iter_rules()}
+    invalid_redirects = set(REDIRECTS.values()) - endpoints
+    assert not invalid_redirects, "historical_redirects redirects to invalid endpoint name"
 
 
 def test_message_status_page_redirects_without_notification_type_specified(client_request):

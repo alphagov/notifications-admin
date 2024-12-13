@@ -88,6 +88,8 @@
     @include govuk-link-decoration;
     // reduce padding until screen is above 420px / zoomed below 300%
     padding-left: govuk-spacing(1);
+    // keep at the bottom with number breaks onto a new line
+    margin-top: auto;
 
     @include govuk-media-query($from: 420px) {
       padding-left: govuk-spacing(2);

@@ -1,0 +1,6 @@
+-r requirements.in
+-r requirements_for_test_common.in
+
+pytest-freezegun==0.4.2
+moto==4.0.9
+html5lib==1.1

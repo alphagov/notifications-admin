@@ -13,8 +13,14 @@
     caption_visible=False,
     empty_message='When users text your service’s phone number ({}) you’ll see the messages here'.format(inbound_number),
     field_headings=[
-      'From',
-      'First two lines of message'
+      {
+        'text':'From',
+        'classes': 'govuk-!-width-two-thirds--static'
+      },
+      {
+        'text':'First two lines of message',
+        'classes': 'govuk-!-width-one-third--static'
+      }
     ],
     field_headings_visible=False
   ) %}
@@ -25,7 +31,7 @@
       >
         {{ item.user_number | format_phone_number_human_readable }}
       </a>
-      <span class="file-list-hint">{{ item.content }}</span>
+      <span class="file-list-hint file-list-hint--flow-text">{{ item.content }}</span>
     {% endcall %}
     {% call field(align='right') %}
       <span class="align-with-message-body">

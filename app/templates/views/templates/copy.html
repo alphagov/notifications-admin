@@ -28,6 +28,7 @@
       ) }}
       <div id="template-list">
         {% for item in services_templates_and_folders %}
+          {% set item_num = loop.index %}
           <div class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
             {% for ancestor in item.ancestors %}
               {% if ancestor.is_service %}

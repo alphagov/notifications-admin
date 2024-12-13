@@ -289,7 +289,7 @@
       // make sticky JS recalculate its cache of the element's position
       GOVUK.stickAtBottomWhenScrolling.recalculate();
 
-      if (currentStateObj && ('setFocus' in currentStateObj)) {
+      if (currentStateObj && ('setFocus' in currentStateObj) && !this.formHasError()) {
         scrollTop = $(window).scrollTop();
         currentStateObj.setFocus();
         $(window).scrollTop(scrollTop);
@@ -327,6 +327,10 @@
         </div>
       </div>
     `).get(0);
+
+    this.formHasError = function() {
+      return Boolean(document.querySelector('.govuk-error-summary'));
+    };
   };
 
 })(window.GOVUK.NotifyModules);
