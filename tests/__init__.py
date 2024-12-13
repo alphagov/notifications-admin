@@ -415,7 +415,7 @@ def inbound_sms_json():
                 "notify_number": "07900000002",
                 "content": f"message-{index + 1}",
                 "created_at": (datetime.utcnow() - timedelta(minutes=60 * hours_ago, seconds=index)).isoformat(),
-                "id": sample_uuid(),
+                "id": str(uuid.uuid4()),
             }
             for index, hours_ago, phone_number in (
                 (0, 1, "447900900000"),
