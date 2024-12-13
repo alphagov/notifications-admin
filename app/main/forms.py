@@ -2042,15 +2042,21 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         return rv
 
 
+class DuplicatableHiddenField(HiddenField):
+    def __call__(self, **kwargs):
+        # Not sure why this works
+        super().__call__(**kwargs)
+
+
 class AdminChangeOrganisationDefaultEmailBrandingForm(StripWhitespaceForm):
-    email_branding_id = HiddenField(
+    email_branding_id = DuplicatableHiddenField(
         "Email branding id",
         validators=[DataRequired()],
     )
 
 
 class AdminChangeOrganisationDefaultLetterBrandingForm(StripWhitespaceForm):
-    letter_branding_id = HiddenField(
+    letter_branding_id = DuplicatableHiddenField(
         "Letter branding id",
         validators=[DataRequired()],
     )
