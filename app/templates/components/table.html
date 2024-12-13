@@ -28,12 +28,12 @@
   </table>
 {%- endmacro %}
 
-{% macro list_table(items, caption='', empty_message='', field_headings=[], field_headings_visible=True, caption_visible=True, equal_length=False) -%}
+{% macro list_table(items, caption='', empty_message='', field_headings=[], field_headings_visible=True, caption_visible=True, equal_length=False, give_rows_ids=True) -%}
   {% set parent_caller = caller %}
 
   {% call mapping_table(caption, field_headings, field_headings_visible, caption_visible, equal_length) %}
     {% for item in items %}
-      {% call row(item.id) %}
+      {% call row(item.id if give_rows_ids else None) %}
         {{ parent_caller(item, loop.index + 1) }}
       {% endcall %}
     {% endfor %}
