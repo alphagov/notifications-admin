@@ -1,22 +1,25 @@
-const helpers = require('./support/helpers.js');
-
-beforeAll(() => {
-  require('../../app/assets/javascripts/autofocus.js');
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
-});
+import Autofocus from '../../app/assets/javascripts/esm/autofocus.mjs';
+import { jest } from '@jest/globals';
+import * as helpers from './support/helpers';
 
 describe('Autofocus', () => {
 
   const labelText = 'Search by name';
   let focusHandler;
   let search;
+  let screenMock;
 
   beforeEach(() => {
-
+    // add class to mimic IRL 
+    document.body.classList.add('govuk-frontend-supported')
     document.title = 'Find services by name - GOV.UK Notify';
+
+    screenMock = new helpers.ScreenMock(jest);
+    screenMock.setWindow({
+      width: 1200,
+      height: 600,
+      scrollTop: 0
+    });
 
     // set up DOM
     document.body.innerHTML =
@@ -38,13 +41,14 @@ describe('Autofocus', () => {
     document.body.innerHTML = '';
     search.removeEventListener('focus', focusHandler);
     focusHandler = null;
+    screenMock.reset();
 
   });
 
   test('is focused when modules start', () => {
 
     // start module
-    window.GOVUK.notifyModules.start();
+    new Autofocus(document.querySelector('[data-notify-module="autofocus"]'))
 
     expect(focusHandler).toHaveBeenCalled();
 
@@ -56,7 +60,7 @@ describe('Autofocus', () => {
     document.getElementById('wrapper').setAttribute('data-notify-module', 'autofocus');
 
     // start module
-    window.GOVUK.notifyModules.start();
+    new Autofocus(document.querySelector('[data-notify-module="autofocus"]'))
 
     expect(focusHandler).toHaveBeenCalled();
 
@@ -65,10 +69,10 @@ describe('Autofocus', () => {
   test('is not focused if the window has scrolled', () => {
 
     // mock the window being scrolled 25px
-    $.prototype.scrollTop = jest.fn(() => 25);
+    screenMock.scrollTo(25);
 
     // start module
-    window.GOVUK.notifyModules.start();
+    new Autofocus(document.querySelector('[data-notify-module="autofocus"]'))
 
     expect(focusHandler).not.toHaveBeenCalled();
 
@@ -77,13 +81,13 @@ describe('Autofocus', () => {
   test('is focused if the window has scrolled but the force-focus flag is set', () => {
 
     // mock the window being scrolled 25px
-    $.prototype.scrollTop = jest.fn(() => 25);
+    screenMock.scrollTo(25);
 
     // set the force-focus flag
     document.querySelector('#search').setAttribute('data-force-focus', true);
 
     // start module
-    window.GOVUK.notifyModules.start();
+    new Autofocus(document.querySelector('[data-notify-module="autofocus"]'))
 
     expect(focusHandler).toHaveBeenCalled();
 
