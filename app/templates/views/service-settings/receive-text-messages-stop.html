@@ -2,6 +2,9 @@
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/error-summary.html" import errorSummary %}
 
 {% block service_page_title %}
   When you stop receiving text messages
@@ -12,6 +15,8 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+
+    {{ errorSummary(form) }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
@@ -48,9 +53,25 @@
       </p>
 
       <h2 class="heading heading-medium">If you’re sure you want to delete your number</h2>
-      <p class="govuk-body">
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact the Notify team</a>.
-      </p>
+        {% if current_user.platform_admin %}
+            {% if not recent_use_date %}
+            <p class="hint">This number has never been used</p>
+            {% else %}
+            <p class="govuk-body">This number was last used
+                <time class="timeago" datetime="{{ recent_use_date}}">
+                    {{ recent_use_date|format_delta }}
+                </time>
+            </p>
+            {% endif %}
+            {% call form_wrapper() %}
+                {{ form.removal_options }}
+                {{ page_footer('Save') }}
+            {% endcall %}
+        {% else %}
+          <p class="govuk-body">
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact the Notify team</a>.
+          </p>
+        {% endif %}
     </div>
   </div>
 

@@ -338,6 +338,16 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.get(f"/service/{service_id}/inbound-sms/summary")
 
     @cache.delete("service-{service_id}")
+    @cache.delete_by_pattern("service-{service_id}-template-*")
+    def remove_service_inbound_sms(self, service_id, archive: bool):
+        return self.post(f"/service/{service_id}/inbound-sms/remove", data={"archive": archive})
+
+    def get_most_recent_inbound_number_usage_date(self, service_id):
+        return self.get(
+            f"/service/{service_id}/inbound-sms/most-recent-usage",
+        )
+
+    @cache.delete("service-{service_id}")
     def create_service_inbound_api(self, service_id, url, bearer_token, user_id):
         data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id}
         return self.post(f"/service/{service_id}/inbound-api", data)
