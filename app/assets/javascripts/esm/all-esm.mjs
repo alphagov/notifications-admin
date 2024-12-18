@@ -7,6 +7,7 @@ import ColourPreview from './colour-preview.mjs';
 import FileUpload from './file-upload.mjs';
 import Autofocus from './autofocus.mjs';
 import AuthenticateSecurityKey from './authenticate-security-key.mjs';
+import RegisterSecurityKey from './register-security-key.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -41,6 +42,11 @@ if ($autoFocus) {
 const $authenticateSecurityKey = document.querySelector('[data-notify-module="authenticate-security-key"]');
 if ($authenticateSecurityKey) {
   new AuthenticateSecurityKey($authenticateSecurityKey);
+}
+
+const $registerSecurityKey = document.querySelector('[data-notify-module="register-security-key"]');
+if ($registerSecurityKey) {
+  new RegisterSecurityKey($registerSecurityKey);
 }
 
 const focusBanner = new FocusBanner();
