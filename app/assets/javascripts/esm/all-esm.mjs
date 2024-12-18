@@ -15,6 +15,7 @@ import RadiosWithImages from './radios-with-images.mjs';
 import LiveSearch from './live-search.mjs';
 import EnhancedTextbox from './enhanced-textbox.mjs';
 import AuthenticateSecurityKey from './authenticate-security-key.mjs';
+import RegisterSecurityKey from './register-security-key.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -87,6 +88,11 @@ if ($enhancedTextboxArray.length > 0) {
 const $authenticateSecurityKey = document.querySelector('[data-notify-module="authenticate-security-key"]');
 if ($authenticateSecurityKey) {
   new AuthenticateSecurityKey($authenticateSecurityKey);
+}
+
+const $registerSecurityKey = document.querySelector('[data-notify-module="register-security-key"]');
+if ($registerSecurityKey) {
+  new RegisterSecurityKey($registerSecurityKey);
 }
 
 const focusBanner = new FocusBanner();
