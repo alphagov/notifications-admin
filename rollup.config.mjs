@@ -100,7 +100,6 @@ export default [
       paths.src + 'javascripts/addBrandingOptionsForm.js',
       paths.src + 'javascripts/setAuthTypeForm.js',
       paths.src + 'javascripts/registerSecurityKey.js',
-      paths.src + 'javascripts/authenticateSecurityKey.js',
       paths.src + 'javascripts/updateStatus.js',
       paths.src + 'javascripts/homepage.js',
       paths.src + 'javascripts/removeInPresenceOf.js',
