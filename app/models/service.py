@@ -5,6 +5,7 @@ from flask import abort, current_app
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
+from app.extensions import redis_client
 from app.models import JSONModel
 from app.models.branding import EmailBranding, LetterBranding
 from app.models.contact_list import ContactLists
@@ -295,6 +296,16 @@ class Service(JSONModel):
             return self.has_sms_templates
         return self.volume_sms > 0
 
+    @property
+    def has_confirmed_email_sender(self):
+        if redis_client.get(f"{self.id}_has_confirmed_email_sender"):
+            return True
+        return False
+
+    @property
+    def needs_to_confirm_email_sender(self):
+        return self.intending_to_send_email and not self.has_confirmed_email_sender
+
     @cached_property
     def email_reply_to_addresses(self):
         return service_api_client.get_reply_to_email_addresses(self.id)
@@ -408,12 +419,20 @@ class Service(JSONModel):
         return {channel: getattr(self, f"volume_{channel}") for channel in ("email", "sms", "letter")}
 
     @property
+    def is_unique(self):
+        if redis_client.get(f"{self.id}_is_unique"):
+            return True
+        return False
+
+    @property
     def go_live_checklist_completed(self):
         return all(
             (
+                self.is_unique,
                 any(self.volumes_by_channel.values()),
                 self.has_team_members_with_manage_service_permission,
                 self.has_templates,
+                not self.needs_to_confirm_email_sender,
                 not self.needs_to_add_email_reply_to_address,
                 not self.needs_to_change_sms_sender,
             )
