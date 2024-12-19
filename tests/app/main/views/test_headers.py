@@ -1,9 +1,13 @@
 def test_owasp_useful_headers_set(
     client_request,
+    mocker,
     mock_get_service_and_organisation_counts,
     mock_get_letter_rates,
     mock_get_sms_rate,
+    fake_nonce,
 ):
+    mocker.patch("secrets.token_urlsafe", return_value=fake_nonce)
+
     client_request.logout()
     response = client_request.get_response(".index")
 
@@ -11,7 +15,7 @@ def test_owasp_useful_headers_set(
     assert response.headers["X-XSS-Protection"] == "1; mode=block"
     assert response.headers["Content-Security-Policy"] == (
         "default-src 'self' static.example.com 'unsafe-inline';"
-        "script-src 'self' static.example.com 'unsafe-inline' 'unsafe-eval' data:;"
+        "script-src 'self' static.example.com 'nonce-TESTs5Vr8v3jgRYLoQuVwA';"
         "connect-src 'self';"
         "object-src 'self';"
         "font-src 'self' static.example.com data:;"
@@ -43,7 +47,10 @@ def test_headers_non_ascii_characters_are_replaced(
     mock_get_service_and_organisation_counts,
     mock_get_letter_rates,
     mock_get_sms_rate,
+    fake_nonce,
 ):
+    mocker.patch("secrets.token_urlsafe", return_value=fake_nonce)
+
     client_request.logout()
     mocker.patch.dict(
         "app.current_app.config",
@@ -54,7 +61,7 @@ def test_headers_non_ascii_characters_are_replaced(
 
     assert response.headers["Content-Security-Policy"] == (
         "default-src 'self' static.example.com 'unsafe-inline';"
-        "script-src 'self' static.example.com 'unsafe-inline' 'unsafe-eval' data:;"
+        "script-src 'self' static.example.com 'nonce-TESTs5Vr8v3jgRYLoQuVwA';"
         "connect-src 'self';"
         "object-src 'self';"
         "font-src 'self' static.example.com data:;"

@@ -1,5 +1,7 @@
 {% extends "govuk_frontend_jinja/template.html"%}
 
+{% set cspNonce = request.csp_nonce %}
+
 {% block headIcons %}
   <link rel="icon" sizes="48x48" href="{{ asset_url('images/favicon.ico') }}">
   <link rel="icon" sizes="any" href="{{ asset_url('images/favicon.svg') }}" type="image/svg+xml">

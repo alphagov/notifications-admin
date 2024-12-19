@@ -1,5 +1,6 @@
 import os
 import pathlib
+import secrets
 from collections.abc import Callable
 from time import monotonic
 
@@ -219,6 +220,7 @@ def init_app(application):
     application.after_request(useful_headers_after_request)
 
     # Load user first (as we want user_id to be available for all calls to API, which service+organisation might make.
+    application.before_request(make_nonce_before_request)
     application.before_request(load_user_id_before_request)
     application.before_request(load_service_before_request)
     application.before_request(load_organisation_before_request)
@@ -336,6 +338,12 @@ def load_user_id_before_request():
     g.user_id = get_user_id_from_flask_login_session()
 
 
+def make_nonce_before_request():
+    # `govuk_frontend_jinja/template.html` can be extended and inline `<script>` can be added without CSP complaining
+    if not getattr(request, "csp_nonce", None):
+        request.csp_nonce = secrets.token_urlsafe(16)
+
+
 #  https://www.owasp.org/index.php/List_of_useful_HTTP_headers
 def useful_headers_after_request(response):
     response.headers.add("X-Content-Type-Options", "nosniff")
@@ -344,7 +352,7 @@ def useful_headers_after_request(response):
         "Content-Security-Policy",
         (
             "default-src 'self' {asset_domain} 'unsafe-inline';"
-            "script-src 'self' {asset_domain} 'unsafe-inline' 'unsafe-eval' data:;"
+            "script-src 'self' {asset_domain} 'nonce-{csp_nonce}';"
             "connect-src 'self';"
             "object-src 'self';"
             "font-src 'self' {asset_domain} data:;"
@@ -355,6 +363,7 @@ def useful_headers_after_request(response):
             "frame-src 'self';".format(
                 asset_domain=current_app.config["ASSET_DOMAIN"],
                 logo_domain=current_app.config["LOGO_CDN_DOMAIN"],
+                csp_nonce=getattr(request, "csp_nonce", ""),
             )
         ),
     )
