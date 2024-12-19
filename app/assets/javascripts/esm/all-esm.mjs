@@ -5,6 +5,7 @@ import CollapsibleCheckboxes from './collapsible-checkboxes.mjs';
 import FocusBanner from './focus-banner.mjs';
 import ColourPreview from './colour-preview.mjs';
 import FileUpload from './file-upload.mjs';
+import Autofocus from './autofocus.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -29,6 +30,11 @@ if ($colourPreview) {
 const $fileUpload = document.querySelector('[data-notify-module="file-upload"]');
 if ($fileUpload) {
   new FileUpload($fileUpload);
+}
+
+const $autoFocus = document.querySelector('[data-notify-module="autofocus"]');
+if ($autoFocus) {
+  new Autofocus($autoFocus);
 }
 
 const focusBanner = new FocusBanner();
