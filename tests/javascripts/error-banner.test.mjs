@@ -1,9 +1,8 @@
-beforeAll(() => {
-  require('../../app/assets/javascripts/errorBanner.js')
-});
+import ErrorBanner from "../../app/assets/javascripts/esm/error-banner.mjs";
 
-afterAll(() => {
-    require('./support/teardown.js');
+beforeAll(() => {
+  // add class to mimic IRL 
+  document.body.classList.add('govuk-frontend-supported')
 });
 
 describe("Error Banner", () => {
@@ -16,7 +15,7 @@ describe("Error Banner", () => {
       document.body.innerHTML = `
       <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" aria-live="polite" tabindex="-1" data-module="govuk-error-summary">
       </div>`;
-      window.GOVUK.ErrorBanner.hideBanner();
+      new ErrorBanner().hideBanner();
       expect(document.querySelector('.govuk-error-summary').classList).toContain('govuk-!-display-none')
     });
   });
@@ -27,7 +26,7 @@ describe("Error Banner", () => {
       <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" aria-live="polite" tabindex="-1" data-module="govuk-error-summary">
       </div>`;
 
-      window.GOVUK.ErrorBanner.showBanner('Some Err');
+      new ErrorBanner().showBanner('Some Err');
     });
 
     test("Will show the element", () => {
