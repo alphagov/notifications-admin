@@ -5685,6 +5685,131 @@ def test_service_receive_text_messages_stop(client_request, service_one, mock_ge
     assert support_link["href"] == url_for(".support")
 
 
+def test_service_receive_text_messages_stop_platform_admin(
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_inbound_number_for_service,
+    mock_get_most_recent_inbound_usage_date,
+):
+    service_one["permissions"] = ["inbound_sms"]
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(
+        ".service_receive_text_messages_stop",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert "This number was last used" in page.text
+    radios = page.select("input[type=radio]")
+    assert len(radios) == 2
+
+    assert radios[0]["value"] == "true"
+    assert radios[1]["value"] == "false"
+    assert normalize_spaces(page.select("form button")[0].text) == "Save"
+
+
+def test_service_receive_text_messages_stop_user_is_not_platform_admin(
+    client_request,
+    service_one,
+    mock_get_inbound_number_for_service,
+):
+    service_one["permissions"] = ["inbound_sms"]
+
+    page = client_request.get(
+        ".service_receive_text_messages_stop",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert "This number was last used" not in page.text
+    support_link = page.select("p a")[-1]
+    assert support_link["href"] == url_for(".support")
+
+
+def test_service_receive_text_messages_stop_success_redirect(
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_inbound_number_for_service,
+    mocker,
+):
+    service_one["permissions"] = ["inbound_sms"]
+    client_request.login(platform_admin_user)
+
+    mock_remove_service_inbound_sms = mocker.patch("app.service_api_client.remove_service_inbound_sms")
+
+    client_request.post(
+        ".service_receive_text_messages_stop",
+        service_id=SERVICE_ONE_ID,
+        _data={"removal_options": "true"},
+        _expected_redirect=url_for(
+            ".service_receive_text_messages_stop_success", service_id=SERVICE_ONE_ID, inbound_number="0781239871"
+        ),
+    )
+
+    mock_remove_service_inbound_sms.assert_called_once_with(SERVICE_ONE_ID, True)
+
+
+def service_receive_text_messages_stop_success(
+    client_request,
+    platform_admin_user,
+    service_one,
+):
+    service_one["permissions"] = ["inbound_sms"]
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(
+        ".service_receive_text_messages_stop_success",
+        service_id=SERVICE_ONE_ID,
+        inbound_number="0781239871",
+    )
+
+    assert page.select_one("h1").text == "You’ve stopped receiving text messages"
+
+    inset_text = page.select_one(".govuk-inset-text")
+    assert inset_text and normalize_spaces(inset_text.text) == "0781239871"
+
+    service_settings_link = page.select_one("a.govuk-link")
+    assert service_settings_link["href"] == url_for("main.service_settings", service_id=SERVICE_ONE_ID)
+    assert "Back to service settings" in service_settings_link.text
+
+
+def test_service_receive_text_messages_stop_handles_error(
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_inbound_number_for_service,
+    mock_get_most_recent_inbound_usage_date,
+    mocker,
+):
+    service_one["permissions"] = ["inbound_sms"]
+    client_request.login(platform_admin_user)
+
+    mock_remove_service_inbound_sms = mocker.patch(
+        "app.service_api_client.remove_service_inbound_sms",
+        side_effect=Exception("Failed to process the request"),
+    )
+
+    page = client_request.post(
+        ".service_receive_text_messages_stop",
+        service_id=SERVICE_ONE_ID,
+        _data={"removal_options": "true"},
+        _expected_status=200,
+    )
+
+    mock_remove_service_inbound_sms.assert_called_once_with(SERVICE_ONE_ID, True)
+
+    error_summary = page.select_one(".govuk-error-summary")
+    assert error_summary is not None
+    assert "There is a problem" in error_summary.text
+    assert "Failed to remove number from service" in error_summary.text
+
+    radios = page.select("input[type=radio]")
+    assert len(radios) == 2
+    assert radios[0]["value"] == "true"
+    assert radios[1]["value"] == "false"
+
+
 def test_show_sms_prefixing_setting_page(
     client_request,
     mock_update_service,

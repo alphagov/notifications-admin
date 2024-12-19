@@ -295,6 +295,7 @@ EXCLUDED_ENDPOINTS = set(
             "service_preview_branding",
             "service_receive_text_messages_start",
             "service_receive_text_messages_stop",
+            "service_receive_text_messages_stop_success",
             "service_receive_text_messages",
             "service_set_auth_type_for_users",
             "service_set_auth_type",
