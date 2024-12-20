@@ -358,7 +358,7 @@ def useful_headers_after_request(response):
             "font-src 'self' {asset_domain} data:;"
             "img-src 'self' {asset_domain}"
             " *.notifications.service.gov.uk {logo_domain} data:;"
-            "style-src 'self' {asset_domain} 'unsafe-inline';"
+            "style-src 'self' {asset_domain} 'nonce-{csp_nonce}';"
             "frame-ancestors 'self';"
             "frame-src 'self';".format(
                 asset_domain=current_app.config["ASSET_DOMAIN"],
