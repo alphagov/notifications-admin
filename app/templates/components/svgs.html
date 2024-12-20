@@ -35,7 +35,7 @@
     role="img" aria-hidden="true" focusable="false"
     class="svg-folder-icon{%- if classes %} {{ classes }}{% endif -%}"
   >
-    <style><![CDATA[
+    <style nonce="{{ request.csp_nonce }}"><![CDATA[
       .svg-folder-icon > path {
         fill: #dee0e2;
       }
