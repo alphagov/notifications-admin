@@ -351,7 +351,7 @@ def useful_headers_after_request(response):
     response.headers.add(
         "Content-Security-Policy",
         (
-            "default-src 'self' {asset_domain} 'unsafe-inline';"
+            "default-src 'self' {asset_domain};"
             "script-src 'self' {asset_domain} 'nonce-{csp_nonce}';"
             "connect-src 'self';"
             "object-src 'self';"
