@@ -2272,6 +2272,20 @@ class AdminServiceInboundNumberForm(StripWhitespaceForm):
     )
 
 
+class AdminServiceInboundNumberArchive(StripWhitespaceForm):
+    removal_options = GovukRadiosField(
+        "What do you want to do with the number?",
+        choices=[("true", "Archive"), ("false", "Release")],
+        validators=[DataRequired(message="Select an option")],
+        param_extensions={
+            "items": [
+                {"hint": {"text": "No other services can use this phone number"}},
+                {"hint": {"text": "Another service can use this phone number"}},
+            ]
+        },
+    )
+
+
 class CallbackForm(StripWhitespaceForm):
     url = GovukTextInputField(
         "URL",

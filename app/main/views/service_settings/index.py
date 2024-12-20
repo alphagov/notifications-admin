@@ -36,6 +36,7 @@ from app.main.forms import (
     AdminPreviewBrandingForm,
     AdminServiceAddDataRetentionForm,
     AdminServiceEditDataRetentionForm,
+    AdminServiceInboundNumberArchive,
     AdminServiceInboundNumberForm,
     AdminServiceMessageLimitForm,
     AdminServiceRateLimitForm,
@@ -693,13 +694,56 @@ def service_receive_text_messages_start(service_id):
     return render_template("views/service-settings/receive-text-messages-start.html")
 
 
-@main.route("/services/<uuid:service_id>/service-settings/receive-text-messages/stop", methods=["GET"])
+@main.route("/services/<uuid:service_id>/service-settings/receive-text-messages/stop", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_receive_text_messages_stop(service_id):
     if not current_service.has_permission("inbound_sms"):
         return redirect(url_for(".service_receive_text_messages", service_id=service_id))
 
-    return render_template("views/service-settings/receive-text-messages-stop.html")
+    form = AdminServiceInboundNumberArchive()
+    inbound_number = current_service.inbound_number
+
+    if form.validate_on_submit():
+        archive = form.removal_options.data == "true"
+
+        try:
+            service_api_client.remove_service_inbound_sms(service_id, archive)
+            return redirect(
+                url_for(
+                    ".service_receive_text_messages_stop_success", service_id=service_id, inbound_number=inbound_number
+                )
+            )
+
+        except Exception as e:
+            current_app.logger.error(
+                "Error removing inbound number %s for service %s: %s", inbound_number, service_id, e
+            )
+            form.removal_options.errors.append("Failed to remove number from service")
+
+    recent_use_date = None
+
+    if current_user.platform_admin:
+        resp = service_api_client.get_most_recent_inbound_number_usage_date(service_id)
+        recent_use_date = resp["most_recent_date"]
+
+    return render_template(
+        "views/service-settings/receive-text-messages-stop.html",
+        form=form,
+        current_user=current_user,
+        recent_use_date=recent_use_date,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/receive-text-messages/stop/success", methods=["GET"])
+@user_has_permissions("manage_service")
+def service_receive_text_messages_stop_success(service_id):
+    inbound_number = request.args.get("inbound_number", None)
+
+    return render_template(
+        "views/service-settings/receive-text-messages-stop-success.html",
+        current_service=current_service,
+        inbound_number=inbound_number,
+    )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-letters", methods=["GET"])
