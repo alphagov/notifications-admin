@@ -7,7 +7,6 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user
 from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import check_token
 
@@ -19,8 +18,8 @@ from app.models.user import User
 from app.utils.login import (
     email_needs_revalidating,
     log_in_user,
+    redirect_if_logged_in,
     redirect_to_sign_in,
-    redirect_when_logged_in,
 )
 
 
@@ -36,10 +35,9 @@ def two_factor_email_interstitial(token):
 
 
 @main.route("/email-auth/<string:token>", methods=["POST"])
+@redirect_if_logged_in
 def two_factor_email(token):
     redirect_url = request.args.get("next")
-    if current_user.is_authenticated:
-        return redirect_when_logged_in(platform_admin=current_user.platform_admin)
 
     # checks url is valid, and hasn't timed out
     try:
