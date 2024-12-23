@@ -2429,7 +2429,7 @@ def test_service_join_request_choose_permissions_on_save(
         request_id=request_id,
         _data={"permissions_field": selected_permissions, "folder_permissions": ["folder-id-1", "folder-id-2"]},
         _expected_status=302,
-        _expected_redirect=url_for("main.your_services"),
+        _expected_redirect=url_for("main.manage_users", service_id=SERVICE_ONE_ID),
     )
 
     mock_update_service_join_requests.assert_called_once_with(
@@ -2488,7 +2488,7 @@ def test_service_join_request_choose_auth_type_on_save(
         request_id=request_id,
         _data={"permissions_field": selected_permissions, "folder_permissions": [], "login_authentication": auth_type},
         _expected_status=302,
-        _expected_redirect=url_for("main.your_services"),
+        _expected_redirect=url_for("main.manage_users", service_id=SERVICE_ONE_ID),
     )
 
     mock_update_service_join_requests.assert_called_once_with(
