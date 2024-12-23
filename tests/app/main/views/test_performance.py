@@ -156,3 +156,33 @@ def test_should_render_performance_page(
         "Department of One Service 1 "
         "No organisation 1"
     )
+
+
+@freeze_time("2021-01-01")
+def test_should_return_performance_data_as_json(
+    client_request,
+    mock_get_service_and_organisation_counts,
+    mocker,
+):
+    mock_get_performance_data = mocker.patch(
+        "app.performance_dashboard_api_client.get_performance_dashboard_stats",
+        return_value=_get_example_performance_data(),
+    )
+    response = client_request.get_response("main.performance_json")
+    assert response.json.keys() == {
+        "average_percentage_under_10_seconds",
+        "count_of_live_services_and_organisations",
+        "email_notifications",
+        "letter_notifications",
+        "live_service_count",
+        "notifications_by_type",
+        "organisations_using_notify",
+        "processing_time",
+        "services_using_notify",
+        "sms_notifications",
+        "total_notifications",
+    }
+    mock_get_performance_data.assert_called_once_with(
+        start_date=date(2020, 12, 25),
+        end_date=date(2021, 1, 1),
+    )

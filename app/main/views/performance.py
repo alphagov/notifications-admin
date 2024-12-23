@@ -3,7 +3,7 @@ from itertools import groupby
 from operator import itemgetter
 from statistics import mean
 
-from flask import render_template
+from flask import jsonify, render_template, request
 
 from app import performance_dashboard_api_client, status_api_client
 from app.main import main
@@ -11,6 +11,7 @@ from app.main.views.sub_navigation_dictionaries import features_nav
 
 
 @main.route("/features/performance")
+@main.route("/features/performance.json", endpoint="performance_json")
 def performance():
     stats = performance_dashboard_api_client.get_performance_dashboard_stats(
         start_date=(datetime.utcnow() - timedelta(days=7)).date(),
@@ -33,6 +34,10 @@ def performance():
         [row["percentage_under_10_seconds"] for row in stats["processing_time"]] or [0]
     )
     stats["count_of_live_services_and_organisations"] = status_api_client.get_count_of_live_services_and_organisations()
+
+    if request.endpoint == "main.performance_json":
+        return jsonify(stats)
+
     return render_template(
         "views/guidance/features/performance.html",
         **stats,
