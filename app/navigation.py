@@ -299,6 +299,7 @@ class MainNavigation(Navigation):
             "service_receive_text_messages",
             "service_receive_text_messages_start",
             "service_receive_text_messages_stop",
+            "service_receive_text_messages_stop_success",
             "service_set_auth_type",
             "service_set_channel",
             "send_files_by_email_contact_details",
