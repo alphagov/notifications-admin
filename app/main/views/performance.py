@@ -30,6 +30,7 @@ def performance():
         ],
         key=itemgetter("organisation_name"),
     )
+    stats.pop("services_using_notify")
     stats["average_percentage_under_10_seconds"] = mean(
         [row["percentage_under_10_seconds"] for row in stats["processing_time"]] or [0]
     )

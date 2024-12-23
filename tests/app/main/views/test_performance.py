@@ -178,7 +178,6 @@ def test_should_return_performance_data_as_json(
         "notifications_by_type",
         "organisations_using_notify",
         "processing_time",
-        "services_using_notify",
         "sms_notifications",
         "total_notifications",
     }
