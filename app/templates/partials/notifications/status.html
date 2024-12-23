@@ -23,7 +23,7 @@
       #}
       via {{ notification.sent_by | format_provider }}
     {% endif %}
-    {% if sent_with_test_key %}
+    {% if notification.sent_with_test_key %}
       (test)
     {% endif %}
   </p>

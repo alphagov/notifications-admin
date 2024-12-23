@@ -2,14 +2,19 @@ from datetime import datetime
 from typing import Any
 
 from markupsafe import Markup
+from notifications_utils.letter_timings import get_letter_timings, letter_can_be_cancelled
 from notifications_utils.template import (
     LetterPreviewTemplate,
     SMSBodyPreviewTemplate,
 )
+from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
+from app.notify_client.api_key_api_client import KEY_TYPE_TEST
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
+from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES
+from app.utils.letters import get_letter_printing_statement
 from app.utils.templates import EmailPreviewTemplate
 
 
@@ -18,7 +23,6 @@ class Notification(JSONModel):
     to: str
     recipient: str
     template: Any
-    job: Any
     sent_at: datetime
     created_at: datetime
     created_by: Any
@@ -37,6 +41,10 @@ class Notification(JSONModel):
 
     __sort_attribute__ = "created_at"
 
+    @classmethod
+    def from_id_and_service_id(cls, id, service_id):
+        return cls(notification_api_client.get_notification(service_id, str(id)))
+
     @property
     def status(self):
         return self._dict["status"]
@@ -50,10 +58,32 @@ class Notification(JSONModel):
         return self.template.get("redact_personalisation")
 
     @property
-    def personalisation(self):
+    def key_type(self):
+        return self._dict.get("key_type")
+
+    @property
+    def sent_with_test_key(self):
+        return self.key_type == KEY_TYPE_TEST
+
+    @property
+    def sent_by(self):
+        return self._dict.get("sent_by")
+
+    @property
+    def _personalisation(self):
         if self.redact_personalisation:
             return {}
         return self._dict["personalisation"]
+
+    @property
+    def personalisation(self):
+        if self.template["template_type"] == "email":
+            return self._personalisation | {"email_address": self.to}
+
+        if self.template["template_type"] == "sms":
+            return self._personalisation | {"phone_number": self.to}
+
+        return self._personalisation
 
     @property
     def preview_of_content(self):
@@ -84,6 +114,41 @@ class Notification(JSONModel):
                     self.personalisation,
                 ).subject
             )
+
+    @cached_property
+    def job(self):
+        from app.models.job import Job
+
+        if self._dict["job"]:
+            return Job.from_id(self._dict["job"]["id"], self.service_id)
+
+    @property
+    def estimated_letter_delivery_date(self):
+        if self.notification_type == "letter":
+            return get_letter_timings(self.created_at.replace(tzinfo=None), postage=self.postage).earliest_delivery
+
+    @property
+    def letter_can_be_cancelled(self):
+        if self.notification_type == "letter":
+            return letter_can_be_cancelled(self.status, self.created_at.replace(tzinfo=None))
+
+    @property
+    def letter_print_day(self):
+        return get_letter_printing_statement(self.status, self.created_at)
+
+    @property
+    def is_precompiled_letter(self):
+        return self.template["is_precompiled_letter"]
+
+    @property
+    def displayed_postage(self):
+        if self.status == "validation-failed":
+            return None
+        return self.postage
+
+    @property
+    def finished(self):
+        return self.status in (DELIVERED_STATUSES + FAILURE_STATUSES)
 
 
 class APINotification(Notification):
