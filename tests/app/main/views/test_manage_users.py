@@ -2596,3 +2596,48 @@ def test_service_join_request_redirects_to_refused_on_reject(
             request_id=request_id,
         ),
     )
+
+
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [
+        (
+            create_active_user_empty_permissions(True),
+            create_active_user_with_permissions(True),
+            "pending",
+        ),
+    ],
+)
+def test_service_join_request_approved_flash_message(
+    client_request,
+    service_one,
+    mock_get_organisation_by_domain,
+    mock_requester,
+    mock_get_service_join_request_status_data,
+    mock_get_template_folders,
+    api_user_active,
+    mocker,
+):
+    request_id = sample_uuid()
+    mocker.patch("app.user_api_client.get_user", return_value=mock_requester)
+    mocker.patch("app.models.user.InvitedUsers._get_items", return_value=[])
+    mocker.patch("app.user_api_client.get_users_for_service", return_value=[api_user_active])
+
+    mocker.patch("app.service_api_client.update_service_join_requests")
+
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
+    page = client_request.post(
+        "main.service_join_request_choose_permissions",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+        _data={"permissions_field": ["send_messages"], "folder_permissions": [], "login_authentication": "email_auth"},
+        _follow_redirects=True,
+    )
+
+    flash_banner = normalize_spaces(page.select_one("div.banner-default-with-tick").text)
+    assert flash_banner == f"{mock_requester['name']} has joined this service"

@@ -204,6 +204,8 @@ def service_join_request_choose_permissions(service_id, request_id):
             folder_permissions=form.folder_permissions.data,
             auth_type=form.login_authentication.data,
         )
+
+        flash(f"{requested_by_user.name} has joined this service", "default_with_tick")
         return redirect(url_for(".manage_users", service_id=service_id))
 
     return render_template(
