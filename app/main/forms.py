@@ -2892,7 +2892,7 @@ class JoinServiceForm(StripWhitespaceForm):
 
     users = GovukCheckboxesField(
         "Select at least one team member who can approve your request",
-        validators=[NotifyDataRequired(thing="at least 1 person to ask")],
+        validators=[DataRequired(message="Select at least 1 person to ask")],
         param_extensions={
             "fieldset": {
                 "legend": {
