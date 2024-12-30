@@ -28,7 +28,8 @@
         caption_visible=False,
         empty_message='No history for this provider',
         field_headings=['Version', 'Last Updated', 'Updated By', 'Priority', 'Active'],
-        field_headings_visible=True
+        field_headings_visible=True,
+        give_rows_ids=False,
       ) %}
 
         {{ text_field(item.version) }}

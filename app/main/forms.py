@@ -2042,15 +2042,30 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         return rv
 
 
+class DuplicatableHiddenField(HiddenField):
+    """
+    An instance of HiddenField which can be reused in multiple forms on the same
+    page without being given the same ID.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self._call_index = 0
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, **kwargs):
+        self._call_index += 1
+        return super().__call__(id=f"{self.name}_{self._call_index}", **kwargs)
+
+
 class AdminChangeOrganisationDefaultEmailBrandingForm(StripWhitespaceForm):
-    email_branding_id = HiddenField(
+    email_branding_id = DuplicatableHiddenField(
         "Email branding id",
         validators=[DataRequired()],
     )
 
 
 class AdminChangeOrganisationDefaultLetterBrandingForm(StripWhitespaceForm):
-    letter_branding_id = HiddenField(
+    letter_branding_id = DuplicatableHiddenField(
         "Letter branding id",
         validators=[DataRequired()],
     )
