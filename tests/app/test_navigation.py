@@ -225,6 +225,7 @@ EXCLUDED_ENDPOINTS = set(
             "org_member_make_service_live_contact_user",
             "org_member_make_service_live_decision",
             "performance",
+            "performance_json",
             "platform_admin_archive_email_branding",
             "platform_admin_confirm_archive_email_branding",
             "platform_admin_create_email_branding",
