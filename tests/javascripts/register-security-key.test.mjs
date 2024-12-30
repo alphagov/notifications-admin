@@ -1,21 +1,25 @@
 import RegisterSecurityKey from '../../app/assets/javascripts/esm/register-security-key.mjs';
 import { jest } from '@jest/globals';
 import * as helpers from './support/helpers';
+import { encode, decode } from 'cbor2';
+import ErrorBanner from '../../app/assets/javascripts/esm/error-banner.mjs';
+
+jest.mock('../../app/assets/javascripts/esm/error-banner.mjs');
+
+let errorBanner
 
 beforeAll(() => {
   document.body.classList.add('govuk-frontend-supported');
   // populate missing values to allow consistent jest.spyOn()
   window.fetch = () => {}
   window.navigator.credentials = { create: () => { } }
-  window.GOVUK.ErrorBanner = {
-    showBanner: () => { },
-    hideBanner: () => { }
-  };
+  // window.GOVUK.ErrorBanner = {
+  //   showBanner: () => { },
+  //   hideBanner: () => { }
+  // };
 })
 
 afterAll(() => {
-  // require('./support/teardown.js')
-
   // restore window attributes to their original undefined state
   delete window.fetch
   delete window.navigator.credentials
@@ -38,6 +42,8 @@ describe('Register security key', () => {
     // you might need to comment this out to debug some failures
     jest.spyOn(console, 'error').mockImplementation(() => {})
 
+    errorBanner = new ErrorBanner()
+
     document.body.innerHTML = `
       <button href="#" class="govuk-button govuk-button--secondary" data-notify-module="register-security-key" data-module="govuk-button">
         Register a key
@@ -56,7 +62,7 @@ describe('Register security key', () => {
     jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
       // initial fetch of options from the server
       // options from the server are CBOR-encoded
-      const webauthnOptions = window.CBOR.encode('options')
+      const webauthnOptions = encode('options')
 
       return Promise.resolve({
         ok: true, arrayBuffer: () => webauthnOptions
@@ -78,7 +84,7 @@ describe('Register security key', () => {
 
     jest.spyOn(window, 'fetch').mockImplementationOnce((_url, options) => {
       // subsequent POST of credential data to server
-      const decodedData = window.CBOR.decode(options.body)
+      const decodedData = decode(options.body)
       expect(decodedData.clientDataJSON).toEqual(new Uint8Array([4,5,6]))
       expect(decodedData.attestationObject).toEqual(new Uint8Array([1,2,3]))
       expect(options.headers['X-CSRFToken']).toBe()
@@ -91,7 +97,7 @@ describe('Register security key', () => {
     })
 
     // this will make the test fail if the error banner is displayed
-    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
+    jest.spyOn(errorBanner, 'showBanner').mockImplementation(() => {
       done('didnt expect the banner to be shown')
     })
 
@@ -102,6 +108,7 @@ describe('Register security key', () => {
     ['network'],
     ['server'],
   ])('errors if fetching WebAuthn options fails (%s error)', (errorType, done) => {
+
     jest.spyOn(window, 'fetch').mockImplementation((_url) => {
       if (errorType == 'network') {
         return Promise.reject('error')
@@ -110,21 +117,19 @@ describe('Register security key', () => {
       }
     })
 
-    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
+    jest.spyOn(errorBanner, 'showBanner').mockImplementation(() => {
       done()
     })
-
-    button.click()
+    
   })
 
   test.each([
     ['network'],
     ['server'],
   ])('errors if sending WebAuthn credentials fails (%s)', (errorType, done) => {
-
     jest.spyOn(window, 'fetch').mockImplementationOnce((_url) => {
       // initial fetch of options from the server
-      const webauthnOptions = window.CBOR.encode('options')
+      const webauthnOptions = encode('options')
 
       return Promise.resolve({
         ok: true, arrayBuffer: () => webauthnOptions
@@ -160,14 +165,14 @@ describe('Register security key', () => {
 
     jest.spyOn(window, 'fetch').mockImplementation((_url) => {
       // initial fetch of options from the server
-      const webauthnOptions = window.CBOR.encode('options')
+      const webauthnOptions = encode('options')
 
       return Promise.resolve({
         ok: true, arrayBuffer: () => webauthnOptions
       })
     })
 
-    jest.spyOn(window.GOVUK.ErrorBanner, 'showBanner').mockImplementation(() => {
+    jest.spyOn(errorBanner, 'showBanner').mockImplementation(() => {
       done()
     })
 
