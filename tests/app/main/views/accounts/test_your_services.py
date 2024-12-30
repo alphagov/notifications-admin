@@ -73,7 +73,7 @@ def mock_get_orgs_and_services(notify_admin, mocker):
     return mocker.patch("app.user_api_client.get_organisations_and_services_for_user", return_value=SAMPLE_DATA)
 
 
-def test_your_services_should_show_your_servicess_page(
+def test_your_services_should_show_your_services_page(
     client_request,
     mock_get_non_empty_organisations_and_services_for_user,
     mock_get_organisation,
@@ -134,7 +134,7 @@ def test_your_services_should_show_your_servicess_page(
     assert mock_get_organisation.call_args_list == []
 
 
-def test_your_services_should_show_your_servicess_page_if_no_services(
+def test_your_services_should_show_your_services_page_if_no_services(
     client_request,
     mock_get_orgs_and_services,
     mock_get_organisation,
@@ -217,6 +217,7 @@ def test_your_services_should_show_join_service_button(
             [
                 "Platform admin",
                 "Live services",
+                "Trial services",
             ],
         ),
         (
@@ -233,6 +234,7 @@ def test_your_services_should_show_join_service_button(
             },
             [
                 "Platform admin",
+                "Live services",
                 "Trial services",
             ],
         ),
@@ -284,7 +286,6 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
             ],
             "Your organisations and services",
         ),
-        # no headings as only one thing to show
         (
             {
                 "organisations": [
@@ -297,12 +298,12 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
                 "services": [],
             },
             [
+                "Organisations",
                 "Live services",
                 "Trial services",
             ],
             "Your organisations and services",
         ),
-        # no headings as only one thing to show
         (
             {
                 "organisations": [],
@@ -315,10 +316,12 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
                     }
                 ],
             },
-            [],
+            [
+                "Live services",
+                "Trial services",
+            ],
             "Your services",
         ),
-        # no headings as only one thing to show
         (
             {
                 "organisations": [],
@@ -331,7 +334,10 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
                     }
                 ],
             },
-            [],
+            [
+                "Live services",
+                "Trial services",
+            ],
             "Your services",
         ),
     ),

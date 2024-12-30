@@ -3,22 +3,17 @@
 
 {% macro service_list(
   heading,
-  show_heading,
   organisations=[],
   services=[]
 ) %}
-  {% if show_heading %}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-quarter">
-        <h2>
-          {{ heading }}
-        </h2>
-      </div>
-      <div class="govuk-grid-column-three-quarters">
-        <ul>
-  {% else %}
-    <ul>
-  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      <h2>
+        {{ heading }}
+      </h2>
+    </div>
+    <div class="govuk-grid-column-three-quarters">
+      <ul>
   {% for org in organisations|sort %}
     <li class="browse-list-item">
       <a href="{{ url_for('main.organisation_dashboard', org_id=org.id) }}" class="govuk-link govuk-link--no-visited-state">{{ org.name }}</a>
@@ -33,13 +28,9 @@
       <a href="{{ url_for('main.service_dashboard', service_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
     </li>
   {% endfor %}
-  {% if show_heading %}
-        </ul>
-      </div>
+      </ul>
     </div>
-  {% else %}
-    </ul>
-  {% endif %}
+  </div>
   <div class="keyline-block"></div>
 {% endmacro %}
 
@@ -82,7 +73,6 @@
   </h1>
 
   <nav class="browse-list">
-
     {% if current_user.platform_admin %}
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter">
@@ -105,7 +95,6 @@
     {% if current_user.organisations %}
       {{ service_list(
         heading='Organisations',
-        show_heading=show_headings,
         organisations=current_user.organisations,
       ) }}
     {% endif %}
@@ -113,27 +102,21 @@
     {% if current_user.live_services %}
       {{ service_list(
         heading='Live services',
-        show_heading=show_headings,
         services=current_user.live_services
+      ) }}
+    {% else %}
+      {{ no_service(
+        heading='Live services',
+        no_live_service_text='No live services'
       ) }}
     {% endif %}
 
     {% if current_user.trial_mode_services %}
       {{ service_list(
         heading='Trial services',
-        show_heading=show_headings,
         services=current_user.trial_mode_services
       ) }}
-    {% endif %}
-
-    {% if not current_user.live_services and not current_user.trial_mode_services %}
-      {% if not current_user.organisations %}
-        <div class="keyline-block"></div>
-      {% endif %}
-      {{ no_service(
-        heading='Live services',
-        no_live_service_text='No live services'
-      ) }}
+    {% else %}
       {{ no_service(
         heading='Trial services',
         no_live_service_text='No trial services'
@@ -144,13 +127,11 @@
 
   {% if can_add_service %}
     <div class="js-stick-at-bottom-when-scrolling">
-      {% if (not current_user.live_services and not current_user.trial_mode_services) or show_headings %}
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-one-quarter">
-            &nbsp;
-          </div>
-          <div class="govuk-grid-column-three-quarters">
-      {% endif %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+          &nbsp;
+        </div>
+        <div class="govuk-grid-column-three-quarters">
         {{ govukButton({
           "element": "a",
           "text": "Add a new service",
@@ -165,10 +146,8 @@
             "classes": "govuk-button--secondary"
           }) }}
         {% endif %}
-      {% if (not current_user.live_services and not current_user.trial_mode_services) or show_headings %}
         </div>
-          </div>
-      {% endif %}
+      </div>
     </div>
   {% endif %}
 
