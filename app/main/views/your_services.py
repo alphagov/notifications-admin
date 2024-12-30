@@ -27,22 +27,11 @@ def your_services():
             len(AllOrganisations()),
             status_api_client.get_count_of_live_services_and_organisations()["services"],
         )
-    # show headings if: user is platform admin, or there are more than two visible sections
-    show_headings = (
-        current_user.platform_admin
-        or [
-            bool(current_user.organisations),
-            bool(current_user.live_services),
-            bool(current_user.trial_mode_services),
-        ].count(True)
-        >= 2
-    )
     return render_template(
         "views/your-services.html",
         can_add_service=current_user.is_gov_user,
         org_count=org_count,
         live_service_count=live_service_count,
-        show_headings=show_headings,
     )
 
 
