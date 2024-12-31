@@ -11,6 +11,7 @@ def test_get_jobs(mock_get_jobs):
         "b",
         contact_list_id="a",
         statuses={
+            "finished all notifications created",
             "finished",
             "sending limits exceeded",
             "ready to send",

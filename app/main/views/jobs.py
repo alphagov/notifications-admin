@@ -20,6 +20,7 @@ from app import (
 from app.formatters import get_time_left, message_count_noun
 from app.main import json_updates, main
 from app.models.job import Job
+from app.notify_client.job_api_client import JobApiClient
 from app.s3_client.s3_csv_client import s3download
 from app.utils import parse_filter_args, set_status_filters
 from app.utils.csv import generate_notifications_csv
@@ -134,7 +135,8 @@ def cancel_letter_job(service_id, job_id):
     if request.method == "POST":
         job = Job.from_id(job_id, service_id=service_id)
 
-        if job.status != "finished" or job.notifications_created < job.notification_count:
+        # reduce to just == FINISHED_ALL_NOTIFICATIONS_CREATED_JOB_STATUS once api support rolled out
+        if job.status not in JobApiClient.FINISHED_JOB_STATUSES or job.notifications_created < job.notification_count:
             flash("We are still processing these letters, please try again in a minute.", "try again")
             return view_job(service_id, job_id)
         try:

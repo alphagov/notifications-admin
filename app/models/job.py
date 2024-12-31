@@ -99,10 +99,12 @@ class Job(JSONModel):
 
     @property
     def still_processing(self):
-        return self.status != "finished" or self.percentage_complete < 100
+        # reduce to status != FINISHED_ALL_NOTIFICATIONS_CREATED_JOB_STATUS once api support rolled out
+        return self.status not in JobApiClient.FINISHED_JOB_STATUSES or self.percentage_complete < 100
 
     @cached_property
     def finished_processing(self):
+        # change to status == FINISHED_ALL_NOTIFICATIONS_CREATED_JOB_STATUS once api support rolled out
         return self.notification_count == self.notifications_sent
 
     @property
