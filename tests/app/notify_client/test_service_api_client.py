@@ -644,3 +644,18 @@ def test_update_service_join_requests(notify_admin, mocker):
     mock_request.assert_called_once_with(
         "POST", f"/service/update-service-join-request-status/{request_id}", data={"status": "approved"}
     )
+
+
+def test_remove_service_inbound_sms_clears_cache(notify_admin, mocker):
+    service_id = SERVICE_ONE_ID
+    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
+    mock_redis_delete_by_pattern = mocker.patch(
+        "app.extensions.RedisClient.delete_by_pattern", new_callable=RedisClientMock
+    )
+    mock_post = mocker.patch("app.notify_client.service_api_client.ServiceAPIClient.post")
+
+    service_api_client.remove_service_inbound_sms(service_id=service_id, archive=True)
+
+    mock_redis_delete.assert_called_with_args(f"service-{service_id}")
+    mock_redis_delete_by_pattern.assert_called_with_args(f"service-{service_id}-template-*")
+    mock_post.assert_called_once_with(f"/service/{service_id}/inbound-sms/remove", data={"archive": True})

@@ -246,6 +246,7 @@
     "/services/<uuid:service_id>/service-settings/receive-text-messages",
     "/services/<uuid:service_id>/service-settings/receive-text-messages/start",
     "/services/<uuid:service_id>/service-settings/receive-text-messages/stop",
+    "/services/<uuid:service_id>/service-settings/receive-text-messages/stop/success",
     "/services/<uuid:service_id>/service-settings/request-to-go-live",
     "/services/<uuid:service_id>/service-settings/request-to-go-live/estimate-usage",
     "/services/<uuid:service_id>/service-settings/send-files-by-email",
