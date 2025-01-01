@@ -12,6 +12,8 @@ from tests.conftest import SERVICE_ONE_ID
         ("cancelled", 10, True),
         ("finished", 5, True),
         ("finished", 10, False),
+        ("finished all notifications created", 5, True),
+        ("finished all notifications created", 10, False),
     ],
 )
 def test_still_processing(notify_admin, job_status, num_notifications_created, expected_still_processing):

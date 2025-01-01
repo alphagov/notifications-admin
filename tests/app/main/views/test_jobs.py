@@ -564,8 +564,9 @@ def test_should_not_show_cancelled_job(
     )
 
 
+@pytest.mark.parametrize("job_status", ["finished", "finished all notifications created"])
 def test_should_cancel_letter_job(
-    client_request, mocker, mock_get_service_letter_template, active_user_with_permissions
+    client_request, job_status, mock_get_service_letter_template, active_user_with_permissions, mocker
 ):
     job_id = str(uuid.uuid4())
     job = job_json(
@@ -573,7 +574,7 @@ def test_should_cancel_letter_job(
         active_user_with_permissions,
         job_id=job_id,
         created_at="2019-06-20T15:30:00.000001+00:00",
-        job_status="finished",
+        job_status=job_status,
         template_type="letter",
     )
     mocker.patch("app.job_api_client.get_job", side_effect=[{"data": job}])
@@ -626,14 +627,14 @@ def test_should_not_show_cancel_link_for_letter_job_if_too_late(
 
 
 @freeze_time("2019-06-20 15:32:00.000001")
-@pytest.mark.parametrize(" job_status", ["finished", "in progress"])
+@pytest.mark.parametrize("job_status", ["finished", "finished all notifications created", "in progress"])
 def test_should_show_cancel_link_for_letter_job(
     client_request,
-    mocker,
     mock_get_service_letter_template,
     mock_get_service_data_retention,
     active_user_with_permissions,
     job_status,
+    mocker,
 ):
     job_id = uuid.uuid4()
     job = job_json(
@@ -660,14 +661,14 @@ def test_should_show_cancel_link_for_letter_job(
 
 @freeze_time("2019-06-20 15:31:00.000001")
 @pytest.mark.parametrize("job_status,number_of_processed_notifications", [["in progress", 2], ["finished", 1]])
-def test_dont_cancel_letter_job_when_to_early_to_cancel(
+def test_dont_cancel_letter_job_when_too_early_to_cancel(
     client_request,
-    mocker,
     mock_get_service_letter_template,
     mock_get_service_data_retention,
     active_user_with_permissions,
     job_status,
     number_of_processed_notifications,
+    mocker,
 ):
     job_id = uuid.uuid4()
     job = job_json(
