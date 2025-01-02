@@ -1,8 +1,9 @@
-const helpers = require('./support/helpers.js')
+import RegisterSecurityKey from '../../app/assets/javascripts/esm/authenticate-security-key.mjs';
+import { jest } from '@jest/globals';
+import * as helpers from './support/helpers';
 
 beforeAll(() => {
-  window.CBOR = require('../../node_modules/cbor-js/cbor.js')
-  require('../../app/assets/javascripts/authenticateSecurityKey.js')
+  document.body.classList.add('govuk-frontend-supported');
 
   // populate missing values to allow consistent jest.spyOn()
   window.fetch = () => { }
@@ -14,7 +15,6 @@ beforeAll(() => {
 })
 
 afterAll(() => {
-  require('./support/teardown.js')
 
   // restore window attributes to their original undefined state
   delete window.fetch
@@ -42,7 +42,7 @@ describe('Authenticate with security key', () => {
       <button data-notify-module="authenticate-security-key" data-module="govuk-button" data-csrf-token="abc123"></button>`
 
     button = document.querySelector('[data-notify-module="authenticate-security-key"]')
-    window.GOVUK.notifyModules.start()
+    new RegisterSecurityKey(button);
   })
 
   afterEach(() => {
