@@ -22,7 +22,7 @@ def test_owasp_useful_headers_set(
         "img-src "
         "'self' static.example.com"
         " *.notifications.service.gov.uk static-logos.test.com data:;"
-        "style-src 'self' static.example.com 'unsafe-inline';"
+        "style-src 'self' static.example.com 'nonce-TESTs5Vr8v3jgRYLoQuVwA';"
         "frame-ancestors 'self';"
         "frame-src 'self';"
     )
@@ -68,7 +68,7 @@ def test_headers_non_ascii_characters_are_replaced(
         "img-src"
         " 'self' static.example.com"
         " *.notifications.service.gov.uk static-logos??.test.com data:;"
-        "style-src 'self' static.example.com 'unsafe-inline';"
+        "style-src 'self' static.example.com 'nonce-TESTs5Vr8v3jgRYLoQuVwA';"
         "frame-ancestors 'self';"
         "frame-src 'self';"
     )
