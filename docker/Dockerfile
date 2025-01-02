@@ -15,16 +15,16 @@ WORKDIR /home/vcap/app
 
 
 ##### Frontend Build Image ###################################################
-FROM ghcr.io/alphagov/notify/unit-tests-image:python311-node20 as frontend_build
-
 ARG NOTIFY_ENVIRONMENT=development
+ARG NODE_VERSION=20
+
+FROM ghcr.io/alphagov/notify/unit-tests-image:python311-node20 as frontend_build
 
 WORKDIR /usr/frontend
 COPY app app
 COPY package-lock.json package.json rollup.config.mjs ./
 
-RUN source ~/.nvm/nvm.sh \
-    && npm ci --no-audit \
+RUN npm ci --no-audit \
     && npm run build
 
 ##### Python Build Image #####################################################
@@ -66,6 +66,8 @@ COPY --chown=notify:notify app app
 COPY --chown=notify:notify application.py entrypoint.sh gunicorn_config.py ./
 COPY --from=frontend_build --chown=notify:notify /usr/frontend/app/static app/static
 COPY --from=frontend_build --chown=notify:notify /usr/frontend/app/templates app/templates
+COPY --from=frontend_build --chown=notify:notify /usr/local/lib /usr/local/lib
+COPY --from=frontend_build --chown=notify:notify /usr/local/bin /usr/local/bin
 COPY --from=python_build --chown=notify:notify /home/vcap/app/app/version.py app/version.py
 
 RUN python -m compileall . && \
@@ -77,11 +79,6 @@ CMD [ "web" ]
 
 ##### Test Image ##############################################################
 FROM production as test
-
-# If bumping this node version, also bump:
-#   `.nvmrc` in notifications-admin
-#   `concourse/docker/unit-tests-image.Dockerfile` in notifications-aws
-ARG NODE_VERSION=20
 
 USER root
 
@@ -95,11 +92,6 @@ RUN echo "Install OS dependencies for test build" && \
       git && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
-
-RUN \
-    echo "Installing Node v${NODE_VERSION}" \
-    && curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - \
-    && apt-get install -y nodejs
 
 RUN usermod -aG sudo notify
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
