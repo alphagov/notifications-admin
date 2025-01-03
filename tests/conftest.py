@@ -3992,6 +3992,27 @@ def create_service_one_user(**overrides):
     return create_user(**user_data)
 
 
+def create_service_two_user_with_permissions(with_unique_id=False):
+    user_data = {
+        "id": str(sample_uuid()) if with_unique_id else sample_uuid(),
+        "organisations": [ORGANISATION_ID],
+        "services": [SERVICE_TWO_ID],
+        "permissions": {
+            SERVICE_TWO_ID: [
+                "send_texts",
+                "send_emails",
+                "send_letters",
+                "manage_users",
+                "manage_templates",
+                "manage_settings",
+                "manage_api_keys",
+                "view_activity",
+            ]
+        },
+    }
+    return create_user(**user_data)
+
+
 def create_user(**overrides):
     user_data = {
         "name": "Test User",

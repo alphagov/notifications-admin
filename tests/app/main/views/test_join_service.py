@@ -11,6 +11,7 @@ from tests.conftest import (
     create_active_user_manage_template_permissions,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
+    create_service_two_user_with_permissions,
     normalize_spaces,
 )
 
@@ -110,6 +111,31 @@ def test_cannot_join_service_for_different_organisation(
     )
 
 
+def test_redirect_if_already_member_of_service(
+    client_request,
+    mock_request_invite_for,
+    service_one,
+    mock_get_organisation_by_domain,
+    mocker,
+):
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.models.organisation.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+    current_user = create_active_user_with_permissions(with_unique_id=True)
+
+    client_request.login(current_user)
+    client_request.post(
+        "main.join_service_ask",
+        service_to_join_id=SERVICE_ONE_ID,
+        _expected_redirect=url_for(
+            "main.service_dashboard",
+            service_id=SERVICE_ONE_ID,
+        ),
+    )
+
+
 @freeze_time("2023-02-03 01:00")
 def test_page_lists_team_members_of_service(
     client_request,
@@ -123,6 +149,8 @@ def test_page_lists_team_members_of_service(
         return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
     )
 
+    current_user = create_service_two_user_with_permissions()
+
     manage_service_user_1 = create_active_user_with_permissions()
     manage_service_user_2 = create_active_user_with_permissions()
     manage_service_user_3 = create_active_user_with_permissions()
@@ -132,6 +160,8 @@ def test_page_lists_team_members_of_service(
     manage_service_user_1["logged_in_at"] = "2023-01-02 01:00"
     manage_service_user_2["logged_in_at"] = "2023-02-03 01:00"
     manage_service_user_3["logged_in_at"] = None
+
+    client_request.login(current_user)
 
     mock_get_users = mocker.patch(
         "app.models.user.Users._get_items",
@@ -196,6 +226,7 @@ def test_page_redirects_on_post(
     client_request,
     mock_request_invite_for,
     service_one,
+    service_two,
     mock_get_organisation_by_domain,
     mocker,
 ):
@@ -204,7 +235,7 @@ def test_page_redirects_on_post(
         "app.models.organisation.organisations_client.get_organisation",
         return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
     )
-    current_user = create_active_user_with_permissions(with_unique_id=True)
+    current_user = create_service_two_user_with_permissions(with_unique_id=True)
     manage_service_user_1 = create_active_user_with_permissions(with_unique_id=True)
     manage_service_user_2 = create_active_user_with_permissions(with_unique_id=True)
     manage_service_user_1["logged_in_at"] = "2023-01-02 01:00"
