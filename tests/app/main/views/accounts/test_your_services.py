@@ -73,7 +73,7 @@ def mock_get_orgs_and_services(notify_admin, mocker):
     return mocker.patch("app.user_api_client.get_organisations_and_services_for_user", return_value=SAMPLE_DATA)
 
 
-def test_your_services_should_show_your_servicess_page(
+def test_your_services_should_show_your_services_page(
     client_request,
     mock_get_non_empty_organisations_and_services_for_user,
     mock_get_organisation,
@@ -122,7 +122,7 @@ def test_your_services_should_show_your_servicess_page(
     assert service_list_items[4].a.text == "service two (org 2)"
     assert service_list_items[4].a["href"] == url_for(".service_dashboard", service_id="67890")
 
-    assert normalize_spaces(headings[2].text) == "Trial services"
+    assert normalize_spaces(headings[2].text) == "Trial mode services"
 
     # trial services
     assert len(trial_services_list_items) == 3
@@ -134,7 +134,7 @@ def test_your_services_should_show_your_servicess_page(
     assert mock_get_organisation.call_args_list == []
 
 
-def test_your_services_should_show_your_servicess_page_if_no_services(
+def test_your_services_should_show_your_services_page_if_no_services(
     client_request,
     mock_get_orgs_and_services,
     mock_get_organisation,
@@ -152,9 +152,9 @@ def test_your_services_should_show_your_servicess_page_if_no_services(
     assert normalize_spaces(page.select_one("h1").text) == "Your services"
     assert normalize_spaces(add_service_link.text) == "Add a new service"
     assert add_service_link["href"] == url_for("main.add_service")
-    assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == ["Live services", "Trial services"]
+    assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == ["Live services", "Trial mode services"]
     assert normalize_spaces(no_live_service[0].text) == "No live services"
-    assert normalize_spaces(no_live_trial_mode[0].text) == "No trial services"
+    assert normalize_spaces(no_live_trial_mode[0].text) == "No trial mode services"
 
 
 def test_your_services_should_show_join_service_button(
@@ -190,7 +190,7 @@ def test_your_services_should_show_join_service_button(
             [
                 "Platform admin",
                 "Live services",
-                "Trial services",
+                "Trial mode services",
             ],
         ),
         (
@@ -199,7 +199,7 @@ def test_your_services_should_show_join_service_button(
                 "Platform admin",
                 "Organisations",
                 "Live services",
-                "Trial services",
+                "Trial mode services",
             ],
         ),
         (
@@ -217,6 +217,7 @@ def test_your_services_should_show_join_service_button(
             [
                 "Platform admin",
                 "Live services",
+                "Trial mode services",
             ],
         ),
         (
@@ -233,7 +234,8 @@ def test_your_services_should_show_join_service_button(
             },
             [
                 "Platform admin",
-                "Trial services",
+                "Live services",
+                "Trial mode services",
             ],
         ),
     ),
@@ -271,7 +273,7 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
             {"organisations": [], "services": []},
             [
                 "Live services",
-                "Trial services",
+                "Trial mode services",
             ],
             "Your services",
         ),
@@ -280,11 +282,10 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
             [
                 "Organisations",
                 "Live services",
-                "Trial services",
+                "Trial mode services",
             ],
             "Your organisations and services",
         ),
-        # no headings as only one thing to show
         (
             {
                 "organisations": [
@@ -297,12 +298,12 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
                 "services": [],
             },
             [
+                "Organisations",
                 "Live services",
-                "Trial services",
+                "Trial mode services",
             ],
             "Your organisations and services",
         ),
-        # no headings as only one thing to show
         (
             {
                 "organisations": [],
@@ -315,10 +316,12 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
                     }
                 ],
             },
-            [],
+            [
+                "Live services",
+                "Trial mode services",
+            ],
             "Your services",
         ),
-        # no headings as only one thing to show
         (
             {
                 "organisations": [],
@@ -331,7 +334,10 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
                     }
                 ],
             },
-            [],
+            [
+                "Live services",
+                "Trial mode services",
+            ],
             "Your services",
         ),
     ),
