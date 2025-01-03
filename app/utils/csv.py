@@ -1,3 +1,4 @@
+from notifications_python_client.errors import HTTPError
 from notifications_utils.recipients import RecipientCSV
 
 from app.formatters import recipient_count
@@ -75,7 +76,14 @@ def generate_notifications_csv(**kwargs):
     yield ",".join(fieldnames) + "\n"
 
     while True:
-        notifications_batch = NotificationsForCSV(**kwargs)
+        try:
+            notifications_batch = NotificationsForCSV(**kwargs)
+        except HTTPError as e:
+            # if we get 404, means last page was not there - so just finish up cleanly
+            if e.status_code == 404:
+                return
+            else:
+                raise e
 
         for notification in notifications_batch:
             if kwargs.get("job_id"):
