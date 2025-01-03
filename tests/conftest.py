@@ -1665,7 +1665,7 @@ def mock_has_no_jobs(notify_admin, mocker):
 def mock_get_jobs(notify_admin, mocker, api_user_active, fake_uuid):
     def _get_jobs(service_id, limit_days=None, statuses=None, contact_list_id=None, page=1):
         if statuses is None:
-            statuses = ["", "scheduled", "pending", "cancelled", "finished"]
+            statuses = ["", "scheduled", "pending", "cancelled", "finished", "finished all notifications created"]
 
         jobs = [
             job_json(
@@ -1685,7 +1685,7 @@ def mock_get_jobs(notify_admin, mocker, api_user_active, fake_uuid):
                 ("export 1/1/2016.xls", None, "finished", "Template A", 1),
                 ("all email addresses.xlsx", None, "pending", "Template B", 1),
                 ("applicants.ods", None, "finished", "Template C", 1),
-                ("thisisatest.csv", None, "finished", "Template D", 2),
+                ("thisisatest.csv", None, "finished all notifications created", "Template D", 2),
             )
         ]
         return {

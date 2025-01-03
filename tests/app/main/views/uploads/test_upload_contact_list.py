@@ -431,6 +431,7 @@ def test_view_contact_list(
         limit_days=7,
         statuses={
             "finished",
+            "finished all notifications created",
             "in progress",
             "pending",
             "ready to send",

@@ -15,6 +15,7 @@ class JobApiClient(NotifyAdminAPIClient):
         "pending",
         "in progress",
         "finished",
+        "finished all notifications created",
         "cancelled",
         "sending limits exceeded",
         "ready to send",
@@ -22,8 +23,11 @@ class JobApiClient(NotifyAdminAPIClient):
     }
     SCHEDULED_JOB_STATUS = "scheduled"
     CANCELLED_JOB_STATUS = "cancelled"
+    FINISHED_JOB_STATUS = "finished"
+    FINISHED_ALL_NOTIFICATIONS_CREATED_JOB_STATUS = "finished all notifications created"
     NON_CANCELLED_JOB_STATUSES = JOB_STATUSES - {CANCELLED_JOB_STATUS}
     NON_SCHEDULED_JOB_STATUSES = JOB_STATUSES - {SCHEDULED_JOB_STATUS, CANCELLED_JOB_STATUS}
+    FINISHED_JOB_STATUSES = {FINISHED_JOB_STATUS, FINISHED_ALL_NOTIFICATIONS_CREATED_JOB_STATUS}
 
     def get_job(self, service_id, job_id):
         params = {}
