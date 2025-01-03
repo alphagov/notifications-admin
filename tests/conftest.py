@@ -2144,6 +2144,14 @@ def mock_get_inbound_sms_summary_with_no_messages(notify_admin, mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_get_most_recent_inbound_usage_date(mocker):
+    return mocker.patch(
+        "app.service_api_client.get_most_recent_inbound_number_usage_date",
+        return_value={"most_recent_date": "2023-12-01T12:00:00Z"},
+    )
+
+
+@pytest.fixture(scope="function")
 def mock_get_inbound_number_for_service(notify_admin, mocker):
     return mocker.patch(
         "app.inbound_number_client.get_inbound_sms_number_for_service", return_value={"data": {"number": "0781239871"}}
@@ -3952,6 +3960,27 @@ def create_service_one_user(**overrides):
         "services": [SERVICE_ONE_ID],
     }
     user_data.update(overrides)
+    return create_user(**user_data)
+
+
+def create_service_two_user_with_permissions(with_unique_id=False):
+    user_data = {
+        "id": str(sample_uuid()) if with_unique_id else sample_uuid(),
+        "organisations": [ORGANISATION_ID],
+        "services": [SERVICE_TWO_ID],
+        "permissions": {
+            SERVICE_TWO_ID: [
+                "send_texts",
+                "send_emails",
+                "send_letters",
+                "manage_users",
+                "manage_templates",
+                "manage_settings",
+                "manage_api_keys",
+                "view_activity",
+            ]
+        },
+    }
     return create_user(**user_data)
 
 

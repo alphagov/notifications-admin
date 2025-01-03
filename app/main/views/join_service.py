@@ -32,6 +32,9 @@ def join_service_ask(service_to_join_id):
     if service.organisation != current_user.default_organisation:
         abort(403)
 
+    if current_user.belongs_to_service(service_to_join_id):
+        return redirect(url_for("main.service_dashboard", service_id=service.id))
+
     form = JoinServiceForm(
         users=service.active_users_with_permission("manage_service"),
     )
