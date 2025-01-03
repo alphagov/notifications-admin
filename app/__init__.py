@@ -351,6 +351,10 @@ def useful_headers_after_request(response):
     response.headers.add(
         "Content-Security-Policy",
         (
+            # we need to keep 'unsafe-inline' on default-src
+            # as inline styles appear in branding iframe preview
+            # and on send email preview and changing that would
+            # require dev work
             "default-src 'self' {asset_domain} 'unsafe-inline';"
             "script-src 'self' {asset_domain} 'nonce-{csp_nonce}';"
             "connect-src 'self';"
@@ -358,7 +362,7 @@ def useful_headers_after_request(response):
             "font-src 'self' {asset_domain} data:;"
             "img-src 'self' {asset_domain}"
             " *.notifications.service.gov.uk {logo_domain} data:;"
-            "style-src 'self' {asset_domain} 'unsafe-inline';"
+            "style-src 'self' {asset_domain} 'nonce-{csp_nonce}';"
             "frame-ancestors 'self';"
             "frame-src 'self';".format(
                 asset_domain=current_app.config["ASSET_DOMAIN"],
