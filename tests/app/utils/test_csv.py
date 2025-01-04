@@ -1,8 +1,10 @@
 from collections import namedtuple
 from csv import DictReader
 from io import StringIO
+from unittest.mock import Mock
 
 import pytest
+from notifications_python_client.errors import HTTPError
 
 from app.utils.csv import generate_notifications_csv, get_errors_for_csv
 from tests import sample_uuid
@@ -228,6 +230,61 @@ def test_generate_notifications_csv_calls_twice_if_notifications_batch_equals_pa
 
     assert mock_get_notifications.mock_calls[1][2]["page"] == 2
     assert mock_get_notifications.mock_calls[1][2]["older_than"] == sample_uuid()
+
+
+@pytest.mark.parametrize("job_id", ["some", None])
+def test_generate_notifications_csv_when_rows_number_divisible_by_page_size(
+    notify_admin,
+    mocker,
+    job_id,
+):
+    mocker.patch(
+        "app.s3_client.s3_csv_client.s3download",
+        return_value="""
+            phone_number
+            07700900000
+            07700900001
+            07700900002
+            07700900003
+            07700900004
+            07700900005
+            07700900006
+            07700900007
+            07700900008
+            07700900009
+        """,
+    )
+
+    service_id = "1234"
+    response_1 = _get_notifications_csv(rows=5)
+    response_2 = _get_notifications_csv(rows=5, row_number=6)
+
+    mock_get_notifications = mocker.patch(
+        "app.models.notification.NotificationsForCSV._get_items",
+        side_effect=[response_1(service_id), response_2(service_id), HTTPError(response=Mock(status_code=404))],
+    )
+
+    csv_content = generate_notifications_csv(
+        service_id=service_id,
+        job_id=job_id or fake_uuid,
+        template_type="sms",
+        page_size=5,
+    )
+    csv = list(DictReader(StringIO("\n".join(csv_content))))
+
+    assert len(csv) == 10
+    assert csv[0]["phone_number"] == "07700900000"
+    assert csv[9]["phone_number"] == "07700900009"
+    assert mock_get_notifications.call_count == 3
+
+    # mock_calls[0][2] is the kwargs from first call
+    assert mock_get_notifications.mock_calls[0][2]["page"] == 1
+    assert not mock_get_notifications.mock_calls[0][2].get("older_than")
+
+    assert mock_get_notifications.mock_calls[1][2]["page"] == 2
+    assert mock_get_notifications.mock_calls[1][2]["older_than"] == sample_uuid()
+
+    assert mock_get_notifications.mock_calls[2][2]["page"] == 3
 
 
 MockRecipients = namedtuple(
