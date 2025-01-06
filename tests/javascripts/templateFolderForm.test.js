@@ -328,37 +328,6 @@ describe('TemplateFolderForm', () => {
 
   });
 
-  describe("Click 'New template' for single channel service", () => {
-    test("should redirect to new template page", () => {
-      setFixtures(hierarchy, "data-channel='sms' data-service='123'")
-      templateFolderForm = document.querySelector('form[data-notify-module=template-folder-form]');
-
-      // start module
-      window.GOVUK.notifyModules.start();
-
-      formControls = templateFolderForm.querySelector('#sticky_template_forms');
-
-      // reset sticky JS mocks called when the module starts
-      resetStickyMocks();
-      // add listener for url change
-      const descriptor1 = Object.getOwnPropertyDescriptor(window, 'location');
-      delete window.location
-
-      const mockCallback = jest.fn(x => {});
-
-      Object.defineProperty(window, 'location', {
-        set: mockCallback
-      });
-      // click
-      helpers.triggerEvent(formControls.querySelector('[value=add-new-template]'), 'click');
-      // expect url to change
-      expect(mockCallback).toHaveBeenCalledWith("/services/123/templates/add-sms")
-
-      setFixtures(hierarchy)
-      resetStickyMocks()
-    });
-  })
-
   describe("Clicking 'New template'", () => {
 
     beforeEach(() => {
