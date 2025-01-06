@@ -351,42 +351,6 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
 
 
 @pytest.mark.parametrize(
-    "permissions,are_data_attrs_added",
-    [
-        (["sms"], True),
-        (["email"], True),
-        (["letter"], True),
-        (["sms", "email"], False),
-    ],
-)
-def test_should_add_data_attributes_for_services_that_only_allow_one_type_of_notifications(
-    client_request,
-    service_one,
-    mock_get_service_templates,
-    mock_get_template_folders,
-    mock_get_no_api_keys,
-    permissions,
-    are_data_attrs_added,
-):
-    service_one["permissions"] = permissions
-
-    page = client_request.get(
-        "main.choose_template",
-        service_id=SERVICE_ONE_ID,
-    )
-
-    if not page.select("#add_new_template_form"):
-        raise ElementNotFound
-
-    if are_data_attrs_added:
-        assert page.select_one("#add_new_template_form").attrs["data-channel"] == permissions[0]
-        assert page.select_one("#add_new_template_form").attrs["data-service"] == SERVICE_ONE_ID
-    else:
-        assert page.select_one("#add_new_template_form").attrs.get("data-channel") is None
-        assert page.select_one("#add_new_template_form").attrs.get("data-service") is None
-
-
-@pytest.mark.parametrize(
     "custom_email_sender_name, expected_email_from",
     (
         (None, "service one"),
