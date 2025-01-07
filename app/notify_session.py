@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 
 from flask import Flask, Request, Response, request
 from flask.sessions import SecureCookieSession, SecureCookieSessionInterface
@@ -17,10 +17,7 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
         """
         absolute_expiration = session_start + app.permanent_session_lifetime
 
-        if current_user and current_user.platform_admin:
-            refresh_duration = timedelta(seconds=app.config["PLATFORM_ADMIN_INACTIVE_SESSION_TIMEOUT"])
-        else:
-            refresh_duration = app.permanent_session_lifetime
+        refresh_duration = app.permanent_session_lifetime
 
         return min(datetime.now(UTC) + refresh_duration, absolute_expiration)
 
