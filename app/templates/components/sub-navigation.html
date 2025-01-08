@@ -25,7 +25,7 @@
   item_set,
   nav_label_prefix
 ) %}
-  <nav class="navigation govuk-!-margin-top-7" aria-label="{{ nav_label_prefix }}">
+  <nav class="navigation govuk-!-margin-top-7 govuk-!-padding-bottom-12" aria-label="{{ nav_label_prefix }}">
     <ol itemscope itemtype="http://schema.org/ItemList">
       {% for item in item_set %}
         {% if item.sub_navigation_items %}
