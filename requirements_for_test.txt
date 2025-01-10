@@ -173,9 +173,9 @@ moto==4.0.9
 mypy-extensions==1.0.0
     # via black
 notifications-python-client==10.0.0
-    # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@d4d07fd31dc65cbcfba3850cea3b05ee8d3e2e62
-    # via -r requirements.in
+    # via -r requirements.txt
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@55cb9e55d4916334ff599201b881a39c412e15cb
+    # via -r requirements.txt
 openpyxl==3.0.10
     # via
     #   -r requirements.txt
@@ -193,7 +193,9 @@ packaging==23.1
 pathspec==0.12.1
     # via black
 phonenumbers==8.13.50
-    # via notifications-utils
+    # via
+    #   -r requirements.txt
+    #   notifications-utils
 pillow==10.3.0
     # via -r requirements.txt
 platformdirs==4.3.6
@@ -274,8 +276,6 @@ pyyaml==6.0.2
     #   notifications-utils
     #   responses
 redis==4.5.4
-    # via flask-redis
-requests==2.32.3
     # via
     #   -r requirements.txt
     #   flask-redis
