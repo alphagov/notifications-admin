@@ -174,7 +174,7 @@ mypy-extensions==1.0.0
     # via black
 notifications-python-client==10.0.0
     # via -r requirements.txt
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@55cb9e55d4916334ff599201b881a39c412e15cb
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@9d8b26f172643484612c4572c9ae72a41e262916
     # via -r requirements.txt
 openpyxl==3.0.10
     # via
