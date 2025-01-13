@@ -45,7 +45,12 @@
  <ul class="govuk-list govuk-list--bullet">
    <li>template ID</li>
    <li>date the letter was sent</li>
-   <li>a reference for each letter if you include this in the list of addresses you upload</li>
+   <li>a reference for each letter if you include either:
+       <ul class="govuk-list govuk-list--bullet">
+           <li>a column called ‘reference’ in the list of addresses you upload</li>
+           <li>the <code>reference</code> argument when making an API call</li>
+       </ul>
+   </li>
 
  </ul>
 
