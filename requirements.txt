@@ -63,7 +63,7 @@ govuk-frontend-jinja==3.5.0
     # via -r requirements.in
 greenlet==3.0.3
     # via eventlet
-gunicorn==21.2.0
+gunicorn==23.0.0
     # via notifications-utils
 humanize==4.4.0
     # via -r requirements.in
