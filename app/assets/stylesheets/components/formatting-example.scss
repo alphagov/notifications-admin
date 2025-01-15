@@ -12,3 +12,23 @@
 code.lang-md {
   @include govuk-font(19);
 }
+
+code.lang-py {
+    background: govuk-colour("light-grey");
+    padding: 3px 5px;
+    border-radius: 1px;
+    font-family: monaco, Consolas, "Lucida Console", monospace;
+    font-size: 15px;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-word;
+
+    @include govuk-media-query(tablet) {
+      font-size: 16px;
+      font-size: 1rem;
+    }
+}
