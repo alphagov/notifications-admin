@@ -1,0 +1,43 @@
+{% extends "withnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  Confirm that your service is unique
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id)}) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ govuk_page_header("Confirm that your service is unique") }}
+
+  <p class="govuk-body">Your service must be the only one of its kind in your organisation.</p>
+
+  <p class="govuk-body">Before you go live, check that your service name describes the purpose of your messages.</p>
+
+  <p class="govuk-body">This will help us to understand if your service is unique.</p>
+
+  <p class="govuk-body">Do not include:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>acronyms, initialisms or abbreviations</li>
+    <li>your own name or the name of someone in your team</li>
+    <li>the name of a web application or back office system</li>
+  </ul>
+
+  {% call form_wrapper() %}
+    {{ form.name }}
+    {{ page_footer('Confirm') }}
+  {% endcall %}
+
+  {% if current_user.default_organisation.can_ask_to_join_a_service %}
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.join_service_choose_service') }}">Check if you need to join an existing service instead</a>
+    </p>
+  {% endif %}
+
+{% endblock %}

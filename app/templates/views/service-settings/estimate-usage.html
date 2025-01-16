@@ -4,9 +4,10 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/checkboxes/macro.html" import govukCheckboxes %}
 
 {% block service_page_title %}
-  Tell us how many messages you expect to send
+  What do you expect to send?
 {% endblock %}
 
 {% block backLink %}
@@ -22,26 +23,68 @@
             Enter the number of messages you expect to send in the next year
           </h1>
         {% endcall %}
-      {% else %}
-        {{ page_header('Tell us how many messages you expect to send') }}
       {% endif %}
-      {% call form_wrapper() %}
-        <div class="form-group">
-          {{ form.volume_email(param_extensions={
-            "classes": "govuk-!-width-one-half",
-            "hint": {"text": "For example, 50,000"},
-          }) }}
-          {{ form.volume_sms(param_extensions={
-            "classes": "govuk-!-width-one-half",
-            "hint": {"text": "For example, 50,000"},
-          }) }}
-          {{ form.volume_letter(param_extensions={
-            "classes": "govuk-!-width-one-half",
-            "hint": {"text": "For example, 50,000"},
-          }) }}
-        </div>
-        {{ page_footer('Continue') }}
-      {% endcall %}
+    {% call form_wrapper() %}
+      {% set emailHtml %}
+        {{ form.volume_email(param_extensions={
+          "classes": "govuk-!-width-one-half",
+          "hint": {"text": "For example 50,000"},
+        }) }}
+      {% endset %}
+      {% set smsHtml %}
+      {{ form.volume_sms(param_extensions={
+        "classes": "govuk-!-width-one-half",
+        "hint": {"text": "For example 50,000"},
+      }) }}
+      {% endset %}
+      {% set letterHtml %}
+      {{ form.volume_letter(param_extensions={
+        "classes": "govuk-!-width-one-half",
+        "hint": {"text": "For example 50,000"},
+      }) }}
+      {% endset %}
+      {{ govukCheckboxes({
+        "name": "estimated-usage",
+        "fieldset": {
+          "legend": {
+            "text": "What do you expect to send?",
+            "isPageHeading": true,
+            "classes": "govuk-fieldset__legend--l"
+          },
+        },
+        "classes":  "govuk-form-group--error" if form.errors,
+        "hint": {
+          "text": "Select all that apply."
+        },
+        "items": [
+          {
+            "value": "emails",
+            "text": "Emails",
+            "checked": true if ('volume_email' in form.errors or form.volume_email.data),
+            "conditional": {
+              "html": emailHtml
+            }
+          },
+          {
+            "value": "sms",
+            "text": "Text messages",
+            "checked": true if ('volume_sms' in form.errors or form.volume_sms.data),
+            "conditional": {
+              "html": smsHtml
+            }
+          },
+          {
+            "value": "letters",
+            "text": "Letters",
+            "checked": true if ('volume_letter' in form.errors or form.volume_letter.data),
+            "conditional": {
+              "html": letterHtml
+            }
+          }
+        ]
+      }) }}
+      {{ page_footer('Save') }}
+    {% endcall %}
     </div>
   </div>
 {% endblock %}

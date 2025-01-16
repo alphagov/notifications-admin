@@ -469,28 +469,7 @@
 
     </div>
 
-    {% if current_service.trial_mode %}
-      <h2 class="heading-medium top-gutter-0">Your service is in trial mode</h2>
-
-        <p class="govuk-body">You can only:</p>
-
-        <ul class="govuk-list govuk-list--bullet">
-          <li>send messages to yourself and other people in your team</li>
-          <li>send {{ current_service.email_message_limit | message_count('email') }} per day</li>
-          <li>send {{ current_service.sms_message_limit | message_count('sms') }} per day</li>
-          <li>create letter templates, but not send them</li>
-        </ul>
-
-      <p class="govuk-body">
-        {% if current_user.has_permissions('manage_service') %}
-          To remove these restrictions, you can send us a
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
-        {% else %}
-          Your service manager can ask to have these restrictions removed.
-        {% endif %}
-      </p>
-
-    {% else %}
+    {% if current_service.live %}
       <h2 class="heading-medium top-gutter-0">Your service is live</h2>
       <p class="govuk-body">
         You can send up to:

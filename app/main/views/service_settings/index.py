@@ -28,7 +28,7 @@ from app.event_handlers import (
     create_archive_service_event,
     create_set_inbound_sms_on_event,
 )
-from app.extensions import zendesk_client
+from app.extensions import redis_client, zendesk_client
 from app.main import json_updates, main
 from app.main.forms import (
     AdminBillingDetailsForm,
@@ -71,6 +71,7 @@ from app.models.branding import (
 from app.models.letter_rates import LetterRates
 from app.models.organisation import Organisation
 from app.models.sms_rate import SMSRate
+from app.notify_client import cache
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
@@ -128,11 +129,45 @@ def service_name_change(service_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/get-ready-to-go-live/confirm-your-service-is-unique", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def service_confirm_unique(service_id):
+    form = RenameServiceForm(name=current_service.name)
+
+    if form.validate_on_submit():
+        try:
+            current_service.update(name=form.name.data)
+        except HTTPError as http_error:
+            if http_error.status_code == 400 and (
+                error_message := service_api_client.parse_edit_service_http_error(http_error)
+            ):
+                form.name.errors.append(error_message)
+            else:
+                raise http_error
+        else:
+            redis_client.set(f"{service_id}_is_unique", b"true", ex=cache.DEFAULT_TTL)
+            return redirect(url_for(".request_to_go_live", service_id=service_id))
+
+    return render_template("views/service-settings/confirm-your-service-is-unique.html", form=form)
+
+
 @main.route("/services/<uuid:service_id>/service-settings/email-sender", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_email_sender_change(service_id):
+    came_from_template_page = request.args.get("came_from_template_page")
+    from_template_folder_id = request.args.get("from_template_folder_id")
+
+    if came_from_template_page:
+        back_link = url_for(
+            "main.choose_template",
+            service_id=service_id,
+            template_folder_id=from_template_folder_id,
+        )
+    else:
+        back_link = url_for("main.service_settings", service_id=service_id)
+
     form = ServiceEmailSenderForm(
-        use_custom_email_sender_name=current_service.custom_email_sender_name is not None,
+        use_custom_email_sender_name=True,
         custom_email_sender_name=current_service.custom_email_sender_name,
     )
 
@@ -140,11 +175,23 @@ def service_email_sender_change(service_id):
         new_sender = form.custom_email_sender_name.data if form.use_custom_email_sender_name.data else None
 
         current_service.update(custom_email_sender_name=new_sender)
+        redis_client.set(f"{service_id}_has_confirmed_email_sender", b"true", ex=cache.DEFAULT_TTL)
 
-        return redirect(url_for(".service_settings", service_id=service_id))
+        if came_from_template_page:
+            return redirect(
+                url_for(
+                    "main.add_service_template",
+                    service_id=service_id,
+                    template_type="email",
+                    template_folder_id=from_template_folder_id,
+                )
+            )
+
+        return redirect(url_for("main.service_settings", service_id=service_id))
 
     return render_template(
         "views/service-settings/custom-email-sender-name.html",
+        back_link=back_link,
         form=form,
         organisation_type=current_service.organisation_type,
         error_summary_enabled=True,
@@ -189,7 +236,7 @@ def service_data_retention(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live/estimate-usage", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/get-ready-to-go-live/what-do-you-expect-to-send", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def estimate_usage(service_id):
     form = EstimateUsageForm(
@@ -214,10 +261,11 @@ def estimate_usage(service_id):
     return render_template(
         "views/service-settings/estimate-usage.html",
         form=form,
+        error_summary_enabled=True,
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["GET"])
+@main.route("/services/<uuid:service_id>/get-ready-to-go-live", methods=["GET"])
 @user_has_permissions("manage_service")
 def request_to_go_live(service_id):
     if current_service.live:
@@ -226,7 +274,7 @@ def request_to_go_live(service_id):
     return render_template("views/service-settings/request-to-go-live.html")
 
 
-@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["POST"])
+@main.route("/services/<uuid:service_id>/get-ready-to-go-live", methods=["POST"])
 @user_has_permissions("manage_service")
 @user_is_gov_user
 def submit_request_to_go_live(service_id):
@@ -404,6 +452,16 @@ def service_email_reply_to(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-reply-to/add", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_add_email_reply_to(service_id):
+    route = request.args.get("route")
+    template_id = request.args.get("template_id")
+
+    if route == "go_live":
+        back_link = url_for("main.request_to_go_live", service_id=service_id)
+    elif route == "send":
+        back_link = url_for("main.set_sender", service_id=service_id, template_id=template_id)
+    else:
+        back_link = url_for("main.service_email_reply_to", service_id=service_id)
+
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
     is_default = first_email_address if first_email_address else form.is_default.data
@@ -436,6 +494,8 @@ def service_add_email_reply_to(service_id):
                         service_id=service_id,
                         notification_id=notification_id,
                         is_default=is_default,
+                        route=route,
+                        template_id=template_id,
                     )
                 )
 
@@ -444,6 +504,7 @@ def service_add_email_reply_to(service_id):
         form=form,
         first_email_address=first_email_address,
         error_summary_enabled=True,
+        back_link=back_link,
     )
 
 
@@ -454,13 +515,31 @@ def service_add_email_reply_to(service_id):
 def service_verify_reply_to_address(service_id, notification_id):
     replace = request.args.get("replace", False)
     is_default = request.args.get("is_default", False)
+    route = request.args.get("route")
+    template_id = request.args.get("template_id")
+
+    if replace:
+        back_link = url_for("main.service_edit_email_reply_to", service_id=service_id, reply_to_email_id=replace)
+    elif route:
+        back_link = url_for(
+            "main.service_add_email_reply_to",
+            service_id=service_id,
+            route=route,
+            template_id=template_id,
+        )
+    else:
+        back_link = url_for("main.service_add_email_reply_to", service_id=service_id, route=route)
+
     return render_template(
         "views/service-settings/email-reply-to/verify.html",
         service_id=service_id,
         notification_id=notification_id,
         partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
+        back_link=back_link,
         replace=replace,
         is_default=is_default,
+        route=route,
+        template_id=template_id,
     )
 
 
@@ -477,6 +556,16 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
     replace = request.args.get("replace", False)
     replace = False if replace == "False" else replace
     existing_is_default = False
+    route = request.args.get("route")
+    template_id = request.args.get("template_id")
+
+    if route == "go_live":
+        continue_url = url_for("main.request_to_go_live", service_id=service_id)
+    elif route == "send":
+        continue_url = url_for("main.set_sender", service_id=service_id, template_id=template_id)
+    else:
+        continue_url = url_for("main.service_email_reply_to", service_id=service_id)
+
     if replace:
         existing = current_service.get_email_reply_to_address(replace)
         existing_is_default = existing["is_default"]
@@ -516,6 +605,7 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
             form=form,
             first_email_address=first_email_address,
             replace=replace,
+            continue_url=continue_url,
         ),
         "stop": 0 if verification_status == "pending" else 1,
     }
@@ -968,8 +1058,14 @@ def service_delete_letter_contact(service_id, letter_contact_id):
 @main.route("/services/<uuid:service_id>/service-settings/sms-sender", methods=["GET"])
 @user_has_permissions("manage_service", "manage_api_keys")
 def service_sms_senders(service_id):
+    if request.args.get("back") == "go-live":
+        back_link = url_for("main.request_to_go_live", service_id=service_id)
+    else:
+        back_link = url_for("main.service_settings", service_id=service_id)
+
     return render_template(
         "views/service-settings/sms-senders.html",
+        back_link=back_link,
     )
 
 
