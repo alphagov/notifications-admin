@@ -642,6 +642,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
         allow_international_sms=current_service.has_permission("international_sms"),
         allow_sms_to_uk_landline=current_service.has_permission("sms_to_uk_landlines"),
         allow_international_letters=current_service.has_permission("international_letters"),
+        should_validate_phone_number=False,
     )
 
     if request.args.get("from_test"):
