@@ -33,7 +33,7 @@
       {{ page_footer('Add new folder', button_name='operation', button_value='add-new-folder') }}
     </div>
   </div>
-  <div id="add_new_template_form" class="sticky-template-form" role="region" aria-label="{{ add_a_template_heading_and_aria_label_text }}" {% if single_notification_channel %}data-channel="{{single_notification_channel}}" data-service="{{current_service.id}}"{% endif %}>
+  <div id="add_new_template_form" class="sticky-template-form" role="region" aria-label="{{ add_a_template_heading_and_aria_label_text }}">
     <h3 class="govuk-heading-s js-hidden">{{ add_a_template_heading_and_aria_label_text }}</h3>
     <div class="js-will-stick-at-bottom-when-scrolling">
      {{form.add_template_by_template_type}}

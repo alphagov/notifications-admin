@@ -163,11 +163,6 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
         option_hints=option_hints,
     )
 
-    single_notification_channel = None
-    notification_channels = current_service.available_template_types
-    if len(notification_channels) == 1:
-        single_notification_channel = notification_channels[0]
-
     if request.method == "POST" and templates_and_folders_form.validate_on_submit():
         if not current_user.has_permissions("manage_templates"):
             abort(403)
@@ -205,7 +200,6 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
         form=templates_and_folders_form,
         move_to_children=templates_and_folders_form.move_to.children(),
         user_has_template_folder_permission=user_has_template_folder_permission,
-        single_notification_channel=single_notification_channel,
         option_hints=option_hints,
         error_summary_enabled=True,
         error_summary_extra_params={

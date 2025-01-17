@@ -187,19 +187,12 @@
       return changed;
     };
 
-    this.$singleNotificationChannel = (document.querySelector('div[id=add_new_template_form]')).getAttribute("data-channel");
-    this.$singleChannelService = (document.querySelector('div[id=add_new_template_form]')).getAttribute("data-service");
-
     this.actionButtonClicked = function(event) {
       event.preventDefault();
       this.currentState = $(event.currentTarget).val();
 
-      if (event.currentTarget.value === 'add-new-template' && this.$singleNotificationChannel) {
-        window.location = "/services/" + this.$singleChannelService + "/templates/add-" + this.$singleNotificationChannel;
-      } else {
-        if (this.stateChanged()) {
+      if (this.stateChanged()) {
           this.render();
-        }
       }
     };
 

@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm as base
+FROM --platform=linux/amd64 python:3.11-slim-bookworm AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
