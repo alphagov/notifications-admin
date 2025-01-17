@@ -17,7 +17,7 @@ notifications-python-client==10.0.0
 fido2==1.1.3
 
 # Run `make bump-utils` to update to the latest version
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@929e926bdfd1441d8b5ffe56c33965c9a42a71e0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@e874406f1d8d2eff2a3492acd08e26e9f3fa5e1f
 govuk-frontend-jinja==3.4.0
 
 # gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains
