@@ -1,4 +1,6 @@
-const helpers = require('./support/helpers.js');
+import PreviewPane from '../../app/assets/javascripts/esm/preview-pane.mjs';
+import * as helpers from './support/helpers.js';
+import { jest } from '@jest/globals';
 
 const emailPageURL = '/services/6658542f-0cad-491f-bec8-ab8457700ead/service-settings/set-email-branding';
 const emailPreviewConfirmationURL = '/services/6658542f-0cad-491f-bec8-ab8457700ead/service-settings/preview-email-branding';
@@ -14,6 +16,7 @@ beforeAll(() => {
 
   // default to the email page, the pathname can be changed inside specific tests
   window.location.pathname = emailPageURL;
+  document.body.classList.add('govuk-frontend-supported');
 
 });
 
@@ -21,7 +24,6 @@ afterAll(() => {
 
   // reset window.location to its original state
   locationMock.reset();
-  require('./support/teardown.js');
 
 });
 
@@ -106,7 +108,7 @@ describe('Preview pane', () => {
       test("it should add the preview pane", () => {
 
         // run preview pane script
-        require('../../app/assets/javascripts/previewPane.js');
+        new PreviewPane(document.querySelector('.govuk-radios__item input[name="branding_style"]:checked'));
 
         expect(document.querySelector('iframe')).not.toBeNull();
 
@@ -115,7 +117,7 @@ describe('Preview pane', () => {
       test("it should change the form to submit the selection instead of posting to a preview page", () => {
 
         // run preview pane script
-        require('../../app/assets/javascripts/previewPane.js');
+        new PreviewPane(document.querySelector('.govuk-radios__item input[name="branding_style"]:checked'));
 
         expect(form.getAttribute('action')).toEqual(emailPreviewConfirmationURL);
 
@@ -124,7 +126,7 @@ describe('Preview pane', () => {
       test("the preview pane should show the page for the selected brand", () => {
 
         // run preview pane script
-        require('../../app/assets/javascripts/previewPane.js');
+        new PreviewPane(document.querySelector('.govuk-radios__item input[name="branding_style"]:checked'));
 
         const selectedValue = Array.from(radios.querySelectorAll('input[type=radio]')).filter(radio => radio.checked)[0].value;
 
@@ -135,7 +137,7 @@ describe('Preview pane', () => {
       test("the submit button should change from 'Preview' to 'Save'", () => {
 
         // run preview pane script
-        require('../../app/assets/javascripts/previewPane.js');
+        new PreviewPane(document.querySelector('.govuk-radios__item input[name="branding_style"]:checked'));
 
         expect(document.querySelector('form button').textContent).toEqual('Save');
 
@@ -148,7 +150,7 @@ describe('Preview pane', () => {
       test("the page shown should match the selected brand", () => {
 
         // run preview pane script
-        require('../../app/assets/javascripts/previewPane.js');
+        new PreviewPane(document.querySelector('.govuk-radios__item input[name="branding_style"]:checked'));
 
         const newSelection = radios.querySelectorAll('input[type=radio]')[1];
 
@@ -177,7 +179,7 @@ describe('Preview pane', () => {
       test("it should add the preview pane", () => {
 
         // run preview pane script
-        require('../../app/assets/javascripts/previewPane.js');
+        new PreviewPane(document.querySelector('.govuk-radios__item input[name="branding_style"]:checked'));
 
         expect(document.querySelector('img')).not.toBeNull();
 
@@ -186,7 +188,7 @@ describe('Preview pane', () => {
       test("it should change the form to submit the selection instead of posting to a preview page", () => {
 
         // run preview pane script
-        require('../../app/assets/javascripts/previewPane.js');
+        new PreviewPane(document.querySelector('.govuk-radios__item input[name="branding_style"]:checked'));
 
         expect(form.getAttribute('action')).toEqual(letterPreviewConfirmationURL);
 
@@ -195,7 +197,7 @@ describe('Preview pane', () => {
       test("the preview pane should show the page for the selected brand", () => {
 
         // run preview pane script
-        require('../../app/assets/javascripts/previewPane.js');
+        new PreviewPane(document.querySelector('.govuk-radios__item input[name="branding_style"]:checked'));
 
         const selectedValue = Array.from(radios.querySelectorAll('input[type=radio]')).filter(radio => radio.checked)[0].value;
 
@@ -206,7 +208,7 @@ describe('Preview pane', () => {
       test("the submit button should change from 'Preview' to 'Save'", () => {
 
         // run preview pane script
-        require('../../app/assets/javascripts/previewPane.js');
+        new PreviewPane(document.querySelector('.govuk-radios__item input[name="branding_style"]:checked'));
 
         expect(document.querySelector('form button').textContent).toEqual('Save');
 
@@ -219,7 +221,7 @@ describe('Preview pane', () => {
       test("the page shown should match the selected brand", () => {
 
         // run preview pane script
-        require('../../app/assets/javascripts/previewPane.js');
+        new PreviewPane(document.querySelector('.govuk-radios__item input[name="branding_style"]:checked'));
 
         const newSelection = radios.querySelectorAll('input[type=radio]')[1];
 

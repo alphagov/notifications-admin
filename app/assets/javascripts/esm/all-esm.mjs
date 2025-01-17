@@ -7,6 +7,7 @@ import ColourPreview from './colour-preview.mjs';
 import FileUpload from './file-upload.mjs';
 import Autofocus from './autofocus.mjs';
 import Homepage from './homepage.mjs';
+import PreviewPane from './preview-pane.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -41,6 +42,13 @@ if ($autoFocus) {
 const $homePage = document.querySelector('[data-notify-module="homepage"]');
 if ($homePage) {
   new Homepage($homePage);
+}
+
+// this module doesn't currently use "data-notify-module" for initialisation
+// should we change that?
+const $previewPane = document.querySelector('.govuk-radios__item input[name="branding_style"]:checked');
+if ($previewPane) {
+  new PreviewPane($previewPane);
 }
 
 const focusBanner = new FocusBanner();
