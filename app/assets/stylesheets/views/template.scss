@@ -18,6 +18,7 @@
   container-type: inline-size;
 
   position: relative;
+  z-index: 1;
 
   &--with-attach-pages-button {
     .page--last {
