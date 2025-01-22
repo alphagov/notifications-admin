@@ -46,7 +46,7 @@ from app.s3_client.s3_csv_client import (
     set_metadata_on_csv_upload,
 )
 from app.utils import PermanentRedirect, should_skip_template_page, unicode_truncate
-from app.utils.csv import Spreadsheet
+from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.user import user_has_permissions
 
 letter_address_columns = [column.replace("_", " ") for column in address_lines_1_to_7_keys]
@@ -661,10 +661,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
     return {
         "recipients": recipients,
         "template": template,
-        # "errors": recipients.has_errors,
-        "errors": False,
-        # "row_errors": get_errors_for_csv(recipients, template.template_type),
-        "row_errors": None,
+        "errors": recipients.has_errors,
+        "row_errors": get_errors_for_csv(recipients, template.template_type),
         "count_of_recipients": len(recipients),
         "count_of_displayed_recipients": len(list(recipients.displayed_rows)),
         "original_file_name": original_file_name,
