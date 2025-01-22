@@ -6,6 +6,7 @@ import FocusBanner from './focus-banner.mjs';
 import ColourPreview from './colour-preview.mjs';
 import FileUpload from './file-upload.mjs';
 import Autofocus from './autofocus.mjs';
+import CopyToClipBoard from './copy-to-clipboard.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -37,6 +38,10 @@ if ($autoFocus) {
   new Autofocus($autoFocus);
 }
 
+const $copyToClipboard = document.querySelector('[data-notify-module="copy-to-clipboard"]');
+if ($copyToClipboard) {
+  new CopyToClipBoard($copyToClipboard);
+}
 const focusBanner = new FocusBanner();
 
 // ES modules do not export to global so in order to
