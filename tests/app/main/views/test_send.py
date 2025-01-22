@@ -4532,17 +4532,6 @@ def test_can_send_from_emergency_contact_list_with_error_rows(
     fake_uuid,
     mocker,
 ):
-    # template_id = fake_uuid
-    # contact_list_id = fake_uuid
-
-    # page = client_request.get(
-    #     # "main.send_from_contact_list",
-    #     "main.check_messages",
-    #     template_id = template_id,
-    #     service_id = SERVICE_ONE_ID,
-    #     contact_list_id = contact_list_id,
-    #     follow_redirects = True)
-
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
@@ -4551,8 +4540,6 @@ def test_can_send_from_emergency_contact_list_with_error_rows(
             +1 800 555 5555,Invalid
         """,
     )
-
-    # mocker.patch("app.job_api_client.get_job")
 
     page = client_request.get(
         "main.check_messages",
