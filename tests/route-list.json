@@ -33,6 +33,7 @@
     "/features/letters",
     "/features/messages-status",
     "/features/performance",
+    "/features/performance.json",
     "/features/roadmap",
     "/features/security",
     "/features/sms",
