@@ -49,7 +49,7 @@ class CopyToClipBoard {
     this.stateOptions = {
       value: this.$module.dataset.value,
       thing: this.$module.dataset.thing
-    },
+    };
     this.name = this.$module.dataset.name.toString();
 
       // if the name is distinct from the thing:
@@ -65,16 +65,22 @@ class CopyToClipBoard {
       this.$module.addEventListener('click', (e) => {
         const target = e.target;
         if (target.matches('.copy-to-clipboard__button--copy')) {
+          this.copyValueToClipboard('blue');
           this.updateHTML('valueCopied', this.stateOptions, this.$module);
+          // this.copyValueToClipboard(
+          //   $('.copy-to-clipboard__value', this.$module, () => {
+          //     this.updateHTML('valueCopied', stateOptions, this.$module);
+          //   }
+          // ))
+          
         }
         if (target.matches('.copy-to-clipboard__button--show')) {
+          this.copyValueToClipboard('red');
           this.updateHTML('valueVisible', this.stateOptions, this.$module);
         }
       });
 
-      console.log(($.extend({ 'onload': true }, this.stateOptions)))
-
-      this.updateHTML('valueVisible', ($.extend({ 'onload': true }, this.stateOptions)), this.$module);
+      this.updateHTML('valueVisible', {...{ 'onload': true }, ...this.stateOptions}, this.$module);
 
       if ('stickAtBottomWhenScrolling' in window.GOVUK) {
         window.GOVUK.stickAtBottomWhenScrolling.recalculate();
@@ -83,56 +89,53 @@ class CopyToClipBoard {
   }
   updateHTML (stateKey, stateOptions, $module) {
     const state = this.states[stateKey](stateOptions);
-    let $button = this.$module.querySelector('.govuk-button');
+    // getElementsBy* works with dynamically added elements
+    // whereas querySelector does not
+    let $button = this.$module.getElementsByTagName('BUTTON');
 
-    $module.querySelector('.copy-to-clipboard__value').remove();
+    $module.querySelectorAll('.copy-to-clipboard__value').forEach(e => e.remove());
     if (state.value !== '') {
       $module.insertAdjacentHTML('afterbegin', state.value);
     }
 
     const $clipboardNoticeEl = this.$module.querySelector('.copy-to-clipboard__notice')
-    $clipboardNoticeEl.textContent =  state.notice.content;
+    $clipboardNoticeEl.insertAdjacentHTML('afterbegin', state.notice.content);
     $clipboardNoticeEl.setAttribute('class', state.notice.classes);
 
-    // console.log(!!$button)
-    if (!!$button) {
+    if ($button.length === 0) {
       const $newButton = document.createElement('button');
       $newButton.classList.add('govuk-button', 'govuk-button--secondary', 'copy-to-clipboard__button--copy');
       this.$module.append($newButton);
     }
-    // console.log($button)
 
-    // $button.innerHtml = state.button.content;
-    // $button.setAttribute('class',state.button.classes);
+    $button[0].textContent = state.button.content;
+    $button[0].setAttribute('class', state.button.classes);
   }
 
-  // getRangeFromElement = function (copyableElement) {
-  //   const range = document.createRange();
-  //   const childNodes = Array.prototype.slice.call(copyableElement.childNodes);
-  //   let prefixIndex = -1;
+  getRangeFromElement (copyableElement) {
+    const range = document.createRange();
+    const childNodes = Array.prototype.slice.call(copyableElement.childNodes);
+    let prefixIndex = -1;
 
-  //   childNodes.forEach((el, idx) => {
-  //     if ((el.nodeType === 1) && el.classList.contains('govuk-visually-hidden')) {
-  //       prefixIndex = idx;
-  //     }
-  //   });
+    childNodes.forEach((el, idx) => {
+      if ((el.nodeType === 1) && el.classList.contains('govuk-visually-hidden')) {
+        prefixIndex = idx;
+      }
+    });
 
-  //   range.selectNodeContents(copyableElement);
-  //   if (prefixIndex !== -1) { range.setStart(copyableElement, prefixIndex + 1); }
+    range.selectNodeContents(copyableElement);
+    if (prefixIndex !== -1) { range.setStart(copyableElement, prefixIndex + 1); }
 
-  //   return range;
-  // }
+    return range;
+  }
 
-  // copyValueToClipboard = function(copyableElement, callback) {
-  //   var selection = window.getSelection ? window.getSelection() : document.selection,
-  //       range = this.getRangeFromElement(copyableElement);
-
-  //   selection.removeAllRanges();
-  //   selection.addRange(range);
-  //   document.execCommand('copy');
-  //   selection.removeAllRanges();
-  //   callback();
-  // }
+  async copyValueToClipboard(text){
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  }
 }
 
 export default CopyToClipBoard;
