@@ -6,6 +6,7 @@ import FocusBanner from './focus-banner.mjs';
 import ColourPreview from './colour-preview.mjs';
 import FileUpload from './file-upload.mjs';
 import Autofocus from './autofocus.mjs';
+import Homepage from './homepage.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -35,6 +36,11 @@ if ($fileUpload) {
 const $autoFocus = document.querySelector('[data-notify-module="autofocus"]');
 if ($autoFocus) {
   new Autofocus($autoFocus);
+}
+
+const $homePage = document.querySelector('[data-notify-module="homepage"]');
+if ($homePage) {
+  new Homepage($homePage);
 }
 
 const focusBanner = new FocusBanner();
