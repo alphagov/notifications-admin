@@ -64,18 +64,12 @@ class CopyToClipBoard {
 
       this.$module.addEventListener('click', (e) => {
         const target = e.target;
+        const copyableValue = this.$module.querySelector('.copy-to-clipboard__value').textContent;
         if (target.matches('.copy-to-clipboard__button--copy')) {
-          this.copyValueToClipboard('blue');
-          this.updateHTML('valueCopied', this.stateOptions, this.$module);
-          // this.copyValueToClipboard(
-          //   $('.copy-to-clipboard__value', this.$module, () => {
-          //     this.updateHTML('valueCopied', stateOptions, this.$module);
-          //   }
-          // ))
-          
+          this.copyValueToClipboard(copyableValue);
+          this.updateHTML('valueCopied', this.stateOptions, this.$module);  
         }
         if (target.matches('.copy-to-clipboard__button--show')) {
-          this.copyValueToClipboard('red');
           this.updateHTML('valueVisible', this.stateOptions, this.$module);
         }
       });
@@ -110,23 +104,6 @@ class CopyToClipBoard {
 
     $button[0].textContent = state.button.content;
     $button[0].setAttribute('class', state.button.classes);
-  }
-
-  getRangeFromElement (copyableElement) {
-    const range = document.createRange();
-    const childNodes = Array.prototype.slice.call(copyableElement.childNodes);
-    let prefixIndex = -1;
-
-    childNodes.forEach((el, idx) => {
-      if ((el.nodeType === 1) && el.classList.contains('govuk-visually-hidden')) {
-        prefixIndex = idx;
-      }
-    });
-
-    range.selectNodeContents(copyableElement);
-    if (prefixIndex !== -1) { range.setStart(copyableElement, prefixIndex + 1); }
-
-    return range;
   }
 
   async copyValueToClipboard(text){
