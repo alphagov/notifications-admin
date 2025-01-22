@@ -2209,6 +2209,18 @@ def mock_s3_download(mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_s3_download_invalid_phone_number_list(mocker):
+    def _download(service_id, upload_id):
+        return """
+            phone number,name
+            +447700900986,John
+            +1 800 555 5555,Invalid
+        """
+
+    return mocker.patch("app.main.views.send.s3download", side_effect=_download)
+
+
+@pytest.fixture(scope="function")
 def mock_s3_get_metadata(mocker):
     def _get_metadata(service_id, upload_id):
         return {"original_file_name": "example.csv"}
