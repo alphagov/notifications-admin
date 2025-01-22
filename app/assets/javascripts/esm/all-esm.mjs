@@ -8,6 +8,7 @@ import FileUpload from './file-upload.mjs';
 import Autofocus from './autofocus.mjs';
 import Homepage from './homepage.mjs';
 import PreviewPane from './preview-pane.mjs';
+import CopyToClipboard from './copy-to-clipboard.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -49,6 +50,11 @@ if ($homePage) {
 const $previewPane = document.querySelector('.govuk-radios__item input[name="branding_style"]:checked');
 if ($previewPane) {
   new PreviewPane($previewPane);
+}
+
+const $CopyToClipboardArray = document.querySelectorAll('[data-notify-module="copy-to-clipboard"]');
+if ($CopyToClipboardArray.length > 0) {
+  $CopyToClipboardArray.forEach((el) => new CopyToClipboard(el));
 }
 
 const focusBanner = new FocusBanner();
