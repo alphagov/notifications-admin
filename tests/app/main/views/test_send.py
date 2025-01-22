@@ -4528,19 +4528,24 @@ def test_can_send_from_emergency_contact_list_with_error_rows(
     # mock_s3_download_invalid_phone_number_list,
     mock_s3_download,
     service_one,
-    mock_get_job,
+    mock_get_job_doesnt_exist,
     fake_uuid,
     mocker,
 ):
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
-            phone number,name
-            +447700900986,John
-            +1 800 555 5555,Invalid
+            phone number
+            +447700900986
+            +1 800 555 5555
         """,
     )
-
+    mocker.patch(
+        "app.main.views.send.get_csv_metadata",
+        return_value={"original_file_name": "example.csv"},
+    )
+    mocker.patch("app.main.views.send.job_api_client.has_sent_previously", return_value=False)
+    mocker.patch("app.main.views.send.set_metadata_on_csv_upload")
     page = client_request.get(
         "main.check_messages",
         service_id=SERVICE_ONE_ID,
@@ -4549,4 +4554,5 @@ def test_can_send_from_emergency_contact_list_with_error_rows(
         _test_page_title=False,
         _follow_redirects=True,
     )
-    assert page == page
+    assert not page.select_one(".banner-dangerous")
+    assert page.select_one(".govuk-button").text.strip() == "Send 2 text messages"
