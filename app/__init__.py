@@ -24,13 +24,14 @@ from flask_wtf.csrf import CSRFError
 from gds_metrics import GDSMetrics
 from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
-from notifications_utils import logging, request_helper
+from notifications_utils import request_helper
 from notifications_utils.asset_fingerprinter import asset_fingerprinter
 from notifications_utils.eventlet import EventletTimeout
 from notifications_utils.formatters import (
     formatted_list,
     get_lines_with_normalised_whitespace,
 )
+from notifications_utils.logging import flask as utils_logging
 from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
 from notifications_utils.safe_string import make_string_safe_for_email_local_part, make_string_safe_for_id
 from notifications_utils.sanitise_text import SanitiseASCII
@@ -194,7 +195,7 @@ def create_app(application):
     ):
         client.init_app(application)
 
-    logging.init_app(application)
+    utils_logging.init_app(application)
     webauthn_server.init_app(application)
 
     login_manager.login_view = "main.sign_in"
