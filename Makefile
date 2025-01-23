@@ -48,7 +48,7 @@ generate-version-file: ## Generates the app version file
 .PHONY: test
 test: ## Run tests
 	ruff check .
-	black --check .
+	ruff format --check .
 	npm test
 	py.test -n auto --maxfail=10 tests/
 
