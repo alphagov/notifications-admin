@@ -201,8 +201,7 @@ def test_should_render_correct_email_not_received_template_for_active_user(
     assert page.select_one("a.govuk-button")["href"] == url_for("main.resend_email_link", next=redirect_url)
 
     assert (
-        "Ask a member of your team with the ‘Manage settings, team and usage’ "
-        "permission to change your sign-in method"
+        "Ask a member of your team with the ‘Manage settings, team and usage’ permission to change your sign-in method"
     ) not in page.text
 
 
@@ -233,6 +232,5 @@ def test_should_render_correct_email_not_received_template_for_email_auth(
     assert page.select_one("a.govuk-button")["href"] == url_for("main.resend_email_link", next=redirect_url)
 
     assert (
-        "Ask a member of your team with the ‘Manage settings, "
-        "team and usage’ permission to change your sign-in method"
+        "Ask a member of your team with the ‘Manage settings, team and usage’ permission to change your sign-in method"
     ) in page.text

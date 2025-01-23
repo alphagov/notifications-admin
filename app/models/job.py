@@ -215,7 +215,6 @@ class ImmediateJobs(ModelList):
 
 
 class ScheduledJobs(ImmediateJobs):
-
     @staticmethod
     def _get_items(*args, **kwargs):
         return job_api_client.get_scheduled_jobs(*args, **kwargs)
@@ -243,7 +242,6 @@ class PaginatedJobsAndScheduledJobs(PaginatedJobs):
 
 
 class PaginatedUploads(PaginatedModelList, ImmediateJobs):
-
     @staticmethod
     def _get_items(*args, **kwargs):
         return job_api_client.get_uploads(*args, **kwargs)

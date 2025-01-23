@@ -226,7 +226,6 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
 
 
 class EmailPreviewTemplate(BaseEmailTemplate):
-
     def __init__(
         self,
         template,

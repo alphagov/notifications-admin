@@ -702,9 +702,9 @@ def assert_url_expected(actual, expected):
             # serialized string
             assert parse_qs(expected_parts.query) == parse_qs(actual_parts.query)
         else:
-            assert getattr(actual_parts, attribute) == getattr(
-                expected_parts, attribute
-            ), f"Expected redirect: {expected}\nActual redirect: {actual}"
+            assert getattr(actual_parts, attribute) == getattr(expected_parts, attribute), (
+                f"Expected redirect: {expected}\nActual redirect: {actual}"
+            )
 
 
 def find_element_by_tag_and_partial_text(page, tag, string):

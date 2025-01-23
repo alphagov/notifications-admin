@@ -521,8 +521,8 @@ def test_template_id_is_searchable_for_services_with_api_keys(
         )
     ] == [
         "folder one",
-        f'{template_2["id"]} template two',
-        f'{template_1["id"]} template one',
+        f"{template_2['id']} template two",
+        f"{template_1['id']} template one",
     ]
 
     assert [
@@ -533,7 +533,7 @@ def test_template_id_is_searchable_for_services_with_api_keys(
         )
     ] == [
         "folder one Folder folder one 1 template",
-        f'template one {template_1["id"]} template one Text message template',
+        f"template one {template_1['id']} template one Text message template",
     ]
 
     assert [

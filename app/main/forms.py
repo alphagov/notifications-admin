@@ -2972,8 +2972,7 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
     def validate_report_has_been_processed(self, field):
         if not field.data and not self.report_completed:
             raise ValidationError(
-                "There is a problem. "
-                "You must confirm that you have removed the email addresses from your mailing list."
+                "There is a problem. You must confirm that you have removed the email addresses from your mailing list."
             )
 
         if field.data and self.report_completed:

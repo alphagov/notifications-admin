@@ -372,7 +372,7 @@ def useful_headers_after_request(response):
         "Link",
         (
             "<{asset_url}>; rel=dns-prefetch, <{asset_url}>; rel=preconnect".format(
-                asset_url=f'https://{current_app.config["ASSET_DOMAIN"]}'
+                asset_url=f"https://{current_app.config['ASSET_DOMAIN']}"
             )
         ),
     )

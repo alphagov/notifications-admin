@@ -311,13 +311,15 @@ def test_register_from_invite(
         ),
         _expected_redirect=url_for("main.verify"),
     )
-    mock_register_user.assert_called_once_with(
-        "Registered in another Browser",
-        sample_invite["email_address"],
-        "+4407700900460",
-        "somreallyhardthingtoguess",
-        "sms_auth",
-    ),
+    (
+        mock_register_user.assert_called_once_with(
+            "Registered in another Browser",
+            sample_invite["email_address"],
+            "+4407700900460",
+            "somreallyhardthingtoguess",
+            "sms_auth",
+        ),
+    )
     mock_get_invited_user_by_id.assert_called_once_with(sample_invite["id"])
 
 

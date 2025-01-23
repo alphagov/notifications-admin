@@ -131,10 +131,10 @@ def render_govuk_frontend_macro(component, params):
 
     # we need to duplicate all curly braces to escape them from the f string so jinja still sees them
     template_string = f"""
-        {{%- from '{govuk_frontend_components[component]['path']}'
-        import {govuk_frontend_components[component]['macro']} -%}}
+        {{%- from '{govuk_frontend_components[component]["path"]}'
+        import {govuk_frontend_components[component]["macro"]} -%}}
 
-        {{{{ {govuk_frontend_components[component]['macro']}(params) }}}}
+        {{{{ {govuk_frontend_components[component]["macro"]}(params) }}}}
     """
 
     return Markup(render_template_string(template_string, params=params))

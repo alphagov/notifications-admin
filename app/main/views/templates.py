@@ -829,9 +829,7 @@ def _get_content_count_error_and_message_for_template(template):
     if template.template_type == "sms":
         if template.is_message_too_long():
             return True, (
-                f"You have "
-                f"{character_count(template.content_count_without_prefix - SMS_CHAR_COUNT_LIMIT)} "
-                f"too many"
+                f"You have {character_count(template.content_count_without_prefix - SMS_CHAR_COUNT_LIMIT)} too many"
             )
         return False, _get_fragment_count_message_for_template(template)
 

@@ -139,7 +139,6 @@ class APIKeyEvents(ModelList):
 
 
 class ServiceEvents(ModelList):
-
     @property
     def model(self):
         return lambda x: x

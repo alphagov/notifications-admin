@@ -2491,7 +2491,7 @@ def test_send_one_off_letter_address_shows_form(
         # it ignores empty lines and strips whitespace from each line.
         # It also strips extra whitespace from the middle of lines.
         (
-            "\n  a\ta  \n\n\n      \n\n\n\nb  b   \r\n sw1a\u00A01aa \n\n",
+            "\n  a\ta  \n\n\n      \n\n\n\nb  b   \r\n sw1a\u00a01aa \n\n",
             {
                 "address_line_1": "a a",
                 "address_line_2": "b b",
@@ -3502,8 +3502,7 @@ def test_warns_if_file_sent_already(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "These messages have already been sent today "
-        "If you need to resend them, rename the file and upload it again."
+        "These messages have already been sent today If you need to resend them, rename the file and upload it again."
     )
 
     mock_get_jobs.assert_called_once_with(SERVICE_ONE_ID, limit_days=0)

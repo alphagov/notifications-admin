@@ -253,7 +253,6 @@ class Organisations(SerialisedModelCollection):
 
 
 class AllOrganisations(ModelList, Organisations):
-
     @staticmethod
     def _get_items(*args, **kwargs):
         return organisations_client.get_organisations(*args, **kwargs)

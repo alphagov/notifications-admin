@@ -697,7 +697,6 @@ class Users(ModelList):
 
 
 class OrganisationUsers(Users):
-
     @staticmethod
     def _get_items(*args, **kwargs):
         return user_api_client.get_users_for_organisation(*args, **kwargs)

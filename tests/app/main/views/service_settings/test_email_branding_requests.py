@@ -262,7 +262,7 @@ def test_email_branding_options_does_not_show_nhs_branding_twice(
     page = client_request.get(".email_branding_options", service_id=SERVICE_ONE_ID)
 
     assert [
-        (radio["value"], page.select_one(f'label[for={radio["id"]}]').text.strip())
+        (radio["value"], page.select_one(f"label[for={radio['id']}]").text.strip())
         for radio in page.select("input[type=radio]")
     ] == [
         (EmailBranding.NHS_ID, "NHS"),

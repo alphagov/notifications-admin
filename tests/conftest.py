@@ -3120,9 +3120,9 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
             # Page should have one H1
             assert len(page.select("h1")) == 1
             page_title, h1 = (normalize_spaces(page.select_one(selector).text) for selector in ("title", "h1"))
-            assert normalize_spaces(page_title).startswith(
-                h1
-            ), f"Page {url} title '{page_title}' does not start with H1 '{h1}'"
+            assert normalize_spaces(page_title).startswith(h1), (
+                f"Page {url} title '{page_title}' does not start with H1 '{h1}'"
+            )
 
         @staticmethod
         def test_for_elements_without_class(page):
@@ -3144,14 +3144,14 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
                         f'(you probably want to add class="{hint}")'
                     )
 
-            assert not page.select(
-                r"main.govuk-\!-padding-top-0 h1.govuk-heading-l"
-            ), "Use heading-large or set error_summary_enabled=True"
+            assert not page.select(r"main.govuk-\!-padding-top-0 h1.govuk-heading-l"), (
+                "Use heading-large or set error_summary_enabled=True"
+            )
 
             if page.select("h1.heading-large"):
-                assert (
-                    "govuk-!-padding-top-0" in page.select_one("main")["class"]
-                ), "Use govuk-heading-l or set error_summary_enabled=False"
+                assert "govuk-!-padding-top-0" in page.select_one("main")["class"], (
+                    "Use govuk-heading-l or set error_summary_enabled=False"
+                )
 
         @staticmethod
         def test_forms_have_an_action_set(page):
@@ -3164,9 +3164,9 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
         @staticmethod
         def test_for_non_smart_quotes(page):
             for el in page.select("h1, h2, h3, h4, h5, h6, p, li"):
-                assert not (
-                    "'" in el.text or '"' in el.text
-                ), f"Non-smart quote or apostrophe found in <{el.name}>: {normalize_spaces(el.text)}"
+                assert not ("'" in el.text or '"' in el.text), (
+                    f"Non-smart quote or apostrophe found in <{el.name}>: {normalize_spaces(el.text)}"
+                )
 
         @staticmethod
         def test_for_script_csp_nonce(page):

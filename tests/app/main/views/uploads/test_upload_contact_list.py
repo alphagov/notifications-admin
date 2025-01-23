@@ -233,9 +233,7 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "Your file has too many rows "
-        "Notify can store files up to 100,000 rows in size. "
-        "Your file has 100,001 rows."
+        "Your file has too many rows Notify can store files up to 100,000 rows in size. Your file has 100,001 rows."
     )
     assert len(page.select("tbody tr")) == 50
     assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 rows"

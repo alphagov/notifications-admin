@@ -200,7 +200,6 @@ def test_unsubscribe_request_reports_summary(
 
 
 def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocker):
-
     mocker.patch.object(UnsubscribeRequestsReports, "_get_items", return_value=[])
 
     page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
@@ -395,7 +394,6 @@ def test_cannot_force_download_for_unbatched_unsubscribe_request_report(
 
 @pytest.mark.parametrize("batch_id", ["32b4e359-d4df-49b6-a92b-2eaa9343cfdd", None])
 def test_non_existing_unsubscribe_request_report_batch_id_returns_404(client_request, mocker, batch_id):
-
     mocker.patch.object(UnsubscribeRequestsReports, "_get_items", return_value=[])
     page = client_request.get(
         "main.unsubscribe_request_report",

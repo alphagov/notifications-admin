@@ -19,9 +19,7 @@ def accept_invite(token):  # noqa: C901
             This invite is for another email address.
             <a href={} class="govuk-link govuk-link--no-visited-state">Sign out</a>
             and click the link again to accept this invite.
-            """.format(
-                current_user.email_address, url_for("main.sign_out")
-            )
+            """.format(current_user.email_address, url_for("main.sign_out"))
         )
 
         flash(message=message)
@@ -56,8 +54,7 @@ def accept_invite(token):  # noqa: C901
                 if invited_user.auth_type == "email_auth" or (
                     # they have a phone number, we want them to start using it.
                     # if they dont have a mobile we just ignore that option of the invite
-                    existing_user.mobile_number
-                    and invited_user.auth_type == "sms_auth"
+                    existing_user.mobile_number and invited_user.auth_type == "sms_auth"
                 ):
                     existing_user.update(auth_type=invited_user.auth_type)
             existing_user.add_to_service(
@@ -82,9 +79,7 @@ def accept_org_invite(token):
             This invite is for another email address.
             <a class="govuk-link govuk-link--no-visited-state" href={}>Sign out</a>
             and click the link again to accept this invite.
-            """.format(
-                current_user.email_address, url_for("main.sign_out")
-            )
+            """.format(current_user.email_address, url_for("main.sign_out"))
         )
 
         flash(message=message)

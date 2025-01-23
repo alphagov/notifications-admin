@@ -675,6 +675,6 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
     assert page.select_one("h1").text == "Add letter branding"
     assert "name already in use" in error_message
 
-    assert (
-        mock_save_permanent.called is True
-    ), "The logo should be persisted to S3 before the DB call so that we know it's there before creating the branding."
+    assert mock_save_permanent.called is True, (
+        "The logo should be persisted to S3 before the DB call so that we know it's there before creating the branding."
+    )

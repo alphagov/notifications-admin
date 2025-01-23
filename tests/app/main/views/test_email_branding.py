@@ -236,7 +236,7 @@ def test_create_email_branding_backlinks(client_request, platform_admin_user, ex
         text="Example text",
         colour="Example colour",
         brand_type="both",
-        **extra_kwargs
+        **extra_kwargs,
     )
 
     assert page.select_one("a.govuk-back-link")["href"] == expected_backlink
@@ -852,8 +852,7 @@ def test_create_email_branding_government_identity_logo_form(client_request, pla
         ),
         (
             "Scotland Office",
-            "https://static.example.com/images/branding/insignia/"
-            "Scotland Office.png?9da8a4c042f1b0f0631bb4ff98330dde",
+            "https://static.example.com/images/branding/insignia/Scotland Office.png?9da8a4c042f1b0f0631bb4ff98330dde",
         ),
         (
             "Wales Office",
