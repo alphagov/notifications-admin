@@ -166,7 +166,7 @@ def service_json(
     letter_message_limit=1000,
     sms_message_limit=1000,
     active=True,
-    restricted=False,
+    restricted=True,
     reply_to_email_address=None,
     custom_email_sender_name=None,
     email_sender_local_part="test.service",

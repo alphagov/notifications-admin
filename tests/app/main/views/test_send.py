@@ -4532,6 +4532,7 @@ def test_can_send_from_emergency_contact_list_with_error_rows(
     fake_uuid,
     mocker,
 ):
+    service_one["restricted"] = False
     mocker.patch(
         "app.main.views.send.s3download",
         return_value="""
