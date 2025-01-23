@@ -4536,7 +4536,6 @@ def test_can_send_from_emergency_contact_list_with_error_rows(
         "app.main.views.send.s3download",
         return_value="""
             phone number
-            +447700900986
             +1 800 555 5555
         """,
     )
@@ -4555,4 +4554,4 @@ def test_can_send_from_emergency_contact_list_with_error_rows(
         _follow_redirects=True,
     )
     assert not page.select_one(".banner-dangerous")
-    assert page.select_one(".govuk-button").text.strip() == "Send 2 text messages"
+    assert page.select_one(".govuk-button").text.strip() == "Send 1 text message"
