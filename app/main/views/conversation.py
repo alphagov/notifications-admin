@@ -1,7 +1,6 @@
 from flask import jsonify, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
 from notifications_utils.template import SMSPreviewTemplate
 
 from app import current_service, notification_api_client, service_api_client
@@ -10,6 +9,7 @@ from app.main.forms import SearchByNameForm
 from app.models.notification import InboundSMSMessage, InboundSMSMessages, Notifications
 from app.models.template_list import UserTemplateList
 from app.utils.user import user_has_permissions
+from app.utils.validation import format_phone_number_human_readable
 
 
 @main.route("/services/<uuid:service_id>/conversation/<uuid:notification_id>")
