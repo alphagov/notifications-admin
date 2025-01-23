@@ -62,23 +62,26 @@ class CopyToClipBoard {
       this.$module.classList.add('copy-to-clipboard');
       this.$module.style.minHeight = getComputedStyle(this.$module).height;
 
-      this.$module.addEventListener('click', (e) => {
-        const target = e.target;
-        const copyableValue = this.$module.querySelector('.copy-to-clipboard__value').textContent;
-        if (target.matches('.copy-to-clipboard__button--copy')) {
-          this.copyValueToClipboard(copyableValue);
-          this.updateHTML('valueCopied', this.stateOptions, this.$module);  
-        }
-        if (target.matches('.copy-to-clipboard__button--show')) {
-          this.updateHTML('valueVisible', this.stateOptions, this.$module);
-        }
-      });
-
       this.updateHTML('valueVisible', {...{ 'onload': true }, ...this.stateOptions}, this.$module);
 
       if ('stickAtBottomWhenScrolling' in window.GOVUK) {
         window.GOVUK.stickAtBottomWhenScrolling.recalculate();
       }
+
+      this.$module.addEventListener('click', (e) => {
+        const target = e.target;
+        const copyableValue = this.$module.querySelector('.copy-to-clipboard__value').textContent;
+        console.log('target', target);
+        if (target.matches('.copy-to-clipboard__button--copy')) {
+          console.log('yes')
+          this.copyValueToClipboard(copyableValue);
+          this.updateHTML('valueCopied', this.stateOptions, this.$module);  
+        }
+        if (target.matches('.copy-to-clipboard__button--show')) {
+          console.log('no')
+          this.updateHTML('valueVisible', this.stateOptions, this.$module);
+        }
+      });
 
   }
   updateHTML (stateKey, stateOptions, $module) {
@@ -92,17 +95,19 @@ class CopyToClipBoard {
       $module.insertAdjacentHTML('afterbegin', state.value);
     }
 
-    const $clipboardNoticeEl = this.$module.querySelector('.copy-to-clipboard__notice')
+    const $clipboardNoticeEl = this.$module.querySelector('.copy-to-clipboard__notice');
     $clipboardNoticeEl.insertAdjacentHTML('afterbegin', state.notice.content);
     $clipboardNoticeEl.setAttribute('class', state.notice.classes);
-
+    console.log('button length', $button.length)
     if ($button.length === 0) {
       const $newButton = document.createElement('button');
       $newButton.classList.add('govuk-button', 'govuk-button--secondary', 'copy-to-clipboard__button--copy');
       this.$module.append($newButton);
+      console.log('inserted and length',$button.length)
     }
-
+    console.log(state.button.content)
     $button[0].textContent = state.button.content;
+    // $button[0].removeAttribute('class');
     $button[0].setAttribute('class', state.button.classes);
   }
 
