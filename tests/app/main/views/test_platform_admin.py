@@ -831,14 +831,7 @@ def test_get_daily_sms_provider_volumes_report_calls_api_and_download_data(clien
     )
 
     assert response.get_data(as_text=True) == (
-        "day,provider,sms totals,sms fragment totals,sms chargeable units,sms cost\r\n"
-        "2019-01-01,"
-        "foo,"
-        "20,"
-        "40,"
-        "60,"
-        "80"
-        "\r\n"
+        "day,provider,sms totals,sms fragment totals,sms chargeable units,sms cost\r\n2019-01-01,foo,20,40,60,80\r\n"
     )
 
 

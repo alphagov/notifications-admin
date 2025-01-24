@@ -462,7 +462,7 @@ ids, params = zip(
             ),
         ),
     ],
-    strict=True
+    strict=True,
 )
 
 

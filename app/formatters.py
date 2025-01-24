@@ -76,14 +76,10 @@ def get_human_day(time, date_prefix=""):
 
 
 def format_time(date):
-    return (
-        {"12:00AM": "Midnight", "12:00PM": "Midday"}
-        .get(
-            utc_string_to_aware_gmt_datetime(date).strftime("%-I:%M%p"),
-            utc_string_to_aware_gmt_datetime(date).strftime("%-I:%M%p"),
-        )
-        .lower()
-    )
+    return {"12:00AM": "Midnight", "12:00PM": "Midday"}.get(
+        utc_string_to_aware_gmt_datetime(date).strftime("%-I:%M%p"),
+        utc_string_to_aware_gmt_datetime(date).strftime("%-I:%M%p"),
+    ).lower()
 
 
 def format_date(date):
@@ -201,40 +197,36 @@ def format_notification_status_as_time(status, created, updated):
 
 
 def format_notification_status_as_field_status(status, notification_type):
-    return (
+    return {
+        "letter": {
+            "failed": "error",
+            "technical-failure": "error",
+            "temporary-failure": "error",
+            "permanent-failure": "error",
+            "delivered": None,
+            "sent": None,
+            "sending": None,
+            "created": None,
+            "accepted": None,
+            "pending-virus-check": None,
+            "virus-scan-failed": "error",
+            "returned-letter": None,
+            "cancelled": "error",
+        },
+    }.get(
+        notification_type,
         {
-            "letter": {
-                "failed": "error",
-                "technical-failure": "error",
-                "temporary-failure": "error",
-                "permanent-failure": "error",
-                "delivered": None,
-                "sent": None,
-                "sending": None,
-                "created": None,
-                "accepted": None,
-                "pending-virus-check": None,
-                "virus-scan-failed": "error",
-                "returned-letter": None,
-                "cancelled": "error",
-            },
-        }
-        .get(
-            notification_type,
-            {
-                "failed": "error",
-                "technical-failure": "error",
-                "temporary-failure": "error",
-                "permanent-failure": "error",
-                "delivered": None,
-                "sent": "sent-international" if notification_type == "sms" else None,
-                "sending": "default",
-                "created": "default",
-                "pending": "default",
-            },
-        )
-        .get(status, "error")
-    )
+            "failed": "error",
+            "technical-failure": "error",
+            "temporary-failure": "error",
+            "permanent-failure": "error",
+            "delivered": None,
+            "sent": "sent-international" if notification_type == "sms" else None,
+            "sending": "default",
+            "created": "default",
+            "pending": "default",
+        },
+    ).get(status, "error")
 
 
 def format_notification_status_as_url(status, notification_type):
@@ -276,7 +268,7 @@ def format_pennies_as_currency(pennies: int | float, long: bool) -> str:
     pennies = decimal.Decimal(str(pennies))
     if pennies >= 100:
         pennies = round(pennies)
-        return f"£{pennies//100:,}.{pennies%100:02}"
+        return f"£{pennies // 100:,}.{pennies % 100:02}"
     elif long:
         return f"{pennies} pence"
 

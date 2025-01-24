@@ -317,7 +317,7 @@ def test_register_from_invite(
         "+4407700900460",
         "somreallyhardthingtoguess",
         "sms_auth",
-    ),
+    )
     mock_get_invited_user_by_id.assert_called_once_with(sample_invite["id"])
 
 

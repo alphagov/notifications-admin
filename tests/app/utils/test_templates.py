@@ -849,9 +849,7 @@ def test_email_preview_template_removes_whitespace_before_punctuation(mock_remov
         [
             mock.call(
                 # fmt: off
-                    '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">'
-                    'content'
-                    '</p>'
+                '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">content</p>'
                 # fmt: on
             ),
             mock.call(Markup("subject")),
@@ -931,9 +929,7 @@ def test_email_preview_shows_reply_to_address(extra_args):
     )
     assert '<dt class="govuk-summary-list__key">\n      Reply&nbsp;to\n    </dt>' in str(template)
     assert (
-        '    <dd class="govuk-summary-list__value email-message-meta__reply-to">\n'
-        "      test@example.com\n"
-        "    </dd>"
+        '    <dd class="govuk-summary-list__value email-message-meta__reply-to">\n      test@example.com\n    </dd>'
     ) in str(template)
 
 

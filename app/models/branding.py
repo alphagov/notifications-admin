@@ -214,7 +214,6 @@ class AllEmailBranding(AllBranding):
 
 
 class EmailBrandingPool(AllEmailBranding):
-
     @staticmethod
     def _get_items(*args, **kwargs):
         return organisations_client.get_email_branding_pool(*args, **kwargs)
@@ -234,7 +233,6 @@ class AllLetterBranding(AllBranding):
 
 
 class LetterBrandingPool(AllLetterBranding):
-
     @staticmethod
     def _get_items(*args, **kwargs):
         return organisations_client.get_letter_branding_pool(*args, **kwargs)

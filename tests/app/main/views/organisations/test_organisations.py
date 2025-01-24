@@ -1290,7 +1290,7 @@ def test_archive_organisation_after_confirmation(
     assert normalize_spaces(page.select_one("h1").text) == "Your services"
     assert normalize_spaces(page.select_one(".banner-default-with-tick").text) == "‘Test organisation’ was deleted"
     mock_redis_delete.assert_called_with_args(
-        f'organisation-{organisation_one["id"]}-name',
+        f"organisation-{organisation_one['id']}-name",
         "domains",
         "organisations",
     )
@@ -2205,7 +2205,7 @@ def test_organisation_settings_links_to_edit_organisation_billing_details_page(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get(".organisation_settings", org_id=organisation_one["id"])
-    assert len(page.select(f"""a[href="/organisations/{organisation_one['id']}/settings/edit-billing-details"]""")) == 1
+    assert len(page.select(f"""a[href="/organisations/{organisation_one["id"]}/settings/edit-billing-details"]""")) == 1
 
 
 def test_view_edit_organisation_billing_details(
@@ -2356,7 +2356,7 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_an_unknown_pe
 
     assert page.select_one("h1").string == "Billing"
     assert (
-        f'{organisation_one["name"]} has accepted the GOV.UK Notify data processing and financial agreement.'
+        f"{organisation_one['name']} has accepted the GOV.UK Notify data processing and financial agreement."
     ) in page.text
     assert page.select_one("main a")["href"] == url_for(".organisation_download_agreement", org_id=ORGANISATION_ID)
 
@@ -2386,7 +2386,7 @@ def test_organisation_billing_page_when_the_agreement_is_not_signed(
     )
 
     assert page.select_one("h1").string == "Billing"
-    assert f'{organisation_one["name"]} {expected_content}' in page.text
+    assert f"{organisation_one['name']} {expected_content}" in page.text
 
 
 @pytest.mark.parametrize(

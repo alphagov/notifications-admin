@@ -20,7 +20,7 @@ class ExampleFormSpecialField(Form):
         """
         \t    bar
     """,
-        " \u180E\u200B \u200C bar \u200D \u2060\uFEFF ",
+        " \u180e\u200b \u200c bar \u200d \u2060\ufeff ",
     ],
 )
 @pytest.mark.parametrize(

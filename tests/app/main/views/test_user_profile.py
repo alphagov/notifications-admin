@@ -553,7 +553,7 @@ def test_should_show_manage_security_key_page(
     )
 
     page = client_request.get(".user_profile_manage_security_key", key_id=webauthn_credential["id"])
-    assert page.select_one("h1").text.strip() == f'Manage ‘{webauthn_credential["name"]}’'
+    assert page.select_one("h1").text.strip() == f"Manage ‘{webauthn_credential['name']}’"
 
     assert page.select_one(".govuk-back-link").text.strip() == "Back"
     assert page.select_one(".govuk-back-link")["href"] == url_for(".user_profile_security_keys")
@@ -678,7 +678,7 @@ def test_shows_delete_link_for_security_key(
     )
 
     page = client_request.get(".user_profile_manage_security_key", key_id=webauthn_credential["id"])
-    assert page.select_one("h1").text.strip() == f'Manage ‘{webauthn_credential["name"]}’'
+    assert page.select_one("h1").text.strip() == f"Manage ‘{webauthn_credential['name']}’"
 
     link = page.select_one(".page-footer a")
     assert normalize_spaces(link.text) == "Delete"
@@ -778,7 +778,7 @@ def test_post_user_profile_take_part_in_user_research(client_request, mocker, ac
         _data={"enabled": False},
         _expected_status=302,
         _expected_redirect=url_for("main.user_profile"),
-    ),
+    )
 
     mock_update_consent.assert_called_once_with(active_user_with_permissions["id"], take_part_in_research=False)
 
@@ -810,6 +810,6 @@ def test_post_user_profile_get_emails_about_new_features(client_request, mocker,
         _data={"enabled": False},
         _expected_status=302,
         _expected_redirect=url_for("main.user_profile"),
-    ),
+    )
 
     mock_update.assert_called_once_with(active_user_with_permissions["id"], receives_new_features_email=False)

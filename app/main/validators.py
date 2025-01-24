@@ -52,9 +52,7 @@ class ValidGovEmail:
         message = """
             Enter a public sector email address or
             <a class="govuk-link govuk-link--no-visited-state" href="{}">find out who can use Notify</a>
-        """.format(
-            url_for("main.guidance_who_can_use_notify")
-        )
+        """.format(url_for("main.guidance_who_can_use_notify"))
         if not is_gov_user(field.data.lower()):
             raise ValidationError(message)
 
@@ -187,8 +185,7 @@ class IsNotAGenericSenderID:
 
     def __init__(
         self,
-        message="Text message sender ID cannot be Alert, Info or Verify as those are prohibited due to "
-        "usage by spam",
+        message="Text message sender ID cannot be Alert, Info or Verify as those are prohibited due to usage by spam",
     ):
         self.message = message
 
@@ -198,7 +195,6 @@ class IsNotAGenericSenderID:
 
 
 class IsNotLikeNHSNoReply:
-
     def __call__(self, form, field):
         lower_cased_data = field.data.lower()
         if (
@@ -225,10 +221,8 @@ def create_phishing_senderid_zendesk_ticket(senderID=None):
 
 
 class IsNotAPotentiallyMaliciousSenderID:
-
     def __call__(self, form, field):
         if protected_sender_id_api_client.get_check_sender_id(sender_id=field.data):
-
             create_phishing_senderid_zendesk_ticket(senderID=field.data)
             current_app.logger.warning("User tried to set sender id to potentially malicious one: %s", field.data)
             raise ValidationError(
@@ -286,7 +280,7 @@ class CharactersNotAllowed:
             else:
                 error_message = (
                     f"Cannot contain "
-                    f'{formatted_list(illegal_characters, conjunction="or", before_each="", after_each="")}'
+                    f"{formatted_list(illegal_characters, conjunction='or', before_each='', after_each='')}"
                 )
 
             if hasattr(field, "error_summary_messages"):
@@ -295,7 +289,7 @@ class CharactersNotAllowed:
                 else:
                     error_summary_message = (
                         f"%s cannot contain "
-                        f'{formatted_list(illegal_characters, conjunction="or", before_each="", after_each="")}'
+                        f"{formatted_list(illegal_characters, conjunction='or', before_each='', after_each='')}"
                     )
                 field.error_summary_messages.append(error_summary_message)
 

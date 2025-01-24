@@ -22,6 +22,6 @@ class TestJsonUpdatesBlueprint:
             except AssertionError:
                 bad_views.append(rule.endpoint)
 
-        assert (
-            not bad_views
-        ), f"Some json_updates blueprint views do not return a 401 for unauthorised clients: {bad_views}"
+        assert not bad_views, (
+            f"Some json_updates blueprint views do not return a 401 for unauthorised clients: {bad_views}"
+        )

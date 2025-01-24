@@ -68,9 +68,9 @@ class TestNotifyAdminSessionInterface:
             response = client.get(url_for("main.api_integration", service_id=SERVICE_ONE_ID))
             assert response.status_code == 200
             assert "user_id" not in session, "The session should have expired and the user dropped from the session"
-            assert (
-                "Expires=Fri, 03 Jan 2020 16:00:01 GMT" in response.headers["Set-Cookie"]
-            ), "A new anonymous session should be created with a permanent lifetime of 1 hour"
+            assert "Expires=Fri, 03 Jan 2020 16:00:01 GMT" in response.headers["Set-Cookie"], (
+                "A new anonymous session should be created with a permanent lifetime of 1 hour"
+            )
 
     def test_logged_platform_user_session_full_expiration(
         self,
@@ -127,9 +127,9 @@ class TestNotifyAdminSessionInterface:
             # still actually loads. Let's make assertions about the session instead.
             assert response.status_code == 200
             assert "user_id" not in session, "The session should have expired and the user dropped from the session"
-            assert (
-                "Expires=Wed, 01 Jan 2020 02:00:01 GMT" in response.headers["Set-Cookie"]
-            ), "A new anonymous session should be created with a permanent lifetime of 1 hour"
+            assert "Expires=Wed, 01 Jan 2020 02:00:01 GMT" in response.headers["Set-Cookie"], (
+                "A new anonymous session should be created with a permanent lifetime of 1 hour"
+            )
 
     def test_platform_admin_session_not_renewed_by_json_views(
         self,
@@ -171,9 +171,9 @@ class TestNotifyAdminSessionInterface:
             response = client.get(url_for("json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID))
             assert response.status_code == 200
             assert session["user_id"] == platform_admin_user["id"]
-            assert (
-                "Set-Cookie" not in response.headers
-            ), "We don't update the inactive session timeout when hitting JSON endpoints."
+            assert "Set-Cookie" not in response.headers, (
+                "We don't update the inactive session timeout when hitting JSON endpoints."
+            )
 
         with freezegun.freeze_time("2020-01-01T00:30:01"):
             response = client.get(url_for("json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID))
@@ -183,9 +183,9 @@ class TestNotifyAdminSessionInterface:
             # still actually loads. Let's make assertions about the session/cookies instead.
             assert response.status_code == 200
             assert "user_id" not in session, "The session should have expired and the user dropped from the session"
-            assert (
-                "Set-Cookie" not in response.headers
-            ), "We don't create a new anonymous session token for JSON endpoints"
+            assert "Set-Cookie" not in response.headers, (
+                "We don't create a new anonymous session token for JSON endpoints"
+            )
 
         with freezegun.freeze_time("2020-01-01T00:30:01"):
             response = client.get(url_for("main.service_dashboard", service_id=SERVICE_ONE_ID))

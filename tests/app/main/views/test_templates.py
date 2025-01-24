@@ -1915,7 +1915,7 @@ def test_should_show_sms_template_with_downgraded_unicode_characters(
     single_letter_contact_block,
     fake_uuid,
 ):
-    msg = "here:\tare some “fancy quotes” and zero\u200Bwidth\u200Bspaces"
+    msg = "here:\tare some “fancy quotes” and zero\u200bwidth\u200bspaces"
     rendered_msg = 'here: are some "fancy quotes" and zerowidthspaces'
 
     mocker.patch(
@@ -3982,7 +3982,7 @@ def test_should_create_sms_template_without_downgrading_unicode_characters(
     service_one,
     mock_create_service_template,
 ):
-    msg = "here:\tare some “fancy quotes” and non\u200Bbreaking\u200Bspaces"
+    msg = "here:\tare some “fancy quotes” and non\u200bbreaking\u200bspaces"
 
     client_request.post(
         ".add_service_template",
@@ -4266,7 +4266,7 @@ def test_set_template_sender_escapes_letter_contact_block_names(
         (
             # Length of placeholder body doesn’t count towards fragment count
             False,
-            f'Hello (( {"a" * 999} ))',
+            f"Hello (( {'a' * 999} ))",
             "Will be charged as 1 text message (not including personalisation)",
             None,
         ),

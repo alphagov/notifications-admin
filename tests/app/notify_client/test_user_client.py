@@ -128,13 +128,7 @@ def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(n
 
 
 @pytest.mark.parametrize(
-    (
-        "expected_cache_get_calls,"
-        "cache_value,"
-        "expected_api_calls,"
-        "expected_cache_set_calls,"
-        "expected_return_value,"
-    ),
+    "expected_cache_get_calls,cache_value,expected_api_calls,expected_cache_set_calls,expected_return_value",
     [
         (
             [call(f"user-{user_id}")],

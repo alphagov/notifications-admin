@@ -40,7 +40,6 @@ class SortingAndEqualityMixin(ABC):
 
 
 class JSONModel(SerialisedModel, SortingAndEqualityMixin):
-
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}

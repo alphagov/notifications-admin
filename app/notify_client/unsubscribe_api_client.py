@@ -10,7 +10,6 @@ from app.notify_client import NotifyAdminAPIClient
 
 
 class UnsubscribeApiClient(NotifyAdminAPIClient):
-
     def unsubscribe(self, notification_id, token):
         try:
             self.post(f"/unsubscribe/{notification_id}/{token}", None)

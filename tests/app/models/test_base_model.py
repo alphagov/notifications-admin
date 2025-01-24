@@ -4,7 +4,6 @@ from app.models import JSONModel
 
 
 def test_looks_up_from_dict():
-
     class Custom(JSONModel):
         foo: str
         __sort_attribute__ = "foo"

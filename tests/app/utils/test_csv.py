@@ -26,7 +26,6 @@ def _get_notifications_csv(
     api_key_name=None,
     page_size=50,
 ):
-
     def _get(service_id, page=1, job_id=None, template_type=template_type, page_size=page_size):
         links = {}
         data = {

@@ -2004,7 +2004,7 @@ def test_service_join_request_approved(
     assert f"{mock_requester['name']} has already joined your service" in page.select_one("h1").text.strip()
 
     today_date = format_date_short(datetime.utcnow())
-    assert f"{mock_service_user['name']} approved this request on { today_date }" in page.select_one("p").text.strip()
+    assert f"{mock_service_user['name']} approved this request on {today_date}" in page.select_one("p").text.strip()
 
 
 @pytest.mark.parametrize(
@@ -2051,8 +2051,7 @@ def test_service_join_request_rejected(
 
     today_date = format_date_short(datetime.utcnow())
     assert (
-        f"{mock_service_user['name']} already refused this request on { today_date }"
-        in page.select_one("p").text.strip()
+        f"{mock_service_user['name']} already refused this request on {today_date}" in page.select_one("p").text.strip()
     )
 
 

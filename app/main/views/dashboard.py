@@ -411,8 +411,7 @@ def inbox_download(service_id):
         mimetype="text/csv",
         headers={
             "Content-Disposition": (
-                f"inline; "
-                f'filename="Received text messages {format_date_numeric(datetime.utcnow().isoformat())}.csv"'
+                f'inline; filename="Received text messages {format_date_numeric(datetime.utcnow().isoformat())}.csv"'
             )
         },
     )
@@ -650,7 +649,7 @@ def get_monthly_usage_breakdown_for_letters(monthly_letters):
 
 def get_monthly_usage_postage_description(row):
     if row["postage"] in ("first", "second"):
-        return f'{row["postage"]} class'
+        return f"{row['postage']} class"
     return "international"
 
 

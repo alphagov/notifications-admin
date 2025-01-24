@@ -93,7 +93,6 @@ def create_unsubscribe_request_report(service_id):
 @main.route("/unsubscribe/<uuid:notification_id>/<string:token>", methods=["GET", "POST"])
 @hide_from_search_engines
 def unsubscribe(notification_id, token):
-
     if request.method == "POST":
         if not unsubscribe_api_client.unsubscribe(notification_id, token):
             return render_template("views/unsubscribe-failed.html"), 404
