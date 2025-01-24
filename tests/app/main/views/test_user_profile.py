@@ -773,13 +773,11 @@ def test_post_user_profile_take_part_in_user_research(client_request, mocker, ac
 
     mock_update_consent = mocker.patch("app.user_api_client.update_user_attribute")
 
-    (
-        client_request.post(
-            ".user_profile_take_part_in_user_research",
-            _data={"enabled": False},
-            _expected_status=302,
-            _expected_redirect=url_for("main.user_profile"),
-        ),
+    client_request.post(
+        ".user_profile_take_part_in_user_research",
+        _data={"enabled": False},
+        _expected_status=302,
+        _expected_redirect=url_for("main.user_profile"),
     )
 
     mock_update_consent.assert_called_once_with(active_user_with_permissions["id"], take_part_in_research=False)
@@ -807,13 +805,11 @@ def test_post_user_profile_get_emails_about_new_features(client_request, mocker,
 
     mock_update = mocker.patch("app.user_api_client.update_user_attribute")
 
-    (
-        client_request.post(
-            ".user_profile_get_emails_about_new_features",
-            _data={"enabled": False},
-            _expected_status=302,
-            _expected_redirect=url_for("main.user_profile"),
-        ),
+    client_request.post(
+        ".user_profile_get_emails_about_new_features",
+        _data={"enabled": False},
+        _expected_status=302,
+        _expected_redirect=url_for("main.user_profile"),
     )
 
     mock_update.assert_called_once_with(active_user_with_permissions["id"], receives_new_features_email=False)
