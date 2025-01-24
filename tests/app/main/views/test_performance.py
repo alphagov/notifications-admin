@@ -8,6 +8,8 @@ from tests.conftest import normalize_spaces
 
 
 def _get_example_performance_data():
+    department_of_examples_and_patterns_uuid = uuid.uuid4()
+
     return {
         "total_notifications": 1_789_000_000,
         "email_notifications": 1_123_000_000,
@@ -69,13 +71,13 @@ def _get_example_performance_data():
         ],
         "services_using_notify": [
             {
-                "organisation_id": uuid.uuid4(),
+                "organisation_id": department_of_examples_and_patterns_uuid,
                 "organisation_name": "Department of Examples and Patterns",
                 "service_id": uuid.uuid4(),
                 "service_name": "Example service",
             },
             {
-                "organisation_id": uuid.uuid4(),
+                "organisation_id": department_of_examples_and_patterns_uuid,
                 "organisation_name": "Department of Examples and Patterns",
                 "service_id": uuid.uuid4(),
                 "service_name": "Example service 2",
@@ -95,6 +97,12 @@ def _get_example_performance_data():
                 "service_id": uuid.uuid4(),
                 "service_name": "Example service 4",
             },
+            {
+                "organisation_id": uuid.uuid4(),
+                "organisation_name": "Department to be ignored",
+                "service_id": uuid.uuid4(),
+                "service_name": "Example service 1",
+            },
         ],
     }
 
@@ -105,10 +113,18 @@ def test_should_render_performance_page(
     mock_get_service_and_organisation_counts,
     mocker,
 ):
+    example_performance_data = _get_example_performance_data()
     mock_get_performance_data = mocker.patch(
         "app.performance_dashboard_api_client.get_performance_dashboard_stats",
-        return_value=_get_example_performance_data(),
+        return_value=example_performance_data,
     )
+    # add a thing
+    orgs_to_ignore = [
+        d["organisation_id"]
+        for d in example_performance_data["services_using_notify"]
+        if d["organisation_name"] == "Department to be ignored"
+    ]
+    mocker.patch("app.main.views.performance.ORGS_TO_IGNORE", orgs_to_ignore)
     page = client_request.get("main.performance")
     mock_get_performance_data.assert_called_once_with(
         start_date=date(2020, 12, 25),
@@ -164,10 +180,17 @@ def test_should_return_performance_data_as_json(
     mock_get_service_and_organisation_counts,
     mocker,
 ):
+    example_performance_data = _get_example_performance_data()
     mock_get_performance_data = mocker.patch(
         "app.performance_dashboard_api_client.get_performance_dashboard_stats",
-        return_value=_get_example_performance_data(),
+        return_value=example_performance_data,
     )
+    orgs_to_ignore = [
+        d["organisation_id"]
+        for d in example_performance_data["services_using_notify"]
+        if d["organisation_name"] == "Department to be ignored"
+    ]
+    mocker.patch("app.main.views.performance.ORGS_TO_IGNORE", orgs_to_ignore)
     response = client_request.get_response("main.performance_json")
     assert response.json.keys() == {
         "average_percentage_under_10_seconds",
@@ -185,3 +208,6 @@ def test_should_return_performance_data_as_json(
         start_date=date(2020, 12, 25),
         end_date=date(2021, 1, 1),
     )
+    assert "Department to be ignored" not in [
+        org["organisation_name"] for org in response.json["organisations_using_notify"]
+    ]
