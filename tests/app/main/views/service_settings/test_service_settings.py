@@ -1144,7 +1144,7 @@ def test_request_to_go_live_redirects_if_service_already_live(
 
 
 @pytest.mark.parametrize(
-    ("estimated_sms_volume,organisation_type,count_of_sms_templates,sms_senders,expected_sms_sender_checklist_item"),
+    "estimated_sms_volume,organisation_type,count_of_sms_templates,sms_senders,expected_sms_sender_checklist_item",
     [
         pytest.param(0, "local", 0, [], "", marks=pytest.mark.xfail(raises=IndexError)),
         pytest.param(
