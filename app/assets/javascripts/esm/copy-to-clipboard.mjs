@@ -52,63 +52,64 @@ class CopyToClipBoard {
     };
     this.name = this.$module.dataset.name.toString();
 
-      // if the name is distinct from the thing:
-      // - it will be used in the rendering
-      // - the value won't be identified by a heading so needs its own label
-      if (this.name.toLowerCase() !== this.stateOptions.thing.toLowerCase()) {
-        this.stateOptions.name = this.name;
-        this.stateOptions.valueLabel = true;
+    // if the name is distinct from the thing:
+    // - it will be used in the rendering
+    // - the value won't be identified by a heading so needs its own label
+    if (this.name.toLowerCase() !== this.stateOptions.thing.toLowerCase()) {
+      this.stateOptions.name = this.name;
+      this.stateOptions.valueLabel = true;
+    }
+    this.$module.classList.add('copy-to-clipboard');
+    this.$module.style.minHeight = getComputedStyle(this.$module).height;
+    // button and SR elements are added
+    this.updateHTML('valueVisible', {...{ 'onload': true }, ...this.stateOptions}, this.$module);
+
+    this.$module.addEventListener('click', (e) => {
+      const $target = e.target;
+      if ($target.tagName === "BUTTON") {
+        const buttonWasClicked = $target.classList.contains('copy-to-clipboard__button--show');
+        buttonWasClicked ? this.updateHTML(buttonWasClicked, this.stateOptions, this.$module, $target)
+        : (
+          this.copyValueToClipboard(this.$module.querySelector('.copy-to-clipboard__value').textContent),
+          this.updateHTML(buttonWasClicked, this.stateOptions, this.$module, $target)
+        );
       }
-      this.$module.classList.add('copy-to-clipboard');
-      this.$module.style.minHeight = getComputedStyle(this.$module).height;
+    });
 
-      this.updateHTML('valueVisible', {...{ 'onload': true }, ...this.stateOptions}, this.$module);
-
-      if ('stickAtBottomWhenScrolling' in window.GOVUK) {
-        window.GOVUK.stickAtBottomWhenScrolling.recalculate();
-      }
-
-      this.$module.addEventListener('click', (e) => {
-        const target = e.target;
-        const copyableValue = this.$module.querySelector('.copy-to-clipboard__value').textContent;
-        console.log('target', target);
-        if (target.matches('.copy-to-clipboard__button--copy')) {
-          console.log('yes')
-          this.copyValueToClipboard(copyableValue);
-          this.updateHTML('valueCopied', this.stateOptions, this.$module);  
-        }
-        if (target.matches('.copy-to-clipboard__button--show')) {
-          console.log('no')
-          this.updateHTML('valueVisible', this.stateOptions, this.$module);
-        }
-      });
-
+    if ('stickAtBottomWhenScrolling' in window.GOVUK) {
+      window.GOVUK.stickAtBottomWhenScrolling.recalculate();
+    }
   }
-  updateHTML (stateKey, stateOptions, $module) {
+  
+  updateHTML (buttonWasClicked, stateOptions, $module, $button) {
+    // use the correct state key to updatet he HTML
+    // if the button was clicked then conent needs to change to reflect that
+    // e.g say 'copied, ....
+    const stateKey = buttonWasClicked ? 'valueVisible' : 'valueCopied';
     const state = this.states[stateKey](stateOptions);
-    // getElementsBy* works with dynamically added elements
-    // whereas querySelector does not
-    let $button = this.$module.getElementsByTagName('BUTTON');
 
     $module.querySelectorAll('.copy-to-clipboard__value').forEach(e => e.remove());
     if (state.value !== '') {
       $module.insertAdjacentHTML('afterbegin', state.value);
     }
-
-    const $clipboardNoticeEl = this.$module.querySelector('.copy-to-clipboard__notice');
-    $clipboardNoticeEl.insertAdjacentHTML('afterbegin', state.notice.content);
+    let $clipboardNoticeEl = $module.querySelector('.copy-to-clipboard__notice');
+    $clipboardNoticeEl.innerHTML = state.notice.content;
     $clipboardNoticeEl.setAttribute('class', state.notice.classes);
-    console.log('button length', $button.length)
-    if ($button.length === 0) {
-      const $newButton = document.createElement('button');
-      $newButton.classList.add('govuk-button', 'govuk-button--secondary', 'copy-to-clipboard__button--copy');
-      this.$module.append($newButton);
-      console.log('inserted and length',$button.length)
-    }
-    console.log(state.button.content)
-    $button[0].textContent = state.button.content;
-    // $button[0].removeAttribute('class');
-    $button[0].setAttribute('class', state.button.classes);
+
+    !$button ? this.generateButton(state) : this.updateButton(state, $button)
+  }
+
+  generateButton (state) {
+    let $newButton = document.createElement('button');
+    $newButton.setAttribute('class', state.button.classes);
+    $newButton.textContent = state.button.content;
+    this.$module.append($newButton);
+  }
+
+  updateButton (state, $button) {
+    $button.textContent = state.button.content;
+    $button.removeAttribute('class');
+    $button.setAttribute('class', state.button.classes);
   }
 
   async copyValueToClipboard(text){
