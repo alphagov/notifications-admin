@@ -1,12 +1,10 @@
-const helpers = require('./support/helpers');
+import * as helpers from './support/helpers.js';
+import CopyToClipboard from '../../app/assets/javascripts/esm/copy-to-clipboard.mjs';
+import { beforeEach, jest } from '@jest/globals';
 
-afterAll(() => {
 
-  require('./support/teardown.js');
-
-  // clear up methods in the global space
-  document.queryCommandSupported = undefined;
-
+beforeAll(() => {
+  document.body.classList.add('govuk-frontend-supported');
 });
 
 describe('copy to clipboard', () => {
@@ -14,7 +12,6 @@ describe('copy to clipboard', () => {
   let apiKey = '00000000-0000-0000-0000-000000000000';
   let thing;
   let component;
-  let selectionMock;
   let rangeMock;
 
   const setUpDOM = function (options) {
@@ -32,17 +29,11 @@ describe('copy to clipboard', () => {
   };
 
   beforeEach(() => {
-
     // mock objects used to manipulate the page selection
-    selectionMock = new helpers.SelectionMock(jest);
     rangeMock = new helpers.RangeMock(jest);
 
-    // plug gaps in JSDOM's API for manipulation of selections
-    window.getSelection = jest.fn(() => selectionMock);
+    // plug gaps in JSDOM's API for Range
     document.createRange = jest.fn(() => rangeMock);
-
-    // plug JSDOM not having execCommand
-    document.execCommand = jest.fn(() => {});
 
     // mock sticky JS
     window.GOVUK.stickAtBottomWhenScrolling = {
@@ -51,43 +42,39 @@ describe('copy to clipboard', () => {
 
   });
 
-  test("If copy command isn't available, nothing should happen", () => {
+  test("If Clipboard API isn't supported, nothing should happen", () => {
 
-    // fake support for the copy command not being available
-    document.queryCommandSupported = jest.fn(command => false);
-
-    require('../../app/assets/javascripts/copyToClipboard.js');
+    // fake Clipboard API not being available
+    navigator.clipboard = false
 
     setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
     component = document.querySelector('[data-notify-module=copy-to-clipboard]');
 
     // start the module
-    window.GOVUK.notifyModules.start();
+    new CopyToClipboard(component);
 
     expect(component.querySelector('button')).toBeNull();
 
   });
 
-  describe("If copy command is available", () => {
-
-    let componentHeightOnLoad;
+  describe("If Clipboard API is supported", () => {
 
     beforeAll(() => {
-
-      // assume copy command is available
-      document.queryCommandSupported = jest.fn(command => command === 'copy');
-
       // force module require to not come from cache
       jest.resetModules();
 
-      require('../../app/assets/javascripts/copyToClipboard.js');
-
     });
 
-    afterEach(() => {
-      screenMock.reset();
-    });
+    beforeEach(() => {
+      // mock Clipboard API availability
+      Object.assign(navigator, {
+        clipboard: { 
+          writeText: jest.fn().mockImplementation(() => Promise.resolve()),
+        },
+      });
+
+    })
 
     describe("On page load", () => {
 
@@ -99,28 +86,8 @@ describe('copy to clipboard', () => {
 
           component = document.querySelector('[data-notify-module=copy-to-clipboard]');
 
-          // set default style for component height (queried by jQuery before checking DOM APIs)
-          const stylesheet = document.createElement('style');
-          stylesheet.innerHTML = '[data-notify-module=copy-to-clipboard] { height: auto; }'; // set to browser default
-          document.getElementsByTagName('head')[0].appendChild(stylesheet);
-
-          componentHeightOnLoad = 50;
-
-          // mock the DOM APIs called for the position & dimension of the component
-          screenMock = new helpers.ScreenMock(jest);
-          screenMock.setWindow({
-            width: 1990,
-            height: 940,
-            scrollTop: 0
-          });
-          screenMock.mockPositionAndDimension('component', component, {
-            offsetHeight: componentHeightOnLoad,
-            offsetWidth: 641,
-            offsetTop: 0
-          });
-
           // start the module
-          window.GOVUK.notifyModules.start();
+          new CopyToClipboard(component);
 
         });
 
@@ -143,13 +110,6 @@ describe('copy to clipboard', () => {
 
         });
 
-        test("It should set the component's minimum height based on its height when the page loads", () => {
-
-          // to prevent the position of the button moving when the state changes
-          expect(window.getComputedStyle(component)['min-height']).toEqual(`${componentHeightOnLoad}px`);
-
-        });
-
         test("It should render the 'thing' without extra whitespace", () => {
 
           expect(component.querySelector('.copy-to-clipboard__value').textContent).toBe('00000000-0000-0000-0000-000000000000');
@@ -169,7 +129,7 @@ describe('copy to clipboard', () => {
           component = document.querySelector('[data-notify-module=copy-to-clipboard]');
 
           // start the module
-          window.GOVUK.notifyModules.start();
+          new CopyToClipboard(component);
 
         });
 
@@ -205,7 +165,7 @@ describe('copy to clipboard', () => {
           component = document.querySelector('[data-notify-module=copy-to-clipboard]');
 
           // start the module
-          window.GOVUK.notifyModules.start();
+          new CopyToClipboard(component);
 
         });
 
@@ -220,6 +180,19 @@ describe('copy to clipboard', () => {
 
       });
 
+      test("It should add a button for copying the thing to the clipboard", () => {
+
+        setUpDOM({ 'thing': 123456, 'name': 987654 });
+
+        component = document.querySelector('[data-notify-module=copy-to-clipboard]');
+
+        // start the module
+        new CopyToClipboard(component);
+
+        expect(component.querySelector('button')).not.toBeNull();
+
+      });
+
     });
 
     describe("If you click the 'Copy Some Thing to clipboard' button", () => {
@@ -227,20 +200,26 @@ describe('copy to clipboard', () => {
       describe("For all variations of the initial HTML", () => {
 
         let keyEl;
+        const originalClipboard = navigator.clipboard;
 
         beforeEach(() => {
 
           setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
-          // start the module
-          window.GOVUK.notifyModules.start();
-
           component = document.querySelector('[data-notify-module=copy-to-clipboard]');
+          // start the module
+          new CopyToClipboard(component);
+
           keyEl = component.querySelector('.copy-to-clipboard__value');
 
           helpers.triggerEvent(component.querySelector('button'), 'click');
 
         });
+
+        afterEach(() => {
+          // reset clipboard to original state
+          navigator.clipboard = originalClipboard;
+        })
 
         test("The live-region should be shown and its text should confirm the copy action", () => {
 
@@ -285,14 +264,9 @@ describe('copy to clipboard', () => {
           expect(rangeMock.selectNodeContents.mock.calls[0]).toEqual([keyEl]);
 
           // that selection (a range) should be added to that for the page (a selection)
-          expect(selectionMock.addRange.mock.calls[0]).toEqual([rangeMock]);
-
-          expect(document.execCommand).toHaveBeenCalled();
-          expect(document.execCommand.mock.calls[0]).toEqual(['copy']);
+          expect(window.navigator.clipboard.writeText).toHaveBeenCalledWith(rangeMock);
 
           // reset any methods in the global space
-          window.queryCommandSupported = undefined;
-          window.getSelection = undefined;
           document.createRange = undefined;
 
         });
@@ -331,10 +305,10 @@ describe('copy to clipboard', () => {
           // different, it will be one of others called the same 'thing'.
           setUpDOM({ 'thing': 'ID', 'name': 'Default' });
 
-          // start the module
-          window.GOVUK.notifyModules.start();
-
           component = document.querySelector('[data-notify-module=copy-to-clipboard]');
+
+          // start the module
+          new CopyToClipboard(component);
 
           helpers.triggerEvent(component.querySelector('button'), 'click');
 
@@ -357,8 +331,6 @@ describe('copy to clipboard', () => {
           expect(rangeMock.setStart.mock.calls[0][1]).toEqual(1);
 
           // reset any methods in the global space
-          window.queryCommandSupported = undefined;
-          window.getSelection = undefined;
           document.createRange = undefined;
 
         });
@@ -374,10 +346,10 @@ describe('copy to clipboard', () => {
           // the only one of its type there
           setUpDOM({ 'thing': 'Some Thing', 'name': 'Some Thing' });
 
-          // start the module
-          window.GOVUK.notifyModules.start();
-
           component = document.querySelector('[data-notify-module=copy-to-clipboard]');
+
+          // start the module
+          new CopyToClipboard(component);
 
           helpers.triggerEvent(component.querySelector('button'), 'click');
 
@@ -398,8 +370,6 @@ describe('copy to clipboard', () => {
           expect(rangeMock.setStart).not.toHaveBeenCalled();
 
           // reset any methods in the global space
-          window.queryCommandSupported = undefined;
-          window.getSelection = undefined;
           document.createRange = undefined;
 
         });
