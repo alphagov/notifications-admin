@@ -3227,7 +3227,7 @@ def mock_get_free_sms_fragment_limit(notify_admin, mocker):
 
 @pytest.fixture(scope="function")
 def mock_create_or_update_free_sms_fragment_limit(notify_admin, mocker):
-    sample_limit = 250000
+    sample_limit = {"free_sms_fragment_limit": 250000}
     return mocker.patch("app.billing_api_client.create_or_update_free_sms_fragment_limit", return_value=sample_limit)
 
 
