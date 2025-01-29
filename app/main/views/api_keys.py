@@ -159,7 +159,7 @@ def check_token_against_dummy_bearer(token):
 @user_has_permissions("manage_api_keys")
 def api_callbacks(service_id):
     if not current_service.has_permission("inbound_sms") and not current_service.has_permission("letter"):
-        return redirect(url_for(".returned_letters_callback", service_id=service_id))
+        return redirect(url_for(".delivery_status_callback", service_id=service_id))
     delivery_status_callback, received_text_messages_callback = get_apis()
     returned_letters_callback = None
     returned_letters_callback = {"url": "https://test.test.com"}
