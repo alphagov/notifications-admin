@@ -255,6 +255,7 @@ EXCLUDED_ENDPOINTS = set(
             "returned_letter_summary",
             "returned_letters_report",
             "returned_letters",
+            "returned_letters_callback",
             "revalidate_email_sent",
             "revoke_api_key",
             "save_contact_list",

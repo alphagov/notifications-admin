@@ -24,7 +24,11 @@ dummy_bearer_token = "bearer_token_set"
 @main.route("/services/<uuid:service_id>/api")
 @user_has_permissions("manage_api_keys")
 def api_integration(service_id):
-    callbacks_link = ".api_callbacks" if current_service.has_permission("inbound_sms") else ".delivery_status_callback"
+    callbacks_link = (
+        ".api_callbacks"
+        if current_service.has_permission("inbound_sms") or current_service.has_permission("letter")
+        else ".delivery_status_callback"
+    )  # noqa: E501
     return render_template(
         "views/api/index.html",
         callbacks_link=callbacks_link,
@@ -38,7 +42,11 @@ def api_documentation(service_id):
     return redirect(url_for(".guidance_api_documentation"), code=301)
 
 
-@main.route("/services/<uuid:service_id>/api/whitelist", methods=["GET", "POST"], endpoint="old_guest_list")
+@main.route(
+    "/services/<uuid:service_id>/api/whitelist",
+    methods=["GET", "POST"],
+    endpoint="old_guest_list",
+)
 @main.route("/services/<uuid:service_id>/api/guest-list", methods=["GET", "POST"])
 @user_has_permissions("manage_api_keys")
 def guest_list(service_id):
@@ -93,7 +101,9 @@ def create_api_key(service_id):
         if current_service.trial_mode and form.key_type.data == KEY_TYPE_NORMAL:
             abort(400)
         secret = api_key_api_client.create_api_key(
-            service_id=service_id, key_name=form.key_name.data, key_type=form.key_type.data
+            service_id=service_id,
+            key_name=form.key_name.data,
+            key_type=form.key_type.data,
         )
         return render_template(
             "views/api/keys/show.html",
@@ -154,17 +164,18 @@ def check_token_against_dummy_bearer(token):
 @main.route("/services/<uuid:service_id>/api/callbacks", methods=["GET"])
 @user_has_permissions("manage_api_keys")
 def api_callbacks(service_id):
-    if not current_service.has_permission("inbound_sms"):
+    if not current_service.has_permission("inbound_sms") and not current_service.has_permission("letter"):
         return redirect(url_for(".delivery_status_callback", service_id=service_id))
-
     delivery_status_callback, received_text_messages_callback = get_apis()
-
+    returned_letters_callback = None
+    returned_letters_callback = {"url": "https://test.test.com"}
     return render_template(
         "views/api/callbacks.html",
         received_text_messages_callback=(
             received_text_messages_callback["url"] if received_text_messages_callback else None
         ),
-        delivery_status_callback=delivery_status_callback["url"] if delivery_status_callback else None,
+        delivery_status_callback=(delivery_status_callback["url"] if delivery_status_callback else None),
+        returned_letters_callback=(returned_letters_callback["url"] if returned_letters_callback else None),
     )
 
 
@@ -180,7 +191,10 @@ def get_delivery_status_callback_details():
                     return service_api_client.get_service_callback_api(current_service.id, row["callback_id"])
 
 
-@main.route("/services/<uuid:service_id>/api/callbacks/delivery-status-callback", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/api/callbacks/delivery-status-callback",
+    methods=["GET", "POST"],
+)
 @user_has_permissions("manage_api_keys")
 def delivery_status_callback(service_id):
     delivery_status_callback = get_delivery_status_callback_details()
@@ -208,7 +222,10 @@ def delivery_status_callback(service_id):
             )
         elif form.url.data:
             service_api_client.create_service_callback_api(
-                service_id, url=form.url.data, bearer_token=form.bearer_token.data, user_id=current_user.id
+                service_id,
+                url=form.url.data,
+                bearer_token=form.bearer_token.data,
+                user_id=current_user.id,
             )
         else:
             # If no callback is set up and the user chooses to continue
@@ -230,7 +247,10 @@ def get_received_text_messages_callback():
         return service_api_client.get_service_inbound_api(current_service.id, current_service.inbound_api[0])
 
 
-@main.route("/services/<uuid:service_id>/api/callbacks/received-text-messages-callback", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/api/callbacks/received-text-messages-callback",
+    methods=["GET", "POST"],
+)
 @user_has_permissions("manage_api_keys")
 def received_text_messages_callback(service_id):
     if not current_service.has_permission("inbound_sms"):
@@ -238,7 +258,7 @@ def received_text_messages_callback(service_id):
 
     received_text_messages_callback = get_received_text_messages_callback()
     form = CallbackForm(
-        url=received_text_messages_callback.get("url") if received_text_messages_callback else "",
+        url=(received_text_messages_callback.get("url") if received_text_messages_callback else ""),
         bearer_token=dummy_bearer_token if received_text_messages_callback else "",
     )
 
@@ -262,10 +282,68 @@ def received_text_messages_callback(service_id):
             )
         elif form.url.data:
             service_api_client.create_service_inbound_api(
-                service_id, url=form.url.data, bearer_token=form.bearer_token.data, user_id=current_user.id
+                service_id,
+                url=form.url.data,
+                bearer_token=form.bearer_token.data,
+                user_id=current_user.id,
             )
         return redirect(url_for(".api_callbacks", service_id=service_id))
     return render_template(
         "views/api/callbacks/received-text-messages-callback.html",
+        form=form,
+    )
+
+
+@main.route(
+    "/services/<uuid:service_id>/api/callbacks/returned-letters-callback",
+    methods=["GET", "POST"],
+)
+@user_has_permissions("manage_api_keys")
+def returned_letters_callback(service_id):
+    delivery_status_callback = get_delivery_status_callback_details()
+    back_link = (
+        ".api_callbacks"
+        if current_service.has_permission("inbound_sms") or current_service.has_permission("letter")
+        else ".api_integration"
+    )
+
+    form = CallbackForm(
+        url=delivery_status_callback.get("url") if delivery_status_callback else "",
+        bearer_token=dummy_bearer_token if delivery_status_callback else "",
+    )
+
+    if form.validate_on_submit():
+        if delivery_status_callback and form.url.data:
+            if delivery_status_callback.get("url") != form.url.data or form.bearer_token.data != dummy_bearer_token:
+                service_api_client.update_service_callback_api(
+                    service_id,
+                    url=form.url.data,
+                    bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
+                    user_id=current_user.id,
+                    callback_api_id=delivery_status_callback.get("id"),
+                )
+        elif delivery_status_callback and not form.url.data:
+            service_api_client.delete_service_callback_api(
+                service_id,
+                delivery_status_callback["id"],
+            )
+        elif form.url.data:
+            service_api_client.create_service_callback_api(
+                service_id,
+                url=form.url.data,
+                bearer_token=form.bearer_token.data,
+                user_id=current_user.id,
+            )
+        else:
+            # If no callback is set up and the user chooses to continue
+            # having no callback (ie both fields empty) then there’s
+            # nothing for us to do here
+            pass
+
+        return redirect(url_for(back_link, service_id=service_id))
+
+    return render_template(
+        "views/api/callbacks/returned-letters-callback.html",
+        back_link=back_link,
         form=form,
     )
