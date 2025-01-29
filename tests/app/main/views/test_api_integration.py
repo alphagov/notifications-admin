@@ -950,6 +950,6 @@ def test_callbacks_page_works_when_no_apis_set(
         expected_2nd_table_row,
     ]
     rows = page.select("tbody tr")
-    assert len(rows) == 2
+    assert len(rows) == 3
     for index, row in enumerate(expected_rows):
         assert row == normalize_spaces(rows[index].text)
