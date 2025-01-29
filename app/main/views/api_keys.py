@@ -24,8 +24,11 @@ dummy_bearer_token = "bearer_token_set"
 @main.route("/services/<uuid:service_id>/api")
 @user_has_permissions("manage_api_keys")
 def api_integration(service_id):
-    # callbacks_link = ".api_callbacks" if current_service.has_permission("inbound_sms") else ".delivery_status_callback" # noqa: E501
-    callbacks_link = ".api_callbacks"
+    callbacks_link = (
+        ".api_callbacks"
+        if current_service.has_permission("inbound_sms") or current_service.has_permission("letter")
+        else ".delivery_status_callback"
+    )  # noqa: E501
     return render_template(
         "views/api/index.html",
         callbacks_link=callbacks_link,

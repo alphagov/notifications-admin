@@ -140,6 +140,7 @@
     "/services/<uuid:service_id>/api/callbacks",
     "/services/<uuid:service_id>/api/callbacks/delivery-status-callback",
     "/services/<uuid:service_id>/api/callbacks/received-text-messages-callback",
+    "/services/<uuid:service_id>/api/callbacks/returned-letters-callback",
     "/services/<uuid:service_id>/api/documentation",
     "/services/<uuid:service_id>/api/guest-list",
     "/services/<uuid:service_id>/api/keys",
