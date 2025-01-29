@@ -77,7 +77,6 @@ export default [
   {
     input: [
       paths.npm + 'jquery/dist/jquery.min.js',
-      paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
       paths.npm + 'timeago/jquery.timeago.js',
       paths.npm + 'textarea-caret/index.js',
       paths.npm + 'cbor-js/cbor.js',
