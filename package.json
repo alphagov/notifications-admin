@@ -59,7 +59,8 @@
   },
   "overrides": {
     "minimist": "1.2.6",
-    "lodash.template": "4.5.0"
+    "lodash.template": "4.5.0",
+    "chokidar": "^4.0.3"
   },
   "jest": {
     "setupFiles": [
