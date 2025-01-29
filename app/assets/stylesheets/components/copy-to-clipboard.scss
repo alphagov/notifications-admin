@@ -1,8 +1,9 @@
 .copy-to-clipboard {
 
   position: relative;
-  padding-bottom: 38px;  // height of button
   display: flex;
+  align-items: flex-start;
+  flex-direction: column;
 
   &__name {
     @include govuk-font(19, $weight: bold);
@@ -15,19 +16,6 @@
     display: block;
     padding: 0 0 10px 0;
     margin: auto 0;
-  }
-
-  &__button--show,
-  &__button--copy {
-
-    position: absolute;
-    bottom: 2px;
-    left: 0px;
-
-    &:active {
-      top: auto;
-    }
-
   }
 
 }
