@@ -735,22 +735,30 @@ def test_callback_forms_can_be_cleared_when_callback_and_inbound_apis_are_empty(
 
 
 @pytest.mark.parametrize(
-    "has_inbound_sms, expected_link",
+    "has_inbound_sms, has_letter, expected_link",
     [
-        (True, "main.api_callbacks"),
-        (False, "main.delivery_status_callback"),
+        (True, True, "main.api_callbacks"),
+        (True, False, "main.api_callbacks"),
+        (False, True, "main.api_callbacks"),
+        (False, False, "main.delivery_status_callback"),
     ],
 )
-def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_inbound_sms(
+def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_inbound_sms_and_no_letter(
     client_request,
     service_one,
     mock_get_notifications,
     mock_get_service_data_retention,
     has_inbound_sms,
+    has_letter,
     expected_link,
 ):
+    service_one["permissions"] = []
     if has_inbound_sms:
         service_one["permissions"] = ["inbound_sms"]
+    if has_letter:
+        service_one["permissions"] = ["letter"]
+    if has_inbound_sms and has_letter:
+        service_one["permissions"] = ["inbound_sms", "letter"]
 
     page = client_request.get(
         "main.api_integration",
@@ -967,6 +975,6 @@ def test_callbacks_page_works_when_no_apis_set(
         expected_2nd_table_row,
     ]
     rows = page.select("tbody tr")
-    assert len(rows) == 2
+    assert len(rows) == 3
     for index, row in enumerate(expected_rows):
         assert row == normalize_spaces(rows[index].text)

@@ -326,6 +326,7 @@ class MainNavigation(Navigation):
             "create_api_key",
             "delivery_status_callback",
             "received_text_messages_callback",
+            "returned_letters_callback",
             "revoke_api_key",
             "guest_list",
             "old_guest_list",
