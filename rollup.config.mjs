@@ -103,6 +103,7 @@ export default [
       paths.src + 'javascripts/updateContent.js',
       paths.src + 'javascripts/templateFolderForm.js',
       paths.src + 'javascripts/updateStatus.js',
+      paths.src + 'javascripts/authenticateSecurityKey.js',
       paths.src + 'javascripts/errorBanner.js',
       paths.src + 'javascripts/main.js',
     ],
