@@ -91,7 +91,7 @@ def test_invalid_list_of_white_list_email_domains(
 def test_uk_mobile_number_validation_messages_match(mocker):
     mock_field = _gen_mock_field("notanumber", error_summary_messages=[])
     mocker.patch(
-        "app.main.validators.validate_phone_number",
+        "app.main.validators.PhoneNumber",
         side_effect=InvalidPhoneError(code=InvalidPhoneError.Codes.UNKNOWN_CHARACTER),
     )
     with pytest.raises(ValidationError) as error:
