@@ -36,7 +36,6 @@ def _gen_mock_field(x, **kwargs):
         "test@gov.police.uk",
         "test@GOV.PoliCe.uk",
         "test@cjsm.net",
-        "test@example.ac.uk",
         "test@example.sch.uk",
     ],
 )
@@ -76,6 +75,7 @@ def test_valid_list_of_white_list_email_domains(
         "test@police.test.uk",
         "test@ucds.com",
         "test@123bl.uk",
+        "test@example.ac.uk",
     ],
 )
 def test_invalid_list_of_white_list_email_domains(
