@@ -77,7 +77,6 @@ export default [
   {
     input: [
       paths.npm + 'jquery/dist/jquery.min.js',
-      paths.npm + 'query-command-supported/dist/queryCommandSupported.min.js',
       paths.npm + 'timeago/jquery.timeago.js',
       paths.npm + 'textarea-caret/index.js',
       paths.npm + 'cbor-js/cbor.js',
@@ -85,7 +84,6 @@ export default [
       paths.src + 'javascripts/govuk-frontend-toolkit/show-hide-content.js',
       paths.src + 'javascripts/stick-to-window-when-scrolling.js',
       paths.src + 'javascripts/cookieCleanup.js',
-      paths.src + 'javascripts/copyToClipboard.js',
       paths.src + 'javascripts/enhancedTextbox.js',
       paths.src + 'javascripts/radioSelect.js',
       paths.src + 'javascripts/updateContent.js',
