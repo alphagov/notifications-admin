@@ -32,12 +32,13 @@ from notifications_utils.formatters import (
     get_lines_with_normalised_whitespace,
 )
 from notifications_utils.logging import flask as utils_logging
-from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
 from notifications_utils.safe_string import make_string_safe_for_email_local_part, make_string_safe_for_id
 from notifications_utils.sanitise_text import SanitiseASCII
 from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
+
+from app.formatters import format_phone_number_human_readable
 
 # must be declared before rest of app is imported to satisfy circular import
 # ruff: noqa: E402

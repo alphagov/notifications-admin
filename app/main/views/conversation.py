@@ -1,10 +1,10 @@
 from flask import jsonify, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
 from notifications_utils.template import SMSPreviewTemplate
 
 from app import current_service, notification_api_client, service_api_client
+from app.formatters import format_phone_number_human_readable
 from app.main import json_updates, main
 from app.main.forms import SearchByNameForm
 from app.models.notification import InboundSMSMessage, InboundSMSMessages, Notifications
