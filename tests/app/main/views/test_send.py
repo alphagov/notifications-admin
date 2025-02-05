@@ -4442,6 +4442,7 @@ def test_send_from_contact_list(
             template_id=fake_uuid,
             upload_id=new_uuid,
             contact_list_id=fake_uuid,
+            emergency_contact=True,
         ),
     )
     mock_download.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, bucket="test-contact-list")
@@ -4519,3 +4520,74 @@ def test_send_to_myself_404s_for_letter(
         template_id=fake_uuid,
         _expected_status=404,
     )
+
+
+def test_can_send_from_emergency_contact_list_with_error_rows(
+    client_request,
+    mock_get_service_template,
+    mock_s3_download,
+    service_one,
+    mock_get_job_doesnt_exist,
+    fake_uuid,
+    mocker,
+):
+    service_one["restricted"] = False
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value="""
+            phone number
+            +1 800 555 5555
+        """,
+    )
+    mocker.patch(
+        "app.main.views.send.get_csv_metadata",
+        return_value={"original_file_name": "example.csv"},
+    )
+    mocker.patch("app.main.views.send.job_api_client.has_sent_previously", return_value=False)
+    mocker.patch("app.main.views.send.set_metadata_on_csv_upload")
+    page = client_request.get(
+        "main.check_messages",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        _test_page_title=False,
+        _follow_redirects=True,
+        emergency_contact=True,
+    )
+    assert not page.select_one(".banner-dangerous")
+    assert page.select_one(".govuk-button").text.strip() == "Send 1 text message"
+
+
+def test_job_not_from_emergency_contact_list_with_error_rows(
+    client_request,
+    mock_get_service_template,
+    mock_s3_download,
+    service_one,
+    mock_get_job_doesnt_exist,
+    fake_uuid,
+    mocker,
+):
+    service_one["restricted"] = False
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value="""
+            phone number
+            +1 800 555 5555
+        """,
+    )
+    mocker.patch(
+        "app.main.views.send.get_csv_metadata",
+        return_value={"original_file_name": "example.csv"},
+    )
+    mocker.patch("app.main.views.send.job_api_client.has_sent_previously", return_value=False)
+    mocker.patch("app.main.views.send.set_metadata_on_csv_upload")
+    page = client_request.get(
+        "main.check_messages",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        _test_page_title=False,
+        _follow_redirects=True,
+    )
+    assert "There’s a problem with example.csv" in page.select_one(".banner-dangerous").text.strip()
+    assert "You need to fix 1 phone number." in page.select_one(".banner-dangerous").text.strip()
