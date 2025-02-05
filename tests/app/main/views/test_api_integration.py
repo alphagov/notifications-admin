@@ -558,8 +558,8 @@ def test_should_update_guestlist(
     data = {
         "email_addresses-1": "test@example.com",
         "email_addresses-3": "test@example.com",
-        "phone_numbers-0": "07988057616",
-        "phone_numbers-2": "+1 202-555-0104",
+        "phone_numbers-0": "07900900000",
+        "phone_numbers-2": "+1800-555-555",
     }
 
     client_request.post(
@@ -572,7 +572,7 @@ def test_should_update_guestlist(
         SERVICE_ONE_ID,
         {
             "email_addresses": ["test@example.com", "test@example.com"],
-            "phone_numbers": ["07988057616", "+1 202-555-0104"],
+            "phone_numbers": ["07900900000", "+1800-555-555"],
         },
     )
 

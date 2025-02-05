@@ -38,7 +38,7 @@ def test_logged_in_user_redirects_to_account(
     "phone_number_to_register_with",
     [
         "+4407700900460",
-        "+1 202-555-0104",
+        "+1800-555-555",
     ],
 )
 @pytest.mark.parametrize(

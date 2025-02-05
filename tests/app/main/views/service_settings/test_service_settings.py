@@ -4917,7 +4917,7 @@ def test_send_files_by_email_contact_details_prefills_the_form_with_the_existing
     [
         ("url", "http://example.com/", "http://new-link.com/"),
         ("email_address", "old@example.com", "new@example.com"),
-        ("phone_number", "020 3451 9002", "020 3451 9001"),
+        ("phone_number", "0207 12345", "0207 56789"),
     ],
 )
 def test_send_files_by_email_contact_details_updates_contact_details_and_redirects_to_settings_page(

@@ -426,7 +426,7 @@ def inbound_sms_json():
                 (4, 5, "33(0)1 12345678"),  # France
                 (5, 7, "1-202-555-0104"),  # USA in one format
                 (6, 9, "+12025550104"),  # USA in another format
-                (7, 9, "+68223001"),  # Cook Islands
+                (7, 9, "+68212345"),  # Cook Islands
             )
         ],
     }

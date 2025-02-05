@@ -7,7 +7,7 @@ from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
-from notifications_utils.recipient_validation.phone_number import PhoneNumber
+from notifications_utils.recipient_validation.phone_number import PhoneNumber, validate_phone_number
 from notifications_utils.sanitise_text import SanitiseSMS
 from ordered_set import OrderedSet
 from wtforms import ValidationError
@@ -95,17 +95,19 @@ class ValidPhoneNumber:
         InvalidPhoneError.Codes.NOT_A_UK_MOBILE: "%s does not look like a UK mobile number",
         InvalidPhoneError.Codes.UNSUPPORTED_COUNTRY_CODE: "Country code for %s not found",
         InvalidPhoneError.Codes.UNKNOWN_CHARACTER: "%s can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + -",
-        InvalidPhoneError.Codes.INVALID_NUMBER: "%s is not valid – double check the phone number you entered",
     }
 
     def __call__(self, form, field):
         try:
             if field.data:
-                number = PhoneNumber(field.data)
-                number.validate(
-                    allow_international_number=self.allow_international_sms,
-                    allow_uk_landline=self.allow_sms_to_uk_landlines,
-                )
+                if self.allow_sms_to_uk_landlines:
+                    number = PhoneNumber(field.data)
+                    number.validate(
+                        allow_international_number=self.allow_international_sms,
+                        allow_uk_landline=self.allow_sms_to_uk_landlines,
+                    )
+                else:
+                    validate_phone_number(field.data, international=self.allow_international_sms)
         except InvalidPhoneError as e:
             error_message = str(e)
             if hasattr(field, "error_summary_messages"):
