@@ -600,6 +600,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
     except HTTPError as e:
         if e.status_code != 404:
             raise
+
     contents = s3download(service_id, upload_id)
 
     template = current_service.get_template_with_user_permission_or_403(
@@ -624,6 +625,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
     elif template.template_type == "sms":
         template.sender = get_sms_sender_from_session()
         template.show_sender = bool(template.sender)
+
     recipients = RecipientCSV(
         contents,
         template=template,
@@ -640,8 +642,8 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
         allow_international_sms=current_service.has_permission("international_sms"),
         allow_sms_to_uk_landline=current_service.has_permission("sms_to_uk_landlines"),
         allow_international_letters=current_service.has_permission("international_letters"),
-        should_validate_phone_number=False,
     )
+
     if request.args.get("from_test"):
         # only happens if generating a letter preview test
         back_link = url_for("main.send_one_off", service_id=service_id, template_id=template.id)
@@ -657,7 +659,9 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
         template.values = recipients[preview_row - 2].recipient_and_personalisation
     elif preview_row > 2:
         abort(404)
+
     original_file_name = get_csv_metadata(service_id, upload_id).get("original_file_name", "")
+
     return {
         "recipients": recipients,
         "template": template,
@@ -695,6 +699,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row):
 def check_messages(service_id, template_id, upload_id, row_index=2):
     data = _check_messages(service_id, template_id, upload_id, row_index)
     data["allowed_file_extensions"] = Spreadsheet.ALLOWED_FILE_EXTENSIONS
+
     if (
         data["recipients"].too_many_rows
         or not data["count_of_recipients"]

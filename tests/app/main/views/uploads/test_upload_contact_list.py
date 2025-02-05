@@ -127,11 +127,11 @@ def test_upload_contact_list_page(client_request):
         (
             """
             phone number
-            +44770
+            +447700900
         """,
             "There’s a problem with invalid.csv You need to fix 1 phone number.",
             "Row in file 1 phone number",
-            "2 Mobile number is too short +44770",
+            "2 Mobile number is too short +447700900",
         ),
         (
             """

@@ -113,6 +113,7 @@ def test_form_phone_number_allows_non_emergency_3_digit_numbers(notify_admin, sh
 
     with notify_admin.test_request_context(method="POST", data=data):
         form = ServiceContactDetailsForm()
+
         if allowed:
             assert form.validate_on_submit()
             assert len(form.errors) == 0
@@ -121,17 +122,3 @@ def test_form_phone_number_allows_non_emergency_3_digit_numbers(notify_admin, sh
             assert not form.validate_on_submit()
             assert len(form.errors) == 1
             assert form.errors["phone_number"] == ["Phone number cannot be an emergency number"]
-
-
-@pytest.mark.parametrize(
-    "short_number, allowed",
-    (("01572 812241 7081", True),),
-)
-def test_form_phone_number_allows_non_emergency_numbers_with_extensions(notify_admin, short_number, allowed):
-    data = {"contact_details_type": "phone_number", "phone_number": short_number}
-
-    with notify_admin.test_request_context(method="POST", data=data):
-        form = ServiceContactDetailsForm()
-        assert form.validate_on_submit()
-        assert len(form.errors) == 0
-        assert form.errors == {}
