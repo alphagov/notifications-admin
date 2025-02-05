@@ -4,7 +4,6 @@ nhs.net
 nhs.scot
 police.uk
 cjsm.net
-ac.uk
 sch.uk
 hscni.net
 llyw.cymru
