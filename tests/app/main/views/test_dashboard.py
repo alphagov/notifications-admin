@@ -269,7 +269,7 @@ def test_inbound_messages_shows_count_of_messages_when_there_are_no_messages(
             "+33 1 12 34 56 78 message-5 5 hours ago",
             "+1 202-555-0104 message-6 7 hours ago",
             "+1 202-555-0104 message-7 9 hours ago",
-            "+682 12345 message-8 9 hours ago",
+            "+682 23 001 message-8 9 hours ago",
         ]
     ),
 )
@@ -437,7 +437,7 @@ def test_download_inbox(
         "+33 1 12 34 56 78,message-5,2016-07-01 08:59\r\n"
         "+1 202-555-0104,message-6,2016-07-01 06:59\r\n"
         "+1 202-555-0104,message-7,2016-07-01 04:59\r\n"
-        "+682 12345,message-8,2016-07-01 04:59\r\n"
+        "+682 23 001,message-8,2016-07-01 04:59\r\n"
     )
 
 
