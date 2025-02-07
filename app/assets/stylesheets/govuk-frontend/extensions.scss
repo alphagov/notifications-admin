@@ -236,3 +236,16 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
   width: 66.66% !important;
 }
 /* stylelint-enable declaration-no-important */
+
+// we use hidden attribute to hide items that don't match live-search results
+// normally the broser would hide the element, but as this one has display property
+// set, we need to set additional override styles
+// used on /organisations/<id>/settings/email-branding/add
+// used on /organisations/<id>/settings/letter-branding/add
+// aused on /organisations/<id>/settings/add-nhs-local-organisation for NHS services
+// used on /services/<id>/service-settings/link-service-to-organisation
+// used on /services/>id>/service-settings/(set-email/letter)-branding 
+.govuk-checkboxes__item[hidden],
+.govuk-radios__item[hidden] {
+  display: none;
+}
