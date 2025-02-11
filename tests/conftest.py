@@ -3384,6 +3384,16 @@ def mock_update_service_callback_api(notify_admin, mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_update_returned_letter_callback_api(notify_admin, mocker):
+    def _update_returned_letter_callback_api(service_id, url, bearer_token, user_id, callback_api_id):
+        return
+
+    return mocker.patch(
+        "app.service_api_client.update_returned_letter_callback_api", side_effect=_update_returned_letter_callback_api
+    )
+
+
+@pytest.fixture(scope="function")
 def organisation_one(api_user_active):
     return organisation_json(ORGANISATION_ID, "organisation one", [api_user_active["id"]])
 
