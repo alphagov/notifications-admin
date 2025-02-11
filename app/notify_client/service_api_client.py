@@ -450,9 +450,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(f"/service/{service_id}/sms-sender/{sms_sender_id}/archive", data=None)
 
     def get_service_callback_api(self, service_id, callback_api_id, callback_type):
-        if callback_type == 'delivery_status':
+        if callback_type == "delivery_status":
             return self.get(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}")["data"]
-        elif callback_type == 'returned_letter':
+        elif callback_type == "returned_letter":
             return self.get(f"/service/{service_id}/returned-letter-api/{callback_api_id}")["data"]
 
     @cache.delete("service-{service_id}")
