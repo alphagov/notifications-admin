@@ -332,12 +332,12 @@ def returned_letters_callback(service_id):
                     callback_api_id=returned_letter_callback.get("id"),
                 )
         elif returned_letter_callback and not form.url.data:
-            service_api_client.delete_service_callback_api(
+            service_api_client.delete_returned_letter_callback_api(
                 service_id,
                 returned_letter_callback["id"],
             )
         elif form.url.data:
-            service_api_client.create_service_callback_api(
+            service_api_client.create_returned_letter_callback_api(
                 service_id,
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,

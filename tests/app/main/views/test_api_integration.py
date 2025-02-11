@@ -667,6 +667,10 @@ def test_callback_forms_validation(client_request, service_one, endpoint, url, b
             "main.received_text_messages_callback",
             "/service/{}/inbound-api/{}",
         ),
+        (
+            "main.returned_letters_callback",
+            "/service/{}/returned-letter-api/{}",
+        ),
     ],
 )
 def test_callback_forms_can_be_cleared(
@@ -680,7 +684,10 @@ def test_callback_forms_can_be_cleared(
     mock_get_valid_service_callback_api,
     mock_get_valid_service_inbound_api,
 ):
-    service_one["service_callback_api"] = [fake_uuid]
+    service_one["service_callback_api"] = [
+        {"callback_id": fake_uuid, "callback_type": "delivery_status"},
+        {"callback_id": fake_uuid, "callback_type": "returned_letter"},
+    ]
     service_one["inbound_api"] = [fake_uuid]
     service_one["permissions"] = ["inbound_sms"]
     mocked_delete = mocker.patch("app.service_api_client.delete")
@@ -704,7 +711,10 @@ def test_callback_forms_can_be_cleared(
 
 
 @pytest.mark.parametrize("bearer_token", ["", "some-bearer-token"])
-@pytest.mark.parametrize("endpoint", ["main.delivery_status_callback", "main.received_text_messages_callback"])
+@pytest.mark.parametrize(
+    "endpoint",
+    ["main.delivery_status_callback", "main.received_text_messages_callback", "main.returned_letters_callback"],
+)
 def test_callback_forms_can_be_cleared_when_callback_and_inbound_apis_are_empty(
     client_request,
     service_one,
@@ -843,6 +853,25 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
             bearer_token="1234567890",
             user_id=fake_uuid,
         )
+
+
+def test_create_returned_letter_callbacks(
+    client_request, service_one, mock_get_notifications, mock_create_returned_letter_callback_api, fake_uuid
+):
+    data = {"url": "https://test.url.com/", "bearer_token": "1234567890", "user_id": fake_uuid}
+
+    client_request.post(
+        "main.returned_letters_callback",
+        service_id=service_one["id"],
+        _data=data,
+    )
+
+    mock_create_returned_letter_callback_api.assert_called_once_with(
+        service_one["id"],
+        url="https://test.url.com/",
+        bearer_token="1234567890",
+        user_id=data["user_id"],
+    )
 
 
 def test_update_delivery_status_callback_details(
