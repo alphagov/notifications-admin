@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.api_callbacks', service_id=current_service.id) }) }}
+  {{ govukBackLink({ "href": url_for('main.api_integration', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -34,7 +34,7 @@
 
 		{% call row() %}
 			{{ text_field('Returned letters') }}
-			{{ optional_text_field(returned_letters_callback, truncate=true) }}
+			{{ optional_text_field(returned_letter_callback, truncate=true) }}
 			{{ edit_field('Change', url_for('main.returned_letters_callback', service_id=current_service.id)) }}
 		{% endcall %}
 	  {% endcall %}

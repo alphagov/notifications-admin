@@ -169,29 +169,26 @@ def check_token_against_dummy_bearer(token):
 def api_callbacks(service_id):
     if not current_service.has_permission("inbound_sms") and not current_service.has_permission("letter"):
         return redirect(url_for(".delivery_status_callback", service_id=service_id))
-    delivery_status_callback, received_text_messages_callback = get_apis()
-    returned_letters_callback = None
-    returned_letters_callback = {"url": "https://test.test.com"}
+
+    delivery_status_callback, received_text_messages_callback, returned_letter_callback = get_apis()
+
     return render_template(
         "views/api/callbacks.html",
         received_text_messages_callback=(
             received_text_messages_callback["url"] if received_text_messages_callback else None
         ),
         delivery_status_callback=(delivery_status_callback["url"] if delivery_status_callback else None),
-        returned_letters_callback=(returned_letters_callback["url"] if returned_letters_callback else None),
+        returned_letter_callback=(returned_letter_callback["url"] if returned_letter_callback else None),
     )
 
 
 def get_delivery_status_callback_details():
     if current_service.service_callback_api:
-        if isinstance(current_service.service_callback_api[0], str):
-            return service_api_client.get_service_callback_api(
-                current_service.id, current_service.service_callback_api[0]
-            )
-        else:
-            for row in current_service.service_callback_api:
-                if row["callback_type"] == "delivery_status":
-                    return service_api_client.get_service_callback_api(current_service.id, row["callback_id"])
+        return service_api_client.get_service_callback_api(
+            current_service.id,
+            current_service.service_callback_api[0],
+            "delivery_status"
+        )
 
 
 @main.route(
