@@ -57,6 +57,13 @@ export default [
             paths.govuk_frontend,
             paths.npm
           ],
+          silenceDeprecations: [
+            "mixed-decls",
+            "global-builtin",
+            "color-functions",
+            "slash-div",
+            "import"
+          ]
         },
         minimize: true,
         url: false,
