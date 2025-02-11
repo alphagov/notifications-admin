@@ -14,7 +14,13 @@ from tests.conftest import (
 )
 
 test_user_auth_combinations = (
-    "user, organisation_can_approve_own_go_live_requests, service_has_active_go_live_request, expected_status",
+    """
+        user,
+        organisation_can_approve_own_go_live_requests,
+        service_has_active_go_live_request,
+        service_is_active,
+        expected_status,
+    """,
     (
         (
             # A user who is a member of the organisation
@@ -25,6 +31,7 @@ test_user_auth_combinations = (
             ),
             True,
             True,
+            True,
             200,
         ),
         (
@@ -32,11 +39,13 @@ test_user_auth_combinations = (
             create_user(id=sample_uuid(), platform_admin=True),
             True,
             True,
+            True,
             200,
         ),
         (
             # User who is a not an organisation team member can’t approve go live requests
             create_user(id=sample_uuid()),
+            True,
             True,
             True,
             403,
@@ -50,6 +59,7 @@ test_user_auth_combinations = (
             ),
             False,
             True,
+            True,
             403,
         ),
         (
@@ -61,11 +71,21 @@ test_user_auth_combinations = (
             ),
             True,
             False,
+            True,
             403,
         ),
         (
             # If the user doesn't have the "can make services live" permission then the user is blocked
             create_user(id=sample_uuid(), organisations=[ORGANISATION_ID], organisation_permissions={}),
+            True,
+            False,
+            True,
+            403,
+        ),
+        (
+            # If the service is not active then the user is blocked
+            create_user(id=sample_uuid(), platform_admin=True),
+            True,
             True,
             False,
             403,
@@ -82,6 +102,7 @@ def test_get_org_member_make_service_live_start(
     user,
     organisation_can_approve_own_go_live_requests,
     service_has_active_go_live_request,
+    service_is_active,
     expected_status,
     mocker,
 ):
@@ -92,6 +113,7 @@ def test_get_org_member_make_service_live_start(
     service_one["has_active_go_live_request"] = service_has_active_go_live_request
     service_one["organisation"] = ORGANISATION_ID
     service_one["volume_letter"] = None
+    service_one["active"] = service_is_active
 
     client_request.login(user)
 
@@ -162,6 +184,7 @@ def test_get_org_member_make_service_live_service_name(
     user,
     organisation_can_approve_own_go_live_requests,
     service_has_active_go_live_request,
+    service_is_active,
     expected_status,
     mocker,
 ):
@@ -172,6 +195,7 @@ def test_get_org_member_make_service_live_service_name(
     service_one["has_active_go_live_request"] = service_has_active_go_live_request
     service_one["organisation"] = ORGANISATION_ID
     service_one["volume_letter"] = None
+    service_one["active"] = service_is_active
 
     client_request.login(user)
 
@@ -334,6 +358,7 @@ def test_get_org_member_make_service_live_unique_service(
     user,
     organisation_can_approve_own_go_live_requests,
     service_has_active_go_live_request,
+    service_is_active,
     expected_status,
     mocker,
 ):
@@ -344,6 +369,7 @@ def test_get_org_member_make_service_live_unique_service(
     service_one["has_active_go_live_request"] = service_has_active_go_live_request
     service_one["organisation"] = ORGANISATION_ID
     service_one["volume_letter"] = None
+    service_one["active"] = service_is_active
 
     client_request.login(user)
 
@@ -465,6 +491,7 @@ def test_get_org_member_make_service_live_contact_user(
     user,
     organisation_can_approve_own_go_live_requests,
     service_has_active_go_live_request,
+    service_is_active,
     expected_status,
     data,
     expected_redirect,
@@ -477,6 +504,7 @@ def test_get_org_member_make_service_live_contact_user(
     service_one["has_active_go_live_request"] = service_has_active_go_live_request
     service_one["organisation"] = ORGANISATION_ID
     service_one["volume_letter"] = None
+    service_one["active"] = service_is_active
 
     client_request.login(user)
 
@@ -502,6 +530,7 @@ def test_get_org_member_make_service_live_decision(
     user,
     organisation_can_approve_own_go_live_requests,
     service_has_active_go_live_request,
+    service_is_active,
     expected_status,
     mocker,
 ):
@@ -512,6 +541,7 @@ def test_get_org_member_make_service_live_decision(
     service_one["has_active_go_live_request"] = service_has_active_go_live_request
     service_one["organisation"] = ORGANISATION_ID
     service_one["volume_letter"] = None
+    service_one["active"] = service_is_active
 
     client_request.login(user)
 
