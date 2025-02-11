@@ -184,9 +184,9 @@ def api_callbacks(service_id):
 
 def get_delivery_status_callback_details():
     if current_service.service_callback_api:
-        return service_api_client.get_service_callback_api(current_service.id,
-                                                           current_service.service_callback_api[0],
-                                                           "delivery_status")
+        return service_api_client.get_service_callback_api(
+            current_service.id, current_service.service_callback_api[0], "delivery_status"
+        )
 
 
 @main.route(
