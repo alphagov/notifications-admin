@@ -449,8 +449,11 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def delete_sms_sender(self, service_id, sms_sender_id):
         return self.post(f"/service/{service_id}/sms-sender/{sms_sender_id}/archive", data=None)
 
-    def get_service_callback_api(self, service_id, callback_api_id):
-        return self.get(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}")["data"]
+    def get_service_callback_api(self, service_id, callback_api_id, callback_type):
+        if callback_type == 'delivery_status':
+            return self.get(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}")["data"]
+        elif callback_type == 'returned_letter':
+            return self.get(f"/service/{service_id}/returned-letter-api/{callback_api_id}")["data"]
 
     @cache.delete("service-{service_id}")
     def update_service_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
