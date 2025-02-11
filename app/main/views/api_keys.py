@@ -136,22 +136,25 @@ def revoke_api_key(service_id, key_id):
 
 
 def get_apis():
-    callback_api = None
+    delivery_status_callback_api = None
+    returned_letter_callback_api = None
     inbound_api = None
-    if current_service.service_callback_api:
-        if isinstance(current_service.service_callback_api[0], str):
-            callback_api = service_api_client.get_service_callback_api(
-                current_service.id, current_service.service_callback_api[0]
-            )
-        else:
-            for row in current_service.service_callback_api:
-                if row["callback_type"] == "delivery_status":
-                    callback_api = service_api_client.get_service_callback_api(current_service.id, row["callback_id"])
+
+    if callback_apis := current_service.service_callback_api:
+        for row in callback_apis:
+            if row["callback_type"] == "delivery_status":
+                delivery_status_callback_api = service_api_client.get_service_callback_api(
+                    current_service.id, row["callback_id"], row["callback_type"]
+                )
+            elif row["callback_type"] == "returned_letter":
+                returned_letter_callback_api = service_api_client.get_service_callback_api(
+                    current_service.id, row["callback_id"], row["callback_type"]
+                )
 
     if current_service.inbound_api:
         inbound_api = service_api_client.get_service_inbound_api(current_service.id, current_service.inbound_api[0])
 
-    return (callback_api, inbound_api)
+    return delivery_status_callback_api, inbound_api, returned_letter_callback_api
 
 
 def check_token_against_dummy_bearer(token):
