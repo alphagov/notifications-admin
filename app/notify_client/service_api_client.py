@@ -471,6 +471,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id}
         return self.post(f"/service/{service_id}/delivery-receipt-api", data)
 
+    @cache.delete("service-{service_id}")
+    def update_returned_letter_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
+        data = {"url": url, "updated_by_id": user_id}
+        if bearer_token:
+            data["bearer_token"] = bearer_token
+        return self.post(f"/service/{service_id}/returned-letter-api/{callback_api_id}", data)
+
     @cache.delete("service-{service_id}-data-retention")
     def create_service_data_retention(self, service_id, notification_type, days_of_retention):
         data = {"notification_type": notification_type, "days_of_retention": days_of_retention}
