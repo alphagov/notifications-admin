@@ -467,7 +467,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.delete(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}")
 
     @cache.delete("service-{service_id}")
-    def create_service_callback_api(self, service_id, url, bearer_token, user_id):
+    def create_delivery_status_callback_api(self, service_id, url, bearer_token, user_id):
         data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id}
         return self.post(f"/service/{service_id}/delivery-receipt-api", data)
 

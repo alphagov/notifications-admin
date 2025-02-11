@@ -221,7 +221,7 @@ def delivery_status_callback(service_id):
                 delivery_status_callback["id"],
             )
         elif form.url.data:
-            service_api_client.create_service_callback_api(
+            service_api_client.create_delivery_status_callback_api(
                 service_id,
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,

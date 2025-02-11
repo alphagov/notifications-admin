@@ -3369,10 +3369,12 @@ def mock_update_service_inbound_api(notify_admin, mocker):
 
 @pytest.fixture(scope="function")
 def mock_create_service_callback_api(notify_admin, mocker):
-    def _create_service_callback_api(service_id, url, bearer_token, user_id):
+    def _create_delivery_status_callback_api(service_id, url, bearer_token, user_id):
         return
 
-    return mocker.patch("app.service_api_client.create_service_callback_api", side_effect=_create_service_callback_api)
+    return mocker.patch(
+        "app.service_api_client.create_delivery_status_callback_api", side_effect=_create_delivery_status_callback_api
+    )
 
 
 @pytest.fixture(scope="function")
