@@ -834,7 +834,7 @@ def test_create_email_branding_government_identity_logo_form(client_request, pla
         ),
         (
             "HM Government",
-            "https://static.example.com/images/branding/insignia/HM Government.png?5f774527e45c4f03ca4a1167acdc0826",
+            "https://static.example.com/images/branding/insignia/HM Government.png?9e4dcaacf920fab30add8dcb87bda726",
         ),
         (
             "HM Revenue & Customs",
@@ -926,7 +926,7 @@ def test_create_email_branding_government_identity_colour(client_request, platfo
             "background: " + input["value"] + ";"
         )
         assert page.select_one("label[for=" + input["id"] + "] img")["src"] == (
-            "https://static.example.com/images/branding/insignia/HM Government.png?5f774527e45c4f03ca4a1167acdc0826"
+            "https://static.example.com/images/branding/insignia/HM Government.png?9e4dcaacf920fab30add8dcb87bda726"
         )
 
 
