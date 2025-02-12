@@ -50,8 +50,8 @@
     "postcss-replace": "2.0.1",
     "rollup": "4.24.0",
     "rollup-plugin-copy": "3.5.0",
-    "rollup-plugin-styler": "1.8.0",
-    "sass": "1.32.7",
+    "rollup-plugin-styler": "2.0.0",
+    "sass": "1.84.0",
     "stylelint": "16.10.0",
     "stylelint-config-gds": "2.0.0",
     "stylelint-config-standard-scss": "13.1.0"
