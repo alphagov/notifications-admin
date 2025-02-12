@@ -456,7 +456,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             return self.get(f"/service/{service_id}/returned-letter-api/{callback_api_id}")["data"]
 
     @cache.delete("service-{service_id}")
-    def update_service_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
+    def update_delivery_status_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
         data = {"url": url, "updated_by_id": user_id}
         if bearer_token:
             data["bearer_token"] = bearer_token
