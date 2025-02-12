@@ -385,7 +385,7 @@ _clients_by_name = {
         ("service", "add_sms_sender", [SERVICE_ONE_ID, ""], {}),
         ("service", "update_sms_sender", [SERVICE_ONE_ID] + [""] * 2, {}),
         ("service", "delete_sms_sender", [SERVICE_ONE_ID, ""], {}),
-        ("service", "update_service_callback_api", [SERVICE_ONE_ID] + [""] * 4, {}),
+        ("service", "update_delivery_status_callback_api", [SERVICE_ONE_ID] + [""] * 4, {}),
         ("service", "create_delivery_status_callback_api", [SERVICE_ONE_ID] + [""] * 3, {}),
         ("user", "add_user_to_service", [SERVICE_ONE_ID, uuid4(), [], []], {}),
         ("invite", "accept_invite", [SERVICE_ONE_ID, uuid4()], {}),
