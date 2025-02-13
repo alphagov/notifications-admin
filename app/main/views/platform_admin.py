@@ -686,12 +686,14 @@ def get_url_for_notify_record(uuid_):
             "api_key": _EndpointSpec(".api_keys", with_service_id=True),
             "template_folder": _EndpointSpec(".choose_template", "template_folder_id", with_service_id=True),
             "service_inbound_api": _EndpointSpec(".received_text_messages_callback", with_service_id=True),
-            "service_callback_api": _EndpointSpec(".delivery_status_callback", with_service_id=True),
+            "delivery_status_callback_api": _EndpointSpec(".delivery_status_callback", with_service_id=True),
+            "returned_letters_callback_api": _EndpointSpec(".returned_letters_callback", with_service_id=True),
             "complaint": _EndpointSpec(".platform_admin_list_complaints"),
             "inbound_sms": _EndpointSpec(
                 ".conversation", "notification_id", with_service_id=True, extra={"_anchor": f"n{uuid_}"}
             ),
         }
+
         if not (spec := url_for_data.get(result["type"])):
             raise KeyError(f"Don't know how to redirect to {result['type']}")
 
