@@ -71,6 +71,9 @@
 
 .edit-template-link-letter-body {
   @extend %edit-template-link;
+  @include govuk-media-query($until: tablet) {
+    z-index: 2;
+  }
   @include govuk-media-query($from: tablet) {
     @include scalable-top(393);
     left: -20px;
