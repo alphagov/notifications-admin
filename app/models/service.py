@@ -647,7 +647,7 @@ class Service(JSONModel):
         return self._callback_service_callback_details("delivery_status")
 
     @property
-    def returned_letter_callback_details(self):
+    def returned_letters_callback_details(self):
         return self._callback_service_callback_details("returned_letter")
 
     def _callback_service_callback_details(self, callback_type):
