@@ -1012,8 +1012,8 @@ class TestPlatformAdminSearch:
                 "/services/abc/api/callbacks/delivery-status-callback",
             ),
             (
-                    {"type": "returned_letters_callback_api", "context": {"service_id": "abc"}},
-                    "/services/abc/api/callbacks/returned-letters-callback",
+                {"type": "returned_letters_callback_api", "context": {"service_id": "abc"}},
+                "/services/abc/api/callbacks/returned-letters-callback",
             ),
             ({"type": "complaint"}, "/platform-admin/complaints"),
             (

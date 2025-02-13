@@ -137,7 +137,7 @@ def revoke_api_key(service_id, key_id):
 
 def get_apis():
     delivery_status_callback_api = None
-    returned_letter_callback_api = None
+    returned_letters_callback_api = None
     inbound_api = None
 
     if callback_apis := current_service.service_callback_api:
@@ -147,14 +147,14 @@ def get_apis():
                     current_service.id, row["callback_id"], row["callback_type"]
                 )
             elif row["callback_type"] == "returned_letter":
-                returned_letter_callback_api = service_api_client.get_service_callback_api(
+                returned_letters_callback_api = service_api_client.get_service_callback_api(
                     current_service.id, row["callback_id"], row["callback_type"]
                 )
 
     if current_service.inbound_api:
         inbound_api = service_api_client.get_service_inbound_api(current_service.id, current_service.inbound_api[0])
 
-    return delivery_status_callback_api, inbound_api, returned_letter_callback_api
+    return delivery_status_callback_api, inbound_api, returned_letters_callback_api
 
 
 def check_token_against_dummy_bearer(token):
@@ -170,7 +170,7 @@ def api_callbacks(service_id):
     if not current_service.has_permission("inbound_sms") and not current_service.has_permission("letter"):
         return redirect(url_for(".delivery_status_callback", service_id=service_id))
 
-    delivery_status_callback, received_text_messages_callback, returned_letter_callback = get_apis()
+    delivery_status_callback, received_text_messages_callback, returned_letters_callback = get_apis()
 
     return render_template(
         "views/api/callbacks.html",
@@ -178,7 +178,7 @@ def api_callbacks(service_id):
             received_text_messages_callback["url"] if received_text_messages_callback else None
         ),
         delivery_status_callback=(delivery_status_callback["url"] if delivery_status_callback else None),
-        returned_letter_callback=(returned_letter_callback["url"] if returned_letter_callback else None),
+        returned_letters_callback=(returned_letters_callback["url"] if returned_letters_callback else None),
     )
 
 
@@ -294,7 +294,7 @@ def received_text_messages_callback(service_id):
 )
 @user_has_permissions("manage_api_keys")
 def returned_letters_callback(service_id):
-    returned_letter_callback_details = current_service.returned_letter_callback_details
+    returned_letters_callback_details = current_service.returned_letters_callback_details
     back_link = (
         ".api_callbacks"
         if current_service.has_permission("inbound_sms") or current_service.has_permission("letter")
@@ -302,30 +302,30 @@ def returned_letters_callback(service_id):
     )
 
     form = CallbackForm(
-        url=returned_letter_callback_details.get("url") if returned_letter_callback_details else "",
-        bearer_token=dummy_bearer_token if returned_letter_callback_details else "",
+        url=returned_letters_callback_details.get("url") if returned_letters_callback_details else "",
+        bearer_token=dummy_bearer_token if returned_letters_callback_details else "",
     )
 
     if form.validate_on_submit():
-        if returned_letter_callback_details and form.url.data:
+        if returned_letters_callback_details and form.url.data:
             if (
-                returned_letter_callback_details.get("url") != form.url.data
+                returned_letters_callback_details.get("url") != form.url.data
                 or form.bearer_token.data != dummy_bearer_token
             ):
-                service_api_client.update_returned_letter_callback_api(
+                service_api_client.update_returned_letters_callback_api(
                     service_id,
                     url=form.url.data,
                     bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
                     user_id=current_user.id,
-                    callback_api_id=returned_letter_callback_details.get("id"),
+                    callback_api_id=returned_letters_callback_details.get("id"),
                 )
-        elif returned_letter_callback_details and not form.url.data:
-            service_api_client.delete_returned_letter_callback_api(
+        elif returned_letters_callback_details and not form.url.data:
+            service_api_client.delete_returned_letters_callback_api(
                 service_id,
-                returned_letter_callback_details["id"],
+                returned_letters_callback_details["id"],
             )
         elif form.url.data:
-            service_api_client.create_returned_letter_callback_api(
+            service_api_client.create_returned_letters_callback_api(
                 service_id,
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,

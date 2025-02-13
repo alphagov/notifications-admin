@@ -855,8 +855,8 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
         )
 
 
-def test_create_returned_letter_callbacks(
-    client_request, service_one, mock_get_notifications, mock_create_returned_letter_callback_api, fake_uuid
+def test_create_returned_letters_callbacks(
+    client_request, service_one, mock_get_notifications, mock_create_returned_letters_callback_api, fake_uuid
 ):
     data = {"url": "https://test.url.com/", "bearer_token": "1234567890", "user_id": fake_uuid}
 
@@ -866,7 +866,7 @@ def test_create_returned_letter_callbacks(
         _data=data,
     )
 
-    mock_create_returned_letter_callback_api.assert_called_once_with(
+    mock_create_returned_letters_callback_api.assert_called_once_with(
         service_one["id"],
         url="https://test.url.com/",
         bearer_token="1234567890",
@@ -900,10 +900,10 @@ def test_update_delivery_status_callback_details(
     )
 
 
-def test_update_returned_letter_callback_details(
+def test_update_returned_letters_callback_details(
     client_request,
     service_one,
-    mock_update_returned_letter_callback_api,
+    mock_update_returned_letters_callback_api,
     mock_get_valid_service_callback_api,
     fake_uuid,
 ):
@@ -917,7 +917,7 @@ def test_update_returned_letter_callback_details(
         _data=data,
     )
 
-    mock_update_returned_letter_callback_api.assert_called_once_with(
+    mock_update_returned_letters_callback_api.assert_called_once_with(
         service_one["id"],
         url="https://test.url.com/",
         bearer_token="1234567890",
@@ -972,10 +972,10 @@ def test_update_delivery_status_callback_without_changes_does_not_update(
     assert mock_update_delivery_status_callback_api.called is False
 
 
-def test_update_returned_letter_callback_without_changes_does_not_update(
+def test_update_returned_letters_callback_without_changes_does_not_update(
     client_request,
     service_one,
-    mock_update_returned_letter_callback_api,
+    mock_update_returned_letters_callback_api,
     fake_uuid,
     mock_get_valid_service_callback_api,
 ):
@@ -988,7 +988,7 @@ def test_update_returned_letter_callback_without_changes_does_not_update(
         _data=data,
     )
 
-    assert mock_update_returned_letter_callback_api.called is False
+    assert mock_update_returned_letters_callback_api.called is False
 
 
 def test_update_receive_text_message_callback_without_changes_does_not_update(
