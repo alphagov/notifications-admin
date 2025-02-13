@@ -20,9 +20,10 @@
       {{ page_header('Callbacks for returned letters') }}
 
       <p class="govuk-body">
-        When you receive a returned letter in Notify, We can forward it to your system.
+        When a letter you sent is returned, Notify will send details of the returned letter to your callback url.
+      </p>
+      <p class="govuk-body">
         Read the callbacks section of our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API documentation</a> for more information
-
       </p>
 
       {% call form_wrapper() %}
