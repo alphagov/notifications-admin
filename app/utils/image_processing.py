@@ -31,7 +31,7 @@ class ImageProcessor:
             # PIL.Image.verify() closes fp, we need to re-open. We know this shouldn't error.
             self._image = PIL.Image.open(self.fp, formats=(img_format,))
 
-        except Exception as e:  # noqa
+        except Exception as e:
             raise CorruptImage from e
 
     @property

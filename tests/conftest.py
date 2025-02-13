@@ -2906,8 +2906,8 @@ def os_environ():
         os.environ[k] = v
 
 
-@pytest.fixture  # noqa (C901 too complex)
-def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):  # noqa (C901 too complex)
+@pytest.fixture
+def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
     def block_method(object, method_name, preferred_method_name):
         def blocked_method(*args, **kwargs):
             raise AttributeError(
