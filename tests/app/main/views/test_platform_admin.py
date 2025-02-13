@@ -1008,8 +1008,12 @@ class TestPlatformAdminSearch:
                 "/services/abc/api/callbacks/received-text-messages-callback",
             ),
             (
-                {"type": "service_callback_api", "context": {"service_id": "abc"}},
+                {"type": "delivery_status_callback_api", "context": {"service_id": "abc"}},
                 "/services/abc/api/callbacks/delivery-status-callback",
+            ),
+            (
+                    {"type": "returned_letters_callback_api", "context": {"service_id": "abc"}},
+                    "/services/abc/api/callbacks/returned-letters-callback",
             ),
             ({"type": "complaint"}, "/platform-admin/complaints"),
             (
