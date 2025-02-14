@@ -79,6 +79,9 @@ a {
 
     &-hidden-by-default {
       display: none;
+      &.visible-as-matches-search-query {
+        display: block;
+      }
     }
 
     &-without-ancestors {
