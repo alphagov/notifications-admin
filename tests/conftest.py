@@ -3322,12 +3322,12 @@ def mock_get_valid_service_inbound_api(notify_admin, mocker):
 
 @pytest.fixture(scope="function")
 def mock_get_valid_service_callback_api(notify_admin, mocker):
-    def _get(service_id, callback_api_id):
+    def _get(service_id, callback_api_id, callback_type):
         return {
             "created_at": "2017-12-04T10:52:55.289026Z",
             "updated_by_id": fake_uuid,
             "id": callback_api_id,
-            "url": "https://hello2.gov.uk",
+            "url": f"https://hello2.gov.uk/{callback_type}",
             "service_id": service_id,
             "updated_at": "2017-12-04T11:28:42.575153Z",
         }
@@ -3347,7 +3347,7 @@ def mock_get_empty_service_inbound_api(notify_admin, mocker):
 def mock_get_empty_service_callback_api(notify_admin, mocker):
     return mocker.patch(
         "app.service_api_client.get_service_callback_api",
-        side_effect=lambda service_id, callback_api_id: None,
+        side_effect=lambda service_id, callback_api_id, callback_type: None,
     )
 
 
@@ -3369,18 +3369,42 @@ def mock_update_service_inbound_api(notify_admin, mocker):
 
 @pytest.fixture(scope="function")
 def mock_create_service_callback_api(notify_admin, mocker):
-    def _create_service_callback_api(service_id, url, bearer_token, user_id):
+    def _create_delivery_status_callback_api(service_id, url, bearer_token, user_id):
         return
 
-    return mocker.patch("app.service_api_client.create_service_callback_api", side_effect=_create_service_callback_api)
+    return mocker.patch(
+        "app.service_api_client.create_delivery_status_callback_api", side_effect=_create_delivery_status_callback_api
+    )
 
 
 @pytest.fixture(scope="function")
-def mock_update_service_callback_api(notify_admin, mocker):
-    def _update_service_callback_api(service_id, url, bearer_token, user_id, callback_api_id):
+def mock_create_returned_letters_callback_api(notify_admin, mocker):
+    def _create_returned_letters_callback_api(service_id, url, bearer_token, user_id):
         return
 
-    return mocker.patch("app.service_api_client.update_service_callback_api", side_effect=_update_service_callback_api)
+    return mocker.patch(
+        "app.service_api_client.create_returned_letters_callback_api", side_effect=_create_returned_letters_callback_api
+    )
+
+
+@pytest.fixture(scope="function")
+def mock_update_delivery_status_callback_api(notify_admin, mocker):
+    def _update_delivery_status_callback_api(service_id, url, bearer_token, user_id, callback_api_id):
+        return
+
+    return mocker.patch(
+        "app.service_api_client.update_delivery_status_callback_api", side_effect=_update_delivery_status_callback_api
+    )
+
+
+@pytest.fixture(scope="function")
+def mock_update_returned_letters_callback_api(notify_admin, mocker):
+    def _update_returned_letters_callback_api(service_id, url, bearer_token, user_id, callback_api_id):
+        return
+
+    return mocker.patch(
+        "app.service_api_client.update_returned_letters_callback_api", side_effect=_update_returned_letters_callback_api
+    )
 
 
 @pytest.fixture(scope="function")

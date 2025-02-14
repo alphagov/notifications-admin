@@ -449,11 +449,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def delete_sms_sender(self, service_id, sms_sender_id):
         return self.post(f"/service/{service_id}/sms-sender/{sms_sender_id}/archive", data=None)
 
-    def get_service_callback_api(self, service_id, callback_api_id):
-        return self.get(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}")["data"]
+    def get_service_callback_api(self, service_id, callback_api_id, callback_type):
+        if callback_type == "delivery_status":
+            return self.get(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}")["data"]
+        elif callback_type == "returned_letter":
+            return self.get(f"/service/{service_id}/returned-letter-api/{callback_api_id}")["data"]
 
     @cache.delete("service-{service_id}")
-    def update_service_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
+    def update_delivery_status_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
         data = {"url": url, "updated_by_id": user_id}
         if bearer_token:
             data["bearer_token"] = bearer_token
@@ -464,9 +467,25 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.delete(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}")
 
     @cache.delete("service-{service_id}")
-    def create_service_callback_api(self, service_id, url, bearer_token, user_id):
+    def create_delivery_status_callback_api(self, service_id, url, bearer_token, user_id):
         data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id}
         return self.post(f"/service/{service_id}/delivery-receipt-api", data)
+
+    @cache.delete("service-{service_id}")
+    def create_returned_letters_callback_api(self, service_id, url, bearer_token, user_id):
+        data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id}
+        return self.post(f"/service/{service_id}/returned-letter-api", data)
+
+    @cache.delete("service-{service_id}")
+    def update_returned_letters_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
+        data = {"url": url, "updated_by_id": user_id}
+        if bearer_token:
+            data["bearer_token"] = bearer_token
+        return self.post(f"/service/{service_id}/returned-letter-api/{callback_api_id}", data)
+
+    @cache.delete("service-{service_id}")
+    def delete_returned_letters_callback_api(self, service_id, callback_api_id):
+        return self.delete(f"/service/{service_id}/returned-letter-api/{callback_api_id}")
 
     @cache.delete("service-{service_id}-data-retention")
     def create_service_data_retention(self, service_id, notification_type, days_of_retention):
