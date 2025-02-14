@@ -222,11 +222,6 @@ def delivery_status_callback(service_id):
     )
 
 
-def get_received_text_messages_callback():
-    if current_service.inbound_api:
-        return service_api_client.get_service_inbound_api(current_service.id, current_service.inbound_api[0])
-
-
 @main.route(
     "/services/<uuid:service_id>/api/callbacks/received-text-messages-callback",
     methods=["GET", "POST"],
@@ -236,7 +231,7 @@ def received_text_messages_callback(service_id):
     if not current_service.has_permission("inbound_sms"):
         return redirect(url_for(".api_integration", service_id=service_id))
 
-    received_text_messages_callback = get_received_text_messages_callback()
+    received_text_messages_callback = current_service.inbound_sms_callback_details
     form = CallbackForm(
         url=(received_text_messages_callback.get("url") if received_text_messages_callback else ""),
         bearer_token=dummy_bearer_token if received_text_messages_callback else "",
