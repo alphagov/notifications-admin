@@ -12,7 +12,7 @@ from markupsafe import Markup
 from notifications_utils.field import Field
 from notifications_utils.formatters import make_quotes_smart
 from notifications_utils.formatters import nl2br as utils_nl2br
-from notifications_utils.recipient_validation.phone_number import InvalidPhoneError, validate_phone_number
+from notifications_utils.recipient_validation.phone_number import InvalidPhoneError, PhoneNumber
 from notifications_utils.take import Take
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
@@ -139,7 +139,7 @@ def format_delta_days(date, numeric_prefix=""):
 
 def valid_phone_number(phone_number):
     try:
-        validate_phone_number(phone_number)
+        PhoneNumber(phone_number)
         return True
     except InvalidPhoneError:
         return False
@@ -441,3 +441,12 @@ def extract_path_from_url(url):
 def sentence_case(sentence):
     first_word, rest_of_sentence = (sentence + " ").split(" ", 1)
     return f"{first_word.title()} {rest_of_sentence}"[:-1]
+
+
+def format_phone_number_human_readable(number):
+    try:
+        phone_number = PhoneNumber(number)
+    except InvalidPhoneError:
+        # if there was a validation error, we want to shortcut out here, but still display the number on the front end
+        return number
+    return phone_number.get_human_readable_format()
