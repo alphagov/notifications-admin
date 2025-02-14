@@ -1030,7 +1030,7 @@ def test_update_receive_text_message_callback_without_changes_does_not_update(
             ],
             {"url": "https://delivery.receipts"},
             "Delivery receipts https://delivery.receipts Change",
-            "DReturned letters Not set Change",
+            "Returned letters Not set Change",
         ),
         (
             [

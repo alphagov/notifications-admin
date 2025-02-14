@@ -135,28 +135,6 @@ def revoke_api_key(service_id, key_id):
         return redirect(url_for(".api_keys", service_id=service_id))
 
 
-def get_apis():
-    delivery_status_callback_api = None
-    returned_letters_callback_api = None
-    inbound_api = None
-
-    if callback_apis := current_service.service_callback_api:
-        for row in callback_apis:
-            if row["callback_type"] == "delivery_status":
-                delivery_status_callback_api = service_api_client.get_service_callback_api(
-                    current_service.id, row["callback_id"], row["callback_type"]
-                )
-            elif row["callback_type"] == "returned_letter":
-                returned_letters_callback_api = service_api_client.get_service_callback_api(
-                    current_service.id, row["callback_id"], row["callback_type"]
-                )
-
-    if current_service.inbound_api:
-        inbound_api = service_api_client.get_service_inbound_api(current_service.id, current_service.inbound_api[0])
-
-    return delivery_status_callback_api, inbound_api, returned_letters_callback_api
-
-
 def check_token_against_dummy_bearer(token):
     if token != dummy_bearer_token:
         return token
@@ -170,15 +148,23 @@ def api_callbacks(service_id):
     if not current_service.has_permission("inbound_sms") and not current_service.has_permission("letter"):
         return redirect(url_for(".delivery_status_callback", service_id=service_id))
 
-    delivery_status_callback, received_text_messages_callback, returned_letters_callback = get_apis()
-
     return render_template(
         "views/api/callbacks.html",
         received_text_messages_callback=(
-            received_text_messages_callback["url"] if received_text_messages_callback else None
+            current_service.inbound_sms_callback_details["url"]
+            if current_service.inbound_sms_callback_details
+            else None
         ),
-        delivery_status_callback=(delivery_status_callback["url"] if delivery_status_callback else None),
-        returned_letters_callback=(returned_letters_callback["url"] if returned_letters_callback else None),
+        delivery_status_callback=(
+            current_service.delivery_status_callback_details["url"]
+            if current_service.delivery_status_callback_details
+            else None
+        ),
+        returned_letters_callback=(
+            current_service.returned_letters_callback_details["url"]
+            if current_service.returned_letters_callback_details
+            else None
+        ),
     )
 
 
