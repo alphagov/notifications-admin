@@ -1060,6 +1060,7 @@ def test_callbacks_page_works_when_no_apis_set(
     inbound_url,
     expected_2nd_table_row,
     expected_3rd_table_row,
+    platform_admin_user,
 ):
     service_one["permissions"] = ["inbound_sms"]
     service_one["inbound_api"] = inbound_api
@@ -1068,6 +1069,7 @@ def test_callbacks_page_works_when_no_apis_set(
     mocker.patch("app.service_api_client.get_service_callback_api", return_value=delivery_url)
     mocker.patch("app.service_api_client.get_service_inbound_api", return_value=inbound_url)
 
+    client_request.login(platform_admin_user)
     page = client_request.get("main.api_callbacks", service_id=service_one["id"], _follow_redirects=True)
     expected_rows = [
         expected_1st_table_row,
