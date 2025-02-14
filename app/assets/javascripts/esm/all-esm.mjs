@@ -10,6 +10,8 @@ import Homepage from './homepage.mjs';
 import PreviewPane from './preview-pane.mjs';
 import CopyToClipboard from './copy-to-clipboard.mjs';
 
+import LiveSearch from './live-search.mjs';
+
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
 
@@ -19,6 +21,11 @@ createAll(Radios);
 createAll(ErrorSummary);
 createAll(SkipLink);
 createAll(Tabs);
+
+const $livesearch = document.querySelector('[data-notify-module="live-search"]');
+if ($livesearch) {
+  new LiveSearch($livesearch);
+}
 
 const $collapsibleCheckboxes = document.querySelector('[data-notify-module="collapsible-checkboxes"]');
 if ($collapsibleCheckboxes) {

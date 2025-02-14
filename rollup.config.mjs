@@ -95,7 +95,6 @@ export default [
       paths.src + 'javascripts/radioSelect.js',
       paths.src + 'javascripts/updateContent.js',
       paths.src + 'javascripts/listEntry.js',
-      paths.src + 'javascripts/liveSearch.js',
       paths.src + 'javascripts/preventDuplicateFormSubmissions.js',
       paths.src + 'javascripts/fullscreenTable.js',
       paths.src + 'javascripts/radios-with-images.js',
