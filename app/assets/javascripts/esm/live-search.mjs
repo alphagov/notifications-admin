@@ -45,11 +45,33 @@ class LiveSearch {
         if ($node.hasAttribute('hidden')) {
           $node.removeAttribute('hidden');
         }
+        // specific to template list as we have items hidden by default in css
+        // (items with ancestors) that we need to show if they match the search query
+        // but also hide them back when there is no search query
+        if ($node.classList.contains('visible-as-matches-search-query')) {
+          $node.classList.remove('visible-as-matches-search-query');
+        }
         results++;
         return;
       }
 
-      isMatch ? $node.removeAttribute('hidden') : $node.setAttribute('hidden', '');
+      if (isMatch) {
+        $node.removeAttribute('hidden');
+        // specific to template list as we have items hidden by default in css
+        // (items with ancestors) that we need to show if they match the search query
+        // we do that by applying a new class with display block property
+        if ($node.classList.contains('template-list-item-hidden-by-default')) {
+          $node.classList.add('visible-as-matches-search-query');
+        }
+      } else {
+        $node.setAttribute('hidden', '');
+        // specific to template list as we have items hidden by default in css
+        // (items with ancestors) that we now need to hide again when they don't
+        // match the search criteria
+        if ($node.classList.contains('visible-as-matches-search-query')) {
+          $node.classList.remove('visible-as-matches-search-query');
+        }
+      };
 
       if (isMatch) {
         results++; 
