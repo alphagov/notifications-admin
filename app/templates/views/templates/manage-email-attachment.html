@@ -1,0 +1,87 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+{% from "components/file-upload.html" import file_upload %}
+{% set title = 'Attach ‘' + placeholder + '’'%}
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.email_template_manage_attachments', service_id=current_service.id, template_id=template.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+  {{ govukSummaryList({
+    "classes": "notify-summary-list service-base-settings",
+    "rows": [
+      {
+        "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "File"
+        },
+        "value": {
+            "html": file_upload(form.file),
+            "classes": "govuk-summary-list__value--truncate govuk-hint"
+        },
+        "actions": {
+          "items": [
+
+          ]
+        }
+      },
+      {
+        "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Available for"
+        },
+        "value": {
+            "text": "90 days after sending",
+            "classes": "govuk-summary-list__value--truncate"
+        },
+        "actions": {
+          "items": [
+              {
+                  "href": url_for(
+                      'main.email_template_manage_attachment',
+                      service_id=service_id,
+                      template_id=template_id,
+                      placeholder=placeholder.strip(),
+                  ),
+                  "text": "Change",
+                  "visuallyHiddenText": "service name",
+                  "classes": "govuk-link--no-visited-state"
+              }
+          ]
+        }
+      },
+      {
+        "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Confirm email address"
+        },
+        "value": {
+            "text": "Yes",
+            "classes": "govuk-summary-list__value--truncate"
+        },
+        "actions": {
+          "items": [
+              {
+                  "href": url_for(
+                      'main.email_template_manage_attachment',
+                      service_id=service_id,
+                      template_id=template_id,
+                      placeholder=placeholder.strip(),
+                  ),
+                  "text": "Change",
+                  "visuallyHiddenText": "service name",
+                  "classes": "govuk-link--no-visited-state"
+              }
+          ]
+        }
+      }
+    ]
+  }) }}
+{% endblock %}
