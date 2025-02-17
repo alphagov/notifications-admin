@@ -54,6 +54,7 @@ from app.main.forms import (
     TemplateAndFoldersSelectionForm,
     TemplateFolderForm,
     WelshLetterTemplateForm,
+    EmailAttachmentForm,
 )
 from app.main.views.send import get_sender_details
 from app.models.service import Service
@@ -1399,9 +1400,53 @@ def letter_template_change_language(template_id, service_id):
 def email_template_manage_attachments(template_id, service_id):
     template = current_service.get_template(template_id)
 
+    rows = [
+        {
+            "key": {
+                "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+                "text": placeholder
+            },
+            "value": {
+                "text": "No file attached",
+                "classes": "govuk-summary-list__value--truncate govuk-hint"
+            },
+            "actions": {
+            "items": [
+                {
+                    "href": url_for(
+                        'main.email_template_manage_attachment',
+                        service_id=service_id,
+                        template_id=template_id,
+                        placeholder=placeholder.strip(),
+                    ),
+                    "text": "Change",
+                    "visuallyHiddenText": "service name",
+                    "classes": "govuk-link--no-visited-state"
+                }
+            ]
+            }
+        }
+        for placeholder in template.placeholders
+    ]
+
     return render_template(
         "views/templates/manage-email-attachments.html",
         template=template,
+        rows=rows,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def email_template_manage_attachment(template_id, service_id):
+    template = current_service.get_template(template_id)
+    placeholder = request.args.get("placeholder")
+    form = EmailAttachmentForm()
+    return render_template(
+        "views/templates/manage-email-attachment.html",
+        template=template,
+        placeholder=placeholder,
+        form=form,
     )
 
 
