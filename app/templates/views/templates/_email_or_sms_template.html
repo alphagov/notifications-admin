@@ -22,3 +22,26 @@
 </div>
 
 {{ template|string }}
+
+{% if template.template_type == "email" %}
+
+  <div class="govuk-!-margin-bottom-2">
+    <div class="js-stick-at-bottom-when-scrolling">
+      <span class="govuk-hint" style="position: relative; top: 7px;">
+        No files attached
+      </span>
+
+      {{ govukButton({
+        "element": "a",
+        "text": "Manage attachments",
+        "href": url_for(
+          '.email_template_manage_attachments',
+          service_id=current_service.id,
+          template_id=template.id
+        ),
+      "classes": "govuk-button--secondary change-language"
+      }) }}
+    </div>
+  </div>
+
+  {% endif %}
