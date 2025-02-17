@@ -1394,6 +1394,17 @@ def letter_template_change_language(template_id, service_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachments", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def email_template_manage_attachments(template_id, service_id):
+    template = current_service.get_template(template_id)
+
+    return render_template(
+        "views/templates/manage-email-attachments.html",
+        template=template,
+    )
+
+
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/change-language/confirm", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 def letter_template_confirm_remove_welsh(template_id, service_id):
