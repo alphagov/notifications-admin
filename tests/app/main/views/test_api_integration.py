@@ -600,7 +600,7 @@ def test_should_validate_guestlist_items(
     assert mock_update_guest_list.called is False
 
 
-def test_GET_delivery_status_callback_page_when_callback_set_up(
+def test_GET_delivery_status_callback_page_when_callback_is_set_up(
     client_request,
     service_one,
     mock_get_valid_service_callback_api,
@@ -775,7 +775,7 @@ def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_in
     assert page.select(".pill-separate-item")[2]["href"] == url_for(expected_link, service_id=service_one["id"])
 
 
-def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_sms(
+def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_sms_or_letter_permissions(
     client_request, service_one, mock_get_valid_service_callback_api
 ):
     page = client_request.get(
@@ -788,17 +788,18 @@ def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_s
 
 
 @pytest.mark.parametrize(
-    "has_inbound_sms, expected_link",
+    "service_permissions, expected_link",
     [
-        (True, "main.api_callbacks"),
-        (False, "main.api_integration"),
+        (["inbound_sms"], "main.api_callbacks"),
+        (["inbound_sms", "letter"], "main.api_callbacks"),
+        (["letter"], "main.api_callbacks"),
+        ([], "main.api_integration"),
     ],
 )
-def test_back_link_directs_to_api_integration_from_delivery_callback_if_no_inbound_sms(
-    client_request, service_one, has_inbound_sms, expected_link
+def test_back_link_directs_to_api_integration_from_delivery_callback_if_no_inbound_sms_or_letter(
+    client_request, service_one, service_permissions, expected_link
 ):
-    if has_inbound_sms:
-        service_one["permissions"] = ["inbound_sms"]
+    service_one["permissions"] = service_permissions
 
     page = client_request.get(
         "main.delivery_status_callback",
