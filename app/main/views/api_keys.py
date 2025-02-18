@@ -273,7 +273,7 @@ def received_text_messages_callback(service_id):
 @user_has_permissions("manage_api_keys")
 def returned_letters_callback(service_id):
     returned_letters_callback_details = current_service.returned_letters_callback_details
-    back_link = ".api_callbacks" if current_service.can_have_multiple_callbacks else ".api_integration"
+    back_link = ".api_callbacks"
 
     form = CallbackForm(
         url=returned_letters_callback_details.get("url") if returned_letters_callback_details else "",
