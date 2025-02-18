@@ -24,11 +24,8 @@ dummy_bearer_token = "bearer_token_set"
 @main.route("/services/<uuid:service_id>/api")
 @user_has_permissions("manage_api_keys")
 def api_integration(service_id):
-    callbacks_link = (
-        ".api_callbacks"
-        if current_service.has_permission("inbound_sms") or current_service.has_permission("letter")
-        else ".delivery_status_callback"
-    )  # noqa: E501
+    callbacks_link = ".api_callbacks" if current_service.can_have_multiple_callbacks else ".delivery_status_callback"
+
     return render_template(
         "views/api/index.html",
         callbacks_link=callbacks_link,
@@ -145,7 +142,7 @@ def check_token_against_dummy_bearer(token):
 @main.route("/services/<uuid:service_id>/api/callbacks", methods=["GET"])
 @user_has_permissions("manage_api_keys")
 def api_callbacks(service_id):
-    if not current_service.has_permission("inbound_sms") and not current_service.has_permission("letter"):
+    if not current_service.can_have_multiple_callbacks:
         return redirect(url_for(".delivery_status_callback", service_id=service_id))
 
     return render_template(
@@ -175,7 +172,7 @@ def api_callbacks(service_id):
 @user_has_permissions("manage_api_keys")
 def delivery_status_callback(service_id):
     delivery_status_callback_details = current_service.delivery_status_callback_details
-    back_link = ".api_callbacks" if current_service.has_permission("inbound_sms") else ".api_integration"
+    back_link = ".api_callbacks" if current_service.can_have_multiple_callbacks else ".api_integration"
 
     form = CallbackForm(
         url=delivery_status_callback_details.get("url") if delivery_status_callback_details else "",
@@ -276,11 +273,7 @@ def received_text_messages_callback(service_id):
 @user_has_permissions("manage_api_keys")
 def returned_letters_callback(service_id):
     returned_letters_callback_details = current_service.returned_letters_callback_details
-    back_link = (
-        ".api_callbacks"
-        if current_service.has_permission("inbound_sms") or current_service.has_permission("letter")
-        else ".api_integration"
-    )
+    back_link = ".api_callbacks" if current_service.can_have_multiple_callbacks else ".api_integration"
 
     form = CallbackForm(
         url=returned_letters_callback_details.get("url") if returned_letters_callback_details else "",

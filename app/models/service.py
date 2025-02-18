@@ -643,6 +643,12 @@ class Service(JSONModel):
         return self.unsubscribe_requests_statistics["datetime_of_latest_unsubscribe_request"]
 
     @property
+    def can_have_multiple_callbacks(self):
+        if self.has_permission("inbound_sms") or self.has_permission("letter"):
+            return True
+        return False
+
+    @property
     def inbound_sms_callback_details(self):
         if self.inbound_api:
             return service_api_client.get_service_inbound_api(self.id, self.inbound_api[0])
