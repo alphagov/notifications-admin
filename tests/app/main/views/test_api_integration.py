@@ -601,6 +601,31 @@ def test_should_validate_guestlist_items(
 
 
 @pytest.mark.parametrize(
+    "callback_api_response",
+    [
+        ["8daaed46-bfa3-423b-9bd0-f66ceadd13d0"],
+        [{"callback_id": "8daaed46-bfa3-423b-9bd0-f66ceadd13d0", "callback_type": "delivery_status"}],
+    ],
+)
+def test_GET_delivery_status_callback_page_when_callback_set_up(
+    client_request,
+    service_one,
+    mock_get_valid_service_callback_api,
+    callback_api_response,
+):
+    service_one["service_callback_api"] = callback_api_response
+
+    page = client_request.get(
+        "main.delivery_status_callback",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    textboxes = page.select("input.govuk-input")
+    assert textboxes[0].get("value") == "https://hello2.gov.uk"
+    assert textboxes[1].get("value") == "bearer_token_set"
+
+
+@pytest.mark.parametrize(
     "endpoint",
     [
         "main.delivery_status_callback",
