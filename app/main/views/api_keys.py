@@ -164,7 +164,14 @@ def api_callbacks(service_id):
 
 def get_delivery_status_callback_details():
     if current_service.service_callback_api:
-        return service_api_client.get_service_callback_api(current_service.id, current_service.service_callback_api[0])
+        if isinstance(current_service.service_callback_api[0], str):
+            return service_api_client.get_service_callback_api(
+                current_service.id, current_service.service_callback_api[0]
+            )
+        else:
+            for row in current_service.service_callback_api:
+                if row["callback_type"] == "delivery_status":
+                    return service_api_client.get_service_callback_api(current_service.id, row["callback_id"])
 
 
 @main.route("/services/<uuid:service_id>/api/callbacks/delivery-status-callback", methods=["GET", "POST"])
