@@ -38,7 +38,7 @@
             "text": "Available for"
         },
         "value": {
-            "text": "26 weeks after sending",
+            "text": attachment.weeks_of_retention|string + " weeks after sending",
             "classes": "govuk-summary-list__value--truncate"
         },
         "actions": {
@@ -63,7 +63,7 @@
             "text": "Confirm email address"
         },
         "value": {
-            "text": "Yes",
+            "text": "Yes" if attachment.email_confirmation else "No",
             "classes": "govuk-summary-list__value--truncate"
         },
         "actions": {
