@@ -28,7 +28,14 @@
   <div class="govuk-!-margin-bottom-2">
     <div class="js-stick-at-bottom-when-scrolling">
       <span class="govuk-hint" style="position: relative; top: 7px;">
-        No files attached
+        {% if not attachments.count %}
+          No files
+        {% elif attachments.count == 1 %}
+          1 file
+        {% else %}
+          {{ attachments.count }} files
+        {% endif %}
+        attached
       </span>
 
       {{ govukButton({
