@@ -3,6 +3,8 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 {% from "components/file-upload.html" import file_upload %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/banner.html" import banner %}
 {% set title = 'Attach ‘' + placeholder + '’'%}
 {% block service_page_title %}
   {{ title }}
@@ -13,6 +15,15 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+
+  {% if delete %}
+    {{ banner(
+      'Are you sure you want to remove this attachment',
+      type='dangerous',
+      delete_button='Yes, remove',
+      action=url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder, delete="true")
+    ) }}
+  {% endif %}
   {{ page_header(title) }}
   {{ govukSummaryList({
     "classes": "notify-summary-list service-base-settings",
@@ -84,4 +95,11 @@
       }
     ]
   }) }}
+
+  {% if attachment.file_name %}
+    {{ page_footer(
+      delete_link=url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder, delete=true),
+      delete_link_text="Remove this attachment",
+    ) }}
+  {% endif %}
 {% endblock %}
