@@ -23,8 +23,8 @@
             "text": "File"
         },
         "value": {
-            "html": file_upload(form.file),
-            "classes": "govuk-summary-list__value--truncate govuk-hint"
+            "html": attachment.file_name or file_upload(form.file),
+            "classes": ""
         },
         "actions": {
           "items": [
