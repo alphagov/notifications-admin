@@ -1,6 +1,6 @@
 import json
 
-from notifications_utils.insensitive_dict import InsensitiveDict
+from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 
 from app.extensions import redis_client
 from app.models import JSONModel
@@ -32,13 +32,13 @@ class TemplateAttachment(JSONModel):
 
 
 class TemplateAttachments():
-    def __init__(self, template_id):
-        self._template_id = template_id
+    def __init__(self, template):
+        self._template = template
         self._dict = InsensitiveDict(json.loads(redis_client.get(self.cache_key) or "{}"))
 
     @property
     def cache_key(self):
-        return f"template-{self._template_id}-attachments"
+        return f"template-{self._template.id}-attachments"
 
     def __getitem__(self, placeholder_name):
         if placeholder_name not in self._dict:
@@ -52,3 +52,10 @@ class TemplateAttachments():
     def __setitem__(self, placeholder_name, value):
         self._dict[InsensitiveDict.make_key(placeholder_name)] = value
         redis_client.set(self.cache_key, json.dumps(self._dict))
+
+    @property
+    def count(self):
+        return sum(
+            bool(self[key]) for key in self._dict
+            if key in InsensitiveDict.from_keys(self._template.placeholders)
+        )
