@@ -3060,7 +3060,6 @@ class EmailAttachmentForm(StripWhitespaceForm):
         "Add recipients",
         validators=[
             DataRequired(message="You need to chose a file to upload"),
-            CsvFileValidator(),
             FileSize(max_size=10 * 1024 * 1024, message="The file must be smaller than 10MB"),
         ],
     )

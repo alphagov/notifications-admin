@@ -1411,7 +1411,7 @@ def email_template_manage_attachments(template_id, service_id):
             },
             "value": {
                 "text": attachments[placeholder].file_name or "No file attached",
-                "classes": "govuk-summary-list__value--truncate govuk-hint"
+                "classes": "govuk-summary-list__value--truncate" if attachments[placeholder] else "govuk-summary-list__value--truncate govuk-hint",
             },
             "actions": {
             "items": [
@@ -1436,6 +1436,7 @@ def email_template_manage_attachments(template_id, service_id):
         "views/templates/manage-email-attachments.html",
         template=template,
         rows=rows,
+        attachments=attachments,
     )
 
 
@@ -1444,8 +1445,11 @@ def email_template_manage_attachments(template_id, service_id):
 def email_template_manage_attachment(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
-    attachment = TemplateAttachments(template.id)["placeholder"]
+    attachment = TemplateAttachments(template.id)[placeholder]
     form = EmailAttachmentForm()
+    if form.validate_on_submit():
+        attachment.file_name = form.file.data.filename
+        return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
     return render_template(
         "views/templates/manage-email-attachment.html",
         template=template,
@@ -1460,11 +1464,12 @@ def email_template_manage_attachment(template_id, service_id):
 def email_template_manage_attachment_retention(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
-    attachment = TemplateAttachments(template.id)["placeholder"]
+    attachment = TemplateAttachments(template.id)[placeholder]
     form = SetServiceAttachmentDataRetentionForm(
         weeks_of_retention=attachment.weeks_of_retention
     )
     if form.validate_on_submit():
+        attachment.weeks_of_retention = form.weeks_of_retention.data
         return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
     return render_template(
         "views/templates/manage-email-attachment-retention.html",
@@ -1479,7 +1484,7 @@ def email_template_manage_attachment_retention(template_id, service_id):
 def email_template_manage_attachment_email_confirmation(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
-    attachment = TemplateAttachments(template.id)["placeholder"]
+    attachment = TemplateAttachments(template.id)[placeholder]
     form = OnOffSettingForm(
         "Require recipient to confirm email address",
         truthy="Yes",
@@ -1487,6 +1492,7 @@ def email_template_manage_attachment_email_confirmation(template_id, service_id)
         enabled=attachment.email_confirmation,
     )
     if form.validate_on_submit():
+        attachment.email_confirmation = form.enabled.data
         return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
     return render_template(
         "views/templates/manage-email-attachment-email-confirmation.html",
