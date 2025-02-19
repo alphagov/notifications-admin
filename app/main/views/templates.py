@@ -1458,6 +1458,8 @@ def email_template_manage_attachment_retention(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
     form = SetServiceAttachmentDataRetentionForm()
+    if form.validate_on_submit():
+        return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
     return render_template(
         "views/templates/manage-email-attachment-retention.html",
         template=template,
@@ -1476,6 +1478,8 @@ def email_template_manage_attachment_email_confirmation(template_id, service_id)
         truthy="Yes",
         falsey="No",
     )
+    if form.validate_on_submit():
+        return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
     return render_template(
         "views/templates/manage-email-attachment-email-confirmation.html",
         template=template,
