@@ -38,16 +38,16 @@
             "text": "Available for"
         },
         "value": {
-            "text": "90 days after sending",
+            "text": "26 weeks after sending",
             "classes": "govuk-summary-list__value--truncate"
         },
         "actions": {
           "items": [
               {
                   "href": url_for(
-                      'main.email_template_manage_attachment',
-                      service_id=service_id,
-                      template_id=template_id,
+                      'main.email_template_manage_attachment_retention',
+                      service_id=current_service.id,
+                      template_id=template.id,
                       placeholder=placeholder.strip(),
                   ),
                   "text": "Change",
@@ -70,9 +70,9 @@
           "items": [
               {
                   "href": url_for(
-                      'main.email_template_manage_attachment',
-                      service_id=service_id,
-                      template_id=template_id,
+                      'main.email_template_manage_attachment_email_confirmation',
+                      service_id=current_service.id,
+                      template_id=template.id,
                       placeholder=placeholder.strip(),
                   ),
                   "text": "Change",
