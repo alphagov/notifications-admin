@@ -1445,9 +1445,13 @@ def email_template_manage_attachments(template_id, service_id):
 @user_has_permissions("manage_templates")
 def email_template_manage_attachment(template_id, service_id):
     template = current_service.get_template(template_id)
-    placeholder = request.args.get("placeholder")
+    placeholder = request.args.get("placeholder", "")
     attachment = TemplateAttachments(template)[placeholder]
+    delete = bool(request.args.get("delete"))
     form = EmailAttachmentForm()
+    if delete and request.method == "POST":
+        del TemplateAttachments(template)[placeholder]
+        return redirect(url_for('main.email_template_manage_attachments', service_id=current_service.id, template_id=template.id))
     if form.validate_on_submit():
         attachment.file_name = form.file.data.filename
         return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
@@ -1457,6 +1461,7 @@ def email_template_manage_attachment(template_id, service_id):
         placeholder=placeholder,
         form=form,
         attachment=attachment,
+        delete=delete,
     )
 
 
