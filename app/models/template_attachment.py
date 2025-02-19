@@ -53,6 +53,10 @@ class TemplateAttachments():
         self._dict[InsensitiveDict.make_key(placeholder_name)] = value
         redis_client.set(self.cache_key, json.dumps(self._dict))
 
+    def __delitem__(self, placeholder_name):
+        self._dict.pop(InsensitiveDict.make_key(placeholder_name))
+        redis_client.set(self.cache_key, json.dumps(self._dict))
+
     @property
     def count(self):
         return sum(
