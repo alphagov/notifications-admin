@@ -129,9 +129,15 @@ def get_apis():
     callback_api = None
     inbound_api = None
     if current_service.service_callback_api:
-        callback_api = service_api_client.get_service_callback_api(
-            current_service.id, current_service.service_callback_api[0]
-        )
+        if isinstance(current_service.service_callback_api[0], str):
+            callback_api = service_api_client.get_service_callback_api(
+                current_service.id, current_service.service_callback_api[0]
+            )
+        else:
+            for row in current_service.service_callback_api:
+                if row["callback_type"] == "delivery_status":
+                    callback_api = service_api_client.get_service_callback_api(current_service.id, row["callback_id"])
+
     if current_service.inbound_api:
         inbound_api = service_api_client.get_service_inbound_api(current_service.id, current_service.inbound_api[0])
 
