@@ -61,6 +61,7 @@ from app.main.forms import (
 from app.main.views.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, UserTemplateList, UserTemplateLists
+from app.models.template_attachment import TemplateAttachments
 from app.s3_client.s3_letter_upload_client import (
     backup_original_letter_to_s3,
     get_attachment_pdf_and_metadata,
@@ -1401,7 +1402,7 @@ def letter_template_change_language(template_id, service_id):
 @user_has_permissions("manage_templates")
 def email_template_manage_attachments(template_id, service_id):
     template = current_service.get_template(template_id)
-
+    attachments = TemplateAttachments(template.id)
     rows = [
         {
             "key": {
@@ -1409,7 +1410,7 @@ def email_template_manage_attachments(template_id, service_id):
                 "text": placeholder
             },
             "value": {
-                "text": "No file attached",
+                "text": attachments[placeholder].file_name or "No file attached",
                 "classes": "govuk-summary-list__value--truncate govuk-hint"
             },
             "actions": {
@@ -1443,12 +1444,14 @@ def email_template_manage_attachments(template_id, service_id):
 def email_template_manage_attachment(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
+    attachment = TemplateAttachments(template.id)["placeholder"]
     form = EmailAttachmentForm()
     return render_template(
         "views/templates/manage-email-attachment.html",
         template=template,
         placeholder=placeholder,
         form=form,
+        attachment=attachment,
     )
 
 
@@ -1457,7 +1460,10 @@ def email_template_manage_attachment(template_id, service_id):
 def email_template_manage_attachment_retention(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
-    form = SetServiceAttachmentDataRetentionForm()
+    attachment = TemplateAttachments(template.id)["placeholder"]
+    form = SetServiceAttachmentDataRetentionForm(
+        weeks_of_retention=attachment.weeks_of_retention
+    )
     if form.validate_on_submit():
         return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
     return render_template(
@@ -1473,10 +1479,12 @@ def email_template_manage_attachment_retention(template_id, service_id):
 def email_template_manage_attachment_email_confirmation(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
+    attachment = TemplateAttachments(template.id)["placeholder"]
     form = OnOffSettingForm(
         "Require recipient to confirm email address",
         truthy="Yes",
         falsey="No",
+        enabled=attachment.email_confirmation,
     )
     if form.validate_on_submit():
         return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
