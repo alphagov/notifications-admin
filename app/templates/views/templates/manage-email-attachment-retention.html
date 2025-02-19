@@ -1,0 +1,21 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% set title = 'How long should the file be available for?'%}
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+  {% call form_wrapper(class='top-gutter') %}
+    {{ form.weeks_of_retention() }}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+{% endblock %}
