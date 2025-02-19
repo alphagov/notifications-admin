@@ -134,6 +134,7 @@ def view_template(service_id, template_id):
         template=template,
         user_has_template_permission=user_has_template_permission,
         content_count_message=content_count_message,
+        attachments=TemplateAttachments(template),
     )
 
 
@@ -1402,7 +1403,7 @@ def letter_template_change_language(template_id, service_id):
 @user_has_permissions("manage_templates")
 def email_template_manage_attachments(template_id, service_id):
     template = current_service.get_template(template_id)
-    attachments = TemplateAttachments(template.id)
+    attachments = TemplateAttachments(template)
     rows = [
         {
             "key": {
@@ -1445,7 +1446,7 @@ def email_template_manage_attachments(template_id, service_id):
 def email_template_manage_attachment(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
-    attachment = TemplateAttachments(template.id)[placeholder]
+    attachment = TemplateAttachments(template)[placeholder]
     form = EmailAttachmentForm()
     if form.validate_on_submit():
         attachment.file_name = form.file.data.filename
@@ -1464,7 +1465,7 @@ def email_template_manage_attachment(template_id, service_id):
 def email_template_manage_attachment_retention(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
-    attachment = TemplateAttachments(template.id)[placeholder]
+    attachment = TemplateAttachments(template)[placeholder]
     form = SetServiceAttachmentDataRetentionForm(
         weeks_of_retention=attachment.weeks_of_retention
     )
@@ -1484,7 +1485,7 @@ def email_template_manage_attachment_retention(template_id, service_id):
 def email_template_manage_attachment_email_confirmation(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
-    attachment = TemplateAttachments(template.id)[placeholder]
+    attachment = TemplateAttachments(template)[placeholder]
     form = OnOffSettingForm(
         "Require recipient to confirm email address",
         truthy="Yes",
