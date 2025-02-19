@@ -1,22 +1,21 @@
-(function (Modules) {
-  'use strict';
+import { isSupported } from 'govuk-frontend';
 
-  var lists = [],
-      listEntry,
-      ListEntry;
+class _ListEntry {
+  constructor($module) {
+    if (!isSupported()) {
+      return this;
+    }
 
-  ListEntry = function (elm) {
-    var $elm = $(elm),
-        idPattern = $elm.prop('id');
+    const idPattern = $module.getAttribute('id');
 
-    if (!idPattern) { return false; }
+    if (idPattern === null) { return false; }
     this.idPattern = idPattern;
     this.elementSelector = '.list-entry, .input-list__button--remove, .input-list__button--add';
     this.sharedInputClasses = ['govuk-input', 'govuk-input--numbered'];
     this.entries = [];
-    this.$wrapper = $elm;
+    this.$wrapper = $module;
     this.minEntries = 2;
-    this.listItemName = this.$wrapper.data('listItemName');
+    this.listItemName = this.$wrapper.dataset.listItemName;
     this.getCustomClasses();
     this.getSharedAttributes();
 
@@ -25,9 +24,9 @@
     this.trimEntries();
     this.render();
     this.bindEvents();
-  };
-  ListEntry.optionalAttributes = ['aria-describedby'];
-  ListEntry.prototype.entryTemplate = dataObj => {
+  }
+
+  entryTemplate (dataObj) {
     const { error, id, name, listItemName, number, value, customClasses, button, sharedInputClasses, sharedAttributes } = dataObj;
 
     return `
@@ -54,14 +53,16 @@
           </button>` : ''}
         </div>
       </div>`;
-  };
-  ListEntry.prototype.addButtonTemplate = dataObj => {
+  }
+
+  addButtonTemplate (dataObj) {
     const { listItemName, entriesLeft } = dataObj;
 
     return `<button type="button" class="govuk-button govuk-button--secondary input-list__button--add">Add another ${listItemName} (${entriesLeft} remaining)</button>`;
-  };
-  ListEntry.prototype.getSharedAttributes = function () {
-    var $inputs = this.$wrapper.find('input'),
+  }
+
+  getSharedAttributes () {
+    var $inputs = this.$wrapper.querySelectorAll('input'),
         attributeTemplate = dataObj => {
           const { name, value } = dataObj;
 
@@ -85,7 +86,7 @@
         attrIdx = elmAttrs.length;
         while (attrIdx--) {
           // prevent duplicates
-          if ($.inArray(elmAttrs[attrIdx].name, existingAttributes) === -1) {
+          if (!existingAttributes.includes(elmAttrs[attrIdx].name)) {
             attrStr += attributeTemplate({ 'name': elmAttrs[attrIdx].name, 'value': elmAttrs[attrIdx].value });
             existingAttributes.push(elmAttrs[attrIdx].name);
           }
@@ -94,11 +95,11 @@
       return attrStr;
     };
 
-    $inputs.each(function (idx, elm) {
+    $inputs.forEach(function (elm) {
       attrIdx = elm.attributes.length;
       elmAttributes = [];
       while(attrIdx--) {
-        if ($.inArray(elm.attributes[attrIdx].name, protectedAttributes) === -1) {
+        if (!protectedAttributes.includes(elm.attributes[attrIdx].name)) {
           elmAttributes.push({
             'name': elm.attributes[attrIdx].name,
             'value': elm.attributes[attrIdx].value
@@ -111,14 +112,15 @@
     });
 
     this.sharedAttributes = (attributes.length) ? getAttributesHTML(attributes) : '';
-  };
-  ListEntry.prototype.getCustomClasses = function () {
+  }
+
+  getCustomClasses () {
     this.customClasses = [];
-    this.$wrapper.find('input').each(function (idx, elm) {
+    this.$wrapper.querySelectorAll('input').forEach(function ($elm) {
       var customClassesForElm = [];
 
-      elm.classList.forEach(token => {
-        if (($.inArray(token, this.sharedInputClasses) === -1) && (token !== 'govuk-input--error')) {
+      $elm.classList.forEach(token => {
+        if (!this.sharedInputClasses.includes(token) && (token !== 'govuk-input--error')) {
           customClassesForElm.push(token);
         }
       });
@@ -127,23 +129,27 @@
         this.customClasses.push(customClassesForElm);
       }
     }.bind(this));
-  };
-  ListEntry.prototype.getValuesAndErrors = function () {
+  }
+
+  getValuesAndErrors () {
     this.entries = [];
     this.errors = [];
-    this.$wrapper.find('input').each(function (idx, elm) {
-      var val = $(elm).val();
-      var $error = $(elm).prev('p.govuk-error-message');
+    this.$wrapper.querySelectorAll('input').forEach(function ($elm) {
+      var val = $elm.value;
+      var $error = $elm.previousElementSibling;
+
+      $error = $error.matches('p.govuk-error-message') ? $error : null;
 
       this.entries.push(val);
-      if ($error.length > 0) {
-        this.errors.push($error.get(0).textContent.trim().replace('Error: ', ''));
+      if ($error !== null) {
+        this.errors.push($error.textContent.trim().replace('Error: ', ''));
       } else {
         this.errors.push(null);
       }
     }.bind(this));
-  };
-  ListEntry.prototype.trimEntries = function () {
+  }
+
+  trimEntries () {
     var entryIdx = this.entries.length,
         newEntries = [];
 
@@ -157,24 +163,29 @@
       }
     }
     this.entries = newEntries.reverse();
-  };
-  ListEntry.prototype.getId = function (num) {
+  }
+
+  getId (num) {
     var pattern = this.idPattern.replace("list-entry-", "");
     if ("undefined" === typeof num) {
       return pattern;
     } else {
       return pattern + "-" + num;
     }
-  };
-  ListEntry.prototype.bindEvents = function () {
-    this.$wrapper.on('click', '.input-list__button--remove', function (e) {
-      this.removeEntry($(e.target));
+  }
+
+  bindEvents () {
+    this.$wrapper.addEventListener('click', function (e) {
+      if (e.target.matches('.input-list__button--remove')) {
+        this.removeEntry($(e.target));
+      }
+      if (e.target.matches('.input-list__button--add')) {
+        this.addEntry();
+      }
     }.bind(this));
-    this.$wrapper.on('click', '.input-list__button--add', function (e) {
-      this.addEntry();
-    }.bind(this));
-  };
-  ListEntry.prototype.shiftFocus = function (opts) {
+  }
+
+  shiftFocus (opts) {
     var numberTargeted;
 
     if (opts.action === 'remove') {
@@ -182,33 +193,37 @@
     } else { // opts.action === 'add'
       numberTargeted = opts.entryNumberFocused + 1;
     }
-    this.$wrapper.find('.list-entry').eq(numberTargeted - 1).find('input').focus();
-  };
-  ListEntry.prototype.removeEntryFromEntriesAndErrors = function (entryNumber) {
+    this.$wrapper.querySelectorAll('.list-entry')[numberTargeted - 1].querySelector('input').focus();
+  }
+
+  removeEntryFromEntriesAndErrors (entryNumber) {
     var entryIdx = entryNumber - 1;
 
     this.entries.splice(entryIdx, 1);
     this.errors.splice(entryIdx, 1);
-  };
-  ListEntry.prototype.addEntry = function ($removeButton) {
+  }
+
+  addEntry ($removeButton) {
     var currentLastEntryNumber = this.entries.length;
 
     this.getValuesAndErrors();
     this.entries.push('');
     this.render();
     this.shiftFocus({ 'action' : 'add', 'entryNumberFocused' : currentLastEntryNumber });
-  };
-  ListEntry.prototype.removeEntry = function ($removeButton) {
+  }
+
+  removeEntry ($removeButton) {
     var entryNumber = parseInt($removeButton.find('span').text().match(/\d+/)[0], 10);
 
     this.getValuesAndErrors();
     this.removeEntryFromEntriesAndErrors(entryNumber);
     this.render();
     this.shiftFocus({ 'action' : 'remove', 'entryNumberFocused' : entryNumber });
-  };
-  ListEntry.prototype.render = function () {
-    this.$wrapper.find(this.elementSelector).remove();
-    $.each(this.entries, function (idx, entry) {
+  }
+
+  render () {
+    this.$wrapper.querySelectorAll(this.elementSelector).forEach(el => el.remove());
+    this.entries.forEach(function (entry, idx) {
       var entryNumber = idx + 1,
           error = this.errors[idx],
           customClasses = this.customClasses[idx],
@@ -232,20 +247,27 @@
       if (customClasses !== null) {
         dataObj.customClasses = ' ' + customClasses.join(' ');
       }
-      this.$wrapper.append(this.entryTemplate(dataObj));
+      this.$wrapper.insertAdjacentHTML('beforeend', this.entryTemplate(dataObj));
     }.bind(this));
     if (this.entries.length < this.maxEntries) {
-      this.$wrapper.append(this.addButtonTemplate({
+      this.$wrapper.insertAdjacentHTML('beforeend', this.addButtonTemplate({
         'listItemName' : this.listItemName,
         'entriesLeft' : (this.maxEntries - this.entries.length)
       }));
     }
-  };
+  }
+}
 
-  Modules.ListEntry = function () {
+const _lists = [];
 
-    this.start = component => lists.push(new ListEntry($(component)));
+class ListEntry {
+  constructor($module) {
+    if (!isSupported()) {
+      return this;
+    }
 
-  };
+    _lists.push(new _ListEntry($module));
+  }
+}
 
-})(window.GOVUK.NotifyModules);
+export default ListEntry;

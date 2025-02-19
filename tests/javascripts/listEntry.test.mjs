@@ -1,9 +1,7 @@
-beforeAll(() => {
-  require('../../app/assets/javascripts/listEntry.js');
-});
+import ListEntry from '../../app/assets/javascripts/esm/list-entry.mjs';
 
-afterAll(() => {
-  require('./support/teardown.js');
+beforeAll(() => {
+  document.body.classList.add('govuk-frontend-supported');
 });
 
 describe("List entry", () => {
@@ -88,7 +86,7 @@ describe("List entry", () => {
     test("Should remove all the fields except the first 2 if no values are present", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       expect(inputList.querySelectorAll('.list-entry').length).toEqual(2);
 
@@ -102,7 +100,7 @@ describe("List entry", () => {
       fields[0].setAttribute('value', domains[0]);
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       // re-select fields, based on updated DOM
       fields = inputList.querySelectorAll('.list-entry input[type=text]');
@@ -120,7 +118,7 @@ describe("List entry", () => {
       fields[1].setAttribute('value', domains[1]);
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       // re-select fields, based on updated DOM
       fields = inputList.querySelectorAll('.list-entry input[type=text]');
@@ -138,7 +136,7 @@ describe("List entry", () => {
       fourDomains.forEach((domain, idx) => { fields[idx].setAttribute('value', domain) });
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       // re-select fields, based on updated DOM
       fields = inputList.querySelectorAll('.list-entry input[type=text]');
@@ -154,7 +152,7 @@ describe("List entry", () => {
     test("Should add 'remove' buttons to all fields except the first", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       inputList.querySelectorAll('.list-entry').forEach((listEntry, idx) => {
 
@@ -171,7 +169,7 @@ describe("List entry", () => {
     test("Should add an 'add feature' button to the bottom of the list", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       const listItems = inputList.children;
 
@@ -180,7 +178,7 @@ describe("List entry", () => {
     });
 
     test("Should copy all unique attributes into the new fields", () => {
-      name_value_pairs = [];
+      const name_value_pairs = [];
 
       inputList.querySelectorAll('.list-entry input[type=text]').forEach((field, idx) => {
 
@@ -192,10 +190,10 @@ describe("List entry", () => {
       });
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       // re-select fields, based on updated DOM
-      fields = inputList.querySelectorAll('.list-entry input[type=text]').forEach((field, idx) => {
+      const fields = inputList.querySelectorAll('.list-entry input[type=text]').forEach((field, idx) => {
 
         expect(field.getAttribute('name')).toEqual(name_value_pairs[idx].name);
         expect(field.getAttribute('value')).toEqual(name_value_pairs[idx].value);
@@ -214,10 +212,10 @@ describe("List entry", () => {
       });
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       // re-select fields, based on updated DOM
-      fields = inputList.querySelectorAll('.list-entry input[type=text]');
+      const fields = inputList.querySelectorAll('.list-entry input[type=text]');
 
       expect(fields[0].getAttribute('pattern')).toEqual('[\w\.]+');
       expect(fields[0].classList.contains('top-level-domain')).toBe(true);
@@ -267,7 +265,7 @@ describe("List entry", () => {
         });
 
         // start module
-        window.GOVUK.notifyModules.start();
+        const _listEntry = new ListEntry(inputList);
 
       });
 
@@ -314,7 +312,7 @@ describe("List entry", () => {
       setFieldValues(10);
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
     });
 
     test("Should remove the associated field", () => {
@@ -391,7 +389,7 @@ describe("List entry", () => {
     test("Should add a new field", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       triggerEvent(inputList.querySelector('.input-list__button--add'), 'click');
 
@@ -402,7 +400,7 @@ describe("List entry", () => {
     test("Should update the number of fields users are allowed to enter if one is removed", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       triggerEvent(inputList.querySelectorAll('.input-list__button--remove')[0], 'click');
 
@@ -413,7 +411,7 @@ describe("List entry", () => {
     test("Should update the number of fields users are allowed to enter if one is added", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       triggerEvent(inputList.querySelector('.input-list__button--add'), 'click');
 
@@ -426,7 +424,7 @@ describe("List entry", () => {
       setFieldValues(9);
 
       // start module
-      window.GOVUK.notifyModules.start();
+      const _listEntry = new ListEntry(inputList);
 
       triggerEvent(inputList.querySelector('.input-list__button--add'), 'click');
 

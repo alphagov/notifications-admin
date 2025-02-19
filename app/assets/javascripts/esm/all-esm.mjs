@@ -9,6 +9,7 @@ import Autofocus from './autofocus.mjs';
 import Homepage from './homepage.mjs';
 import PreviewPane from './preview-pane.mjs';
 import CopyToClipboard from './copy-to-clipboard.mjs';
+import ListEntry from './list-entry.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -55,6 +56,11 @@ if ($previewPane) {
 const $CopyToClipboardArray = document.querySelectorAll('[data-notify-module="copy-to-clipboard"]');
 if ($CopyToClipboardArray.length > 0) {
   $CopyToClipboardArray.forEach((el) => new CopyToClipboard(el));
+}
+
+const $ListEntryArray = document.querySelectorAll('[data-notify-module="list-entry"]');
+if ($ListEntryArray.length > 0) {
+  $ListEntryArray.forEach((el) => new ListEntry(el));
 }
 
 const focusBanner = new FocusBanner();
