@@ -19,6 +19,7 @@ from flask import (
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
+from notifications_utils.field import Field
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.s3 import s3download
 from notifications_utils.template import Template
@@ -1408,7 +1409,7 @@ def email_template_manage_attachments(template_id, service_id):
         {
             "key": {
                 "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-                "text": placeholder
+                "html": Field(f"(({placeholder}))")
             },
             "value": {
                 "text": attachments[placeholder].file_name or "No file attached",
