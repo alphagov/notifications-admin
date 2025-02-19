@@ -1,3 +1,4 @@
+import base64
 import json
 
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
@@ -32,6 +33,9 @@ class TemplateAttachment(JSONModel):
 
 
 class TemplateAttachments():
+
+    BASE_URL = "https://www.download.example.gov.uk/f/"
+
     def __init__(self, template):
         self._template = template
         self._dict = InsensitiveDict(json.loads(redis_client.get(self.cache_key) or "{}"))
@@ -63,3 +67,10 @@ class TemplateAttachments():
             bool(self[key]) for key in self._dict
             if key in InsensitiveDict.from_keys(self._template.placeholders)
         )
+
+    @property
+    def as_personalisation(self):
+        return {
+            placeholder: f"{self.BASE_URL}{base64.b64encode(attachment['file_name'].encode()).decode()}" if attachment['file_name'] else None
+            for placeholder, attachment in self._dict.items()
+        }

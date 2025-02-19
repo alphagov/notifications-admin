@@ -117,6 +117,8 @@ def view_template(service_id, template_id):
         show_recipient=True,
         include_letter_edit_ui_overlay=True,
     )
+    attachments = TemplateAttachments(template)
+    template.values = attachments.as_personalisation
 
     if template._template["archived"]:
         template.include_letter_edit_ui_overlay = False
@@ -134,7 +136,7 @@ def view_template(service_id, template_id):
         template=template,
         user_has_template_permission=user_has_template_permission,
         content_count_message=content_count_message,
-        attachments=TemplateAttachments(template),
+        attachments=attachments,
     )
 
 
