@@ -55,6 +55,8 @@ from app.main.forms import (
     TemplateFolderForm,
     WelshLetterTemplateForm,
     EmailAttachmentForm,
+    SetServiceAttachmentDataRetentionForm,
+    OnOffSettingForm,
 )
 from app.main.views.send import get_sender_details
 from app.models.service import Service
@@ -1442,6 +1444,38 @@ def email_template_manage_attachment(template_id, service_id):
     form = EmailAttachmentForm()
     return render_template(
         "views/templates/manage-email-attachment.html",
+        template=template,
+        placeholder=placeholder,
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/retention", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def email_template_manage_attachment_retention(template_id, service_id):
+    template = current_service.get_template(template_id)
+    placeholder = request.args.get("placeholder")
+    form = SetServiceAttachmentDataRetentionForm()
+    return render_template(
+        "views/templates/manage-email-attachment-retention.html",
+        template=template,
+        placeholder=placeholder,
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/email-confirmation", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def email_template_manage_attachment_email_confirmation(template_id, service_id):
+    template = current_service.get_template(template_id)
+    placeholder = request.args.get("placeholder")
+    form = OnOffSettingForm(
+        "Require recipient to confirm email address",
+        truthy="Yes",
+        falsey="No",
+    )
+    return render_template(
+        "views/templates/manage-email-attachment-email-confirmation.html",
         template=template,
         placeholder=placeholder,
         form=form,
