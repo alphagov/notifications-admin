@@ -2531,7 +2531,7 @@ class SetServiceAttachmentDataRetentionForm(StripWhitespaceForm):
         things="the number of weeks",
         validators=[
             NotifyDataRequired(thing="a number of weeks"),
-            validators.NumberRange(min=3, max=90, message="The number of weeks must be between 1 and 78"),
+            validators.NumberRange(min=1, max=78, message="The number of weeks must be between 1 and 78"),
         ],
         param_extensions={"hint": {"text": "Must be between 1 week and 78 weeks (18 months)"}},
     )
