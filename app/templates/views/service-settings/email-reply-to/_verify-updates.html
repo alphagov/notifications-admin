@@ -6,6 +6,7 @@
 
 <div class="ajax-block-container">
   {% if verification_status == "pending" %}
+    <div role="status"></div>
     {{ page_header('Checking email reply-to address') }}
     <p class="govuk-body">
       We’re checking that ‘{{ reply_to_email_address }}’ is a real email address.
@@ -19,7 +20,6 @@
     </p>
   {% elif verification_status == "success" %}
     {{ banner("‘{}’ is ready to use".format(reply_to_email_address), type='default', with_tick=True) }}
-
     {{ page_header('Checking email reply-to address') }}
     <div class="js-stick-at-bottom-when-scrolling">
       {{ govukButton({
