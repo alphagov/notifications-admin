@@ -28,12 +28,12 @@
   <div class="govuk-!-margin-bottom-2">
     <div class="js-stick-at-bottom-when-scrolling">
       <span class="govuk-hint" style="position: relative; top: 7px;">
-        {% if not attachments.count %}
+        {% if not template.attachments.count %}
           No files
-        {% elif attachments.count == 1 %}
+        {% elif template.attachments.count == 1 %}
           1 file
         {% else %}
-          {{ attachments.count }} files
+          {{ template.attachments.count }} files
         {% endif %}
         attached
       </span>

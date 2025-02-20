@@ -118,8 +118,7 @@ def view_template(service_id, template_id):
         show_recipient=True,
         include_letter_edit_ui_overlay=True,
     )
-    attachments = TemplateAttachments(template)
-    template.values = attachments.as_personalisation
+    template.values = template.attachments.as_personalisation
 
     if template._template["archived"]:
         template.include_letter_edit_ui_overlay = False
@@ -137,7 +136,6 @@ def view_template(service_id, template_id):
         template=template,
         user_has_template_permission=user_has_template_permission,
         content_count_message=content_count_message,
-        attachments=attachments,
     )
 
 
@@ -1404,7 +1402,6 @@ def letter_template_change_language(template_id, service_id):
 @user_has_permissions("manage_templates")
 def email_template_manage_attachments(template_id, service_id):
     template = current_service.get_template(template_id)
-    attachments = TemplateAttachments(template)
     rows = [
         {
             "key": {
@@ -1412,8 +1409,8 @@ def email_template_manage_attachments(template_id, service_id):
                 "html": Field(f"(({placeholder}))")
             },
             "value": {
-                "text": attachments[placeholder].file_name or "No file attached",
-                "classes": "govuk-summary-list__value--truncate" if attachments[placeholder] else "govuk-summary-list__value--truncate govuk-hint",
+                "text": template.attachments[placeholder].file_name or "No file attached",
+                "classes": "govuk-summary-list__value--truncate" if template.attachments[placeholder] else "govuk-summary-list__value--truncate govuk-hint",
             },
             "actions": {
             "items": [
@@ -1438,7 +1435,6 @@ def email_template_manage_attachments(template_id, service_id):
         "views/templates/manage-email-attachments.html",
         template=template,
         rows=rows,
-        attachments=attachments,
     )
 
 
@@ -1447,11 +1443,11 @@ def email_template_manage_attachments(template_id, service_id):
 def email_template_manage_attachment(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder", "")
-    attachment = TemplateAttachments(template)[placeholder]
+    attachment = template.attachments[placeholder]
     delete = bool(request.args.get("delete"))
     form = EmailAttachmentForm()
     if delete and request.method == "POST":
-        del TemplateAttachments(template)[placeholder]
+        del template.attachments[placeholder]
         return redirect(url_for('main.email_template_manage_attachments', service_id=current_service.id, template_id=template.id))
     if form.validate_on_submit():
         attachment.file_name = form.file.data.filename
@@ -1471,7 +1467,7 @@ def email_template_manage_attachment(template_id, service_id):
 def email_template_manage_attachment_retention(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
-    attachment = TemplateAttachments(template)[placeholder]
+    attachment = template.attachments[placeholder]
     form = SetServiceAttachmentDataRetentionForm(
         weeks_of_retention=attachment.weeks_of_retention
     )
@@ -1491,7 +1487,7 @@ def email_template_manage_attachment_retention(template_id, service_id):
 def email_template_manage_attachment_email_confirmation(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
-    attachment = TemplateAttachments(template)[placeholder]
+    attachment = template.attachments[placeholder]
     form = OnOffSettingForm(
         "Require recipient to confirm email address",
         truthy="Yes",
