@@ -118,7 +118,6 @@ def view_template(service_id, template_id):
         show_recipient=True,
         include_letter_edit_ui_overlay=True,
     )
-    template.values = template.attachments.as_personalisation
 
     if template._template["archived"]:
         template.include_letter_edit_ui_overlay = False
@@ -1430,7 +1429,7 @@ def email_template_manage_attachments(template_id, service_id):
             ]
             }
         }
-        for placeholder in template.placeholders
+        for placeholder in template.all_placeholders
     ]
 
     return render_template(

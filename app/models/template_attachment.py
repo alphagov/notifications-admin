@@ -65,7 +65,7 @@ class TemplateAttachments():
     def count(self):
         return sum(
             bool(self[key]) for key in self._dict
-            if key in InsensitiveDict.from_keys(self._template.placeholders)
+            if key in InsensitiveDict.from_keys(self._template.all_placeholders)
         )
 
     @property
