@@ -13,9 +13,11 @@ from notifications_utils.template import (
     SMSPreviewTemplate,
     do_nice_typography,
 )
+from werkzeug.utils import cached_property
 
 from app.extensions import redis_client
 from app.models import JSONModel
+from app.models.template_attachment import TemplateAttachments
 from app.notify_client import cache
 
 
@@ -273,6 +275,10 @@ class EmailPreviewTemplate(BaseEmailTemplate):
             .then(do_nice_typography)
             .then(normalise_whitespace)
         )
+
+    @cached_property
+    def attachments(self):
+        return TemplateAttachments(self)
 
 
 class LetterAttachment(JSONModel):
