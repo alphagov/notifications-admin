@@ -7,5 +7,5 @@ set_gunicorn_defaults(globals())
 
 workers = 5
 worker_class = "eventlet"
-keepalive = 90
+keepalive = 35
 timeout = int(os.getenv("HTTP_SERVE_TIMEOUT_SECONDS", 30))  # though has little effect with eventlet worker_class
