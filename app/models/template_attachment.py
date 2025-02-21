@@ -1,7 +1,7 @@
 import base64
 import json
 
-from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
+from notifications_utils.insensitive_dict import InsensitiveDict
 
 from app.extensions import redis_client
 from app.models import JSONModel
