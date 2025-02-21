@@ -80,7 +80,7 @@ def test_notification_status_page_shows_details(
     assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == "To: 07123456789"
     assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: hello Jo"
 
-    assert normalize_spaces(page.select(".ajax-block-container p")[0].text) == expected_status
+    assert normalize_spaces(page.select(".ajax-block-container p")[0].text) == f"Status: {expected_status}"
 
     _mock_get_notification.assert_called_with(service_one["id"], fake_uuid)
 
