@@ -32,8 +32,7 @@ class TemplateAttachment(JSONModel):
         return bool(self.file_name)
 
 
-class TemplateAttachments():
-
+class TemplateAttachments:
     BASE_URL = "https://www.download.example.gov.uk/f/"
 
     def __init__(self, template):
@@ -64,13 +63,14 @@ class TemplateAttachments():
     @property
     def count(self):
         return sum(
-            bool(self[key]) for key in self._dict
-            if key in InsensitiveDict.from_keys(self._template.all_placeholders)
+            bool(self[key]) for key in self._dict if key in InsensitiveDict.from_keys(self._template.all_placeholders)
         )
 
     @property
     def as_personalisation(self):
         return {
-            placeholder: f"{self.BASE_URL}{base64.b64encode(attachment['file_name'].encode()).decode()}" if attachment['file_name'] else None
+            placeholder: f"{self.BASE_URL}{base64.b64encode(attachment['file_name'].encode()).decode()}"
+            if attachment["file_name"]
+            else None
             for placeholder, attachment in self._dict.items()
         }
