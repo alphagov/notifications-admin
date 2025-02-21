@@ -42,27 +42,26 @@ from app.formatters import character_count, message_count
 from app.main import main, no_cookie
 from app.main.forms import (
     CopyTemplateForm,
+    EmailAttachmentForm,
     EmailTemplateForm,
     FieldWithNoneOption,
     LetterTemplateForm,
     LetterTemplateLanguagesForm,
     LetterTemplatePostageForm,
+    OnOffSettingForm,
     PDFUploadForm,
     RenameTemplateForm,
     SearchTemplatesForm,
+    SetServiceAttachmentDataRetentionForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
     TemplateAndFoldersSelectionForm,
     TemplateFolderForm,
     WelshLetterTemplateForm,
-    EmailAttachmentForm,
-    SetServiceAttachmentDataRetentionForm,
-    OnOffSettingForm,
 )
 from app.main.views.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, UserTemplateList, UserTemplateLists
-from app.models.template_attachment import TemplateAttachments
 from app.s3_client.s3_letter_upload_client import (
     backup_original_letter_to_s3,
     get_attachment_pdf_and_metadata,
