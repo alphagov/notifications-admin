@@ -771,6 +771,8 @@ def edit_service_template(service_id, template_id, language=None):
             else:
                 raise e
         else:
+            if new_template.template_type == "email":
+                new_template.attachments.prune_orphans()
             editing_english_content_in_bilingual_letter = (
                 template.template_type == "letter" and template.welsh_page_count and language != "welsh"
             )
