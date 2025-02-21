@@ -74,3 +74,8 @@ class TemplateAttachments:
             else None
             for placeholder, attachment in self._dict.items()
         }
+
+    def prune_orphans(self):
+        for placeholder in self._dict.keys():
+            if placeholder not in self._template.all_placeholders:
+                del self[placeholder]
