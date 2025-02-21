@@ -1405,27 +1405,29 @@ def email_template_manage_attachments(template_id, service_id):
         {
             "key": {
                 "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-                "html": Field(f"(({placeholder}))")
+                "html": Field(f"(({placeholder}))"),
             },
             "value": {
                 "text": template.attachments[placeholder].file_name or "No file attached",
-                "classes": "govuk-summary-list__value--truncate" if template.attachments[placeholder] else "govuk-summary-list__value--truncate govuk-hint",
+                "classes": "govuk-summary-list__value--truncate"
+                if template.attachments[placeholder]
+                else "govuk-summary-list__value--truncate govuk-hint",
             },
             "actions": {
-            "items": [
-                {
-                    "href": url_for(
-                        'main.email_template_manage_attachment',
-                        service_id=service_id,
-                        template_id=template_id,
-                        placeholder=placeholder.strip(),
-                    ),
-                    "text": "Change",
-                    "visuallyHiddenText": "service name",
-                    "classes": "govuk-link--no-visited-state"
-                }
-            ]
-            }
+                "items": [
+                    {
+                        "href": url_for(
+                            "main.email_template_manage_attachment",
+                            service_id=service_id,
+                            template_id=template_id,
+                            placeholder=placeholder.strip(),
+                        ),
+                        "text": "Change",
+                        "visuallyHiddenText": "service name",
+                        "classes": "govuk-link--no-visited-state",
+                    }
+                ]
+            },
         }
         for placeholder in template.all_placeholders
     ]
@@ -1447,10 +1449,19 @@ def email_template_manage_attachment(template_id, service_id):
     form = EmailAttachmentForm()
     if delete and request.method == "POST":
         del template.attachments[placeholder]
-        return redirect(url_for('main.email_template_manage_attachments', service_id=current_service.id, template_id=template.id))
+        return redirect(
+            url_for("main.email_template_manage_attachments", service_id=current_service.id, template_id=template.id)
+        )
     if form.validate_on_submit():
         attachment.file_name = form.file.data.filename
-        return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
+        return redirect(
+            url_for(
+                "main.email_template_manage_attachment",
+                service_id=current_service.id,
+                template_id=template.id,
+                placeholder=placeholder,
+            )
+        )
     return render_template(
         "views/templates/manage-email-attachment.html",
         template=template,
@@ -1467,12 +1478,17 @@ def email_template_manage_attachment_retention(template_id, service_id):
     template = current_service.get_template(template_id)
     placeholder = request.args.get("placeholder")
     attachment = template.attachments[placeholder]
-    form = SetServiceAttachmentDataRetentionForm(
-        weeks_of_retention=attachment.weeks_of_retention
-    )
+    form = SetServiceAttachmentDataRetentionForm(weeks_of_retention=attachment.weeks_of_retention)
     if form.validate_on_submit():
         attachment.weeks_of_retention = form.weeks_of_retention.data
-        return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
+        return redirect(
+            url_for(
+                "main.email_template_manage_attachment",
+                service_id=current_service.id,
+                template_id=template.id,
+                placeholder=placeholder,
+            )
+        )
     return render_template(
         "views/templates/manage-email-attachment-retention.html",
         template=template,
@@ -1481,7 +1497,9 @@ def email_template_manage_attachment_retention(template_id, service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/email-confirmation", methods=["GET", "POST"])
+@main.route(
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/email-confirmation", methods=["GET", "POST"]
+)
 @user_has_permissions("manage_templates")
 def email_template_manage_attachment_email_confirmation(template_id, service_id):
     template = current_service.get_template(template_id)
@@ -1495,7 +1513,14 @@ def email_template_manage_attachment_email_confirmation(template_id, service_id)
     )
     if form.validate_on_submit():
         attachment.email_confirmation = form.enabled.data
-        return redirect(url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder))
+        return redirect(
+            url_for(
+                "main.email_template_manage_attachment",
+                service_id=current_service.id,
+                template_id=template.id,
+                placeholder=placeholder,
+            )
+        )
     return render_template(
         "views/templates/manage-email-attachment-email-confirmation.html",
         template=template,
