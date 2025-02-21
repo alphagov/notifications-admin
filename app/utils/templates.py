@@ -3,11 +3,10 @@ from typing import Any
 
 from flask import current_app, render_template, url_for
 from markupsafe import Markup
-from ordered_set import OrderedSet
 from notifications_utils.countries import Postage
-from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.field import Field
 from notifications_utils.formatters import escape_html, formatted_list, normalise_whitespace
+from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.take import Take
 from notifications_utils.template import (
     BaseEmailTemplate,
@@ -15,6 +14,7 @@ from notifications_utils.template import (
     SMSPreviewTemplate,
     do_nice_typography,
 )
+from ordered_set import OrderedSet
 from werkzeug.utils import cached_property
 
 from app.extensions import redis_client
@@ -302,11 +302,11 @@ class EmailPreviewTemplate(BaseEmailTemplate):
     @property
     def placeholders(self):
         return OrderedSet(
-            (
+
                 placeholder
                 for placeholder in self.all_placeholders
                 if InsensitiveDict.make_key(placeholder) not in self.attachments.as_personalisation.keys()
-            )
+
         )
 
 
