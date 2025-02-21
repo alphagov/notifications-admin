@@ -15,9 +15,20 @@
   {{ page_header(title) }}
 
   {% if not rows %}
-    <p class="govuk-body">
-      You need to personalise message first
-    </p>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-five-sixths">
+        <p class="govuk-body">
+          You need to personalise your template before you can upload an attachment, for&nbsp;example:
+        </p>
+        <div class="govuk-inset-text">
+          Download file here: <span class="placeholder">((application form))</span>
+        </div>
+        <p class="govuk-body">
+          When you upload an attachment, Notify will replace the placeholder with a link
+          to download the file.
+        </p>
+      </div>
+    </div>
   {% else %}
     {{ govukSummaryList({
       "classes": "notify-summary-list service-base-settings",
