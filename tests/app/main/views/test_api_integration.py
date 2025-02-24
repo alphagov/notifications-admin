@@ -775,6 +775,51 @@ def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_in
     assert page.select(".pill-separate-item")[2]["href"] == url_for(expected_link, service_id=service_one["id"])
 
 
+@pytest.mark.parametrize(
+    "service_permissions, expected_rows",
+    [
+        pytest.param(
+            [],
+            ["Delivery receipts Not set Change"],
+            marks=pytest.mark.xfail(reason="Endpoint will redirect to delivery receipts page"),
+        ),
+        (
+            ["inbound_sms"],
+            [
+                "Delivery receipts Not set Change",
+                "Received text messages Not set Change",
+            ],
+        ),
+        (
+            ["letter"],
+            [
+                "Delivery receipts Not set Change",
+                "Returned letters Not set Change",
+            ],
+        ),
+        (
+            ["inbound_sms", "letter"],
+            [
+                "Delivery receipts Not set Change",
+                "Received text messages Not set Change",
+                "Returned letters Not set Change",
+            ],
+        ),
+    ],
+)
+def test_callbacks_page_lists_correct_rows_depending_on_service_permissions(
+    client_request, service_one, service_permissions, expected_rows
+):
+    service_one["permissions"] = service_permissions
+
+    page = client_request.get(
+        "main.api_callbacks",
+        service_id=service_one["id"],
+    )
+
+    assert [normalize_spaces(row.text) for row in page.select("main tbody tr")] == expected_rows
+
+
 def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_sms_or_letter_permissions(
     client_request, service_one, mock_get_valid_service_callback_api
 ):
@@ -1060,7 +1105,7 @@ def test_callbacks_page_works_when_no_apis_set(
     expected_3rd_table_row,
     platform_admin_user,
 ):
-    service_one["permissions"] = ["inbound_sms"]
+    service_one["permissions"] = ["inbound_sms", "letter"]
     service_one["inbound_api"] = inbound_api
     service_one["service_callback_api"] = service_callback_api
 
