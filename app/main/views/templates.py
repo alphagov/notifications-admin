@@ -1410,9 +1410,7 @@ def email_template_manage_attachments(template_id, service_id):
             },
             "value": {
                 "text": template.attachments[placeholder].file_name or "No file attached",
-                "classes": "govuk-summary-list__value--truncate"
-                if template.attachments[placeholder]
-                else "govuk-summary-list__value--truncate govuk-hint",
+                "classes": "" if template.attachments[placeholder] else "govuk-hint",
             },
             "actions": {
                 "items": [
