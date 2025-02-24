@@ -6,6 +6,7 @@ import pytest
 from flask import url_for
 
 from app.main.views.platform_admin import (
+    build_live_service_permissions_for_users_list,
     create_global_stats,
     format_stats_by_service,
     get_tech_failure_status_box_data,
@@ -13,7 +14,7 @@ from app.main.views.platform_admin import (
     sum_service_usage,
 )
 from tests import service_json
-from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
+from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, create_user, normalize_spaces
 
 
 def test_should_redirect_if_not_logged_in(client_request):
@@ -1044,3 +1045,99 @@ class TestPlatformAdminSearch:
         page = client_request.post(".platform_admin_search", _data={"search": ""}, _expected_status=200)
 
         assert page.select_one(".govuk-error-summary a")["href"] == "#search"
+
+
+def test_build_live_service_permissions_for_users_list_csv():
+    services = [{"id": "1", "name": "Service 1"}, {"id": "2", "name": "Service 2"}, {"id": "3", "name": "Service 3"}]
+
+    permissions = {
+        "1": ["manage_users", "manage_settings"],  # equivalent to ui manage_service
+        "2": ["send_texts", "send_emails", "send_letters"],  # equivalent to ui send_messages
+        "3": ["manage_templates"],
+    }
+
+    filtered_permissions = {"manage_service", "send_messages"}
+
+    result = build_live_service_permissions_for_users_list(services, permissions, filtered_permissions)
+
+    assert result == "Service 1: manage_service; Service 2: send_messages"
+
+
+def test_platform_admin_users_list_without_any_filters(client_request, platform_admin_user, mocker):
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        "main.platform_admin_users_list",
+        _expected_status=200,
+        _data={},
+    )
+
+    assert "You must provide at least one filter option" in page.select_one(".govuk-error-summary__list").text
+
+
+def test_platform_admin_users_list_when_no_results_for_filters(client_request, platform_admin_user, mocker):
+    client_request.login(platform_admin_user)
+
+    mocker.patch("app.main.views.platform_admin.admin_api_client.fetch_users_list", return_value={"data": []})
+
+    page = client_request.post(
+        "main.platform_admin_users_list", _expected_status=200, _data={"created_to_date": "2024-01-01"}
+    )
+
+    error = page.select_one(".banner-dangerous")
+    assert normalize_spaces(error.text) == "No results for filters selected"
+
+
+def test_platform_admin_users_list_csv_export(client_request, platform_admin_user, mocker):
+    client_request.login(platform_admin_user)
+
+    first_user = create_user(
+        name="User 1",
+        email_address="user1@example.com",
+        created_at="2024-01-01T12:00:00.000Z",
+        take_part_in_research=True,
+        services=[{"id": "1", "name": "Service A"}],
+        permissions={"1": ["manage_users", "manage_settings"]},
+    )
+    second_user = create_user(
+        name="User 2",
+        email_address="user2@example.com",
+        created_at="2024-01-02T12:00:00.000Z",
+        take_part_in_research=False,
+    )
+
+    mocker.patch(
+        "app.main.views.platform_admin.admin_api_client.fetch_users_list",
+        return_value={"data": [first_user, second_user]},
+    )
+
+    response = client_request.post_response(
+        "main.platform_admin_users_list",
+        _data={"created_from_date": "2024-01-01", "created_to_date": "2024-01-02"},
+        _expected_status=200,
+    )
+
+    assert response.content_type == "text/csv; charset=utf-8"
+    assert response.headers["Content-Disposition"].startswith('inline; filename="')
+
+    csv_content = response.get_data(as_text=True)
+
+    expected_csv = (
+        "Name,Email,Created At,Research Opt In,Is Org Team Member,Number of Live Services,Live Service Permissions\r\n"
+        "User 1,user1@example.com,01-01-2024,Yes,No,1,Service A: manage_service\r\n"
+        "User 2,user2@example.com,02-01-2024,No,No,0,\r\n"
+    )
+
+    assert csv_content == expected_csv
+
+
+def test_platform_admin_users_list_with_invalid_date_range(client_request, platform_admin_user, mocker):
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        "main.platform_admin_users_list",
+        _expected_status=200,
+        _data={"created_from_date": "2024-01-10", "created_to_date": "2024-01-05"},
+    )
+
+    assert "Created (To)' date must be after 'Created (From)" in page.select_one(".govuk-error-message").text

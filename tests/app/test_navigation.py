@@ -124,6 +124,7 @@ EXCLUDED_ENDPOINTS = set(
             "get_daily_sms_provider_volumes",
             "get_daily_volumes",
             "get_dvla_billing_report",
+            "platform_admin_users_list",
             "get_example_csv",
             "get_volumes_by_service",
             "go_to_dashboard_after_tour",
