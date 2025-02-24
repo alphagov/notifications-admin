@@ -305,11 +305,9 @@ class EmailPreviewTemplate(BaseEmailTemplate):
     @property
     def placeholders(self):
         return OrderedSet(
-
-                placeholder
-                for placeholder in self.all_placeholders
-                if InsensitiveDict.make_key(placeholder) not in self.attachments.as_personalisation.keys()
-
+            placeholder
+            for placeholder in self.all_placeholders
+            if InsensitiveDict.make_key(placeholder) not in self.attachments.as_personalisation.keys()
         )
 
 
