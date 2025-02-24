@@ -145,24 +145,7 @@ def api_callbacks(service_id):
     if not current_service.can_have_multiple_callbacks:
         return redirect(url_for(".delivery_status_callback", service_id=service_id))
 
-    return render_template(
-        "views/api/callbacks.html",
-        received_text_messages_callback=(
-            current_service.inbound_sms_callback_details["url"]
-            if current_service.inbound_sms_callback_details
-            else None
-        ),
-        delivery_status_callback=(
-            current_service.delivery_status_callback_details["url"]
-            if current_service.delivery_status_callback_details
-            else None
-        ),
-        returned_letters_callback=(
-            current_service.returned_letters_callback_details["url"]
-            if current_service.returned_letters_callback_details
-            else None
-        ),
-    )
+    return render_template("views/api/callbacks.html")
 
 
 @main.route(
