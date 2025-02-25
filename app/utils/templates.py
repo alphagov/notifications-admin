@@ -6,6 +6,7 @@ from markupsafe import Markup
 from notifications_utils.countries import Postage
 from notifications_utils.field import Field
 from notifications_utils.formatters import escape_html, formatted_list, normalise_whitespace
+from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.take import Take
 from notifications_utils.template import (
     BaseEmailTemplate,
@@ -13,9 +14,12 @@ from notifications_utils.template import (
     SMSPreviewTemplate,
     do_nice_typography,
 )
+from ordered_set import OrderedSet
+from werkzeug.utils import cached_property
 
 from app.extensions import redis_client
 from app.models import JSONModel
+from app.models.template_attachment import TemplateAttachments
 from app.notify_client import cache
 
 
@@ -272,6 +276,35 @@ class EmailPreviewTemplate(BaseEmailTemplate):
             )
             .then(do_nice_typography)
             .then(normalise_whitespace)
+        )
+
+    @cached_property
+    def attachments(self):
+        return TemplateAttachments(self)
+
+    @property
+    def values(self):
+        return super().values | self.attachments.as_personalisation
+
+    @values.setter
+    def values(self, value):
+        # Assigning to super().values doesn’t work here. We need to get
+        # the property object instead, which has the special method
+        # fset, which invokes the setter it as if we were
+        # assigning to it outside this class.
+        super(EmailPreviewTemplate, type(self)).values.fset(self, value)
+
+    @property
+    def all_placeholders(self):
+        # Includes those pre-populated with an attachment
+        return super().placeholders
+
+    @property
+    def placeholders(self):
+        return OrderedSet(
+            placeholder
+            for placeholder in self.all_placeholders
+            if InsensitiveDict.make_key(placeholder) not in self.attachments.as_personalisation.keys()
         )
 
 

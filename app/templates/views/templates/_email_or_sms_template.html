@@ -1,18 +1,54 @@
 <div class="govuk-grid-row">
   {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
     <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-      <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
-        Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
-      </a>
+      {{ govukButton({
+        "element": "a",
+        "text": "Get ready to send",
+        "href": url_for(".set_sender", service_id=current_service.id, template_id=template.id),
+        "classes": "govuk-button--secondary template-action-button"
+        }) }}
     </div>
   {% endif %}
   {% if current_user.has_permissions('manage_templates') %}
     <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
-        Edit<span class="govuk-visually-hidden"> this template</span>
-      </a>
+      {{ govukButton({
+        "element": "a",
+        "text": "Edit",
+        "href": url_for(".edit_service_template", service_id=current_service.id, template_id=template.id),
+        "classes": "govuk-button--secondary template-action-button"
+        }) }}
     </div>
   {% endif %}
 </div>
 
 {{ template|string }}
+
+{% if template.template_type == "email" %}
+
+  <div class="govuk-!-margin-bottom-2">
+    <div class="js-stick-at-bottom-when-scrolling">
+      <span class="govuk-hint" style="position: relative; top: 7px;">
+        {% if not template.attachments.count %}
+          No files
+        {% elif template.attachments.count == 1 %}
+          1 file
+        {% else %}
+          {{ template.attachments.count }} files
+        {% endif %}
+        attached
+      </span>
+
+      {{ govukButton({
+        "element": "a",
+        "text": "Manage attachments",
+        "href": url_for(
+          '.email_template_manage_attachments',
+          service_id=current_service.id,
+          template_id=template.id
+        ),
+      "classes": "govuk-button--secondary change-language"
+      }) }}
+    </div>
+  </div>
+
+  {% endif %}

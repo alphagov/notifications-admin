@@ -19,6 +19,7 @@ from flask import (
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
+from notifications_utils.field import Field
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.s3 import s3download
 from notifications_utils.template import Template
@@ -41,14 +42,17 @@ from app.formatters import character_count, message_count
 from app.main import main, no_cookie
 from app.main.forms import (
     CopyTemplateForm,
+    EmailAttachmentForm,
     EmailTemplateForm,
     FieldWithNoneOption,
     LetterTemplateForm,
     LetterTemplateLanguagesForm,
     LetterTemplatePostageForm,
+    OnOffSettingForm,
     PDFUploadForm,
     RenameTemplateForm,
     SearchTemplatesForm,
+    SetServiceAttachmentDataRetentionForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
     TemplateAndFoldersSelectionForm,
@@ -789,6 +793,8 @@ def edit_service_template(service_id, template_id, language=None):
             else:
                 raise e
         else:
+            if new_template.template_type == "email":
+                new_template.attachments.prune_orphans()
             editing_english_content_in_bilingual_letter = (
                 template.template_type == "letter" and template.welsh_page_count and language != "welsh"
             )
@@ -1411,6 +1417,136 @@ def letter_template_change_language(template_id, service_id):
         form=form,
         template=template,
         error_summary_enabled=True,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachments", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def email_template_manage_attachments(template_id, service_id):
+    template = current_service.get_template(template_id)
+    rows = [
+        {
+            "key": {
+                "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+                "html": Field(f"(({placeholder}))"),
+            },
+            "value": {
+                "text": template.attachments[placeholder].file_name or "No file attached",
+                "classes": "" if template.attachments[placeholder] else "govuk-hint",
+            },
+            "actions": {
+                "items": [
+                    {
+                        "href": url_for(
+                            "main.email_template_manage_attachment",
+                            service_id=service_id,
+                            template_id=template_id,
+                            placeholder=placeholder.strip(),
+                        ),
+                        "text": "Change",
+                        "visuallyHiddenText": "service name",
+                        "classes": "govuk-link--no-visited-state",
+                    }
+                ]
+            },
+        }
+        for placeholder in template.all_placeholders
+    ]
+
+    return render_template(
+        "views/templates/manage-email-attachments.html",
+        template=template,
+        rows=rows,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def email_template_manage_attachment(template_id, service_id):
+    template = current_service.get_template(template_id)
+    placeholder = request.args.get("placeholder", "")
+    attachment = template.attachments[placeholder]
+    delete = bool(request.args.get("delete"))
+    form = EmailAttachmentForm()
+    if delete and request.method == "POST":
+        del template.attachments[placeholder]
+        return redirect(
+            url_for("main.email_template_manage_attachments", service_id=current_service.id, template_id=template.id)
+        )
+    if form.validate_on_submit():
+        attachment.file_name = form.file.data.filename
+        return redirect(
+            url_for(
+                "main.email_template_manage_attachment",
+                service_id=current_service.id,
+                template_id=template.id,
+                placeholder=placeholder,
+            )
+        )
+    return render_template(
+        "views/templates/manage-email-attachment.html",
+        template=template,
+        placeholder=placeholder,
+        form=form,
+        attachment=attachment,
+        delete=delete,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/retention", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def email_template_manage_attachment_retention(template_id, service_id):
+    template = current_service.get_template(template_id)
+    placeholder = request.args.get("placeholder")
+    attachment = template.attachments[placeholder]
+    form = SetServiceAttachmentDataRetentionForm(weeks_of_retention=attachment.weeks_of_retention)
+    if form.validate_on_submit():
+        attachment.weeks_of_retention = form.weeks_of_retention.data
+        return redirect(
+            url_for(
+                "main.email_template_manage_attachment",
+                service_id=current_service.id,
+                template_id=template.id,
+                placeholder=placeholder,
+            )
+        )
+    return render_template(
+        "views/templates/manage-email-attachment-retention.html",
+        template=template,
+        placeholder=placeholder,
+        form=form,
+    )
+
+
+@main.route(
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/email-confirmation", methods=["GET", "POST"]
+)
+@user_has_permissions("manage_templates")
+def email_template_manage_attachment_email_confirmation(template_id, service_id):
+    template = current_service.get_template(template_id)
+    placeholder = request.args.get("placeholder")
+    attachment = template.attachments[placeholder]
+    form = OnOffSettingForm(
+        "Require recipient to confirm email address",
+        truthy="Yes",
+        falsey="No",
+        enabled=attachment.email_confirmation,
+    )
+    if form.validate_on_submit():
+        attachment.email_confirmation = form.enabled.data
+        return redirect(
+            url_for(
+                "main.email_template_manage_attachment",
+                service_id=current_service.id,
+                template_id=template.id,
+                placeholder=placeholder,
+            )
+        )
+    return render_template(
+        "views/templates/manage-email-attachment-email-confirmation.html",
+        template=template,
+        placeholder=placeholder,
+        form=form,
     )
 
 
