@@ -45,7 +45,8 @@ $email-message-gutter-mobile: govuk-spacing(3);
       }
 
       // deal with long email addresses
-      & > .email-message-meta__reply-to {
+      & > .email-message-meta__reply-to,
+      & > .email-message-meta__send-to {
         word-break: break-word;
       }
 
