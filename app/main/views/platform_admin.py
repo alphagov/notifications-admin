@@ -25,6 +25,7 @@ from app.main.forms import (
     AdminReturnedLettersForm,
     BillingReportDateFilterForm,
     PlatformAdminSearchForm,
+    PlatformAdminUsersListForm,
     RequiredDateFilterForm,
 )
 from app.notify_client.platform_admin_api_client import admin_api_client
@@ -39,6 +40,7 @@ from app.utils.pagination import (
     get_page_from_request,
 )
 from app.utils.user import user_is_platform_admin
+from app.utils.user_permissions import all_ui_permissions, translate_permissions_from_db_to_ui
 
 COMPLAINT_THRESHOLD = 0.02
 FAILURE_THRESHOLD = 3
@@ -754,3 +756,95 @@ def format_stats_by_service(services):
             "created_at": service["created_at"],
             "active": service["active"],
         }
+
+
+@main.route("/platform-admin/reports/users-list", methods=["GET", "POST"])
+@user_is_platform_admin
+def platform_admin_users_list():
+    form = PlatformAdminUsersListForm()
+
+    if not form.validate_on_submit():
+        return render_template("views/platform-admin/users-list.html", form=form, error_summary_enabled=True)
+
+    take_part_in_research = {"yes": True, "no": False}.get(form.take_part_in_research.data)
+
+    selected_permissions = form.permissions_field.data
+
+    def extract_date(field):
+        return str(field.data) if field.data else None
+
+    results = admin_api_client.fetch_users_list(
+        created_from_date=extract_date(form.created_from_date),
+        created_to_date=extract_date(form.created_to_date),
+        logged_from_date=extract_date(form.logged_from_date),
+        logged_to_date=extract_date(form.logged_to_date),
+        take_part_in_research=take_part_in_research,
+    ).get("data", [])
+
+    if not results:
+        flash("No results for filters selected")
+        return render_template("views/platform-admin/users-list.html", form=form, error_summary_enabled=True)
+
+    column_names = {
+        "name": "Name",
+        "email_address": "Email",
+        "created_at": "Created At",
+        "take_part_in_research": "Research Opt In",
+        "is_team_member_of_organisation": "Is Org Team Member",
+        "num_live_services": "Number of Live Services",
+        "live_service_permissions": "Live Service Permissions",
+    }
+
+    live_services_data = [list(column_names.values())]
+
+    def format_user_row(user):
+        created_at = datetime.strptime(user["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%d-%m-%Y")
+        is_team_member_of_org = "Yes" if user.get("organisations", []) else "No"
+        live_service_permissions = build_live_service_permissions_for_users_list(
+            user["services"], user["permissions"], selected_permissions
+        )
+
+        return {
+            "name": user["name"],
+            "email_address": user["email_address"],
+            "created_at": created_at,
+            "take_part_in_research": "Yes" if user["take_part_in_research"] else "No",
+            "is_team_member_of_organisation": is_team_member_of_org,
+            "num_live_services": len(user["services"]),
+            "live_service_permissions": live_service_permissions,
+        }
+
+    live_services_data.extend([list(format_user_row(user).values()) for user in results])
+
+    return (
+        Spreadsheet.from_rows(live_services_data).as_csv_data,
+        200,
+        {
+            "Content-Type": "text/csv; charset=utf-8",
+            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())}_users_list.csv"',
+        },
+    )
+
+
+def build_live_service_permissions_for_users_list(services, permissions, selected_permissions) -> str:
+    """ "
+    Returns a string of service_name: permissions selected on the form
+    eg, "Service Name 1: manage_service, manage_users; Service Name 2: view_activity"
+    """
+    service_permissions = []
+
+    if not selected_permissions:
+        selected_permissions = all_ui_permissions
+
+    service_name_lookup = {str(service["id"]): service["name"] for service in services}
+
+    for service_id, service_perms in permissions.items():
+        translated_perms = translate_permissions_from_db_to_ui(service_perms)
+
+        filtered_permissions = translated_perms.intersection(set(selected_permissions))
+
+        if filtered_permissions:
+            service_name = service_name_lookup.get(service_id, f"Service {service_id}")
+            service_permissions.append(f"{service_name}: {', '.join(filtered_permissions)}")
+
+    return "; ".join(service_permissions)

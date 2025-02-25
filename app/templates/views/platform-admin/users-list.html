@@ -1,0 +1,106 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import mapping_table, row, text_field %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% block per_page_title %}
+    Users List
+{% endblock %}
+
+{% block platform_admin_content %}
+
+<h1 class="govuk-heading-l">
+    Export Users List
+</h1>
+
+<p class="govuk-body">
+    Filter and download the list of users.
+</p>
+
+{% call form_wrapper() %}
+<fieldset class="govuk-fieldset">
+
+    {% set creation_date_content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+            {{ form.created_from_date(param_extensions={"hint": {"text": "YYYY-MM-DD"}}) }}
+        </div>
+        <div class="govuk-grid-column-one-half">
+            {{ form.created_to_date(param_extensions={"hint": {"text": "YYYY-MM-DD"}}) }}
+        </div>
+    </div>
+    {% endset %}
+    {{ govukDetails({
+                "summaryText": "Filter by creation date",
+                "html": creation_date_content,
+                "open": (form.created_from_date.value or form.created_to_date.value) or ('created_from_date' in form.errors) or ('created_to_date' in form.errors)
+            }) }}
+
+    {% set login_date_content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+            {{ form.logged_from_date(param_extensions={"hint": {"text": "YYYY-MM-DD"}}) }}
+        </div>
+        <div class="govuk-grid-column-one-half">
+            {{ form.logged_to_date(param_extensions={"hint": {"text": "YYYY-MM-DD"}}) }}
+        </div>
+    </div>
+    {% endset %}
+    {{ govukDetails({
+                "summaryText": "Filter by last login date",
+                "html": login_date_content,
+                "open": (form.logged_from_date.value or form.logged_to_date.value) or ('logged_from_date' in form.errors) or ('logged_to_date' in form.errors)
+            }) }}
+
+    {% set permissions_content %}
+    <fieldset class="govuk-fieldset">
+        <div class="govuk-checkboxes">
+            {{ form.permissions_field }}
+        </div>
+    </fieldset>
+    {% endset %}
+    {{ govukDetails({
+                "summaryText": "Filter by permissions",
+                "html": permissions_content,
+                "open": (form.permissions_field.value) or ('permissions_field' in form.errors)
+            }) }}
+
+    {% set research_content %}
+    {{ form.take_part_in_research }}
+    {% endset %}
+    {{ govukDetails({
+                "summaryText": "Filter by research opt-in",
+                "html": research_content,
+                "open": (form.take_part_in_research.value) or ('take_part_in_research' in form.errors)
+            }) }}
+
+    {{ page_footer('Download report (CSV)') }}
+</fieldset>
+{% endcall %}
+
+<div class="bottom-gutter-3-2">
+    {% call mapping_table(
+          caption="Data included in the report",
+          field_headings=['Field', 'Description'],
+          field_headings_visible=True,
+          caption_visible=True
+        ) %}
+        {% for column_heading, description in [
+            ('Name', 'The full name of the user'),
+            ('Email', 'The email address associated with the user'),
+            ('Created At', 'The date the user account was created'),
+            ('Research Opt In', 'Whether the user has opted in to research'),
+            ('Is Org Team Member', 'Indicates if the user is a member of an organisation'),
+            ('Number of Live Services', 'The number of live services the user has access to'),
+            ('Live Service Permissions', 'The services and associated permissions assigned to the user'),
+          ] %}
+            {% call row() %}
+                {{ text_field(column_heading) }}
+                {{ text_field(description) }}
+            {% endcall %}
+        {% endfor %}
+    {% endcall %}
+</div>
+
+{% endblock %}

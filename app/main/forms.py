@@ -2875,6 +2875,59 @@ class PlatformAdminSearchForm(StripWhitespaceForm):
     )
 
 
+class PlatformAdminUsersListForm(StripWhitespaceForm):
+    created_from_date = GovukDateField("Created (From)", thing="a start date", validators=[Optional()])
+    created_to_date = GovukDateField("Created (To)", thing="an end date", validators=[Optional()])
+    logged_from_date = GovukDateField("Logged In (From)", thing="a start date", validators=[Optional()])
+    logged_to_date = GovukDateField("Logged In (To)", thing="an end date", validators=[Optional()])
+
+    take_part_in_research = GovukRadiosField(
+        label="Research Opt In?",
+        choices=[("yes", "Yes"), ("no", "No")],
+        validators=[Optional()],
+    )
+
+    permissions_field = GovukCheckboxesField(
+        "Permissions",
+        filters=[partial(filter_by_permissions, permissions=permission_options)],
+        choices=list(permission_options),
+        param_extensions={"hint": {"text": "Select the permissions to filter by"}},
+    )
+
+    custom_field_order: tuple = (
+        "permissions_field",
+        "created_from_date",
+        "created_to_date",
+        "logged_from_date",
+        "logged_to_date",
+        "take_part_in_research",
+    )
+
+    def validate(self, extra_validators=None):
+        if not (
+            self.created_from_date.data
+            or self.created_to_date.data
+            or self.logged_from_date.data
+            or self.logged_to_date.data
+            or self.take_part_in_research.data
+            or self.permissions_field.data
+        ):
+            self.form_errors = ("You must provide at least one filter option",)
+            return False
+
+        if self.created_from_date.data and self.created_to_date.data:
+            if self.created_from_date.data > self.created_to_date.data:
+                self.created_to_date.errors = ("The 'Created (To)' date must be after 'Created (From)'",)
+                return False
+
+        if self.logged_from_date.data and self.logged_to_date.data:
+            if self.logged_from_date.data > self.logged_to_date.data:
+                self.logged_to_date.errors = ("The 'Logged In (To)' date must be after 'Logged In (From)'",)
+                return False
+
+        return super().validate(extra_validators=extra_validators)
+
+
 class UniqueServiceForm(StripWhitespaceForm):
     is_unique = GovukRadiosField(
         label="Is the service unique?",

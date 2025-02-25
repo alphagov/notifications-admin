@@ -109,6 +109,7 @@ class HeaderNavigation(Navigation):
             "live_services_csv",
             "notifications_sent_by_service",
             "get_billing_report",
+            "platform_admin_users_list",
             "get_daily_volumes",
             "get_dvla_billing_report",
             "get_daily_sms_provider_volumes",
@@ -427,6 +428,7 @@ class PlatformAdminNavigation(Navigation):
             "get_volumes_by_service",
             "get_daily_volumes",
             "get_daily_sms_provider_volumes",
+            "platform_admin_users_list",
         },
         "email-branding": {
             "email_branding",
