@@ -6,7 +6,6 @@ from markupsafe import Markup
 from notifications_utils.countries import Postage
 from notifications_utils.field import Field
 from notifications_utils.formatters import escape_html, formatted_list, normalise_whitespace
-from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.take import Take
 from notifications_utils.template import (
     BaseEmailTemplate,
@@ -304,11 +303,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     @property
     def placeholders(self):
-        return OrderedSet(
-            placeholder
-            for placeholder in self.all_placeholders
-            if InsensitiveDict.make_key(placeholder) not in self.attachments.as_personalisation.keys()
-        )
+        return OrderedSet(placeholder for placeholder in self.all_placeholders if placeholder not in self.attachments)
 
 
 class LetterAttachment(JSONModel):

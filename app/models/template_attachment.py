@@ -2,9 +2,16 @@ import base64
 import json
 
 from notifications_utils.insensitive_dict import InsensitiveDict
+from notifications_utils.insensitive_dict import InsensitiveSet as UtilsInsensitiveSet
 
 from app.extensions import redis_client
 from app.models import JSONModel
+
+
+# Implements https://github.com/alphagov/notifications-utils/pull/1197/files
+class InsensitiveSet(UtilsInsensitiveSet):
+    def __contains__(self, key):
+        return key in InsensitiveDict.from_keys(self)
 
 
 class TemplateAttachment(JSONModel):
@@ -32,39 +39,41 @@ class TemplateAttachment(JSONModel):
         return bool(self.file_name)
 
 
-class TemplateAttachments:
+class TemplateAttachments(InsensitiveDict):
     BASE_URL = "https://www.download.example.gov.uk/f/"
 
     def __init__(self, template):
         self._template = template
-        self._dict = InsensitiveDict(json.loads(redis_client.get(self.cache_key) or "{}"))
+        super().__init__(json.loads(redis_client.get(self.cache_key) or "{}"))
 
     @property
     def cache_key(self):
         return f"template-{self._template.id}-attachments"
 
     def __getitem__(self, placeholder_name):
-        if placeholder_name not in self._dict:
-            self._dict[placeholder_name] = {
+        if placeholder_name not in self:
+            self[placeholder_name] = {
                 "file_name": None,
                 "weeks_of_retention": 26,
                 "email_confirmation": True,
             }
-        return TemplateAttachment(self._dict[placeholder_name], parent=self, placeholder_name=placeholder_name)
+        return TemplateAttachment(
+            super().__getitem__(placeholder_name),
+            parent=self,
+            placeholder_name=placeholder_name,
+        )
 
     def __setitem__(self, placeholder_name, value):
-        self._dict[InsensitiveDict.make_key(placeholder_name)] = value
-        redis_client.set(self.cache_key, json.dumps(self._dict))
+        super().__setitem__(placeholder_name, value)
+        redis_client.set(self.cache_key, json.dumps(self))
 
     def __delitem__(self, placeholder_name):
-        self._dict.pop(InsensitiveDict.make_key(placeholder_name))
-        redis_client.set(self.cache_key, json.dumps(self._dict))
+        super().__delitem__(InsensitiveDict.make_key(placeholder_name))
+        redis_client.set(self.cache_key, json.dumps(self))
 
     @property
     def count(self):
-        return sum(
-            bool(self[key]) for key in self._dict if key in InsensitiveDict.from_keys(self._template.all_placeholders)
-        )
+        return sum(bool(self[key]) for key in self if key in InsensitiveSet(self._template.all_placeholders))
 
     @property
     def as_personalisation(self):
@@ -72,10 +81,10 @@ class TemplateAttachments:
             placeholder: f"{self.BASE_URL}{base64.b64encode(attachment['file_name'].encode()).decode()}"
             if attachment["file_name"]
             else None
-            for placeholder, attachment in self._dict.items()
+            for placeholder, attachment in self.items()
         }
 
     def prune_orphans(self):
-        for placeholder in self._dict.keys():
-            if placeholder not in self._template.all_placeholders:
+        for placeholder in self.keys():
+            if placeholder not in InsensitiveSet(self._template.all_placeholders):
                 del self[placeholder]
