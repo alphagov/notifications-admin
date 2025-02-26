@@ -57,6 +57,13 @@ export default [
             paths.govuk_frontend,
             paths.npm
           ],
+          silenceDeprecations: [
+            "mixed-decls",
+            "global-builtin",
+            "color-functions",
+            "slash-div",
+            "import"
+          ]
         },
         minimize: true,
         url: false,
@@ -87,7 +94,6 @@ export default [
       paths.src + 'javascripts/enhancedTextbox.js',
       paths.src + 'javascripts/radioSelect.js',
       paths.src + 'javascripts/updateContent.js',
-      paths.src + 'javascripts/listEntry.js',
       paths.src + 'javascripts/liveSearch.js',
       paths.src + 'javascripts/preventDuplicateFormSubmissions.js',
       paths.src + 'javascripts/fullscreenTable.js',

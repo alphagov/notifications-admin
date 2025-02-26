@@ -687,6 +687,41 @@ def test_switch_service_to_live_with_no_organisation(
     )
 
 
+@pytest.mark.parametrize(
+    "active",
+    (
+        pytest.param(False),
+        pytest.param(True, marks=pytest.mark.xfail(reason="403 caused by something else")),
+    ),
+)
+def test_switch_archived_service_to_live(
+    client_request,
+    service_one,
+    platform_admin_user,
+    fake_uuid,
+    active,
+    mocker,
+):
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(agreement_signed=True),
+    )
+    service_one["organisation"] = fake_uuid
+    service_one["active"] = active
+
+    client_request.login(platform_admin_user)
+    client_request.get(
+        "main.service_switch_live",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
+    client_request.post(
+        "main.service_switch_live",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
+
+
 def test_show_live_service(
     client_request,
     mock_get_live_service,

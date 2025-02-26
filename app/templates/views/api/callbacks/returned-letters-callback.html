@@ -1,0 +1,46 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Callbacks for delivery receipts
+{% endblock %}
+
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for(back_link, service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      {{ page_header('Callbacks for returned letters') }}
+
+      <p class="govuk-body">
+        When a letter you sent is returned, Notify will send details of the returned letter to your callback url.
+      </p>
+      <p class="govuk-body">
+        Read the callbacks section of our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API documentation</a> for more information
+      </p>
+
+      {% call form_wrapper() %}
+        {{ form.url(param_extensions={
+          "classes": "govuk-!-width-full",
+          "hint": {"text": "Must start with https://"}
+        }) }}
+
+        {{ form.bearer_token(param_extensions={
+          "classes": "govuk-!-width-full",
+          "hint": {"text": "At least 10 characters"},
+          "autocomplete": "new-password"
+        }) }}
+
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

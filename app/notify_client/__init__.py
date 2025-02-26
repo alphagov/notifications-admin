@@ -15,9 +15,18 @@ def _attach_current_user(data):
 
 class NotifyAdminAPIClient(BaseAPIClient):
     def __init__(self, app):
+        try:
+            base_url = app.config["API_HOST_NAME"]
+        except RuntimeError as e:
+            raise RuntimeError(
+                "Could not teardown fixtures after test run. Try: \n"
+                "• moving `mocker` so it’s the final argument to your test function. \n"
+                "• running pytest with the `--setup-show` flag to see which fixture is the problem"
+            ) from e
+
         super().__init__(
             "x" * 100,
-            base_url=app.config["API_HOST_NAME"],
+            base_url=base_url,
         )
         # our credential lengths aren't what BaseAPIClient's __init__ will expect
         # given it's designed for destructuring end-user api keys
