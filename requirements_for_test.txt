@@ -55,7 +55,7 @@ click==8.1.3
     #   flask
 coverage==7.6.4
     # via pytest-testmon
-cryptography==43.0.1
+cryptography==44.0.1
     # via
     #   -r requirements.txt
     #   fido2
