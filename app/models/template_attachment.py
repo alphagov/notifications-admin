@@ -15,6 +15,8 @@ class InsensitiveSet(UtilsInsensitiveSet):
 
 
 class TemplateAttachment(JSONModel):
+    BASE_URL = "https://www.download.example.gov.uk/f/"
+
     file_name: str
     weeks_of_retention: int
     email_confirmation: bool
@@ -38,10 +40,14 @@ class TemplateAttachment(JSONModel):
     def __bool__(self):
         return bool(self.file_name)
 
+    @property
+    def url(self):
+        if not self.file_name:
+            return
+        return f"{self.BASE_URL}{base64.b64encode(self.file_name.encode()).decode()}"
+
 
 class TemplateAttachments(InsensitiveDict):
-    BASE_URL = "https://www.download.example.gov.uk/f/"
-
     def __init__(self, template):
         self._template = template
         super().__init__(json.loads(redis_client.get(self.cache_key) or "{}"))
@@ -77,12 +83,7 @@ class TemplateAttachments(InsensitiveDict):
 
     @property
     def as_personalisation(self):
-        return {
-            placeholder: f"{self.BASE_URL}{base64.b64encode(attachment['file_name'].encode()).decode()}"
-            if attachment["file_name"]
-            else None
-            for placeholder, attachment in self.items()
-        }
+        return {placeholder: self[placeholder].url for placeholder in self}
 
     def prune_orphans(self):
         for placeholder in self.keys():
