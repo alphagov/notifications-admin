@@ -1,6 +1,6 @@
 from flask import Blueprint, request, session
 
-from app.utils.constants import JSON_UPDATES_BLUEPRINT_NAME
+from app.constants import JSON_UPDATES_BLUEPRINT_NAME
 
 main = Blueprint("main", __name__)
 json_updates = Blueprint(JSON_UPDATES_BLUEPRINT_NAME, __name__)
