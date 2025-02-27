@@ -4,7 +4,7 @@ from flask import Flask, Request, Response, request
 from flask.sessions import SecureCookieSession, SecureCookieSessionInterface
 from flask_login import current_user
 
-from app.utils.constants import JSON_UPDATES_BLUEPRINT_NAME
+from app.constants import JSON_UPDATES_BLUEPRINT_NAME
 
 
 class NotifyAdminSessionInterface(SecureCookieSessionInterface):

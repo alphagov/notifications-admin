@@ -51,7 +51,13 @@ from wtforms.validators import (
 )
 
 from app import asset_fingerprinter, current_organisation
-from app.constants import LetterLanguageOptions
+from app.constants import (
+    SERVICE_JOIN_REQUEST_APPROVED,
+    SERVICE_JOIN_REQUEST_REJECTED,
+    SIGN_IN_METHOD_TEXT,
+    SIGN_IN_METHOD_TEXT_OR_EMAIL,
+    LetterLanguageOptions,
+)
 from app.formatters import (
     format_auth_type,
     format_date_human,
@@ -91,12 +97,6 @@ from app.models.branding import (
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.utils import branding
-from app.utils.constants import (
-    SERVICE_JOIN_REQUEST_APPROVED,
-    SERVICE_JOIN_REQUEST_REJECTED,
-    SIGN_IN_METHOD_TEXT,
-    SIGN_IN_METHOD_TEXT_OR_EMAIL,
-)
 from app.utils.govuk_frontend_field import (
     GovukFrontendWidgetMixin,
     render_govuk_frontend_macro,

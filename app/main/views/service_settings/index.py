@@ -24,6 +24,7 @@ from app import (
     organisations_client,
     service_api_client,
 )
+from app.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.event_handlers import (
     create_archive_service_event,
     create_set_inbound_sms_on_event,
@@ -72,7 +73,6 @@ from app.models.letter_rates import LetterRates
 from app.models.organisation import Organisation
 from app.models.sms_rate import SMSRate
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
-from app.utils.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
 from app.utils.user import (
     user_has_permissions,
