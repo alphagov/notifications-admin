@@ -8,7 +8,7 @@
 {% set page_title = "Attach pages" %}
 
 {% block service_page_title %}
-    {{ page_title }}
+{% if error and not use_error_summary %}Error: {% endif %}{{ page_title }}
 {% endblock %}
 
 {% block backLink %}
