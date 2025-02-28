@@ -1,0 +1,29 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% block service_page_title %}
+  Require recipient to confirm email address
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% call form_wrapper() %}
+    {{ form.enabled(
+      param_extensions={
+        'fieldset': {
+          'legend': {
+            'isPageHeading': True,
+            'classes': 'govuk-fieldset__legend--l'
+          }
+        }
+      }
+    ) }}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+
+{% endblock %}
