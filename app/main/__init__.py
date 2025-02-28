@@ -33,6 +33,7 @@ from app.main.views import (  # noqa
     pricing,
     providers,
     register,
+    report_requests,
     returned_letters,
     security_policy,
     send,
