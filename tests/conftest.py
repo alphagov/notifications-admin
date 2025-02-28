@@ -14,7 +14,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.url_safe_token import generate_token
 
 from app import create_app, reset_memos, webauthn_server
-from app.constants import LetterLanguageOptions
+from app.constants import REPORT_REQUEST_STORED, LetterLanguageOptions
 
 from . import (
     NotifyBeautifulSoup,
@@ -4330,6 +4330,21 @@ def create_unsubscribe_request_report(
         "is_a_batched_report": bool(batch_id),
         "will_be_archived_at": will_be_archived_at,
     }
+
+
+def create_report_request(**overrides):
+    report_request_data = {
+        "id": "5bf2a1f9-0e6b-4d5e-b409-3509bf7a37b0",
+        "user_id": "a4125154-9272-474e-8500-cfb23a58d7a6",
+        "service_id": SERVICE_ONE_ID,
+        "report_type": "notifications_status_csv",
+        "status": REPORT_REQUEST_STORED,
+        "parameter": {},
+        "created_at": "2025-02-27T13:35:32.919548Z",
+        "updated_at": "2025-02-27T13:35:32.919548Z",
+    }
+    report_request_data.update(overrides)
+    return report_request_data
 
 
 @pytest.fixture
