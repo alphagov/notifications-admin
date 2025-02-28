@@ -14,11 +14,11 @@ from flask_login import current_user
 from markupsafe import Markup
 
 from app import login_manager
+from app.constants import JSON_UPDATES_BLUEPRINT_NAME
 from app.main import main
 from app.main.forms import LoginForm
 from app.models.user import InvitedUser, User
 from app.utils import hide_from_search_engines
-from app.utils.constants import JSON_UPDATES_BLUEPRINT_NAME
 from app.utils.login import redirect_if_logged_in
 
 

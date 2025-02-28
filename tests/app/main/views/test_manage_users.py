@@ -7,8 +7,8 @@ from flask import url_for
 from flask_login import current_user
 
 import app
+from app.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_REJECTED
 from app.formatters import format_date_short
-from app.utils.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_REJECTED
 from app.utils.user import is_gov_user
 from app.utils.user_permissions import translate_permissions_from_ui_to_db
 from tests import organisation_json
