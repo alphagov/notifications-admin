@@ -8,7 +8,7 @@ from werkzeug.local import LocalProxy
 
 from app import memo_resetters
 from app.extensions import redis_client
-from app.notify_client import NotifyAdminAPIClient, cache
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session, cache
 
 
 class OrganisationsClient(NotifyAdminAPIClient):
@@ -166,7 +166,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
 _organisations_client_context_var: ContextVar[OrganisationsClient] = ContextVar("organisations_client")
 get_organisations_client: LazyLocalGetter[OrganisationsClient] = LazyLocalGetter(
     _organisations_client_context_var,
-    lambda: OrganisationsClient(current_app),
+    lambda: OrganisationsClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_organisations_client.clear())
 organisations_client = LocalProxy(get_organisations_client)

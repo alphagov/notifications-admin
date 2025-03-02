@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient, cache
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session, cache
 
 
 class InboundNumberClient(NotifyAdminAPIClient):
@@ -32,7 +32,7 @@ class InboundNumberClient(NotifyAdminAPIClient):
 _inbound_number_client_context_var: ContextVar[InboundNumberClient] = ContextVar("inbound_number_client")
 get_inbound_number_client: LazyLocalGetter[InboundNumberClient] = LazyLocalGetter(
     _inbound_number_client_context_var,
-    lambda: InboundNumberClient(current_app),
+    lambda: InboundNumberClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_inbound_number_client.clear())
 inbound_number_client = LocalProxy(get_inbound_number_client)

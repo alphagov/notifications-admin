@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session
 
 
 class UploadApiClient(NotifyAdminAPIClient):
@@ -22,7 +22,7 @@ class UploadApiClient(NotifyAdminAPIClient):
 _upload_api_client_context_var: ContextVar[UploadApiClient] = ContextVar("upload_api_client")
 get_upload_api_client: LazyLocalGetter[UploadApiClient] = LazyLocalGetter(
     _upload_api_client_context_var,
-    lambda: UploadApiClient(current_app),
+    lambda: UploadApiClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_upload_api_client.clear())
 upload_api_client = LocalProxy(get_upload_api_client)

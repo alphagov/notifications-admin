@@ -6,7 +6,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session
 
 
 class UnsubscribeApiClient(NotifyAdminAPIClient):
@@ -23,7 +23,7 @@ class UnsubscribeApiClient(NotifyAdminAPIClient):
 _unsubscribe_api_client_context_var: ContextVar[UnsubscribeApiClient] = ContextVar("unsubscribe_api_client")
 get_unsubscribe_api_client: LazyLocalGetter[UnsubscribeApiClient] = LazyLocalGetter(
     _unsubscribe_api_client_context_var,
-    lambda: UnsubscribeApiClient(current_app),
+    lambda: UnsubscribeApiClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_unsubscribe_api_client.clear())
 unsubscribe_api_client = LocalProxy(get_unsubscribe_api_client)

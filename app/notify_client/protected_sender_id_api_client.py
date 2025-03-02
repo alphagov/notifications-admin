@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session
 
 
 class ProtectedSenderIDApiClient(NotifyAdminAPIClient):
@@ -18,7 +18,7 @@ _protected_sender_id_api_client_context_var: ContextVar[ProtectedSenderIDApiClie
 )
 get_protected_sender_id_api_client: LazyLocalGetter[ProtectedSenderIDApiClient] = LazyLocalGetter(
     _protected_sender_id_api_client_context_var,
-    lambda: ProtectedSenderIDApiClient(current_app),
+    lambda: ProtectedSenderIDApiClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_protected_sender_id_api_client.clear())
 protected_sender_id_api_client = LocalProxy(get_protected_sender_id_api_client)

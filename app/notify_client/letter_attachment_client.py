@@ -6,7 +6,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient, cache
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session, cache
 
 
 class LetterAttachmentClient(NotifyAdminAPIClient):
@@ -37,7 +37,7 @@ class LetterAttachmentClient(NotifyAdminAPIClient):
 _letter_attachment_client_context_var: ContextVar[LetterAttachmentClient] = ContextVar("letter_attachment_client")
 get_letter_attachment_client: LazyLocalGetter[LetterAttachmentClient] = LazyLocalGetter(
     _letter_attachment_client_context_var,
-    lambda: LetterAttachmentClient(current_app),
+    lambda: LetterAttachmentClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_letter_attachment_client.clear())
 letter_attachment_client = LocalProxy(get_letter_attachment_client)
