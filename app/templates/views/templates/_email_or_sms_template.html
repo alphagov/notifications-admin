@@ -28,19 +28,19 @@
   <div class="govuk-!-margin-bottom-2">
     <div class="js-stick-at-bottom-when-scrolling">
       <span class="govuk-hint" style="position: relative; top: 7px;">
-        {% if not template.attachments.count %}
+        {% if not template.attachments %}
           No files
         {% elif template.attachments.count == 1 %}
           1 file
         {% else %}
           {{ template.attachments.count }} files
         {% endif %}
-        attached
+        added
       </span>
 
       {{ govukButton({
         "element": "a",
-        "text": "Manage attachments",
+        "text": "Manage files" if template.attachments else "Add files",
         "href": url_for(
           '.email_template_manage_attachments',
           service_id=current_service.id,
