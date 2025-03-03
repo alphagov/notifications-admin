@@ -1411,7 +1411,7 @@ def email_template_manage_attachments(template_id, service_id):
                 "html": Field(f"(({placeholder}))"),
             },
             "value": {
-                "text": template.attachments[placeholder].file_name or "No file attached",
+                "text": template.attachments[placeholder].file_name or "No file uploaded",
                 "classes": "" if template.attachments[placeholder] else "govuk-hint",
             },
             "actions": {
@@ -1423,8 +1423,8 @@ def email_template_manage_attachments(template_id, service_id):
                             template_id=template_id,
                             placeholder=placeholder.strip(),
                         ),
-                        "text": "Change",
-                        "visuallyHiddenText": "service name",
+                        "text": "Change" if template.attachments[placeholder] else "Upload file",
+                        "visuallyHiddenText": "",
                         "classes": "govuk-link--no-visited-state",
                     }
                 ]
@@ -1507,7 +1507,7 @@ def email_template_manage_attachment_email_confirmation(template_id, service_id)
     placeholder = request.args.get("placeholder")
     attachment = template.attachments[placeholder]
     form = OnOffSettingForm(
-        "Require recipient to confirm email address",
+        "Ask recipient for their email address",
         truthy="Yes",
         falsey="No",
         enabled=attachment.email_confirmation,

@@ -3,8 +3,9 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% set title = 'Ask recipient for their email address' %}
 {% block service_page_title %}
-  Require recipient to confirm email address
+  {{ title }}
 {% endblock %}
 
 {% block backLink %}
@@ -12,18 +13,34 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {% call form_wrapper() %}
-    {{ form.enabled(
-      param_extensions={
-        'fieldset': {
-          'legend': {
-            'isPageHeading': True,
-            'classes': 'govuk-fieldset__legend--l'
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header(title) }}
+      <p class="govuk-body">
+        The recipient must enter their email address before they can download the file. This is for added security.
+      </p>
+      {% call form_wrapper() %}
+        {{ form.enabled(
+          param_extensions={
+            'fieldset': {
+              'legend': {
+                'isPageHeading': False,
+                'classes': 'govuk-visually-hidden'
+              }
+            }
           }
-        }
-      }
-    ) }}
-    {{ page_footer('Continue') }}
-  {% endcall %}
+        ) }}
+        {{ page_footer('Continue') }}
+        <p class="govuk-body">
+          You should choose ‘Yes’ if you send files that contain:
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>personally identifiable information</li>
+          <li>commercially sensitive information</li>
+          <li>information classified as ‘OFFICIAL’ or ‘OFFICIAL-SENSITIVE’ under the <a href="https://www.gov.uk/government/publications/government-security-classifications" class="govuk-link govuk-link--no-visited-state">Government Security Classifications</a> policy</li>
+        </ul>
+      {% endcall %}
+    </div>
+  </div>
 
 {% endblock %}
