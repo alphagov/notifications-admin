@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
-{% set title = 'How long should the file be available for?'%}
+{% set title = 'How long should the file be available for'%}
 {% block service_page_title %}
   {{ title }}
 {% endblock %}
@@ -15,7 +15,16 @@
 {% block maincolumn_content %}
   {{ page_header(title) }}
   {% call form_wrapper(class='top-gutter') %}
-    {{ form.weeks_of_retention() }}
+    {{ form.weeks_of_retention(param_extensions={
+      "classes": "govuk-input--width-2"
+    }) }}
     {{ page_footer('Continue') }}
+    <p class="govuk-body">
+      When choosing the length of time the file is available, you should think about:
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>the need to protect the recipient’s personal information</li>
+      <li>whether the recipient will need to download the file again later</li>
+    </ul>
   {% endcall %}
 {% endblock %}
