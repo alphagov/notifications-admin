@@ -34,6 +34,7 @@ NEW_MOBILE_PASSWORD_CONFIRMED = "new-mob-password-confirmed"
 
 
 @main.route("/user-profile")
+@main.route("/your-account")
 @user_is_logged_in
 def user_profile():
     return render_template(
@@ -43,6 +44,7 @@ def user_profile():
 
 
 @main.route("/user-profile/name", methods=["GET", "POST"])
+@main.route("/your-account/name", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_name():
     form = ChangeNameForm(new_name=current_user.name)
@@ -60,6 +62,7 @@ def user_profile_name():
 
 
 @main.route("/user-profile/email", methods=["GET", "POST"])
+@main.route("/your-account/email", methods=["GET", "POST"])
 @user_is_logged_in
 @user_is_gov_user
 def user_profile_email():
@@ -77,6 +80,7 @@ def user_profile_email():
 
 
 @main.route("/user-profile/email/authenticate", methods=["GET", "POST"])
+@main.route("/your-account/email/authenticate", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_email_authenticate():
     # Validate password for form
@@ -102,6 +106,7 @@ def user_profile_email_authenticate():
 
 
 @main.route("/user-profile/email/confirm/<string:token>", methods=["GET"])
+@main.route("/your-account/email/confirm/<string:token>", methods=["GET"])
 @user_is_logged_in
 def user_profile_email_confirm(token):
     token_data = check_token(
@@ -120,6 +125,8 @@ def user_profile_email_confirm(token):
 
 @main.route("/user-profile/mobile-number", methods=["GET", "POST"])
 @main.route("/user-profile/mobile-number/delete", methods=["GET"], endpoint="user_profile_confirm_delete_mobile_number")
+@main.route("/your-account/mobile-number", methods=["GET", "POST"])
+@main.route("/your-account/mobile-number/delete", methods=["GET"], endpoint="user_profile_confirm_delete_mobile_number")
 @user_is_logged_in
 def user_profile_mobile_number():
     user = User.from_id(current_user.id)
@@ -142,6 +149,7 @@ def user_profile_mobile_number():
 
 
 @main.route("/user-profile/mobile-number/delete", methods=["POST"])
+@main.route("/your-account/mobile-number/delete", methods=["POST"])
 @user_is_logged_in
 def user_profile_mobile_number_delete():
     if current_user.auth_type != "email_auth":
@@ -153,6 +161,7 @@ def user_profile_mobile_number_delete():
 
 
 @main.route("/user-profile/mobile-number/authenticate", methods=["GET", "POST"])
+@main.route("/your-account/mobile-number/authenticate", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_mobile_number_authenticate():
     # Validate password for form
@@ -179,6 +188,7 @@ def user_profile_mobile_number_authenticate():
 
 
 @main.route("/user-profile/mobile-number/confirm", methods=["GET", "POST"])
+@main.route("/your-account/mobile-number/confirm", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_mobile_number_confirm():
     # Validate verify code for form
@@ -202,6 +212,7 @@ def user_profile_mobile_number_confirm():
 
 
 @main.route("/user-profile/password", methods=["GET", "POST"])
+@main.route("/your-account/password", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_password():
     # Validate password for form
@@ -222,6 +233,7 @@ def user_profile_password():
 
 
 @main.route("/user-profile/take-part-in-user-research", methods=["GET", "POST"])
+@main.route("/your-account/take-part-in-user-research", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_take_part_in_user_research():
     form = YesNoSettingForm(
@@ -237,6 +249,7 @@ def user_profile_take_part_in_user_research():
 
 
 @main.route("/user-profile/get-emails-about-new-features", methods=["GET", "POST"])
+@main.route("/your-account/get-emails-about-new-features", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_get_emails_about_new_features():
     form = YesNoSettingForm(
@@ -256,6 +269,7 @@ def user_profile_get_emails_about_new_features():
 
 
 @main.route("/user-profile/disable-platform-admin-view", methods=["GET", "POST"])
+@main.route("/your-account/disable-platform-admin-view", methods=["GET", "POST"])
 @user_is_logged_in
 def user_profile_disable_platform_admin_view():
     if not current_user.platform_admin and not session.get("disable_platform_admin_view"):
@@ -276,6 +290,7 @@ def user_profile_disable_platform_admin_view():
 
 
 @main.route("/user-profile/security-keys", methods=["GET"])
+@main.route("/your-account/security-keys", methods=["GET"])
 @user_is_logged_in
 def user_profile_security_keys():
     if not current_user.can_use_webauthn:
@@ -293,6 +308,16 @@ def user_profile_security_keys():
 )
 @main.route(
     "/user-profile/security-keys/<uuid:key_id>/delete",
+    methods=["GET"],
+    endpoint="user_profile_confirm_delete_security_key",
+)
+@main.route(
+    "/your-account/security-keys/<uuid:key_id>/manage",
+    methods=["GET", "POST"],
+    endpoint="user_profile_manage_security_key",
+)
+@main.route(
+    "/your-account/security-keys/<uuid:key_id>/delete",
     methods=["GET"],
     endpoint="user_profile_confirm_delete_security_key",
 )
@@ -327,6 +352,7 @@ def user_profile_manage_security_key(key_id):
 
 
 @main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=["POST"])
+@main.route("/your-account/security-keys/<uuid:key_id>/delete", methods=["POST"])
 @user_is_logged_in
 def user_profile_delete_security_key(key_id):
     if not current_user.can_use_webauthn:
