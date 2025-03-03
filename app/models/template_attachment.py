@@ -77,6 +77,9 @@ class TemplateAttachments(InsensitiveDict):
         super().__delitem__(InsensitiveDict.make_key(placeholder_name))
         redis_client.set(self.cache_key, json.dumps(self))
 
+    def __bool__(self):
+        return self.count > 0
+
     @property
     def count(self):
         return sum(bool(self[key]) for key in self if key in InsensitiveSet(self._template.all_placeholders))
