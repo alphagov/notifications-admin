@@ -4,7 +4,7 @@
 ago==0.0.95
 humanize==4.4.0
 Flask-WTF==1.2.1
-Flask-Login @ git+https://github.com/maxcountryman/flask-login.git@2204b4eee7b215977ba5a1bf85e2061f7fa65e20#egg=flask-login
+Flask-Login==0.6.3
 
 Pillow==10.3.0
 
