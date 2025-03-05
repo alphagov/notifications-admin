@@ -173,7 +173,7 @@ class HeaderNavigation(Navigation):
             nav_items.append(
                 {
                     "href": url_for("main.user_profile"),
-                    "text": "Your profile",
+                    "text": "Your account",
                     "active": self.is_selected("user-profile"),
                 }
             )

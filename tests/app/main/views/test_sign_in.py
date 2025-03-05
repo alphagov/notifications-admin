@@ -100,7 +100,7 @@ def test_logged_in_user_redirects_to_account(client_request):
 def test_logged_in_user_redirects_to_next_url(client_request):
     client_request.get(
         "main.sign_in",
-        next="/user-profile",
+        next="/your-account",
         _expected_status=302,
         _expected_redirect=url_for("main.user_profile"),
     )

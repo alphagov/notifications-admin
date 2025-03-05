@@ -463,7 +463,7 @@ def test_should_show_back_to_service_if_user_belongs_to_service(
     service_one,
 ):
     mock_get_service.return_value = service_one
-    expected_page_text = "service one   Switch service Dashboard Templates Uploads Team members"
+    expected_page_text = "service one   Your services Dashboard Templates Uploads Team members"
 
     page = client_request.get(
         "main.view_template",

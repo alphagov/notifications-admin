@@ -21,7 +21,7 @@ def test_should_show_overview_page(
     client_request,
 ):
     page = client_request.get("main.user_profile")
-    assert page.select_one("h1").text.strip() == "Your profile"
+    assert page.select_one("h1").text.strip() == "Your account"
     assert "Use platform admin view" not in page
     assert "Security keys" not in page
 
@@ -50,7 +50,7 @@ def test_overview_page_shows_disable_for_platform_admin(client_request, platform
     mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items")
     client_request.login(platform_admin_user)
     page = client_request.get("main.user_profile")
-    assert page.select_one("h1").text.strip() == "Your profile"
+    assert page.select_one("h1").text.strip() == "Your account"
     disable_platform_admin_row = page.select(".govuk-summary-list__row")[-1]
     assert (
         " ".join(disable_platform_admin_row.text.split())
@@ -425,7 +425,7 @@ def test_non_gov_user_cannot_see_change_email_link(
     page = client_request.get("main.user_profile")
     change_email_link = url_for("main.user_profile_email")
     assert not page.select_one(f'a[href="{change_email_link}"]')
-    assert page.select_one("h1").text.strip() == "Your profile"
+    assert page.select_one("h1").text.strip() == "Your account"
 
 
 def test_non_gov_user_cannot_access_change_email_page(
