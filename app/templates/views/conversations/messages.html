@@ -24,7 +24,7 @@
     {% endset %}
   {% endif %}
   
-    <div class="govuk-grid-row sms-message-row" id="n{{ message.id }}" tabindex="0">
+    <div class="govuk-grid-row sms-message-row" id="n{{ message.id }}">
       {% if message.inbound %}
         <div class="govuk-grid-column-two-thirds sms-message-inbound">
           <h2 class="govuk-visually-hidden">{{ message.created_at | format_datetime_relative }} message received</h2>
