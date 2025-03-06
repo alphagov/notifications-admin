@@ -16,6 +16,8 @@ from notifications_utils.recipient_validation.phone_number import InvalidPhoneEr
 from notifications_utils.take import Take
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
+from app.utils.time import is_less_than_days_ago
+
 
 def convert_to_boolean(value):
     if isinstance(value, str):
@@ -441,3 +443,16 @@ def extract_path_from_url(url):
 def sentence_case(sentence):
     first_word, rest_of_sentence = (sentence + " ").split(" ", 1)
     return f"{first_word.title()} {rest_of_sentence}"[:-1]
+
+
+def message_finished_processing_notification(processing_started, data_retention_period):
+    within_data_retention_message = "No messages to show"
+    outside_data_retention_message = (
+        f"These messages have been deleted because they were sent more than {data_retention_period} days ago"
+    )
+
+    return (
+        within_data_retention_message
+        if is_less_than_days_ago(processing_started, data_retention_period)
+        else outside_data_retention_message
+    )
