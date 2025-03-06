@@ -36,7 +36,7 @@ def test_overview_page_change_links_for_regular_user(client_request):
 
     assert page.select_one(f'a[href="{url_for("main.your_account_name")}"]')
     assert page.select_one(f'a[href="{url_for("main.your_account_email")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_mobile_number")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_mobile_number")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_password")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_take_part_in_user_research")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_get_emails_about_new_features")}"]')
@@ -232,7 +232,7 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
 def test_should_show_mobile_number_page(
     client_request,
 ):
-    page = client_request.get("main.user_profile_mobile_number")
+    page = client_request.get("main.your_account_mobile_number")
     assert "Change your mobile number" in page.text
     assert "Delete your number" not in page.text
 
@@ -241,7 +241,7 @@ def test_change_your_mobile_number_page_shows_delete_link_if_user_on_email_auth(
     client_request, api_user_active_email_auth
 ):
     client_request.login(api_user_active_email_auth)
-    page = client_request.get("main.user_profile_mobile_number")
+    page = client_request.get("main.your_account_mobile_number")
     assert "Change your mobile number" in page.text
     assert "Delete your number" in page.text
 
@@ -249,7 +249,7 @@ def test_change_your_mobile_number_page_shows_delete_link_if_user_on_email_auth(
 def test_change_your_mobile_number_page_doesnt_show_delete_link_if_user_has_no_mobile_number(client_request, mocker):
     user = create_user(id=fake_uuid, auth_type="email_auth", mobile_number=None)
     mocker.patch("app.user_api_client.get_user", return_value=user)
-    page = client_request.get("main.user_profile_mobile_number")
+    page = client_request.get("main.your_account_mobile_number")
     assert "Change your mobile number" in page.text
     assert "Delete your number" not in page.text
 
@@ -258,7 +258,7 @@ def test_confirm_delete_mobile_number(client_request, api_user_active_email_auth
     mocker.patch("app.user_api_client.get_user", return_value=api_user_active_email_auth)
 
     page = client_request.get(
-        ".user_profile_confirm_delete_mobile_number",
+        ".your_account_confirm_delete_mobile_number",
         _test_page_title=False,
     )
 
@@ -274,7 +274,7 @@ def test_delete_mobile_number(client_request, api_user_active_email_auth, mocker
 
     client_request.login(api_user_active_email_auth)
     client_request.post(
-        ".user_profile_mobile_number_delete",
+        ".your_account_mobile_number_delete",
         _expected_redirect=url_for(
             ".your_account",
         ),
@@ -294,11 +294,11 @@ def test_should_redirect_after_mobile_number_change(
     phone_number_to_register_with,
 ):
     client_request.post(
-        "main.user_profile_mobile_number",
+        "main.your_account_mobile_number",
         _data={"mobile_number": phone_number_to_register_with},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile_mobile_number_authenticate",
+            "main.your_account_mobile_number_authenticate",
         ),
     )
     with client_request.session_transaction() as session:
@@ -312,7 +312,7 @@ def test_should_show_authenticate_after_mobile_number_change(
         session["new-mob"] = "+441234123123"
 
     page = client_request.get(
-        "main.user_profile_mobile_number_authenticate",
+        "main.your_account_mobile_number_authenticate",
     )
 
     assert "Change your mobile number" in page.text
@@ -328,11 +328,11 @@ def test_should_redirect_after_mobile_number_authenticate(
         session["new-mob"] = "+441234123123"
 
     client_request.post(
-        "main.user_profile_mobile_number_authenticate",
+        "main.your_account_mobile_number_authenticate",
         _data={"password": "12345667"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile_mobile_number_confirm",
+            "main.your_account_mobile_number_confirm",
         ),
     )
 
@@ -342,7 +342,7 @@ def test_should_show_confirm_after_mobile_number_change(
 ):
     with client_request.session_transaction() as session:
         session["new-mob-password-confirmed"] = True
-    page = client_request.get("main.user_profile_mobile_number_confirm")
+    page = client_request.get("main.your_account_mobile_number_confirm")
 
     assert "Change your mobile number" in page.text
     assert "Confirm" in page.text
@@ -377,7 +377,7 @@ def test_should_redirect_after_mobile_number_confirm(
         session["current_session_id"] = user_before["current_session_id"]
 
     client_request.post(
-        "main.user_profile_mobile_number_confirm",
+        "main.your_account_mobile_number_confirm",
         _data={"sms_code": "12345"},
         _expected_status=302,
         _expected_redirect=url_for(

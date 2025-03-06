@@ -118,20 +118,18 @@ def your_account_email_confirm(token):
     return redirect(url_for(".your_account"))
 
 
-@main.route("/user-profile/mobile-number", methods=["GET", "POST"])
-@main.route("/user-profile/mobile-number/delete", methods=["GET"], endpoint="user_profile_confirm_delete_mobile_number")
 @main.route("/your-account/mobile-number", methods=["GET", "POST"])
-@main.route("/your-account/mobile-number/delete", methods=["GET"], endpoint="user_profile_confirm_delete_mobile_number")
+@main.route("/your-account/mobile-number/delete", methods=["GET"], endpoint="your_account_confirm_delete_mobile_number")
 @user_is_logged_in
-def user_profile_mobile_number():
+def your_account_mobile_number():
     user = User.from_id(current_user.id)
     form = ChangeMobileNumberForm(mobile_number=current_user.mobile_number)
 
     if form.validate_on_submit():
         session[NEW_MOBILE] = form.mobile_number.data
-        return redirect(url_for(".user_profile_mobile_number_authenticate"))
+        return redirect(url_for(".your_account_mobile_number_authenticate"))
 
-    if request.endpoint == "main.user_profile_confirm_delete_mobile_number":
+    if request.endpoint == "main.your_account_confirm_delete_mobile_number":
         flash("Are you sure you want to delete your mobile number from Notify?", "delete")
 
     return render_template(
@@ -143,10 +141,9 @@ def user_profile_mobile_number():
     )
 
 
-@main.route("/user-profile/mobile-number/delete", methods=["POST"])
 @main.route("/your-account/mobile-number/delete", methods=["POST"])
 @user_is_logged_in
-def user_profile_mobile_number_delete():
+def your_account_mobile_number_delete():
     if current_user.auth_type != "email_auth":
         abort(403)
 
@@ -155,10 +152,9 @@ def user_profile_mobile_number_delete():
     return redirect(url_for(".your_account"))
 
 
-@main.route("/user-profile/mobile-number/authenticate", methods=["GET", "POST"])
 @main.route("/your-account/mobile-number/authenticate", methods=["GET", "POST"])
 @user_is_logged_in
-def user_profile_mobile_number_authenticate():
+def your_account_mobile_number_authenticate():
     # Validate password for form
     def _check_password(pwd):
         return user_api_client.verify_password(current_user.id, pwd)
@@ -166,32 +162,31 @@ def user_profile_mobile_number_authenticate():
     form = ConfirmPasswordForm(_check_password)
 
     if NEW_MOBILE not in session:
-        return redirect(url_for(".user_profile_mobile_number"))
+        return redirect(url_for(".your_account_mobile_number"))
 
     if form.validate_on_submit():
         session[NEW_MOBILE_PASSWORD_CONFIRMED] = True
         current_user.send_verify_code(to=session[NEW_MOBILE])
-        return redirect(url_for(".user_profile_mobile_number_confirm"))
+        return redirect(url_for(".your_account_mobile_number_confirm"))
 
     return render_template(
         "views/your-account/authenticate.html",
         thing="mobile number",
         form=form,
-        back_link=url_for(".user_profile_mobile_number_confirm"),
+        back_link=url_for(".your_account_mobile_number_confirm"),
         error_summary_enabled=True,
     )
 
 
-@main.route("/user-profile/mobile-number/confirm", methods=["GET", "POST"])
 @main.route("/your-account/mobile-number/confirm", methods=["GET", "POST"])
 @user_is_logged_in
-def user_profile_mobile_number_confirm():
+def your_account_mobile_number_confirm():
     # Validate verify code for form
     def _check_code(cde):
         return user_api_client.check_verify_code(current_user.id, cde, "sms")
 
     if NEW_MOBILE_PASSWORD_CONFIRMED not in session:
-        return redirect(url_for(".user_profile_mobile_number"))
+        return redirect(url_for(".your_account_mobile_number"))
 
     form = TwoFactorForm(_check_code)
 
