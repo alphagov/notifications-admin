@@ -239,15 +239,15 @@ def test_should_show_job_with_sending_limit_exceeded_status(
         # Created a while ago, started just within the last 24h
         (datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 1, 9, 1, 0, 1), "No messages to show yet…"),
         # Created a while ago, started exactly 24h ago
-        # ---
-        # It doesn’t matter that 24h (1 day) and 7 days (the service’s data
-        # retention) don’t match up. We’re testing the case of no
-        # notifications existing more than 1 day after the job started
-        # processing. In this case we assume it’s because the service’s
-        # data retention has kicked in.
         (
             datetime(2020, 1, 1, 0, 0, 0),
             datetime(2020, 1, 9, 1, 0, 0),
+            "No messages to show",
+        ),
+        # Processed but the data retention period has elapsed
+        (
+            datetime(2020, 1, 1, 0, 0, 0),
+            datetime(2020, 1, 2, 1, 0, 0),
             "These messages have been deleted because they were sent more than 7 days ago",
         ),
     ),
