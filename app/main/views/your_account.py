@@ -42,10 +42,9 @@ def your_account():
     )
 
 
-@main.route("/user-profile/name", methods=["GET", "POST"])
 @main.route("/your-account/name", methods=["GET", "POST"])
 @user_is_logged_in
-def user_profile_name():
+def your_account_name():
     form = ChangeNameForm(new_name=current_user.name)
 
     if form.validate_on_submit():

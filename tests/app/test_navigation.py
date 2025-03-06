@@ -368,7 +368,6 @@ EXCLUDED_ENDPOINTS = set(
             "user_profile_mobile_number_confirm",
             "user_profile_mobile_number_delete",
             "user_profile_mobile_number",
-            "user_profile_name",
             "user_profile_password",
             "user_profile_security_keys",
             "user_profile_take_part_in_user_research",
@@ -392,6 +391,7 @@ EXCLUDED_ENDPOINTS = set(
             "webauthn_complete_authentication",
             "webauthn_complete_register",
             "your_account",
+            "your_account_name",
         },
     )
 )

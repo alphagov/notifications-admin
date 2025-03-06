@@ -34,7 +34,7 @@ def test_should_show_overview_page(
 def test_overview_page_change_links_for_regular_user(client_request):
     page = client_request.get("main.your_account")
 
-    assert page.select_one(f'a[href="{url_for("main.user_profile_name")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_name")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_email")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_mobile_number")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_password")}"]')
@@ -86,7 +86,7 @@ def test_overview_page_shows_security_keys_if_user_they_can_use_webauthn(
 
 
 def test_should_show_name_page(client_request):
-    page = client_request.get("main.user_profile_name")
+    page = client_request.get("main.your_account_name")
     assert page.select_one("h1").text.strip() == "Change your name"
 
 
@@ -95,7 +95,7 @@ def test_should_redirect_after_name_change(
     mock_update_user_attribute,
 ):
     client_request.post(
-        "main.user_profile_name",
+        "main.your_account_name",
         _data={"new_name": "New Name"},
         _expected_status=302,
         _expected_redirect=url_for("main.your_account"),
