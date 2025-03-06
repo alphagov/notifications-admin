@@ -38,7 +38,7 @@ NEW_MOBILE_PASSWORD_CONFIRMED = "new-mob-password-confirmed"
 @user_is_logged_in
 def user_profile():
     return render_template(
-        "views/user-profile.html",
+        "views/your-account.html",
         can_see_edit=current_user.is_gov_user,
     )
 
@@ -54,7 +54,7 @@ def user_profile_name():
         return redirect(url_for(".user_profile"))
 
     return render_template(
-        "views/user-profile/change.html",
+        "views/your-account/change.html",
         thing="name",
         form=form,
         error_summary_enabled=True,
@@ -72,7 +72,7 @@ def user_profile_email():
         session[NEW_EMAIL] = form.email_address.data
         return redirect(url_for(".user_profile_email_authenticate"))
     return render_template(
-        "views/user-profile/change.html",
+        "views/your-account/change.html",
         thing="email address",
         form=form,
         error_summary_enabled=True,
@@ -97,7 +97,7 @@ def user_profile_email_authenticate():
         return render_template("views/change-email-continue.html", new_email=session[NEW_EMAIL])
 
     return render_template(
-        "views/user-profile/authenticate.html",
+        "views/your-account/authenticate.html",
         thing="email address",
         form=form,
         back_link=url_for(".user_profile_email"),
@@ -140,7 +140,7 @@ def user_profile_mobile_number():
         flash("Are you sure you want to delete your mobile number from Notify?", "delete")
 
     return render_template(
-        "views/user-profile/change.html",
+        "views/your-account/change.html",
         thing="mobile number",
         form=form,
         user_auth=user.auth_type,
@@ -179,7 +179,7 @@ def user_profile_mobile_number_authenticate():
         return redirect(url_for(".user_profile_mobile_number_confirm"))
 
     return render_template(
-        "views/user-profile/authenticate.html",
+        "views/your-account/authenticate.html",
         thing="mobile number",
         form=form,
         back_link=url_for(".user_profile_mobile_number_confirm"),
@@ -208,7 +208,7 @@ def user_profile_mobile_number_confirm():
         current_user.update(mobile_number=mobile_number)
         return redirect(url_for(".user_profile"))
 
-    return render_template("views/user-profile/confirm.html", form_field=form.sms_code, thing="mobile number")
+    return render_template("views/your-account/confirm.html", form_field=form.sms_code, thing="mobile number")
 
 
 @main.route("/user-profile/password", methods=["GET", "POST"])
@@ -226,7 +226,7 @@ def user_profile_password():
         return redirect(url_for(".user_profile"))
 
     return render_template(
-        "views/user-profile/change-password.html",
+        "views/your-account/change-password.html",
         form=form,
         error_summary_enabled=True,
     )
@@ -245,7 +245,7 @@ def user_profile_take_part_in_user_research():
         current_user.update(take_part_in_research=form.enabled.data)
         return redirect(url_for(".user_profile"))
 
-    return render_template("views/user-profile/take-part-in-user-research.html", form=form, error_summary_enabled=True)
+    return render_template("views/your-account/take-part-in-user-research.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/user-profile/get-emails-about-new-features", methods=["GET", "POST"])
@@ -262,7 +262,7 @@ def user_profile_get_emails_about_new_features():
         return redirect(url_for(".user_profile"))
 
     return render_template(
-        "views/user-profile/get-emails-about-new-features.html",
+        "views/your-account/get-emails-about-new-features.html",
         form=form,
         error_summary_enabled=True,
     )
@@ -286,7 +286,7 @@ def user_profile_disable_platform_admin_view():
         session["disable_platform_admin_view"] = not form.enabled.data
         return redirect(url_for(".user_profile"))
 
-    return render_template("views/user-profile/disable-platform-admin-view.html", form=form, error_summary_enabled=True)
+    return render_template("views/your-account/disable-platform-admin-view.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/user-profile/security-keys", methods=["GET"])
@@ -297,7 +297,7 @@ def user_profile_security_keys():
         abort(403)
 
     return render_template(
-        "views/user-profile/security-keys.html",
+        "views/your-account/security-keys.html",
     )
 
 
@@ -344,7 +344,7 @@ def user_profile_manage_security_key(key_id):
         flash("Are you sure you want to delete this security key?", "delete")
 
     return render_template(
-        "views/user-profile/manage-security-key.html",
+        "views/your-account/manage-security-key.html",
         security_key=security_key,
         form=form,
         error_summary_enabled=True,
