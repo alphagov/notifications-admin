@@ -59,11 +59,10 @@ def your_account_name():
     )
 
 
-@main.route("/user-profile/email", methods=["GET", "POST"])
 @main.route("/your-account/email", methods=["GET", "POST"])
 @user_is_logged_in
 @user_is_gov_user
-def user_profile_email():
+def your_account_email():
     form = ChangeEmailForm(User.already_registered, email_address=current_user.email_address)
 
     if form.validate_on_submit():
@@ -88,7 +87,7 @@ def user_profile_email_authenticate():
     form = ConfirmPasswordForm(_check_password)
 
     if NEW_EMAIL not in session:
-        return redirect(url_for("main.user_profile_email"))
+        return redirect(url_for("main.your_account_email"))
 
     if form.validate_on_submit():
         user_api_client.send_change_email_verification(current_user.id, session[NEW_EMAIL])
@@ -98,7 +97,7 @@ def user_profile_email_authenticate():
         "views/your-account/authenticate.html",
         thing="email address",
         form=form,
-        back_link=url_for(".user_profile_email"),
+        back_link=url_for(".your_account_email"),
         error_summary_enabled=True,
     )
 

@@ -85,9 +85,9 @@ class HeaderNavigation(Navigation):
         "user-profile": {
             "your_account",
             "your_account_name",
+            "your_account_email",
             "user_profile_confirm_delete_mobile_number",
             "user_profile_disable_platform_admin_view",
-            "user_profile_email",
             "user_profile_email_authenticate",
             "user_profile_email_confirm",
             "user_profile_get_emails_about_new_features",

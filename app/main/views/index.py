@@ -421,6 +421,7 @@ REDIRECTS = {
     "/add-or-join-service": "main.your_services",
     "/user-profile": "main.your_account",
     "/user-profile/name": "main.your_account_name",
+    "/user-profile/email": "main.your_account_email",
 }
 
 for old_url, new_endpoint in REDIRECTS.items():

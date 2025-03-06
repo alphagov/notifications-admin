@@ -35,7 +35,7 @@ def test_overview_page_change_links_for_regular_user(client_request):
     page = client_request.get("main.your_account")
 
     assert page.select_one(f'a[href="{url_for("main.your_account_name")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_email")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_email")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_mobile_number")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_password")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_take_part_in_user_research")}"]')
@@ -106,7 +106,7 @@ def test_should_redirect_after_name_change(
 def test_should_show_email_page(
     client_request,
 ):
-    page = client_request.get("main.user_profile_email")
+    page = client_request.get("main.your_account_email")
     assert page.select_one("h1").text.strip() == "Change your email address"
     # template is shared with "Change your mobile number" but we don't want to show Delete mobile number link
     assert "Delete your number" not in page.text
@@ -117,7 +117,7 @@ def test_should_redirect_after_email_change(
     mock_email_is_not_already_in_use,
 ):
     client_request.post(
-        "main.user_profile_email",
+        "main.your_account_email",
         _data={"email_address": "new_notify@notify.gov.uk"},
         _expected_status=302,
         _expected_redirect=url_for(
@@ -153,7 +153,7 @@ def test_should_show_errors_if_new_email_address_does_not_validate(
     error_link,
 ):
     page = client_request.post(
-        "main.user_profile_email",
+        "main.your_account_email",
         _data={"email_address": email_address},
         _expected_status=200,
     )
@@ -190,7 +190,7 @@ def test_should_redirect_from_authenticate_if_new_email_not_in_session(
 ):
     client_request.get(
         "main.user_profile_email_authenticate",
-        _expected_redirect=url_for("main.user_profile_email"),
+        _expected_redirect=url_for("main.your_account_email"),
     )
 
 
@@ -423,7 +423,7 @@ def test_non_gov_user_cannot_see_change_email_link(
 ):
     client_request.login(api_nongov_user_active)
     page = client_request.get("main.your_account")
-    change_email_link = url_for("main.user_profile_email")
+    change_email_link = url_for("main.your_account_email")
     assert not page.select_one(f'a[href="{change_email_link}"]')
     assert page.select_one("h1").text.strip() == "Your account"
 
@@ -434,7 +434,7 @@ def test_non_gov_user_cannot_access_change_email_page(
     mock_get_organisations,
 ):
     client_request.login(api_nongov_user_active)
-    client_request.get("main.user_profile_email", _expected_status=403)
+    client_request.get("main.your_account_email", _expected_status=403)
 
 
 def test_normal_user_doesnt_see_disable_platform_admin(client_request):
