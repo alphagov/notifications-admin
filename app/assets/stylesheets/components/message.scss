@@ -79,6 +79,9 @@ a {
 
     &-hidden-by-default {
       display: none;
+      &.visible-as-matches-search-query {
+        display: block;
+      }
     }
 
     &-without-ancestors {
@@ -178,7 +181,6 @@ a {
       padding-left: 0;
       width: auto;
     }
-
   }
 
   &-folder,
