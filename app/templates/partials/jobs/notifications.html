@@ -49,7 +49,7 @@
         notifications,
         caption=uploaded_file_name,
         caption_visible=False,
-        empty_message='No messages to show yet…' if job.awaiting_processing_or_recently_processed else 'These messages have been deleted because they were sent more than {} days ago'.format(service_data_retention_days),
+        empty_message='No messages to show yet…' if job.awaiting_processing_or_recently_processed else job.processing_started | message_finished_processing_notification(service_data_retention_days),
         field_headings=[
           'Recipient',
           'Status'
