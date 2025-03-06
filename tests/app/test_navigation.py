@@ -359,8 +359,6 @@ EXCLUDED_ENDPOINTS = set(
             "user_profile_confirm_delete_security_key",
             "user_profile_delete_security_key",
             "user_profile_disable_platform_admin_view",
-            "user_profile_email_authenticate",
-            "user_profile_email_confirm",
             "user_profile_get_emails_about_new_features",
             "user_profile_manage_security_key",
             "user_profile_mobile_number_authenticate",
@@ -392,6 +390,8 @@ EXCLUDED_ENDPOINTS = set(
             "your_account",
             "your_account_name",
             "your_account_email",
+            "your_account_email_authenticate",
+            "your_account_email_confirm",
         },
     )
 )

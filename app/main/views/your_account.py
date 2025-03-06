@@ -67,7 +67,7 @@ def your_account_email():
 
     if form.validate_on_submit():
         session[NEW_EMAIL] = form.email_address.data
-        return redirect(url_for(".user_profile_email_authenticate"))
+        return redirect(url_for(".your_account_email_authenticate"))
     return render_template(
         "views/your-account/change.html",
         thing="email address",
@@ -76,10 +76,9 @@ def your_account_email():
     )
 
 
-@main.route("/user-profile/email/authenticate", methods=["GET", "POST"])
 @main.route("/your-account/email/authenticate", methods=["GET", "POST"])
 @user_is_logged_in
-def user_profile_email_authenticate():
+def your_account_email_authenticate():
     # Validate password for form
     def _check_password(pwd):
         return user_api_client.verify_password(current_user.id, pwd)
@@ -102,10 +101,9 @@ def user_profile_email_authenticate():
     )
 
 
-@main.route("/user-profile/email/confirm/<string:token>", methods=["GET"])
 @main.route("/your-account/email/confirm/<string:token>", methods=["GET"])
 @user_is_logged_in
-def user_profile_email_confirm(token):
+def your_account_email_confirm(token):
     token_data = check_token(
         token,
         current_app.config["SECRET_KEY"],

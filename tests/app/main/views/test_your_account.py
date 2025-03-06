@@ -121,7 +121,7 @@ def test_should_redirect_after_email_change(
         _data={"email_address": "new_notify@notify.gov.uk"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile_email_authenticate",
+            "main.your_account_email_authenticate",
         ),
     )
 
@@ -179,7 +179,7 @@ def test_should_show_authenticate_after_email_change(
     with client_request.session_transaction() as session:
         session["new-email"] = "new_notify@notify.gov.uk"
 
-    page = client_request.get("main.user_profile_email_authenticate")
+    page = client_request.get("main.your_account_email_authenticate")
 
     assert "Change your email address" in page.text
     assert "Confirm" in page.text
@@ -189,7 +189,7 @@ def test_should_redirect_from_authenticate_if_new_email_not_in_session(
     client_request,
 ):
     client_request.get(
-        "main.user_profile_email_authenticate",
+        "main.your_account_email_authenticate",
         _expected_redirect=url_for("main.your_account_email"),
     )
 
@@ -202,7 +202,7 @@ def test_should_render_change_email_continue_after_authenticate_email(
     with client_request.session_transaction() as session:
         session["new-email"] = "new_notify@notify.gov.uk"
     page = client_request.post(
-        "main.user_profile_email_authenticate",
+        "main.your_account_email_authenticate",
         _data={"password": "12345"},
         _expected_status=200,
     )
@@ -222,7 +222,7 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
     )
     client_request.get_url(
         url_for_endpoint_with_token(
-            "main.user_profile_email_confirm",
+            "main.your_account_email_confirm",
             token=token,
         ),
         _expected_redirect=url_for("main.your_account"),

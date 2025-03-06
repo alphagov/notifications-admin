@@ -422,6 +422,8 @@ REDIRECTS = {
     "/user-profile": "main.your_account",
     "/user-profile/name": "main.your_account_name",
     "/user-profile/email": "main.your_account_email",
+    "/user-profile/email/authenticate": "main.your_account_email_authenticate",
+    "/user-profile/email/confirm/<string:token>": "main.your_account_email_confirm",
 }
 
 for old_url, new_endpoint in REDIRECTS.items():
