@@ -1,6 +1,8 @@
+from datetime import datetime
 from functools import partial
 
 import pytest
+import pytz
 from flask import url_for
 from freezegun import freeze_time
 
@@ -9,6 +11,7 @@ from app.formatters import (
     format_notification_status_as_url,
     format_pennies_as_currency,
     format_pounds_as_currency,
+    message_finished_processing_notification,
     sentence_case,
 )
 
@@ -144,3 +147,24 @@ def test_format_datetime_relative(time, human_readable_datetime):
 )
 def test_sentence_case(sentence, sentence_case_sentence):
     assert sentence_case(sentence) == sentence_case_sentence
+
+
+@freeze_time("2020-01-10 1:0:0")
+@pytest.mark.parametrize(
+    "processing_started, data_retention_period, expected_message",
+    [
+        (
+            datetime(2020, 1, 4, 1, 0, 0),
+            7,
+            "No messages to show",
+        ),
+        (
+            datetime(2020, 1, 2, 1, 0, 0),
+            7,
+            "These messages have been deleted because they were sent more than 7 days ago",
+        ),
+    ],
+)
+def test_message_finished_processing_notification(processing_started, data_retention_period, expected_message):
+    message = message_finished_processing_notification(pytz.utc.localize(processing_started), data_retention_period)
+    assert message == expected_message
