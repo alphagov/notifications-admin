@@ -20,7 +20,7 @@ from tests.conftest import (
 def test_should_show_overview_page(
     client_request,
 ):
-    page = client_request.get("main.user_profile")
+    page = client_request.get("main.your_account")
     assert page.select_one("h1").text.strip() == "Your account"
     assert "Use platform admin view" not in page
     assert "Security keys" not in page
@@ -32,7 +32,7 @@ def test_should_show_overview_page(
 
 
 def test_overview_page_change_links_for_regular_user(client_request):
-    page = client_request.get("main.user_profile")
+    page = client_request.get("main.your_account")
 
     assert page.select_one(f'a[href="{url_for("main.user_profile_name")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_email")}"]')
@@ -49,7 +49,7 @@ def test_overview_page_change_links_for_regular_user(client_request):
 def test_overview_page_shows_disable_for_platform_admin(client_request, platform_admin_user, mocker):
     mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items")
     client_request.login(platform_admin_user)
-    page = client_request.get("main.user_profile")
+    page = client_request.get("main.your_account")
     assert page.select_one("h1").text.strip() == "Your account"
     disable_platform_admin_row = page.select(".govuk-summary-list__row")[-1]
     assert (
@@ -80,7 +80,7 @@ def test_overview_page_shows_security_keys_if_user_they_can_use_webauthn(
         "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=credentials,
     )
-    page = client_request.get("main.user_profile")
+    page = client_request.get("main.your_account")
     security_keys_row = page.select(".govuk-summary-list__row")[-2]
     assert " ".join(security_keys_row.text.split()) == expected_row_text
 
@@ -98,7 +98,7 @@ def test_should_redirect_after_name_change(
         "main.user_profile_name",
         _data={"new_name": "New Name"},
         _expected_status=302,
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
     assert mock_update_user_attribute.called is True
 
@@ -225,7 +225,7 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
             "main.user_profile_email_confirm",
             token=token,
         ),
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
 
 
@@ -276,7 +276,7 @@ def test_delete_mobile_number(client_request, api_user_active_email_auth, mocker
     client_request.post(
         ".user_profile_mobile_number_delete",
         _expected_redirect=url_for(
-            ".user_profile",
+            ".your_account",
         ),
     )
     mock_delete.assert_called_once_with(api_user_active_email_auth["id"], mobile_number=None)
@@ -381,7 +381,7 @@ def test_should_redirect_after_mobile_number_confirm(
         _data={"sms_code": "12345"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile",
+            "main.your_account",
         ),
     )
 
@@ -411,7 +411,7 @@ def test_should_redirect_after_password_change(
         },
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile",
+            "main.your_account",
         ),
     )
 
@@ -422,7 +422,7 @@ def test_non_gov_user_cannot_see_change_email_link(
     mock_get_organisations,
 ):
     client_request.login(api_nongov_user_active)
-    page = client_request.get("main.user_profile")
+    page = client_request.get("main.your_account")
     change_email_link = url_for("main.user_profile_email")
     assert not page.select_one(f'a[href="{change_email_link}"]')
     assert page.select_one("h1").text.strip() == "Your account"
@@ -459,7 +459,7 @@ def test_can_disable_platform_admin(client_request, platform_admin_user):
         "main.user_profile_disable_platform_admin_view",
         _data={"enabled": False},
         _expected_status=302,
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
 
     with client_request.session_transaction() as session:
@@ -476,7 +476,7 @@ def test_can_reenable_platform_admin(client_request, platform_admin_user):
         "main.user_profile_disable_platform_admin_view",
         _data={"enabled": True},
         _expected_status=302,
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
 
     with client_request.session_transaction() as session:
@@ -777,7 +777,7 @@ def test_post_user_profile_take_part_in_user_research(client_request, mocker, ac
         ".user_profile_take_part_in_user_research",
         _data={"enabled": False},
         _expected_status=302,
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
 
     mock_update_consent.assert_called_once_with(active_user_with_permissions["id"], take_part_in_research=False)
@@ -809,7 +809,7 @@ def test_post_user_profile_get_emails_about_new_features(client_request, mocker,
         ".user_profile_get_emails_about_new_features",
         _data={"enabled": False},
         _expected_status=302,
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
 
     mock_update.assert_called_once_with(active_user_with_permissions["id"], receives_new_features_email=False)

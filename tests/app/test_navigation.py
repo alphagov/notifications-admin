@@ -355,7 +355,6 @@ EXCLUDED_ENDPOINTS = set(
             "uploads",
             "usage",
             "user_information",
-            "user_profile",
             "user_profile_confirm_delete_mobile_number",
             "user_profile_confirm_delete_security_key",
             "user_profile_delete_security_key",
@@ -392,6 +391,7 @@ EXCLUDED_ENDPOINTS = set(
             "webauthn_begin_register",
             "webauthn_complete_authentication",
             "webauthn_complete_register",
+            "your_account",
         },
     )
 )

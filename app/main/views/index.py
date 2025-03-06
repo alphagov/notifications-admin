@@ -419,6 +419,7 @@ REDIRECTS = {
     "/using-notify/who-can-use-notify": "main.guidance_who_can_use_notify",
     "/using-notify/who-its-for": "main.guidance_who_can_use_notify",
     "/add-or-join-service": "main.your_services",
+    "/user-profile": "main.your_account",
 }
 
 for old_url, new_endpoint in REDIRECTS.items():

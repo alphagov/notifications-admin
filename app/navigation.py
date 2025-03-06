@@ -83,7 +83,7 @@ class HeaderNavigation(Navigation):
             "guidance_upload_a_letter",
         },
         "user-profile": {
-            "user_profile",
+            "your_account",
             "user_profile_confirm_delete_mobile_number",
             "user_profile_disable_platform_admin_view",
             "user_profile_email",
@@ -172,7 +172,7 @@ class HeaderNavigation(Navigation):
         if current_user.is_authenticated:
             nav_items.append(
                 {
-                    "href": url_for("main.user_profile"),
+                    "href": url_for("main.your_account"),
                     "text": "Your account",
                     "active": self.is_selected("user-profile"),
                 }

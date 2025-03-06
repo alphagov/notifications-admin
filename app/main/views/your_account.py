@@ -33,10 +33,9 @@ NEW_MOBILE = "new-mob"
 NEW_MOBILE_PASSWORD_CONFIRMED = "new-mob-password-confirmed"
 
 
-@main.route("/user-profile")
 @main.route("/your-account")
 @user_is_logged_in
-def user_profile():
+def your_account():
     return render_template(
         "views/your-account.html",
         can_see_edit=current_user.is_gov_user,
@@ -51,7 +50,7 @@ def user_profile_name():
 
     if form.validate_on_submit():
         current_user.update(name=form.new_name.data)
-        return redirect(url_for(".user_profile"))
+        return redirect(url_for(".your_account"))
 
     return render_template(
         "views/your-account/change.html",
@@ -120,7 +119,7 @@ def user_profile_email_confirm(token):
     user.update(email_address=token.email)
     session.pop(NEW_EMAIL, None)
 
-    return redirect(url_for(".user_profile"))
+    return redirect(url_for(".your_account"))
 
 
 @main.route("/user-profile/mobile-number", methods=["GET", "POST"])
@@ -157,7 +156,7 @@ def user_profile_mobile_number_delete():
 
     current_user.update(mobile_number=None)
 
-    return redirect(url_for(".user_profile"))
+    return redirect(url_for(".your_account"))
 
 
 @main.route("/user-profile/mobile-number/authenticate", methods=["GET", "POST"])
@@ -206,7 +205,7 @@ def user_profile_mobile_number_confirm():
         del session[NEW_MOBILE]
         del session[NEW_MOBILE_PASSWORD_CONFIRMED]
         current_user.update(mobile_number=mobile_number)
-        return redirect(url_for(".user_profile"))
+        return redirect(url_for(".your_account"))
 
     return render_template("views/your-account/confirm.html", form_field=form.sms_code, thing="mobile number")
 
@@ -223,7 +222,7 @@ def user_profile_password():
 
     if form.validate_on_submit():
         user_api_client.update_password(current_user.id, password=form.new_password.data)
-        return redirect(url_for(".user_profile"))
+        return redirect(url_for(".your_account"))
 
     return render_template(
         "views/your-account/change-password.html",
@@ -243,7 +242,7 @@ def user_profile_take_part_in_user_research():
 
     if form.validate_on_submit():
         current_user.update(take_part_in_research=form.enabled.data)
-        return redirect(url_for(".user_profile"))
+        return redirect(url_for(".your_account"))
 
     return render_template("views/your-account/take-part-in-user-research.html", form=form, error_summary_enabled=True)
 
@@ -259,7 +258,7 @@ def user_profile_get_emails_about_new_features():
 
     if form.validate_on_submit():
         current_user.update(receives_new_features_email=form.enabled.data)
-        return redirect(url_for(".user_profile"))
+        return redirect(url_for(".your_account"))
 
     return render_template(
         "views/your-account/get-emails-about-new-features.html",
@@ -284,7 +283,7 @@ def user_profile_disable_platform_admin_view():
 
     if form.validate_on_submit():
         session["disable_platform_admin_view"] = not form.enabled.data
-        return redirect(url_for(".user_profile"))
+        return redirect(url_for(".your_account"))
 
     return render_template("views/your-account/disable-platform-admin-view.html", form=form, error_summary_enabled=True)
 
