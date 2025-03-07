@@ -15,7 +15,7 @@ class InsensitiveSet(UtilsInsensitiveSet):
 
 
 class TemplateAttachment(JSONModel):
-    BASE_URL = "https://www.download.example.gov.uk/f/"
+    BASE_URL = "https://documents.service.gov.uk"
 
     file_name: str
     weeks_of_retention: int
@@ -41,10 +41,16 @@ class TemplateAttachment(JSONModel):
         return bool(self.file_name)
 
     @property
-    def url(self):
+    def url(self, custom=False):
         if not self.file_name:
             return
-        return f"{self.BASE_URL}{base64.b64encode(self.file_name.encode()).decode()}"
+        if custom:
+            return f"{self.BASE_URL}/f/{base64.b64encode(self.file_name.encode()).decode()}"
+        return (
+            f"{self.BASE_URL}"
+            "/d/YlxDzgNUQYi1Qg6QxIpptA/WiwkEBFmSy6WYJ0gLemPdg"
+            "?key=oe78i7L5xPD-VZVfPAUHyxr5YVBwMB73Hu7sAl-HnXU"
+        )
 
 
 class TemplateAttachments(InsensitiveDict):
