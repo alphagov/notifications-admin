@@ -80,13 +80,18 @@ class TemplateAttachments(InsensitiveDict):
     def __bool__(self):
         return self.count > 0
 
+    def __contains__(self, key):
+        if not super().__contains__(key):
+            return False
+        return bool(TemplateAttachment(super().__getitem__(key), parent=self, placeholder_name=key))
+
     @property
     def count(self):
         return sum(bool(self[key]) for key in self if key in InsensitiveSet(self._template.all_placeholders))
 
     @property
     def as_personalisation(self):
-        return {placeholder: self[placeholder].url for placeholder in self}
+        return {placeholder: self[placeholder].url for placeholder in self if self[placeholder]}
 
     def prune_orphans(self):
         for placeholder in self.keys():
