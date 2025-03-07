@@ -51,7 +51,7 @@ flask==3.1.0
     #   gds-metrics
     #   notifications-utils
     #   sentry-sdk
-flask-login @ git+https://github.com/maxcountryman/flask-login.git@2204b4eee7b215977ba5a1bf85e2061f7fa65e20#egg=flask-login
+flask-login==0.6.3
     # via -r requirements.in
 flask-redis==0.4.0
     # via notifications-utils
