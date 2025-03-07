@@ -43,7 +43,7 @@ def test_overview_page_change_links_for_regular_user(client_request):
 
     # only platform admins see this
     assert not page.select_one(f'a[href="{url_for("main.user_profile_security_keys")}"]')
-    assert not page.select_one(f'a[href="{url_for("main.user_profile_disable_platform_admin_view")}"]')
+    assert not page.select_one(f'a[href="{url_for("main.your_account_disable_platform_admin_view")}"]')
 
 
 def test_overview_page_shows_disable_for_platform_admin(client_request, platform_admin_user, mocker):
@@ -438,12 +438,12 @@ def test_non_gov_user_cannot_access_change_email_page(
 
 
 def test_normal_user_doesnt_see_disable_platform_admin(client_request):
-    client_request.get("main.user_profile_disable_platform_admin_view", _expected_status=403)
+    client_request.get("main.your_account_disable_platform_admin_view", _expected_status=403)
 
 
 def test_platform_admin_can_see_disable_platform_admin_page(client_request, platform_admin_user):
     client_request.login(platform_admin_user)
-    page = client_request.get("main.user_profile_disable_platform_admin_view")
+    page = client_request.get("main.your_account_disable_platform_admin_view")
 
     assert page.select_one("h1").text.strip() == "Use platform admin view"
     assert page.select_one("input[checked]")["value"] == "True"
@@ -456,7 +456,7 @@ def test_can_disable_platform_admin(client_request, platform_admin_user):
         assert "disable_platform_admin_view" not in session
 
     client_request.post(
-        "main.user_profile_disable_platform_admin_view",
+        "main.your_account_disable_platform_admin_view",
         _data={"enabled": False},
         _expected_status=302,
         _expected_redirect=url_for("main.your_account"),
@@ -473,7 +473,7 @@ def test_can_reenable_platform_admin(client_request, platform_admin_user):
         session["disable_platform_admin_view"] = True
 
     client_request.post(
-        "main.user_profile_disable_platform_admin_view",
+        "main.your_account_disable_platform_admin_view",
         _data={"enabled": True},
         _expected_status=302,
         _expected_redirect=url_for("main.your_account"),

@@ -86,6 +86,7 @@ class HeaderNavigation(Navigation):
             "your_account",
             "your_account_confirm_delete_mobile_number",
             "your_account_name",
+            "your_account_disable_platform_admin_view",
             "your_account_email",
             "your_account_email_authenticate",
             "your_account_email_confirm",
@@ -96,7 +97,6 @@ class HeaderNavigation(Navigation):
             "your_account_mobile_number_delete",
             "your_account_password",
             "your_account_take_part_in_user_research",
-            "user_profile_disable_platform_admin_view",
         },
         "platform-admin": {
             "archive_user",

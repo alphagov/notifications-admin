@@ -255,10 +255,9 @@ def your_account_get_emails_about_new_features():
     )
 
 
-@main.route("/user-profile/disable-platform-admin-view", methods=["GET", "POST"])
 @main.route("/your-account/disable-platform-admin-view", methods=["GET", "POST"])
 @user_is_logged_in
-def user_profile_disable_platform_admin_view():
+def your_account_disable_platform_admin_view():
     if not current_user.platform_admin and not session.get("disable_platform_admin_view"):
         abort(403)
 

@@ -431,6 +431,7 @@ REDIRECTS = {
     "/add-or-join-service": "main.your_services",
     "/user-profile": "main.your_account",
     "/user-profile/name": "main.your_account_name",
+    "/user-profile/disable-platform-admin-view": "main.your_account_disable_platform_admin_view",
     "/user-profile/email": "main.your_account_email",
     "/user-profile/email/authenticate": "main.your_account_email_authenticate",
     "/user-profile/email/confirm/<string:token>": "main.your_account_email_confirm",
