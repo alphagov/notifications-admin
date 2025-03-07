@@ -10,7 +10,7 @@ from notifications_python_client.errors import HTTPError
 
 from app.main.views.verify import activate_user
 from tests import organisation_json
-from tests.conftest import create_user
+from tests.conftest import create_user, normalize_spaces
 
 
 def test_should_return_verify_template(
@@ -174,6 +174,24 @@ def test_verify_email_redirects_to_email_sent_if_token_expired(
         "main.verify_email",
         token="notreal",
         _expected_redirect=url_for("main.resend_email_verification"),
+    )
+
+
+def test_verify_email_shows_flash_message_if_token_expired(
+    client_request,
+    mocker,
+):
+    client_request.logout()
+    mocker.patch("app.main.views.verify.check_token", side_effect=SignatureExpired("expired"))
+
+    page = client_request.get(
+        "main.verify_email",
+        token="notreal",
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
+        "The link in the email we sent you has expired. We’ve sent you a new one."
     )
 
 
