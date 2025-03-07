@@ -5,7 +5,7 @@ import boto3
 import botocore
 import pytest
 from flask import current_app
-from moto import mock_s3
+from moto import mock_aws
 
 from app.s3_client.s3_letter_upload_client import (
     LetterMetadata,
@@ -102,7 +102,7 @@ def test_lettermetadata_unquotes_special_keys():
     assert metadata.get("recipient") == "£hi"
 
 
-@mock_s3
+@mock_aws
 @pytest.mark.parametrize(
     "will_raise_custom_error,expected_exception",
     [(True, LetterNotFoundError), (False, botocore.exceptions.ClientError)],

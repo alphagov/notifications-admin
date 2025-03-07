@@ -198,6 +198,7 @@
     "/services/<uuid:service_id>/preview-invalid-attachment-image/<uuid:file_id>",
     "/services/<uuid:service_id>/preview-letter-image/<uuid:file_id>",
     "/services/<uuid:service_id>/preview-letter/<uuid:file_id>",
+    "/services/<uuid:service_id>/report-request/<uuid:report_request_id>.csv",
     "/services/<uuid:service_id>/returned-letters",
     "/services/<uuid:service_id>/returned-letters/<simple_date:reported_at>",
     "/services/<uuid:service_id>/returned-letters/<simple_date:reported_at>.csv",

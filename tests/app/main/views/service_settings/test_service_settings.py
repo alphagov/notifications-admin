@@ -12,11 +12,11 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
 import app
+from app.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.main.views.service_settings.branding import (
     _should_set_default_org_email_branding,
 )
 from app.models.service import Service
-from app.utils.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
 from tests import (
     find_element_by_tag_and_partial_text,
     invite_json,
