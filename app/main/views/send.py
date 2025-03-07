@@ -804,6 +804,11 @@ def fields_to_fill_in(template, prefill_current_user=False):
     if "letter" == template.template_type:
         return InsensitiveSet(letter_address_columns + list(template.placeholders))
 
+    if template.template_type == "email":
+        for attachment in template.attachments:
+            if template.attachments[attachment]:
+                session["placeholders"][attachment] = template.attachments[attachment].url
+
     if not prefill_current_user:
         return InsensitiveSet(first_column_headings[template.template_type] + list(template.placeholders))
 
