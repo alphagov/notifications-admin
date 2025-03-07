@@ -4,7 +4,7 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Received text message
+  Text message conversation with {{ user_number }}
 {% endblock %}
 
 {% block backLink %}
@@ -17,6 +17,7 @@
 
     <div class="bottom-gutter js-stick-at-top-when-scrolling">
       <h1 class="heading-large govuk-!-margin-top-0">
+        <span class="govuk-visually-hidden">Text message conversation with</span>
         {{ user_number }}
       </h1>
     </div>
