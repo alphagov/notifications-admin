@@ -5,7 +5,6 @@ from itertools import groupby
 
 from flask import Response, abort, jsonify, render_template, request, session, url_for
 from flask_login import current_user
-from notifications_utils.recipient_validation.phone_number import format_phone_number_human_readable
 from werkzeug.utils import redirect
 
 from app import (
@@ -17,7 +16,7 @@ from app import (
 )
 from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
 from app.extensions import redis_client
-from app.formatters import format_date_numeric, format_datetime_numeric
+from app.formatters import format_date_numeric, format_datetime_numeric, format_phone_number_human_readable
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
 from app.models.notification import InboundSMSMessages, Notifications
