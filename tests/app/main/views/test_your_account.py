@@ -38,8 +38,8 @@ def test_overview_page_change_links_for_regular_user(client_request):
     assert page.select_one(f'a[href="{url_for("main.your_account_email")}"]')
     assert page.select_one(f'a[href="{url_for("main.your_account_mobile_number")}"]')
     assert page.select_one(f'a[href="{url_for("main.your_account_password")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_take_part_in_user_research")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_get_emails_about_new_features")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_take_part_in_user_research")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_get_emails_about_new_features")}"]')
 
     # only platform admins see this
     assert not page.select_one(f'a[href="{url_for("main.user_profile_security_keys")}"]')
@@ -752,12 +752,12 @@ def test_delete_security_key_handles_last_credential_error(
         (False, None, ""),
     ],
 )
-def test_get_user_profile_take_part_in_user_research(
+def test_get_your_account_take_part_in_user_research(
     client_request, active_user_with_permissions, take_part_in_research, is_yes_checked, is_no_checked
 ):
     active_user_with_permissions["take_part_in_research"] = take_part_in_research
     client_request.login(active_user_with_permissions)
-    page = client_request.get("main.user_profile_take_part_in_user_research")
+    page = client_request.get("main.your_account_take_part_in_user_research")
     assert "Take part in user research" in page.text
     radios = page.select("input.govuk-radios__input")
     assert len(radios) == 2
@@ -767,14 +767,14 @@ def test_get_user_profile_take_part_in_user_research(
     assert radios[1].attrs.get("checked", None) == is_no_checked
 
 
-def test_post_user_profile_take_part_in_user_research(client_request, mocker, active_user_with_permissions):
+def test_post_your_account_take_part_in_user_research(client_request, mocker, active_user_with_permissions):
     active_user_with_permissions["take_part_in_research"] = True
     client_request.login(active_user_with_permissions)
 
     mock_update_consent = mocker.patch("app.user_api_client.update_user_attribute")
 
     client_request.post(
-        ".user_profile_take_part_in_user_research",
+        ".your_account_take_part_in_user_research",
         _data={"enabled": False},
         _expected_status=302,
         _expected_redirect=url_for("main.your_account"),
@@ -784,12 +784,12 @@ def test_post_user_profile_take_part_in_user_research(client_request, mocker, ac
 
 
 @pytest.mark.parametrize("receives_new_features_email", [True, False])
-def test_get_user_profile_get_emails_about_new_features(
+def test_get_your_account_get_emails_about_new_features(
     client_request, active_user_with_permissions, receives_new_features_email
 ):
     active_user_with_permissions["receives_new_features_email"] = receives_new_features_email
     client_request.login(active_user_with_permissions)
-    page = client_request.get("main.user_profile_get_emails_about_new_features")
+    page = client_request.get("main.your_account_get_emails_about_new_features")
     assert "Get emails about new features" in page.text
     radios = page.select("input.govuk-radios__input")
     assert len(radios) == 2
@@ -799,14 +799,14 @@ def test_get_user_profile_get_emails_about_new_features(
     assert checked_radio[0]["value"] == str(receives_new_features_email)
 
 
-def test_post_user_profile_get_emails_about_new_features(client_request, mocker, active_user_with_permissions):
+def test_post_your_account_get_emails_about_new_features(client_request, mocker, active_user_with_permissions):
     active_user_with_permissions["receives_new_features_email"] = True
     client_request.login(active_user_with_permissions)
 
     mock_update = mocker.patch("app.user_api_client.update_user_attribute")
 
     client_request.post(
-        ".user_profile_get_emails_about_new_features",
+        ".your_account_get_emails_about_new_features",
         _data={"enabled": False},
         _expected_status=302,
         _expected_redirect=url_for("main.your_account"),

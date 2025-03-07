@@ -434,10 +434,12 @@ REDIRECTS = {
     "/user-profile/email": "main.your_account_email",
     "/user-profile/email/authenticate": "main.your_account_email_authenticate",
     "/user-profile/email/confirm/<string:token>": "main.your_account_email_confirm",
+    "/user-profile/get-emails-about-new-features": "main.your_account_get_emails_about_new_features",
     "/user-profile/mobile-number": "main.your_account_mobile_number",
     "/user-profile/mobile-number/authenticate": "main.your_account_mobile_number_authenticate",
     "/user-profile/mobile-number/confirm": "main.your_account_mobile_number_confirm",
     "/user-profile/password": "main.your_account_password",
+    "/user-profile/take-part-in-user-research": "main.your_account_take_part_in_user_research",
 }
 
 for old_url, new_endpoint in REDIRECTS.items():

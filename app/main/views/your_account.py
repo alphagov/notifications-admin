@@ -221,10 +221,9 @@ def your_account_password():
     )
 
 
-@main.route("/user-profile/take-part-in-user-research", methods=["GET", "POST"])
 @main.route("/your-account/take-part-in-user-research", methods=["GET", "POST"])
 @user_is_logged_in
-def user_profile_take_part_in_user_research():
+def your_account_take_part_in_user_research():
     form = YesNoSettingForm(
         name="Take part in user research",
         enabled=current_user.take_part_in_research,
@@ -237,10 +236,9 @@ def user_profile_take_part_in_user_research():
     return render_template("views/your-account/take-part-in-user-research.html", form=form, error_summary_enabled=True)
 
 
-@main.route("/user-profile/get-emails-about-new-features", methods=["GET", "POST"])
 @main.route("/your-account/get-emails-about-new-features", methods=["GET", "POST"])
 @user_is_logged_in
-def user_profile_get_emails_about_new_features():
+def your_account_get_emails_about_new_features():
     form = YesNoSettingForm(
         name="Get emails about new features",
         enabled=current_user.receives_new_features_email,
