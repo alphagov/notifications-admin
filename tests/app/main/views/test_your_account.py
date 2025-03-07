@@ -42,7 +42,7 @@ def test_overview_page_change_links_for_regular_user(client_request):
     assert page.select_one(f'a[href="{url_for("main.your_account_get_emails_about_new_features")}"]')
 
     # only platform admins see this
-    assert not page.select_one(f'a[href="{url_for("main.user_profile_security_keys")}"]')
+    assert not page.select_one(f'a[href="{url_for("main.your_account_security_keys")}"]')
     assert not page.select_one(f'a[href="{url_for("main.your_account_disable_platform_admin_view")}"]')
 
 
@@ -488,7 +488,7 @@ def test_user_doesnt_see_security_keys_unless_they_can_use_webauthn(client_reque
     client_request.login(platform_admin_user)
 
     client_request.get(
-        ".user_profile_security_keys",
+        ".your_account_security_keys",
         _expected_status=403,
     )
 
@@ -508,7 +508,7 @@ def test_should_show_security_keys_page(
         return_value=[webauthn_credential, webauthn_credential_2],
     )
 
-    page = client_request.get(".user_profile_security_keys")
+    page = client_request.get(".your_account_security_keys")
     assert page.select_one("h1").text.strip() == "Security keys"
 
     cred_1 = page.select("tr")[1]
@@ -520,7 +520,7 @@ def test_should_show_security_keys_page(
     assert normalize_spaces(cred_2_lhs.text) == "Another test credential Never used (registered 1 year, 4 months ago)"
     manage_link = cred_1.select_one("td.table-field-right-aligned a")
     assert normalize_spaces(manage_link.text) == "Manage"
-    assert manage_link["href"] == url_for(".user_profile_manage_security_key", key_id=webauthn_credential["id"])
+    assert manage_link["href"] == url_for(".your_account_manage_security_key", key_id=webauthn_credential["id"])
 
     register_button = page.select_one("[data-notify-module='register-security-key']")
     assert register_button.text.strip() == "Register a key"
@@ -552,11 +552,11 @@ def test_should_show_manage_security_key_page(
         return_value=[webauthn_credential],
     )
 
-    page = client_request.get(".user_profile_manage_security_key", key_id=webauthn_credential["id"])
+    page = client_request.get(".your_account_manage_security_key", key_id=webauthn_credential["id"])
     assert page.select_one("h1").text.strip() == f"Manage ‘{webauthn_credential['name']}’"
 
     assert page.select_one(".govuk-back-link").text.strip() == "Back"
-    assert page.select_one(".govuk-back-link")["href"] == url_for(".user_profile_security_keys")
+    assert page.select_one(".govuk-back-link")["href"] == url_for(".your_account_security_keys")
 
     assert page.select_one("#security_key_name")["value"] == webauthn_credential["name"]
 
@@ -575,7 +575,7 @@ def test_manage_security_key_page_404s_when_key_not_found(
         return_value=[webauthn_credential_2],
     )
     client_request.get(
-        ".user_profile_manage_security_key",
+        ".your_account_manage_security_key",
         key_id=webauthn_credential["id"],
         _expected_status=404,
     )
@@ -584,11 +584,11 @@ def test_manage_security_key_page_404s_when_key_not_found(
 @pytest.mark.parametrize(
     "endpoint,method",
     [
-        (".user_profile_manage_security_key", "get"),
-        (".user_profile_manage_security_key", "post"),
-        (".user_profile_confirm_delete_security_key", "get"),
-        (".user_profile_confirm_delete_security_key", "post"),
-        (".user_profile_delete_security_key", "post"),
+        (".your_account_manage_security_key", "get"),
+        (".your_account_manage_security_key", "post"),
+        (".your_account_confirm_delete_security_key", "get"),
+        (".your_account_confirm_delete_security_key", "post"),
+        (".your_account_delete_security_key", "post"),
     ],
 )
 def test_cant_manage_security_keys_unless_can_use_webauthn(
@@ -625,12 +625,12 @@ def test_should_redirect_after_change_of_security_key_name(
     mock_update = mocker.patch("app.user_api_client.update_webauthn_credential_name_for_user")
 
     client_request.post(
-        "main.user_profile_manage_security_key",
+        "main.your_account_manage_security_key",
         key_id=webauthn_credential["id"],
         _data={"security_key_name": "new name"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile_security_keys",
+            "main.your_account_security_keys",
         ),
     )
 
@@ -639,7 +639,7 @@ def test_should_redirect_after_change_of_security_key_name(
     )
 
 
-def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_the_same(
+def test_your_account_manage_security_key_should_not_call_api_if_key_name_stays_the_same(
     client_request, platform_admin_user, webauthn_credential, mocker
 ):
     client_request.login(platform_admin_user)
@@ -652,12 +652,12 @@ def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_
     mock_update = mocker.patch("app.user_api_client.update_webauthn_credential_name_for_user")
 
     client_request.post(
-        "main.user_profile_manage_security_key",
+        "main.your_account_manage_security_key",
         key_id=webauthn_credential["id"],
         _data={"security_key_name": webauthn_credential["name"]},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile_security_keys",
+            "main.your_account_security_keys",
         ),
     )
 
@@ -677,12 +677,12 @@ def test_shows_delete_link_for_security_key(
         return_value=[webauthn_credential],
     )
 
-    page = client_request.get(".user_profile_manage_security_key", key_id=webauthn_credential["id"])
+    page = client_request.get(".your_account_manage_security_key", key_id=webauthn_credential["id"])
     assert page.select_one("h1").text.strip() == f"Manage ‘{webauthn_credential['name']}’"
 
     link = page.select_one(".page-footer a")
     assert normalize_spaces(link.text) == "Delete"
-    assert link["href"] == url_for(".user_profile_confirm_delete_security_key", key_id=webauthn_credential["id"])
+    assert link["href"] == url_for(".your_account_confirm_delete_security_key", key_id=webauthn_credential["id"])
 
 
 def test_confirm_delete_security_key(client_request, platform_admin_user, webauthn_credential, mocker):
@@ -694,7 +694,7 @@ def test_confirm_delete_security_key(client_request, platform_admin_user, webaut
     )
 
     page = client_request.get(
-        ".user_profile_confirm_delete_security_key",
+        ".your_account_confirm_delete_security_key",
         key_id=webauthn_credential["id"],
         _test_page_title=False,
     )
@@ -711,10 +711,10 @@ def test_delete_security_key(client_request, platform_admin_user, webauthn_crede
     mock_delete = mocker.patch("app.user_api_client.delete_webauthn_credential_for_user")
 
     client_request.post(
-        ".user_profile_delete_security_key",
+        ".your_account_delete_security_key",
         key_id=webauthn_credential["id"],
         _expected_redirect=url_for(
-            ".user_profile_security_keys",
+            ".your_account_security_keys",
         ),
     )
     mock_delete.assert_called_once_with(credential_id=webauthn_credential["id"], user_id=platform_admin_user["id"])
@@ -738,7 +738,7 @@ def test_delete_security_key_handles_last_credential_error(
     )
 
     page = client_request.post(
-        ".user_profile_delete_security_key", key_id=webauthn_credential["id"], _follow_redirects=True
+        ".your_account_delete_security_key", key_id=webauthn_credential["id"], _follow_redirects=True
     )
     assert "Manage ‘Test credential’" in page.select_one("h1").text
     expected_message = "You cannot delete your last security key."

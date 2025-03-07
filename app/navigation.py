@@ -82,20 +82,23 @@ class HeaderNavigation(Navigation):
             "guidance_unsubscribe_links",
             "guidance_upload_a_letter",
         },
-        "user-profile": {
+        "your-account": {
             "your_account",
             "your_account_confirm_delete_mobile_number",
-            "your_account_name",
+            "your_account_delete_security_key",
             "your_account_disable_platform_admin_view",
             "your_account_email",
             "your_account_email_authenticate",
             "your_account_email_confirm",
             "your_account_get_emails_about_new_features",
+            "your_account_manage_security_key",
             "your_account_mobile_number",
             "your_account_mobile_number_authenticate",
             "your_account_mobile_number_confirm",
             "your_account_mobile_number_delete",
+            "your_account_name",
             "your_account_password",
+            "your_account_security_keys",
             "your_account_take_part_in_user_research",
         },
         "platform-admin": {
@@ -174,7 +177,7 @@ class HeaderNavigation(Navigation):
                 {
                     "href": url_for("main.your_account"),
                     "text": "Your account",
-                    "active": self.is_selected("user-profile"),
+                    "active": self.is_selected("your-account"),
                 }
             )
         else:

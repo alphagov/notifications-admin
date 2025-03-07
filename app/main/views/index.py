@@ -371,6 +371,16 @@ def user_profile_mobile_number_delete():
     return redirect(url_for("main.your_account_mobile_number_delete"), 301)
 
 
+@main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=["GET"])
+def user_profile_confirm_delete_security_key(key_id):
+    return redirect(url_for("main.your_account_confirm_delete_security_key"), 301)
+
+
+@main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=["POST"])
+def user_profile_delete_security_key(key_id):
+    return redirect(url_for("main.your_account_delete_security_key"), 301)
+
+
 def historical_redirects(new_endpoint, **kwargs):
     return redirect(url_for(new_endpoint, **kwargs), 301)
 
@@ -430,7 +440,6 @@ REDIRECTS = {
     "/using-notify/who-its-for": "main.guidance_who_can_use_notify",
     "/add-or-join-service": "main.your_services",
     "/user-profile": "main.your_account",
-    "/user-profile/name": "main.your_account_name",
     "/user-profile/disable-platform-admin-view": "main.your_account_disable_platform_admin_view",
     "/user-profile/email": "main.your_account_email",
     "/user-profile/email/authenticate": "main.your_account_email_authenticate",
@@ -439,7 +448,10 @@ REDIRECTS = {
     "/user-profile/mobile-number": "main.your_account_mobile_number",
     "/user-profile/mobile-number/authenticate": "main.your_account_mobile_number_authenticate",
     "/user-profile/mobile-number/confirm": "main.your_account_mobile_number_confirm",
+    "/user-profile/name": "main.your_account_name",
     "/user-profile/password": "main.your_account_password",
+    "/user-profile/security-keys": "main.your_account_security_keys",
+    "/user-profile/security-keys/<uuid:key_id>/manage": "main.your_account_manage_security_key",
     "/user-profile/take-part-in-user-research": "main.your_account_take_part_in_user_research",
 }
 

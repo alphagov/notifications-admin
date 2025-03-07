@@ -275,10 +275,9 @@ def your_account_disable_platform_admin_view():
     return render_template("views/your-account/disable-platform-admin-view.html", form=form, error_summary_enabled=True)
 
 
-@main.route("/user-profile/security-keys", methods=["GET"])
 @main.route("/your-account/security-keys", methods=["GET"])
 @user_is_logged_in
-def user_profile_security_keys():
+def your_account_security_keys():
     if not current_user.can_use_webauthn:
         abort(403)
 
@@ -288,27 +287,17 @@ def user_profile_security_keys():
 
 
 @main.route(
-    "/user-profile/security-keys/<uuid:key_id>/manage",
-    methods=["GET", "POST"],
-    endpoint="user_profile_manage_security_key",
-)
-@main.route(
-    "/user-profile/security-keys/<uuid:key_id>/delete",
-    methods=["GET"],
-    endpoint="user_profile_confirm_delete_security_key",
-)
-@main.route(
     "/your-account/security-keys/<uuid:key_id>/manage",
     methods=["GET", "POST"],
-    endpoint="user_profile_manage_security_key",
+    endpoint="your_account_manage_security_key",
 )
 @main.route(
     "/your-account/security-keys/<uuid:key_id>/delete",
     methods=["GET"],
-    endpoint="user_profile_confirm_delete_security_key",
+    endpoint="your_account_confirm_delete_security_key",
 )
 @user_is_logged_in
-def user_profile_manage_security_key(key_id):
+def your_account_manage_security_key(key_id):
     if not current_user.can_use_webauthn:
         abort(403)
 
@@ -324,9 +313,9 @@ def user_profile_manage_security_key(key_id):
             user_api_client.update_webauthn_credential_name_for_user(
                 user_id=current_user.id, credential_id=key_id, new_name_for_credential=form.security_key_name.data
             )
-        return redirect(url_for(".user_profile_security_keys"))
+        return redirect(url_for(".your_account_security_keys"))
 
-    if request.endpoint == "main.user_profile_confirm_delete_security_key":
+    if request.endpoint == "main.your_account_confirm_delete_security_key":
         flash("Are you sure you want to delete this security key?", "delete")
 
     return render_template(
@@ -337,10 +326,9 @@ def user_profile_manage_security_key(key_id):
     )
 
 
-@main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=["POST"])
 @main.route("/your-account/security-keys/<uuid:key_id>/delete", methods=["POST"])
 @user_is_logged_in
-def user_profile_delete_security_key(key_id):
+def your_account_delete_security_key(key_id):
     if not current_user.can_use_webauthn:
         abort(403)
 
@@ -350,8 +338,8 @@ def user_profile_delete_security_key(key_id):
         message = "Cannot delete last remaining webauthn credential for user"
         if e.message == message:
             flash("You cannot delete your last security key.")
-            return redirect(url_for(".user_profile_manage_security_key", key_id=key_id))
+            return redirect(url_for(".your_account_manage_security_key", key_id=key_id))
         else:
             raise e
 
-    return redirect(url_for(".user_profile_security_keys"))
+    return redirect(url_for(".your_account_security_keys"))
