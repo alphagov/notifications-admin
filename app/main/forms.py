@@ -965,7 +965,7 @@ class PermissionsForm(StripWhitespaceForm):
                     {
                         "hint": {
                             "text": "Not available because this team member has not added a "
-                            "phone number to their profile"
+                            "phone number to their account"
                         },
                         "disabled": True,
                     },
