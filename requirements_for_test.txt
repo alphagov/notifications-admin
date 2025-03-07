@@ -167,7 +167,7 @@ mistune==0.8.4
     #   notifications-utils
 moto==4.0.9
     # via -r requirements_for_test.in
-notifications-python-client==10.0.0
+notifications-python-client @ git+https://github.com/alphagov/notifications-python-client.git@5eafd129144f5006e2d7bf501a9c38450979d4b6
     # via -r requirements.txt
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@d6311c3ab83b8225265277f781157c48f9318ae9
     # via -r requirements.txt
