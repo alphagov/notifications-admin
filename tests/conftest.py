@@ -3163,7 +3163,7 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
 
         @staticmethod
         def test_for_non_smart_quotes(page):
-            for el in page.select("h1, h2, h3, h4, h5, h6, p, li"):
+            for el in page.select("h1, h2, h3, h4, h5, h6, p, li, .banner-dangerous"):
                 assert not ("'" in el.text or '"' in el.text), (
                     f"Non-smart quote or apostrophe found in <{el.name}>: {normalize_spaces(el.text)}"
                 )

@@ -38,7 +38,7 @@ def verify_email(token):
             current_app.config["EMAIL_EXPIRY_SECONDS"],
         )
     except SignatureExpired:
-        flash("The link in the email we sent you has expired. We've sent you a new one.")
+        flash("The link in the email we sent you has expired. We’ve sent you a new one.")
         return redirect(url_for("main.resend_email_verification"))
 
     token = Token(token_data)
