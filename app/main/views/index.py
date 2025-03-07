@@ -437,6 +437,7 @@ REDIRECTS = {
     "/user-profile/mobile-number": "main.your_account_mobile_number",
     "/user-profile/mobile-number/authenticate": "main.your_account_mobile_number_authenticate",
     "/user-profile/mobile-number/confirm": "main.your_account_mobile_number_confirm",
+    "/user-profile/password": "main.your_account_password",
 }
 
 for old_url, new_endpoint in REDIRECTS.items():

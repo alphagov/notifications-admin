@@ -93,9 +93,9 @@ class HeaderNavigation(Navigation):
             "your_account_mobile_number_authenticate",
             "your_account_mobile_number_confirm",
             "your_account_mobile_number_delete",
+            "your_account_password",
             "user_profile_disable_platform_admin_view",
             "user_profile_get_emails_about_new_features",
-            "user_profile_password",
             "user_profile_take_part_in_user_research",
         },
         "platform-admin": {

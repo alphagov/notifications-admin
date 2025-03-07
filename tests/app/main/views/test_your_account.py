@@ -37,7 +37,7 @@ def test_overview_page_change_links_for_regular_user(client_request):
     assert page.select_one(f'a[href="{url_for("main.your_account_name")}"]')
     assert page.select_one(f'a[href="{url_for("main.your_account_email")}"]')
     assert page.select_one(f'a[href="{url_for("main.your_account_mobile_number")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_password")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_password")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_take_part_in_user_research")}"]')
     assert page.select_one(f'a[href="{url_for("main.user_profile_get_emails_about_new_features")}"]')
 
@@ -393,7 +393,7 @@ def test_should_redirect_after_mobile_number_confirm(
 def test_should_show_password_page(
     client_request,
 ):
-    page = client_request.get("main.user_profile_password")
+    page = client_request.get("main.your_account_password")
 
     assert page.select_one("h1").text.strip() == "Change your password"
 
@@ -404,7 +404,7 @@ def test_should_redirect_after_password_change(
     mock_verify_password,
 ):
     client_request.post(
-        "main.user_profile_password",
+        "main.your_account_password",
         _data={
             "new_password": "the new password",
             "old_password": "the old password",

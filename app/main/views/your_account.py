@@ -201,10 +201,9 @@ def your_account_mobile_number_confirm():
     return render_template("views/your-account/confirm.html", form_field=form.sms_code, thing="mobile number")
 
 
-@main.route("/user-profile/password", methods=["GET", "POST"])
 @main.route("/your-account/password", methods=["GET", "POST"])
 @user_is_logged_in
-def user_profile_password():
+def your_account_password():
     # Validate password for form
     def _check_password(pwd):
         return user_api_client.verify_password(current_user.id, pwd)

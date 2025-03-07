@@ -362,7 +362,6 @@ EXCLUDED_ENDPOINTS = set(
             "user_profile_manage_security_key",
             "user_profile_mobile_number_delete",
             "user_profile_mobile_number",
-            "user_profile_password",
             "user_profile_security_keys",
             "user_profile_take_part_in_user_research",
             "verify_email",
@@ -394,6 +393,7 @@ EXCLUDED_ENDPOINTS = set(
             "your_account_mobile_number_authenticate",
             "your_account_mobile_number_confirm",
             "your_account_mobile_number_delete",
+            "your_account_password",
         },
     )
 )
