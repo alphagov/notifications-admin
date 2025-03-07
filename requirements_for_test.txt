@@ -41,10 +41,6 @@ cffi==1.15.1
     # via
     #   -r requirements.txt
     #   cryptography
-chardet==5.0.0
-    # via
-    #   -r requirements.txt
-    #   pyexcel
 charset-normalizer==2.1.1
     # via
     #   -r requirements.txt
@@ -68,7 +64,7 @@ docopt==0.6.2
     # via
     #   -r requirements.txt
     #   notifications-python-client
-et-xmlfile==1.1.0
+et-xmlfile==2.0.0
     # via
     #   -r requirements.txt
     #   openpyxl
@@ -149,7 +145,7 @@ lml==0.1.0
     #   -r requirements.txt
     #   pyexcel
     #   pyexcel-io
-lxml==4.9.1
+lxml==5.3.1
     # via
     #   -r requirements.txt
     #   pyexcel-ezodf
@@ -171,7 +167,7 @@ notifications-python-client==10.0.0
     # via -r requirements.txt
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@d6311c3ab83b8225265277f781157c48f9318ae9
     # via -r requirements.txt
-openpyxl==3.0.10
+openpyxl==3.1.5
     # via
     #   -r requirements.txt
     #   pyexcel-xlsx
@@ -200,13 +196,13 @@ pycparser==2.21
     # via
     #   -r requirements.txt
     #   cffi
-pyexcel==0.7.0
+pyexcel==0.7.1
     # via -r requirements.txt
 pyexcel-ezodf==0.3.4
     # via
     #   -r requirements.txt
     #   pyexcel-ods3
-pyexcel-io==0.6.6
+pyexcel-io==0.6.7
     # via
     #   -r requirements.txt
     #   pyexcel
@@ -217,7 +213,7 @@ pyexcel-ods3==0.6.1
     # via -r requirements.txt
 pyexcel-xls==0.7.0
     # via -r requirements.txt
-pyexcel-xlsx==0.6.0
+pyexcel-xlsx==0.6.1
     # via -r requirements.txt
 pyjwt==2.4.0
     # via
