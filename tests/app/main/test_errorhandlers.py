@@ -67,7 +67,7 @@ def test_load_organisation_before_request_ignores_static_appropriately(
 
 @pytest.mark.parametrize(
     "url",
-    ["/new-password/MALFORMED_TOKEN", "/user-profile/email/confirm/MALFORMED_TOKEN", "/verify-email/MALFORMED_TOKEN"],
+    ["/new-password/MALFORMED_TOKEN", "/your-account/email/confirm/MALFORMED_TOKEN", "/verify-email/MALFORMED_TOKEN"],
 )
 def test_malformed_token_returns_page_not_found(client_request, url):
     page = client_request.get_url(url, _expected_status=404)

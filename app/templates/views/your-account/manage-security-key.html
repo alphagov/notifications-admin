@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.user_profile_security_keys') }) }}
+  {{ govukBackLink({ "href": url_for('main.your_account_security_keys') }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -24,7 +24,7 @@
         {{ page_footer(
           'Save',
           delete_link=url_for(
-            '.user_profile_confirm_delete_security_key', key_id=security_key.id),
+            '.your_account_confirm_delete_security_key', key_id=security_key.id),
           delete_link_text='Delete'
         ) }}
       {% endcall %}

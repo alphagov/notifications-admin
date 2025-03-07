@@ -3,14 +3,14 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = 'Get emails about new features' %}
+{% set page_title = 'Take part in user research' %}
 
 {% block per_page_title %}
 {{ page_title }}
 {% endblock %}
 
 {% block backLink %}
-{{ govukBackLink({ "href": url_for('main.user_profile') }) }}
+{{ govukBackLink({ "href": url_for('main.your_account') }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -27,7 +27,7 @@
                 }
               },
               "hint": {
-                "text": "We send up to 6 emails a year about new features and improvements to GOV.UK Notify."
+                "text": "Tell us if you want to be contacted to take part in user research to improve GOV.UK Notify."
               }
             })
           }}

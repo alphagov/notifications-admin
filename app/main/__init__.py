@@ -43,9 +43,9 @@ from app.main.views import (  # noqa
     two_factor,
     uploads,
     unsubscribe_requests,
-    user_profile,
     verify,
     webauthn_credentials,
+    your_account,
     your_services,
 )
 from app.main.views.organisations import branding, index  # noqa
