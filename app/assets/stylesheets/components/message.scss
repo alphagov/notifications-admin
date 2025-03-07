@@ -181,6 +181,11 @@ a {
       padding-left: 0;
       width: auto;
     }
+    // some template-list items are not radios or checkboxes (copy template page)
+    // so we need these override styles
+    &[hidden] {
+      display: none;
+    }
   }
 
   &-folder,
