@@ -42,7 +42,7 @@ def archive_user(user_id):
 
         return redirect(url_for(".user_information", user_id=user_id))
     else:
-        flash("There's no way to reverse this! Are you sure you want to archive this user?", "delete")
+        flash("There’s no way to reverse this! Are you sure you want to archive this user?", "delete")
         return user_information(user_id)
 
 
