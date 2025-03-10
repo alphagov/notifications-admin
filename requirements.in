@@ -8,10 +8,10 @@ Flask-Login==0.6.3
 
 Pillow==10.3.0
 
-pyexcel==0.7.0
-pyexcel-io==0.6.6
+pyexcel==0.7.1
+pyexcel-io==0.6.7
 pyexcel-xls==0.7.0
-pyexcel-xlsx==0.6.0
+pyexcel-xlsx==0.6.1
 pyexcel-ods3==0.6.1
 notifications-python-client==10.0.0
 fido2==1.1.3
