@@ -82,21 +82,24 @@ class HeaderNavigation(Navigation):
             "guidance_unsubscribe_links",
             "guidance_upload_a_letter",
         },
-        "user-profile": {
-            "user_profile",
-            "user_profile_confirm_delete_mobile_number",
-            "user_profile_disable_platform_admin_view",
-            "user_profile_email",
-            "user_profile_email_authenticate",
-            "user_profile_email_confirm",
-            "user_profile_get_emails_about_new_features",
-            "user_profile_mobile_number",
-            "user_profile_mobile_number_authenticate",
-            "user_profile_mobile_number_confirm",
-            "user_profile_mobile_number_delete",
-            "user_profile_name",
-            "user_profile_password",
-            "user_profile_take_part_in_user_research",
+        "your-account": {
+            "your_account",
+            "your_account_confirm_delete_mobile_number",
+            "your_account_delete_security_key",
+            "your_account_disable_platform_admin_view",
+            "your_account_email",
+            "your_account_email_authenticate",
+            "your_account_email_confirm",
+            "your_account_get_emails_about_new_features",
+            "your_account_manage_security_key",
+            "your_account_mobile_number",
+            "your_account_mobile_number_authenticate",
+            "your_account_mobile_number_confirm",
+            "your_account_mobile_number_delete",
+            "your_account_name",
+            "your_account_password",
+            "your_account_security_keys",
+            "your_account_take_part_in_user_research",
         },
         "platform-admin": {
             "archive_user",
@@ -172,9 +175,9 @@ class HeaderNavigation(Navigation):
         if current_user.is_authenticated:
             nav_items.append(
                 {
-                    "href": url_for("main.user_profile"),
+                    "href": url_for("main.your_account"),
                     "text": "Your account",
-                    "active": self.is_selected("user-profile"),
+                    "active": self.is_selected("your-account"),
                 }
             )
         else:

@@ -20,7 +20,7 @@ from tests.conftest import (
 def test_should_show_overview_page(
     client_request,
 ):
-    page = client_request.get("main.user_profile")
+    page = client_request.get("main.your_account")
     assert page.select_one("h1").text.strip() == "Your account"
     assert "Use platform admin view" not in page
     assert "Security keys" not in page
@@ -32,24 +32,24 @@ def test_should_show_overview_page(
 
 
 def test_overview_page_change_links_for_regular_user(client_request):
-    page = client_request.get("main.user_profile")
+    page = client_request.get("main.your_account")
 
-    assert page.select_one(f'a[href="{url_for("main.user_profile_name")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_email")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_mobile_number")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_password")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_take_part_in_user_research")}"]')
-    assert page.select_one(f'a[href="{url_for("main.user_profile_get_emails_about_new_features")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_name")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_email")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_mobile_number")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_password")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_take_part_in_user_research")}"]')
+    assert page.select_one(f'a[href="{url_for("main.your_account_get_emails_about_new_features")}"]')
 
     # only platform admins see this
-    assert not page.select_one(f'a[href="{url_for("main.user_profile_security_keys")}"]')
-    assert not page.select_one(f'a[href="{url_for("main.user_profile_disable_platform_admin_view")}"]')
+    assert not page.select_one(f'a[href="{url_for("main.your_account_security_keys")}"]')
+    assert not page.select_one(f'a[href="{url_for("main.your_account_disable_platform_admin_view")}"]')
 
 
 def test_overview_page_shows_disable_for_platform_admin(client_request, platform_admin_user, mocker):
     mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items")
     client_request.login(platform_admin_user)
-    page = client_request.get("main.user_profile")
+    page = client_request.get("main.your_account")
     assert page.select_one("h1").text.strip() == "Your account"
     disable_platform_admin_row = page.select(".govuk-summary-list__row")[-1]
     assert (
@@ -80,13 +80,13 @@ def test_overview_page_shows_security_keys_if_user_they_can_use_webauthn(
         "app.models.webauthn_credential.WebAuthnCredentials._get_items",
         return_value=credentials,
     )
-    page = client_request.get("main.user_profile")
+    page = client_request.get("main.your_account")
     security_keys_row = page.select(".govuk-summary-list__row")[-2]
     assert " ".join(security_keys_row.text.split()) == expected_row_text
 
 
 def test_should_show_name_page(client_request):
-    page = client_request.get("main.user_profile_name")
+    page = client_request.get("main.your_account_name")
     assert page.select_one("h1").text.strip() == "Change your name"
 
 
@@ -95,10 +95,10 @@ def test_should_redirect_after_name_change(
     mock_update_user_attribute,
 ):
     client_request.post(
-        "main.user_profile_name",
+        "main.your_account_name",
         _data={"new_name": "New Name"},
         _expected_status=302,
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
     assert mock_update_user_attribute.called is True
 
@@ -106,7 +106,7 @@ def test_should_redirect_after_name_change(
 def test_should_show_email_page(
     client_request,
 ):
-    page = client_request.get("main.user_profile_email")
+    page = client_request.get("main.your_account_email")
     assert page.select_one("h1").text.strip() == "Change your email address"
     # template is shared with "Change your mobile number" but we don't want to show Delete mobile number link
     assert "Delete your number" not in page.text
@@ -117,11 +117,11 @@ def test_should_redirect_after_email_change(
     mock_email_is_not_already_in_use,
 ):
     client_request.post(
-        "main.user_profile_email",
+        "main.your_account_email",
         _data={"email_address": "new_notify@notify.gov.uk"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile_email_authenticate",
+            "main.your_account_email_authenticate",
         ),
     )
 
@@ -153,7 +153,7 @@ def test_should_show_errors_if_new_email_address_does_not_validate(
     error_link,
 ):
     page = client_request.post(
-        "main.user_profile_email",
+        "main.your_account_email",
         _data={"email_address": email_address},
         _expected_status=200,
     )
@@ -179,7 +179,7 @@ def test_should_show_authenticate_after_email_change(
     with client_request.session_transaction() as session:
         session["new-email"] = "new_notify@notify.gov.uk"
 
-    page = client_request.get("main.user_profile_email_authenticate")
+    page = client_request.get("main.your_account_email_authenticate")
 
     assert "Change your email address" in page.text
     assert "Confirm" in page.text
@@ -189,8 +189,8 @@ def test_should_redirect_from_authenticate_if_new_email_not_in_session(
     client_request,
 ):
     client_request.get(
-        "main.user_profile_email_authenticate",
-        _expected_redirect=url_for("main.user_profile_email"),
+        "main.your_account_email_authenticate",
+        _expected_redirect=url_for("main.your_account_email"),
     )
 
 
@@ -202,7 +202,7 @@ def test_should_render_change_email_continue_after_authenticate_email(
     with client_request.session_transaction() as session:
         session["new-email"] = "new_notify@notify.gov.uk"
     page = client_request.post(
-        "main.user_profile_email_authenticate",
+        "main.your_account_email_authenticate",
         _data={"password": "12345"},
         _expected_status=200,
     )
@@ -222,17 +222,17 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
     )
     client_request.get_url(
         url_for_endpoint_with_token(
-            "main.user_profile_email_confirm",
+            "main.your_account_email_confirm",
             token=token,
         ),
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
 
 
 def test_should_show_mobile_number_page(
     client_request,
 ):
-    page = client_request.get("main.user_profile_mobile_number")
+    page = client_request.get("main.your_account_mobile_number")
     assert "Change your mobile number" in page.text
     assert "Delete your number" not in page.text
 
@@ -241,7 +241,7 @@ def test_change_your_mobile_number_page_shows_delete_link_if_user_on_email_auth(
     client_request, api_user_active_email_auth
 ):
     client_request.login(api_user_active_email_auth)
-    page = client_request.get("main.user_profile_mobile_number")
+    page = client_request.get("main.your_account_mobile_number")
     assert "Change your mobile number" in page.text
     assert "Delete your number" in page.text
 
@@ -249,7 +249,7 @@ def test_change_your_mobile_number_page_shows_delete_link_if_user_on_email_auth(
 def test_change_your_mobile_number_page_doesnt_show_delete_link_if_user_has_no_mobile_number(client_request, mocker):
     user = create_user(id=fake_uuid, auth_type="email_auth", mobile_number=None)
     mocker.patch("app.user_api_client.get_user", return_value=user)
-    page = client_request.get("main.user_profile_mobile_number")
+    page = client_request.get("main.your_account_mobile_number")
     assert "Change your mobile number" in page.text
     assert "Delete your number" not in page.text
 
@@ -258,7 +258,7 @@ def test_confirm_delete_mobile_number(client_request, api_user_active_email_auth
     mocker.patch("app.user_api_client.get_user", return_value=api_user_active_email_auth)
 
     page = client_request.get(
-        ".user_profile_confirm_delete_mobile_number",
+        ".your_account_confirm_delete_mobile_number",
         _test_page_title=False,
     )
 
@@ -274,9 +274,9 @@ def test_delete_mobile_number(client_request, api_user_active_email_auth, mocker
 
     client_request.login(api_user_active_email_auth)
     client_request.post(
-        ".user_profile_mobile_number_delete",
+        ".your_account_mobile_number_delete",
         _expected_redirect=url_for(
-            ".user_profile",
+            ".your_account",
         ),
     )
     mock_delete.assert_called_once_with(api_user_active_email_auth["id"], mobile_number=None)
@@ -294,11 +294,11 @@ def test_should_redirect_after_mobile_number_change(
     phone_number_to_register_with,
 ):
     client_request.post(
-        "main.user_profile_mobile_number",
+        "main.your_account_mobile_number",
         _data={"mobile_number": phone_number_to_register_with},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile_mobile_number_authenticate",
+            "main.your_account_mobile_number_authenticate",
         ),
     )
     with client_request.session_transaction() as session:
@@ -312,7 +312,7 @@ def test_should_show_authenticate_after_mobile_number_change(
         session["new-mob"] = "+441234123123"
 
     page = client_request.get(
-        "main.user_profile_mobile_number_authenticate",
+        "main.your_account_mobile_number_authenticate",
     )
 
     assert "Change your mobile number" in page.text
@@ -328,11 +328,11 @@ def test_should_redirect_after_mobile_number_authenticate(
         session["new-mob"] = "+441234123123"
 
     client_request.post(
-        "main.user_profile_mobile_number_authenticate",
+        "main.your_account_mobile_number_authenticate",
         _data={"password": "12345667"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile_mobile_number_confirm",
+            "main.your_account_mobile_number_confirm",
         ),
     )
 
@@ -342,7 +342,7 @@ def test_should_show_confirm_after_mobile_number_change(
 ):
     with client_request.session_transaction() as session:
         session["new-mob-password-confirmed"] = True
-    page = client_request.get("main.user_profile_mobile_number_confirm")
+    page = client_request.get("main.your_account_mobile_number_confirm")
 
     assert "Change your mobile number" in page.text
     assert "Confirm" in page.text
@@ -377,11 +377,11 @@ def test_should_redirect_after_mobile_number_confirm(
         session["current_session_id"] = user_before["current_session_id"]
 
     client_request.post(
-        "main.user_profile_mobile_number_confirm",
+        "main.your_account_mobile_number_confirm",
         _data={"sms_code": "12345"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile",
+            "main.your_account",
         ),
     )
 
@@ -393,7 +393,7 @@ def test_should_redirect_after_mobile_number_confirm(
 def test_should_show_password_page(
     client_request,
 ):
-    page = client_request.get("main.user_profile_password")
+    page = client_request.get("main.your_account_password")
 
     assert page.select_one("h1").text.strip() == "Change your password"
 
@@ -404,14 +404,14 @@ def test_should_redirect_after_password_change(
     mock_verify_password,
 ):
     client_request.post(
-        "main.user_profile_password",
+        "main.your_account_password",
         _data={
             "new_password": "the new password",
             "old_password": "the old password",
         },
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile",
+            "main.your_account",
         ),
     )
 
@@ -422,8 +422,8 @@ def test_non_gov_user_cannot_see_change_email_link(
     mock_get_organisations,
 ):
     client_request.login(api_nongov_user_active)
-    page = client_request.get("main.user_profile")
-    change_email_link = url_for("main.user_profile_email")
+    page = client_request.get("main.your_account")
+    change_email_link = url_for("main.your_account_email")
     assert not page.select_one(f'a[href="{change_email_link}"]')
     assert page.select_one("h1").text.strip() == "Your account"
 
@@ -434,16 +434,16 @@ def test_non_gov_user_cannot_access_change_email_page(
     mock_get_organisations,
 ):
     client_request.login(api_nongov_user_active)
-    client_request.get("main.user_profile_email", _expected_status=403)
+    client_request.get("main.your_account_email", _expected_status=403)
 
 
 def test_normal_user_doesnt_see_disable_platform_admin(client_request):
-    client_request.get("main.user_profile_disable_platform_admin_view", _expected_status=403)
+    client_request.get("main.your_account_disable_platform_admin_view", _expected_status=403)
 
 
 def test_platform_admin_can_see_disable_platform_admin_page(client_request, platform_admin_user):
     client_request.login(platform_admin_user)
-    page = client_request.get("main.user_profile_disable_platform_admin_view")
+    page = client_request.get("main.your_account_disable_platform_admin_view")
 
     assert page.select_one("h1").text.strip() == "Use platform admin view"
     assert page.select_one("input[checked]")["value"] == "True"
@@ -456,10 +456,10 @@ def test_can_disable_platform_admin(client_request, platform_admin_user):
         assert "disable_platform_admin_view" not in session
 
     client_request.post(
-        "main.user_profile_disable_platform_admin_view",
+        "main.your_account_disable_platform_admin_view",
         _data={"enabled": False},
         _expected_status=302,
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
 
     with client_request.session_transaction() as session:
@@ -473,10 +473,10 @@ def test_can_reenable_platform_admin(client_request, platform_admin_user):
         session["disable_platform_admin_view"] = True
 
     client_request.post(
-        "main.user_profile_disable_platform_admin_view",
+        "main.your_account_disable_platform_admin_view",
         _data={"enabled": True},
         _expected_status=302,
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
 
     with client_request.session_transaction() as session:
@@ -488,7 +488,7 @@ def test_user_doesnt_see_security_keys_unless_they_can_use_webauthn(client_reque
     client_request.login(platform_admin_user)
 
     client_request.get(
-        ".user_profile_security_keys",
+        ".your_account_security_keys",
         _expected_status=403,
     )
 
@@ -508,7 +508,7 @@ def test_should_show_security_keys_page(
         return_value=[webauthn_credential, webauthn_credential_2],
     )
 
-    page = client_request.get(".user_profile_security_keys")
+    page = client_request.get(".your_account_security_keys")
     assert page.select_one("h1").text.strip() == "Security keys"
 
     cred_1 = page.select("tr")[1]
@@ -520,7 +520,7 @@ def test_should_show_security_keys_page(
     assert normalize_spaces(cred_2_lhs.text) == "Another test credential Never used (registered 1 year, 4 months ago)"
     manage_link = cred_1.select_one("td.table-field-right-aligned a")
     assert normalize_spaces(manage_link.text) == "Manage"
-    assert manage_link["href"] == url_for(".user_profile_manage_security_key", key_id=webauthn_credential["id"])
+    assert manage_link["href"] == url_for(".your_account_manage_security_key", key_id=webauthn_credential["id"])
 
     register_button = page.select_one("[data-notify-module='register-security-key']")
     assert register_button.text.strip() == "Register a key"
@@ -552,11 +552,11 @@ def test_should_show_manage_security_key_page(
         return_value=[webauthn_credential],
     )
 
-    page = client_request.get(".user_profile_manage_security_key", key_id=webauthn_credential["id"])
+    page = client_request.get(".your_account_manage_security_key", key_id=webauthn_credential["id"])
     assert page.select_one("h1").text.strip() == f"Manage ‘{webauthn_credential['name']}’"
 
     assert page.select_one(".govuk-back-link").text.strip() == "Back"
-    assert page.select_one(".govuk-back-link")["href"] == url_for(".user_profile_security_keys")
+    assert page.select_one(".govuk-back-link")["href"] == url_for(".your_account_security_keys")
 
     assert page.select_one("#security_key_name")["value"] == webauthn_credential["name"]
 
@@ -575,7 +575,7 @@ def test_manage_security_key_page_404s_when_key_not_found(
         return_value=[webauthn_credential_2],
     )
     client_request.get(
-        ".user_profile_manage_security_key",
+        ".your_account_manage_security_key",
         key_id=webauthn_credential["id"],
         _expected_status=404,
     )
@@ -584,11 +584,11 @@ def test_manage_security_key_page_404s_when_key_not_found(
 @pytest.mark.parametrize(
     "endpoint,method",
     [
-        (".user_profile_manage_security_key", "get"),
-        (".user_profile_manage_security_key", "post"),
-        (".user_profile_confirm_delete_security_key", "get"),
-        (".user_profile_confirm_delete_security_key", "post"),
-        (".user_profile_delete_security_key", "post"),
+        (".your_account_manage_security_key", "get"),
+        (".your_account_manage_security_key", "post"),
+        (".your_account_confirm_delete_security_key", "get"),
+        (".your_account_confirm_delete_security_key", "post"),
+        (".your_account_delete_security_key", "post"),
     ],
 )
 def test_cant_manage_security_keys_unless_can_use_webauthn(
@@ -625,12 +625,12 @@ def test_should_redirect_after_change_of_security_key_name(
     mock_update = mocker.patch("app.user_api_client.update_webauthn_credential_name_for_user")
 
     client_request.post(
-        "main.user_profile_manage_security_key",
+        "main.your_account_manage_security_key",
         key_id=webauthn_credential["id"],
         _data={"security_key_name": "new name"},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile_security_keys",
+            "main.your_account_security_keys",
         ),
     )
 
@@ -639,7 +639,7 @@ def test_should_redirect_after_change_of_security_key_name(
     )
 
 
-def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_the_same(
+def test_your_account_manage_security_key_should_not_call_api_if_key_name_stays_the_same(
     client_request, platform_admin_user, webauthn_credential, mocker
 ):
     client_request.login(platform_admin_user)
@@ -652,12 +652,12 @@ def test_user_profile_manage_security_key_should_not_call_api_if_key_name_stays_
     mock_update = mocker.patch("app.user_api_client.update_webauthn_credential_name_for_user")
 
     client_request.post(
-        "main.user_profile_manage_security_key",
+        "main.your_account_manage_security_key",
         key_id=webauthn_credential["id"],
         _data={"security_key_name": webauthn_credential["name"]},
         _expected_status=302,
         _expected_redirect=url_for(
-            "main.user_profile_security_keys",
+            "main.your_account_security_keys",
         ),
     )
 
@@ -677,12 +677,12 @@ def test_shows_delete_link_for_security_key(
         return_value=[webauthn_credential],
     )
 
-    page = client_request.get(".user_profile_manage_security_key", key_id=webauthn_credential["id"])
+    page = client_request.get(".your_account_manage_security_key", key_id=webauthn_credential["id"])
     assert page.select_one("h1").text.strip() == f"Manage ‘{webauthn_credential['name']}’"
 
     link = page.select_one(".page-footer a")
     assert normalize_spaces(link.text) == "Delete"
-    assert link["href"] == url_for(".user_profile_confirm_delete_security_key", key_id=webauthn_credential["id"])
+    assert link["href"] == url_for(".your_account_confirm_delete_security_key", key_id=webauthn_credential["id"])
 
 
 def test_confirm_delete_security_key(client_request, platform_admin_user, webauthn_credential, mocker):
@@ -694,7 +694,7 @@ def test_confirm_delete_security_key(client_request, platform_admin_user, webaut
     )
 
     page = client_request.get(
-        ".user_profile_confirm_delete_security_key",
+        ".your_account_confirm_delete_security_key",
         key_id=webauthn_credential["id"],
         _test_page_title=False,
     )
@@ -711,10 +711,10 @@ def test_delete_security_key(client_request, platform_admin_user, webauthn_crede
     mock_delete = mocker.patch("app.user_api_client.delete_webauthn_credential_for_user")
 
     client_request.post(
-        ".user_profile_delete_security_key",
+        ".your_account_delete_security_key",
         key_id=webauthn_credential["id"],
         _expected_redirect=url_for(
-            ".user_profile_security_keys",
+            ".your_account_security_keys",
         ),
     )
     mock_delete.assert_called_once_with(credential_id=webauthn_credential["id"], user_id=platform_admin_user["id"])
@@ -738,7 +738,7 @@ def test_delete_security_key_handles_last_credential_error(
     )
 
     page = client_request.post(
-        ".user_profile_delete_security_key", key_id=webauthn_credential["id"], _follow_redirects=True
+        ".your_account_delete_security_key", key_id=webauthn_credential["id"], _follow_redirects=True
     )
     assert "Manage ‘Test credential’" in page.select_one("h1").text
     expected_message = "You cannot delete your last security key."
@@ -752,12 +752,12 @@ def test_delete_security_key_handles_last_credential_error(
         (False, None, ""),
     ],
 )
-def test_get_user_profile_take_part_in_user_research(
+def test_get_your_account_take_part_in_user_research(
     client_request, active_user_with_permissions, take_part_in_research, is_yes_checked, is_no_checked
 ):
     active_user_with_permissions["take_part_in_research"] = take_part_in_research
     client_request.login(active_user_with_permissions)
-    page = client_request.get("main.user_profile_take_part_in_user_research")
+    page = client_request.get("main.your_account_take_part_in_user_research")
     assert "Take part in user research" in page.text
     radios = page.select("input.govuk-radios__input")
     assert len(radios) == 2
@@ -767,29 +767,29 @@ def test_get_user_profile_take_part_in_user_research(
     assert radios[1].attrs.get("checked", None) == is_no_checked
 
 
-def test_post_user_profile_take_part_in_user_research(client_request, mocker, active_user_with_permissions):
+def test_post_your_account_take_part_in_user_research(client_request, mocker, active_user_with_permissions):
     active_user_with_permissions["take_part_in_research"] = True
     client_request.login(active_user_with_permissions)
 
     mock_update_consent = mocker.patch("app.user_api_client.update_user_attribute")
 
     client_request.post(
-        ".user_profile_take_part_in_user_research",
+        ".your_account_take_part_in_user_research",
         _data={"enabled": False},
         _expected_status=302,
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
 
     mock_update_consent.assert_called_once_with(active_user_with_permissions["id"], take_part_in_research=False)
 
 
 @pytest.mark.parametrize("receives_new_features_email", [True, False])
-def test_get_user_profile_get_emails_about_new_features(
+def test_get_your_account_get_emails_about_new_features(
     client_request, active_user_with_permissions, receives_new_features_email
 ):
     active_user_with_permissions["receives_new_features_email"] = receives_new_features_email
     client_request.login(active_user_with_permissions)
-    page = client_request.get("main.user_profile_get_emails_about_new_features")
+    page = client_request.get("main.your_account_get_emails_about_new_features")
     assert "Get emails about new features" in page.text
     radios = page.select("input.govuk-radios__input")
     assert len(radios) == 2
@@ -799,17 +799,17 @@ def test_get_user_profile_get_emails_about_new_features(
     assert checked_radio[0]["value"] == str(receives_new_features_email)
 
 
-def test_post_user_profile_get_emails_about_new_features(client_request, mocker, active_user_with_permissions):
+def test_post_your_account_get_emails_about_new_features(client_request, mocker, active_user_with_permissions):
     active_user_with_permissions["receives_new_features_email"] = True
     client_request.login(active_user_with_permissions)
 
     mock_update = mocker.patch("app.user_api_client.update_user_attribute")
 
     client_request.post(
-        ".user_profile_get_emails_about_new_features",
+        ".your_account_get_emails_about_new_features",
         _data={"enabled": False},
         _expected_status=302,
-        _expected_redirect=url_for("main.user_profile"),
+        _expected_redirect=url_for("main.your_account"),
     )
 
     mock_update.assert_called_once_with(active_user_with_permissions["id"], receives_new_features_email=False)
