@@ -68,6 +68,7 @@ $tail-angle: 20deg;
   @include govuk-font(16);
   color: $govuk-secondary-text-colour;
   margin: -20px govuk-spacing(3) 20px govuk-spacing(3);
+  display: block;
 }
 
 .sms-message-status-outbound {
