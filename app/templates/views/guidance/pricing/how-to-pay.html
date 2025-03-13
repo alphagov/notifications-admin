@@ -34,15 +34,19 @@
     </h3>
 
     <p class="govuk-body">
-      GOV.UK Notify is run by the Government Digital Service (GDS), which is part of the Cabinet Office.
+      GOV.UK Notify is run by the Government Digital Service (GDS).
     </p>
 
     <p class="govuk-body">
-      Before you can send us a <abbr title="purchase order">PO</abbr> your organisation may need to add the Cabinet Office as a supplier.
+      GDS is moving from the Cabinet Office to the Department for Science, Innovation and Technology (DSIT).
     </p>
 
     <p class="govuk-body">
-      To do this, they’ll need the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">Cabinet Office billing details</a>.
+      Before you can send us a <abbr title="purchase order">PO</abbr> your organisation may need to add DSIT as a supplier.
+    </p>
+
+    <p class="govuk-body">
+      To do this, they’ll need the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">DSIT billing details</a>.
     </p>
 
     <h3 class="heading-small" id="where-to-send-your-po">
@@ -61,7 +65,7 @@
 
     {% if current_user.is_authenticated %}
     <p class="govuk-body">
-      The email address is {{ billing_details['notify_billing_email_address'] }}
+      Their email address is {{ billing_details['notify_billing_email_address'] }}
     </p>
     {% else %}
     <p class="govuk-body">
@@ -78,7 +82,7 @@
     </h2>
 
     <p class="govuk-body">
-      The Cabinet Office will send your organisation an invoice each quarter if you:
+      We will send your organisation an invoice each quarter if you:
     </p>
 
     <ul class="govuk-list govuk-list--bullet">

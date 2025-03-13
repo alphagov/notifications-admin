@@ -85,7 +85,7 @@ class Config:
 
     NOTIFY_SERVICE_ID = "d6aa2c68-a2d9-4437-ab19-3ae8eb202553"
 
-    NOTIFY_BILLING_DETAILS = json.loads(os.environ.get("NOTIFY_BILLING_DETAILS") or "null") or {
+    BILLING_DETAILS = json.loads(os.environ.get("BILLING_DETAILS") or "null") or {
         "account_number": "98765432",
         "sort_code": "01-23-45",
         "IBAN": "GB33BUKB20201555555555",
