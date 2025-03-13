@@ -1,7 +1,5 @@
-afterAll(() => {
-  require('./support/teardown.js');
-
-});
+import RadiosWithImages from '../../app/assets/javascripts/esm/radios-with-images.mjs';
+import { jest } from '@jest/globals';
 
 describe('Radios with images', () => {
 
@@ -9,6 +7,8 @@ describe('Radios with images', () => {
   let radios;
 
   beforeEach(() => {
+    // add class to mimic IRL 
+    document.body.classList.add('govuk-frontend-supported');
     // set up DOM
     document.body.innerHTML =
       `
@@ -69,11 +69,12 @@ describe('Radios with images', () => {
   });
 
   test('Clicking a image image should select the related radio input', () => {
-    // run radios-with-images script
-    require('../../app/assets/javascripts/radios-with-images.js');
 
     // start the module
-    window.GOVUK.notifyModules.start();
+    const $radiosWithImagesArray = document.querySelectorAll('[data-notify-module="radios-with-images"]');
+    if ($radiosWithImagesArray.length > 0) {
+      $radiosWithImagesArray.forEach((el) => new RadiosWithImages(el)); 
+    } 
 
     expect(document.querySelector('#banner-0').checked).toBe(false);
     expect(document.querySelector('#banner-1').checked).toBe(false);
@@ -91,11 +92,11 @@ describe('Radios with images', () => {
     expect(document.querySelector('#banner-0-description').style.cursor).toBe('');
     expect(document.querySelector('#banner-1-description').style.cursor).toBe('');
 
-    // run radios-with-images script
-    require('../../app/assets/javascripts/radios-with-images.js');
-
     // start the module
-    window.GOVUK.notifyModules.start();
+    const $radiosWithImagesArray = document.querySelectorAll('[data-notify-module="radios-with-images"]');
+    if ($radiosWithImagesArray.length > 0) {
+      $radiosWithImagesArray.forEach((el) => new RadiosWithImages(el)); 
+    } 
 
     expect(document.querySelector('#banner-0-description').style.cursor).toBe('pointer');
     expect(document.querySelector('#banner-1-description').style.cursor).toBe('pointer');
