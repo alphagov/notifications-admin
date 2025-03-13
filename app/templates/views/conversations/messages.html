@@ -4,21 +4,21 @@
   {% if message.status == 'delivered' %}
     {% set status_text_in_heading = 'Sent' %}
     {% set visual_status_text %}
-      <time class="sms-message-status sms-message-status-outbound" tabindex="-1">
+      <time class="sms-message-status sms-message-status-outbound" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
         {{ message.created_at | format_datetime_relative }}
       </time>
     {% endset %}
   {% elif message.status in ['pending', 'sending', 'created'] %}
     {% set status_text_in_heading = 'Sending since' %}
     {% set visual_status_text %}
-      <time class="sms-message-status sms-message-status-outbound hint" tabindex="-1">
+      <time class="sms-message-status sms-message-status-outbound hint" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
         sending
       </time>
     {% endset %}
   {% else %}
     {% set status_text_in_heading = 'Failed' %}
     {% set visual_status_text %}
-      <time class="sms-message-status sms-message-status-outbound table-field-error-label" tabindex="-1">
+      <time class="sms-message-status sms-message-status-outbound table-field-error-label" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
         Failed (sent {{ message.created_at | format_datetime_relative }})
       </time>
     {% endset %}
@@ -29,7 +29,7 @@
         <div class="govuk-grid-column-two-thirds sms-message-inbound">
           <h2 class="govuk-visually-hidden">Received {{ message.created_at | format_datetime_relative }}</h2>
           {{ message.content | string }}
-          <time class="sms-message-status">
+          <time class="sms-message-status" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
             {{ message.created_at | format_datetime_relative }}
           </time>
         </div>
