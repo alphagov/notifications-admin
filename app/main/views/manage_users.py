@@ -3,6 +3,7 @@ from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import current_service, service_api_client
+from app.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_REJECTED
 from app.event_handlers import (
     create_email_change_event,
     create_mobile_number_change_event,
@@ -22,7 +23,6 @@ from app.main.forms import (
 )
 from app.models.service import Service, ServiceJoinRequest
 from app.models.user import InvitedUser, User
-from app.utils.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_REJECTED
 from app.utils.user import is_gov_user, user_has_permissions
 from app.utils.user_permissions import permission_options, translate_permissions_from_ui_to_db
 

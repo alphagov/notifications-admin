@@ -124,6 +124,7 @@ from app.notify_client.performance_dashboard_api_client import (
 from app.notify_client.platform_admin_api_client import admin_api_client  # noqa
 from app.notify_client.protected_sender_id_api_client import protected_sender_id_api_client  # noqa
 from app.notify_client.provider_client import provider_client  # noqa
+from app.notify_client.report_request_api_client import report_request_api_client  # noqa
 from app.notify_client.service_api_client import service_api_client  # noqa
 from app.notify_client.sms_rate_client import sms_rate_api_client  # noqa
 from app.notify_client.status_api_client import status_api_client  # noqa
