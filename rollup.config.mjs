@@ -96,7 +96,6 @@ export default [
       paths.src + 'javascripts/updateContent.js',
       paths.src + 'javascripts/preventDuplicateFormSubmissions.js',
       paths.src + 'javascripts/fullscreenTable.js',
-      paths.src + 'javascripts/radios-with-images.js',
       paths.src + 'javascripts/liveCheckboxControls.js',
       paths.src + 'javascripts/templateFolderForm.js',
       paths.src + 'javascripts/addBrandingOptionsForm.js',
