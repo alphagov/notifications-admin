@@ -47,7 +47,7 @@ def guidance_pricing_letters():
 def guidance_how_to_pay():
     return render_template(
         "views/guidance/pricing/how-to-pay.html",
-        billing_details=current_app.config["NOTIFY_BILLING_DETAILS"],
+        billing_details=current_app.config["BILLING_DETAILS"],
         navigation_links=pricing_nav(),
     )
 
@@ -57,7 +57,7 @@ def guidance_billing_details():
     if current_user.is_authenticated:
         return render_template(
             "views/guidance/pricing/billing-details.html",
-            billing_details=current_app.config["NOTIFY_BILLING_DETAILS"],
+            billing_details=current_app.config["BILLING_DETAILS"],
             navigation_links=pricing_nav(),
         )
     return render_template(

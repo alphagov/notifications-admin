@@ -15,7 +15,7 @@
     {{ page_header('Billing details') }}
 
     <p class="govuk-body">
-      You can use the information on this page to add the Cabinet Office as a supplier. Your organisation may need to do this before you can raise a purchase order (PO).
+      You can use the information on this page to add the Department for Science, Innovation and Technology (DSIT) as a supplier. Your organisation may need to do this before you can raise a purchase order (PO).
     </p>
 
     <p class="govuk-body">
@@ -27,14 +27,13 @@
     </h2>
 
     <p class="govuk-body">
-      Cabinet Office
+      Department for Science, Innovation and Technology
     </p>
 
     <p class="govuk-body">
-      The White Chapel Building <br>
-      10 Whitechapel High Street <br>
+      100 Parliament Street <br>
       London <br>
-      E1 8QS
+      SW1A 2BQ
     </p>
 
     <h3 class="heading-small" id="email-addresses">
@@ -51,7 +50,7 @@
 
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
-        'GB 88 88 010 80',
+        'GB 888 8255 50',
         thing='<abbr title="Value Added Tax">VAT</abbr> number',
     ) }}
     </div>
@@ -61,12 +60,12 @@
     </h2>
 
     <p class="govuk-body">
-      National Westminster Bank PLC (part of RBS group) <br>
-      Government Banking Services Branch <br>
-      2nd Floor <br>
-      280 Bishopsgate <br>
-      London <br>
-      EC2M 4RB
+      National Westminster Bank PLC <br>
+      NatWest Customer Service Centre <br>
+      Brampton Road <br>
+      Newcastle-under-Lyme <br>
+      Staffordshire <br>
+      ST5 0QX
     </p>
 
     <h3 class="heading-small" id="account-name">
@@ -74,7 +73,7 @@
     </h3>
 
     <p class="govuk-body">
-      Cabinet Office
+      Department for Science, Innovation and Technology
     </p>
 
     <h3 class="heading-small" id="account-number">
@@ -121,17 +120,26 @@
       ) }}
     </div>
 
+    <h3 class="heading-small" id="duns-number">
+      D-U-N-S number
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        '227331642',
+        thing='<abbr title="Data Universal Numbering System">D-U-N-S</abbr> number',
+    ) }}
+    </div>
+
     <h2 class="heading-medium govuk-!-margin-top-7" id="invoice-address">
       Invoice address
     </h2>
 
     <p class="govuk-body">
-      SSCL – Accounts Receivable <br>
-      PO Box 221 <br>
-      Thornton-Cleveleys <br>
-      Blackpool <br>
-      Lancashire <br>
-      FY1 9JN
+      Department for Science, Innovation and Technology <br>
+      100 Parliament Street <br>
+      London <br>
+      SW1A 2BQ
     </p>
 
 {% endblock %}
