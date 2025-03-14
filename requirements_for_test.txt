@@ -165,7 +165,7 @@ moto==4.0.9
     # via -r requirements_for_test.in
 notifications-python-client==10.0.0
     # via -r requirements.txt
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@d6311c3ab83b8225265277f781157c48f9318ae9
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@e89dcc53c7f88ef23053d1efb2c00b8ef2ea377e
     # via -r requirements.txt
 openpyxl==3.1.5
     # via
@@ -180,7 +180,9 @@ packaging==23.1
     #   -r requirements.txt
     #   gunicorn
     #   pytest
-phonenumbers==8.13.52
+pathspec==0.12.1
+    # via black
+phonenumbers==8.13.50
     # via
     #   -r requirements.txt
     #   notifications-utils
