@@ -12,6 +12,7 @@ import CopyToClipboard from './copy-to-clipboard.mjs';
 import ListEntry from './list-entry.mjs';
 
 import LiveSearch from './live-search.mjs';
+import EnhancedTextbox from './enhanced-textbox.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -68,6 +69,12 @@ if ($CopyToClipboardArray.length > 0) {
 const $ListEntryArray = document.querySelectorAll('[data-notify-module="list-entry"]');
 if ($ListEntryArray.length > 0) {
   $ListEntryArray.forEach((el) => new ListEntry(el));
+}
+
+
+const $enhancedTextboxArray = document.querySelectorAll('[data-notify-module="enhanced-textbox"]');
+if ($enhancedTextboxArray.length > 0) {
+  $enhancedTextboxArray.forEach((el) => new EnhancedTextbox(el));
 }
 
 const focusBanner = new FocusBanner();
