@@ -1,7 +1,7 @@
 import os
 
 from gds_metrics.gunicorn import child_exit  # noqa
-from notifications_utils.gunicorn_defaults import set_gunicorn_defaults
+from notifications_utils.gunicorn.defaults import set_gunicorn_defaults
 
 set_gunicorn_defaults(globals())
 
