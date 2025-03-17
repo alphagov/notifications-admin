@@ -1007,7 +1007,7 @@ def test_whitespace_in_email_preview_message_subject_placeholders():
                 '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; '
                 'color: #0B0C0C;">'
                 '<a style="word-wrap: break-word; color: #1D70B8;" '
-                "href=\"<span class='placeholder'>&#40;&#40;var&#41;&#41;</span>\">"
+                'href="http://%3Cspan%20class=%27placeholder%27%3E&#40;&#40;var&#41;&#41;%3C/span%3E">'
                 "Example"
                 "</a>"
                 "</p>"
@@ -1019,7 +1019,7 @@ def test_whitespace_in_email_preview_message_subject_placeholders():
                 '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; '
                 'color: #0B0C0C;">'
                 '<a style="word-wrap: break-word; color: #1D70B8;" '
-                "href=\"https://blah.blah/?query=<span class='placeholder'>&#40;&#40;var&#41;&#41;</span>\">"
+                'href="https://blah.blah/?query=%3Cspan%20class=%27placeholder%27%3E&#40;&#40;var&#41;&#41;%3C/span%3E">'
                 "Example"
                 "</a>"
                 "</p>"
@@ -1031,7 +1031,7 @@ def test_whitespace_in_email_preview_message_subject_placeholders():
                 '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; '
                 'color: #0B0C0C;">'
                 '<a style="word-wrap: break-word; color: #1D70B8;" '
-                "href=\"pre<span class='placeholder'>&#40;&#40;var&#41;&#41;</span>post\">"
+                'href="http://pre%3Cspan%20class=%27placeholder%27%3E&#40;&#40;var&#41;&#41;%3C/span%3Epost">'
                 "Example"
                 "</a>"
                 "</p>"
