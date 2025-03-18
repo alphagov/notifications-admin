@@ -426,7 +426,7 @@ def test_manage_users_page_does_not_links_to_user_profile_page_if_user_only_invi
             None,
             """
             Text message code
-            Not available because this team member has not added a phone number to their profile
+            Not available because this team member has not added a phone number to their account
             """,
         ),
         (
@@ -2334,7 +2334,7 @@ def test_join_a_service_with_no_email_auth_hides_auth_type_options(
             None,
             """
             Text message code
-            Not available because this team member has not added a phone number to their profile
+            Not available because this team member has not added a phone number to their account
             """,
         ),
         (
