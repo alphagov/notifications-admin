@@ -29,7 +29,7 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     "valid_from, expected_last_updated",
     (
         ("2040-04-01T12:00:00", "Last updated 1 April 2040"),
-        ("2023-04-01T12:00:00", "Last updated 28 March 2024"),
+        ("2023-04-01T12:00:00", "Last updated 21 March 2025"),
     ),
 )
 @pytest.mark.parametrize(
