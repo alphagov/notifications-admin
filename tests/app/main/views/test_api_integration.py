@@ -1001,7 +1001,12 @@ def test_update_receive_text_message_callback_details(
     service_one["inbound_api"] = [fake_uuid]
     service_one["permissions"] = ["inbound_sms"]
 
-    data = {"url": "https://test.url.com/", "bearer_token": "1234567890", "user_id": fake_uuid}
+    data = {
+        "url": "https://test.url.com/",
+        "bearer_token": "1234567890",
+        "user_id": fake_uuid,
+        "callback_type": "inbound_sms",
+    }
 
     client_request.post(
         "main.received_text_messages_callback",
@@ -1014,7 +1019,7 @@ def test_update_receive_text_message_callback_details(
         url="https://test.url.com/",
         bearer_token="1234567890",
         user_id=fake_uuid,
-        inbound_api_id=fake_uuid,
+        callback_api_id=fake_uuid,
         callback_type="inbound_sms",
     )
 
@@ -1066,7 +1071,7 @@ def test_update_receive_text_message_callback_without_changes_does_not_update(
 ):
     service_one["inbound_api"] = [fake_uuid]
     service_one["permissions"] = ["inbound_sms"]
-    data = {"user_id": fake_uuid, "url": "https://hello3.gov.uk", "bearer_token": "bearer_token_set"}
+    data = {"user_id": fake_uuid, "url": "https://hello3.gov.uk/inbound_sms", "bearer_token": "bearer_token_set"}
 
     client_request.post(
         "main.received_text_messages_callback",
