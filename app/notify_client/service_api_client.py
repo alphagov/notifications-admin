@@ -363,8 +363,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.get(f"/service/{service_id}/inbound-api/{inbound_sms_api_id}")["data"]
 
     @cache.delete("service-{service_id}")
-    def delete_service_inbound_api(self, service_id, callback_api_id):
-        return self.delete(f"/service/{service_id}/inbound-api/{callback_api_id}")
+    def delete_service_inbound_api(self, service_id, callback_api_id, callback_type):
+        return self.delete(f"/service/{service_id}/inbound-api/{callback_api_id}?callback_type={callback_type}")
 
     def get_reply_to_email_addresses(self, service_id):
         return self.get(f"/service/{service_id}/email-reply-to")
@@ -465,8 +465,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}", data)
 
     @cache.delete("service-{service_id}")
-    def delete_service_callback_api(self, service_id, callback_api_id):
-        return self.delete(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}")
+    def delete_service_callback_api(self, service_id, callback_api_id, callback_type):
+        return self.delete(
+            f"/service/{service_id}/delivery-receipt-api/{callback_api_id}?callback_type={callback_type}"
+        )
 
     @cache.delete("service-{service_id}")
     def create_delivery_status_callback_api(self, service_id, url, bearer_token, user_id, callback_type):
@@ -488,8 +490,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(f"/service/{service_id}/returned-letter-api/{callback_api_id}", data)
 
     @cache.delete("service-{service_id}")
-    def delete_returned_letters_callback_api(self, service_id, callback_api_id):
-        return self.delete(f"/service/{service_id}/returned-letter-api/{callback_api_id}")
+    def delete_returned_letters_callback_api(self, service_id, callback_api_id, callback_type):
+        return self.delete(f"/service/{service_id}/returned-letter-api/{callback_api_id}?callback_type={callback_type}")
 
     @cache.delete("service-{service_id}-data-retention")
     def create_service_data_retention(self, service_id, notification_type, days_of_retention):
