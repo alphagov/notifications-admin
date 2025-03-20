@@ -30,7 +30,7 @@ def guidance_pricing_text_messages():
         ),
         _search_form=SearchByNameForm(),
         navigation_links=pricing_nav(),
-        last_updated=datetime(2024, 3, 28).astimezone(UTC),
+        last_updated=datetime(2025, 3, 21).astimezone(UTC),
     )
 
 
