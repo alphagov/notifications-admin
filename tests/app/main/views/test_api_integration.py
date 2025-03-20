@@ -654,20 +654,19 @@ def test_callback_forms_validation(client_request, service_one, endpoint, url, b
 
 @pytest.mark.parametrize("bearer_token", ["", "some-bearer-token"])
 @pytest.mark.parametrize(
-    "endpoint, expected_delete_url",
+    "endpoint, expected_delete_url, callback_type",
     [
         (
             "main.delivery_status_callback",
             "/service/{}/delivery-receipt-api/{}",
+            "delivery_status",
         ),
         (
             "main.received_text_messages_callback",
             "/service/{}/inbound-api/{}",
+            "inbound_sms",
         ),
-        (
-            "main.returned_letters_callback",
-            "/service/{}/returned-letter-api/{}",
-        ),
+        ("main.returned_letters_callback", "/service/{}/returned-letter-api/{}", "returned_letter"),
     ],
 )
 def test_callback_forms_can_be_cleared(
@@ -680,6 +679,7 @@ def test_callback_forms_can_be_cleared(
     fake_uuid,
     mock_get_valid_service_callback_api,
     mock_get_valid_service_inbound_api,
+    callback_type,
 ):
     service_one["service_callback_api"] = [
         {"callback_id": fake_uuid, "callback_type": "delivery_status"},
@@ -704,7 +704,8 @@ def test_callback_forms_can_be_cleared(
 
     assert not page.select(".error-message")
 
-    mocked_delete.assert_called_once_with(expected_delete_url.format(service_one["id"], fake_uuid))
+    expected_parameter = f"{fake_uuid}"
+    mocked_delete.assert_called_once_with(expected_delete_url.format(service_one["id"], expected_parameter))
 
 
 @pytest.mark.parametrize("bearer_token", ["", "some-bearer-token"])
@@ -856,10 +857,10 @@ def test_back_link_directs_to_api_integration_from_delivery_callback_if_no_inbou
 
 
 @pytest.mark.parametrize(
-    "endpoint",
+    "endpoint, callback_type",
     [
-        "main.delivery_status_callback",
-        "main.received_text_messages_callback",
+        ("main.delivery_status_callback", "delivery_status"),
+        ("main.received_text_messages_callback", "inbound_sms"),
     ],
 )
 def test_create_delivery_status_and_receive_text_message_callbacks(
@@ -869,12 +870,18 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
     mock_create_service_inbound_api,
     mock_create_service_callback_api,
     endpoint,
+    callback_type,
     fake_uuid,
 ):
     if endpoint == "main.received_text_messages_callback":
         service_one["permissions"] = ["inbound_sms"]
 
-    data = {"url": "https://test.url.com/", "bearer_token": "1234567890", "user_id": fake_uuid}
+    data = {
+        "url": "https://test.url.com/",
+        "bearer_token": "1234567890",
+        "user_id": fake_uuid,
+        "callback_type": callback_type,
+    }
 
     client_request.post(
         endpoint,
@@ -888,6 +895,7 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
             url="https://test.url.com/",
             bearer_token="1234567890",
             user_id=fake_uuid,
+            callback_type=callback_type,
         )
     else:
         mock_create_service_callback_api.assert_called_once_with(
@@ -895,13 +903,19 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
             url="https://test.url.com/",
             bearer_token="1234567890",
             user_id=fake_uuid,
+            callback_type=callback_type,
         )
 
 
 def test_create_returned_letters_callbacks(
     client_request, service_one, mock_get_notifications, mock_create_returned_letters_callback_api, fake_uuid
 ):
-    data = {"url": "https://test.url.com/", "bearer_token": "1234567890", "user_id": fake_uuid}
+    data = {
+        "url": "https://test.url.com/",
+        "bearer_token": "1234567890",
+        "user_id": fake_uuid,
+        "callback_type": "returned_letter",
+    }
 
     client_request.post(
         "main.returned_letters_callback",
@@ -914,6 +928,7 @@ def test_create_returned_letters_callbacks(
         url="https://test.url.com/",
         bearer_token="1234567890",
         user_id=data["user_id"],
+        callback_type=data["callback_type"],
     )
 
 

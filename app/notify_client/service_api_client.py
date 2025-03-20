@@ -348,8 +348,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         )
 
     @cache.delete("service-{service_id}")
-    def create_service_inbound_api(self, service_id, url, bearer_token, user_id):
-        data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id}
+    def create_service_inbound_api(self, service_id, url, bearer_token, user_id, callback_type):
+        data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id, "callback_type": callback_type}
         return self.post(f"/service/{service_id}/inbound-api", data)
 
     @cache.delete("service-{service_id}")
@@ -467,13 +467,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.delete(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}")
 
     @cache.delete("service-{service_id}")
-    def create_delivery_status_callback_api(self, service_id, url, bearer_token, user_id):
-        data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id}
+    def create_delivery_status_callback_api(self, service_id, url, bearer_token, user_id, callback_type):
+        data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id, "callback_type": callback_type}
         return self.post(f"/service/{service_id}/delivery-receipt-api", data)
 
     @cache.delete("service-{service_id}")
-    def create_returned_letters_callback_api(self, service_id, url, bearer_token, user_id):
-        data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id}
+    def create_returned_letters_callback_api(self, service_id, url, bearer_token, user_id, callback_type):
+        data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id, "callback_type": callback_type}
         return self.post(f"/service/{service_id}/returned-letter-api", data)
 
     @cache.delete("service-{service_id}")
