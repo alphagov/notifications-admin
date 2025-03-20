@@ -24,7 +24,13 @@ Text message pricing
       }
     ) }}
 
-  <p class="govuk-body">Each unique service you add has an annual allowance of free text messages.</p>
+  {% if sms_rate != 2.33 %}
+   <div class="govuk-inset-text">
+     <p class="govuk-body">On 1 April 2025 the cost of sending a text message will go up to 2.33 pence (plus VAT).</p>
+   </div>
+   {% endif %}  
+
+<p class="govuk-body">Each unique service you add has an annual allowance of free text messages.</p>
   <p class="govuk-body">When a service has used its annual allowance, it costs {{ sms_rate }} (plus VAT) for each text message you send.</p>
 
   <div class="bottom-gutter-3-2">
