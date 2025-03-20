@@ -178,7 +178,7 @@ def delivery_status_callback(service_id):
                 )
         elif delivery_status_callback_details and not form.url.data:
             service_api_client.delete_service_callback_api(
-                service_id, delivery_status_callback_details["id"], callback_type="delivery_status"
+                service_id, delivery_status_callback_details["id"], "delivery_status"
             )
         elif form.url.data:
             service_api_client.create_delivery_status_callback_api(
@@ -229,7 +229,7 @@ def received_text_messages_callback(service_id):
                     url=form.url.data,
                     bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
                     user_id=current_user.id,
-                    inbound_api_id=received_text_messages_callback.get("id"),
+                    callback_api_id=received_text_messages_callback.get("id"),
                     callback_type="inbound_sms",
                 )
         elif received_text_messages_callback and not form.url.data:
@@ -283,7 +283,7 @@ def returned_letters_callback(service_id):
                 )
         elif returned_letters_callback_details and not form.url.data:
             service_api_client.delete_returned_letters_callback_api(
-                service_id, returned_letters_callback_details["id"], callback_type="returned_letter"
+                service_id, returned_letters_callback_details["id"], "returned_letter"
             )
         elif form.url.data:
             service_api_client.create_returned_letters_callback_api(

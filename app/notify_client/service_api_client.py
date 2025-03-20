@@ -353,14 +353,14 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(f"/service/{service_id}/inbound-api", data)
 
     @cache.delete("service-{service_id}")
-    def update_service_inbound_api(self, service_id, url, bearer_token, user_id, inbound_api_id, callback_type):
+    def update_service_inbound_api(self, service_id, url, bearer_token, user_id, callback_api_id, callback_type):
         data = {"url": url, "updated_by_id": user_id, "callback_type": callback_type}
         if bearer_token:
             data["bearer_token"] = bearer_token
-        return self.post(f"/service/{service_id}/inbound-api/{inbound_api_id}", data)
+        return self.post(f"/service/{service_id}/inbound-api/{callback_api_id}", data)
 
-    def get_service_inbound_api(self, service_id, inbound_sms_api_id):
-        return self.get(f"/service/{service_id}/inbound-api/{inbound_sms_api_id}")["data"]
+    def get_service_inbound_api(self, service_id, callback_api_id, callback_type):
+        return self.get(f"/service/{service_id}/inbound-api/{callback_api_id}?callback_type={callback_type}")["data"]
 
     @cache.delete("service-{service_id}")
     def delete_service_inbound_api(self, service_id, callback_api_id, callback_type):
@@ -451,9 +451,13 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
     def get_service_callback_api(self, service_id, callback_api_id, callback_type):
         if callback_type == "delivery_status":
-            return self.get(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}")["data"]
+            return self.get(
+                f"/service/{service_id}/delivery-receipt-api/{callback_api_id}?callback_type={callback_type}"
+            )["data"]
         elif callback_type == "returned_letter":
-            return self.get(f"/service/{service_id}/returned-letter-api/{callback_api_id}")["data"]
+            return self.get(
+                f"/service/{service_id}/returned-letter-api/{callback_api_id}?callback_type={callback_type}"
+            )["data"]
 
     @cache.delete("service-{service_id}")
     def update_delivery_status_callback_api(
