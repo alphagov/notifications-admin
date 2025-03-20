@@ -186,6 +186,7 @@ def delivery_status_callback(service_id):
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,
                 user_id=current_user.id,
+                callback_type="delivery_status",
             )
         else:
             # If no callback is set up and the user chooses to continue
@@ -241,6 +242,7 @@ def received_text_messages_callback(service_id):
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,
                 user_id=current_user.id,
+                callback_type="inbound_sms",
             )
         return redirect(url_for(".api_callbacks", service_id=service_id))
     return render_template(
@@ -287,6 +289,7 @@ def returned_letters_callback(service_id):
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,
                 user_id=current_user.id,
+                callback_type="returned_letter",
             )
         else:
             # If no callback is set up and the user chooses to continue
