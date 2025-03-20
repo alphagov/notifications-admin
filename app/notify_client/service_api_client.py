@@ -353,8 +353,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(f"/service/{service_id}/inbound-api", data)
 
     @cache.delete("service-{service_id}")
-    def update_service_inbound_api(self, service_id, url, bearer_token, user_id, inbound_api_id):
-        data = {"url": url, "updated_by_id": user_id}
+    def update_service_inbound_api(self, service_id, url, bearer_token, user_id, inbound_api_id, callback_type):
+        data = {"url": url, "updated_by_id": user_id, "callback_type": callback_type}
         if bearer_token:
             data["bearer_token"] = bearer_token
         return self.post(f"/service/{service_id}/inbound-api/{inbound_api_id}", data)
@@ -456,8 +456,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             return self.get(f"/service/{service_id}/returned-letter-api/{callback_api_id}")["data"]
 
     @cache.delete("service-{service_id}")
-    def update_delivery_status_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
-        data = {"url": url, "updated_by_id": user_id}
+    def update_delivery_status_callback_api(
+        self, service_id, url, bearer_token, user_id, callback_api_id, callback_type
+    ):
+        data = {"url": url, "updated_by_id": user_id, "callback_type": callback_type}
         if bearer_token:
             data["bearer_token"] = bearer_token
         return self.post(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}", data)
@@ -477,8 +479,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(f"/service/{service_id}/returned-letter-api", data)
 
     @cache.delete("service-{service_id}")
-    def update_returned_letters_callback_api(self, service_id, url, bearer_token, user_id, callback_api_id):
-        data = {"url": url, "updated_by_id": user_id}
+    def update_returned_letters_callback_api(
+        self, service_id, url, bearer_token, user_id, callback_api_id, callback_type
+    ):
+        data = {"url": url, "updated_by_id": user_id, "callback_type": callback_type}
         if bearer_token:
             data["bearer_token"] = bearer_token
         return self.post(f"/service/{service_id}/returned-letter-api/{callback_api_id}", data)
