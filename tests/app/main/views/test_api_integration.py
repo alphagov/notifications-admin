@@ -941,7 +941,12 @@ def test_update_delivery_status_callback_details(
 ):
     service_one["service_callback_api"] = [{"callback_id": fake_uuid, "callback_type": "delivery_status"}]
 
-    data = {"url": "https://test.url.com/", "bearer_token": "1234567890", "user_id": fake_uuid}
+    data = {
+        "url": "https://test.url.com/",
+        "bearer_token": "1234567890",
+        "user_id": fake_uuid,
+        "callback_type": "delivery_status",
+    }
 
     client_request.post(
         "main.delivery_status_callback",
@@ -955,6 +960,7 @@ def test_update_delivery_status_callback_details(
         bearer_token="1234567890",
         user_id=fake_uuid,
         callback_api_id=fake_uuid,
+        callback_type=data["callback_type"],
     )
 
 
@@ -981,6 +987,7 @@ def test_update_returned_letters_callback_details(
         bearer_token="1234567890",
         user_id=fake_uuid,
         callback_api_id=fake_uuid,
+        callback_type="returned_letter",
     )
 
 
@@ -1008,6 +1015,7 @@ def test_update_receive_text_message_callback_details(
         bearer_token="1234567890",
         user_id=fake_uuid,
         inbound_api_id=fake_uuid,
+        callback_type="inbound_sms",
     )
 
 

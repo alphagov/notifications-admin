@@ -3361,7 +3361,7 @@ def mock_create_service_inbound_api(notify_admin, mocker):
 
 @pytest.fixture(scope="function")
 def mock_update_service_inbound_api(notify_admin, mocker):
-    def _update_service_inbound_api(service_id, url, bearer_token, user_id, inbound_api_id):
+    def _update_service_inbound_api(service_id, url, bearer_token, user_id, inbound_api_id, callback_type):
         return
 
     return mocker.patch("app.service_api_client.update_service_inbound_api", side_effect=_update_service_inbound_api)
@@ -3389,7 +3389,7 @@ def mock_create_returned_letters_callback_api(notify_admin, mocker):
 
 @pytest.fixture(scope="function")
 def mock_update_delivery_status_callback_api(notify_admin, mocker):
-    def _update_delivery_status_callback_api(service_id, url, bearer_token, user_id, callback_api_id):
+    def _update_delivery_status_callback_api(service_id, url, bearer_token, user_id, callback_api_id, callback_type):
         return
 
     return mocker.patch(
@@ -3399,7 +3399,7 @@ def mock_update_delivery_status_callback_api(notify_admin, mocker):
 
 @pytest.fixture(scope="function")
 def mock_update_returned_letters_callback_api(notify_admin, mocker):
-    def _update_returned_letters_callback_api(service_id, url, bearer_token, user_id, callback_api_id):
+    def _update_returned_letters_callback_api(service_id, url, bearer_token, user_id, callback_api_id, callback_type):
         return
 
     return mocker.patch(
