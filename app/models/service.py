@@ -651,7 +651,7 @@ class Service(JSONModel):
     @property
     def inbound_sms_callback_details(self):
         if self.inbound_api:
-            return service_api_client.get_service_inbound_api(self.id, self.inbound_api[0])
+            return service_api_client.get_service_inbound_api(self.id, self.inbound_api[0], "inbound_sms")
 
     @property
     def delivery_status_callback_details(self):
