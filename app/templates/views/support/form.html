@@ -20,9 +20,9 @@
       <div class="govuk-grid-column-two-thirds">
         {% if show_status_page_banner %}
           {% set insetHtml %}
-          Check our <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">
-            system status</a>
-          page to see if there are any known issues with GOV.UK Notify.
+          <p class="govuk-body">First, check the <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">
+            GOV.UK Notify status page</a>.</p>
+          <p class="govuk-body">You do not need to contact us if your problem is already listed on that page.</p>
           {% endset %}
           {{ govukInsetText({"html": insetHtml, classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-3"}) }}
         {% endif %}

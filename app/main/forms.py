@@ -1701,7 +1701,7 @@ class FeedbackOrProblem(StripWhitespaceForm):
 
 class Triage(StripWhitespaceForm):
     severe = GovukRadiosField(
-        "Is it an emergency?",
+        "Did you get one of the following errors?",
         choices=[
             ("yes", "Yes"),
             ("no", "No"),

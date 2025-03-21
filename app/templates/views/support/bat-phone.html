@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Report an emergency out of hours
+  How to report a problem outside office hours
 {% endblock %}
 
 {% block backLink %}
@@ -12,7 +12,7 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Report an emergency out of hours')}}
+    {{ page_header('How to report a problem outside office hours')}}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <p class="govuk-body">
@@ -26,22 +26,31 @@
           If your problem is not listed on the status page, contact us using our emergency email address.
         </p>
         <p class="govuk-body">
-          This is the email address we sent to your service manager in an email called ‘Your service is live’.
+          This is the email address we sent to your service manager when we made your service live.
         </p>
         <p class="govuk-body">
-          We do not offer out of hours support if your service is in
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a>.
+          When you contact our emergency email address we’ll reply within 30 minutes.
         </p>
 
-        <h2 class="heading-medium">When you report an emergency</h2>
-        <p class="govuk-body">
-          We’ll reply within 30 minutes.
-        </p>
+        <h2 class="heading-medium">Do not use our emergency email address if</h2>
 
-        <h2 class="heading-medium">If it’s not an emergency</h2>
+        <ul class="govuk-list govuk-list--bullet">
+        <li>
+          you did not get a ‘technical difficulties’ error when uploading a file
+        </li>
+        <li>
+          you did not get a 500 response code when using the API
+        </li>
+        <li>
+          your service is still in trial mode
+        </li>
+      </ul>
+
         <p class="bottom-gutter-2">
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.feedback', ticket_type='report-problem', severe='no') }}">Fill in this form</a>
-          and we’ll reply by the end of the next working day.
+          Instead you need to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.feedback', ticket_type='report-problem', severe='no') }}">fill in our support form</a>.
+        </p>
+        <p class="govuk-body">
+          We’ll reply by the end of the next working day.
         </p>
       </div>
     </div>

@@ -510,7 +510,7 @@ def test_options_on_triage_page(
     ticket_type,
 ):
     page = client_request.get("main.triage", ticket_type=ticket_type)
-    assert normalize_spaces(page.select_one("h1").text) == "Is it an emergency?"
+    assert normalize_spaces(page.select_one("h1").text) == "Did you get one of the following errors?"
     assert page.select("form input[type=radio]")[0]["value"] == "yes"
     assert page.select("form input[type=radio]")[1]["value"] == "no"
 
