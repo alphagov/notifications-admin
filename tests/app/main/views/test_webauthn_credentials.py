@@ -18,10 +18,10 @@ def webauthn_authentication_post_data(fake_uuid, webauthn_credential, client_req
         {
             "credentialId": credential_id,
             "authenticatorData": base64.b64decode(b"dKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvABAAACfQ=="),
-            "clientDataJSON": b'{"challenge":"e-g-nXaRxMagEiqTJSyD82RsEc5if_6jyfJDy8bNKlw","origin":"https://webauthn.io","type":"webauthn.get"}',  # noqa
+            "clientDataJSON": b'{"challenge":"e-g-nXaRxMagEiqTJSyD82RsEc5if_6jyfJDy8bNKlw","origin":"https://webauthn.io","type":"webauthn.get"}',
             "signature": bytes.fromhex(
-                "304502204a76f05cd52a778cdd4df1565e0004e5cc1ead360419d0f5c3a0143bf37e7f15022100932b5c308a560cfe4f244214843075b904b3eda64e85d64662a81198c386cdde"  # noqa
-            ),  # noqa
+                "304502204a76f05cd52a778cdd4df1565e0004e5cc1ead360419d0f5c3a0143bf37e7f15022100932b5c308a560cfe4f244214843075b904b3eda64e85d64662a81198c386cdde"
+            ),
         }
     )
 

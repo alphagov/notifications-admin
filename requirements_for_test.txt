@@ -128,7 +128,7 @@ itsdangerous==2.2.0
     #   flask
     #   flask-wtf
     #   notifications-utils
-jinja2==3.1.5
+jinja2==3.1.6
     # via
     #   -r requirements.txt
     #   flask
@@ -164,7 +164,7 @@ moto==5.1.0
     # via -r requirements_for_test.in
 notifications-python-client==10.0.0
     # via -r requirements.txt
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@e89dcc53c7f88ef23053d1efb2c00b8ef2ea377e
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@3fb3caf0efc9ccbebfe79b3269f84bfd66fc90d5
     # via -r requirements.txt
 openpyxl==3.1.5
     # via
@@ -179,8 +179,6 @@ packaging==23.1
     #   -r requirements.txt
     #   gunicorn
     #   pytest
-pathspec==0.12.1
-    # via black
 phonenumbers==8.13.50
     # via
     #   -r requirements.txt
