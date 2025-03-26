@@ -10,6 +10,7 @@ import Homepage from './homepage.mjs';
 import PreviewPane from './preview-pane.mjs';
 import CopyToClipboard from './copy-to-clipboard.mjs';
 import ListEntry from './list-entry.mjs';
+import RadiosWithImages from './radios-with-images.mjs';
 
 import LiveSearch from './live-search.mjs';
 
@@ -68,6 +69,11 @@ if ($CopyToClipboardArray.length > 0) {
 const $ListEntryArray = document.querySelectorAll('[data-notify-module="list-entry"]');
 if ($ListEntryArray.length > 0) {
   $ListEntryArray.forEach((el) => new ListEntry(el));
+}
+
+const $radiosWithImagesArray = document.querySelectorAll('[data-notify-module="radios-with-images"]');
+if ($radiosWithImagesArray.length > 0) {
+  $radiosWithImagesArray.forEach((el) => new RadiosWithImages(el));
 }
 
 const focusBanner = new FocusBanner();
