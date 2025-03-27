@@ -3307,12 +3307,12 @@ def mock_get_orgs_and_services_associated_with_branding_no_services(notify_admin
 
 @pytest.fixture(scope="function")
 def mock_get_valid_service_inbound_api(notify_admin, mocker):
-    def _get(service_id, callback_api_id, callback_type):
+    def _get(service_id, callback_api_id):
         return {
             "created_at": "2017-12-04T10:52:55.289026Z",
             "updated_by_id": fake_uuid,
             "id": callback_api_id,
-            "url": f"https://hello3.gov.uk/{callback_type}",
+            "url": "https://hello3.gov.uk/inbound_sms",
             "service_id": service_id,
             "updated_at": "2017-12-04T11:28:42.575153Z",
         }
