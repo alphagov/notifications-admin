@@ -2871,9 +2871,9 @@ def test_service_add_reply_to_email_address_without_verification_for_platform_ad
 @pytest.mark.parametrize(
     "status,expected_failure,expected_success",
     [
-        ("delivered", 0, 1),
-        ("sending", 0, 0),
-        ("permanent-failure", 1, 0),
+        ("delivered", False, True),
+        ("sending", False, False),
+        ("permanent-failure", True, False),
     ],
 )
 @freeze_time("2018-06-01 11:11:00.061258")
@@ -2907,7 +2907,7 @@ def test_service_verify_reply_to_address(
         notification_id=notification["id"],
         _optional_args=f"?is_default={is_default}{replace}",
     )
-    assert page.select_one("h1").text == "Checking email reply-to address"
+    assert page.select_one("h1").text == "Reply-to email address check"
     back_link = page.select_one(".govuk-back-link")
     assert back_link.text.strip() == "Back"
     if replace:
@@ -2915,8 +2915,10 @@ def test_service_verify_reply_to_address(
     else:
         assert "/email-reply-to/add" in back_link["href"]
 
-    assert len(page.select("div.banner-dangerous")) == expected_failure
-    assert len(page.select("div.banner-default-with-tick")) == expected_success
+    assert (page.select_one("div.banner-dangerous") is not None) == expected_failure
+    assert (
+        page.select_one("main p.govuk-body:nth-of-type(1)").text.strip() == "The check is complete."
+    ) == expected_success
 
     if status == "delivered":
         if replace:
