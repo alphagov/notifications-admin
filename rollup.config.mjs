@@ -91,7 +91,6 @@ export default [
       paths.src + 'javascripts/govuk-frontend-toolkit/show-hide-content.js',
       paths.src + 'javascripts/stick-to-window-when-scrolling.js',
       paths.src + 'javascripts/cookieCleanup.js',
-      paths.src + 'javascripts/enhancedTextbox.js',
       paths.src + 'javascripts/radioSelect.js',
       paths.src + 'javascripts/updateContent.js',
       paths.src + 'javascripts/preventDuplicateFormSubmissions.js',

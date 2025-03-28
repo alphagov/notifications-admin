@@ -13,6 +13,7 @@ import ListEntry from './list-entry.mjs';
 import RadiosWithImages from './radios-with-images.mjs';
 
 import LiveSearch from './live-search.mjs';
+import EnhancedTextbox from './enhanced-textbox.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -74,6 +75,12 @@ if ($ListEntryArray.length > 0) {
 const $radiosWithImagesArray = document.querySelectorAll('[data-notify-module="radios-with-images"]');
 if ($radiosWithImagesArray.length > 0) {
   $radiosWithImagesArray.forEach((el) => new RadiosWithImages(el));
+}
+
+
+const $enhancedTextboxArray = document.querySelectorAll('[data-notify-module="enhanced-textbox"]');
+if ($enhancedTextboxArray.length > 0) {
+  $enhancedTextboxArray.forEach((el) => new EnhancedTextbox(el));
 }
 
 const focusBanner = new FocusBanner();
