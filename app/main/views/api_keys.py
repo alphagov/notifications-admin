@@ -239,7 +239,7 @@ def received_text_messages_callback(service_id):
                 callback_type="inbound_sms",
             )
         elif form.url.data:
-            service_api_client.create_service_inbound_api(
+            service_api_client.create_service_callback_api(
                 service_id,
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,
