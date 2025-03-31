@@ -663,7 +663,7 @@ def test_callback_forms_validation(client_request, service_one, endpoint, url, b
         ),
         (
             "main.received_text_messages_callback",
-            "/service/{}/inbound-api/{}",
+            "/service/{}/callback-api/{}",
             "inbound_sms",
         ),
         ("main.returned_letters_callback", "/service/{}/callback-api/{}", "returned_letter"),
