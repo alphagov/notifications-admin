@@ -908,7 +908,7 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
 
 
 def test_create_returned_letters_callbacks(
-    client_request, service_one, mock_get_notifications, mock_create_returned_letters_callback_api, fake_uuid
+    client_request, service_one, mock_get_notifications, mock_create_service_callback_api, fake_uuid
 ):
     data = {
         "url": "https://test.url.com/",
@@ -923,7 +923,7 @@ def test_create_returned_letters_callbacks(
         _data=data,
     )
 
-    mock_create_returned_letters_callback_api.assert_called_once_with(
+    mock_create_service_callback_api.assert_called_once_with(
         service_one["id"],
         url="https://test.url.com/",
         bearer_token="1234567890",
