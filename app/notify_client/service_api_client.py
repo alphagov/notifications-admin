@@ -347,13 +347,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             f"/service/{service_id}/inbound-sms/most-recent-usage",
         )
 
-    @cache.delete("service-{service_id}")
-    def update_service_inbound_api(self, service_id, url, bearer_token, user_id, callback_api_id, callback_type):
-        data = {"url": url, "updated_by_id": user_id, "callback_type": callback_type}
-        if bearer_token:
-            data["bearer_token"] = bearer_token
-        return self.post(f"/service/{service_id}/inbound-api/{callback_api_id}", data)
-
     def get_service_inbound_api(self, service_id, callback_api_id):
         return self.get(f"/service/{service_id}/inbound-api/{callback_api_id}?callback_type=inbound_sms")["data"]
 
@@ -455,28 +448,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             )["data"]
 
     @cache.delete("service-{service_id}")
-    def update_delivery_status_callback_api(
-        self, service_id, url, bearer_token, user_id, callback_api_id, callback_type
-    ):
-        data = {"url": url, "updated_by_id": user_id, "callback_type": callback_type}
-        if bearer_token:
-            data["bearer_token"] = bearer_token
-        return self.post(f"/service/{service_id}/delivery-receipt-api/{callback_api_id}", data)
-
-    @cache.delete("service-{service_id}")
     def delete_service_callback_api(self, service_id, callback_api_id, callback_type):
         return self.delete(
             f"/service/{service_id}/delivery-receipt-api/{callback_api_id}?callback_type={callback_type}"
         )
-
-    @cache.delete("service-{service_id}")
-    def update_returned_letters_callback_api(
-        self, service_id, url, bearer_token, user_id, callback_api_id, callback_type
-    ):
-        data = {"url": url, "updated_by_id": user_id, "callback_type": callback_type}
-        if bearer_token:
-            data["bearer_token"] = bearer_token
-        return self.post(f"/service/{service_id}/returned-letter-api/{callback_api_id}", data)
 
     @cache.delete("service-{service_id}")
     def delete_returned_letters_callback_api(self, service_id, callback_api_id, callback_type):
