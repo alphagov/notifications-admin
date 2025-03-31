@@ -867,7 +867,6 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
     client_request,
     service_one,
     mock_get_notifications,
-    mock_create_service_inbound_api,
     mock_create_service_callback_api,
     endpoint,
     callback_type,
@@ -889,26 +888,17 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
         _data=data,
     )
 
-    if endpoint == "main.received_text_messages_callback":
-        mock_create_service_inbound_api.assert_called_once_with(
-            service_one["id"],
-            url="https://test.url.com/",
-            bearer_token="1234567890",
-            user_id=fake_uuid,
-            callback_type=callback_type,
-        )
-    else:
-        mock_create_service_callback_api.assert_called_once_with(
-            service_one["id"],
-            url="https://test.url.com/",
-            bearer_token="1234567890",
-            user_id=fake_uuid,
-            callback_type=callback_type,
-        )
+    mock_create_service_callback_api.assert_called_once_with(
+        service_one["id"],
+        url="https://test.url.com/",
+        bearer_token="1234567890",
+        user_id=fake_uuid,
+        callback_type=callback_type,
+    )
 
 
 def test_create_returned_letters_callbacks(
-    client_request, service_one, mock_get_notifications, mock_create_returned_letters_callback_api, fake_uuid
+    client_request, service_one, mock_get_notifications, mock_create_service_callback_api, fake_uuid
 ):
     data = {
         "url": "https://test.url.com/",
@@ -923,7 +913,7 @@ def test_create_returned_letters_callbacks(
         _data=data,
     )
 
-    mock_create_returned_letters_callback_api.assert_called_once_with(
+    mock_create_service_callback_api.assert_called_once_with(
         service_one["id"],
         url="https://test.url.com/",
         bearer_token="1234567890",
