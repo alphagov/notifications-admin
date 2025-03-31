@@ -508,6 +508,11 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         data = {"days_of_retention": days_of_retention}
         return self.post(f"/service/{service_id}/data-retention/{data_retention_id}", data)
 
+    @cache.delete("service-{service_id}")
+    def create_service_callback_api(self, service_id, url, bearer_token, user_id, callback_type):
+        data = {"url": url, "bearer_token": bearer_token, "updated_by_id": user_id, "callback_type": callback_type}
+        return self.post(f"/service/{service_id}/callback-api", data)
+
     @cache.set("service-{service_id}-data-retention")
     def get_service_data_retention(self, service_id):
         return self.get(f"/service/{service_id}/data-retention")
