@@ -233,7 +233,7 @@ def received_text_messages_callback(service_id):
                     callback_type="inbound_sms",
                 )
         elif received_text_messages_callback and not form.url.data:
-            service_api_client.delete_service_inbound_api(
+            service_api_client.delete_service_callback_api(
                 service_id=service_id,
                 callback_api_id=received_text_messages_callback["id"],
                 callback_type="inbound_sms",
@@ -282,7 +282,7 @@ def returned_letters_callback(service_id):
                     callback_type="returned_letter",
                 )
         elif returned_letters_callback_details and not form.url.data:
-            service_api_client.delete_returned_letters_callback_api(
+            service_api_client.delete_service_callback_api(
                 service_id, returned_letters_callback_details["id"], "returned_letter"
             )
         elif form.url.data:

@@ -658,15 +658,15 @@ def test_callback_forms_validation(client_request, service_one, endpoint, url, b
     [
         (
             "main.delivery_status_callback",
-            "/service/{}/delivery-receipt-api/{}",
+            "/service/{}/callback-api/{}",
             "delivery_status",
         ),
         (
             "main.received_text_messages_callback",
-            "/service/{}/inbound-api/{}",
+            "/service/{}/callback-api/{}",
             "inbound_sms",
         ),
-        ("main.returned_letters_callback", "/service/{}/returned-letter-api/{}", "returned_letter"),
+        ("main.returned_letters_callback", "/service/{}/callback-api/{}", "returned_letter"),
     ],
 )
 def test_callback_forms_can_be_cleared(
@@ -1017,7 +1017,7 @@ def test_update_receive_text_message_callback_details(
 def test_update_delivery_status_callback_without_changes_does_not_update(
     client_request,
     service_one,
-    mock_update_delivery_status_callback_api,
+    mock_update_service_callback_api,
     fake_uuid,
     mock_get_valid_service_callback_api,
 ):
@@ -1030,13 +1030,13 @@ def test_update_delivery_status_callback_without_changes_does_not_update(
         _data=data,
     )
 
-    assert mock_update_delivery_status_callback_api.called is False
+    assert mock_update_service_callback_api.called is False
 
 
 def test_update_returned_letters_callback_without_changes_does_not_update(
     client_request,
     service_one,
-    mock_update_returned_letters_callback_api,
+    mock_update_service_callback_api,
     fake_uuid,
     mock_get_valid_service_callback_api,
 ):
@@ -1049,13 +1049,13 @@ def test_update_returned_letters_callback_without_changes_does_not_update(
         _data=data,
     )
 
-    assert mock_update_returned_letters_callback_api.called is False
+    assert mock_update_service_callback_api.called is False
 
 
 def test_update_receive_text_message_callback_without_changes_does_not_update(
     client_request,
     service_one,
-    mock_update_service_inbound_api,
+    mock_update_service_callback_api,
     fake_uuid,
     mock_get_valid_service_inbound_api,
 ):
@@ -1069,7 +1069,7 @@ def test_update_receive_text_message_callback_without_changes_does_not_update(
         _data=data,
     )
 
-    assert mock_update_service_inbound_api.called is False
+    assert mock_update_service_callback_api.called is False
 
 
 @pytest.mark.parametrize(
