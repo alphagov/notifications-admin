@@ -666,7 +666,7 @@ def test_callback_forms_validation(client_request, service_one, endpoint, url, b
             "/service/{}/inbound-api/{}",
             "inbound_sms",
         ),
-        ("main.returned_letters_callback", "/service/{}/returned-letter-api/{}", "returned_letter"),
+        ("main.returned_letters_callback", "/service/{}/callback-api/{}", "returned_letter"),
     ],
 )
 def test_callback_forms_can_be_cleared(
