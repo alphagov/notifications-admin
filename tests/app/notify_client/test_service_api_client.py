@@ -375,6 +375,7 @@ _clients_by_name = {
         ("service", "remove_user_from_service", [SERVICE_ONE_ID, ""], {}),
         ("service", "update_guest_list", [SERVICE_ONE_ID, {}], {}),
         ("service", "create_service_callback_api", [SERVICE_ONE_ID] + [""] * 4, {}),
+        ("service", "update_returned_letters_callback_api", [SERVICE_ONE_ID] + [""] * 5, {}),
         ("service", "update_service_inbound_api", [SERVICE_ONE_ID] + [""] * 5, {}),
         ("service", "add_reply_to_email_address", [SERVICE_ONE_ID, ""], {}),
         ("service", "update_reply_to_email_address", [SERVICE_ONE_ID] + [""] * 2, {}),

@@ -925,7 +925,7 @@ def test_create_returned_letters_callbacks(
 def test_update_delivery_status_callback_details(
     client_request,
     service_one,
-    mock_update_delivery_status_callback_api,
+    mock_update_service_callback_api,
     mock_get_valid_service_callback_api,
     fake_uuid,
 ):
@@ -944,7 +944,7 @@ def test_update_delivery_status_callback_details(
         _data=data,
     )
 
-    mock_update_delivery_status_callback_api.assert_called_once_with(
+    mock_update_service_callback_api.assert_called_once_with(
         service_one["id"],
         url="https://test.url.com/",
         bearer_token="1234567890",

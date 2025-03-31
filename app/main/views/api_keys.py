@@ -168,7 +168,7 @@ def delivery_status_callback(service_id):
                 delivery_status_callback_details.get("url") != form.url.data
                 or form.bearer_token.data != dummy_bearer_token
             ):
-                service_api_client.update_delivery_status_callback_api(
+                service_api_client.update_service_callback_api(
                     service_id,
                     url=form.url.data,
                     bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
