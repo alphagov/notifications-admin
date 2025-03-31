@@ -168,7 +168,7 @@ def delivery_status_callback(service_id):
                 delivery_status_callback_details.get("url") != form.url.data
                 or form.bearer_token.data != dummy_bearer_token
             ):
-                service_api_client.update_delivery_status_callback_api(
+                service_api_client.update_service_callback_api(
                     service_id,
                     url=form.url.data,
                     bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
@@ -224,7 +224,7 @@ def received_text_messages_callback(service_id):
                 received_text_messages_callback.get("url") != form.url.data
                 or form.bearer_token.data != dummy_bearer_token
             ):
-                service_api_client.update_service_inbound_api(
+                service_api_client.update_service_callback_api(
                     service_id,
                     url=form.url.data,
                     bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
@@ -273,7 +273,7 @@ def returned_letters_callback(service_id):
                 returned_letters_callback_details.get("url") != form.url.data
                 or form.bearer_token.data != dummy_bearer_token
             ):
-                service_api_client.update_returned_letters_callback_api(
+                service_api_client.update_service_callback_api(
                     service_id,
                     url=form.url.data,
                     bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
