@@ -6,6 +6,7 @@ from itertools import groupby
 from flask import Response, abort, jsonify, render_template, request, session, url_for
 from flask_login import current_user
 from werkzeug.utils import redirect
+from notifications_python_client.errors import HTTPError
 
 from app import (
     billing_api_client,
@@ -13,6 +14,7 @@ from app import (
     notification_api_client,
     service_api_client,
     template_statistics_client,
+    report_request_api_client,
 )
 from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
 from app.extensions import redis_client
@@ -98,6 +100,29 @@ def redirect_to_main_view_notification(current_service, message_type, search_que
         )
     )
 
+def post_csv_report_request_and_redirect(current_service, report_type, message_type, status):
+    # post data to create report request, get back request_id and then redirect
+    try:
+      request_id = report_request_api_client.create_report_request(
+        current_service.id,
+        str(report_type),
+        {
+          "user_id": current_user.id,
+          "report_type": report_type + '_report',
+          "notification_type": message_type,
+          "notification_status": status,
+        }
+        
+      )
+      return redirect(
+        url_for(
+            "main.csv_report_request",
+            service_id=current_service.id,
+            request_id=request_id,
+        )
+      )
+    except HTTPError as e:
+       raise e
 
 @main.route("/services/<uuid:service_id>/notifications", methods=["GET", "POST"])
 @main.route("/services/<uuid:service_id>/notifications/<template_type:message_type>", methods=["GET", "POST"])
@@ -121,13 +146,19 @@ def view_notifications(service_id, message_type=None):
             message_type=message_type,
             status=request.args.get("status"),
         )
+    csv_report_request_type = request.form.get("report_type", "")
+    csv_report_message_type = request.form.get("message_type", "")
+    csv_report_message_status = 'all' if request.form.get("message_status") == 'sending,delivered,failed' else request.form.get("message_status")
 
     search_term = request.form.get("to", "")
     search_query_hash = request.args.get("search_query", "")
     cached_search_query_hash, cached_search_term = cache_search_query(search_term, service_id, search_query_hash)
 
+    if request.method == "POST" and csv_report_request_type:
+        return post_csv_report_request_and_redirect(current_service, csv_report_request_type, csv_report_message_type, csv_report_message_status)
+
     if request.method == "POST" and not search_term:
-        return redirect_to_main_view_notification(current_service, message_type, None)
+      return redirect_to_main_view_notification(current_service, message_type, None)
 
     if cached_search_query_hash and search_query_hash != cached_search_query_hash:
         return redirect_to_main_view_notification(current_service, message_type, cached_search_query_hash)
@@ -162,7 +193,6 @@ def view_notifications(service_id, message_type=None):
         download_link=download_link,
         can_download=can_download,
     )
-
 
 @main.route("/services/<uuid:service_id>/template-activity")
 @user_has_permissions("view_activity")
