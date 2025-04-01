@@ -161,7 +161,6 @@ def delivery_status_callback(service_id):
         url=delivery_status_callback_details.get("url") if delivery_status_callback_details else "",
         bearer_token=dummy_bearer_token if delivery_status_callback else "",
     )
-
     if form.validate_on_submit():
         if delivery_status_callback_details and form.url.data:
             if (
@@ -298,7 +297,6 @@ def returned_letters_callback(service_id):
             # having no callback (ie both fields empty) then there’s
             # nothing for us to do here
             pass
-
         return redirect(url_for(back_link, service_id=service_id))
 
     return render_template(
