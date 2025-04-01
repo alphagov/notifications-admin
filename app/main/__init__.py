@@ -12,6 +12,7 @@ from app.main.views import (  # noqa
     api_keys,
     code_not_received,
     conversation,
+    csv_report_request,
     dashboard,
     email_branding,
     feedback,
