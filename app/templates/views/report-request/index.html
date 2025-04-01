@@ -1,0 +1,63 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% macro report_text(channel, status) -%}
+  {% if channel == 'sms' %}
+    {% set channel_plural = 'text messages' %}
+  {% else %}
+    {% set channel_plural = channel + 's' %}
+  {% endif %}
+  {% if status == 'all' or status == 'sending,delivered,failed' %}
+    {{ 'all ' + channel_plural }}
+  {% else %}
+    {{channel_plural + ' with the ' + '\''+ status + '\'' + ' status' }}
+  {% endif %}
+{%- endmacro %}
+
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% set footer_block_text %}
+  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+  <h2 class="govuk-heading-m">Your report contains a lot of data</h2>
+  <p class="govuk-body">To speed things up next time, you can either:
+  <ul class="govuk-list govuk-list--bullet">
+    <li>reduce your data retention period and download reports more frequently</li>
+    <li>use the GOV.UK Notify API to get the status of your message</li>
+  </ul>
+{% endset %}
+
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {% if not report_request %}
+        {{ page_header(page_title) }}
+        <p class="govuk-body govuk-hint">There is currently no available report. To generate a new report, please go to the <a class="govuk-link govuk-link--no-visited-state error-text-colour" href="{{ url_for('main.service_dashboard', service_id=current_service.id) }}">dashaboard page</a> and choose a notification type.</p>
+      {% else %}
+        {% if report_status == 'failed' %}
+          {% call banner_wrapper(type='dangerous') %}
+            <h1 class='banner-title'>
+              We could not create your report
+            </h1>
+            <p class="govuk-body error-text-colour govuk-!-font-weight-bold">The file size is too big. Please <a class="govuk-link govuk-link--no-visited-state error-text-colour" href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback') }}">contact support</a>.</p>
+          {% endcall %}
+          {{footer_block_text}}
+        {% else %}
+        <h1 class="heading-large loading-indicator" id="page-header">{{ page_title }}</h1>
+        <div role="status">
+          <p class="govuk-body">We're creating a CSV file of {{ report_text(notification_type,notification_status) }} from the last {{ retention_period }} days.
+          <p class="govuk-body">This can take up to 5 minutes.</p>
+          <p class="govuk-body">Please do not close this page.</p>
+        </div>
+          {{footer_block_text}}
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}
