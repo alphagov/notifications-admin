@@ -347,9 +347,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             f"/service/{service_id}/inbound-sms/most-recent-usage",
         )
 
-    def get_service_inbound_api(self, service_id, callback_api_id):
-        return self.get(f"/service/{service_id}/inbound-api/{callback_api_id}?callback_type=inbound_sms")["data"]
-
     def get_reply_to_email_addresses(self, service_id):
         return self.get(f"/service/{service_id}/email-reply-to")
 
@@ -433,16 +430,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def delete_sms_sender(self, service_id, sms_sender_id):
         return self.post(f"/service/{service_id}/sms-sender/{sms_sender_id}/archive", data=None)
 
-    def get_service_callback_api(self, service_id, callback_api_id, callback_type):
-        if callback_type == "delivery_status":
-            return self.get(
-                f"/service/{service_id}/delivery-receipt-api/{callback_api_id}?callback_type={callback_type}"
-            )["data"]
-        elif callback_type == "returned_letter":
-            return self.get(
-                f"/service/{service_id}/returned-letter-api/{callback_api_id}?callback_type={callback_type}"
-            )["data"]
-
     @cache.delete("service-{service_id}-data-retention")
     def create_service_data_retention(self, service_id, notification_type, days_of_retention):
         data = {"notification_type": notification_type, "days_of_retention": days_of_retention}
@@ -469,6 +456,9 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     @cache.delete("service-{service_id}")
     def delete_service_callback_api(self, service_id, callback_api_id, callback_type):
         return self.delete(f"/service/{service_id}/callback-api/{callback_api_id}?callback_type={callback_type}")
+
+    def get_service_callback_api(self, service_id, callback_api_id, callback_type):
+        return self.get(f"/service/{service_id}/callback-api/{callback_api_id}?callback_type={callback_type}")["data"]
 
     @cache.set("service-{service_id}-data-retention")
     def get_service_data_retention(self, service_id):
