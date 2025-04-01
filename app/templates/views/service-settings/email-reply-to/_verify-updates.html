@@ -1,4 +1,4 @@
-{% from "components/banner.html" import banner, banner_wrapper %}
+{% from "components/banner.html" import banner_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -6,21 +6,33 @@
 
 <div class="ajax-block-container">
   {% if verification_status == "pending" %}
-    {{ page_header('Checking email reply-to address') }}
-    <p class="govuk-body">
-      We’re checking that ‘{{ reply_to_email_address }}’ is a real email address.
-    </p>
-    <p class="govuk-body">
-      <span class='loading-indicator'>This can take a minute</span>
-    </p>
+    <div role="status"></div>
+    {{ page_header('Reply-to email address check') }}
+    <div role="status">
+      <p class="govuk-body">
+        We need to check that ‘{{ reply_to_email_address }}’ is a real email address.
+      </p>
+      <p class="govuk-body">
+        This can take up to a minute.
+      </p>
+      <p class="govuk-body">
+        <span class='loading-indicator'>Please wait</span>
+      </p>
+    </div>
 
     <p class="js-hidden govuk-body">
       <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_verify_reply_to_address', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace) }}">Refresh</a>
     </p>
   {% elif verification_status == "success" %}
-    {{ banner("‘{}’ is ready to use".format(reply_to_email_address), type='default', with_tick=True) }}
-
-    {{ page_header('Checking email reply-to address') }}
+    {{ page_header('Reply-to email address check') }}
+    <div role="status">
+      <p class="govuk-body">
+        The check is complete.
+      </p>
+      <p class="govuk-body">
+        We’ve added ‘{{ reply_to_email_address }}’ to your reply-to email addresses.
+      </p>
+    </div>
     <div class="js-stick-at-bottom-when-scrolling">
       {{ govukButton({
         "element": "a",
@@ -42,7 +54,7 @@
         </p>
       {% endcall %}
     </div>
-    {{ page_header('Checking email reply-to address') }}
+    {{ page_header('Reply-to email address check') }}
     {% if replace %}
       {% set form_url = url_for('main.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
     {% else %}

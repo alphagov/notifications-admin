@@ -23,7 +23,7 @@ class FocusBanner {
 
     // focus success and error banners when they appear in any content updates
     $(document).on("updateContent.onafterupdate", function(evt, el) {
-      this.focusBanner($(".banner-dangerous, .banner-default-with-tick", el));
+      this.focusBanner($(".banner-dangerous", el));
     }.bind(this));
   }
 

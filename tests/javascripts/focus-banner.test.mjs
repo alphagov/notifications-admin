@@ -56,35 +56,6 @@ describe('Focus banner', () => {
 
     });
 
-    test('If there is a div.banner-default-with-tick in the updated content, it should be focused', () => {
-
-      document.body.innerHTML = `
-        <div class="ajax-block-container">
-        </div>`;
-
-      const ajaxBlockContainer = document.querySelector('.ajax-block-container');
-
-      (new FocusBanner());
-
-      ajaxBlockContainer.innerHTML = `
-        <div class="banner-default-with-tick">
-          <h2>This is a problem with your upload</h2>
-          <p>The file uploaded needs to be a PNG</p>
-        </div>`;
-
-      // simulate a content update event
-      $(document).trigger('updateContent.onafterupdate', ajaxBlockContainer);
-
-      const bannerEl = document.querySelector('.banner-default-with-tick');
-
-      expect(document.activeElement).toBe(bannerEl);
-
-      $(bannerEl).trigger('blur');
-
-      expect(bannerEl.hasAttribute('tabindex')).toBe(false);
-
-    });
-
   });
 
 });
