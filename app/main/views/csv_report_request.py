@@ -5,7 +5,7 @@ from app.main import main
 from app.utils.user import user_has_permissions
 from notifications_python_client.errors import HTTPError
 
-@main.route("/services/<uuid:service_id>/csv-report/<uuid:request_id>", methods=["GET"])
+@main.route("/services/<uuid:service_id>/download-report/<uuid:request_id>", methods=["GET"])
 @user_has_permissions()
 def csv_report_request(service_id, request_id):
   # if users have bookmarked the page and they com back to it, there will likely be no report avaialble
@@ -18,7 +18,7 @@ def csv_report_request(service_id, request_id):
         report_status = None
         notification_type = None
         notification_status = None
-        page_title= "No report available"
+        page_title= "Your report is no longer available"
   else:
     report_request = report_request_api_client.get_report_request(service_id, request_id).get("data", {})
     report_status = report_request['status']
@@ -28,7 +28,7 @@ def csv_report_request(service_id, request_id):
 
 
   return render_template(
-      "views/report-request/index.html",
+      "views/csv-report/index.html",
       retention_period = current_service.get_days_of_retention('email'),
       notification_status = notification_status,
       notification_type = notification_type,

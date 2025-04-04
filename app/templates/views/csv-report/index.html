@@ -24,10 +24,11 @@
 {% set footer_block_text %}
   <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
   <h2 class="govuk-heading-m">Your report contains a lot of data</h2>
-  <p class="govuk-body">To speed things up next time, you can either:
+  <p class="govuk-body">To speed things up next time, you can:
   <ul class="govuk-list govuk-list--bullet">
-    <li>reduce your data retention period and download reports more frequently</li>
-    <li>use the GOV.UK Notify API to get the status of your message</li>
+    <li>reduce your data retention period on the Settings page</li>
+    <li>download your reports more frequently</li>
+    <li>or use the GOV.UK Notify API to get the status of your messages</li>
   </ul>
 {% endset %}
 
@@ -37,7 +38,9 @@
     <div class="govuk-grid-column-three-quarters">
       {% if not report_request %}
         {{ page_header(page_title) }}
-        <p class="govuk-body govuk-hint">There is currently no available report. To generate a new report, please go to the <a class="govuk-link govuk-link--no-visited-state error-text-colour" href="{{ url_for('main.service_dashboard', service_id=current_service.id) }}">dashaboard page</a> and choose a notification type.</p>
+        <p class="govuk-body">
+          <a class="govuk-link govuk-link--no-visited-state error-text-colour" href="{{ url_for('main.service_dashboard', service_id=current_service.id) }}">Go back to the dashboard to download a new report</a> 
+        </p>
       {% else %}
         {% if report_status == 'failed' %}
           {% call banner_wrapper(type='dangerous') %}
