@@ -235,6 +235,11 @@ details .arrow {
   margin-top: govuk-spacing(3);
 }
 
+// inline-form style
+.form--inline {
+  display: inline-flex;
+}
+
 @keyframes live-pulse {
   0%   {
     background: govuk-colour("red");

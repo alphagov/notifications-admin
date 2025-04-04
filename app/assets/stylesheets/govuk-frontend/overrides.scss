@@ -68,3 +68,9 @@ $link-colour-on-grey-background: #1852ab;
     box-shadow: inset 0px -4px $govuk-focus-text-colour, inset 0px 15px $govuk-focus-colour, inset 15px 0px $govuk-focus-colour, inset 0px -11px $govuk-focus-colour;
   }
 }
+
+.govuk-button-group--flex-start {
+  @include govuk-media-query($until: tablet) {
+    align-items: start;
+  }
+}
