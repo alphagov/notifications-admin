@@ -347,9 +347,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             f"/service/{service_id}/inbound-sms/most-recent-usage",
         )
 
-    def get_service_inbound_api(self, service_id, callback_api_id):
-        return self.get(f"/service/{service_id}/inbound-api/{callback_api_id}?callback_type=inbound_sms")["data"]
-
     def get_reply_to_email_addresses(self, service_id):
         return self.get(f"/service/{service_id}/email-reply-to")
 
