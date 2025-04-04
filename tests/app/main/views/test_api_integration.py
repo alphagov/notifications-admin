@@ -658,15 +658,15 @@ def test_callback_forms_validation(client_request, service_one, endpoint, url, b
     [
         (
             "main.delivery_status_callback",
-            "/service/{}/delivery-receipt-api/{}",
+            "/service/{}/callback-api/{}",
             "delivery_status",
         ),
         (
             "main.received_text_messages_callback",
-            "/service/{}/inbound-api/{}",
+            "/service/{}/callback-api/{}",
             "inbound_sms",
         ),
-        ("main.returned_letters_callback", "/service/{}/returned-letter-api/{}", "returned_letter"),
+        ("main.returned_letters_callback", "/service/{}/callback-api/{}", "returned_letter"),
     ],
 )
 def test_callback_forms_can_be_cleared(
@@ -678,7 +678,6 @@ def test_callback_forms_can_be_cleared(
     mocker,
     fake_uuid,
     mock_get_valid_service_callback_api,
-    mock_get_valid_service_inbound_api,
     callback_type,
 ):
     service_one["service_callback_api"] = [
@@ -720,7 +719,6 @@ def test_callback_forms_can_be_cleared_when_callback_and_inbound_apis_are_empty(
     bearer_token,
     mocker,
     mock_get_empty_service_callback_api,
-    mock_get_empty_service_inbound_api,
 ):
     service_one["permissions"] = ["inbound_sms"]
     mocked_delete = mocker.patch("app.service_api_client.delete")
@@ -867,7 +865,6 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
     client_request,
     service_one,
     mock_get_notifications,
-    mock_create_service_inbound_api,
     mock_create_service_callback_api,
     endpoint,
     callback_type,
@@ -889,26 +886,17 @@ def test_create_delivery_status_and_receive_text_message_callbacks(
         _data=data,
     )
 
-    if endpoint == "main.received_text_messages_callback":
-        mock_create_service_inbound_api.assert_called_once_with(
-            service_one["id"],
-            url="https://test.url.com/",
-            bearer_token="1234567890",
-            user_id=fake_uuid,
-            callback_type=callback_type,
-        )
-    else:
-        mock_create_service_callback_api.assert_called_once_with(
-            service_one["id"],
-            url="https://test.url.com/",
-            bearer_token="1234567890",
-            user_id=fake_uuid,
-            callback_type=callback_type,
-        )
+    mock_create_service_callback_api.assert_called_once_with(
+        service_one["id"],
+        url="https://test.url.com/",
+        bearer_token="1234567890",
+        user_id=fake_uuid,
+        callback_type=callback_type,
+    )
 
 
 def test_create_returned_letters_callbacks(
-    client_request, service_one, mock_get_notifications, mock_create_returned_letters_callback_api, fake_uuid
+    client_request, service_one, mock_get_notifications, mock_create_service_callback_api, fake_uuid
 ):
     data = {
         "url": "https://test.url.com/",
@@ -923,7 +911,7 @@ def test_create_returned_letters_callbacks(
         _data=data,
     )
 
-    mock_create_returned_letters_callback_api.assert_called_once_with(
+    mock_create_service_callback_api.assert_called_once_with(
         service_one["id"],
         url="https://test.url.com/",
         bearer_token="1234567890",
@@ -935,7 +923,7 @@ def test_create_returned_letters_callbacks(
 def test_update_delivery_status_callback_details(
     client_request,
     service_one,
-    mock_update_delivery_status_callback_api,
+    mock_update_service_callback_api,
     mock_get_valid_service_callback_api,
     fake_uuid,
 ):
@@ -954,7 +942,7 @@ def test_update_delivery_status_callback_details(
         _data=data,
     )
 
-    mock_update_delivery_status_callback_api.assert_called_once_with(
+    mock_update_service_callback_api.assert_called_once_with(
         service_one["id"],
         url="https://test.url.com/",
         bearer_token="1234567890",
@@ -967,7 +955,7 @@ def test_update_delivery_status_callback_details(
 def test_update_returned_letters_callback_details(
     client_request,
     service_one,
-    mock_update_returned_letters_callback_api,
+    mock_update_service_callback_api,
     mock_get_valid_service_callback_api,
     fake_uuid,
 ):
@@ -981,7 +969,7 @@ def test_update_returned_letters_callback_details(
         _data=data,
     )
 
-    mock_update_returned_letters_callback_api.assert_called_once_with(
+    mock_update_service_callback_api.assert_called_once_with(
         service_one["id"],
         url="https://test.url.com/",
         bearer_token="1234567890",
@@ -994,8 +982,8 @@ def test_update_returned_letters_callback_details(
 def test_update_receive_text_message_callback_details(
     client_request,
     service_one,
-    mock_update_service_inbound_api,
-    mock_get_valid_service_inbound_api,
+    mock_update_service_callback_api,
+    mock_get_valid_service_callback_api,
     fake_uuid,
 ):
     service_one["inbound_api"] = [fake_uuid]
@@ -1014,7 +1002,7 @@ def test_update_receive_text_message_callback_details(
         _data=data,
     )
 
-    mock_update_service_inbound_api.assert_called_once_with(
+    mock_update_service_callback_api.assert_called_once_with(
         service_one["id"],
         url="https://test.url.com/",
         bearer_token="1234567890",
@@ -1027,7 +1015,7 @@ def test_update_receive_text_message_callback_details(
 def test_update_delivery_status_callback_without_changes_does_not_update(
     client_request,
     service_one,
-    mock_update_delivery_status_callback_api,
+    mock_update_service_callback_api,
     fake_uuid,
     mock_get_valid_service_callback_api,
 ):
@@ -1040,13 +1028,13 @@ def test_update_delivery_status_callback_without_changes_does_not_update(
         _data=data,
     )
 
-    assert mock_update_delivery_status_callback_api.called is False
+    assert mock_update_service_callback_api.called is False
 
 
 def test_update_returned_letters_callback_without_changes_does_not_update(
     client_request,
     service_one,
-    mock_update_returned_letters_callback_api,
+    mock_update_service_callback_api,
     fake_uuid,
     mock_get_valid_service_callback_api,
 ):
@@ -1059,19 +1047,19 @@ def test_update_returned_letters_callback_without_changes_does_not_update(
         _data=data,
     )
 
-    assert mock_update_returned_letters_callback_api.called is False
+    assert mock_update_service_callback_api.called is False
 
 
 def test_update_receive_text_message_callback_without_changes_does_not_update(
     client_request,
     service_one,
-    mock_update_service_inbound_api,
+    mock_update_service_callback_api,
     fake_uuid,
-    mock_get_valid_service_inbound_api,
+    mock_get_valid_service_callback_api,
 ):
     service_one["inbound_api"] = [fake_uuid]
     service_one["permissions"] = ["inbound_sms"]
-    data = {"user_id": fake_uuid, "url": "https://hello3.gov.uk/inbound_sms", "bearer_token": "bearer_token_set"}
+    data = {"user_id": fake_uuid, "url": "https://hello2.gov.uk/inbound_sms", "bearer_token": "bearer_token_set"}
 
     client_request.post(
         "main.received_text_messages_callback",
@@ -1079,45 +1067,59 @@ def test_update_receive_text_message_callback_without_changes_does_not_update(
         _data=data,
     )
 
-    assert mock_update_service_inbound_api.called is False
+    assert mock_update_service_callback_api.called is False
 
 
 @pytest.mark.parametrize(
-    "service_callback_api, delivery_url, expected_1st_table_row,  expected_3rd_table_row",
+    "service_callback_api, inbound_api, delivery_url, expected_1st_row, expected_2nd_row, expected_3rd_row",
     [
-        (None, {}, "Delivery receipts Not set Change", "Returned letters Not set Change"),
+        (
+            None,
+            None,
+            {},
+            "Delivery receipts Not set Change",
+            "Received text messages Not set Change",
+            "Returned letters Not set Change",
+        ),
         (
             [
                 {"callback_id": uuid.uuid4(), "callback_type": "delivery_status"},
                 {"callback_id": uuid.uuid4(), "callback_type": "returned_letter"},
             ],
-            {"url": "https://delivery.receipts"},
-            "Delivery receipts https://delivery.receipts Change",
-            "Delivery receipts https://returned.letter Change",
+            None,
+            {"url": "https://generic.urls"},
+            "Delivery receipts https://generic.urls Change",
+            "Received text messages Not set Change",
+            "Returned letters https://generic.urls Change",
         ),
         (
             [
                 {"callback_id": uuid.uuid4(), "callback_type": "delivery_status"},
             ],
+            None,
             {"url": "https://delivery.receipts"},
             "Delivery receipts https://delivery.receipts Change",
+            "Received text messages Not set Change",
             "Returned letters Not set Change",
         ),
         (
             [
                 {"callback_id": uuid.uuid4(), "callback_type": "returned_letter"},
             ],
-            {"url": "https://delivery.receipts"},
+            None,
+            {"url": "https://returned.letter"},
             "Delivery receipts Not set Change",
-            "Delivery receipts https://returned.letter Change",
+            "Received text messages Not set Change",
+            "Returned letters https://returned.letter Change",
         ),
-    ],
-)
-@pytest.mark.parametrize(
-    "inbound_api, inbound_url, expected_2nd_table_row",
-    [
-        (None, {}, "Received text messages Not set Change"),
-        (sample_uuid(), {"url": "https://inbound.sms"}, "Received text messages https://inbound.sms Change"),
+        (
+            None,
+            sample_uuid(),
+            {"url": "https://inbound.sms"},
+            "Delivery receipts Not set Change",
+            "Received text messages https://inbound.sms Change",
+            "Returned letters Not set Change",
+        ),
     ],
 )
 def test_callbacks_page_works_when_no_apis_set(
@@ -1126,11 +1128,10 @@ def test_callbacks_page_works_when_no_apis_set(
     mocker,
     service_callback_api,
     delivery_url,
-    expected_1st_table_row,
+    expected_1st_row,
     inbound_api,
-    inbound_url,
-    expected_2nd_table_row,
-    expected_3rd_table_row,
+    expected_2nd_row,
+    expected_3rd_row,
     platform_admin_user,
 ):
     service_one["permissions"] = ["inbound_sms", "letter"]
@@ -1138,13 +1139,13 @@ def test_callbacks_page_works_when_no_apis_set(
     service_one["service_callback_api"] = service_callback_api
 
     mocker.patch("app.service_api_client.get_service_callback_api", return_value=delivery_url)
-    mocker.patch("app.service_api_client.get_service_inbound_api", return_value=inbound_url)
 
     client_request.login(platform_admin_user)
     page = client_request.get("main.api_callbacks", service_id=service_one["id"], _follow_redirects=True)
     expected_rows = [
-        expected_1st_table_row,
-        expected_2nd_table_row,
+        expected_1st_row,
+        expected_2nd_row,
+        expected_3rd_row,
     ]
     rows = page.select("tbody tr")
     assert len(rows) == 3

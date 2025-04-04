@@ -168,7 +168,7 @@ def delivery_status_callback(service_id):
                 delivery_status_callback_details.get("url") != form.url.data
                 or form.bearer_token.data != dummy_bearer_token
             ):
-                service_api_client.update_delivery_status_callback_api(
+                service_api_client.update_service_callback_api(
                     service_id,
                     url=form.url.data,
                     bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
@@ -181,7 +181,7 @@ def delivery_status_callback(service_id):
                 service_id, delivery_status_callback_details["id"], "delivery_status"
             )
         elif form.url.data:
-            service_api_client.create_delivery_status_callback_api(
+            service_api_client.create_service_callback_api(
                 service_id,
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,
@@ -224,7 +224,7 @@ def received_text_messages_callback(service_id):
                 received_text_messages_callback.get("url") != form.url.data
                 or form.bearer_token.data != dummy_bearer_token
             ):
-                service_api_client.update_service_inbound_api(
+                service_api_client.update_service_callback_api(
                     service_id,
                     url=form.url.data,
                     bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
@@ -233,13 +233,13 @@ def received_text_messages_callback(service_id):
                     callback_type="inbound_sms",
                 )
         elif received_text_messages_callback and not form.url.data:
-            service_api_client.delete_service_inbound_api(
+            service_api_client.delete_service_callback_api(
                 service_id=service_id,
                 callback_api_id=received_text_messages_callback["id"],
                 callback_type="inbound_sms",
             )
         elif form.url.data:
-            service_api_client.create_service_inbound_api(
+            service_api_client.create_service_callback_api(
                 service_id,
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,
@@ -273,7 +273,7 @@ def returned_letters_callback(service_id):
                 returned_letters_callback_details.get("url") != form.url.data
                 or form.bearer_token.data != dummy_bearer_token
             ):
-                service_api_client.update_returned_letters_callback_api(
+                service_api_client.update_service_callback_api(
                     service_id,
                     url=form.url.data,
                     bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
@@ -282,11 +282,11 @@ def returned_letters_callback(service_id):
                     callback_type="returned_letter",
                 )
         elif returned_letters_callback_details and not form.url.data:
-            service_api_client.delete_returned_letters_callback_api(
+            service_api_client.delete_service_callback_api(
                 service_id, returned_letters_callback_details["id"], "returned_letter"
             )
         elif form.url.data:
-            service_api_client.create_returned_letters_callback_api(
+            service_api_client.create_service_callback_api(
                 service_id,
                 url=form.url.data,
                 bearer_token=form.bearer_token.data,
