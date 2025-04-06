@@ -35,4 +35,5 @@ def csv_report_request(service_id, request_id):
       report_status = report_status,
       page_title = page_title,
       report_request = report_request,
+      request_id = request_id,
   )

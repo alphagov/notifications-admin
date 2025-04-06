@@ -56,6 +56,10 @@
           <p class="govuk-body">We're creating a CSV file of {{ report_text(notification_type,notification_status) }} from the last {{ retention_period }} days.
           <p class="govuk-body">This can take up to 5 minutes.</p>
           <p class="govuk-body">Please do not close this page.</p>
+
+          <p class="js-hidden govuk-body">
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.csv_report_request', service_id=current_service.id, request_id=request_id) }}">Refresh page to check for an update</a>
+          </p>
         </div>
           {{footer_block_text}}
         {% endif %}
