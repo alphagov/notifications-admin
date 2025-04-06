@@ -86,9 +86,7 @@
         <div class="govuk-button-group govuk-button-group--flex-start">
           {% call form_wrapper(class='form--inline') %}
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="report_type" value="notifications">
-            <input type="hidden" name="message_type" value={{message_type}}>
-            <input type="hidden" name="message_status" value="{{status}}">
+            <input type="hidden" name="report_type" value="notifications_report">
             {{ govukButton({
               "html": 'Download this report (CSV)',
               "classes": "govuk-button--as-link",

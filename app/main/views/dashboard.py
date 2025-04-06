@@ -108,7 +108,7 @@ def post_csv_report_request_and_redirect(current_service, report_type, message_t
         str(report_type),
         {
           "user_id": current_user.id,
-          "report_type": report_type + '_report',
+          "report_type": report_type,
           "notification_type": message_type,
           "notification_status": status,
         }
@@ -147,15 +147,14 @@ def view_notifications(service_id, message_type=None):
             status=request.args.get("status"),
         )
     csv_report_request_type = request.form.get("report_type", "")
-    csv_report_message_type = request.form.get("message_type", "")
-    csv_report_message_status = 'all' if request.form.get("message_status") == 'sending,delivered,failed' else request.form.get("message_status")
+    csv_report_message_status = 'all' if request.args.get("status") == 'sending,delivered,failed' or  request.args.get("status") == '' else request.args.get("status")
 
     search_term = request.form.get("to", "")
     search_query_hash = request.args.get("search_query", "")
     cached_search_query_hash, cached_search_term = cache_search_query(search_term, service_id, search_query_hash)
 
     if request.method == "POST" and csv_report_request_type:
-        return post_csv_report_request_and_redirect(current_service, csv_report_request_type, csv_report_message_type, csv_report_message_status)
+        return post_csv_report_request_and_redirect(current_service, csv_report_request_type, message_type, csv_report_message_status)
 
     if request.method == "POST" and not search_term:
       return redirect_to_main_view_notification(current_service, message_type, None)
