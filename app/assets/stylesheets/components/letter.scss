@@ -86,6 +86,10 @@ $iso-paper-ratio: 141.42135624%;
       background-image: file-url('envelope-international.svg');
     }
 
+    &-economy {
+      background-image: file-url('envelope-economy.svg');
+    }
+
     .letter-sent &:hover {
       background-color: transparent;
       border-color: transparent;
