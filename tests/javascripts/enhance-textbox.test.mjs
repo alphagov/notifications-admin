@@ -1,12 +1,7 @@
-const helpers = require('./support/helpers.js');
+import * as helpers from './support/helpers.js'
+import EnhancedTextbox from '../../app/assets/javascripts/esm/enhanced-textbox.mjs';
+import { jest } from '@jest/globals';
 
-beforeAll(() => {
-  require('../../app/assets/javascripts/enhancedTextbox.js');
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
-});
 
 describe('Enhanced textbox', () => {
 
@@ -16,7 +11,6 @@ describe('Enhanced textbox', () => {
   let stylesheet;
 
   beforeAll(() => {
-
     // set some default styling
     stylesheet = document.createElement('style');
 
@@ -34,7 +28,7 @@ describe('Enhanced textbox', () => {
   });
 
   beforeEach(() => {
-
+    document.body.classList.add('govuk-frontend-supported');
     // set up DOM
     document.body.innerHTML = `
       <div class="govuk-form-group govuk-textarea-highlight">
@@ -49,6 +43,7 @@ describe('Enhanced textbox', () => {
   afterEach(() => {
 
     document.body.innerHTML = '';
+    jest.resetModules();
 
   });
 
@@ -57,7 +52,7 @@ describe('Enhanced textbox', () => {
     test("An element should be added as a layer below the textbox to hold the highlights", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -72,7 +67,7 @@ describe('Enhanced textbox', () => {
     test("The element's dimensions and border-width should match those of the textbox", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -91,7 +86,7 @@ describe('Enhanced textbox', () => {
 
       setDisplayPropertyOfFormGroups('none');
 
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       setDisplayPropertyOfFormGroups('block');
 
@@ -102,7 +97,7 @@ describe('Enhanced textbox', () => {
 
     test("The element should be hidden from assistive technologies", () => {
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       expect(backgroundEl.getAttribute('aria-hidden')).toEqual('true');
 
@@ -113,7 +108,7 @@ describe('Enhanced textbox', () => {
       textarea.textContent  = "Dear ((title)) ((name))";
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -131,7 +126,7 @@ describe('Enhanced textbox', () => {
       textarea.setAttribute('data-highlight-placeholders', 'false')
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -146,7 +141,7 @@ describe('Enhanced textbox', () => {
       textarea.textContent = "When you arrive, please go to the ((weekday??main entrance))((weekend??side entrance))";
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -167,9 +162,10 @@ describe('Enhanced textbox', () => {
           <label class="govuk-label" for="template_content">Message</label>
           <textarea class="govuk-textarea govuk-!-width-full govuk-textarea-highlight__textbox" id="template_content" name="template_content" rows="8" data-notify-module="enhanced-textbox" data-autofocus-textbox="true"></textarea>
         </div>`;
-        window.GOVUK.notifyModules.start();
-
+       
         textarea = document.querySelector('textarea');
+
+        new EnhancedTextbox(textarea);
 
         expect(document.activeElement).toBe(textarea);
 
@@ -182,7 +178,7 @@ describe('Enhanced textbox', () => {
           <label class="govuk-label" for="template_content">Message</label>
           <textarea class="govuk-textarea govuk-!-width-full govuk-textarea-highlight__textbox" id="template_content" name="template_content" rows="8" data-notify-module="enhanced-textbox" data-autofocus-textbox="false"></textarea>
         </div>`;
-        window.GOVUK.notifyModules.start();
+        new EnhancedTextbox(textarea);
 
         textarea = document.querySelector('textarea');
 
@@ -197,7 +193,7 @@ describe('Enhanced textbox', () => {
           <label class="govuk-label" for="template_content">Message</label>
           <textarea class="govuk-textarea govuk-!-width-full govuk-textarea-highlight__textbox" id="template_content" name="template_content" rows="8" data-notify-module="enhanced-textbox"></textarea>
         </div>`;
-        window.GOVUK.notifyModules.start();
+        new EnhancedTextbox(textarea);
 
         textarea = document.querySelector('textarea');
 
@@ -229,7 +225,7 @@ describe('Enhanced textbox', () => {
       `;
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -246,8 +242,9 @@ describe('Enhanced textbox', () => {
     });
 
     test("If a resize changes the textarea's width, the width of the element below should still match", () => {
+
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -267,7 +264,7 @@ describe('Enhanced textbox', () => {
       textarea.textContent = "Dear ((title)) ((name))";
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -287,7 +284,7 @@ describe('Enhanced textbox', () => {
       textarea.textContent = "Dear ((title)) ((name))";
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -313,7 +310,7 @@ describe('Enhanced textbox', () => {
         Ref: ((reference))`;
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -337,7 +334,7 @@ describe('Enhanced textbox', () => {
         Your appointment will be on ((date)). When you arrive, please go to the ((weekday??main entrance))((weekend??side entrance)).`;
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -383,7 +380,7 @@ describe('Enhanced textbox', () => {
       `;
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -401,7 +398,7 @@ describe('Enhanced textbox', () => {
 
     test("If a resize changes the textarea's width, the width of the element below should still match", () => {
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -421,7 +418,7 @@ describe('Enhanced textbox', () => {
       textarea.textContent = "Dear ((title)) ((name))";
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -441,7 +438,7 @@ describe('Enhanced textbox', () => {
       textarea.textContent = "Dear ((title)) ((name))";
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
@@ -467,7 +464,7 @@ describe('Enhanced textbox', () => {
         Ref: ((reference))`;
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new EnhancedTextbox(textarea);
 
       backgroundEl = textarea.nextElementSibling;
 
