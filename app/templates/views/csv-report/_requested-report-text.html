@@ -1,0 +1,13 @@
+{% macro report_text(channel, status) -%}
+  We're creating a CSV file of
+  {% if channel == 'sms' %}
+    {% set channel_plural = 'text messages' %}
+  {% else %}
+    {% set channel_plural = channel + 's' %}
+  {% endif %}
+  {% if status == 'all' or status == 'sending,delivered,failed' %}
+    {{ 'all ' + channel_plural }}
+  {% else %}
+    {{channel_plural + ' with the ' + '\''+ status + '\'' + ' status' }}
+  {% endif %}
+{%- endmacro %}
