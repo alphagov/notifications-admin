@@ -1,8 +1,9 @@
-from flask import render_template, request
+from flask import render_template, request, url_for
 
 from app import current_service, report_request_api_client
 from app.main import main
 from app.utils.user import user_has_permissions
+from werkzeug.utils import redirect
 from notifications_python_client.errors import HTTPError
 
 @main.route("/services/<uuid:service_id>/download-report/<uuid:request_id>", methods=["GET"])
@@ -37,3 +38,31 @@ def csv_report_request(service_id, request_id):
       report_request = report_request,
       request_id = request_id,
   )
+
+@main.route("/services/<uuid:service_id>/download-report/<uuid:request_id>/ready", methods=["GET"])
+@user_has_permissions()
+def csv_report_ready(service_id, request_id):
+  try:
+    report_request = report_request_api_client.get_report_request(service_id, request_id)['data']
+  except HTTPError as e:
+      if e.status_code == 404:
+        return redirect(
+          url_for(
+              "main.csv_report_request",
+              service_id=current_service.id,
+              request_id=request_id,
+              report_request = None,
+              report_status = None,
+              notification_type = None,
+              notification_status = None,
+          )
+        )
+  else:
+    # if the report is no longer available, show them "No longer available page"
+    return render_template(
+        "views/csv-report/ready.html",
+        retention_period = current_service.get_days_of_retention('email'),
+        notification_status = report_request['parameter']['notification_status'],
+        notification_type = report_request['parameter']['notification_type'],
+        request_id = request_id,
+    )
