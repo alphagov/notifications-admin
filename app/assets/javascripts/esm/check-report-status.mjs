@@ -17,46 +17,39 @@ class CheckReportStatus {
     }
     this.$component = $module;
 
-    const pollingInterval = 5000; // 5 seconds in milliseconds
-const maxPollingDuration = 30000; // 300 seconds (5 minutes) in milliseconds
-const apiEndpoint = '/services/af41756e-5f17-4e4d-ac98-bea1bc8fe366/download-report/39acaf48-0cd4-4548-9783-0597081c8ac6/status.json'; // Replace with your API endpoint
-const successResponse = 'success'; // Define what constitutes a success response
+    this.checkStatus();
 
-async function pollApi(apiEndpoint, successResponse, pollingInterval, maxPollingDuration) {
-  const startTime = Date.now(); // Record the start time
+  }
 
-  const makeRequest = async () => {
+  checkStatus() {
+    const fetchInterval = 20000; // 20s
+    const reportStatusEndpoint = `${location.pathname}/status.json`;
+    const reportReadyStatus = 'completed';
+
+    const request = async () => {
       try {
-          const response = await fetch(apiEndpoint); // Make request
+          const response = await fetch(reportStatusEndpoint);
           const data = await response.json();
 
-          if (data.status === successResponse) {
-              console.log('Success response received:', data);
-              return; // // Stop polling if success response
+          if (data.status === reportReadyStatus) {
+            // run update text
+            this.updatePageText()
+            // run redirect
+            return;
           }
 
-          const elapsedTime = Date.now() - startTime;
+          setTimeout(request, fetchInterval);
 
-          if (elapsedTime < maxPollingDuration) {
-              setTimeout(makeRequest, pollingInterval); // Schedule next request
-          } else {
-              console.log('Maximum polling duration reached. Stopping polling.');
-          }
       } catch (error) {
-          console.error('Error making API request:', error);
-          const elapsedTime = Date.now() - startTime;
-
-          if (elapsedTime < maxPollingDuration) {
-              setTimeout(makeRequest, pollingInterval); // Schedule next request
-          } else {
-              console.log('Maximum polling duration reached. Stopping polling.');
-          }
+        console.error('Error checking status', error);
       }
-  };
+    };
+    request();
+  }
 
-  makeRequest(); // Start the first request
-}
-
-pollApi(apiEndpoint, successResponse, pollingInterval, maxPollingDuration);
+  updatePageText() {
+    document.body.innerHTML = 'yes'
   }
 }
+
+export default CheckReportStatus;
