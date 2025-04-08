@@ -1,7 +1,7 @@
-from flask import render_template, url_for
+from flask import render_template, url_for, jsonify
 
 from app import current_service
-from app.main import main
+from app.main import json_updates, main
 from app.utils.user import user_has_permissions
 from werkzeug.utils import redirect
 from notifications_python_client.errors import HTTPError
@@ -66,3 +66,11 @@ def csv_report_ready(service_id, report_request_id):
         notification_type = report_request.parameter['notification_type'],
         report_request_id = report_request_id,
     )
+  
+@main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>/status.json")
+@user_has_permissions()
+def report_request_status_updates(service_id, report_request_id):
+    report_request_status = ReportRequest.from_id(service_id, report_request_id).status
+    return jsonify({
+        "status": report_request_status
+        })
