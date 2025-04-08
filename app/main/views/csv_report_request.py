@@ -72,5 +72,5 @@ def csv_report_ready(service_id, report_request_id):
 def report_request_status_updates(service_id, report_request_id):
     report_request_status = ReportRequest.from_id(service_id, report_request_id).status
     return jsonify({
-        "status": report_request_status
-        })
+      "status": report_request_status
+    })
