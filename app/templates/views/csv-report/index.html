@@ -33,7 +33,7 @@
           <p class="govuk-body">Please do not close this page.</p>
 
           <p class="js-hidden govuk-body">
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.csv_report_request', service_id=current_service.id, request_id=request_id) }}">Refresh page to check for an update</a>
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.csv_report_request', service_id=current_service.id, report_request_id=report_request_id) }}">Refresh page to check for an update</a>
           </p>
         </div>
           {% include 'views/csv-report/_footer-text.html' %}
