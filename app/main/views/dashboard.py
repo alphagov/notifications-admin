@@ -101,9 +101,9 @@ def redirect_to_main_view_notification(current_service, message_type, search_que
     )
 
 def post_csv_report_request_and_redirect(current_service, report_type, message_type, status):
-    # post data to create report request, get back request_id and then redirect
+    # post data to create report request, get back report_request_id and then redirect
     try:
-      request_id = report_request_api_client.create_report_request(
+      report_request_id = report_request_api_client.create_report_request(
         current_service.id,
         str(report_type),
         {
@@ -118,7 +118,7 @@ def post_csv_report_request_and_redirect(current_service, report_type, message_t
         url_for(
             "main.csv_report_request",
             service_id=current_service.id,
-            request_id=request_id,
+            report_request_id=report_request_id,
         )
       )
     except HTTPError as e:
