@@ -18,7 +18,7 @@
       {{ govukButton({
         "element": "a",
         "html": "Download",
-        "href": url_for('main.report_request_download', service_id=current_service.id, report_request_id=request_id)
+        "href": url_for('main.report_request_download', service_id=current_service.id, report_request_id=report_request_id)
       }) }}
       {% include 'views/csv-report/_footer-text.html' %}
     </div> 
