@@ -19,6 +19,17 @@ def user_information(user_id):
     )
 
 
+@main.route("/users/<uuid:user_id>/remove-platform-admin", methods=["GET", "POST"])
+@user_is_platform_admin
+def remove_platform_admin(user_id):
+    if request.method == "POST":
+        User.from_id(user_id).update(platform_admin=False)
+        return redirect(url_for(".user_information", user_id=user_id))
+
+    flash("Are you sure you want to remove platform admin from this user?", "remove")
+    return user_information(user_id)
+
+
 @main.route("/users/<uuid:user_id>/archive", methods=["GET", "POST"])
 @user_is_platform_admin
 def archive_user(user_id):
