@@ -24,7 +24,7 @@ class CheckReportStatus {
   checkStatus() {
     const fetchInterval = 20000; // 20s
     const reportStatusEndpoint = `${location.pathname}/status.json`;
-    const reportReadyStatus = 'completed';
+    const reportReadyStatus = 'stored';
     const reportFailedStatus = 'failed';
 
     const request = async () => {
