@@ -10,6 +10,13 @@
       <h1 class="heading-large">
         {{ user.name }}
       </h1>
+      {% if user.platform_admin %}
+        <p class="govuk-body">
+          <strong class="govuk-tag govuk-tag--red">Platform admin</strong>
+          &ensp;
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.remove_platform_admin', user_id=user.id) }}">Remove</a>
+        </p>
+      {% endif %}
       <p class="govuk-body">{{ user.email_address }}</p>
       <p class="{{ '' if user.mobile_number else 'hint' }}">{{ user.mobile_number or 'No mobile number'}}</p>
 
