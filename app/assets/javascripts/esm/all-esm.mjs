@@ -84,7 +84,7 @@ if ($enhancedTextboxArray.length > 0) {
   $enhancedTextboxArray.forEach((el) => new EnhancedTextbox(el));
 }
 
-const $checkReportStatusEl = document.querySelectorAll('[data-notify-module="check-report-status"]');
+const $checkReportStatusEl = document.querySelector('[data-notify-module="check-report-status"]');
 if ($checkReportStatusEl) {
   new CheckReportStatus($checkReportStatusEl);
 }

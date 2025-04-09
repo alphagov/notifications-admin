@@ -15,7 +15,7 @@ class CheckReportStatus {
     if (!isSupported()) {
       return this;
     }
-    this.$component = $module;
+    this.$module = $module;
 
     this.checkStatus();
 
@@ -25,20 +25,25 @@ class CheckReportStatus {
     const fetchInterval = 20000; // 20s
     const reportStatusEndpoint = `${location.pathname}/status.json`;
     const reportReadyStatus = 'completed';
+    const reportFailedStatus = 'failed';
 
     const request = async () => {
       try {
           const response = await fetch(reportStatusEndpoint);
           const data = await response.json();
 
-          if (data.status === reportReadyStatus) {
-            // run update text
-            this.updatePageText()
-            // run redirect
+          if (data.status === reportReadyStatus || data.status === reportFailedStatus) {
+            // inform user about the updated status
+            this.updatePageTextAndRedirect();
+            // redirect after 5s
+            setTimeout( () => {
+              location.replace(location.pathname);
+           }, 5000);
+           
             return;
           }
-
-          setTimeout(request, fetchInterval);
+        // if no change to the status, keep checking
+         setTimeout( () => { request() }, fetchInterval);
 
       } catch (error) {
         console.error('Error checking status', error);
@@ -47,8 +52,12 @@ class CheckReportStatus {
     request();
   }
 
-  updatePageText() {
-    document.body.innerHTML = 'yes'
+  updatePageTextAndRedirect() {
+    const statusUpdateText = document.createElement('p');
+    statusUpdateText.classList.add('govuk-body');
+    statusUpdateText.textContent = 'Report status has been updated. We will redirect you shortly.'
+    this.$module.innerHTML = '';
+    this.$module.append(statusUpdateText);
   }
 }
 
