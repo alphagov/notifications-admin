@@ -1,16 +1,17 @@
 from flask import render_template, url_for, jsonify
 
 from app import current_service
-from app.main import json_updates, main
+from app.main import main
 from app.utils.user import user_has_permissions
 from werkzeug.utils import redirect
 from notifications_python_client.errors import HTTPError
 from app.models.report_request import ReportRequest
+from app.constants import REPORT_REQUEST_FAILED ,REPORT_REQUEST_STORED
 
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>", methods=["GET"])
 @user_has_permissions()
 def csv_report_request(service_id, report_request_id):
-  # if users have bookmarked the page and they com back to it, there will likely be no report avaialble
+  # if users have bookmarked the page and they come back to it, there will likely be no report avaialble
   # get report status
   try:
     report_request = ReportRequest.from_id(service_id, report_request_id)
@@ -23,9 +24,18 @@ def csv_report_request(service_id, report_request_id):
         page_title= "Your report is no longer available"
   else:
     report_status = report_request.status
-    notification_type =  report_request.parameter['notification_type']
-    notification_status =  report_request.parameter['notification_status']
-    page_title= "Error: We could not create your report" if report_status == 'failed' else "Preparing your report"
+    if report_status == REPORT_REQUEST_STORED:
+       return redirect(
+        url_for(
+            "main.csv_report_ready",
+            service_id=current_service.id,
+            report_request_id=report_request_id,
+        )
+      )
+    else:
+      notification_type =  report_request.parameter['notification_type']
+      notification_status =  report_request.parameter['notification_status']
+      page_title= "Error: We could not create your report" if report_status == REPORT_REQUEST_FAILED else "Preparing your report"
 
 
   return render_template(
