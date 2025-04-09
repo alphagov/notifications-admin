@@ -1,12 +1,13 @@
-from flask import render_template, url_for, jsonify
+from flask import jsonify, render_template, url_for
+from notifications_python_client.errors import HTTPError
+from werkzeug.utils import redirect
 
 from app import current_service
+from app.constants import REPORT_REQUEST_FAILED, REPORT_REQUEST_STORED
 from app.main import main
-from app.utils.user import user_has_permissions
-from werkzeug.utils import redirect
-from notifications_python_client.errors import HTTPError
 from app.models.report_request import ReportRequest
-from app.constants import REPORT_REQUEST_FAILED ,REPORT_REQUEST_STORED, REPORT_REQUEST_PENDING
+from app.utils.user import user_has_permissions
+
 
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>", methods=["GET"])
 @user_has_permissions()
@@ -37,7 +38,8 @@ def csv_report_request(service_id, report_request_id):
     else:
       notification_type =  report_request.parameter['notification_type']
       notification_status =  report_request.parameter['notification_status']
-      page_title= "Error: We could not create your report" if report_status == REPORT_REQUEST_FAILED else "Preparing your report"
+      page_title = "Error: We could not create your report" \
+        if report_status == REPORT_REQUEST_FAILED else "Preparing your report"
 
 
   return render_template(
@@ -89,11 +91,11 @@ def csv_report_ready(service_id, report_request_id):
         notification_type = report_request.parameter['notification_type'],
         report_request_id = report_request_id,
       )
-  
+
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>/status.json")
 @user_has_permissions()
 def report_request_status_updates(service_id, report_request_id):
-    report_request_status = ReportRequest.from_id(service_id, report_request_id).status
-    return jsonify({
-      "status": report_request_status
-    })
+  report_request_status = ReportRequest.from_id(service_id, report_request_id).status
+  return jsonify({
+    "status": report_request_status
+  })
