@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient, cache
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session, cache
 
 
 class PerformanceDashboardAPIClient(NotifyAdminAPIClient):
@@ -30,7 +30,7 @@ _performance_dashboard_api_client_context_var: ContextVar[PerformanceDashboardAP
 )
 get_performance_dashboard_api_client: LazyLocalGetter[PerformanceDashboardAPIClient] = LazyLocalGetter(
     _performance_dashboard_api_client_context_var,
-    lambda: PerformanceDashboardAPIClient(current_app),
+    lambda: PerformanceDashboardAPIClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_performance_dashboard_api_client.clear())
 performance_dashboard_api_client = LocalProxy(get_performance_dashboard_api_client)
