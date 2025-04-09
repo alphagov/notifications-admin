@@ -1532,6 +1532,17 @@ def email_template_manage_attachment_email_confirmation(template_id, service_id)
     )
 
 
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/upload-needed")
+@user_has_permissions("manage_templates")
+def email_template_manage_attachment_upload_needed(template_id, service_id):
+    template = current_service.get_template(template_id)
+
+    return render_template(
+        "views/templates/manage-email-attachment-upload-needed.html",
+        template=template,
+    )
+
+
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/change-language/confirm", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
 def letter_template_confirm_remove_welsh(template_id, service_id):
