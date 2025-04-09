@@ -35,7 +35,7 @@ class CheckReportStatus {
           if (data.status === reportReadyStatus || data.status === reportFailedStatus) {
             // inform user about the updated status
             this.updatePageTextAndRedirect();
-            // redirect after 5s
+            // redirect after 10s
             setTimeout( () => {
               location.replace(location.pathname);
            },10000);
