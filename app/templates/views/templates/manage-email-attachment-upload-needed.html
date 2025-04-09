@@ -1,0 +1,28 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% set title = 'You need to upload files' %}
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header(title) }}
+      <p class="govuk-body">
+        Can’t send without files
+      </p>
+      <p class="govuk-body">
+        <a href="{{ url_for('main.email_template_manage_attachments', service_id=current_service.id, template_id=template.id)}} ">Manage files</a>
+      </p>
+    </div>
+  </div>
+
+{% endblock %}
