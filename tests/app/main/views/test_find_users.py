@@ -203,19 +203,30 @@ def test_remove_platform_admin_prompts_for_confirmation(
     assert page.select_one("div.banner-dangerous form[method=post] button[type=submit]")
 
 
+@pytest.mark.parametrize(
+    "mobile_number, expected_auth_type",
+    (
+        ("12345", "sms_auth"),
+        (None, "email_auth"),
+    ),
+)
 def test_remove_platform_removes(
     client_request,
     platform_admin_user,
-    api_user_active,
+    fake_uuid,
     mock_get_organisations_and_services_for_user,
     mock_update_user_attribute,
+    mobile_number,
+    expected_auth_type,
 ):
+    platform_admin_user["mobile_number"] = mobile_number
     client_request.login(platform_admin_user)
-    client_request.post("main.remove_platform_admin", user_id=api_user_active["id"])
+    client_request.post("main.remove_platform_admin", user_id=fake_uuid)
 
     mock_update_user_attribute.assert_called_once_with(
-        api_user_active["id"],
+        platform_admin_user["id"],
         platform_admin=False,
+        auth_type=expected_auth_type,
     )
 
 

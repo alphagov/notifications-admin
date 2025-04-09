@@ -23,7 +23,7 @@ def user_information(user_id):
 @user_is_platform_admin
 def remove_platform_admin(user_id):
     if request.method == "POST":
-        User.from_id(user_id).update(platform_admin=False)
+        User.from_id(user_id).remove_platform_admin()
         return redirect(url_for(".user_information", user_id=user_id))
 
     flash("Are you sure you want to remove platform admin from this user?", "remove")

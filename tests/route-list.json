@@ -385,6 +385,7 @@
     "/users/<uuid:user_id>",
     "/users/<uuid:user_id>/archive",
     "/users/<uuid:user_id>/change_auth",
+    "/users/<uuid:user_id>/remove-platform-admin",
     "/using-notify",
     "/using-notify/api-documentation",
     "/using-notify/attach-pages",
