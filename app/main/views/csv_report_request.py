@@ -31,7 +31,7 @@ def csv_report_request(service_id, report_request_id):
        return redirect(
         url_for(
             "main.csv_report_ready",
-            service_id=current_service.id,
+            service_id=service_id,
             report_request_id=report_request_id,
         )
       )
@@ -64,7 +64,7 @@ def csv_report_ready(service_id, report_request_id):
         return redirect(
           url_for(
               "main.csv_report_request",
-              service_id=current_service.id,
+              service_id=service_id,
               report_request_id=report_request_id,
               report_request = None,
               report_status = None,
@@ -79,7 +79,7 @@ def csv_report_ready(service_id, report_request_id):
       return redirect(
         url_for(
             "main.csv_report_request",
-            service_id=current_service.id,
+            service_id=service_id,
             report_request_id=report_request_id,
         )
       )
