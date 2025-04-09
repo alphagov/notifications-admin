@@ -1409,7 +1409,7 @@ def email_template_manage_attachments(template_id, service_id):
         {
             "key": {
                 "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-                "html": Field(f"(({placeholder}))"),
+                "html": Field(f"(({placeholder}::file))"),
             },
             "value": {
                 "text": template.attachments[placeholder].file_name or "No file uploaded",
@@ -1431,13 +1431,14 @@ def email_template_manage_attachments(template_id, service_id):
                 ]
             },
         }
-        for placeholder in InsensitiveSet(template.all_placeholders)
+        for placeholder in InsensitiveSet(template.file_placeholders)
     ]
 
     return render_template(
         "views/templates/manage-email-attachments.html",
         template=template,
         rows=rows,
+        example_placeholder=Field(f"((application form::file))"),
     )
 
 
