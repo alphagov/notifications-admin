@@ -6,7 +6,7 @@ from app.utils.user import user_has_permissions
 from werkzeug.utils import redirect
 from notifications_python_client.errors import HTTPError
 from app.models.report_request import ReportRequest
-from app.constants import REPORT_REQUEST_FAILED ,REPORT_REQUEST_STORED
+from app.constants import REPORT_REQUEST_FAILED ,REPORT_REQUEST_STORED, REPORT_REQUEST_PENDING
 
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>", methods=["GET"])
 @user_has_permissions()
@@ -71,13 +71,24 @@ def csv_report_ready(service_id, report_request_id):
           )
         )
   else:
-    return render_template(
+    # if they bookmarked the page and come back to it
+    # show them either the error for failed or no reports available page
+    if report_request.status != REPORT_REQUEST_STORED:
+      return redirect(
+        url_for(
+            "main.csv_report_request",
+            service_id=current_service.id,
+            report_request_id=report_request_id,
+        )
+      )
+    else:
+      return render_template(
         "views/csv-report/ready.html",
         retention_period = current_service.get_days_of_retention('email'),
         notification_status = report_request.parameter['notification_status'],
         notification_type = report_request.parameter['notification_type'],
         report_request_id = report_request_id,
-    )
+      )
   
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>/status.json")
 @user_has_permissions()
