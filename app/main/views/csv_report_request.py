@@ -11,8 +11,7 @@ from app.constants import REPORT_REQUEST_FAILED ,REPORT_REQUEST_STORED
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>", methods=["GET"])
 @user_has_permissions()
 def csv_report_request(service_id, report_request_id):
-  # if users have bookmarked the page and they come back to it, there will likely be no report avaialble
-  # get report status
+  # if users have bookmarked the page and they come back to it, there will likely be no report available
   try:
     report_request = ReportRequest.from_id(service_id, report_request_id)
   except HTTPError as e:
@@ -24,6 +23,9 @@ def csv_report_request(service_id, report_request_id):
         page_title= "Your report is no longer available"
   else:
     report_status = report_request.status
+    # if they refresh that page manually before JS does
+    # or they copy and paste that url in manually or bookmark it
+    # we redirect them to the download page
     if report_status == REPORT_REQUEST_STORED:
        return redirect(
         url_for(
@@ -56,6 +58,7 @@ def csv_report_ready(service_id, report_request_id):
     report_request = ReportRequest.from_id(service_id, report_request_id)
   except HTTPError as e:
       if e.status_code == 404:
+         # if the report is no longer available, show them "No longer available page"
         return redirect(
           url_for(
               "main.csv_report_request",
@@ -68,7 +71,6 @@ def csv_report_ready(service_id, report_request_id):
           )
         )
   else:
-    # if the report is no longer available, show them "No longer available page"
     return render_template(
         "views/csv-report/ready.html",
         retention_period = current_service.get_days_of_retention('email'),
