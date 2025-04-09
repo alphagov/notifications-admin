@@ -101,5 +101,5 @@ class TemplateAttachments(InsensitiveDict):
 
     def prune_orphans(self):
         for placeholder in self.keys():
-            if placeholder not in InsensitiveSet(self._template.all_placeholders):
+            if placeholder not in InsensitiveSet(self._template.file_placeholders):
                 del self[placeholder]
