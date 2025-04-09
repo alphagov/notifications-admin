@@ -34,7 +34,7 @@ class CheckReportStatus {
 
           if (data.status === reportReadyStatus || data.status === reportFailedStatus) {
             // inform user about the updated status
-            this.updatePageTextAndRedirect();
+            this.updatePageText();
             // redirect after 10s
             setTimeout( () => {
               location.replace(location.pathname);
@@ -52,7 +52,7 @@ class CheckReportStatus {
     request();
   }
 
-  updatePageTextAndRedirect() {
+  updatePageText() {
     const statusUpdateText = document.createElement('p');
     statusUpdateText.classList.add('govuk-body');
     statusUpdateText.textContent = 'Report status has been updated. We will redirect you shortly.'
