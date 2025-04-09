@@ -96,6 +96,10 @@ class TemplateAttachments(InsensitiveDict):
         return sum(bool(self[key]) for key in self if key in InsensitiveSet(self._template.all_placeholders))
 
     @property
+    def uploaded(self):
+        return all(self[key] for key in self if key in InsensitiveSet(self._template.file_placeholders))
+
+    @property
     def as_personalisation(self):
         return {placeholder: self[placeholder].url for placeholder in self if self[placeholder]}
 
