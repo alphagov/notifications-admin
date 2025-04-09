@@ -38,7 +38,7 @@ class CheckReportStatus {
             // redirect after 5s
             setTimeout( () => {
               location.replace(location.pathname);
-           }, 5000);
+           },10000);
            
             return;
           }
