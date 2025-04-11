@@ -33,7 +33,7 @@ def csv_report_request(service_id, report_request_id):
         url_for(
             "main.csv_report_ready",
             service_id=service_id,
-            report_request_id=report_request_id,
+            report_request_id=report_request.id,
         )
       )
     else:
@@ -64,7 +64,6 @@ def csv_report_ready(service_id, report_request_id):
           url_for(
               "main.csv_report_request",
               service_id=service_id,
-              report_request_id=report_request_id,
               report_request = None,
               notification_type = None,
               notification_status = None,
@@ -80,7 +79,7 @@ def csv_report_ready(service_id, report_request_id):
         url_for(
             "main.csv_report_request",
             service_id=service_id,
-            report_request_id=report_request_id,
+            report_request_id=report_request.id,
         )
       )
     else:
@@ -89,7 +88,7 @@ def csv_report_ready(service_id, report_request_id):
         retention_period = current_service.get_days_of_retention('email'),
         notification_status = report_request.parameter['notification_status'],
         notification_type = report_request.parameter['notification_type'],
-        report_request_id = report_request_id,
+        report_request_id = report_request.id,
       )
 
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>/status.json")
