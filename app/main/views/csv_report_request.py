@@ -1,4 +1,5 @@
-from flask import jsonify, render_template, url_for
+from flask import abort, jsonify, render_template, url_for
+from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from werkzeug.utils import redirect
 
@@ -18,16 +19,16 @@ def csv_report_request(service_id, report_request_id):
   except HTTPError as e:
       if e.status_code == 404:
         report_request = None
-        report_status = None
         notification_type = None
         notification_status = None
         page_title= "Your report is no longer available"
   else:
-    report_status = report_request.status
+    if report_request.user_id != current_user.id:
+      abort(403)
     # if they refresh that page manually before JS does
     # or they copy and paste that url in manually or bookmark it
     # we redirect them to the download page
-    if report_status == REPORT_REQUEST_STORED:
+    if report_request.status == REPORT_REQUEST_STORED:
        return redirect(
         url_for(
             "main.csv_report_ready",
@@ -39,7 +40,7 @@ def csv_report_request(service_id, report_request_id):
       notification_type =  report_request.parameter['notification_type']
       notification_status =  report_request.parameter['notification_status']
       page_title = "Error: We could not create your report" \
-        if report_status == REPORT_REQUEST_FAILED else "Preparing your report"
+        if report_request.status == REPORT_REQUEST_FAILED else "Preparing your report"
 
 
   return render_template(
@@ -47,10 +48,8 @@ def csv_report_request(service_id, report_request_id):
       retention_period = current_service.get_days_of_retention('email'),
       notification_status = notification_status,
       notification_type = notification_type,
-      report_status = report_status,
-      page_title = page_title,
       report_request = report_request,
-      report_request_id = report_request_id,
+      page_title = page_title,
   )
 
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>/ready", methods=["GET"])
@@ -67,12 +66,13 @@ def csv_report_ready(service_id, report_request_id):
               service_id=service_id,
               report_request_id=report_request_id,
               report_request = None,
-              report_status = None,
               notification_type = None,
               notification_status = None,
           )
         )
   else:
+    if report_request.user_id != current_user.id:
+      abort(403)
     # if they bookmarked the page and come back to it
     # show them either the error for failed or no reports available page
     if report_request.status != REPORT_REQUEST_STORED:
