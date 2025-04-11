@@ -17,7 +17,7 @@
           <a class="govuk-link govuk-link--no-visited-state error-text-colour" href="{{ url_for('main.service_dashboard', service_id=current_service.id) }}">Go back to the dashboard to download a new report</a> 
         </p>
       {% else %}
-        {% if report_status == 'failed' %}
+        {% if report_request.status == 'failed' %}
           {% call banner_wrapper(type='dangerous') %}
             <h1 class='banner-title'>
               We could not create your report
