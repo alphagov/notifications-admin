@@ -184,9 +184,8 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
     white-space: pre-wrap;
     overflow-wrap: break-word;
     word-wrap: break-word;
-    padding: 4px;
+    padding: 4px 4px govuk-spacing(6) 4px;
     border: 2px solid transparent;
-    padding-bottom: govuk-spacing(3);
     z-index: 10;
     // match govuk-textarea line height
     line-height: 1.25;
