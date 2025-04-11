@@ -61,7 +61,12 @@ class EnhancedTextbox {
     this.$textbox.style.height =
       `${Math.max(
           this.initialHeight,
-          this.$backgroundHighlightElement.offsetHeight
+          // jquery .height and vanilla javascript offsetHeight or clientHeight 
+          // take padding values into account in different ways
+          // 15px adjustment would suffice to account for 15px padding
+          // set in CSS, but adjusting the height by 16px prevents the scrollbar
+          // from appearing entirely
+          this.$backgroundHighlightElement.offsetHeight + 16
       )}px`;
 
     if ('stickAtBottomWhenScrolling' in GOVUK) {
