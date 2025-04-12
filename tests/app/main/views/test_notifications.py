@@ -938,3 +938,26 @@ def test_should_show_reply_to_from_notification(
     )
 
     assert "reply to info" in page.text
+
+
+# before going live with this feature, update test to check
+# users with 'view activity' permissions
+def test_show_csv_request_form_to_users_with_correct_permissions(
+    client_request,
+    service_one,
+    mock_get_notifications,
+    mock_get_service_data_retention,
+    mock_get_service_statistics,
+    mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
+    platform_admin_user,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        "main.view_notifications",
+        service_id=service_one["id"],
+        message_type="email",
+        status="delivered",
+    )
+
+    assert len(page.select("form.csv-request-form")) == 1
