@@ -18,7 +18,11 @@ SERVICE_JOIN_REQUEST_REJECTED = "rejected"
 SERVICE_JOIN_REQUEST_CANCELLED = "cancelled"
 
 # Report request report statuses
+REPORT_REQUEST_PENDING = "pending"
+REPORT_REQUEST_IN_PROGRESS = "in progress"
 REPORT_REQUEST_STORED = "stored"
+REPORT_REQUEST_FAILED = "failed"
+REPORT_REQUEST_DELETED = "deleted"
 
 # Error codes from the API
 QR_CODE_TOO_LONG = "qr-code-too-long"
