@@ -235,6 +235,13 @@ details .arrow {
   margin-top: govuk-spacing(3);
 }
 
+// inline-form style
+// to allow for the form and text to be side-by-side
+// used on notifications page for download csv report
+.form--inline {
+  display: inline-flex;
+}
+
 @keyframes live-pulse {
   0%   {
     background: govuk-colour("red");
