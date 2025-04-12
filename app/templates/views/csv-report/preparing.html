@@ -1,0 +1,26 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "views/csv-report/_requested-report-text.html" import report_text %}
+
+{% set page_title = 'Preparing your report' %}
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {{ page_header(page_title, classes="loading-indicator") }}
+      <div role="status" data-notify-module="check-report-status">
+        <p class="govuk-body">We’re creating a CSV file of {{ report_text(report_request.parameter['notification_type'],report_request.parameter['notification_status']) }} from the last {{ retention_period }} days.
+        <p class="govuk-body">This can take up to 5 minutes.</p>
+        <p class="govuk-body">Please do not close this page.</p>
+
+        <p class="js-hidden govuk-body">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.report_request', service_id=current_service.id, report_request_id=report_request.id) }}">Refresh page to check for an update</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
