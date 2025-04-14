@@ -1,4 +1,5 @@
 import uuid
+from unittest.mock import ANY, call
 
 import pytest
 from flask import url_for
@@ -218,6 +219,7 @@ def test_remove_platform_removes(
     mock_update_user_attribute,
     mobile_number,
     expected_auth_type,
+    mock_events,
 ):
     platform_admin_user["mobile_number"] = mobile_number
     client_request.login(platform_admin_user)
@@ -228,6 +230,7 @@ def test_remove_platform_removes(
         platform_admin=False,
         auth_type=expected_auth_type,
     )
+    assert mock_events.call_args_list == [call("remove_platform_admin", ANY)]
 
 
 def test_user_information_page_shows_archive_link_for_active_users(
