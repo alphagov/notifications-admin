@@ -203,10 +203,10 @@ class Service(JSONModel):
             invited_user_id=str(invited_user_id),
         )
 
-    def request_invite_for(self, user_to_invite, *, service_managers_ids, reason):
-        invite_api_client.request_invite_for(
-            user_to_invite_id=user_to_invite.id,
-            service_id=self.id,
+    def create_service_join_request(self, user_to_invite, *, service_id, service_managers_ids, reason):
+        service_api_client.create_service_join_request(
+            user_to_invite.id,
+            service_id=service_id,
             service_managers_ids=service_managers_ids,
             reason=reason,
         )

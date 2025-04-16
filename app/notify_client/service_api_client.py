@@ -24,6 +24,11 @@ ALLOWED_TEMPLATE_ATTRIBUTES = {
 
 
 class ServiceAPIClient(NotifyAdminAPIClient):
+    def __init__(self, app):
+        super().__init__(app)
+
+        self.admin_url = app.config["ADMIN_BASE_URL"]
+
     @cache.delete("user-{user_id}")
     def create_service(
         self,
@@ -533,6 +538,15 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             return "Sender name cannot include characters from a non-Latin alphabet"
 
         return None
+
+    def create_service_join_request(self, user_to_invite_id, *, service_id, service_managers_ids, reason):
+        data = {
+            "requester_id": user_to_invite_id,
+            "contacted_user_ids": service_managers_ids,
+            "invite_link_host": self.admin_url,
+            "reason": reason,
+        }
+        return self.post(f"/service/{service_id}/service-join-request", data=data)
 
     @cache.set("service-join-request-{request_id}")
     def get_service_join_request(self, request_id, service_id):

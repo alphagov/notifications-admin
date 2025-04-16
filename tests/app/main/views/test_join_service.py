@@ -113,7 +113,7 @@ def test_cannot_join_service_for_different_organisation(
 
 def test_redirect_if_already_member_of_service(
     client_request,
-    mock_request_invite_for,
+    mock_create_service_join_request,
     service_one,
     mock_get_organisation_by_domain,
     mocker,
@@ -224,7 +224,7 @@ def test_page_lists_team_members_of_service(
 
 def test_page_redirects_on_post(
     client_request,
-    mock_request_invite_for,
+    mock_create_service_join_request,
     service_one,
     service_two,
     mock_get_organisation_by_domain,
@@ -264,8 +264,8 @@ def test_page_redirects_on_post(
         },
     )
 
-    mock_request_invite_for.assert_called_once_with(
-        user_to_invite_id=current_user["id"],
+    mock_create_service_join_request.assert_called_once_with(
+        current_user["id"],
         service_managers_ids=[
             manage_service_user_1["id"],
         ],
