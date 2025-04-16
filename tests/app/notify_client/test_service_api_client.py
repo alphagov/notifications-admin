@@ -640,7 +640,7 @@ def test_update_service_join_requests(notify_admin, mocker):
     mock_redis_delete.assert_called_with_args(*expected_cache_deletes)
 
     mock_request.assert_called_once_with(
-        "POST", f"/service/update-service-join-request-status/{request_id}", data={"status": "approved"}
+        "POST", f"/service/{service_id}/service-join-request/{request_id}", data={"status": "approved"}
     )
 
 

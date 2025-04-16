@@ -543,7 +543,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     @cache.delete("service-{service_id}-template-folders")
     def update_service_join_requests(self, request_id, requester_id, service_id, **kwargs):
         data = dict(**kwargs)
-        return self.post(f"/service/update-service-join-request-status/{request_id}", data)
+        return self.post(f"/service/{service_id}/service-join-request/{request_id}", data)
 
 
 _service_api_client_context_var: ContextVar[ServiceAPIClient] = ContextVar("service_api_client")
