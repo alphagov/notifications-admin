@@ -706,8 +706,8 @@ class ServiceJoinRequest(JSONModel):
         return self.status == SERVICE_JOIN_REQUEST_CANCELLED
 
     @classmethod
-    def from_id(cls, request_id):
-        return cls(service_api_client.get_service_join_requests(request_id))
+    def from_id(cls, request_id, service_id):
+        return cls(service_api_client.get_service_join_request(request_id, service_id))
 
     def update(self, **kwargs):
         return service_api_client.update_service_join_requests(self.id, self.requester["id"], self.service_id, **kwargs)

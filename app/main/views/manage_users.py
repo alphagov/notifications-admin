@@ -97,7 +97,7 @@ def invite_user(service_id, user_id=None):
 
 
 def validate_service_join_request(service_id, request_id):
-    service_join_request = ServiceJoinRequest.from_id(request_id)
+    service_join_request = ServiceJoinRequest.from_id(request_id, service_id)
     requested_by = service_join_request.requester
     request_changed_by = service_join_request.status_changed_by
     requested_service = Service.from_id(service_join_request.service_id)
@@ -141,7 +141,7 @@ def service_join_request_approve(service_id, request_id):
         return join_request_validation
 
     form = JoinServiceRequestApproveForm()
-    service_join_request = ServiceJoinRequest.from_id(request_id)
+    service_join_request = ServiceJoinRequest.from_id(request_id, service_id)
     requested_by = service_join_request.requester
     requested_service = Service.from_id(service_join_request.service_id)
 
@@ -182,7 +182,7 @@ def service_join_request_choose_permissions(service_id, request_id):
     if join_request_validation:
         return join_request_validation
 
-    service_join_request = ServiceJoinRequest.from_id(request_id)
+    service_join_request = ServiceJoinRequest.from_id(request_id, service_id)
 
     requested_by = service_join_request.requester
     requested_by_user = User.from_id(requested_by["id"])
@@ -224,7 +224,7 @@ def service_join_request_refused(service_id, request_id):
     if join_request_validation:
         return join_request_validation
 
-    service_join_request = ServiceJoinRequest.from_id(request_id)
+    service_join_request = ServiceJoinRequest.from_id(request_id, service_id)
     requested_by = service_join_request.requester
 
     service_join_request.update(
