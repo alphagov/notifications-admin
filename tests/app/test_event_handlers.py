@@ -1,7 +1,7 @@
 import uuid
 from unittest.mock import ANY
 
-from app.event_handlers import events, on_user_logged_in
+from app.event_handlers import events
 from app.models.user import User
 
 
@@ -14,8 +14,14 @@ def event_dict(**extra):
 
 
 def test_on_user_logged_in_calls_events_api(client_request, api_user_active, mock_events):
-    on_user_logged_in("_notify_admin", User(api_user_active))
-
+    client_request.logout()
+    user = User(api_user_active)
+    client_request.logout()
+    print(user)
+    user.sign_out()
+    print(user)
+    user.login()
+    print(user)
     mock_events.assert_called_with("sucessful_login", event_dict(user_id=str(api_user_active["id"])))
 
 

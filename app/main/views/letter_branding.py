@@ -4,7 +4,7 @@ from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import letter_branding_client, logo_client
-from app.event_handlers import create_update_letter_branding_event
+from app.event_handlers import events
 from app.main import main
 from app.main.forms import (
     AdminEditLetterBrandingForm,
