@@ -19,6 +19,7 @@ ALLOWED_ATTRIBUTES = {
     "email_access_validated_at",
     "take_part_in_research",
     "receives_new_features_email",
+    "platform_admin",
 }
 
 
@@ -64,6 +65,9 @@ class UserApiClient(NotifyAdminAPIClient):
         disallowed_attributes = set(data.keys()) - ALLOWED_ATTRIBUTES
         if disallowed_attributes:
             raise TypeError(f"Not allowed to update user attributes: {', '.join(disallowed_attributes)}")
+
+        if "platform_admin" in data and data["platform_admin"] is not False:
+            raise TypeError(f"Not allowed to update user attribute platform_admin to {data['platform_admin']}")
 
         url = f"/user/{user_id}"
         user_data = self.post(url, data=data)

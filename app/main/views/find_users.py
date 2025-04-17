@@ -3,7 +3,7 @@ from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import user_api_client
-from app.event_handlers import create_archive_user_event
+from app.event_handlers import create_archive_user_event, create_remove_platform_admin_event
 from app.main import main
 from app.main.forms import AuthTypeForm
 from app.models.user import User
@@ -17,6 +17,18 @@ def user_information(user_id):
         "views/find-users/user-information.html",
         user=User.from_id(user_id),
     )
+
+
+@main.route("/users/<uuid:user_id>/remove-platform-admin", methods=["GET", "POST"])
+@user_is_platform_admin
+def remove_platform_admin(user_id):
+    if request.method == "POST":
+        User.from_id(user_id).remove_platform_admin()
+        create_remove_platform_admin_event(user_id=str(user_id), removed_by_id=current_user.id)
+        return redirect(url_for(".user_information", user_id=user_id))
+
+    flash("Are you sure you want to remove platform admin from this user?", "remove")
+    return user_information(user_id)
 
 
 @main.route("/users/<uuid:user_id>/archive", methods=["GET", "POST"])

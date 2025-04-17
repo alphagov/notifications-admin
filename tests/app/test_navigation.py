@@ -247,6 +247,7 @@ EXCLUDED_ENDPOINTS = set(
             "register_from_org_invite",
             "register",
             "registration_continue",
+            "remove_platform_admin",
             "remove_user_from_organisation",
             "remove_user_from_service",
             "rename_template",

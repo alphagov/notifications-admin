@@ -21,6 +21,7 @@ EVENT_SCHEMAS = {
     "update_email_branding": {"email_branding_id", "updated_by_id", "old_email_branding"},
     "update_letter_branding": {"letter_branding_id", "updated_by_id", "old_letter_branding"},
     "set_inbound_sms_on": {"user_id", "service_id", "inbound_number_id"},
+    "remove_platform_admin": {"user_id", "removed_by_id"},
 }
 
 
@@ -70,6 +71,10 @@ def create_update_letter_branding_event(**kwargs):
 
 def create_set_inbound_sms_on_event(**kwargs):
     _send_event("set_inbound_sms_on", **kwargs)
+
+
+def create_remove_platform_admin_event(**kwargs):
+    _send_event("remove_platform_admin", **kwargs)
 
 
 def _send_event(event_type, **kwargs):
