@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient, cache
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session, cache
 
 
 class SMSRateApiClient(NotifyAdminAPIClient):
@@ -17,7 +17,7 @@ class SMSRateApiClient(NotifyAdminAPIClient):
 _sms_rate_api_client_context_var: ContextVar[SMSRateApiClient] = ContextVar("sms_rate_api_client")
 get_sms_rate_api_client: LazyLocalGetter[SMSRateApiClient] = LazyLocalGetter(
     _sms_rate_api_client_context_var,
-    lambda: SMSRateApiClient(current_app),
+    lambda: SMSRateApiClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_sms_rate_api_client.clear())
 sms_rate_api_client = LocalProxy(get_sms_rate_api_client)
