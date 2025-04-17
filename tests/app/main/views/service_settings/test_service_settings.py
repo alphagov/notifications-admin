@@ -4800,6 +4800,8 @@ def test_should_show_page_to_set_per_day_international_sms_message_limit(
     assert normalize_spaces(page.select_one("label").text) == "Daily international text message limit"
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "500"
 
+    assert "artificially inflated traffic" in page.select_one(".govuk-hint").text
+
 
 @pytest.mark.parametrize(
     "user, is_trial_service",
