@@ -37,8 +37,7 @@ class LetterRates(ModelList):
     def _get_items(*args, **kwargs):
         # Once the economy postage is live, we can remove this logic
         resp = letter_rate_api_client.get_letter_rates(*args, **kwargs)
-        filtered_letter_rates = filter(lambda r: r["post_class"] in LetterRates.post_classes, resp)
-        return list(filtered_letter_rates)
+        return [rate for rate in resp if rate["post_class"] in LetterRates.post_classes]
 
     @property
     def rates(self):
