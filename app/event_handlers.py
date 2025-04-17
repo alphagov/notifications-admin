@@ -8,8 +8,19 @@ class Event:
     def __init__(self, name, schema):
         self.name = name
         self.schema = schema
+
     def __call__(self, **kwargs):
-        _send_event(self.name, self.schema, **kwargs)
+        expected_keys = self.schema
+        actual_keys = set(kwargs.keys())
+
+        if expected_keys != actual_keys:
+            raise ValueError(f"Expected {expected_keys}, but got {actual_keys}")
+
+        event_data = _construct_event_data(request)
+        event_data.update(kwargs)
+
+        events_api_client.create_event(self.name, event_data)
+
 
 class Events:
 
@@ -89,18 +100,6 @@ def create_update_letter_branding_event(**kwargs):
 def create_set_inbound_sms_on_event(**kwargs):
     events.set_inbound_sms_on(**kwargs)
 
-
-def _send_event(event_type, schema=None, **kwargs):
-    expected_keys = schema
-    actual_keys = set(kwargs.keys())
-
-    if expected_keys != actual_keys:
-        raise ValueError(f"Expected {expected_keys}, but got {actual_keys}")
-
-    event_data = _construct_event_data(request)
-    event_data.update(kwargs)
-
-    events_api_client.create_event(event_type, event_data)
 
 
 def _construct_event_data(request):
