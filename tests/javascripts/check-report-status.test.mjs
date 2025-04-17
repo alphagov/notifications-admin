@@ -8,15 +8,23 @@ const route = `/services/6658542f-0cad-491f-bec8-ab8457700ead/download-report/${
 let responseObj = {};
 let locationMock;
 
+jest.useFakeTimers();
+
 beforeAll(() => {
-  jest.useFakeTimers();
   // JDSOM does no have fetch
-  global.fetch = jest.fn().mockImplementation(() =>
-    Promise.resolve({
-      json: () => Promise.resolve(responseObj),
-    })
-  );
-  jest.spyOn(global, 'fetch');
+  window.fetch = jest.fn();
+  // window.fetch.mockImplementation(() => {
+  //   console.log('before mock fetch promise return');
+  //    return Promise.resolve({
+  //       'json': () => Promise.resolve(responseObj)
+  //     })
+  // });
+  // window.fetch = jest.fn().mockImplementation(() =>
+  //   Promise.resolve({
+  //     json: () => Promise.resolve(responseObj),
+  //   })
+  // );
+  // jest.spyOn(global, 'fetch');
   // mock calls to window.location
   locationMock = new helpers.LocationMock();
   window.location.pathname = route;
@@ -24,11 +32,9 @@ beforeAll(() => {
 
 afterAll(() => {
   jest.restoreAllMocks();
-  locationMock.reset();
-  delete global.fetch;
 });
 
-describe('Update content', () => {
+describe('CheckReportStatus', () => {
 
   beforeEach(() => {
     document.body.classList.add('govuk-frontend-supported')
@@ -43,15 +49,14 @@ describe('Update content', () => {
   afterEach(() => {
 
     document.body.innerHTML = '';
-
-    // ensure any timers set by continually starting the module are cleared
-    jest.clearAllTimers();
-
+    jest.clearAllTimers()
+    window.fetch = undefined;
+    locationMock.reset();
   });
 
   test('it should fetch data from the endpoint', async () => {
     responseObj = {status: 'pending'}
-    new CheckReportStatus('[data-notify-module="check-report-status"]');
+    new CheckReportStatus(document.querySelector('[data-notify-module="check-report-status"]'));
 
     expect(global.fetch).toHaveBeenCalledWith(
       `${route}/status.json`,
@@ -60,27 +65,66 @@ describe('Update content', () => {
 
 
   test.only('it should keep checking every 20s if the status is still not "stored', async () => {
-    responseObj = {status: 'pending'}
-    new CheckReportStatus('[data-notify-module="check-report-status"]');
 
-    expect(global.fetch).toHaveBeenCalledTimes(1);
-    jest.advanceTimersByTime(20001);
-    expect(global.fetch).toHaveBeenCalledTimes(2);
-    jest.advanceTimersByTime(20001);
-    expect(global.fetch).toHaveBeenCalledTimes(3);
+    responseObj = {status: 'pending'}
+    jest.spyOn(window, 'fetch').mockImplementationOnce(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      jest.advanceTimersByTime(20001);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
+      jest.advanceTimersByTime(20001);
+      expect(global.fetch).toHaveBeenCalledTimes(3);
+      return Promise.resolve({
+        json: () => Promise.resolve(responseObj)
+      })
+    })
+
+    new CheckReportStatus(document.querySelector('[data-notify-module="check-report-status"]'));
+
+    // debugger;
+    // new CheckReportStatus(document.querySelector('[data-notify-module="check-report-status"]'));
+    // console.log(performance.now(), 'before')
+    // expect(global.fetch).toHaveBeenCalledTimes(1);
+    // jest.advanceTimersByTime(20001);
+    // console.log(performance.now(), 'after')
+    
+    // expect(global.fetch).toHaveBeenCalledTimes(2);
+    // jest.advanceTimersByTime(20001);
+    // expect(global.fetch).toHaveBeenCalledTimes(3);
   });
 
 
   test('it should update page text if status of the report is "stored"', async () => {
-
     responseObj = {status: 'stored'}
 
-    new CheckReportStatus('[data-notify-module="check-report-status"]');
+    jest.spyOn(window, 'fetch').mockImplementationOnce(() => {
+      new CheckReportStatus(document.querySelector('[data-notify-module="check-report-status"]'));
+      expect(document.body.textContent.trim()).toContain('Report status has been updated. We will redirect you shortly.')
 
+      return Promise.resolve({
+        json: () => Promise.resolve(responseObj)
+      })
+    })
+
+    // new CheckReportStatus(document.querySelector('[data-notify-module="check-report-status"]'));
+    // console.log(performance.now(), 'before')
     // jest.advanceTimersByTime(500);
+    // console.log(performance.now(), 'after')
+    // expect(document.body.textContent.trim()).toContain('Report status has been updated. We will redirect you shortly.')
+  });
 
-    expect(document.body.textContent.trim()).toContain("0")
-     
+  test('it should reload the page after 10s if status is no longer "pending"', async () => {
+
+    responseObj = {status: 'failed'};
+
+    window.location.replace = jest.fn();
+
+    new CheckReportStatus(document.querySelector('[data-notify-module="check-report-status"]'));
+    
+    jest.advanceTimersByTime(10001);
+
+    jest.spyOn(window, 'fetch').mockImplementation(() => {
+      expect(window.location.new).toHaveBeenCalled();
+    })
   });
 
 });
