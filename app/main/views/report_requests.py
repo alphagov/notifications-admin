@@ -1,10 +1,88 @@
-from flask import abort, send_file
+from flask import abort, jsonify, render_template, send_file, url_for
 from flask_login import current_user
+from notifications_python_client.errors import HTTPError
+from werkzeug.utils import redirect
 
-from app.constants import REPORT_REQUEST_STORED
-from app.main import main
+from app import current_service
+from app.constants import REPORT_REQUEST_FAILED, REPORT_REQUEST_STORED
+from app.main import json_updates, main
 from app.models.report_request import ReportRequest
-from app.utils.user import user_is_platform_admin
+from app.utils.user import user_has_permissions, user_is_platform_admin
+
+
+@main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>", methods=["GET"])
+@user_has_permissions()
+def report_request(service_id, report_request_id):
+    try:
+        report_request = ReportRequest.from_id(service_id, report_request_id)
+    except HTTPError as e:
+        # if there is no request ID, endpoint will return an error
+        # so we want to show a useful page instead of a 404
+        if e.status_code == 404:
+            return render_template(
+                "views/csv-report/unavailable.html",
+            )
+    else:
+        if report_request.user_id != current_user.id:
+            abort(403)
+        # if they refresh that page manually before JS does
+        # or they copy and paste that url in manually or bookmark it
+        # we redirect them to the download page
+        if report_request.status == REPORT_REQUEST_STORED:
+            return redirect(
+                url_for(
+                    "main.report_ready",
+                    service_id=service_id,
+                    report_request_id=report_request.id,
+                )
+            )
+
+        if report_request.status == REPORT_REQUEST_FAILED:
+            return render_template(
+                "views/csv-report/error.html",
+            )
+
+    return render_template(
+        "views/csv-report/preparing.html",
+        retention_period=current_service.get_days_of_retention("email"),
+        report_request=report_request,
+    )
+
+
+@main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>/ready", methods=["GET"])
+@user_has_permissions()
+def report_ready(service_id, report_request_id):
+    try:
+        report_request = ReportRequest.from_id(service_id, report_request_id)
+    except HTTPError as e:
+        if e.status_code == 404:
+            # if the report is no longer available, show them "No longer available page"
+            return redirect(
+                url_for(
+                    "main.report_request",
+                    service_id=service_id,
+                    report_request_id=report_request_id,
+                )
+            )
+    else:
+        if report_request.user_id != current_user.id:
+            abort(403)
+        # if they bookmarked the page and come back to it
+        # show them either the error for failed or no reports available page
+        if report_request.status != REPORT_REQUEST_STORED:
+            return redirect(
+                url_for(
+                    "main.report_request",
+                    service_id=service_id,
+                    report_request_id=report_request_id,
+                )
+            )
+
+        return render_template(
+            "views/csv-report/ready.html",
+            retention_period=current_service.get_days_of_retention("email"),
+            report_request=report_request,
+        )
 
 
 @main.route("/services/<uuid:service_id>/report-request/<uuid:report_request_id>.csv")
@@ -25,3 +103,10 @@ def report_request_download(service_id, report_request_id):
         download_name=f"{report_request_id}.csv",
         as_attachment=True,
     )
+
+
+@json_updates.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>/status.json")
+@user_has_permissions()
+def report_request_status_updates(service_id, report_request_id):
+    report_request_status = ReportRequest.from_id(service_id, report_request_id).status
+    return jsonify({"status": report_request_status})
