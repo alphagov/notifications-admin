@@ -4,33 +4,7 @@ from flask import request
 from app.notify_client.events_api_client import events_api_client
 
 
-class Event:
-    def __init__(self, name, schema):
-        self.name = name
-        self.schema = schema
-
-    def __call__(self, **kwargs):
-        expected_keys = self.schema
-        actual_keys = set(kwargs.keys())
-
-        if expected_keys != actual_keys:
-            raise ValueError(f"Expected {expected_keys}, but got {actual_keys}")
-
-        event_data = _construct_event_data(request)
-        event_data.update(kwargs)
-
-        events_api_client.create_event(self.name, event_data)
-
-
 class Events:
-
-    def __new__(cls):
-        for key, value in vars(cls).items():
-            if key.startswith("__"):
-                continue
-            setattr(cls, key, Event(key, value))
-        return cls
-
     sucessful_login = {"user_id"}
     update_user_email = {"user_id", "updated_by_id", "original_email_address", "new_email_address"}
     update_user_mobile_number = {"user_id", "updated_by_id", "original_mobile_number", "new_mobile_number"}
@@ -50,8 +24,33 @@ class Events:
     update_letter_branding = {"letter_branding_id", "updated_by_id", "old_letter_branding"}
     set_inbound_sms_on = {"user_id", "service_id", "inbound_number_id"}
 
+    def __new__(cls):
+        for key, value in vars(cls).items():
+            if key.startswith("__"):
+                continue
+            setattr(cls, key, Event(key, value))
+        return cls
+
 
 events = Events()
+
+
+class Event:
+    def __init__(self, name, schema):
+        self.name = name
+        self.schema = schema
+
+    def __call__(self, **kwargs):
+        expected_keys = self.schema
+        actual_keys = set(kwargs.keys())
+
+        if expected_keys != actual_keys:
+            raise ValueError(f"Expected {expected_keys}, but got {actual_keys}")
+
+        event_data = _construct_event_data(request)
+        event_data.update(kwargs)
+
+        events_api_client.create_event(self.name, event_data)
 
 
 def _construct_event_data(request):
