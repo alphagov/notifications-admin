@@ -649,6 +649,24 @@ def service_set_international_sms(service_id):
     )
 
 
+@main.route(
+    "/services/<uuid:service_id>/service-settings/set-message-limit/international-sms",
+    methods=["GET", "POST"],
+)
+@user_has_permissions("manage_service")
+def set_per_day_international_sms_message_limit(service_id):
+    form = AdminServiceMessageLimitForm(
+        message_limit=current_service.get_message_limit("international_sms"),
+        notification_type="international_sms",
+    )
+
+    return render_template(
+        "views/service-settings/set-message-limit-for-international-sms.html",
+        form=form,
+        error_summary_enabled=True,
+    )
+
+
 @main.route("/services/<uuid:service_id>/service-settings/set-international-letters", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_set_international_letters(service_id):

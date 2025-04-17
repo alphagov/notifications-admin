@@ -4787,6 +4787,20 @@ def test_switch_service_enable_international_sms_and_letters(
     assert mocked_fn.call_args[0][0] == service_one["id"]
 
 
+def test_should_show_page_to_set_per_day_international_sms_message_limit(
+    client_request,
+    service_one,
+):
+    service_one["permissions"] = ["international_sms"]
+
+    page = client_request.get(
+        "main.set_per_day_international_sms_message_limit",
+        service_id=SERVICE_ONE_ID,
+    )
+    assert normalize_spaces(page.select_one("label").text) == "Daily international text message limit"
+    assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "500"
+
+
 @pytest.mark.parametrize(
     "user, is_trial_service",
     (
