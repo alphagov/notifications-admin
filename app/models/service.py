@@ -46,6 +46,7 @@ class Service(JSONModel):
     id: Any
     inbound_api: Any
     email_message_limit: int
+    international_sms_message_limit: int
     sms_message_limit: int
     letter_message_limit: int
     rate_limit: int

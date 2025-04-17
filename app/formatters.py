@@ -365,6 +365,9 @@ def message_count_noun(count, message_type):
     if message_type == "sms":
         return "text message" if singular else "text messages"
 
+    if message_type == "international_sms":
+        return "international text message" if singular else "international text messages"
+
     if message_type == "email":
         return "email" if singular else "emails"
 
