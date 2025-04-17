@@ -3,7 +3,7 @@ from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import user_api_client
-from app.event_handlers import events
+from app.event_handlers import Events
 from app.main import main
 from app.main.forms import AuthTypeForm
 from app.models.user import User
@@ -36,7 +36,7 @@ def archive_user(user_id):
                 )
                 return redirect(url_for("main.user_information", user_id=user_id))
 
-        events.archive_user(
+        Events.archive_user(
             user_id=str(user_id), user_email_address=original_email_address, archived_by_id=current_user.id
         )
 

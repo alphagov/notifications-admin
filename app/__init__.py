@@ -552,13 +552,13 @@ def setup_blueprints(application):
 def setup_event_handlers():
     from flask_login import user_logged_in
 
-    from app.event_handlers import events
+    from app.event_handlers import Events
 
     print("SETUP")
 
     def on_user_logged_in(_sender, user):
         print("CALL")
-        events.sucessful_login(user_id=user.id)
+        Events.sucessful_login(user_id=user.id)
 
     user_logged_in.connect(on_user_logged_in)
 
