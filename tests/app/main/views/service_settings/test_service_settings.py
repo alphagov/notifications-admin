@@ -4432,34 +4432,6 @@ def test_should_show_page_to_set_per_day_message_limit(
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1,000"
 
 
-@pytest.mark.parametrize(
-    "notification_type, expected_api_field_updated",
-    (
-        ("email", "email_message_limit"),
-        ("sms", "sms_message_limit"),
-        ("letter", "letter_message_limit"),
-    ),
-)
-def test_should_set_message_limit(
-    client_request,
-    platform_admin_user,
-    notification_type,
-    expected_api_field_updated,
-    mock_update_service,
-):
-    client_request.login(platform_admin_user)
-    client_request.post(
-        "main.set_per_day_message_limit",
-        service_id=SERVICE_ONE_ID,
-        notification_type=notification_type,
-        _data={"message_limit": "1,234"},
-    )
-    mock_update_service.assert_called_once_with(
-        SERVICE_ONE_ID,
-        **{expected_api_field_updated: 1234},
-    )
-
-
 @pytest.mark.parametrize("notification_type", ["sms", "email", "letter"])
 @pytest.mark.parametrize(
     "new_limit, expected_api_argument",
