@@ -4417,11 +4417,11 @@ def logo_client(notify_admin):
 
 
 @pytest.fixture(scope="function")
-def mock_request_invite_for(notify_admin, mocker):
-    def _request_invite_for(*, user_to_invite_id, service_id, service_managers_ids, reason):
+def mock_create_service_join_request(notify_admin, mocker):
+    def _create_service_join_request(user_to_invite_id, *, service_id, service_managers_ids, reason):
         return
 
-    return mocker.patch("app.invite_api_client.request_invite_for", side_effect=_request_invite_for)
+    return mocker.patch("app.service_api_client.create_service_join_request", side_effect=_create_service_join_request)
 
 
 @pytest.fixture(scope="function")

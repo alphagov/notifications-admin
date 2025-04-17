@@ -39,8 +39,9 @@ def join_service_ask(service_to_join_id):
         users=service.active_users_with_permission("manage_service"),
     )
     if form.validate_on_submit():
-        service.request_invite_for(
+        service.create_service_join_request(
             current_user,
+            service_id=service.id,
             service_managers_ids=form.users.data,
             reason=form.reason.data,
         )

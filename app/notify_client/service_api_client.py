@@ -24,6 +24,11 @@ ALLOWED_TEMPLATE_ATTRIBUTES = {
 
 
 class ServiceAPIClient(NotifyAdminAPIClient):
+    def __init__(self, app):
+        super().__init__(app)
+
+        self.admin_url = app.config["ADMIN_BASE_URL"]
+
     @cache.delete("user-{user_id}")
     def create_service(
         self,
@@ -534,16 +539,25 @@ class ServiceAPIClient(NotifyAdminAPIClient):
 
         return None
 
+    def create_service_join_request(self, user_to_invite_id, *, service_id, service_managers_ids, reason):
+        data = {
+            "requester_id": user_to_invite_id,
+            "contacted_user_ids": service_managers_ids,
+            "invite_link_host": self.admin_url,
+            "reason": reason,
+        }
+        return self.post(f"/service/{service_id}/service-join-request", data=data)
+
     @cache.set("service-join-request-{request_id}")
-    def get_service_join_requests(self, request_id):
-        return self.get(f"/service/service-join-request/{request_id}")
+    def get_service_join_request(self, request_id, service_id):
+        return self.get(f"/service/{service_id}/service-join-request/{request_id}")
 
     @cache.delete("service-join-request-{request_id}")
     @cache.delete("user-{requester_id}")
     @cache.delete("service-{service_id}-template-folders")
     def update_service_join_requests(self, request_id, requester_id, service_id, **kwargs):
         data = dict(**kwargs)
-        return self.post(f"/service/update-service-join-request-status/{request_id}", data)
+        return self.post(f"/service/{service_id}/service-join-request/{request_id}", data)
 
 
 _service_api_client_context_var: ContextVar[ServiceAPIClient] = ContextVar("service_api_client")
