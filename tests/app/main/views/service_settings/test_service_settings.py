@@ -162,6 +162,7 @@ def mock_get_service_settings_page_common(
                 "Email authentication Off Change your settings for Email authentication",
                 "Extra letter formatting options Off Change your settings for Extra letter formatting options",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
+                "Sending economy letters Off Change your settings for Sending economy letters",
             ],
         ),
     ],

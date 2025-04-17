@@ -103,6 +103,18 @@ def test_service_set_permission_requires_platform_admin(
             "False",
             [],
         ),
+        (
+            ["letter"],
+            "economy_letter_sending",
+            "True",
+            ["letter", "economy_letter_sending"],
+        ),
+        (
+            ["letter", "economy_letter_sending"],
+            "economy_letter_sending",
+            "False",
+            ["letter"],
+        ),
     ],
 )
 def test_service_set_permission(
@@ -158,6 +170,12 @@ def test_service_set_permission(
             ".service_set_permission",
             {"permission": "extra_letter_formatting"},
             "Extra letter formatting options Off Change your settings for Extra letter formatting options",
+        ),
+        (
+            {"permissions": ["letter"]},
+            ".service_set_permission",
+            {"permission": "economy_letter_sending"},
+            "Sending economy letters Off Change your settings for Sending economy letters",
         ),
     ],
 )
