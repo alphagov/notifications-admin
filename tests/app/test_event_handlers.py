@@ -2,6 +2,7 @@ import uuid
 from unittest.mock import ANY
 
 from app.event_handlers import (
+    Event,
     create_add_user_to_service_event,
     create_archive_service_event,
     create_archive_user_event,
