@@ -14,15 +14,10 @@ def event_dict(**extra):
 
 
 def test_on_user_logged_in_calls_events_api(client_request, api_user_active, mock_events):
-    return
+    from flask_login import login_user
     client_request.logout()
     user = User(api_user_active)
-    client_request.logout()
-    print(user)
-    user.sign_out()
-    print(user)
-    user.login()
-    print(user)
+    login_user(user)
     mock_events.assert_called_with("sucessful_login", event_dict(user_id=str(api_user_active["id"])))
 
 

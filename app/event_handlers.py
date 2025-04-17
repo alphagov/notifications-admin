@@ -43,8 +43,7 @@ class Events(metaclass=EventsMeta):
     set_inbound_sms_on = {"user_id", "service_id", "inbound_number_id"}
 
 
-def _send_event(event_type, schema, **kwargs):
-    expected_keys = schema
+def _send_event(event_type, expected_keys, **kwargs):
     actual_keys = set(kwargs.keys())
 
     if expected_keys != actual_keys:
