@@ -47,6 +47,7 @@ memo_resetters: list[Callable] = []
 from app import proxy_fix, webauthn_server
 from app.commands import setup_commands
 from app.config import Config, configs
+from app.event_handlers import Events
 from app.extensions import antivirus_client, redis_client, zendesk_client  # noqa
 from app.formatters import (
     convert_to_boolean,
@@ -549,10 +550,12 @@ def setup_blueprints(application):
     application.register_blueprint(status_blueprint)
 
 
+def on_user_logged_in(_sender, user):
+    Events.sucessful_login(user_id=user.id)
+
+
 def setup_event_handlers():
     from flask_login import user_logged_in
-
-    from app.event_handlers import on_user_logged_in
 
     user_logged_in.connect(on_user_logged_in)
 

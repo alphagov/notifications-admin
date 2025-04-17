@@ -4,11 +4,7 @@ from notifications_python_client.errors import HTTPError
 
 from app import current_service, service_api_client
 from app.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_REJECTED
-from app.event_handlers import (
-    create_email_change_event,
-    create_mobile_number_change_event,
-    create_remove_user_from_service_event,
-)
+from app.event_handlers import Events
 from app.formatters import redact_mobile_number
 from app.main import main
 from app.main.forms import (
@@ -280,7 +276,7 @@ def remove_user_from_service(service_id, user_id):
         else:
             abort(500, e)
     else:
-        create_remove_user_from_service_event(user_id=user_id, removed_by_id=current_user.id, service_id=service_id)
+        Events.remove_user_from_service(user_id=user_id, removed_by_id=current_user.id, service_id=service_id)
 
     return redirect(url_for(".manage_users", service_id=service_id))
 
@@ -329,7 +325,7 @@ def confirm_edit_user_email(service_id, user_id):
         except HTTPError as e:
             abort(500, e)
         else:
-            create_email_change_event(
+            Events.update_user_email(
                 user_id=user.id,
                 updated_by_id=current_user.id,
                 original_email_address=user.email_address,
@@ -380,7 +376,7 @@ def confirm_edit_user_mobile_number(service_id, user_id):
         except HTTPError as e:
             abort(500, e)
         else:
-            create_mobile_number_change_event(
+            Events.update_user_mobile_number(
                 user_id=user.id,
                 updated_by_id=current_user.id,
                 original_mobile_number=user.mobile_number,

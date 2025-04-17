@@ -272,7 +272,7 @@ def test_update_letter_branding_with_original_file_and_new_details(
     mock_save_temporary = mocker.patch("app.main.views.letter_branding.logo_client.save_temporary_logo")
     mock_save_permanent = mocker.patch("app.main.views.letter_branding.logo_client.save_permanent_logo")
     mock_create_update_letter_branding_event = mocker.patch(
-        "app.main.views.letter_branding.create_update_letter_branding_event"
+        "app.main.views.letter_branding.Events.update_letter_branding"
     )
 
     client_request.login(platform_admin_user)
@@ -368,7 +368,7 @@ def test_update_letter_branding_with_new_file_and_new_details(
     )
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
     mock_create_update_letter_branding_event = mocker.patch(
-        "app.main.views.letter_branding.create_update_letter_branding_event"
+        "app.main.views.letter_branding.Events.update_letter_branding"
     )
 
     branding_id = str(UUID(int=0))
@@ -407,7 +407,7 @@ def test_update_letter_branding_does_not_save_to_db_if_uploading_fails(
 ):
     mock_client_update = mocker.patch("app.main.views.letter_branding.letter_branding_client.update_letter_branding")
     mock_create_update_letter_branding_event = mocker.patch(
-        "app.main.views.letter_branding.create_update_letter_branding_event"
+        "app.main.views.letter_branding.Events.update_letter_branding"
     )
     mocker.patch(
         "app.main.views.letter_branding.logo_client.save_permanent_logo", side_effect=BotoClientError({}, "error")

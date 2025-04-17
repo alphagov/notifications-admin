@@ -508,9 +508,7 @@ def test_update_existing_branding(
     }
 
     mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo", return_value="email/test.png")
-    mock_create_update_email_branding_event = mocker.patch(
-        "app.main.views.email_branding.create_update_email_branding_event"
-    )
+    mock_create_update_email_branding_event = mocker.patch("app.main.views.email_branding.Events.update_email_branding")
 
     client_request.login(platform_admin_user)
     client_request.post(
@@ -570,7 +568,7 @@ def test_update_existing_branding_does_not_reupload_logo_if_unchanged(
     }
 
     mock_save_permanent = mocker.patch("app.main.views.email_branding.logo_client.save_permanent_logo")
-    mocker.patch("app.main.views.email_branding.create_update_email_branding_event")
+    mocker.patch("app.main.views.email_branding.Events.update_email_branding")
 
     client_request.login(platform_admin_user)
     client_request.post(

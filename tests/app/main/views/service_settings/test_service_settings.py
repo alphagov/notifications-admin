@@ -4840,7 +4840,7 @@ def test_archive_service_after_confirm(
 ):
     service_one["restricted"] = is_trial_service
     mock_api = mocker.patch("app.service_api_client.post")
-    mock_event = mocker.patch("app.main.views.service_settings.index.create_archive_service_event")
+    mock_event = mocker.patch("app.main.views.service_settings.index.Events.archive_service")
     redis_delete_mock = mocker.patch("app.notify_client.service_api_client.redis_client.delete")
     mocker.patch("app.notify_client.service_api_client.redis_client.delete_by_pattern")
 
@@ -5675,7 +5675,7 @@ def test_post_service_receive_text_messages_start_turns_on_feature_and_redirects
         "app.inbound_number_client.add_inbound_number_to_service",
         return_value={"id": "abcd", "service_id": SERVICE_ONE_ID, "inbound_number_id": "1234"},
     )
-    mock_event = mocker.patch("app.main.views.service_settings.index.create_set_inbound_sms_on_event")
+    mock_event = mocker.patch("app.main.views.service_settings.index.Events.set_inbound_sms_on")
 
     page = client_request.post(
         ".service_receive_text_messages_start", service_id=SERVICE_ONE_ID, _follow_redirects=True

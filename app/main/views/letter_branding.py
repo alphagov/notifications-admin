@@ -4,7 +4,7 @@ from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
 from app import letter_branding_client, logo_client
-from app.event_handlers import create_update_letter_branding_event
+from app.event_handlers import Events
 from app.main import main
 from app.main.forms import (
     AdminEditLetterBrandingForm,
@@ -81,7 +81,7 @@ def update_letter_branding(branding_id):
                 name=letter_branding_details_form.name.data,
                 updated_by_id=current_user.id,
             )
-            create_update_letter_branding_event(
+            Events.update_letter_branding(
                 letter_branding_id=branding_id,
                 updated_by_id=current_user.id,
                 old_letter_branding=letter_branding.serialize(),
