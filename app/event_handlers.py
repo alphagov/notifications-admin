@@ -53,54 +53,6 @@ class Events:
 
 events = Events()
 
-def on_user_logged_in(_sender, user):
-    events.sucessful_login(user_id=user.id)
-
-
-def create_email_change_event(**kwargs):
-    events.update_user_email(**kwargs)
-
-
-def create_mobile_number_change_event(**kwargs):
-    events.update_user_mobile_number(**kwargs)
-
-
-def create_remove_user_from_service_event(**kwargs):
-    events.remove_user_from_service(**kwargs)
-
-
-def create_add_user_to_service_event(**kwargs):
-    events.add_user_to_service(**kwargs)
-
-
-def create_set_user_permissions_event(**kwargs):
-    events.set_user_permissions(**kwargs)
-
-
-def create_set_organisation_user_permissions_event(**kwargs):
-    events.set_organisation_user_permissions(**kwargs)
-
-
-def create_archive_user_event(**kwargs):
-    events.archive_user(**kwargs)
-
-
-def create_archive_service_event(**kwargs):
-    events.archive_service(**kwargs)
-
-
-def create_update_email_branding_event(**kwargs):
-    events.update_email_branding(**kwargs)
-
-
-def create_update_letter_branding_event(**kwargs):
-    events.update_letter_branding(**kwargs)
-
-
-def create_set_inbound_sms_on_event(**kwargs):
-    events.set_inbound_sms_on(**kwargs)
-
-
 
 def _construct_event_data(request):
     return {"ip_address": _get_remote_addr(request), "browser_fingerprint": _get_browser_fingerprint(request)}

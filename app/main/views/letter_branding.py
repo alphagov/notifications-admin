@@ -81,7 +81,7 @@ def update_letter_branding(branding_id):
                 name=letter_branding_details_form.name.data,
                 updated_by_id=current_user.id,
             )
-            create_update_letter_branding_event(
+            events.update_letter_branding(
                 letter_branding_id=branding_id,
                 updated_by_id=current_user.id,
                 old_letter_branding=letter_branding.serialize(),
