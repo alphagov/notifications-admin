@@ -211,7 +211,7 @@ def test_remove_platform_admin_prompts_for_confirmation(
         (None, "email_auth"),
     ),
 )
-def test_remove_platform_removes(
+def test_remove_platform_admin_removes_user_admin_privilege_and_changes_user_auth(
     client_request,
     platform_admin_user,
     fake_uuid,
