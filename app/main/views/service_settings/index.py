@@ -660,6 +660,11 @@ def set_per_day_international_sms_message_limit(service_id):
         notification_type="international_sms",
     )
 
+    if form.validate_on_submit():
+        current_service.update(international_sms_message_limit=form.message_limit.data)
+
+        return redirect(url_for(".service_settings", service_id=service_id))
+
     return render_template(
         "views/service-settings/set-message-limit-for-international-sms.html",
         form=form,
