@@ -14,10 +14,11 @@ class Event:
         if self.schema != actual_keys:
             raise ValueError(f"Expected {self.schema}, but got {actual_keys}")
 
-        event_data = _construct_event_data()
-        event_data.update(kwargs)
+        events_api_client.create_event(self.name, self.event_data | kwargs)
 
-        events_api_client.create_event(self.name, event_data)
+    @property
+    def event_data(self):
+        return {"ip_address": _get_remote_addr(), "browser_fingerprint": _get_browser_fingerprint()}
 
 
 class EventsMeta(type):
@@ -48,10 +49,6 @@ class Events(metaclass=EventsMeta):
     update_letter_branding = {"letter_branding_id", "updated_by_id", "old_letter_branding"}
     set_inbound_sms_on = {"user_id", "service_id", "inbound_number_id"}
     remove_platform_admin = {"user_id", "removed_by_id"}
-
-
-def _construct_event_data():
-    return {"ip_address": _get_remote_addr(), "browser_fingerprint": _get_browser_fingerprint()}
 
 
 # This might not be totally correct depending on proxy setup
