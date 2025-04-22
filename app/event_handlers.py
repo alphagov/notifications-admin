@@ -47,7 +47,7 @@ class Events(metaclass=EventsMeta):
     update_email_branding = {"email_branding_id", "updated_by_id", "old_email_branding"}
     update_letter_branding = {"letter_branding_id", "updated_by_id", "old_letter_branding"}
     set_inbound_sms_on = {"user_id", "service_id", "inbound_number_id"}
-    remove_platform_admin: {"user_id", "removed_by_id"}
+    remove_platform_admin = {"user_id", "removed_by_id"}
 
 
 def _construct_event_data(request):
@@ -63,16 +63,10 @@ def _get_remote_addr(request):
 
 
 def _get_browser_fingerprint(request):
-    browser = request.user_agent.browser
-    version = request.user_agent.version
-    platform = request.user_agent.platform
-    user_agent_string = request.user_agent.string
     # at some point this may be hashed?
-    finger_print = {
-        "browser": browser,
-        "platform": platform,
-        "version": version,
-        "user_agent_string": user_agent_string,
+    return {
+        "browser": request.user_agent.browser,
+        "platform": request.user_agent.platform,
+        "version": request.user_agent.version,
+        "user_agent_string": request.user_agent.string,
     }
-
-    return finger_print
