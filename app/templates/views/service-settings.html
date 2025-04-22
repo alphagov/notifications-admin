@@ -251,6 +251,8 @@
         }
       ]%}
 
+      {% set restricted_text_message_settings_rows = [] %}
+
       {% if current_service.has_permission("sms") %}
         {% set restricted_text_message_settings_rows = [
           {
@@ -295,6 +297,25 @@
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Receive text messages"
+            },
+            "value": {
+              "text": "On" if current_service.has_permission("inbound_sms") else "Off"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_receive_text_messages', service_id=current_service.id),
+                  "text": "Change",
+                  "visuallyHiddenText": "your settings for receiving text messages",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
               "text": "Send international text messages"
             },
             "value": {
@@ -311,29 +332,36 @@
               ]
             }
           },
+        ]%}
+      {% endif %}
+
+      {% set restricted_international_text_message_settings_rows = [] %}
+
+      {% if current_service.has_permission("international_sms") and current_service.has_permission("sms") %}
+        {% set restricted_international_text_message_settings_rows = [
           {
             "key": {
-              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-              "text": "Receive text messages"
-            },
+                "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+                "text": "International text message limit",
+              },
             "value": {
-              "text": "On" if current_service.has_permission("inbound_sms") else "Off"
+              "text": "{} per day".format(current_service.get_message_limit('international_sms')|format_thousands)
             },
             "actions": {
               "items": [
                 {
-                  "href": url_for('main.service_receive_text_messages', service_id=current_service.id),
+                  "href": url_for('main.set_per_day_international_sms_message_limit', service_id=current_service.id),
                   "text": "Change",
-                  "visuallyHiddenText": "your settings for receiving text messages",
+                  "visuallyHiddenText": "daily international {} limit".format('sms'|format_notification_type|lower),
                   "classes": "govuk-link--no-visited-state"
                 }
               ]
             }
-          }
+          },
         ]%}
       {% endif %}
 
-      {% set text_message_settings_rows = base_text_message_setting_row + restricted_text_message_settings_rows  if restricted_text_message_settings_rows else base_text_message_setting_row %}
+      {% set text_message_settings_rows = base_text_message_setting_row + restricted_text_message_settings_rows + restricted_international_text_message_settings_rows %}
 
       {{ govukSummaryList({
         "classes": "notify-summary-list service-sms-settings",

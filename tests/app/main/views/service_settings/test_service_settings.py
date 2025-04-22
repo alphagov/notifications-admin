@@ -76,8 +76,8 @@ def mock_get_service_settings_page_common(
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
-                "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
@@ -111,8 +111,8 @@ def mock_get_service_settings_page_common(
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
-                "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
                 "Live No Organisation must accept the data processing and financial agreement first",
                 "Count in list of live services Yes Change if service is counted in list of live services",
@@ -333,8 +333,9 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
-                "Send international text messages On Change your settings for sending international text messages",
                 "Receive text messages On Change your settings for receiving text messages",
+                "Send international text messages On Change your settings for sending international text messages",
+                "International text message limit 500 per day Change daily international text message limit",
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
@@ -352,8 +353,8 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
-                "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
