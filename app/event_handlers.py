@@ -14,7 +14,7 @@ class Event:
         if self.schema != actual_keys:
             raise ValueError(f"Expected {self.schema}, but got {actual_keys}")
 
-        event_data = _construct_event_data(request)
+        event_data = _construct_event_data()
         event_data.update(kwargs)
 
         events_api_client.create_event(self.name, event_data)
@@ -50,19 +50,19 @@ class Events(metaclass=EventsMeta):
     remove_platform_admin = {"user_id", "removed_by_id"}
 
 
-def _construct_event_data(request):
-    return {"ip_address": _get_remote_addr(request), "browser_fingerprint": _get_browser_fingerprint(request)}
+def _construct_event_data():
+    return {"ip_address": _get_remote_addr(), "browser_fingerprint": _get_browser_fingerprint()}
 
 
 # This might not be totally correct depending on proxy setup
-def _get_remote_addr(request):
+def _get_remote_addr():
     if request.headers.getlist("X-Forwarded-For"):
         return request.headers.getlist("X-Forwarded-For")[0]
     else:
         return request.remote_addr
 
 
-def _get_browser_fingerprint(request):
+def _get_browser_fingerprint():
     # at some point this may be hashed?
     return {
         "browser": request.user_agent.browser,
