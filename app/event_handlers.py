@@ -9,7 +9,15 @@ class Event:
         self.schema = schema
 
     def __call__(self, **kwargs):
-        _send_event(self.name, self.schema, **kwargs)
+        actual_keys = set(kwargs.keys())
+
+        if self.schema != actual_keys:
+            raise ValueError(f"Expected {self.schema}, but got {actual_keys}")
+
+        event_data = _construct_event_data(request)
+        event_data.update(kwargs)
+
+        events_api_client.create_event(self.name, event_data)
 
 
 class EventsMeta(type):
@@ -40,22 +48,6 @@ class Events(metaclass=EventsMeta):
     update_letter_branding = {"letter_branding_id", "updated_by_id", "old_letter_branding"}
     set_inbound_sms_on = {"user_id", "service_id", "inbound_number_id"}
     remove_platform_admin: {"user_id", "removed_by_id"}
-
-
-def on_user_logged_in(_sender, user):
-    Events.sucessful_login(user_id=user.id)
-
-
-def _send_event(event_type, expected_keys, **kwargs):
-    actual_keys = set(kwargs.keys())
-
-    if expected_keys != actual_keys:
-        raise ValueError(f"Expected {expected_keys}, but got {actual_keys}")
-
-    event_data = _construct_event_data(request)
-    event_data.update(kwargs)
-
-    events_api_client.create_event(event_type, event_data)
 
 
 def _construct_event_data(request):
