@@ -58,8 +58,7 @@ def _construct_event_data():
 def _get_remote_addr():
     if request.headers.getlist("X-Forwarded-For"):
         return request.headers.getlist("X-Forwarded-For")[0]
-    else:
-        return request.remote_addr
+    return request.remote_addr
 
 
 def _get_browser_fingerprint():
