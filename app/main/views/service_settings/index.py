@@ -25,10 +25,7 @@ from app import (
     service_api_client,
 )
 from app.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
-from app.event_handlers import (
-    create_archive_service_event,
-    create_set_inbound_sms_on_event,
-)
+from app.event_handlers import Events
 from app.extensions import zendesk_client
 from app.main import json_updates, main
 from app.main.forms import (
@@ -342,7 +339,7 @@ def archive_service(service_id):
         cached_service_user_ids = [user.id for user in current_service.active_users]
 
         service_api_client.archive_service(service_id, cached_service_user_ids)
-        create_archive_service_event(service_id=service_id, archived_by_id=current_user.id)
+        Events.archive_service(service_id=service_id, archived_by_id=current_user.id)
 
         flash(
             f"‘{current_service.name}’ was deleted",
@@ -686,7 +683,7 @@ def service_receive_text_messages_start(service_id):
     if request.method == "POST":
         sms_sender = inbound_number_client.add_inbound_number_to_service(current_service.id)
         current_service.force_permission("inbound_sms", on=True)
-        create_set_inbound_sms_on_event(
+        Events.set_inbound_sms_on(
             user_id=current_user.id,
             service_id=current_service.id,
             inbound_number_id=sms_sender["inbound_number_id"],

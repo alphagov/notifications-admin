@@ -1,6 +1,7 @@
 import pytest
 from flask import url_for
 
+from tests.app.test_event_handlers import event_dict
 from tests.conftest import (
     SERVICE_ONE_ID,
     normalize_spaces,
@@ -79,6 +80,8 @@ def test_should_login_user_and_should_redirect_to_next_url(
             service_id=SERVICE_ONE_ID,
         ),
     )
+
+    mock_create_event.assert_called_once_with("sucessful_login", event_dict(user_id=api_user_active["id"]))
 
 
 def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate_email(
@@ -288,7 +291,6 @@ def test_two_factor_sms_should_activate_pending_user(
     mocker,
     api_user_pending,
     mock_check_verify_code,
-    mock_create_event,
     mock_activate_user,
     mock_email_validated_recently,
 ):
@@ -345,7 +347,6 @@ def test_valid_two_factor_email_link_logs_in_user(
     mock_get_user,
     mock_get_services_with_one_service,
     mocker,
-    mock_create_event,
 ):
     mocker.patch("app.user_api_client.check_verify_code", return_value=(True, ""))
 

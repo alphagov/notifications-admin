@@ -1381,7 +1381,7 @@ def test_manage_user_page_doesnt_show_folder_hint_if_service_cant_edit_folder_pe
 def test_remove_user_from_service(
     client_request, active_user_with_permissions, api_user_active, service_one, mock_remove_user_from_service, mocker
 ):
-    mock_event_handler = mocker.patch("app.main.views.manage_users.create_remove_user_from_service_event")
+    mock_event_handler = mocker.patch("app.main.views.manage_users.Events.remove_user_from_service")
 
     client_request.post(
         "main.remove_user_from_service",
@@ -1620,7 +1620,7 @@ def test_confirm_edit_user_email_changes_user_email(
     # get_user gets called twice - first to check if current user can see the page, then to see if the team member
     # whose email address we're changing belongs to the service
     mocker.patch("app.user_api_client.get_user", side_effect=[active_user_with_permissions, api_user_active])
-    mock_event_handler = mocker.patch("app.main.views.manage_users.create_email_change_event")
+    mock_event_handler = mocker.patch("app.main.views.manage_users.Events.update_user_email")
 
     new_email = "new_email@gov.uk"
     with client_request.session_transaction() as session:
@@ -1808,7 +1808,7 @@ def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
     # get_user gets called twice - first to check if current user can see the page, then to see if the team member
     # whose mobile number we're changing belongs to the service
     mocker.patch("app.user_api_client.get_user", side_effect=[active_user_with_permissions, api_user_active])
-    mock_event_handler = mocker.patch("app.main.views.manage_users.create_mobile_number_change_event")
+    mock_event_handler = mocker.patch("app.main.views.manage_users.Events.update_user_mobile_number")
 
     new_number = "07554080636"
     with client_request.session_transaction() as session:

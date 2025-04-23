@@ -7,11 +7,7 @@ from notifications_python_client.errors import HTTPError
 from werkzeug.utils import cached_property
 
 from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
-from app.event_handlers import (
-    create_add_user_to_service_event,
-    create_set_organisation_user_permissions_event,
-    create_set_user_permissions_event,
-)
+from app.event_handlers import Events
 from app.models import JSONModel, ModelList
 from app.models.organisation import Organisation, Organisations
 from app.models.webauthn_credential import WebAuthnCredentials
@@ -154,7 +150,7 @@ class User(BaseUser, UserMixin):
             permissions=permissions,
             folder_permissions=folder_permissions,
         )
-        create_set_user_permissions_event(
+        Events.set_user_permissions(
             user_id=self.id,
             service_id=service_id,
             original_ui_permissions=self.permissions_for_service(service_id),
@@ -168,7 +164,7 @@ class User(BaseUser, UserMixin):
             organisation_id=organisation_id,
             permissions=[{"permission": p} for p in permissions],
         )
-        create_set_organisation_user_permissions_event(
+        Events.set_organisation_user_permissions(
             user_id=self.id,
             organisation_id=organisation_id,
             original_permissions=self.permissions_for_organisation(organisation_id),
@@ -429,7 +425,7 @@ class User(BaseUser, UserMixin):
                 permissions,
                 folder_permissions,
             )
-            create_add_user_to_service_event(
+            Events.add_user_to_service(
                 user_id=self.id,
                 invited_by_id=invited_by_id,
                 service_id=service_id,
