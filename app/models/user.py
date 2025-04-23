@@ -469,6 +469,14 @@ class User(BaseUser, UserMixin):
             and self.has_permission_for_organisation(service.organisation_id, PERMISSION_CAN_MAKE_SERVICES_LIVE)
         )
 
+    def remove_platform_admin(self):
+        if not self.platform_admin:
+            return
+        self.update(
+            platform_admin=False,
+            auth_type="sms_auth" if self.mobile_number else "email_auth",
+        )
+
 
 class InvitedUser(BaseUser):
     service: Any
