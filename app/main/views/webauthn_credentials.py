@@ -7,7 +7,7 @@ from app.main import main
 from app.models.user import User
 from app.models.webauthn_credential import RegistrationError, WebAuthnCredential
 from app.notify_client.user_api_client import user_api_client
-from app.utils.login import email_needs_revalidating, log_in_user, redirect_to_sign_in
+from app.utils.login import log_in_user, redirect_to_sign_in
 from app.utils.user import user_is_logged_in
 
 
@@ -159,7 +159,7 @@ def _complete_webauthn_login_attempt(user, webauthn_credential_id_used_for_login
         # user account is locked as too many failed logins
         abort(403)
 
-    if email_needs_revalidating(user):
+    if user.email_needs_revalidating:
         user_api_client.send_verify_code(user.id, "email", None, redirect_url)
         return redirect(url_for(".revalidate_email_sent", next=redirect_url))
 
