@@ -27,6 +27,7 @@ class Config:
     ASSETS_DEBUG = False
     AWS_REGION = "eu-west-1"
     DEFAULT_SERVICE_LIMIT = 50
+    DEFAULT_SERVICE_INTERNATIONAL_SMS_LIMIT = 100
     DEFAULT_LIVE_SERVICE_RATE_LIMITS = {
         "email": 250_000,
         "sms": 250_000,
