@@ -1,3 +1,5 @@
+from unittest.mock import PropertyMock
+
 import pytest
 from flask import url_for
 
@@ -12,7 +14,7 @@ from tests.conftest import (
 
 @pytest.fixture
 def mock_email_validated_recently(mocker):
-    return mocker.patch("app.main.views.two_factor.email_needs_revalidating", return_value=False)
+    return mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=False)
 
 
 @pytest.mark.parametrize("request_url", ["two_factor_email_sent", "revalidate_email_sent"])
@@ -93,7 +95,7 @@ def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate
     client_request.logout()
 
     mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
-    mocker.patch("app.main.views.two_factor.email_needs_revalidating", return_value=True)
+    mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=True)
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
     client_request.post(

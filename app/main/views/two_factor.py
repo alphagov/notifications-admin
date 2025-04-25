@@ -16,7 +16,6 @@ from app.main.forms import TwoFactorForm
 from app.models.token import Token
 from app.models.user import User
 from app.utils.login import (
-    email_needs_revalidating,
     log_in_user,
     redirect_if_logged_in,
     redirect_to_sign_in,
@@ -73,7 +72,7 @@ def two_factor_sms():
     redirect_url = request.args.get("next")
 
     if form.validate_on_submit():
-        if email_needs_revalidating(user):
+        if user.email_needs_revalidating:
             user_api_client.send_verify_code(user.id, "email", None, redirect_url)
             return redirect(url_for(".revalidate_email_sent", next=redirect_url))
         else:
