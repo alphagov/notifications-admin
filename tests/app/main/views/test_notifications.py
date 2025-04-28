@@ -515,6 +515,12 @@ def test_notification_page_does_not_show_cancel_link_for_letter_which_cannot_be_
             "Estimated delivery date: Tuesday 5 January",
         ),
         (
+            "economy",
+            "Postage: economy",
+            "letter-postage-economy",
+            "Estimated delivery date: Thursday 7 January",
+        ),
+        (
             "europe",
             "Postage: international",
             "letter-postage-international",
