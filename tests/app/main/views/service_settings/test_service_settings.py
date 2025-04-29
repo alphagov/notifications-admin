@@ -4812,13 +4812,11 @@ def test_should_show_page_to_set_per_day_international_sms_message_limit(
 )
 def test_set_per_day_international_sms_message_limit(
     client_request,
-    platform_admin_user,
     new_limit,
     expected_api_argument,
     mock_update_service,
     mocker,
 ):
-    client_request.login(platform_admin_user)
     client_request.post(
         "main.set_per_day_international_sms_message_limit",
         service_id=SERVICE_ONE_ID,
