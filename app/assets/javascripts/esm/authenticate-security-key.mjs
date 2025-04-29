@@ -1,5 +1,6 @@
 import { isSupported } from 'govuk-frontend';
 import ErrorBanner from './error-banner.mjs';
+import { decode, encode } from 'cbor2';
 
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
 // that uses ES2015 Classes -
@@ -34,7 +35,7 @@ class AuthenticateSecurityKey {
         return response.arrayBuffer();
       })
       .then(data => {
-        var options = window.CBOR.decode(data);
+        var options = decode(new Uint8Array(data));
         // triggers browser dialogue to login with authenticator
         return window.navigator.credentials.get(options);
       })
@@ -65,7 +66,7 @@ class AuthenticateSecurityKey {
         return response.arrayBuffer();
       })
       .then(cbor => {
-        return Promise.resolve(window.CBOR.decode(cbor));
+        return Promise.resolve(decode(new Uint8Array(cbor)));
       })
       .then(data => {
         window.location.assign(data.redirect_url);
@@ -81,7 +82,7 @@ class AuthenticateSecurityKey {
     return fetch(this.authenticatePath, {
       method: 'POST',
       headers: { 'X-CSRFToken': csrf_token },
-      body: window.CBOR.encode({
+      body: encode({
         credentialId: new Uint8Array(credential.rawId),
         authenticatorData: new Uint8Array(credential.response.authenticatorData),
         signature: new Uint8Array(credential.response.signature),

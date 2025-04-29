@@ -86,7 +86,6 @@ export default [
       paths.npm + 'jquery/dist/jquery.min.js',
       paths.npm + 'timeago/jquery.timeago.js',
       paths.npm + 'textarea-caret/index.js',
-      paths.npm + 'cbor-js/cbor.js',
       paths.src + 'javascripts/modules.js',
       paths.src + 'javascripts/govuk-frontend-toolkit/show-hide-content.js',
       paths.src + 'javascripts/stick-to-window-when-scrolling.js',
@@ -110,7 +109,6 @@ export default [
     },
     moduleContext: {
       './node_modules/jquery/dist/jquery.min.js': 'window',
-      './node_modules/cbor-js/cbor.js': 'window',
     },
     plugins: [
       nodeResolve(),
