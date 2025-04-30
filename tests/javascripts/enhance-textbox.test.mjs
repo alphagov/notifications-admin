@@ -162,7 +162,7 @@ describe('Enhanced textbox', () => {
           <label class="govuk-label" for="template_content">Message</label>
           <textarea class="govuk-textarea govuk-!-width-full govuk-textarea-highlight__textbox" id="template_content" name="template_content" rows="8" data-notify-module="enhanced-textbox" data-autofocus-textbox="true"></textarea>
         </div>`;
-       
+
         textarea = document.querySelector('textarea');
 
         new EnhancedTextbox(textarea);
@@ -358,7 +358,25 @@ describe('Enhanced textbox', () => {
 
     });
 
+    test("If an unsafe placeholder is added, it should be highlighted with placeholder-unsafe style", () => {
+
+      textarea.textContent = "Dear ((title::unsafe)) ((surname::unsafe))";
+
+      // start module
+      new EnhancedTextbox(textarea);
+
+      backgroundEl = textarea.nextElementSibling;
+      helpers.triggerEvent(textarea, 'input');
+
+      // add some more content with some optional content inside
+      const unsafeHighlightTags = backgroundEl.querySelectorAll('.placeholder-unsafe');
+
+      expect(unsafeHighlightTags.length).toEqual(2);
+
+    });
+
   });
+
 
   describe("When the content of the textbox is updated", () => {
 
