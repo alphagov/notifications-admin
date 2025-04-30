@@ -111,6 +111,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "letter_branding",
             "letter_contact_block",
             "email_message_limit",
+            "international_sms_message_limit",
             "sms_message_limit",
             "letter_message_limit",
             "name",

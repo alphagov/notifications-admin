@@ -1348,13 +1348,10 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
 
         self.message_limit.label.text = f"Daily {message_count_noun(1, notification_type)} limit"
         self.message_limit.things = f"the number of {message_count_noun(999, notification_type)}"
-        self.message_limit.param_extensions = {
-            "hint": {
-                "text": (
-                    f"Number of {message_count_noun(999, notification_type)} the service is allowed to send each day"
-                )
-            }
-        }
+        hint_text = f"Number of {message_count_noun(999, notification_type)} the service is allowed to send each day"
+        if notification_type != "international_sms":
+            self.message_limit.param_extensions = {"hint": {"text": hint_text}}
+
         self.message_limit.validators = [
             NotifyInputRequired(thing=f"a number of {message_count_noun(2, notification_type)}"),
             NumberRange(min=0, message="Number must be greater than or equal to 0"),

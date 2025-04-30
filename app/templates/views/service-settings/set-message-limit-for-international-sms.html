@@ -1,0 +1,46 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = "Daily international text message limit" %}
+
+
+{% block service_page_title %}
+{{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+{{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+        {{ page_header(page_title) }}
+        <p class="govuk-body">
+            Number of international text meesages the service is allowed to send each day.
+        </p>
+        <p class="govuk-body">
+            When choosing a limit you should think about:
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>how many international messages your service needs to send</li>
+            <li>any costs to your service if there is fraud, such as
+                <a class="govuk-link govuk-link--no-visited-state"
+                    href="https://www.ncsc.gov.uk/blog-post/ait-fraud-what-you-need-to-know">artificial inflation of
+                    traffic</a>
+            </li>
+        </ul>
+        {% call form_wrapper() %}
+        {{
+        form.message_limit()
+        }}
+        {{ page_footer('Save') }}
+        {% endcall %}
+    </div>
+</div>
+
+{% endblock %}
