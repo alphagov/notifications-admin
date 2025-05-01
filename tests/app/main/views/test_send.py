@@ -3271,6 +3271,63 @@ def test_check_messages_shows_too_many_messages_errors(
     assert normalize_spaces(page.select("div.banner-dangerous p")[1]) == expected_msg
 
 
+@pytest.mark.parametrize(
+    "num_requested,expected_msg",
+    [
+        (None, "‘example.csv’ contains 1,234 international phone numbers."),
+        ("0", "‘example.csv’ contains 1,234 international phone numbers."),
+        (
+            "1",
+            (
+                "You can still send 499 international text messages today, "
+                "but ‘example.csv’ contains 1,234 international phone numbers."
+            ),
+        ),
+    ],
+    ids=["none_sent", "none_sent", "some_sent"],
+)
+def test_check_messages_shows_too_many_international_sms_messages_errors(
+    client_request,
+    service_one,
+    mock_get_users_by_service,
+    mock_get_service_template,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+    num_requested,
+    expected_msg,
+    mock_s3_get_metadata,
+    mocker,
+):
+    service_one["permissions"] += ["international_sms"]
+    service_one["restricted"] = False
+    service_one["sms_message_limit"] = 250_000
+
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value=",\n".join(
+            ["phone number"]
+            + (["+12025550104"] * 1_234)  # international numbers
+            + (["+447900900567"] * 567)  # UK numbers
+        ),
+    )
+    mocker.patch("app.extensions.redis_client.get", return_value=num_requested)
+
+    with client_request.session_transaction() as session:
+        session["file_uploads"] = {fake_uuid: {"template_id": fake_uuid, "notification_count": 1, "valid": True}}
+
+    page = client_request.get(
+        "main.check_messages",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        upload_id=fake_uuid,
+        _test_page_title=False,
+    )
+
+    assert page.select_one("h1").text.strip() == "Too many international phone numbers"
+    assert normalize_spaces(page.select("div.banner-dangerous p")[1]) == expected_msg
+
+
 def test_check_messages_shows_trial_mode_error(
     client_request,
     mock_s3_get_metadata,

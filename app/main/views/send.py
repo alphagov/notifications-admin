@@ -618,6 +618,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, emergency_c
     )
 
     remaining_messages = current_service.remaining_messages(template.template_type)
+    remaining_international_sms_messages = current_service.remaining_messages("international_sms")
 
     if template.template_type == "email":
         template.reply_to = get_email_reply_to_address_from_session()
@@ -637,6 +638,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, emergency_c
             else None
         ),
         remaining_messages=remaining_messages,
+        remaining_international_sms_messages=remaining_international_sms_messages,
         allow_international_sms=current_service.has_permission("international_sms"),
         allow_sms_to_uk_landline=current_service.has_permission("sms_to_uk_landlines"),
         allow_international_letters=current_service.has_permission("international_letters"),
@@ -669,6 +671,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, emergency_c
         "upload_id": upload_id,
         "form": CsvUploadForm(),
         "remaining_messages": remaining_messages,
+        "remaining_international_sms_messages": remaining_international_sms_messages,
         "_choose_time_form": choose_time_form,
         "back_link": back_link,
         "trying_to_send_letters_in_trial_mode": all(
