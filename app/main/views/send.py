@@ -617,8 +617,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, emergency_c
         ),
     )
 
-    notification_count = service_api_client.get_notification_count(service_id, notification_type=template.template_type)
-    remaining_messages = current_service.get_message_limit(template.template_type) - notification_count
+    remaining_messages = current_service.remaining_messages(template.template_type)
 
     if template.template_type == "email":
         template.reply_to = get_email_reply_to_address_from_session()
