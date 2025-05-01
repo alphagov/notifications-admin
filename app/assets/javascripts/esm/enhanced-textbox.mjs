@@ -81,7 +81,7 @@ class EnhancedTextbox {
         if (value && separator == "??") {
           return `<span class='placeholder-conditional'>((${name}${separator}</span>${value}))`;
         } else if (value && separator == "::") {
-          return `<span class='placeholder-typed placeholder-unsafe'>((${name}</span>${separator}${value}))`;
+          return `<span class='placeholder-unsafe'>((${name}</span>${separator}${value}))`;
         } else {
           return `<span class='placeholder'>((${name}${value}))</span>`;
         }
