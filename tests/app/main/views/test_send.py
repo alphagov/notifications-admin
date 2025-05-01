@@ -4148,6 +4148,7 @@ TRIAL_MODE_MSG = (
 )
 TOO_LONG_MSG = "Text messages cannot be longer than 918 characters. Your message is 954 characters."
 SERVICE_DAILY_LIMIT_MSG = "Exceeded send limits (sms: 1000) for today"
+SERVICE_DAILY_INTERNTIONAL_SMS_LIMIT_MSG = "Exceeded send limits (international_sms: 1234) for today"
 
 
 @pytest.mark.parametrize(
@@ -4167,6 +4168,11 @@ SERVICE_DAILY_LIMIT_MSG = "Exceeded send limits (sms: 1000) for today"
             SERVICE_DAILY_LIMIT_MSG,
             "Daily limit reached",
             "You can only send 1,000 text messages per day in trial mode.",
+        ),
+        (
+            SERVICE_DAILY_INTERNTIONAL_SMS_LIMIT_MSG,
+            "Daily limit reached",
+            "You can only send 500 international text messages per day.",
         ),
     ],
 )

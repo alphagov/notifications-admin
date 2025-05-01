@@ -989,7 +989,10 @@ def get_template_error_dict(exception):
     if "service is in trial mode" in exception.message:
         error = "not-allowed-to-send-to"
     elif "Exceeded send limits" in exception.message:
-        error = "too-many-messages"
+        if "international_sms" in exception.message:
+            error = "too-many-international-sms-messages"
+        else:
+            error = "too-many-messages"
     # the error from the api is changing for message-too-long, but we need both until the api is deployed.
     elif "Content for template has a character count greater than the limit of" in exception.message:
         error = "message-too-long"
