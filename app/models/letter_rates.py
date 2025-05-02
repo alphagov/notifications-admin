@@ -24,6 +24,7 @@ class LetterRates(ModelList):
     post_classes = {
         # The API doesn’t store names or a sort order for the classes
         # so we define them here.
+        "economy": "Economy mail",
         "second": "Second class",
         "first": "First class",
         # The API will return rows for `europe` and `rest-of-world`.
@@ -35,9 +36,7 @@ class LetterRates(ModelList):
 
     @staticmethod
     def _get_items(*args, **kwargs):
-        # Once the economy postage is live, we can remove this logic
-        resp = letter_rate_api_client.get_letter_rates(*args, **kwargs)
-        return [rate for rate in resp if rate["post_class"] in LetterRates.post_classes]
+        return letter_rate_api_client.get_letter_rates(*args, **kwargs)
 
     @property
     def rates(self):
