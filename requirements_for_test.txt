@@ -68,7 +68,7 @@ et-xmlfile==2.0.0
     # via
     #   -r requirements.txt
     #   openpyxl
-eventlet==0.39.0
+eventlet==0.39.1
     # via
     #   -r requirements.txt
     #   gunicorn
