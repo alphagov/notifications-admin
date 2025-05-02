@@ -2452,6 +2452,17 @@ def mock_get_monthly_usage_for_service(notify_admin, mocker):
             {
                 "month": "February",
                 "notification_type": "letter",
+                "rate": 0.18,
+                "chargeable_units": 6,
+                "notifications_sent": 6,
+                "postage": "economy",
+                "charged_units": 6,
+                "free_allowance_used": 0,
+                "cost": 1.08,
+            },
+            {
+                "month": "February",
+                "notification_type": "letter",
                 "rate": 0.31,
                 "chargeable_units": 10,
                 "notifications_sent": 10,
