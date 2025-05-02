@@ -28,7 +28,7 @@ class Branding(JSONModel):
 
     @classmethod
     def with_default_values(cls, **kwargs):
-        return cls(dict.fromkeys(cls({}).__annotations__) | kwargs)
+        return cls(dict.fromkeys(cls.__annotations__) | kwargs)
 
     def name_like(self, name):
         return make_string_safe(name, whitespace="") == make_string_safe(self.name, whitespace="")
