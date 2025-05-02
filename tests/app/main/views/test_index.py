@@ -370,7 +370,7 @@ def test_bulk_sending_limits(client_request):
 
     assert normalize_spaces(paragraphs[0].text) == "You can send a batch of up to 100,000 messages at once."
     assert normalize_spaces(paragraphs[1].text) == (
-        "There’s a maximum daily limit of 250,000 emails, 250,000 text messages and 20,000 letters. "
+        "There’s a default maximum limit of 250,000 emails, 250,000 text messages and 20,000 letters. "
         "If you need to discuss these limits, contact us."
     )
 
