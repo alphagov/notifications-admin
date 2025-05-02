@@ -390,6 +390,9 @@ def recipient_count_label(count, template_type):
     if template_type == "sms":
         return "phone number" if singular else "phone numbers"
 
+    if template_type == "international_sms":
+        return "international phone number" if singular else "international phone numbers"
+
     if template_type == "email":
         return "email address" if singular else "email addresses"
 

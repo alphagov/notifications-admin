@@ -126,6 +126,10 @@
 
         {% include "partials/check/too-many-messages.html" %}
 
+      {% elif recipients.more_international_sms_than_can_send %}
+
+        {% include "partials/check/too-many-international-sms-messages.html" %}
+
       {% endif %}
 
     {% endcall %}
