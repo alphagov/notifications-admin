@@ -16,7 +16,6 @@ def _create_service(service_name, organisation_type, form):
             service_name=service_name,
             organisation_type=organisation_type,
             email_message_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
-            international_sms_message_limit=current_app.config["DEFAULT_SERVICE_INTERNATIONAL_SMS_LIMIT"],
             sms_message_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
             letter_message_limit=current_app.config["DEFAULT_SERVICE_LIMIT"],
             restricted=True,

@@ -627,7 +627,6 @@ def mock_create_service(notify_admin, mocker):
         service_name,
         organisation_type,
         email_message_limit,
-        international_sms_message_limit,
         sms_message_limit,
         letter_message_limit,
         restricted,
@@ -639,7 +638,6 @@ def mock_create_service(notify_admin, mocker):
             [user_id],
             restricted=restricted,
             email_message_limit=email_message_limit,
-            international_sms_message_limit=international_sms_message_limit,
             sms_message_limit=sms_message_limit,
             letter_message_limit=letter_message_limit,
         )
