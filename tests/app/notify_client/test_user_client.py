@@ -210,7 +210,7 @@ _clients_by_name = {
         ("user", "activate_user", [user_id], {}),
         ("user", "archive_user", [user_id], {}),
         ("service", "remove_user_from_service", [SERVICE_ONE_ID, user_id], {}),
-        ("service", "create_service", ["", "", 0, 0, 0, False, user_id], {}),
+        ("service", "create_service", ["", "", 0, 0, 0, 0, False, user_id], {}),
         ("invite", "accept_invite", [SERVICE_ONE_ID, user_id], {}),
     ],
 )

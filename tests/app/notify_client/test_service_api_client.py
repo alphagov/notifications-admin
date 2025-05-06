@@ -66,13 +66,14 @@ def test_client_creates_service_with_correct_data(
     mocker.patch("app.notify_client.current_user", id="123")
 
     client.create_service(
-        "My first service",
-        "central_government",
-        1,
-        1,
-        1,
-        True,
-        fake_uuid,
+        service_name="My first service",
+        organisation_type="central_government",
+        email_message_limit=1,
+        international_sms_message_limit=1,
+        sms_message_limit=1,
+        letter_message_limit=1,
+        restricted=True,
+        user_id=fake_uuid,
     )
     mock_post.assert_called_once_with(
         "/service",
@@ -85,6 +86,7 @@ def test_client_creates_service_with_correct_data(
             # The rest pass through with the same names
             "organisation_type": "central_government",
             "email_message_limit": 1,
+            "international_sms_message_limit": 1,
             "sms_message_limit": 1,
             "letter_message_limit": 1,
             "restricted": True,
