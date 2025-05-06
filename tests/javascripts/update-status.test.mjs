@@ -1,45 +1,31 @@
-const each = require('jest-each').default;
-
-const helpers = require('./support/helpers.js');
+import UpdateStatus from '../../app/assets/javascripts/esm/update-status.mjs';
+import { jest } from '@jest/globals';
+import * as helpers from './support/helpers.js';
 
 const serviceNumber = '6658542f-0cad-491f-bec8-ab8457700ead';
 const updatesURL = `/services/${serviceNumber}/templates/count-sms-length`;
 
-let responseObj = {};
-let jqueryAJAXReturnObj;
 
 beforeAll(() => {
 
   // ensure all timers go through Jest
   jest.useFakeTimers();
 
-  // mock the bits of jQuery used
-  jest.spyOn(window.$, 'ajax');
-
-  // set up the object returned from $.ajax so it responds with whatever responseObj is set to
-  jqueryAJAXReturnObj = {
-    done: callback => {
-      // For these tests the server responds immediately
-      callback(responseObj);
-      return jqueryAJAXReturnObj;
-    },
-    fail: () => {}
-  };
-
-  $.ajax.mockImplementation(() => jqueryAJAXReturnObj);
-
-  require('../../app/assets/javascripts/updateStatus.js');
-
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
 });
 
 describe('Update content', () => {
 
+  let $module;
+  let updateStatus;
+  let mockFetch;
+
   beforeEach(() => {
 
+    // Mock the window fetch function
+    mockFetch = jest.fn();
+    window.fetch = mockFetch;
+
+    document.body.classList.add('govuk-frontend-supported');
     document.body.innerHTML = `
       <form>
         <input type="hidden" name="csrf_token" value="abc123" />
@@ -52,23 +38,27 @@ describe('Update content', () => {
       </div>
     `;
 
+    $module = document.querySelector('[data-notify-module="update-status"]')
+
+    // Instantiate the class
+    updateStatus = new UpdateStatus($module);
+
   });
 
   afterEach(() => {
 
     document.body.innerHTML = '';
 
-    // tidy up record of mocked AJAX calls
-    $.ajax.mockClear();
-
     // ensure any timers set by continually starting the module are cleared
     jest.clearAllTimers();
+
+    jest.restoreAllMocks();
 
   });
 
   test("It should add attributes to the elements", () => {
 
-    window.GOVUK.notifyModules.start();
+    updateStatus.init();
 
     expect(
       document.querySelectorAll('[data-notify-module=update-status]')[0].id
@@ -88,7 +78,7 @@ describe('Update content', () => {
 
     document.getElementById('template_content').removeAttribute('aria-describedby');
 
-    window.GOVUK.notifyModules.start();
+    updateStatus.init();
 
     expect(
       document.getElementById('template_content').getAttribute('aria-describedby')
@@ -98,24 +88,31 @@ describe('Update content', () => {
 
   });
 
-  test("It should make requests to the URL specified in the data-updates-url attribute", () => {
+  test("It should make requests to the URL specified in the data-updates-url attribute", async () => {
 
-    window.GOVUK.notifyModules.start();
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve()
+    });
 
-    expect($.ajax.mock.calls[0][0]).toEqual(updatesURL);
-    expect($.ajax.mock.calls[0]).toEqual([
-      updatesURL,
-      {
-        "data": "csrf_token=abc123&template_content=Content%20of%20message",
-        "method": "post"
-      }
-    ]);
+    await updateStatus.init();
+
+    expect(mockFetch).toHaveBeenCalledWith(updatesURL, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: "csrf_token=abc123&template_content=Content+of+message",
+    });
 
   });
 
-  test("It should replace the content of the div with the returned HTML", () => {
+  test("It should replace the content of the div with the returned HTML", async () => {
 
-    responseObj = {'html': 'Updated content'}
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({'html': 'Updated content'})
+    });
 
     expect(
       document.querySelectorAll('[data-notify-module=update-status]')[0].textContent.trim()
@@ -123,7 +120,7 @@ describe('Update content', () => {
       "Initial content"
     );
 
-    window.GOVUK.notifyModules.start();
+    await updateStatus.update();
 
     expect(
       document.querySelectorAll('[data-notify-module=update-status]')[0].textContent.trim()
@@ -135,44 +132,74 @@ describe('Update content', () => {
 
   test("It should fire when the content of the textarea changes", () => {
 
+    jest.spyOn(updateStatus, 'update');
+
     let textarea = document.getElementById('template_content');
 
     // Initial update triggered
-    window.GOVUK.notifyModules.start();
-    expect($.ajax.mock.calls.length).toEqual(1);
+    updateStatus.init();
+
+    expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
     // 150ms of inactivity
     jest.advanceTimersByTime(150);
     helpers.triggerEvent(textarea, 'input');
 
-    expect($.ajax.mock.calls.length).toEqual(2);
+    expect(updateStatus.update).toHaveBeenCalledTimes(2);
 
   });
 
   test("It should fire only after 150ms of inactivity", () => {
 
+    jest.spyOn(updateStatus, 'update');
+
     let textarea = document.getElementById('template_content');
 
     // Initial update triggered
-    window.GOVUK.notifyModules.start();
-    expect($.ajax.mock.calls.length).toEqual(1);
+    updateStatus.init();
+    expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
     helpers.triggerEvent(textarea, 'input');
     jest.advanceTimersByTime(149);
-    expect($.ajax.mock.calls.length).toEqual(1);
+    expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
     helpers.triggerEvent(textarea, 'input');
     jest.advanceTimersByTime(149);
-    expect($.ajax.mock.calls.length).toEqual(1);
+    expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
     helpers.triggerEvent(textarea, 'input');
     jest.advanceTimersByTime(149);
-    expect($.ajax.mock.calls.length).toEqual(1);
+    expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
     // > 150ms of inactivity
     jest.advanceTimersByTime(1);
-    expect($.ajax.mock.calls.length).toEqual(2);
+    expect(updateStatus.update).toHaveBeenCalledTimes(2);
 
+  });
+
+  test('It should throw an error if the request fetch initiated fails', async () => {
+    mockFetch.mockRejectedValueOnce(new Error('Fetch error'));
+    // Spy on console.error
+    console.error = jest.fn();
+
+    await updateStatus.update();
+
+    expect(console.error).toHaveBeenCalledWith(
+      'Failed to update status:',
+      expect.any(Error)
+    );
+  });
+
+  test("It should not call getRenderer if the response is not ok", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false
+    });
+    // spy on getRenderer
+    jest.spyOn(updateStatus, 'getRenderer');
+
+    await updateStatus.update();
+
+    expect(updateStatus.getRenderer).not.toHaveBeenCalled();
   });
 
 });
