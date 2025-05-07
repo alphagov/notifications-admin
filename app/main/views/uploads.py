@@ -250,9 +250,7 @@ def uploaded_letter_preview(service_id, file_id):
 
     error_message = get_letter_validation_error(error_shortcode, invalid_pages, page_count)
 
-    form = LetterUploadPostageForm(
-        postage_zone=postal_address.postage, show_economy_class=current_service.has_permission("economy_letter_sending")
-    )
+    form = LetterUploadPostageForm(postage_zone=postal_address.postage)
 
     template = current_service.get_precompiled_letter_template(
         letter_preview_url=url_for(".view_letter_upload_as_preview", service_id=service_id, file_id=file_id),
@@ -319,9 +317,7 @@ def send_uploaded_letter(service_id, file_id):
 
     postal_address = PostalAddress(metadata.get("recipient"))
 
-    form = LetterUploadPostageForm(
-        postage_zone=postal_address.postage, show_economy_class=current_service.has_permission("economy_letter_sending")
-    )
+    form = LetterUploadPostageForm(postage_zone=postal_address.postage)
 
     if not form.validate_on_submit():
         return uploaded_letter_preview(service_id, file_id)
