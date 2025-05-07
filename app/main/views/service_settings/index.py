@@ -83,7 +83,6 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = {
     "extra_email_formatting": {"title": "Extra email formatting options", "requires": "email"},
     "extra_letter_formatting": {"title": "Extra letter formatting options", "requires": "letter"},
     "sms_to_uk_landlines": {"title": "Sending SMS to UK landlines"},
-    "economy_letter_sending": {"title": "Sending economy letters", "requires": "letter"},
 }
 
 THANKS_FOR_BRANDING_REQUEST_MESSAGE = (
