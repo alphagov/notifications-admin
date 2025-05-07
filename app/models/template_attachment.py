@@ -20,6 +20,7 @@ class TemplateAttachment(JSONModel):
     file_name: str
     weeks_of_retention: int
     email_confirmation: bool
+    link_text: str
 
     __sort_attribute__ = "file_name"
 
@@ -41,11 +42,18 @@ class TemplateAttachment(JSONModel):
         return bool(self.file_name)
 
     @property
-    def url(self, custom=False):
+    def url(self):
         if not self.file_name:
             return
-        if custom:
-            return f"{self.BASE_URL}/f/{base64.b64encode(self.file_name.encode()).decode()}"
+        if self.link_text:
+            return (
+                f"[{self.link_text}]"
+                f"("
+                f"{self.BASE_URL}"
+                "/d/YlxDzgNUQYi1Qg6QxIpptA/WiwkEBFmSy6WYJ0gLemPdg"
+                "?key=oe78i7L5xPD-VZVfPAUHyxr5YVBwMB73Hu7sAl-HnXU"
+                f")"
+            )
         return (
             f"{self.BASE_URL}"
             "/d/YlxDzgNUQYi1Qg6QxIpptA/WiwkEBFmSy6WYJ0gLemPdg"
@@ -68,6 +76,7 @@ class TemplateAttachments(InsensitiveDict):
                 "file_name": None,
                 "weeks_of_retention": 26,
                 "email_confirmation": True,
+                "link_text": None,
             }
         return TemplateAttachment(
             super().__getitem__(placeholder_name),
