@@ -1523,18 +1523,13 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
     choices = [
         ("first", "First class"),
         ("second", "Second class"),
+        ("economy", "Economy mail"),
     ]
-
-    def __init__(self, *args, show_economy_class, **kwargs):
-        super().__init__(*args, **kwargs)
-        if show_economy_class:
-            self.postage.choices.append(("economy", "Economy mail"))
-            self.postage.thing = "first class, second class or economy mail"
 
     postage = GovukRadiosField(
         "Choose the postage for this letter template",
         choices=choices,
-        thing="first class or second class",
+        thing="first class, second class or economy mail",
         validators=[DataRequired()],
     )
 
