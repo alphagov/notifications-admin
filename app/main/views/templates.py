@@ -1409,7 +1409,7 @@ def email_template_manage_attachments(template_id, service_id):
         {
             "key": {
                 "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-                "html": Field(f"(({placeholder}::file))"),
+                "html": Field(f"(({placeholder}))", with_brackets=False),
             },
             "value": {
                 "text": template.attachments[placeholder].file_name or "No file uploaded",
@@ -1438,7 +1438,7 @@ def email_template_manage_attachments(template_id, service_id):
         "views/templates/manage-email-attachments.html",
         template=template,
         rows=rows,
-        example_placeholder=Field(f"((application form::file))"),
+        example_placeholder=Field(f"((example::file))"),
     )
 
 
