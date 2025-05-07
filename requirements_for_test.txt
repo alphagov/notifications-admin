@@ -246,7 +246,7 @@ python-dateutil==2.8.2
     #   botocore
     #   freezegun
     #   moto
-python-json-logger==2.0.7
+python-json-logger==3.3.0
     # via
     #   -r requirements.txt
     #   notifications-utils

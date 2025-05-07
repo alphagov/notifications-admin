@@ -142,7 +142,7 @@ pypdf==3.13.0
     # via notifications-utils
 python-dateutil==2.8.2
     # via botocore
-python-json-logger==2.0.7
+python-json-logger==3.3.0
     # via notifications-utils
 pytz==2024.2
     # via notifications-utils
