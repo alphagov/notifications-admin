@@ -40,7 +40,7 @@
 
       {{ govukButton({
         "element": "a",
-        "text": "Manage files" if template.attachments else "Add files",
+        "text": "Attach files" if template.attachments else "Attach files",
         "href": url_for(
           '.email_template_manage_attachments',
           service_id=current_service.id,

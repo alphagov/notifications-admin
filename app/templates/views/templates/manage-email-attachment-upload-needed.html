@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
-{% set title = 'You need to upload files' %}
+{% set title = 'You need to attach files to your template' %}
 {% block service_page_title %}
   {{ title }}
 {% endblock %}
@@ -17,10 +17,13 @@
     <div class="govuk-grid-column-five-sixths">
       {{ page_header(title) }}
       <p class="govuk-body">
-        Can’t send without files
+        You need to do this before you can send your email.
       </p>
       <p class="govuk-body">
-        <a href="{{ url_for('main.email_template_manage_attachments', service_id=current_service.id, template_id=template.id)}} ">Manage files</a>
+        When you upload a file, Notify will replace the placeholder with a link to download the file.
+      </p>
+      <p class="govuk-body">
+        <a href="{{ url_for('main.email_template_manage_attachments', service_id=current_service.id, template_id=template.id)}} ">Attach files</a>
       </p>
     </div>
   </div>
