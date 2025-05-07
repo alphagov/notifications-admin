@@ -54,6 +54,7 @@ from app.main.forms import (
     RenameTemplateForm,
     SearchTemplatesForm,
     SetServiceAttachmentDataRetentionForm,
+    SetServiceAttachmentLinkText,
     SetTemplateSenderForm,
     SMSTemplateForm,
     TemplateAndFoldersSelectionForm,
@@ -1472,6 +1473,31 @@ def email_template_manage_attachment(template_id, service_id):
         form=form,
         attachment=attachment,
         delete=delete,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/link-text", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def email_template_manage_attachment_link_text(template_id, service_id):
+    template = current_service.get_template(template_id)
+    placeholder = request.args.get("placeholder")
+    attachment = template.attachments[placeholder]
+    form = SetServiceAttachmentLinkText(link_text=attachment.link_text)
+    if form.validate_on_submit():
+        attachment.link_text = form.link_text.data
+        return redirect(
+            url_for(
+                "main.email_template_manage_attachment",
+                service_id=current_service.id,
+                template_id=template.id,
+                placeholder=placeholder,
+            )
+        )
+    return render_template(
+        "views/templates/manage-email-attachment-link-text.html",
+        template=template,
+        placeholder=placeholder,
+        form=form,
     )
 
 

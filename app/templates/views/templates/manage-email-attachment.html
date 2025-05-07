@@ -53,6 +53,31 @@
       {
         "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Link text"
+        },
+        "value": {
+            "text": attachment.link_text or None,
+            "classes": "govuk-summary-list__value--truncate" if attachment.link_text else "govuk-hint"
+        },
+        "actions": {
+          "items": [
+              {
+                  "href": url_for(
+                      'main.email_template_manage_attachment_link_text',
+                      service_id=current_service.id,
+                      template_id=template.id,
+                      placeholder=placeholder.strip(),
+                  ),
+                  "text": "Change",
+                  "visuallyHiddenText": "service name",
+                  "classes": "govuk-link--no-visited-state"
+              }
+          ]
+        }
+      },
+      {
+        "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
             "text": "Available for"
         },
         "value": {

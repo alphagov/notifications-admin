@@ -2537,6 +2537,10 @@ class SetServiceAttachmentDataRetentionForm(StripWhitespaceForm):
     )
 
 
+class SetServiceAttachmentLinkText(StripWhitespaceForm):
+    link_text = GovukTextInputField("Link text (optional)")
+
+
 class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
     notification_type = GovukRadiosField(
         "What notification type?",
