@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session
 
 
 class EventsApiClient(NotifyAdminAPIClient):
@@ -18,7 +18,7 @@ class EventsApiClient(NotifyAdminAPIClient):
 _events_api_client_context_var: ContextVar[EventsApiClient] = ContextVar("events_api_client")
 get_events_api_client: LazyLocalGetter[EventsApiClient] = LazyLocalGetter(
     _events_api_client_context_var,
-    lambda: EventsApiClient(current_app),
+    lambda: EventsApiClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_events_api_client.clear())
 events_api_client = LocalProxy(get_events_api_client)
