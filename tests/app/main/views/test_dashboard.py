@@ -1339,7 +1339,7 @@ def test_menu_send_messages(
     mock_get_free_sms_fragment_limit,
     mock_get_returned_letter_statistics_with_no_returned_letters,
 ):
-    service_one["permissions"] = ["email", "sms", "letter", "upload_letters"]
+    service_one["permissions"] = ["email", "sms", "letter"]
 
     page = _test_dashboard_menu(
         client_request,
@@ -1362,33 +1362,6 @@ def test_menu_send_messages(
     assert url_for("main.service_settings", service_id=service_one["id"]) not in page
     assert url_for("main.api_keys", service_id=service_one["id"]) not in page
     assert url_for("main.view_providers") not in page
-
-
-def test_menu_send_messages_when_service_does_not_have_upload_letters_permission(
-    client_request,
-    mocker,
-    api_user_active,
-    service_one,
-    mock_get_service_templates,
-    mock_has_no_jobs,
-    mock_get_template_statistics,
-    mock_get_service_statistics,
-    mock_get_unsubscribe_requests_statistics,
-    mock_get_annual_usage_for_service,
-    mock_get_inbound_sms_summary,
-    mock_get_free_sms_fragment_limit,
-    mock_get_returned_letter_statistics_with_no_returned_letters,
-):
-    page = _test_dashboard_menu(
-        client_request,
-        mocker,
-        api_user_active,
-        service_one,
-        ["view_activity", "send_texts", "send_emails", "send_letters"],
-    )
-
-    assert page.select_one(".navigation")
-    assert url_for("main.uploads", service_id=service_one["id"]) not in page.select_one(".navigation")
 
 
 def test_menu_manage_service(

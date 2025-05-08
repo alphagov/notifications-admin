@@ -18,12 +18,7 @@ from tests.conftest import (
             [],
             marks=pytest.mark.xfail(raises=AssertionError),
         ),
-        pytest.param(
-            ["upload_letters"],
-            marks=pytest.mark.xfail(raises=AssertionError),
-        ),
         ["letter"],
-        ["letter", "upload_letters"],
     ),
 )
 def test_upload_letters_button_only_with_letters_permission(
@@ -102,7 +97,7 @@ def test_get_upload_hub_page(
     mocker,
 ):
     mocker.patch("app.job_api_client.get_jobs", return_value={"data": []})
-    service_one["permissions"] += ["letter", "upload_letters"]
+    service_one["permissions"] += ["letter"]
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Uploads"
 
