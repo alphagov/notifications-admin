@@ -164,7 +164,7 @@ moto==5.1.0
     # via -r requirements_for_test.in
 notifications-python-client==10.0.0
     # via -r requirements.txt
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@f3636bfdcdf43c0a18ab0e91b127e8eda5a63e50
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@73d5018cacd490863ca96544b059d63df07f2c3b
     # via -r requirements.txt
 openpyxl==3.1.5
     # via
@@ -246,7 +246,7 @@ python-dateutil==2.8.2
     #   botocore
     #   freezegun
     #   moto
-python-json-logger==2.0.7
+python-json-logger==3.3.0
     # via
     #   -r requirements.txt
     #   notifications-utils
