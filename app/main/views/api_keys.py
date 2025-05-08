@@ -8,6 +8,7 @@ from app import (
     current_service,
     service_api_client,
 )
+from app.constants import ServiceCallbackTypes
 from app.main import main
 from app.main.forms import CallbackForm, CreateKeyForm, GuestList
 from app.models.notification import APINotifications
@@ -212,40 +213,17 @@ def received_text_messages_callback(service_id):
     if not current_service.has_permission("inbound_sms"):
         return redirect(url_for(".api_integration", service_id=service_id))
 
-    received_text_messages_callback = current_service.inbound_sms_callback_details
+    callback_details = current_service.inbound_sms_callback_details
     form = CallbackForm(
-        url=(received_text_messages_callback.get("url") if received_text_messages_callback else ""),
-        bearer_token=dummy_bearer_token if received_text_messages_callback else "",
+        url=(callback_details.get("url") if callback_details else ""),
+        bearer_token=dummy_bearer_token if callback_details else "",
     )
+    callback_type = ServiceCallbackTypes.inbound_sms.value
 
     if form.validate_on_submit():
-        if received_text_messages_callback and form.url.data:
-            if (
-                received_text_messages_callback.get("url") != form.url.data
-                or form.bearer_token.data != dummy_bearer_token
-            ):
-                service_api_client.update_service_callback_api(
-                    service_id,
-                    url=form.url.data,
-                    bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
-                    user_id=current_user.id,
-                    callback_api_id=received_text_messages_callback.get("id"),
-                    callback_type="inbound_sms",
-                )
-        elif received_text_messages_callback and not form.url.data:
-            service_api_client.delete_service_callback_api(
-                service_id=service_id,
-                callback_api_id=received_text_messages_callback["id"],
-                callback_type="inbound_sms",
-            )
-        elif form.url.data:
-            service_api_client.create_service_callback_api(
-                service_id,
-                url=form.url.data,
-                bearer_token=form.bearer_token.data,
-                user_id=current_user.id,
-                callback_type="inbound_sms",
-            )
+        create_or_update_or_remove_callback(
+            callback_details=callback_details, callback_type=callback_type, form=form, service_id=service_id
+        )
         return redirect(url_for(".api_callbacks", service_id=service_id))
     return render_template(
         "views/api/callbacks/received-text-messages-callback.html",
