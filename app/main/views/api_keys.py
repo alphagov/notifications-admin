@@ -210,45 +210,19 @@ def received_text_messages_callback(service_id):
 )
 @user_has_permissions("manage_api_keys")
 def returned_letters_callback(service_id):
-    returned_letters_callback_details = current_service.returned_letters_callback_details
+    callback_details = current_service.returned_letters_callback_details
     back_link = ".api_callbacks"
 
     form = CallbackForm(
-        url=returned_letters_callback_details.get("url") if returned_letters_callback_details else "",
-        bearer_token=dummy_bearer_token if returned_letters_callback_details else "",
+        url=callback_details.get("url") if callback_details else "",
+        bearer_token=dummy_bearer_token if callback_details else "",
     )
+    callback_type = ServiceCallbackTypes.returned_letter.value
 
     if form.validate_on_submit():
-        if returned_letters_callback_details and form.url.data:
-            if (
-                returned_letters_callback_details.get("url") != form.url.data
-                or form.bearer_token.data != dummy_bearer_token
-            ):
-                service_api_client.update_service_callback_api(
-                    service_id,
-                    url=form.url.data,
-                    bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
-                    user_id=current_user.id,
-                    callback_api_id=returned_letters_callback_details.get("id"),
-                    callback_type="returned_letter",
-                )
-        elif returned_letters_callback_details and not form.url.data:
-            service_api_client.delete_service_callback_api(
-                service_id, returned_letters_callback_details["id"], "returned_letter"
-            )
-        elif form.url.data:
-            service_api_client.create_service_callback_api(
-                service_id,
-                url=form.url.data,
-                bearer_token=form.bearer_token.data,
-                user_id=current_user.id,
-                callback_type="returned_letter",
-            )
-        else:
-            # If no callback is set up and the user chooses to continue
-            # having no callback (ie both fields empty) then there’s
-            # nothing for us to do here
-            pass
+        create_or_update_or_remove_callback(
+            callback_details=callback_details, callback_type=callback_type, form=form, service_id=service_id
+        )
         return redirect(url_for(back_link, service_id=service_id))
 
     return render_template(
