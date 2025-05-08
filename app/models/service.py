@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Any
 
 from flask import abort, current_app
-from notifications_python_client.errors import HTTPError
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
@@ -657,15 +656,7 @@ class Service(JSONModel):
 
     @property
     def inbound_sms_callback_details(self):
-        if self.inbound_api:
-            try:
-                return service_api_client.get_service_callback_api(self.id, self.inbound_api[0], "inbound_sms")
-            except HTTPError:
-                pass
-        try:
-            return self.get_service_callback_details("inbound_sms")
-        except HTTPError:
-            pass
+        return self.get_service_callback_details("inbound_sms")
 
     @property
     def delivery_status_callback_details(self):
