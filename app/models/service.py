@@ -71,7 +71,6 @@ class Service(JSONModel):
     ALL_PERMISSIONS = TEMPLATE_TYPES + (
         "edit_folder_permissions",
         "email_auth",
-        "extra_email_formatting",
         "inbound_sms",
         "international_letters",
         "international_sms",

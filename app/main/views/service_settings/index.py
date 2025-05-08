@@ -80,7 +80,6 @@ from app.utils.user import (
 PLATFORM_ADMIN_SERVICE_PERMISSIONS = {
     "inbound_sms": {"title": "Receive inbound SMS", "requires": "sms", "endpoint": ".service_set_inbound_number"},
     "email_auth": {"title": "Email authentication"},
-    "extra_email_formatting": {"title": "Extra email formatting options", "requires": "email"},
     "sms_to_uk_landlines": {"title": "Sending SMS to UK landlines"},
     "economy_letter_sending": {"title": "Sending economy letters", "requires": "letter"},
 }
