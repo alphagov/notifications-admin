@@ -44,7 +44,6 @@ class Service(JSONModel):
     go_live_at: datetime
     has_active_go_live_request: bool
     id: Any
-    inbound_api: Any
     email_message_limit: int
     international_sms_message_limit: int
     sms_message_limit: int
