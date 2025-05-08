@@ -76,7 +76,6 @@ class Service(JSONModel):
         "inbound_sms",
         "international_letters",
         "international_sms",
-        "upload_document",
         "sms_to_uk_landlines",
         "economy_letter_sending",
     )

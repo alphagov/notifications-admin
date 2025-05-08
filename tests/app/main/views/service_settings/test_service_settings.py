@@ -5081,7 +5081,6 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
     mocker,
 ):
     service_one["contact_link"] = "http://example.com/"
-    service_one["permissions"].append("upload_document")
 
     page = client_request.post(
         "main.send_files_by_email_contact_details",
