@@ -1014,9 +1014,7 @@ def edit_template_postage(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     if template.template_type != "letter":
         abort(404)
-    form = LetterTemplatePostageForm(
-        **template._template, show_economy_class=current_service.has_permission("economy_letter_sending")
-    )
+    form = LetterTemplatePostageForm(**template._template)
     if form.validate_on_submit():
         postage = form.postage.data
         service_api_client.update_service_template(service_id, template_id, postage=postage)
