@@ -80,18 +80,6 @@ def test_service_set_permission_requires_platform_admin(
             ["email"],
         ),
         (
-            ["letter"],
-            "extra_letter_formatting",
-            "True",
-            ["letter", "extra_letter_formatting"],
-        ),
-        (
-            ["letter", "extra_letter_formatting"],
-            "extra_letter_formatting",
-            "False",
-            ["letter"],
-        ),
-        (
             [],
             "sms_to_uk_landlines",
             "True",
@@ -164,12 +152,6 @@ def test_service_set_permission(
             ".service_set_permission",
             {"permission": "extra_email_formatting"},
             "Extra email formatting options Off Change your settings for Extra email formatting options",
-        ),
-        (
-            {"permissions": ["letter"]},
-            ".service_set_permission",
-            {"permission": "extra_letter_formatting"},
-            "Extra letter formatting options Off Change your settings for Extra letter formatting options",
         ),
         (
             {"permissions": ["letter"]},
