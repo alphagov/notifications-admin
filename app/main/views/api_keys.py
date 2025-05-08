@@ -305,3 +305,35 @@ def returned_letters_callback(service_id):
         back_link=back_link,
         form=form,
     )
+
+
+def create_or_update_or_remove_callback(callback_details, callback_type, form, service_id):
+    if callback_details and form.url.data:
+        if callback_details.get("url") != form.url.data or form.bearer_token.data != dummy_bearer_token:
+            service_api_client.update_service_callback_api(
+                service_id,
+                url=form.url.data,
+                bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
+                user_id=current_user.id,
+                callback_api_id=callback_details.get("id"),
+                callback_type=callback_type,
+            )
+    elif callback_details and not form.url.data:
+        service_api_client.delete_service_callback_api(
+            service_id=service_id,
+            callback_api_id=callback_details["id"],
+            callback_type=callback_type,
+        )
+    elif form.url.data:
+        service_api_client.create_service_callback_api(
+            service_id,
+            url=form.url.data,
+            bearer_token=form.bearer_token.data,
+            user_id=current_user.id,
+            callback_type=callback_type,
+        )
+    else:
+        # If no callback is set up and the user chooses to continue
+        # having no callback (ie both fields empty) then there’s
+        # nothing for us to do here
+        pass
