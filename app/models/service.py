@@ -663,19 +663,19 @@ class Service(JSONModel):
             except HTTPError:
                 pass
         try:
-            return self._callback_service_callback_details("inbound_sms")
+            return self.get_service_callback_details("inbound_sms")
         except HTTPError:
             pass
 
     @property
     def delivery_status_callback_details(self):
-        return self._callback_service_callback_details("delivery_status")
+        return self.get_service_callback_details("delivery_status")
 
     @property
     def returned_letters_callback_details(self):
-        return self._callback_service_callback_details("returned_letter")
+        return self.get_service_callback_details("returned_letter")
 
-    def _callback_service_callback_details(self, callback_type):
+    def get_service_callback_details(self, callback_type):
         if callback_api := self.service_callback_api:
             for row in callback_api:
                 if row["callback_type"] == callback_type:
