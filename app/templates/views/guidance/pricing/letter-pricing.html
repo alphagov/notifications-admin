@@ -32,9 +32,11 @@
 
 <p class="govuk-body">Letters must be 10 pages or less (5 double-sided sheets of paper).</p>
 
+<p class="govuk-body">Prices do not include VAT.</p>
+
   <div>
     {% call mapping_table(
-      caption='Letter pricing',
+      caption='Letter pricing. Prices do not include VAT.',
       field_headings=['Paper'] + letter_rates.post_classes.values()|list,
       field_headings_visible=True,
       caption_visible=False
@@ -43,11 +45,13 @@
         {% call row() %}
           {% call row_heading() %} {{ sheets }} sheet{{ 's' if sheets > 1 else '' }} {% endcall %}
           {% for post_class in letter_rates.post_classes.keys() %}
-            {{ text_field(letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False) + ' + VAT') }}
+            {{ text_field(letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False)) }}
           {% endfor %}
         {% endcall %}
       {% endfor %}
     {% endcall %}
   </div>
+
+<p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_delivery_times', _anchor='letters') }}">delivery times</a>.</p>
 
 {% endblock %}
