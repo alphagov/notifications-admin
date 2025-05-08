@@ -161,6 +161,7 @@ def delivery_status_callback(service_id):
         url=delivery_status_callback_details.get("url") if delivery_status_callback_details else "",
         bearer_token=dummy_bearer_token if delivery_status_callback else "",
     )
+
     if form.validate_on_submit():
         if delivery_status_callback_details and form.url.data:
             if (

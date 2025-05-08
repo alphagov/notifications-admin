@@ -28,3 +28,11 @@ QR_CODE_TOO_LONG = "qr-code-too-long"
 class LetterLanguageOptions(str, enum.Enum):
     english = "english"
     welsh_then_english = "welsh_then_english"
+
+
+# Service callbacks
+class ServiceCallbackTypes(enum.StrEnum):
+    delivery_status = "delivery_status"
+    complaint = "complaint"
+    returned_letter = "returned_letter"
+    inbound_sms = "inbound_sms"
