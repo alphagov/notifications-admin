@@ -8,7 +8,12 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.dashboard import cache_search_query, get_status_filters, make_cache_key
+from app.main.views.dashboard import (
+    cache_search_query,
+    get_status_filters,
+    make_cache_key,
+    post_report_request_and_redirect,
+)
 from app.main.views.jobs import get_time_left
 from app.models.service import Service
 from app.utils import SEVEN_DAYS_TTL, get_sha512_hashed
@@ -1164,3 +1169,43 @@ def test_ajax_blocks_have_same_resource(
         # ensure both ajax blocks have a data-form, so that they both issue the same POST request to the json endpoint
         assert block["data-form"] == "search-form"
     assert {block["data-key"] for block in ajax_blocks} == {"counts", "notifications"}
+
+
+def test_view_notifications_post_report_request(
+    client_request,
+    mock_get_service,
+    mocker,
+):
+    mocker.patch(
+        "app.notify_client.report_request_api_client.ReportRequestClient.post",
+        return_value={"data": {"id": "mock_report_request_id"}},
+    )
+
+    mock_current_user = create_active_user_with_permissions()
+
+    mock_create_report_request = mocker.patch(
+        "app.main.views.dashboard.report_request_api_client.create_report_request",
+        return_value="mock_report_request_id",
+    )
+    report_type = "notifications_report"
+    message_type = "email"
+    status = "delivered"
+    response = post_report_request_and_redirect(mock_get_service, report_type, message_type, status)
+
+    mock_create_report_request.assert_called_once_with(
+        mock_get_service.id,
+        report_type,
+        {
+            "user_id": mock_current_user["id"],
+            "report_type": report_type,
+            "notification_type": message_type,
+            "notification_status": status,
+        },
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        "main.report_request",
+        service_id=mock_get_service.id,
+        report_request_id="mock_report_request_id",
+    )

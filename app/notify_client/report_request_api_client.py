@@ -14,6 +14,11 @@ class ReportRequestClient(NotifyAdminAPIClient):
 
         return report_request
 
+    def create_report_request(self, service_id, report_type, data):
+        response = self.post(url=f"/service/{service_id}/report-request?report_type={report_type}", data=data)
+
+        return response["data"]["id"]
+
 
 _report_request_api_client_context_var: ContextVar[ReportRequestClient] = ContextVar("report_request_api_client")
 get_report_request_api_client: LazyLocalGetter[ReportRequestClient] = LazyLocalGetter(
