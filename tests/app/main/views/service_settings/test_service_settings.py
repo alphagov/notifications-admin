@@ -904,9 +904,12 @@ def test_should_check_if_estimated_volumes_provided(
         )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
+    assert page.select_one("h1").text == "Make your service live"
 
-    assert normalize_spaces(page.select_one(".task-list .task-list-item").text) == expected_estimated_volumes_item
+    assert (
+        normalize_spaces(page.select_one(".govuk-task-list .govuk-task-list__item").text)
+        == expected_estimated_volumes_item
+    )
 
 
 @pytest.mark.parametrize(
@@ -953,9 +956,9 @@ def test_should_check_for_reply_to_on_go_live(
         )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
+    assert page.select_one("h1").text == "Make your service live"
 
-    checklist_items = page.select(".task-list .task-list-item")
+    checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
     assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
 
     if count_of_email_templates:
@@ -1024,9 +1027,9 @@ def test_should_check_for_sending_things_right(
     )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
+    assert page.select_one("h1").text == "Make your service live"
 
-    checklist_items = page.select(".task-list .task-list-item")
+    checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
     assert normalize_spaces(checklist_items[1].text) == expected_user_checklist_item
     assert normalize_spaces(checklist_items[2].text) == expected_templates_checklist_item
 
@@ -1035,16 +1038,16 @@ def test_should_check_for_sending_things_right(
 
 
 @pytest.mark.parametrize(
-    "checklist_completed, agreement_signed, expected_button",
+    "checklist_completed, agreement_signed, disabled_button",
     (
-        (True, True, True),
-        (True, None, True),
-        (True, False, False),
-        (False, True, False),
-        (False, None, False),
+        (True, True, False),
+        (True, None, False),
+        (True, False, True),
+        (False, True, True),
+        (False, None, True),
     ),
 )
-def test_should_not_show_go_live_button_if_checklist_not_complete(
+def test_should_show_disabled_go_live_button_if_checklist_not_complete(
     client_request,
     mocker,
     mock_get_service_templates,
@@ -1054,7 +1057,7 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
     single_sms_sender,
     checklist_completed,
     agreement_signed,
-    expected_button,
+    disabled_button,
 ):
     mocker.patch(
         "app.models.service.Service.go_live_checklist_completed",
@@ -1077,22 +1080,21 @@ def test_should_not_show_go_live_button_if_checklist_not_complete(
         )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
+    assert page.select_one("h1").text == "Make your service live"
+    assert page.select_one("form")["method"] == "post"
+    assert page.select_one("form button").text.strip() == "Send a request to go live"
 
-    if expected_button:
-        assert page.select_one("form")["method"] == "post"
-        assert "action" not in page.select_one("form")
-        assert normalize_spaces(page.select("main p")[0].text) == (
-            "When we receive your request we’ll get back to you by the end of the next working day."
+    if disabled_button:
+        assert normalize_spaces(page.select("main p")[2].text) == (
+            "You must complete all the tasks before you can send a request to go live."
         )
-        assert page.select_one("form button").text.strip() == "Request to go live"
+        assert len(page.select_one("form button[disabled]")) == 1
     else:
-        assert not page.select("form")
-        assert not page.select("form button")
-        assert len(page.select("main p")) == 1
-        assert normalize_spaces(page.select_one("main p").text) == (
-            "You must complete these steps before you can request to go live."
+        assert not any(
+            p.text == "You must complete all the tasks before you can send a request to go live."
+            for p in page.select("main p")
         )
+        assert not (page.select_one("form button[disabled]"))
 
 
 @pytest.mark.parametrize(
@@ -1140,15 +1142,15 @@ def test_should_not_show_go_live_button_if_service_already_has_go_live_request(
         )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
+    assert page.select_one("h1").text == "Make your service live"
 
     if expected_button:
-        assert page.select_one("form button").text.strip() == "Request to go live"
+        assert page.select_one("form button").text.strip() == "Send a request to go live"
     else:
         assert not page.select("form")
         assert not page.select("form button")
-        assert len(page.select("main p")) == 1
-        assert normalize_spaces(page.select_one("main p").text) == (
+        assert len(page.select("main p")) == 3
+        assert normalize_spaces(page.select("main p")[2].text) == (
             "Your team has already sent a request to go live for this service."
         )
 
@@ -1290,9 +1292,9 @@ def test_should_check_for_sms_sender_on_go_live(
         )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
+    assert page.select_one("h1").text == "Make your service live"
 
-    checklist_items = page.select(".task-list .task-list-item")
+    checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
     assert normalize_spaces(checklist_items[3].text) == expected_sms_sender_checklist_item
 
     mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
@@ -1349,9 +1351,9 @@ def test_should_check_for_mou_on_request_to_go_live(
         "app.organisations_client.get_organisation", return_value=organisation_json(agreement_signed=agreement_signed)
     )
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
+    assert page.select_one("h1").text == "Make your service live"
 
-    checklist_items = page.select(".task-list .task-list-item")
+    checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
     assert normalize_spaces(checklist_items[3].text) == expected_item
 
 
@@ -1404,8 +1406,8 @@ def test_gp_without_organisation_is_shown_agreement_step(
     )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
-    assert normalize_spaces(page.select(".task-list .task-list-item")[3].text) == (
+    assert page.select_one("h1").text == "Make your service live"
+    assert normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[3].text) == (
         "Accept our data processing and financial agreement Not completed"
     )
 
@@ -1436,7 +1438,7 @@ def test_non_gov_user_is_told_they_cant_go_live(
     )
     client_request.login(api_nongov_user_active)
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("main p").text) == (
+    assert normalize_spaces(page.select("main p")[2].text) == (
         "Only team members with a government email address can request to go live."
     )
     assert len(page.select("main form")) == 0
