@@ -2,6 +2,7 @@ import pytest
 from werkzeug.datastructures import MultiDict
 
 from app.main.forms import CreateKeyForm
+from app.models.api_key import APIKeys
 
 
 @pytest.mark.parametrize(
@@ -15,19 +16,25 @@ def test_return_validation_error_when_key_name_exists(
     client_request,
     expiry_date,
     expected_errors,
+    mocker,
 ):
-    _existing_keys = [
-        {
-            "name": "some key",
-            "expiry_date": expiry_date,
+    mocker.patch(
+        "app.models.api_key.api_key_api_client.get_api_keys",
+        return_value={
+            "apiKeys": [
+                {
+                    "name": "some key",
+                    "expiry_date": expiry_date,
+                },
+                {
+                    "name": "another key",
+                    "expiry_date": None,
+                },
+            ]
         },
-        {
-            "name": "another key",
-            "expiry_date": None,
-        },
-    ]
+    )
 
-    form = CreateKeyForm(_existing_keys, formdata=MultiDict([("key_name", "Some key")]))
+    form = CreateKeyForm(APIKeys("foo"), formdata=MultiDict([("key_name", "Some key")]))
 
     form.key_type.choices = [("a", "a"), ("b", "b")]
     form.validate()
