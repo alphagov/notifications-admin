@@ -12,11 +12,6 @@ from app.main import main
 from app.main.forms import CallbackForm, CreateKeyForm, GuestList
 from app.models.api_key import APIKey
 from app.models.notification import APINotifications
-from app.notify_client.api_key_api_client import (
-    KEY_TYPE_NORMAL,
-    KEY_TYPE_TEAM,
-    KEY_TYPE_TEST,
-)
 from app.utils.user import user_has_permissions
 
 dummy_bearer_token = "bearer_token_set"
@@ -75,9 +70,9 @@ def api_keys(service_id):
 def create_api_key(service_id):
     form = CreateKeyForm(current_service.api_keys)
     form.key_type.choices = [
-        (KEY_TYPE_NORMAL, "Live – sends to anyone"),
-        (KEY_TYPE_TEAM, "Team and guest list – limits who you can send to"),
-        (KEY_TYPE_TEST, "Test – pretends to send messages"),
+        (APIKey.TYPE_NORMAL, "Live – sends to anyone"),
+        (APIKey.TYPE_TEAM, "Team and guest list – limits who you can send to"),
+        (APIKey.TYPE_TEST, "Test – pretends to send messages"),
     ]
     # preserve order of items extended by starting with empty dicts
     form.key_type.param_extensions = {"items": [{}, {}]}
@@ -94,7 +89,7 @@ def create_api_key(service_id):
     if current_service.has_permission("letter"):
         form.key_type.param_extensions["items"][1]["hint"] = {"text": "Cannot be used to send letters"}
     if form.validate_on_submit():
-        if current_service.trial_mode and form.key_type.data == KEY_TYPE_NORMAL:
+        if current_service.trial_mode and form.key_type.data == APIKey.TYPE_NORMAL:
             abort(400)
         secret = APIKey.create(
             service_id=service_id,
