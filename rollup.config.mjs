@@ -86,7 +86,6 @@ export default [
       paths.npm + 'jquery/dist/jquery.min.js',
       paths.npm + 'timeago/jquery.timeago.js',
       paths.npm + 'textarea-caret/index.js',
-      paths.npm + 'cbor-js/cbor.js',
       paths.src + 'javascripts/modules.js',
       paths.src + 'javascripts/govuk-frontend-toolkit/show-hide-content.js',
       paths.src + 'javascripts/stick-to-window-when-scrolling.js',
@@ -99,10 +98,8 @@ export default [
       paths.src + 'javascripts/templateFolderForm.js',
       paths.src + 'javascripts/addBrandingOptionsForm.js',
       paths.src + 'javascripts/setAuthTypeForm.js',
-      paths.src + 'javascripts/registerSecurityKey.js',
-      paths.src + 'javascripts/authenticateSecurityKey.js',
       paths.src + 'javascripts/updateStatus.js',
-      paths.src + 'javascripts/errorBanner.js',
+      paths.src + 'javascripts/homepage.js',
       paths.src + 'javascripts/removeInPresenceOf.js',
       paths.src + 'javascripts/main.js',
     ],
@@ -112,7 +109,6 @@ export default [
     },
     moduleContext: {
       './node_modules/jquery/dist/jquery.min.js': 'window',
-      './node_modules/cbor-js/cbor.js': 'window',
     },
     plugins: [
       nodeResolve(),
