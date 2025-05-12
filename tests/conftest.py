@@ -1456,7 +1456,7 @@ def mock_revoke_api_key(notify_admin, mocker):
     def _revoke(service_id, key_id):
         return {}
 
-    return mocker.patch("app.api_key_api_client.revoke_api_key", side_effect=_revoke)
+    return mocker.patch("app.models.api_key.api_key_api_client.revoke_api_key", side_effect=_revoke)
 
 
 @pytest.fixture(scope="function")
@@ -1473,7 +1473,7 @@ def mock_get_api_keys(notify_admin, mocker, fake_uuid):
         }
         return keys
 
-    return mocker.patch("app.api_key_api_client.get_api_keys", side_effect=_get_keys)
+    return mocker.patch("app.models.api_key.api_key_api_client.get_api_keys", side_effect=_get_keys)
 
 
 @pytest.fixture(scope="function")
@@ -1482,7 +1482,7 @@ def mock_get_no_api_keys(notify_admin, mocker):
         keys = {"apiKeys": []}
         return keys
 
-    return mocker.patch("app.api_key_api_client.get_api_keys", side_effect=_get_keys)
+    return mocker.patch("app.models.api_key.api_key_api_client.get_api_keys", side_effect=_get_keys)
 
 
 @pytest.fixture(scope="function")

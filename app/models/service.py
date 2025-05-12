@@ -14,13 +14,13 @@ from app.constants import (
     SIGN_IN_METHOD_TEXT_OR_EMAIL,
 )
 from app.models import JSONModel
+from app.models.api_key import APIKeys
 from app.models.branding import EmailBranding, LetterBranding
 from app.models.contact_list import ContactLists
 from app.models.job import ImmediateJobs, PaginatedJobs, PaginatedUploads, ScheduledJobs
 from app.models.organisation import Organisation
 from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
 from app.models.user import InvitedUsers, User, Users
-from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.inbound_number_client import inbound_number_client
 from app.notify_client.invite_api_client import invite_api_client
@@ -560,13 +560,7 @@ class Service(JSONModel):
 
     @cached_property
     def api_keys(self):
-        return sorted(
-            api_key_api_client.get_api_keys(self.id)["apiKeys"],
-            key=lambda key: key["name"].lower(),
-        )
-
-    def get_api_key(self, id):
-        return self._get_by_id(self.api_keys, id)
+        return APIKeys(self.id)
 
     @property
     def able_to_accept_agreement(self):

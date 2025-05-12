@@ -399,7 +399,7 @@ def test_should_create_api_key_with_type_normal(
     fake_uuid,
     mocker,
 ):
-    post = mocker.patch("app.notify_client.api_key_api_client.ApiKeyApiClient.post", return_value={"data": fake_uuid})
+    post = mocker.patch("app.models.api_key.api_key_api_client.post", return_value={"data": fake_uuid})
 
     page = client_request.post(
         "main.create_api_key",
@@ -426,7 +426,7 @@ def test_cant_create_normal_api_key_in_trial_mode(
     mock_has_permissions,
     mocker,
 ):
-    mock_post = mocker.patch("app.notify_client.api_key_api_client.ApiKeyApiClient.post")
+    mock_post = mocker.patch("app.models.api_key.api_key_api_client.post")
 
     client_request.post(
         "main.create_api_key",
