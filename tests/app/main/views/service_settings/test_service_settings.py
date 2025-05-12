@@ -4632,7 +4632,7 @@ def test_unknown_channel_404s(
     [
         (
             "letter",
-            "It costs between 61 pence and £1.63 to send a letter using Notify.",
+            "It costs between 59 pence and £1.76 to send a letter using Notify.",
             "Send letters",
             ["email", "sms"],
             "False",
@@ -4641,7 +4641,7 @@ def test_unknown_channel_404s(
         ),
         (
             "letter",
-            "It costs between 61 pence and £1.63 to send a letter using Notify.",
+            "It costs between 59 pence and £1.76 to send a letter using Notify.",
             "Send letters",
             ["email", "sms", "letter"],
             "True",
