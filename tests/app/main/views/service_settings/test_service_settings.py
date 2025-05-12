@@ -129,7 +129,6 @@ def mock_get_service_settings_page_common(
                 "Custom data retention Email – 7 days Change data retention",
                 "Receive inbound SMS Off Change your settings for Receive inbound SMS",
                 "Email authentication Off Change your settings for Email authentication",
-                "Extra email formatting options Off Change your settings for Extra email formatting options",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
             ],
         ),
@@ -160,7 +159,6 @@ def mock_get_service_settings_page_common(
                 "Letter branding Not set Change letter branding (admin view)",
                 "Custom data retention Email – 7 days Change data retention",
                 "Email authentication Off Change your settings for Email authentication",
-                "Extra letter formatting options Off Change your settings for Extra letter formatting options",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
                 "Sending economy letters Off Change your settings for Sending economy letters",
             ],
@@ -5081,7 +5079,6 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
     mocker,
 ):
     service_one["contact_link"] = "http://example.com/"
-    service_one["permissions"].append("upload_document")
 
     page = client_request.post(
         "main.send_files_by_email_contact_details",
