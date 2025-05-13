@@ -1,6 +1,7 @@
 {% extends "content_template.html" %}
 
 {% from "components/service-link.html" import service_link %}
+{% from "components/table.html" import mapping_table, row, text_field, field %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -29,30 +30,27 @@
 
 <h2 class="heading-medium">Daily limits</h2>
 <div class="bottom-gutter-3-2">
-    
-    {% set central_government_organisations_text %}
-    Central government departments and <br>national organisations
-    {% endset %}
 
-    {% call mapping_table(
-      caption=‘Daily message limit',
-      field_headings=[‘Message', ‘Daily limit'],
-      field_headings_visible=True,
-      caption_visible=False
-    ) %}
-      {% for organisation_type, charge in [
-        (Emails, ‘250,000'),
-        (’Text', ‘250,000 text messages including a default 100 international text messages'),
-        (‘Letters', ‘20,000’),
-      ] %}
-        {% call row() %}
-          {{ text_field(organisation_type) }}
-          {{ text_field(charge) }}
-        {% endcall %}
-      {% endfor %}
-    {% endcall %}
+  {% call mapping_table(
+    caption='Notification Daily Limits',
+    field_headings=['Message', 'Daily Limit'],
+    field_headings_visible=True,
+    caption_visible=False,
+    equal_length=True,
+  ) %}
+    {% for message, limit in  [
+    ('Emails', '250,000'),
+    ('Text', '250,000 free text messages including a default 100 international text messages'),
+    ('Letters', '20,000')]
+    %}
+      {% call row() %}
+        {{ text_field(message) }}
+        {{ text_field(limit) }}
+      {% endcall %}
+    {% endfor %}
+  {% endcall %}
   </div>
-                                                                                                                        
+
 <p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.support") }}>contact us</a>.</p>
 
 <h3 class="heading-medium">Change the international text message limit</h3>
@@ -70,7 +68,7 @@
      <li>any costs to your service if there is fraud, such as Artificial Inflation of Traffic (AIT)</li>
  </ul>
 <p class="gov-uk body">If you do not need to send international text messages, you can turn this off in <b class="govuk-!-font-weight-bold">Settings</b>.</p>
-  
+
 <details class="govuk-details">
   <summary class="govuk-details__summary">
     <span class="govuk-details__summary-text">
