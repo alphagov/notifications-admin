@@ -16,6 +16,8 @@
 
   <p class="govuk-body">You can send a batch of up to {{ max_spreadsheet_rows|format_thousands }} messages at once.</p>
 
+<p class="gov-uk body">There’s a <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_daily_limits" )}}>daily limit</a> to the number of messages you can send.</p>
+
   <p class="govuk-body">To send a batch of messages:</p>
 
   <ol class="govuk-list govuk-list--number">
@@ -27,65 +29,5 @@
   <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_personalisation" )}}>how to personalise your messages</a>.</p>
 
   <p class="govuk-body">You can also <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_schedule_messages" )}}>schedule a batch of emails and text messages</a>.</p>
-
-<h2 class="heading-medium">Daily limits</h2>
-<div class="bottom-gutter-3-2">
-
-  {% call mapping_table(
-    caption='Notification Daily Limits',
-    field_headings=['Message', 'Daily Limit'],
-    field_headings_visible=True,
-    caption_visible=False,
-    equal_length=True,
-  ) %}
-    {% for message, limit in  [
-    ('Emails', '250,000'),
-    ('Text', '250,000 free text messages including a default 100 international text messages'),
-    ('Letters', '20,000')]
-    %}
-      {% call row() %}
-        {{ text_field(message) }}
-        {{ text_field(limit) }}
-      {% endcall %}
-    {% endfor %}
-  {% endcall %}
-  </div>
-
-<p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.support") }}>contact us</a>.</p>
-
-<h3 class="heading-medium">Change the international text message limit</h3>
-<p class="gov-uk body">To change the international daily text message limit:</p>
-
- <ol class="govuk-list govuk-list--number">
-   <li>Go to <b class="govuk-!-font-weight-bold">Settings</b></li>
-   <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">International text message limit</b> row</li>
- </ol>
-
-<p class="gov-uk body">When changing the limit, you should think about:</p>
-
- <ul class="govuk-list govuk-list--bullet">
-     <li>how many international messages your service needs to send each day</li>
-     <li>any costs to your service if there is fraud, such as Artificial Inflation of Traffic (AIT)</li>
- </ul>
-<p class="gov-uk body">If you do not need to send international text messages, you can turn this off in <b class="govuk-!-font-weight-bold">Settings</b>.</p>
-
-<details class="govuk-details">
-  <summary class="govuk-details__summary">
-    <span class="govuk-details__summary-text">
-      Help protect your service from AIT
-    </span>
-  </summary>
-  <div class="govuk-details__text">
-    You should take steps to protect your service from an AIT attack by:
-    <ul class="govuk-list govuk-list--bullet">
-      <li>tracking how many messages you send and set an alert in your system for anything that is not normal</li>
-      <li>stopping multiple messages being sent to the same number</li>
-    </ul>
-    Find out what you can do to help protect your service from <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/guidance/business-communications-sms-and-telephone-best-practice#section_4">AIT</a>.
-
-  </div>
-</details>
-
-
 
 {% endblock %}
