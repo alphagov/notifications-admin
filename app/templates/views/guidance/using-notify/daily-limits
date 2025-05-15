@@ -14,9 +14,9 @@
 
 <h1 class="heading-medium">Daily limits</h1>
 <div class="bottom-gutter-3-2">
-<p class=""gov-uk body>There’s a limit to the number of messages you can send each day. </p>
+<p class=""govuk-body>There’s a limit to the number of messages you can send each day. </p>
   {% call mapping_table(
-    caption='Notification Daily Limits',
+    caption='Notification Daily limits',
     field_headings=['Message', 'Daily limit'],
     field_headings_visible=True,
     caption_visible=False,
@@ -55,10 +55,10 @@
 
 
 <h3 class="heading-medium">Help protect your service from AIT</h3>
-   <p class="govuk-body">You should take steps to protect your service from an AIT attack by:</p>
+   <p class="govuk-body">You should take steps to protect your service from an AIT attack, such as:</p>
     <ul class="govuk-list govuk-list--bullet">
-      <li>tracking how many messages you send and set an alert in your system for anything that is not normal</li>
-      <li>stopping multiple messages being sent to the same number</li>
+      <li>track how many messages you send and set an alert in your system for anything that is not normal</li>
+      <li>stop multiple messages being sent to the same number</li>
     </ul>
   <p class="govuk-body">Find more information on<a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/guidance/business-communications-sms-and-telephone-best-practice#section_4">AIT and how you can protect your service</a>.</p>
 
