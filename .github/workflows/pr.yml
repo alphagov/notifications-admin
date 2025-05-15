@@ -1,0 +1,82 @@
+name: Test
+
+on:
+  pull_request:
+    branches:
+      - "main"
+
+concurrency:
+  group: ${{ github.workflow }}.${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    services:
+      db:
+        image: postgres:15-bullseye
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: notification_api
+          POSTGRES_USER: notify
+          POSTGRES_PASSWORD: notify
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 1s
+          --health-retries 10
+
+      redis:
+        image: redis:6.2
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      FLASK_APP: 'application:application'
+      SQLALCHEMY_DATABASE_URI: postgresql://notify:notify@localhost/notification_api
+
+    steps:
+      - uses: szenius/set-timezone@v2.0
+        with:
+          timezoneLinux: "Europe/Amsterdam"
+
+      - uses: actions/checkout@v4
+
+      - uses: gerlero/apt-install@v1
+        with:
+          packages: build-essential git libcurl4-openssl-dev curl libssl-dev
+          install-recommends: false
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          activate-environment: true
+          enable-cache: true
+          cache-dependency-glob: |
+            requirements_for_test.in
+            requirements_for_test.txt
+            requirements_nl_test.txt
+
+      - name: Install application requirements (pip)
+        run: uv pip install -r requirements_nl_test.txt
+
+      - uses: astral-sh/ruff-action@v3
+
+      - name: Generate version file
+        run: make generate-version-file
+
+      - uses: pavelzw/pytest-action@v2
+        with:
+          verbose: false
+          emoji: false

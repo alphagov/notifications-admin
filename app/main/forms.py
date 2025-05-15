@@ -1,9 +1,9 @@
-from html import escape
 import weakref
 from contextlib import suppress
 from copy import deepcopy
 from datetime import datetime, timedelta
 from functools import partial
+from html import escape
 from itertools import chain
 from numbers import Number
 
@@ -19,7 +19,7 @@ from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
-from notifications_utils.recipient_validation.phone_number import PhoneNumber as PhoneNumberUtils
+from notifications_utils.recipient_validation.notifynl.phone_number import PhoneNumber as PhoneNumberUtils
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
 from ordered_set import OrderedSet

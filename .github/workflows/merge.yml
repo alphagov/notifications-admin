@@ -1,0 +1,107 @@
+name: Merge
+
+on:
+  push:
+    branches: ["main"]
+
+concurrency:
+  group: ${{ github.workflow }}.${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: ghcr.io/worth-nl/notifynl-api
+
+jobs:
+  build-tag-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+        dockerfile-target: ["test", "concourse_tests"]
+
+    steps:
+      - uses: szenius/set-timezone@v2.0
+        with:
+          timezoneLinux: "Europe/Amsterdam"
+
+      - uses: actions/checkout@v4
+
+      - uses: gerlero/apt-install@v1
+        with:
+          packages: build-essential git libcurl4-openssl-dev curl libssl-dev
+          install-recommends: false
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          activate-environment: true
+          enable-cache: true
+          cache-dependency-glob: |
+            requirements_for_test.in
+            requirements_for_test.txt
+            requirements_nl_test.txt
+
+      - name: Install application requirements (pip)
+        run: uv pip install -r requirements_nl_test.txt
+
+      - name: Set tag
+        id: set-tag
+        run: |
+          TAG=$(date +%Y%m%d).${{ github.run_number }}
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          file: docker/Dockerfile
+          load: true
+          tags: ${{ env.IMAGE }}:${{ steps.set-tag.outputs.tag }}
+          target: ${{ matrix.dockerfile-target }}
+
+    outputs:
+      tag: ${{ steps.set-tag.outputs.tag }}
+
+  image-push-and-release:
+    runs-on: ubuntu-latest
+
+    needs: build-tag-test
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: https://ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          file: docker/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE }}:latest,${{ env.IMAGE }}:${{ needs.build-tag-test.outputs.tag }}
+          platforms: linux/amd64,linux/arm64
+          provenance: false
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.build-tag-test.outputs.tag }}
+          make_latest: true
+          token: ${{ secrets.RELEASE_TOKEN }}
+          generate_release_notes: true
