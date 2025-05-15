@@ -8,6 +8,7 @@ from app import (
     current_service,
     service_api_client,
 )
+from app.constants import ServiceCallbackTypes
 from app.main import main
 from app.main.forms import CallbackForm, CreateKeyForm, GuestList
 from app.models.notification import APINotifications
@@ -154,45 +155,19 @@ def api_callbacks(service_id):
 )
 @user_has_permissions("manage_api_keys")
 def delivery_status_callback(service_id):
-    delivery_status_callback_details = current_service.delivery_status_callback_details
+    callback_details = current_service.delivery_status_callback_details
     back_link = ".api_callbacks" if current_service.can_have_multiple_callbacks else ".api_integration"
 
     form = CallbackForm(
-        url=delivery_status_callback_details.get("url") if delivery_status_callback_details else "",
-        bearer_token=dummy_bearer_token if delivery_status_callback else "",
+        url=callback_details.get("url") if callback_details else "",
+        bearer_token=dummy_bearer_token if callback_details else "",
     )
-    if form.validate_on_submit():
-        if delivery_status_callback_details and form.url.data:
-            if (
-                delivery_status_callback_details.get("url") != form.url.data
-                or form.bearer_token.data != dummy_bearer_token
-            ):
-                service_api_client.update_service_callback_api(
-                    service_id,
-                    url=form.url.data,
-                    bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
-                    user_id=current_user.id,
-                    callback_api_id=delivery_status_callback_details.get("id"),
-                    callback_type="delivery_status",
-                )
-        elif delivery_status_callback_details and not form.url.data:
-            service_api_client.delete_service_callback_api(
-                service_id, delivery_status_callback_details["id"], "delivery_status"
-            )
-        elif form.url.data:
-            service_api_client.create_service_callback_api(
-                service_id,
-                url=form.url.data,
-                bearer_token=form.bearer_token.data,
-                user_id=current_user.id,
-                callback_type="delivery_status",
-            )
-        else:
-            # If no callback is set up and the user chooses to continue
-            # having no callback (ie both fields empty) then there’s
-            # nothing for us to do here
-            pass
+    callback_type = ServiceCallbackTypes.delivery_status.value
 
+    if form.validate_on_submit():
+        create_or_update_or_remove_callback(
+            callback_details=callback_details, callback_type=callback_type, form=form, service_id=service_id
+        )
         return redirect(url_for(back_link, service_id=service_id))
 
     return render_template(
@@ -211,40 +186,17 @@ def received_text_messages_callback(service_id):
     if not current_service.has_permission("inbound_sms"):
         return redirect(url_for(".api_integration", service_id=service_id))
 
-    received_text_messages_callback = current_service.inbound_sms_callback_details
+    callback_details = current_service.inbound_sms_callback_details
     form = CallbackForm(
-        url=(received_text_messages_callback.get("url") if received_text_messages_callback else ""),
-        bearer_token=dummy_bearer_token if received_text_messages_callback else "",
+        url=(callback_details.get("url") if callback_details else ""),
+        bearer_token=dummy_bearer_token if callback_details else "",
     )
+    callback_type = ServiceCallbackTypes.inbound_sms.value
 
     if form.validate_on_submit():
-        if received_text_messages_callback and form.url.data:
-            if (
-                received_text_messages_callback.get("url") != form.url.data
-                or form.bearer_token.data != dummy_bearer_token
-            ):
-                service_api_client.update_service_callback_api(
-                    service_id,
-                    url=form.url.data,
-                    bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
-                    user_id=current_user.id,
-                    callback_api_id=received_text_messages_callback.get("id"),
-                    callback_type="inbound_sms",
-                )
-        elif received_text_messages_callback and not form.url.data:
-            service_api_client.delete_service_callback_api(
-                service_id=service_id,
-                callback_api_id=received_text_messages_callback["id"],
-                callback_type="inbound_sms",
-            )
-        elif form.url.data:
-            service_api_client.create_service_callback_api(
-                service_id,
-                url=form.url.data,
-                bearer_token=form.bearer_token.data,
-                user_id=current_user.id,
-                callback_type="inbound_sms",
-            )
+        create_or_update_or_remove_callback(
+            callback_details=callback_details, callback_type=callback_type, form=form, service_id=service_id
+        )
         return redirect(url_for(".api_callbacks", service_id=service_id))
     return render_template(
         "views/api/callbacks/received-text-messages-callback.html",
@@ -258,45 +210,19 @@ def received_text_messages_callback(service_id):
 )
 @user_has_permissions("manage_api_keys")
 def returned_letters_callback(service_id):
-    returned_letters_callback_details = current_service.returned_letters_callback_details
+    callback_details = current_service.returned_letters_callback_details
     back_link = ".api_callbacks"
 
     form = CallbackForm(
-        url=returned_letters_callback_details.get("url") if returned_letters_callback_details else "",
-        bearer_token=dummy_bearer_token if returned_letters_callback_details else "",
+        url=callback_details.get("url") if callback_details else "",
+        bearer_token=dummy_bearer_token if callback_details else "",
     )
+    callback_type = ServiceCallbackTypes.returned_letter.value
 
     if form.validate_on_submit():
-        if returned_letters_callback_details and form.url.data:
-            if (
-                returned_letters_callback_details.get("url") != form.url.data
-                or form.bearer_token.data != dummy_bearer_token
-            ):
-                service_api_client.update_service_callback_api(
-                    service_id,
-                    url=form.url.data,
-                    bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
-                    user_id=current_user.id,
-                    callback_api_id=returned_letters_callback_details.get("id"),
-                    callback_type="returned_letter",
-                )
-        elif returned_letters_callback_details and not form.url.data:
-            service_api_client.delete_service_callback_api(
-                service_id, returned_letters_callback_details["id"], "returned_letter"
-            )
-        elif form.url.data:
-            service_api_client.create_service_callback_api(
-                service_id,
-                url=form.url.data,
-                bearer_token=form.bearer_token.data,
-                user_id=current_user.id,
-                callback_type="returned_letter",
-            )
-        else:
-            # If no callback is set up and the user chooses to continue
-            # having no callback (ie both fields empty) then there’s
-            # nothing for us to do here
-            pass
+        create_or_update_or_remove_callback(
+            callback_details=callback_details, callback_type=callback_type, form=form, service_id=service_id
+        )
         return redirect(url_for(back_link, service_id=service_id))
 
     return render_template(
@@ -304,3 +230,35 @@ def returned_letters_callback(service_id):
         back_link=back_link,
         form=form,
     )
+
+
+def create_or_update_or_remove_callback(callback_details, callback_type, form, service_id):
+    if callback_details and form.url.data:
+        if callback_details.get("url") != form.url.data or form.bearer_token.data != dummy_bearer_token:
+            service_api_client.update_service_callback_api(
+                service_id,
+                url=form.url.data,
+                bearer_token=check_token_against_dummy_bearer(form.bearer_token.data),
+                user_id=current_user.id,
+                callback_api_id=callback_details.get("id"),
+                callback_type=callback_type,
+            )
+    elif callback_details and not form.url.data:
+        service_api_client.delete_service_callback_api(
+            service_id=service_id,
+            callback_api_id=callback_details["id"],
+            callback_type=callback_type,
+        )
+    elif form.url.data:
+        service_api_client.create_service_callback_api(
+            service_id,
+            url=form.url.data,
+            bearer_token=form.bearer_token.data,
+            user_id=current_user.id,
+            callback_type=callback_type,
+        )
+    else:
+        # If no callback is set up and the user chooses to continue
+        # having no callback (ie both fields empty) then there’s
+        # nothing for us to do here
+        pass

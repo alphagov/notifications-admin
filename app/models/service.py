@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Any
 
 from flask import abort, current_app
-from notifications_python_client.errors import HTTPError
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
@@ -45,7 +44,6 @@ class Service(JSONModel):
     go_live_at: datetime
     has_active_go_live_request: bool
     id: Any
-    inbound_api: Any
     email_message_limit: int
     international_sms_message_limit: int
     sms_message_limit: int
@@ -657,25 +655,17 @@ class Service(JSONModel):
 
     @property
     def inbound_sms_callback_details(self):
-        if self.inbound_api:
-            try:
-                return service_api_client.get_service_callback_api(self.id, self.inbound_api[0], "inbound_sms")
-            except HTTPError:
-                pass
-        try:
-            return self._callback_service_callback_details("inbound_sms")
-        except HTTPError:
-            pass
+        return self.get_service_callback_details("inbound_sms")
 
     @property
     def delivery_status_callback_details(self):
-        return self._callback_service_callback_details("delivery_status")
+        return self.get_service_callback_details("delivery_status")
 
     @property
     def returned_letters_callback_details(self):
-        return self._callback_service_callback_details("returned_letter")
+        return self.get_service_callback_details("returned_letter")
 
-    def _callback_service_callback_details(self, callback_type):
+    def get_service_callback_details(self, callback_type):
         if callback_api := self.service_callback_api:
             for row in callback_api:
                 if row["callback_type"] == callback_type:

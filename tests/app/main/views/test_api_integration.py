@@ -4,7 +4,7 @@ from unittest.mock import call
 import pytest
 from flask import url_for
 
-from tests import generate_uuid, sample_uuid, validate_route_permission
+from tests import generate_uuid, validate_route_permission
 from tests.conftest import SERVICE_ONE_ID, create_notifications, normalize_spaces
 
 
@@ -683,8 +683,8 @@ def test_callback_forms_can_be_cleared(
     service_one["service_callback_api"] = [
         {"callback_id": fake_uuid, "callback_type": "delivery_status"},
         {"callback_id": fake_uuid, "callback_type": "returned_letter"},
+        {"callback_id": fake_uuid, "callback_type": "inbound_sms"},
     ]
-    service_one["inbound_api"] = [fake_uuid]
     service_one["permissions"] = ["inbound_sms"]
     mocked_delete = mocker.patch("app.service_api_client.delete")
 
@@ -897,19 +897,21 @@ def test_create_service_callbacks(
 
 
 @pytest.mark.parametrize(
-    "endpoint, service_callback_api, inbound_callback_api, callback_type",
+    "endpoint, service_callback_api, callback_type",
     [
         (
             "main.delivery_status_callback",
             [{"callback_id": uuid.uuid4(), "callback_type": "delivery_status"}],
-            [],
             "delivery_status",
         ),
-        ("main.received_text_messages_callback", None, [uuid.uuid4()], "inbound_sms"),
+        (
+            "main.received_text_messages_callback",
+            [{"callback_id": uuid.uuid4(), "callback_type": "inbound_sms"}],
+            "inbound_sms",
+        ),
         (
             "main.returned_letters_callback",
             [{"callback_id": uuid.uuid4(), "callback_type": "returned_letter"}],
-            [],
             "returned_letter",
         ),
     ],
@@ -922,10 +924,8 @@ def test_update_service_callback_details(
     endpoint,
     callback_type,
     service_callback_api,
-    inbound_callback_api,
     fake_uuid,
 ):
-    service_one["inbound_api"] = inbound_callback_api
     service_one["permissions"] = ["inbound_sms"]
     service_one["service_callback_api"] = service_callback_api
 
@@ -941,9 +941,7 @@ def test_update_service_callback_details(
         service_id=service_one["id"],
         _data=data,
     )
-    callback_api_id = (
-        inbound_callback_api[0] if callback_type == "inbound_sms" else service_callback_api[0]["callback_id"]
-    )
+    callback_api_id = service_callback_api[0]["callback_id"]
     mock_update_service_callback_api.assert_called_once_with(
         service_one["id"],
         url=f"https://test.url.com/{callback_type}",
@@ -984,10 +982,9 @@ def test_update_service_callback_without_changes_does_not_update(
 
 
 @pytest.mark.parametrize(
-    "service_callback_api, inbound_api, delivery_url, expected_1st_row, expected_2nd_row, expected_3rd_row",
+    "service_callback_api, delivery_url, expected_1st_row, expected_2nd_row, expected_3rd_row",
     [
         (
-            None,
             None,
             {},
             "Delivery receipts Not set Change",
@@ -998,18 +995,17 @@ def test_update_service_callback_without_changes_does_not_update(
             [
                 {"callback_id": uuid.uuid4(), "callback_type": "delivery_status"},
                 {"callback_id": uuid.uuid4(), "callback_type": "returned_letter"},
+                {"callback_id": uuid.uuid4(), "callback_type": "inbound_sms"},
             ],
-            None,
             {"url": "https://generic.urls"},
             "Delivery receipts https://generic.urls Change",
-            "Received text messages Not set Change",
+            "Received text messages https://generic.urls Change",
             "Returned letters https://generic.urls Change",
         ),
         (
             [
                 {"callback_id": uuid.uuid4(), "callback_type": "delivery_status"},
             ],
-            None,
             {"url": "https://delivery.receipts"},
             "Delivery receipts https://delivery.receipts Change",
             "Received text messages Not set Change",
@@ -1019,15 +1015,15 @@ def test_update_service_callback_without_changes_does_not_update(
             [
                 {"callback_id": uuid.uuid4(), "callback_type": "returned_letter"},
             ],
-            None,
             {"url": "https://returned.letter"},
             "Delivery receipts Not set Change",
             "Received text messages Not set Change",
             "Returned letters https://returned.letter Change",
         ),
         (
-            None,
-            sample_uuid(),
+            [
+                {"callback_id": uuid.uuid4(), "callback_type": "inbound_sms"},
+            ],
             {"url": "https://inbound.sms"},
             "Delivery receipts Not set Change",
             "Received text messages https://inbound.sms Change",
@@ -1042,13 +1038,11 @@ def test_callbacks_page_works_when_no_apis_set(
     service_callback_api,
     delivery_url,
     expected_1st_row,
-    inbound_api,
     expected_2nd_row,
     expected_3rd_row,
     platform_admin_user,
 ):
     service_one["permissions"] = ["inbound_sms", "letter"]
-    service_one["inbound_api"] = inbound_api
     service_one["service_callback_api"] = service_callback_api
 
     mocker.patch("app.service_api_client.get_service_callback_api", return_value=delivery_url)
