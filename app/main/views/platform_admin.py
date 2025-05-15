@@ -306,6 +306,7 @@ def get_billing_report():
 
 
 @main.route("/platform-admin/reports/dvla-billing", methods=["GET", "POST"])
+@user_is_platform_admin
 def get_dvla_billing_report():
     form = BillingReportDateFilterForm()
 
