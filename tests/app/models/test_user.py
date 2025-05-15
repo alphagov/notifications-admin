@@ -162,7 +162,7 @@ def test_invited_org_user_from_session_returns_none_if_nothing_present(client_re
 
 def test_set_permissions(client_request, mocker, active_user_view_permissions, fake_uuid):
     mock_api = mocker.patch("app.models.user.user_api_client.set_user_permissions")
-    mock_event = mocker.patch("app.models.user.create_set_user_permissions_event")
+    mock_event = mocker.patch("app.models.user.Events.set_user_permissions")
 
     User(active_user_view_permissions).set_permissions(
         service_id=SERVICE_ONE_ID,
@@ -183,7 +183,7 @@ def test_set_permissions(client_request, mocker, active_user_view_permissions, f
 
 def test_add_to_service(client_request, mocker, api_user_active, fake_uuid):
     mock_api = mocker.patch("app.models.user.user_api_client.add_user_to_service")
-    mock_event = mocker.patch("app.models.user.create_add_user_to_service_event")
+    mock_event = mocker.patch("app.models.user.Events.add_user_to_service")
 
     User(api_user_active).add_to_service(
         service_id=SERVICE_ONE_ID,

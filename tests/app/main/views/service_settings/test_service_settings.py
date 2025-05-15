@@ -76,8 +76,8 @@ def mock_get_service_settings_page_common(
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
-                "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
@@ -111,8 +111,8 @@ def mock_get_service_settings_page_common(
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
-                "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
                 "Live No Organisation must accept the data processing and financial agreement first",
                 "Count in list of live services Yes Change if service is counted in list of live services",
@@ -129,7 +129,6 @@ def mock_get_service_settings_page_common(
                 "Custom data retention Email – 7 days Change data retention",
                 "Receive inbound SMS Off Change your settings for Receive inbound SMS",
                 "Email authentication Off Change your settings for Email authentication",
-                "Extra email formatting options Off Change your settings for Extra email formatting options",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
             ],
         ),
@@ -160,8 +159,8 @@ def mock_get_service_settings_page_common(
                 "Letter branding Not set Change letter branding (admin view)",
                 "Custom data retention Email – 7 days Change data retention",
                 "Email authentication Off Change your settings for Email authentication",
-                "Extra letter formatting options Off Change your settings for Extra letter formatting options",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
+                "Sending economy letters Off Change your settings for Sending economy letters",
             ],
         ),
     ],
@@ -332,8 +331,9 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
-                "Send international text messages On Change your settings for sending international text messages",
                 "Receive text messages On Change your settings for receiving text messages",
+                "Send international text messages On Change your settings for sending international text messages",
+                "International text message limit 500 per day Change daily international text message limit",
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
@@ -351,8 +351,8 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
-                "Send international text messages Off Change your settings for sending international text messages",
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
@@ -4431,34 +4431,6 @@ def test_should_show_page_to_set_per_day_message_limit(
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "1,000"
 
 
-@pytest.mark.parametrize(
-    "notification_type, expected_api_field_updated",
-    (
-        ("email", "email_message_limit"),
-        ("sms", "sms_message_limit"),
-        ("letter", "letter_message_limit"),
-    ),
-)
-def test_should_set_message_limit(
-    client_request,
-    platform_admin_user,
-    notification_type,
-    expected_api_field_updated,
-    mock_update_service,
-):
-    client_request.login(platform_admin_user)
-    client_request.post(
-        "main.set_per_day_message_limit",
-        service_id=SERVICE_ONE_ID,
-        notification_type=notification_type,
-        _data={"message_limit": "1,234"},
-    )
-    mock_update_service.assert_called_once_with(
-        SERVICE_ONE_ID,
-        **{expected_api_field_updated: 1234},
-    )
-
-
 @pytest.mark.parametrize("notification_type", ["sms", "email", "letter"])
 @pytest.mark.parametrize(
     "new_limit, expected_api_argument",
@@ -4814,6 +4786,47 @@ def test_switch_service_enable_international_sms_and_letters(
     assert mocked_fn.call_args[0][0] == service_one["id"]
 
 
+def test_should_show_page_to_set_per_day_international_sms_message_limit(
+    client_request,
+    service_one,
+):
+    service_one["permissions"] = ["international_sms"]
+
+    page = client_request.get(
+        "main.set_per_day_international_sms_message_limit",
+        service_id=SERVICE_ONE_ID,
+    )
+    assert normalize_spaces(page.select_one("label").text) == "Daily international text message limit"
+    assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "500"
+
+
+@pytest.mark.parametrize(
+    "new_limit, expected_api_argument",
+    [
+        ("1", 1),
+        ("1200", 1200),
+        pytest.param("foo", "foo", marks=pytest.mark.xfail),
+    ],
+)
+def test_set_per_day_international_sms_message_limit(
+    client_request,
+    new_limit,
+    expected_api_argument,
+    mock_update_service,
+    mocker,
+):
+    client_request.post(
+        "main.set_per_day_international_sms_message_limit",
+        service_id=SERVICE_ONE_ID,
+        _data={
+            "message_limit": new_limit,
+        },
+    )
+    assert mock_update_service.call_args_list == [
+        mocker.call(SERVICE_ONE_ID, international_sms_message_limit=expected_api_argument)
+    ]
+
+
 @pytest.mark.parametrize(
     "user, is_trial_service",
     (
@@ -4839,7 +4852,7 @@ def test_archive_service_after_confirm(
 ):
     service_one["restricted"] = is_trial_service
     mock_api = mocker.patch("app.service_api_client.post")
-    mock_event = mocker.patch("app.main.views.service_settings.index.create_archive_service_event")
+    mock_event = mocker.patch("app.main.views.service_settings.index.Events.archive_service")
     redis_delete_mock = mocker.patch("app.notify_client.service_api_client.redis_client.delete")
     mocker.patch("app.notify_client.service_api_client.redis_client.delete_by_pattern")
 
@@ -5066,7 +5079,6 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
     mocker,
 ):
     service_one["contact_link"] = "http://example.com/"
-    service_one["permissions"].append("upload_document")
 
     page = client_request.post(
         "main.send_files_by_email_contact_details",
@@ -5674,7 +5686,7 @@ def test_post_service_receive_text_messages_start_turns_on_feature_and_redirects
         "app.inbound_number_client.add_inbound_number_to_service",
         return_value={"id": "abcd", "service_id": SERVICE_ONE_ID, "inbound_number_id": "1234"},
     )
-    mock_event = mocker.patch("app.main.views.service_settings.index.create_set_inbound_sms_on_event")
+    mock_event = mocker.patch("app.main.views.service_settings.index.Events.set_inbound_sms_on")
 
     page = client_request.post(
         ".service_receive_text_messages_start", service_id=SERVICE_ONE_ID, _follow_redirects=True

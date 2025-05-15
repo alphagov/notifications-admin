@@ -231,7 +231,7 @@ def test_letter_image_renderer_requires_valid_postage():
             {"service": SERVICE_ONE_ID, "content": "", "subject": "", "template_type": "letter", "postage": "third"},
             image_url="foo",
         )
-    assert str(exception.value) == ("postage must be None, 'first', 'second', 'europe' or 'rest-of-world'")
+    assert str(exception.value) == ("postage must be None, 'first', 'second', 'economy', 'europe' or 'rest-of-world'")
 
 
 @pytest.mark.parametrize(
@@ -288,6 +288,11 @@ def test_letter_image_renderer_requires_image_url_to_render():
             "second",
             ["letter-postage", "letter-postage-second"],
             "Postage: second class",
+        ),
+        (
+            "economy",
+            ["letter-postage", "letter-postage-economy"],
+            "Postage: economy",
         ),
         (
             "europe",
@@ -367,6 +372,7 @@ def test_letter_image_renderer_passes_postage_to_html_attribute(
         pytest.param({"postage": None}, False, None, None),
         pytest.param({"postage": "first"}, True, "letter-postage-first", "first class"),
         pytest.param({"postage": "second"}, True, "letter-postage-second", "second class"),
+        pytest.param({"postage": "economy"}, True, "letter-postage-economy", "economy"),
         pytest.param({"postage": "europe"}, True, "letter-postage-international", "international"),
         pytest.param({"postage": "rest-of-world"}, True, "letter-postage-international", "international"),
         pytest.param(

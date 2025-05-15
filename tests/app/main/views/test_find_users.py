@@ -1,11 +1,12 @@
 import uuid
+from unittest.mock import ANY, call
 
 import pytest
 from flask import url_for
 from notifications_python_client.errors import HTTPError
 
 from tests import user_json
-from tests.conftest import normalize_spaces
+from tests.conftest import create_user, normalize_spaces
 
 
 def test_user_information_page_shows_information_about_user(
@@ -64,6 +65,8 @@ def test_user_information_page_shows_information_about_user(
         "Nature Therapy",
         "Fresh Orchard Juice",
     ]
+
+    assert "platform admin" not in page.select_one("main").text.lower()
 
 
 def test_user_information_page_shows_change_auth_type_link(
@@ -163,6 +166,71 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
     page = client_request.get("main.user_information", user_id=fake_uuid)
 
     assert normalize_spaces(page.select("main p")[-1].text) == "2 failed login attempts"
+
+
+def test_user_information_page_shows_if_user_is_platform_admin(
+    client_request,
+    platform_admin_user,
+    api_user_active,
+    mock_get_organisations_and_services_for_user,
+    mocker,
+):
+    client_request.login(platform_admin_user)
+    other_platform_admin_user = create_user(platform_admin=True, id=uuid.uuid4())
+    mocker.patch("app.user_api_client.get_user", return_value=other_platform_admin_user)
+
+    page = client_request.get("main.user_information", user_id=other_platform_admin_user["id"])
+
+    assert normalize_spaces(page.select_one(".govuk-tag").text) == "Platform admin"
+    assert normalize_spaces(page.select_one("main p a").text) == "Remove"
+    assert page.select_one("main p a")["href"] == url_for(
+        "main.remove_platform_admin",
+        user_id=other_platform_admin_user["id"],
+    )
+
+
+def test_remove_platform_admin_prompts_for_confirmation(
+    client_request,
+    platform_admin_user,
+    api_user_active,
+    mock_get_organisations_and_services_for_user,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get("main.remove_platform_admin", user_id=api_user_active["id"])
+
+    assert normalize_spaces(page.select_one("div.banner-dangerous").text) == (
+        "Are you sure you want to remove platform admin from this user? Yes, remove"
+    )
+    assert page.select_one("div.banner-dangerous form[method=post] button[type=submit]")
+
+
+@pytest.mark.parametrize(
+    "mobile_number, expected_auth_type",
+    (
+        ("12345", "sms_auth"),
+        (None, "email_auth"),
+    ),
+)
+def test_remove_platform_admin_removes_user_admin_privilege_and_changes_user_auth(
+    client_request,
+    platform_admin_user,
+    fake_uuid,
+    mock_get_organisations_and_services_for_user,
+    mock_update_user_attribute,
+    mobile_number,
+    expected_auth_type,
+    mock_events,
+):
+    platform_admin_user["mobile_number"] = mobile_number
+    client_request.login(platform_admin_user)
+    client_request.post("main.remove_platform_admin", user_id=fake_uuid)
+
+    mock_update_user_attribute.assert_called_once_with(
+        platform_admin_user["id"],
+        platform_admin=False,
+        auth_type=expected_auth_type,
+    )
+    assert mock_events.call_args_list == [call("remove_platform_admin", ANY)]
 
 
 def test_user_information_page_shows_archive_link_for_active_users(

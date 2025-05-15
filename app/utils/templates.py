@@ -27,6 +27,7 @@ class BaseLetterImageTemplate(BaseLetterTemplate):
     allowed_postage_types = (
         Postage.FIRST,
         Postage.SECOND,
+        Postage.ECONOMY,
         Postage.EUROPE,
         Postage.REST_OF_WORLD,
     )
@@ -86,6 +87,7 @@ class BaseLetterImageTemplate(BaseLetterTemplate):
         return {
             Postage.FIRST: "first class",
             Postage.SECOND: "second class",
+            Postage.ECONOMY: "economy",
             Postage.EUROPE: "international",
             Postage.REST_OF_WORLD: "international",
         }.get(self.postage)
@@ -95,6 +97,7 @@ class BaseLetterImageTemplate(BaseLetterTemplate):
         return {
             Postage.FIRST: "letter-postage-first",
             Postage.SECOND: "letter-postage-second",
+            Postage.ECONOMY: "letter-postage-economy",
             Postage.EUROPE: "letter-postage-international",
             Postage.REST_OF_WORLD: "letter-postage-international",
         }.get(self.postage)

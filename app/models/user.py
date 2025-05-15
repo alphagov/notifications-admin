@@ -7,11 +7,7 @@ from notifications_python_client.errors import HTTPError
 from werkzeug.utils import cached_property
 
 from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
-from app.event_handlers import (
-    create_add_user_to_service_event,
-    create_set_organisation_user_permissions_event,
-    create_set_user_permissions_event,
-)
+from app.event_handlers import Events
 from app.models import JSONModel, ModelList
 from app.models.organisation import Organisation, Organisations
 from app.models.webauthn_credential import WebAuthnCredentials
@@ -19,6 +15,7 @@ from app.notify_client import InviteTokenError
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.user_api_client import user_api_client
+from app.utils.time import is_less_than_days_ago
 from app.utils.user import is_gov_user
 from app.utils.user_permissions import (
     all_ui_permissions,
@@ -131,6 +128,10 @@ class User(BaseUser, UserMixin):
             organisation: set(permissions) for organisation, permissions in permissions_by_organisation.items()
         }
 
+    @property
+    def email_needs_revalidating(self):
+        return not is_less_than_days_ago(self.email_access_validated_at, 90)
+
     def update(self, **kwargs):
         response = user_api_client.update_user_attribute(self.id, **kwargs)
         self.__init__(response)
@@ -154,7 +155,7 @@ class User(BaseUser, UserMixin):
             permissions=permissions,
             folder_permissions=folder_permissions,
         )
-        create_set_user_permissions_event(
+        Events.set_user_permissions(
             user_id=self.id,
             service_id=service_id,
             original_ui_permissions=self.permissions_for_service(service_id),
@@ -168,7 +169,7 @@ class User(BaseUser, UserMixin):
             organisation_id=organisation_id,
             permissions=[{"permission": p} for p in permissions],
         )
-        create_set_organisation_user_permissions_event(
+        Events.set_organisation_user_permissions(
             user_id=self.id,
             organisation_id=organisation_id,
             original_permissions=self.permissions_for_organisation(organisation_id),
@@ -429,7 +430,7 @@ class User(BaseUser, UserMixin):
                 permissions,
                 folder_permissions,
             )
-            create_add_user_to_service_event(
+            Events.add_user_to_service(
                 user_id=self.id,
                 invited_by_id=invited_by_id,
                 service_id=service_id,
@@ -467,6 +468,14 @@ class User(BaseUser, UserMixin):
             self.belongs_to_organisation(service.organisation_id)
             and service.organisation.can_approve_own_go_live_requests
             and self.has_permission_for_organisation(service.organisation_id, PERMISSION_CAN_MAKE_SERVICES_LIVE)
+        )
+
+    def remove_platform_admin(self):
+        if not self.platform_admin:
+            return
+        self.update(
+            platform_admin=False,
+            auth_type="sms_auth" if self.mobile_number else "email_auth",
         )
 
 

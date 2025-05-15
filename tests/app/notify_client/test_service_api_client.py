@@ -66,13 +66,14 @@ def test_client_creates_service_with_correct_data(
     mocker.patch("app.notify_client.current_user", id="123")
 
     client.create_service(
-        "My first service",
-        "central_government",
-        1,
-        1,
-        1,
-        True,
-        fake_uuid,
+        service_name="My first service",
+        organisation_type="central_government",
+        email_message_limit=1,
+        international_sms_message_limit=1,
+        sms_message_limit=1,
+        letter_message_limit=1,
+        restricted=True,
+        user_id=fake_uuid,
     )
     mock_post.assert_called_once_with(
         "/service",
@@ -85,6 +86,7 @@ def test_client_creates_service_with_correct_data(
             # The rest pass through with the same names
             "organisation_type": "central_government",
             "email_message_limit": 1,
+            "international_sms_message_limit": 1,
             "sms_message_limit": 1,
             "letter_message_limit": 1,
             "restricted": True,
@@ -553,19 +555,29 @@ def test_client_updates_service_with_allowed_attributes(
 
     allowed_attributes = [
         "active",
+        "billing_contact_email_addresses",
+        "billing_contact_names",
+        "billing_reference",
         "contact_link",
         "count_as_live",
+        "custom_email_sender_name",
         "email_branding",
         "free_sms_fragment_limit",
         "go_live_at",
         "go_live_user",
+        "has_active_go_live_request",
         "letter_branding",
         "letter_contact_block",
+        "email_message_limit",
+        "international_sms_message_limit",
+        "sms_message_limit",
+        "letter_message_limit",
         "name",
         "notes",
         "organisation_type",
         "permissions",
         "prefix_sms",
+        "purchase_order_number",
         "rate_limit",
         "reply_to_email_address",
         "restricted",
@@ -640,7 +652,7 @@ def test_update_service_join_requests(notify_admin, mocker):
     mock_redis_delete.assert_called_with_args(*expected_cache_deletes)
 
     mock_request.assert_called_once_with(
-        "POST", f"/service/update-service-join-request-status/{request_id}", data={"status": "approved"}
+        "POST", f"/service/{service_id}/service-join-request/{request_id}", data={"status": "approved"}
     )
 
 

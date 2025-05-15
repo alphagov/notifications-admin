@@ -113,7 +113,7 @@ def test_cannot_join_service_for_different_organisation(
 
 def test_redirect_if_already_member_of_service(
     client_request,
-    mock_request_invite_for,
+    mock_create_service_join_request,
     service_one,
     mock_get_organisation_by_domain,
     mocker,
@@ -222,9 +222,49 @@ def test_page_lists_team_members_of_service(
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
 
 
+def test_page_does_not_show_form_if_no_users_have_permission_to_approve_the_request(
+    client_request,
+    service_one,
+    mock_get_organisation_by_domain,
+    mock_get_invites_for_service,
+    mocker,
+):
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
+    current_user = create_service_two_user_with_permissions()
+
+    # Users with permission for a different service
+    create_active_user_with_permissions()
+    create_active_user_with_permissions()
+    create_active_user_with_permissions()
+
+    client_request.login(current_user)
+
+    mocker.patch(
+        "app.models.user.Users._get_items",
+        return_value=[
+            # Three users, but none appear on the page
+            create_active_user_empty_permissions(),
+            create_active_user_manage_template_permissions(),
+            create_active_user_view_permissions(),
+        ],
+    )
+
+    page = client_request.get("main.join_service_ask", service_to_join_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one("h1").text) == "Ask to join this service"
+    assert normalize_spaces(page.select_one("main p").text) == "You’re asking to join ‘service one’."
+    assert not page.select("form")
+    assert "No one on that service has permission to approve your request." in normalize_spaces(page.text)
+
+
 def test_page_redirects_on_post(
     client_request,
-    mock_request_invite_for,
+    mock_create_service_join_request,
     service_one,
     service_two,
     mock_get_organisation_by_domain,
@@ -264,8 +304,8 @@ def test_page_redirects_on_post(
         },
     )
 
-    mock_request_invite_for.assert_called_once_with(
-        user_to_invite_id=current_user["id"],
+    mock_create_service_join_request.assert_called_once_with(
+        current_user["id"],
         service_managers_ids=[
             manage_service_user_1["id"],
         ],

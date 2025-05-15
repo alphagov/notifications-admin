@@ -365,6 +365,9 @@ def message_count_noun(count, message_type):
     if message_type == "sms":
         return "text message" if singular else "text messages"
 
+    if message_type == "international_sms":
+        return "international text message" if singular else "international text messages"
+
     if message_type == "email":
         return "email" if singular else "emails"
 
@@ -386,6 +389,9 @@ def recipient_count_label(count, template_type):
 
     if template_type == "sms":
         return "phone number" if singular else "phone numbers"
+
+    if template_type == "international_sms":
+        return "international phone number" if singular else "international phone numbers"
 
     if template_type == "email":
         return "email address" if singular else "email addresses"

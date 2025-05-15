@@ -1381,7 +1381,7 @@ def test_manage_user_page_doesnt_show_folder_hint_if_service_cant_edit_folder_pe
 def test_remove_user_from_service(
     client_request, active_user_with_permissions, api_user_active, service_one, mock_remove_user_from_service, mocker
 ):
-    mock_event_handler = mocker.patch("app.main.views.manage_users.create_remove_user_from_service_event")
+    mock_event_handler = mocker.patch("app.main.views.manage_users.Events.remove_user_from_service")
 
     client_request.post(
         "main.remove_user_from_service",
@@ -1620,7 +1620,7 @@ def test_confirm_edit_user_email_changes_user_email(
     # get_user gets called twice - first to check if current user can see the page, then to see if the team member
     # whose email address we're changing belongs to the service
     mocker.patch("app.user_api_client.get_user", side_effect=[active_user_with_permissions, api_user_active])
-    mock_event_handler = mocker.patch("app.main.views.manage_users.create_email_change_event")
+    mock_event_handler = mocker.patch("app.main.views.manage_users.Events.update_user_email")
 
     new_email = "new_email@gov.uk"
     with client_request.session_transaction() as session:
@@ -1808,7 +1808,7 @@ def test_confirm_edit_user_mobile_number_changes_user_mobile_number(
     # get_user gets called twice - first to check if current user can see the page, then to see if the team member
     # whose mobile number we're changing belongs to the service
     mocker.patch("app.user_api_client.get_user", side_effect=[active_user_with_permissions, api_user_active])
-    mock_event_handler = mocker.patch("app.main.views.manage_users.create_mobile_number_change_event")
+    mock_event_handler = mocker.patch("app.main.views.manage_users.Events.update_user_mobile_number")
 
     new_number = "07554080636"
     with client_request.session_transaction() as session:
@@ -1876,13 +1876,13 @@ def service_join_request_get_data(request_id, status, mock_requester, status_cha
 def mock_get_service_join_request_status_data(mocker, mock_requester, mock_service_user, status):
     mocker.patch("app.notify_client.current_user", side_effect=mock_service_user)
 
-    def _get(request_id):
+    def _get(request_id, service_id):
         mock_contacted_service_users = [mock_service_user["id"], sample_uuid()]
         return service_join_request_get_data(
             request_id, status, mock_requester, mock_service_user, mock_contacted_service_users
         )
 
-    return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
+    return mocker.patch("app.service_api_client.get_service_join_request", side_effect=_get)
 
 
 @pytest.fixture(scope="function")
@@ -1890,13 +1890,13 @@ def mock_get_service_join_request_not_logged_in_user(mocker):
     mock_requester = create_active_user_empty_permissions(True)
     mock_service_user = create_active_user_with_permissions(True)
 
-    def _get(request_id):
+    def _get(request_id, service_id):
         mock_contacted_service_users = [mock_service_user["id"]]
         return service_join_request_get_data(
             request_id, SERVICE_JOIN_REQUEST_REJECTED, mock_requester, mock_service_user, mock_contacted_service_users
         )
 
-    return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
+    return mocker.patch("app.service_api_client.get_service_join_request", side_effect=_get)
 
 
 @pytest.fixture(scope="function")
@@ -1904,7 +1904,7 @@ def mock_get_service_join_request_user_already_joined(mocker):
     mock_requester = create_active_user_empty_permissions(True)
     mock_service_user = create_active_user_with_permissions(True)
 
-    def _get(request_id):
+    def _get(request_id, service_id):
         mock_contacted_service_users = [mock_service_user["id"], sample_uuid()]
         mock_request_data = service_join_request_get_data(
             request_id, "pending", mock_requester, None, mock_contacted_service_users
@@ -1912,7 +1912,7 @@ def mock_get_service_join_request_user_already_joined(mocker):
         mock_request_data["requester"]["belongs_to_service"] = [SERVICE_ONE_ID]
         return mock_request_data
 
-    return mocker.patch("app.service_api_client.get_service_join_requests", side_effect=_get)
+    return mocker.patch("app.service_api_client.get_service_join_request", side_effect=_get)
 
 
 @pytest.mark.parametrize(
@@ -2305,7 +2305,7 @@ def test_join_a_service_with_no_email_auth_hides_auth_type_options(
     requester = create_active_user_empty_permissions(True)
 
     mocker.patch(
-        "app.service_api_client.get_service_join_requests",
+        "app.service_api_client.get_service_join_request",
         return_value=service_join_request_get_data(fake_uuid, "pending", requester, None, [fake_uuid]),
     )
 
@@ -2360,7 +2360,7 @@ def test_join_a_service_user_with_no_mobile_number_cant_be_set_to_sms_auth(
     requester = create_user(mobile_number=mobile_number)
 
     mocker.patch(
-        "app.service_api_client.get_service_join_requests",
+        "app.service_api_client.get_service_join_request",
         return_value=service_join_request_get_data(fake_uuid, "pending", {}, None, [fake_uuid]),
     )
 

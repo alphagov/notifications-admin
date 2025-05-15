@@ -43,6 +43,12 @@
         {% include "partials/check/too-many-messages.html" %}
       {% endcall %}
     </div>
+  {% elif error == 'too-many-international-sms-messages' %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/too-many-international-sms-messages.html" %}
+      {% endcall %}
+    </div>
   {% elif error == 'message-too-long' %}
     {# the only row_errors we can get when sending one off messages is that the message is too long #}
     <div class="bottom-gutter">

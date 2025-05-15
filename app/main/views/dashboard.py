@@ -469,7 +469,7 @@ def aggregate_template_usage(template_statistics, sort_key="count"):
 def aggregate_notifications_stats(template_statistics):
     template_statistics = filter_out_cancelled_stats(template_statistics)
     notifications = {
-        template_type: {status: 0 for status in ("requested", "delivered", "failed")}
+        template_type: dict.fromkeys(("requested", "delivered", "failed"), 0)
         for template_type in ["sms", "email", "letter"]
     }
     for stat in template_statistics:

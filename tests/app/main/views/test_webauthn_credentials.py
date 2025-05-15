@@ -1,5 +1,5 @@
 import base64
-from unittest.mock import ANY, Mock
+from unittest.mock import ANY, Mock, PropertyMock
 
 import pytest
 from fido2 import cbor
@@ -371,7 +371,7 @@ def test_verify_webauthn_login_signs_user_in(
     client_request.login(platform_admin_user)
     mocker.patch("app.main.views.webauthn_credentials._verify_webauthn_authentication")
     mocker.patch("app.user_api_client.complete_webauthn_login_attempt", return_value=(True, None))
-    mocker.patch("app.main.views.webauthn_credentials.email_needs_revalidating", return_value=False)
+    mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=False)
 
     resp = client_request.post_response("main.webauthn_complete_authentication", _expected_status=200, **url_kwargs)
 
@@ -414,7 +414,7 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
     mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
     mocker.patch("app.main.views.webauthn_credentials._verify_webauthn_authentication")
     mocker.patch("app.user_api_client.complete_webauthn_login_attempt", return_value=(True, None))
-    mocker.patch("app.main.views.webauthn_credentials.email_needs_revalidating", return_value=True)
+    mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=True)
 
     resp = client_request.post_response(
         "main.webauthn_complete_authentication",
@@ -444,7 +444,7 @@ def test_verify_webauthn_login_passes_webauthn_credential_id_to_api(
         "app.main.views.webauthn_credentials._verify_webauthn_authentication",
         return_value=Mock(id="12345"),
     )
-    mocker.patch("app.main.views.webauthn_credentials.email_needs_revalidating", return_value=False)
+    mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=False)
     mock_succesful_login_api_call = mocker.patch(
         "app.user_api_client.complete_webauthn_login_attempt", return_value=(True, None)
     )

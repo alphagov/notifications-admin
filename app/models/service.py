@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any
 
 from flask import abort, current_app
+from notifications_python_client.errors import HTTPError
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
@@ -46,6 +47,7 @@ class Service(JSONModel):
     id: Any
     inbound_api: Any
     email_message_limit: int
+    international_sms_message_limit: int
     sms_message_limit: int
     letter_message_limit: int
     rate_limit: int
@@ -69,13 +71,11 @@ class Service(JSONModel):
     ALL_PERMISSIONS = TEMPLATE_TYPES + (
         "edit_folder_permissions",
         "email_auth",
-        "extra_email_formatting",
-        "extra_letter_formatting",
         "inbound_sms",
         "international_letters",
         "international_sms",
-        "upload_document",
         "sms_to_uk_landlines",
+        "economy_letter_sending",
     )
 
     @classmethod
@@ -203,10 +203,10 @@ class Service(JSONModel):
             invited_user_id=str(invited_user_id),
         )
 
-    def request_invite_for(self, user_to_invite, *, service_managers_ids, reason):
-        invite_api_client.request_invite_for(
-            user_to_invite_id=user_to_invite.id,
-            service_id=self.id,
+    def create_service_join_request(self, user_to_invite, *, service_id, service_managers_ids, reason):
+        service_api_client.create_service_join_request(
+            user_to_invite.id,
+            service_id=service_id,
             service_managers_ids=service_managers_ids,
             reason=reason,
         )
@@ -615,6 +615,13 @@ class Service(JSONModel):
     def get_message_limit(self, notification_type):
         return getattr(self, f"{notification_type}_message_limit")
 
+    def remaining_messages(self, notification_type):
+        if notification_type == "international_sms" and not self.has_permission("international_sms"):
+            return 0
+        return self.get_message_limit(notification_type) - (
+            service_api_client.get_notification_count(self.id, notification_type=notification_type)
+        )
+
     @property
     def sign_in_method(self) -> str:
         if self.has_permission("email_auth"):
@@ -651,7 +658,14 @@ class Service(JSONModel):
     @property
     def inbound_sms_callback_details(self):
         if self.inbound_api:
-            return service_api_client.get_service_callback_api(self.id, self.inbound_api[0], "inbound_sms")
+            try:
+                return service_api_client.get_service_callback_api(self.id, self.inbound_api[0], "inbound_sms")
+            except HTTPError:
+                pass
+        try:
+            return self._callback_service_callback_details("inbound_sms")
+        except HTTPError:
+            pass
 
     @property
     def delivery_status_callback_details(self):
@@ -706,8 +720,8 @@ class ServiceJoinRequest(JSONModel):
         return self.status == SERVICE_JOIN_REQUEST_CANCELLED
 
     @classmethod
-    def from_id(cls, request_id):
-        return cls(service_api_client.get_service_join_requests(request_id))
+    def from_id(cls, request_id, service_id):
+        return cls(service_api_client.get_service_join_request(request_id, service_id))
 
     def update(self, **kwargs):
         return service_api_client.update_service_join_requests(self.id, self.requester["id"], self.service_id, **kwargs)

@@ -6,7 +6,7 @@ from notifications_python_client.errors import HTTPError
 from werkzeug.datastructures import FileStorage
 
 from app import email_branding_client
-from app.event_handlers import create_update_email_branding_event
+from app.event_handlers import Events
 from app.main import main
 from app.main.forms import (
     AdminEditEmailBrandingForm,
@@ -96,7 +96,7 @@ def platform_admin_update_email_branding(branding_id):
                 brand_type=form.brand_type.data,
                 updated_by_id=current_user.id,
             )
-            create_update_email_branding_event(
+            Events.update_email_branding(
                 email_branding_id=branding_id,
                 updated_by_id=str(current_user.id),
                 old_email_branding=email_branding.serialize(),

@@ -25,10 +25,7 @@ from app import (
     service_api_client,
 )
 from app.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
-from app.event_handlers import (
-    create_archive_service_event,
-    create_set_inbound_sms_on_event,
-)
+from app.event_handlers import Events
 from app.extensions import zendesk_client
 from app.main import json_updates, main
 from app.main.forms import (
@@ -83,9 +80,8 @@ from app.utils.user import (
 PLATFORM_ADMIN_SERVICE_PERMISSIONS = {
     "inbound_sms": {"title": "Receive inbound SMS", "requires": "sms", "endpoint": ".service_set_inbound_number"},
     "email_auth": {"title": "Email authentication"},
-    "extra_email_formatting": {"title": "Extra email formatting options", "requires": "email"},
-    "extra_letter_formatting": {"title": "Extra letter formatting options", "requires": "letter"},
     "sms_to_uk_landlines": {"title": "Sending SMS to UK landlines"},
+    "economy_letter_sending": {"title": "Sending economy letters", "requires": "letter"},
 }
 
 THANKS_FOR_BRANDING_REQUEST_MESSAGE = (
@@ -341,7 +337,7 @@ def archive_service(service_id):
         cached_service_user_ids = [user.id for user in current_service.active_users]
 
         service_api_client.archive_service(service_id, cached_service_user_ids)
-        create_archive_service_event(service_id=service_id, archived_by_id=current_user.id)
+        Events.archive_service(service_id=service_id, archived_by_id=current_user.id)
 
         flash(
             f"‘{current_service.name}’ was deleted",
@@ -651,6 +647,29 @@ def service_set_international_sms(service_id):
     )
 
 
+@main.route(
+    "/services/<uuid:service_id>/service-settings/set-message-limit/international-sms",
+    methods=["GET", "POST"],
+)
+@user_has_permissions("manage_service")
+def set_per_day_international_sms_message_limit(service_id):
+    form = AdminServiceMessageLimitForm(
+        message_limit=current_service.get_message_limit("international_sms"),
+        notification_type="international_sms",
+    )
+
+    if form.validate_on_submit():
+        current_service.update(international_sms_message_limit=form.message_limit.data)
+
+        return redirect(url_for(".service_settings", service_id=service_id))
+
+    return render_template(
+        "views/service-settings/set-message-limit-for-international-sms.html",
+        form=form,
+        error_summary_enabled=True,
+    )
+
+
 @main.route("/services/<uuid:service_id>/service-settings/set-international-letters", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_set_international_letters(service_id):
@@ -685,7 +704,7 @@ def service_receive_text_messages_start(service_id):
     if request.method == "POST":
         sms_sender = inbound_number_client.add_inbound_number_to_service(current_service.id)
         current_service.force_permission("inbound_sms", on=True)
-        create_set_inbound_sms_on_event(
+        Events.set_inbound_sms_on(
             user_id=current_user.id,
             service_id=current_service.id,
             inbound_number_id=sms_sender["inbound_number_id"],

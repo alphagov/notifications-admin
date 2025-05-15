@@ -1,6 +1,9 @@
+from unittest.mock import PropertyMock
+
 import pytest
 from flask import url_for
 
+from tests.app.test_event_handlers import event_dict
 from tests.conftest import (
     SERVICE_ONE_ID,
     normalize_spaces,
@@ -11,7 +14,7 @@ from tests.conftest import (
 
 @pytest.fixture
 def mock_email_validated_recently(mocker):
-    return mocker.patch("app.main.views.two_factor.email_needs_revalidating", return_value=False)
+    return mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=False)
 
 
 @pytest.mark.parametrize("request_url", ["two_factor_email_sent", "revalidate_email_sent"])
@@ -80,6 +83,8 @@ def test_should_login_user_and_should_redirect_to_next_url(
         ),
     )
 
+    mock_create_event.assert_called_once_with("sucessful_login", event_dict(user_id=api_user_active["id"]))
+
 
 def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate_email(
     client_request,
@@ -90,7 +95,7 @@ def test_should_send_email_and_redirect_to_info_page_if_user_needs_to_revalidate
     client_request.logout()
 
     mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
-    mocker.patch("app.main.views.two_factor.email_needs_revalidating", return_value=True)
+    mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=True)
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
     client_request.post(
@@ -288,7 +293,6 @@ def test_two_factor_sms_should_activate_pending_user(
     mocker,
     api_user_pending,
     mock_check_verify_code,
-    mock_create_event,
     mock_activate_user,
     mock_email_validated_recently,
 ):
@@ -345,7 +349,6 @@ def test_valid_two_factor_email_link_logs_in_user(
     mock_get_user,
     mock_get_services_with_one_service,
     mocker,
-    mock_create_event,
 ):
     mocker.patch("app.user_api_client.check_verify_code", return_value=(True, ""))
 

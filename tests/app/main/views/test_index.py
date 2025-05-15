@@ -187,7 +187,6 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
         ("/using-notify/guidance/message-status", "main.guidance_message_status", {}),
         ("/using-notify/guidance/message-status/sms", "main.guidance_message_status", {"notification_type": "sms"}),
         ("/using-notify/who-its-for", "main.guidance_who_can_use_notify", {}),
-        ("/add-or-join-service", "main.your_services", {}),
     ],
     ids=(lambda arg: arg if isinstance(arg, str) and arg.startswith("/") else ""),
 )
@@ -371,7 +370,7 @@ def test_bulk_sending_limits(client_request):
 
     assert normalize_spaces(paragraphs[0].text) == "You can send a batch of up to 100,000 messages at once."
     assert normalize_spaces(paragraphs[1].text) == (
-        "There’s a maximum daily limit of 250,000 emails, 250,000 text messages and 20,000 letters. "
+        "There’s a default maximum limit of 250,000 emails, 250,000 text messages and 20,000 letters. "
         "If you need to discuss these limits, contact us."
     )
 

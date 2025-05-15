@@ -3,7 +3,6 @@ from functools import wraps
 from flask import redirect, request, session, url_for
 
 from app.models.user import User
-from app.utils.time import is_less_than_days_ago
 
 
 def redirect_to_sign_in(f):
@@ -54,10 +53,6 @@ def redirect_if_logged_in(f):
             return f(*args, **kwargs)
 
     return wrapped
-
-
-def email_needs_revalidating(user):
-    return not is_less_than_days_ago(user.email_access_validated_at, 90)
 
 
 # see https://stackoverflow.com/questions/60532973/how-do-i-get-a-is-safe-url-function-to-use-with-flask-and-how-does-it-work  # noqa

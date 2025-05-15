@@ -318,6 +318,7 @@ class MainNavigation(Navigation):
             "service_settings",
             "service_sms_senders",
             "set_free_sms_allowance",
+            "set_per_day_international_sms_message_limit",
             "set_per_day_message_limit",
             "set_per_minute_rate_limit",
             "submit_request_to_go_live",
