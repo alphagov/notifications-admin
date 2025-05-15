@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE: ghcr.io/worth-nl/notifynl-api
+  IMAGE: ghcr.io/worth-nl/notifynl-admin
 
 jobs:
   build-tag-test:
@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11"]
-        dockerfile-target: ["test", "concourse_tests"]
+        dockerfile-target: ["test"]
 
     steps:
       - uses: szenius/set-timezone@v2.0

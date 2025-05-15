@@ -16,35 +16,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11"]
-
-    services:
-      db:
-        image: postgres:15-bullseye
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_DB: notification_api
-          POSTGRES_USER: notify
-          POSTGRES_PASSWORD: notify
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 5s
-          --health-timeout 1s
-          --health-retries 10
-
-      redis:
-        image: redis:6.2
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-
-    env:
-      FLASK_APP: 'application:application'
-      SQLALCHEMY_DATABASE_URI: postgresql://notify:notify@localhost/notification_api
+        node-version: ["22"]
 
     steps:
       - uses: szenius/set-timezone@v2.0
@@ -57,6 +29,10 @@ jobs:
         with:
           packages: build-essential git libcurl4-openssl-dev curl libssl-dev
           install-recommends: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
 
       - uses: astral-sh/setup-uv@v6
         with:
@@ -71,10 +47,19 @@ jobs:
       - name: Install application requirements (pip)
         run: uv pip install -r requirements_nl_test.txt
 
+      - name: NPM install
+        run: npm ci --no-audit
+
+      - name: NPM build
+        run: npm run build
+
       - uses: astral-sh/ruff-action@v3
 
       - name: Generate version file
         run: make generate-version-file
+
+      - name: Jest
+        run: npm test
 
       - uses: pavelzw/pytest-action@v2
         with:
