@@ -17,7 +17,7 @@ class EnhancedTextbox {
     }
 
     this.$module = $module;
-    this.tagPattern = /\(\(([^\)\((\?)]+)(\?\?)?([^\)\(]*)\)\)/g;
+    this.tagPattern = /\(\(([^\)\((\?)(\:)]+)((\?\?)|(::))?([^\)\(]*)\)\)/g;
     this.highlightPlaceholders = this.$module.dataset.highlightPlaceholders === 'true';
     this.autofocus = this.$module.dataset.autofocusTextbox === 'true';
     this.$textbox = this.$module;
@@ -42,10 +42,10 @@ class EnhancedTextbox {
     this.$visibleTextbox.style.visibility = 'hidden';
     this.$visibleTextbox.style.display = 'block';
     document.querySelector('body').append(this.$visibleTextbox);
-    
+
     this.initialHeight = this.$visibleTextbox.offsetHeight;
 
-    this.$backgroundHighlightElement.style.borderWidth = 
+    this.$backgroundHighlightElement.style.borderWidth =
       window.getComputedStyle(this.$textbox).getPropertyValue('border-width');
 
     this.$visibleTextbox.remove();
@@ -77,9 +77,11 @@ class EnhancedTextbox {
 
   contentReplaced () {
     return this.contentEscaped().replace(
-      this.tagPattern, (match, name, separator, value) => {
-        if (value && separator) {
-          return `<span class='placeholder-conditional'>((${name}??</span>${value}))`;
+      this.tagPattern, (match, name, separator, _, __, value) => {
+        if (value && separator == "??") {
+          return `<span class='placeholder-conditional'>((${name}${separator}</span>${value}))`;
+        } else if (value && separator == "::") {
+          return `<span class='placeholder-unsafe'>((${name}</span>${separator}${value}))`;
         } else {
           return `<span class='placeholder'>((${name}${value}))</span>`;
         }
