@@ -72,7 +72,7 @@ jobs:
       - uses: dorny/test-reporter@v2
         with:
           name: JEST Tests
-          path: jest-*.xml
+          path: reports/jest-*.xml
           reporter: jest-junit
 
       - uses: pavelzw/pytest-action@v2

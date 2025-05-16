@@ -980,7 +980,7 @@ coverage.xml
 test_results.xml
 *,cover
 .testmon*
-
+reports/
 
 # Translations
 *.mo
