@@ -74,6 +74,8 @@ jobs:
           name: JEST Tests
           path: reports/jest-*.xml
           reporter: jest-junit
+          only-summary: true
+          use-actions-summary: false
 
       - uses: pavelzw/pytest-action@v2
         with:
