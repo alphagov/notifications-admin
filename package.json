@@ -7,6 +7,7 @@
   },
   "scripts": {
     "test": "npm run lint:scss && npm run lint:js && node --experimental-vm-modules node_modules/.bin/jest tests/javascripts",
+    "test-report": "node --experimental-vm-modules node_modules/.bin/jest tests/javascripts --ci --reporters=default --reporters=jest-junit",
     "test-watch": "jest --watch tests/javascripts",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand $npm_config_test",
     "build": "npm run clean && rollup -c",
@@ -47,6 +48,7 @@
     "jest": "29.7.0",
     "jest-each": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
+    "jest-junit": "^16.0.0",
     "postcss-replace": "2.0.1",
     "rollup": "4.36.0",
     "rollup-plugin-copy": "3.5.0",
@@ -74,5 +76,14 @@
       "<rootDir>/**/?(*.)(test).{js,mjs}"
     ],
     "testEnvironment": "jsdom"
+  },
+  "jest-junit": {
+    "outputDirectory": "reports",
+    "outputName": "jest-junit.xml",
+    "ancestorSeparator": " › ",
+    "uniqueOutputName": "false",
+    "suiteNameTemplate": "{filepath}",
+    "classNameTemplate": "{classname}",
+    "titleTemplate": "{title}"
   }
 }

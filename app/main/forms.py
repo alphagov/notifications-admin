@@ -3,6 +3,7 @@ from contextlib import suppress
 from copy import deepcopy
 from datetime import datetime, timedelta
 from functools import partial
+from html import escape
 from itertools import chain
 from numbers import Number
 
@@ -18,7 +19,7 @@ from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
-from notifications_utils.recipient_validation.phone_number import PhoneNumber as PhoneNumberUtils
+from notifications_utils.recipient_validation.notifynl.phone_number import PhoneNumber as PhoneNumberUtils
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
 from ordered_set import OrderedSet
@@ -2041,6 +2042,8 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         op = request.form.get("operation")
         if op == "email-branding-details":
             # we only want to validate alt_text/text if we're editing the fields, not the file
+            if self.alt_text.data:
+                self.alt_text.data = escape(self.alt_text.data)
 
             if self.alt_text.data and self.text.data:
                 self.alt_text.errors.append("Alt text must be empty if you have already entered logo text")

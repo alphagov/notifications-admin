@@ -946,7 +946,7 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(
     mock_send = mocker.patch("app.main.views.uploads.notification_api_client.send_precompiled_letter")
     mocker.patch("app.main.views.uploads.get_letter_metadata", return_value=metadata)
 
-    service_one["permissions"] = ["letter", "upload_letters", "economy_letter_sending"]
+    service_one["permissions"] = ["letter", "economy_letter_sending"]
 
     client_request.post(
         "main.send_uploaded_letter",
@@ -976,7 +976,7 @@ def test_send_uploaded_letter_redirects_if_file_not_in_s3(
 ):
     mocker.patch("app.main.views.uploads.get_letter_metadata", side_effect=LetterNotFoundError)
 
-    service_one["permissions"] = ["letter", "upload_letters"]
+    service_one["permissions"] = ["letter"]
 
     client_request.post(
         "main.send_uploaded_letter",
@@ -1040,7 +1040,7 @@ def test_send_uploaded_letter_when_metadata_states_pdf_is_invalid(
         ),
     )
 
-    service_one["permissions"] = ["letter", "upload_letters"]
+    service_one["permissions"] = ["letter"]
 
     client_request.post(
         "main.send_uploaded_letter",

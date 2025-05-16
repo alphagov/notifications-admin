@@ -1057,7 +1057,6 @@ def test_POST_letter_template_change_to_welsh_and_english_resets_english_subject
         },
     )
 
-    service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
 
     mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
@@ -1194,7 +1193,6 @@ def test_POST_letter_template_confirm_remove_welsh_resets_english_subject_and_co
 
     mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
 
-    service_one["permissions"].append("extra_letter_formatting")
     client_request.login(active_user_with_permissions)
 
     mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
@@ -1903,7 +1901,6 @@ def test_should_be_able_to_view_a_letter_template_with_bilingual_content(
     fake_uuid,
     mocker,
 ):
-    service_one["permissions"].append("extra_letter_formatting")
     do_mock_get_page_counts_for_letter(mocker, count=5, welsh_page_count=3)
     page = client_request.get(
         "main.view_template",
@@ -3646,7 +3643,6 @@ def test_update_template_for_english_content_in_welsh_letter(
 ):
     do_mock_get_page_counts_for_letter(mocker, count=1, welsh_page_count=1)
     service_one["permissions"].append("letter")
-    service_one["permissions"].append("extra_letter_formatting")
     name = "new template name"
     content = "English letter content"
     subject = "English letter subject"

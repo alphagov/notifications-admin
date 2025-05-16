@@ -7,7 +7,7 @@ from notifications_utils.field import Field
 from notifications_utils.formatters import formatted_list
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
-from notifications_utils.recipient_validation.phone_number import PhoneNumber
+from notifications_utils.recipient_validation.notifynl.phone_number import PhoneNumber
 from notifications_utils.sanitise_text import SanitiseSMS
 from ordered_set import OrderedSet
 from wtforms import ValidationError
