@@ -14,6 +14,7 @@ import RadiosWithImages from './radios-with-images.mjs';
 
 import LiveSearch from './live-search.mjs';
 import EnhancedTextbox from './enhanced-textbox.mjs';
+import CheckReportStatus from './check-report-status.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -81,6 +82,11 @@ if ($radiosWithImagesArray.length > 0) {
 const $enhancedTextboxArray = document.querySelectorAll('[data-notify-module="enhanced-textbox"]');
 if ($enhancedTextboxArray.length > 0) {
   $enhancedTextboxArray.forEach((el) => new EnhancedTextbox(el));
+}
+
+const $checkReportStatusEl = document.querySelector('[data-notify-module="check-report-status"]');
+if ($checkReportStatusEl) {
+  new CheckReportStatus($checkReportStatusEl).checkStatus();
 }
 
 const focusBanner = new FocusBanner();
