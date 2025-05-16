@@ -1,7 +1,6 @@
 {% extends "content_template.html" %}
 
 {% from "components/service-link.html" import service_link %}
-{% from "components/table.html" import mapping_table, row, text_field, field %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -16,7 +15,7 @@
 
   <p class="govuk-body">You can send a batch of up to {{ max_spreadsheet_rows|format_thousands }} messages at once.</p>
 
-<p class="govuk-body">There’s a <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_daily_limits" )}}>daily limit</a> to the number of messages you can send.</p>
+<p class="govuk-body">There’s a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_daily_limits" )}}">daily limit</a> to the number of messages you can send.</p>
 
   <p class="govuk-body">To send a batch of messages:</p>
 
@@ -26,8 +25,8 @@
     <li>Select <b class="govuk-!-font-weight-bold">Upload a list of email addresses</b>, <b class="govuk-!-font-weight-bold">Upload a list of phone numbers</b>, or <b class="govuk-!-font-weight-bold">Upload a list of addresses</b>.</li>
   </ol>
 
-  <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_personalisation" )}}>how to personalise your messages</a>.</p>
+  <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_personalisation" )}}">how to personalise your messages</a>.</p>
 
-  <p class="govuk-body">You can also <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_schedule_messages" )}}>schedule a batch of emails and text messages</a>.</p>
+  <p class="govuk-body">You can also <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_schedule_messages" )}}">schedule a batch of emails and text messages</a>.</p>
 
 {% endblock %}

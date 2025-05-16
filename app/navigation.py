@@ -61,6 +61,7 @@ class HeaderNavigation(Navigation):
             "guidance_api_documentation",
             "guidance_attach_pages",
             "guidance_bulk_sending",
+            "guidance_daily_limits",
             "guidance_data_retention_period",
             "guidance_delivery_times",
             "guidance_email_branding",

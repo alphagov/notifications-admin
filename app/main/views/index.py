@@ -13,7 +13,7 @@ from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import HTMLEmailTemplate
 
 from app import status_api_client
-from app.formatters import message_count
+from app.formatters import format_thousands
 from app.main import main
 from app.main.forms import FieldWithNoneOption
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
@@ -173,10 +173,19 @@ def guidance_bulk_sending():
     return render_template(
         "views/guidance/using-notify/bulk-sending.html",
         max_spreadsheet_rows=RecipientCSV.max_rows,
-        rate_limits=[
-            message_count(limit, channel)
-            for channel, limit in current_app.config["DEFAULT_LIVE_SERVICE_RATE_LIMITS"].items()
-        ],
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/daily-limits")
+def guidance_daily_limits():
+    rate_limits = {
+        type: format_thousands(limit) for type, limit in current_app.config["DEFAULT_LIVE_SERVICE_RATE_LIMITS"].items()
+    }
+    return render_template(
+        "views/guidance/using-notify/daily-limits.html",
+        max_spreadsheet_rows=RecipientCSV.max_rows,
+        rate_limits=rate_limits,
         navigation_links=using_notify_nav(),
     )
 
