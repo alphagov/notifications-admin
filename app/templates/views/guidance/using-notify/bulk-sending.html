@@ -15,7 +15,7 @@
 
   <p class="govuk-body">You can send a batch of up to {{ max_spreadsheet_rows|format_thousands }} messages at once.</p>
 
-  <p class="govuk-body">There’s a default maximum limit of {{ rate_limits|formatted_list(before_each="", after_each="") }}. If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.support") }}>contact us</a>.</p>
+<p class="govuk-body">There’s a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_daily_limits" )}}">daily limit</a> to the number of messages you can send.</p>
 
   <p class="govuk-body">To send a batch of messages:</p>
 
@@ -25,25 +25,8 @@
     <li>Select <b class="govuk-!-font-weight-bold">Upload a list of email addresses</b>, <b class="govuk-!-font-weight-bold">Upload a list of phone numbers</b>, or <b class="govuk-!-font-weight-bold">Upload a list of addresses</b>.</li>
   </ol>
 
-  <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_personalisation" )}}>how to personalise your messages</a>.</p>
+  <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_personalisation" )}}">how to personalise your messages</a>.</p>
 
-  <p class="govuk-body">You can also <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_schedule_messages" )}}>schedule a batch of emails and text messages</a>.</p>
-
-<h2 class="heading-medium">International text messages</h2>
-<p class="gov-uk body">There’s a default daily limit of 100 international text messages. This limit is part of the daily text message allowance.</p>
-<p class="gov-uk body">To change the international daily text message limit:</p>
-
- <ol class="govuk-list govuk-list--number">
-   <li>Go to <b class="govuk-!-font-weight-bold">Settings</b></li>
-   <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">International text message limit</b> row</li>
- </ol>
-
-<p class="gov-uk body">When changing the limit, you should think about:</p>
-
- <ul class="govuk-list govuk-list--bullet">
- <li>how many international messages your service needs to send each day</li>
- <li>any costs to your service if there is fraud, such as <a class="govuk-link govuk-link--no-visited-state" href="(https://www.ncsc.gov.uk/guidance/business-communications-sms-and-telephone-best-practice)">artificial inflation of traffic</a></li>
-  </ul>
-
+  <p class="govuk-body">You can also <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_schedule_messages" )}}">schedule a batch of emails and text messages</a>.</p>
 
 {% endblock %}
