@@ -7,6 +7,7 @@
   },
   "scripts": {
     "test": "npm run lint:scss && npm run lint:js && node --experimental-vm-modules node_modules/.bin/jest tests/javascripts",
+    "test-report": "node --experimental-vm-modules node_modules/.bin/jest tests/javascripts --ci --reporters=default --reporters=jest-junit",
     "test-watch": "jest --watch tests/javascripts",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand $npm_config_test",
     "build": "npm run clean && rollup -c",

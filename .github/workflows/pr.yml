@@ -67,7 +67,7 @@ jobs:
         run: npm run lint:js
 
       - name: Jest tests
-        run: jest --ci --reporters=default --reporters=jest-junit                 # run tests (configured to use jest-junit reporter)
+        run: npm run test-report                # run tests (configured to use jest-junit reporter)
 
       - uses: dorny/test-reporter@v2
         with:
