@@ -1,10 +1,9 @@
 {% extends "content_template.html" %}
 
-{% from "components/service-link.html" import service_link %}
-{% from "components/table.html" import mapping_table, row, text_field, field %}
+{% from "components/table.html" import mapping_table, row, text_field %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Using Notify' %}
+{% set navigation_label_prefix = "Using Notify" %}
 
 {% block per_page_title %}
   Daily limits
@@ -14,18 +13,18 @@
 
 <h1 class="heading-medium">Daily limits</h1>
 <div class="bottom-gutter-3-2">
-<p class=""govuk-body>There’s a limit to the number of messages you can send each day. </p>
+<p class="govuk-body">There’s a limit to the number of messages you can send each day. </p>
   {% call mapping_table(
-    caption='Notification Daily limits',
-    field_headings=['Message', 'Daily limit'],
+    caption="Notification Daily limits",
+    field_headings=["Message", "Daily limit"],
     field_headings_visible=True,
     caption_visible=False,
     equal_length=True,
   ) %}
     {% for message, limit in  [
-    ('Emails', '250,000'),
-    ('Text', '250,000 text messages including a default 100 international text messages'),
-    ('Letters', '20,000')]
+    ("Emails", rate_limits.email),
+    ("Text", rate_limits.sms + " text messages including a default 100 international text messages"),
+    ("Letters", rate_limits.letter)]
     %}
       {% call row() %}
         {{ text_field(message) }}
@@ -35,7 +34,7 @@
   {% endcall %}
   </div>
 
-<p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.support") }}>contact us</a>.</p>
+<p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">contact us</a>.</p>
 
 <h3 class="heading-medium">Change the international text message limit</h3>
 <p class="govuk-body">To change the international daily text message limit:</p>
