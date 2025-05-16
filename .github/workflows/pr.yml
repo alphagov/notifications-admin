@@ -60,8 +60,20 @@ jobs:
       - name: Generate version file
         run: make generate-version-file
 
-      - name: Jest
-        run: npm test
+      - name: NPM lint SCSS
+        run: npm run lint:scss
+
+      - name: NPM lint JS
+        run: npm run lint:js
+
+      - name: Jest tests
+        run: jest --ci --reporters=default --reporters=jest-junit                 # run tests (configured to use jest-junit reporter)
+
+      - uses: dorny/test-reporter@v2
+        with:
+          name: JEST Tests
+          path: jest-*.xml
+          reporter: jest-junit
 
       - uses: pavelzw/pytest-action@v2
         with:
