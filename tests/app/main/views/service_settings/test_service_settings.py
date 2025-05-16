@@ -2031,6 +2031,11 @@ def test_should_redirect_after_request_to_go_live(
     mock_get_users_by_service,
     mock_update_service,
 ):
+    mocker.patch(
+        "app.models.service.Service.go_live_checklist_completed",
+        new_callable=PropertyMock,
+        return_value=True,
+    )
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
         "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
@@ -2083,6 +2088,30 @@ def test_should_redirect_after_request_to_go_live(
     )
 
 
+def test_should_not_submit_the_form_if_not_all_tasks_completed(
+    client_request,
+    mocker,
+    active_user_with_permissions,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_organisations_and_services_for_user,
+    single_sms_sender,
+    mock_get_service_settings_page_common,
+    mock_get_users_by_service,
+    mock_update_service,
+):
+    mocker.patch(
+        "app.models.service.Service.go_live_checklist_completed",
+        new_callable=PropertyMock,
+        return_value=False,
+    )
+    client_request.post(
+        "main.request_to_go_live",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
+
+
 @pytest.mark.parametrize(
     "can_approve_own_go_live_requests, expected_subject, expected_go_live_notes, expected_zendesk_task_type",
     (
@@ -2124,6 +2153,11 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
     expected_subject,
     expected_zendesk_task_type,
 ):
+    mocker.patch(
+        "app.models.service.Service.go_live_checklist_completed",
+        new_callable=PropertyMock,
+        return_value=True,
+    )
     mocker.patch(
         "app.organisations_client.get_organisation",
         side_effect=lambda org_id: organisation_json(
@@ -2200,6 +2234,11 @@ def test_request_to_go_live_displays_mou_signatories(
         ),
     )
     mocker.patch(
+        "app.models.service.Service.go_live_checklist_completed",
+        new_callable=PropertyMock,
+        return_value=True,
+    )
+    mocker.patch(
         "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
@@ -2234,6 +2273,11 @@ def test_should_be_able_to_request_to_go_live_with_no_organisation(
             new_callable=PropertyMock,
             return_value=1,
         )
+    mocker.patch(
+        "app.models.service.Service.go_live_checklist_completed",
+        new_callable=PropertyMock,
+        return_value=True,
+    )
     mock_post = mocker.patch(
         "app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True
     )
@@ -2262,6 +2306,11 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
     expected_call_args,
 ):
     organisation_one["can_approve_own_go_live_requests"] = can_approve_own_go_live_requests
+    mocker.patch(
+        "app.models.service.Service.go_live_checklist_completed",
+        new_callable=PropertyMock,
+        return_value=True,
+    )
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
     mocker.patch("app.main.views.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True)
 
