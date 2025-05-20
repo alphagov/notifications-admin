@@ -11,9 +11,9 @@ blinker==1.9.0
     #   flask
     #   gds-metrics
     #   sentry-sdk
-boto3==1.34.129
+boto3[crt]==1.34.129
     # via notifications-utils
-botocore==1.34.129
+botocore[crt]==1.34.129
     # via
     #   boto3
     #   s3transfer
@@ -41,7 +41,7 @@ eventlet==0.39.1
     # via gunicorn
 fido2==1.1.3
     # via -r requirements.in
-flask==3.1.0
+flask==3.1.1
     # via
     #   flask-login
     #   flask-redis
@@ -63,12 +63,16 @@ govuk-frontend-jinja==3.5.0
     # via -r requirements.in
 greenlet==3.0.3
     # via eventlet
-gunicorn==23.0.0
+gunicorn[eventlet]==23.0.0
     # via notifications-utils
 humanize==4.4.0
     # via -r requirements.in
 idna==3.7
     # via requests
+importlib-metadata==8.7.0
+    # via
+    #   flask
+    #   segno
 itsdangerous==2.2.0
     # via
     #   flask
@@ -93,6 +97,7 @@ lxml==5.3.1
     #   pyexcel-ods3
 markupsafe==2.1.1
     # via
+    #   flask
     #   jinja2
     #   sentry-sdk
     #   werkzeug
@@ -101,7 +106,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==10.0.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@0b99dd5a5b0f55a77a537c7fdcf508d76e286a76
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@99.5.0
     # via -r requirements.in
 openpyxl==3.1.5
     # via pyexcel-xlsx
@@ -159,7 +164,7 @@ s3transfer==0.10.1
     # via boto3
 segno==1.6.1
     # via notifications-utils
-sentry-sdk==1.45.1
+sentry-sdk[flask]==1.45.1
     # via -r requirements.in
 six==1.16.0
     # via python-dateutil
@@ -169,6 +174,10 @@ statsd==4.0.1
     # via notifications-utils
 texttable==1.6.4
     # via pyexcel
+typing-extensions==4.13.2
+    # via
+    #   pypdf
+    #   python-json-logger
 urllib3==1.26.19
     # via
     #   botocore
@@ -184,3 +193,5 @@ xlrd==2.0.1
     # via pyexcel-xls
 xlwt==1.3.0
     # via pyexcel-xls
+zipp==3.21.0
+    # via importlib-metadata
