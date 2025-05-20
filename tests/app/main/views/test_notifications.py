@@ -263,7 +263,7 @@ def test_notification_page_shows_page_for_letter_notification(
     )
     assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == "Printing starts today at 5:30pm"
     assert normalize_spaces(page.select("main p:nth-of-type(3)")[0].text) == (
-        "Estimated delivery date: Wednesday 6 January"
+        "Estimated delivery by Thursday 7 January"
     )
     assert len(page.select(".letter-postage")) == 1
     assert normalize_spaces(page.select_one(".letter-postage").text) == "Postage: second class"
@@ -512,25 +512,25 @@ def test_notification_page_does_not_show_cancel_link_for_letter_which_cannot_be_
             "first",
             "Postage: first class",
             "letter-postage-first",
-            "Estimated delivery date: Tuesday 5 January",
+            "Estimated delivery by Tuesday 5 January",
         ),
         (
             "economy",
             "Postage: economy",
             "letter-postage-economy",
-            "Estimated delivery date: Thursday 7 January",
+            "Estimated delivery by Monday 11 January",
         ),
         (
             "europe",
             "Postage: international",
             "letter-postage-international",
-            "Estimated delivery date: Friday 8 January",
+            "Estimated delivery by Monday 11 January",
         ),
         (
             "rest-of-world",
             "Postage: international",
             "letter-postage-international",
-            "Estimated delivery date: Monday 11 January",
+            "Estimated delivery by Wednesday 13 January",
         ),
     ),
 )
