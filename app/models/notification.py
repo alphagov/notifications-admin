@@ -125,7 +125,7 @@ class Notification(JSONModel):
     @property
     def estimated_letter_delivery_date(self):
         if self.notification_type == "letter":
-            return get_letter_timings(self.created_at.replace(tzinfo=None), postage=self.postage).earliest_delivery
+            return get_letter_timings(self.created_at.replace(tzinfo=None), postage=self.postage).latest_delivery
 
     @property
     def letter_can_be_cancelled(self):
