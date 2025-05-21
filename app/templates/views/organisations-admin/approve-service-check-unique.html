@@ -22,12 +22,11 @@
     <div class="govuk-grid-column-five-sixths">
 
       <p class="govuk-body">
-        You are responsible for making sure that this service is the only one of its kind in your organisation.
+        ‘{{ current_service.name }}’ must be the only service of its kind in your organisation.
       </p>
 
     <p class="govuk-body">
-      Before you continue, you should check the list of
-      <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation.id) }}" class="govuk-link govuk-link--no-visited-state">{{ current_service.organisation.name }} services</a>.
+      Before you continue, check the list of <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation.id) }}" class="govuk-link govuk-link--no-visited-state">{{ current_service.organisation.name }} services</a>.
     </p>
 
     <p class="govuk-body">
