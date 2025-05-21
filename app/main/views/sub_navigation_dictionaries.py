@@ -95,6 +95,10 @@ def using_notify_nav():
                     "link": "main.guidance_bulk_sending",
                 },
                 {
+                    "name": "Daily limits",
+                    "link": "main.guidance_daily_limits",
+                },
+                {
                     "name": "Data retention period",
                     "link": "main.guidance_data_retention_period",
                 },
