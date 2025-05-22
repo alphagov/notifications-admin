@@ -1,0 +1,54 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+{% set title = 'Manage files' if template.attachments else 'Attach files' %}
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+
+  {% if not rows %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-five-sixths">
+        <p class="govuk-body">
+          You need to add a placeholder to your template before you can upload a file, for&nbsp;example:
+        </p>
+        <div class="govuk-inset-text">
+          Download file: {{ example_placeholder|safe }}
+        </div>
+        <p class="govuk-body">
+          When you upload a file, Notify will replace the placeholder with a link
+          to download the file.
+        </p>
+        {{ page_footer(
+          secondary_link=url_for('main.edit_service_template', service_id=current_service.id, template_id=template.id),
+          secondary_link_text="Edit email template"
+        )}}
+      </div>
+    </div>
+  {% else %}
+    {{ govukSummaryList({
+      "classes": "notify-summary-list service-base-settings",
+      "rows": rows
+    }) }}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-five-sixths">
+        <p class="govuk-body">
+          When you upload a file, Notify will replace the placeholder with a link to download the file.
+        </p>
+        {{ page_footer(
+          secondary_link=url_for('main.edit_service_template', service_id=current_service.id, template_id=template.id),
+          secondary_link_text="Edit email template"
+        )}}
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
