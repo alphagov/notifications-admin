@@ -11,7 +11,7 @@ from app.utils.user import user_has_permissions
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_start(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+        return render_template("views/service-already-live.html", prompt_to_switch_service=False), 410
 
     if current_user.platform_admin and not current_service.organisation_id:
         return render_template("views/service-settings/service-no-organisation.html"), 410
@@ -29,7 +29,7 @@ def org_member_make_service_live_start(service_id):
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_check_unique(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+        return render_template("views/service-already-live.html", prompt_to_switch_service=False), 410
 
     if not current_user.can_make_service_live(current_service):
         abort(403)
@@ -72,7 +72,7 @@ def org_member_make_service_live_check_unique(service_id):
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_service_name(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+        return render_template("views/service-already-live.html", prompt_to_switch_service=False), 410
 
     if not current_user.can_make_service_live(current_service):
         abort(403)
@@ -131,7 +131,7 @@ def org_member_make_service_live_service_name(service_id):
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_contact_user(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+        return render_template("views/service-already-live.html", prompt_to_switch_service=False), 410
 
     if not current_user.can_make_service_live(current_service):
         abort(403)
@@ -166,7 +166,7 @@ def org_member_make_service_live_contact_user(service_id):
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_decision(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+        return render_template("views/service-already-live.html", prompt_to_switch_service=False), 410
 
     if not current_user.can_make_service_live(current_service):
         abort(403)

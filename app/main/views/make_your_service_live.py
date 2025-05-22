@@ -12,9 +12,9 @@ from app.utils.user import user_has_permissions, user_is_gov_user
 @user_has_permissions("manage_service")
 def request_to_go_live(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=True)
+        return render_template("views/service-already-live.html", prompt_to_switch_service=True)
 
-    return render_template("views/service-settings/request-to-go-live.html")
+    return render_template("views/request-to-go-live.html")
 
 
 @main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["POST"])
