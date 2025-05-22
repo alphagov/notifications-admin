@@ -85,8 +85,8 @@ def org_member_make_service_live_service_name(service_id):
     form = OnOffSettingForm(
         truthy="Yes",
         falsey="No",
-        name=f"Is the service name ‘{current_service.name}’ easy to understand?",
-        choices_for_error_message="‘yes’ if the service name is easy to understand",
+        name=f"Will recipients understand the name ‘{current_service.name}’?",
+        choices_for_error_message="‘yes’ if recipients will understand the service name",
     )
 
     # Re-populate the form field data from URL query args, if present. This allows backlinks to take a user back to
