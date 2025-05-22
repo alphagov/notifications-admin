@@ -5,7 +5,7 @@
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/banner.html" import banner %}
-{% set title = 'Add ‘' + placeholder + '’' %}
+{% set title = 'Manage ‘' + placeholder + '’' if attachment else 'Add ‘' + placeholder + '’' %}
 {% block service_page_title %}
   {{ title }}
 {% endblock %}
@@ -47,7 +47,7 @@
               "visuallyHiddenText": "this file",
               "classes": "govuk-link govuk-link--destructive"
             }
-          ] if attachment.file_name else []
+          ] if attachment else []
         }
       },
       {

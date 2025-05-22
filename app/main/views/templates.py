@@ -1425,7 +1425,7 @@ def email_template_manage_attachments(template_id, service_id):
                             template_id=template_id,
                             placeholder=placeholder.strip(),
                         ),
-                        "text": "Change" if template.attachments[placeholder] else "Upload file",
+                        "text": "Manage" if template.attachments[placeholder] else "Upload file",
                         "visuallyHiddenText": "",
                         "classes": "govuk-link--no-visited-state",
                     }
