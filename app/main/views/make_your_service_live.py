@@ -58,4 +58,7 @@ def submit_request_to_go_live(service_id):
     current_service.notify_organisation_users_of_request_to_go_live()
 
     flash("Thanks for your request to go live. We’ll get back to you within one working day.", "default")
-    return redirect(url_for(".service_settings", service_id=service_id))
+    return render_template(
+        "views/request-to-go-live.html",
+        go_live_request_sent=True,
+    )
