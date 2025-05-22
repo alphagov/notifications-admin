@@ -8,7 +8,7 @@ from app.main import main
 from app.utils.user import user_has_permissions, user_is_gov_user
 
 
-@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["GET"])
+@main.route("/services/<uuid:service_id>/make-your-service-live", methods=["GET"])
 @user_has_permissions("manage_service")
 def request_to_go_live(service_id):
     if current_service.live:
@@ -17,7 +17,7 @@ def request_to_go_live(service_id):
     return render_template("views/request-to-go-live.html")
 
 
-@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["POST"])
+@main.route("/services/<uuid:service_id>/make-your-service-live", methods=["POST"])
 @user_has_permissions("manage_service")
 @user_is_gov_user
 def submit_request_to_go_live(service_id):
