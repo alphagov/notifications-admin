@@ -6,7 +6,7 @@ from werkzeug.local import LocalProxy
 
 from app import memo_resetters
 from app.extensions import redis_client
-from app.notify_client import NotifyAdminAPIClient, cache
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session, cache
 
 
 class TemplateFolderAPIClient(NotifyAdminAPIClient):
@@ -63,7 +63,7 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
 _template_folder_api_client_context_var: ContextVar[TemplateFolderAPIClient] = ContextVar("template_folder_api_client")
 get_template_folder_api_client: LazyLocalGetter[TemplateFolderAPIClient] = LazyLocalGetter(
     _template_folder_api_client_context_var,
-    lambda: TemplateFolderAPIClient(current_app),
+    lambda: TemplateFolderAPIClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_template_folder_api_client.clear())
 template_folder_api_client = LocalProxy(get_template_folder_api_client)
