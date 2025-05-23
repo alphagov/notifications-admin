@@ -20,6 +20,7 @@ from app.main.views.sub_navigation_dictionaries import features_nav, using_notif
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
 from app.models.sms_rate import SMSRate
+from app.utils.user import user_has_permissions
 
 redirects = Blueprint("redirects", __name__)
 main.register_blueprint(redirects)
@@ -379,6 +380,18 @@ def user_profile_confirm_delete_security_key(key_id):
 @main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=["POST"])
 def user_profile_delete_security_key(key_id):
     return redirect(url_for("main.your_account_delete_security_key"), 301)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["GET"])
+@user_has_permissions("manage_service")
+def request_to_go_live_old_path(service_id):
+    return redirect(url_for("main.request_to_go_live", service_id=service_id), 301)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["POST"])
+@user_has_permissions("manage_service")
+def submit_request_to_go_live_old_path(service_id):
+    return redirect(url_for("main.submit_request_to_go_live", service_id=service_id), 301)
 
 
 def historical_redirects(new_endpoint, **kwargs):
