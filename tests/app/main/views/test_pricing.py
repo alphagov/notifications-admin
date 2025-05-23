@@ -13,16 +13,16 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     first_row = pricing_rows[0]
     assert "1 sheet" in first_row.text
 
-    assert "61p + VAT" in first_row.text
-    assert "97p + VAT" in first_row.text
-    assert "£1.44 + VAT" in first_row.text
+    assert "61p" in first_row.text
+    assert "97p" in first_row.text
+    assert "£1.44" in first_row.text
 
     last_row = pricing_rows[-1]
     assert "5 sheets" in last_row.text
 
-    assert "79p + VAT" in last_row.text
-    assert "£1.15 + VAT" in last_row.text
-    assert "£1.63 + VAT" in last_row.text
+    assert "79p" in last_row.text
+    assert "£1.15" in last_row.text
+    assert "£1.63" in last_row.text
 
 
 @pytest.mark.parametrize(
