@@ -145,7 +145,6 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Custom data retention Email – 7 days Change data retention",
                 "Email authentication Off Change your settings for Email authentication",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
-                "Sending economy letters Off Change your settings for Sending economy letters",
             ],
         ),
     ],

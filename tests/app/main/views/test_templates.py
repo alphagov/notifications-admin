@@ -1615,14 +1615,12 @@ def test_edit_letter_template_postage_page_displays_correctly(
     assert page.select("input[checked]")[0].attrs["value"] == "second"
 
 
-def test_edit_letter_template_displays_all_postage_for_service_with_permission(
+def test_edit_letter_template_displays_all_postage_options(
     client_request,
     service_one,
     fake_uuid,
     mock_get_service_letter_template,
 ):
-    service_one.update({"permissions": ["economy_letter_sending"]})
-
     page = client_request.get(
         "main.edit_template_postage",
         service_id=SERVICE_ONE_ID,
@@ -1638,29 +1636,6 @@ def test_edit_letter_template_displays_all_postage_for_service_with_permission(
         (radio["value"], page.select_one(f"label[for={radio['id']}]").text.strip())
         for radio in page.select("input[type=radio]")
     ] == [("first", "First class"), ("second", "Second class"), ("economy", "Economy mail")]
-
-
-def test_edit_letter_template_displays_first_and_second_for_service_without_permission(
-    client_request,
-    service_one,
-    fake_uuid,
-    mock_get_service_letter_template,
-):
-    page = client_request.get(
-        "main.edit_template_postage",
-        service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-    )
-
-    assert page.select_one("h1").text.strip() == "Change postage"
-    assert page.select("input[checked]")[0].attrs["value"] == "second"
-
-    assert len(page.select("input[type=radio]")) == 2
-
-    assert [
-        (radio["value"], page.select_one(f"label[for={radio['id']}]").text.strip())
-        for radio in page.select("input[type=radio]")
-    ] == [("first", "First class"), ("second", "Second class")]
 
 
 def test_edit_letter_template_postage_page_404s_if_template_is_not_a_letter(
