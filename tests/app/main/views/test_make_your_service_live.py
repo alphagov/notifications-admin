@@ -383,10 +383,8 @@ def test_should_not_show_go_live_button_if_service_already_has_go_live_request(
     else:
         assert not page.select("form")
         assert not page.select("form button")
-        assert len(page.select("main p")) == 3
-        assert normalize_spaces(page.select("main p")[2].text) == (
-            "Your team has already sent a request to go live for this service."
-        )
+        assert len(page.select("main p")) == 2
+        assert normalize_spaces(page.select_one("main p").text) == ("You sent a request to go live for this service.")
 
 
 @pytest.mark.parametrize(
@@ -693,7 +691,7 @@ def test_non_gov_users_cant_request_to_go_live(
 
 
 @freeze_time("2012-12-21 13:12:12.12354")
-def test_should_redirect_after_request_to_go_live(
+def test_should_render_the_same_page_after_request_to_go_live(
     client_request,
     mocker,
     active_user_with_permissions,
@@ -754,7 +752,8 @@ def test_should_redirect_after_request_to_go_live(
     assert normalize_spaces(page.select_one(".banner-default").text) == (
         "Thanks for your request to go live. We’ll get back to you within one working day."
     )
-    assert normalize_spaces(page.select_one("h1").text) == "Settings"
+    assert normalize_spaces(page.select_one("main p").text) == ("You sent a request to go live for this service.")
+    assert normalize_spaces(page.select_one("h1").text) == "Make your service live"
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
         go_live_user=active_user_with_permissions["id"],
