@@ -58,4 +58,7 @@ def submit_request_to_go_live(service_id):
     current_service.notify_organisation_users_of_request_to_go_live()
 
     flash("Thanks for your request to go live. We’ll get back to you within one working day.", "default")
-    return redirect(url_for(".service_settings", service_id=service_id))
+    # not sure what was happening trying to use render_template
+    # current_service.update did not finish before the page loaded
+    # so page 404ed with data not present
+    return redirect(url_for(".request_to_go_live", service_id=service_id))
