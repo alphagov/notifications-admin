@@ -660,7 +660,7 @@ def get_monthly_usage_breakdown(year, monthly_usage):
 
 
 def get_monthly_usage_breakdown_for_letters(monthly_letters):
-    postage_order = {"first class": 0, "second class": 1, "international": 2}
+    postage_order = {"first class": 0, "second class": 1, "economy mail": 2, "international": 3}
 
     group_key = lambda row: (postage_order[get_monthly_usage_postage_description(row)], row["rate"])  # noqa: E731
 
@@ -685,6 +685,8 @@ def get_monthly_usage_breakdown_for_letters(monthly_letters):
 def get_monthly_usage_postage_description(row):
     if row["postage"] in ("first", "second"):
         return f"{row['postage']} class"
+    elif row["postage"] == "economy":
+        return "economy mail"
     return "international"
 
 
