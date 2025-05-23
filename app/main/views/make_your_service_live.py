@@ -1,10 +1,12 @@
 from flask import abort, flash, redirect, render_template, url_for
 from flask_login import current_user
+from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
-from app import current_service
+from app import current_service, service_api_client
 from app.extensions import zendesk_client
 from app.main import main
+from app.main.forms import RenameServiceForm
 from app.utils.user import user_has_permissions, user_is_gov_user
 
 
@@ -59,3 +61,33 @@ def submit_request_to_go_live(service_id):
 
     flash("Thanks for your request to go live. We’ll get back to you within one working day.", "default")
     return redirect(url_for(".service_settings", service_id=service_id))
+
+
+@main.route("/services/<uuid:service_id>/make-your-service-live/confirm-service-unique", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def confirm_service_is_unique(service_id):
+    if current_service.live:
+        # what do we want to return here?
+        return
+    form = RenameServiceForm(name=current_service.name)
+    back_link = url_for("main.make_your_service_live", service_id=service_id)
+
+    if form.validate_on_submit():
+        try:
+            current_service.update(name=form.name.data)
+        except HTTPError as http_error:
+            if http_error.status_code == 400 and (
+                error_message := service_api_client.parse_edit_service_http_error(http_error)
+            ):
+                form.name.errors.append(error_message)
+            else:
+                raise http_error
+        else:
+            return redirect(url_for(".service_settings", service_id=service_id))
+
+    return render_template(
+        "views/confirm-service-unique.html",
+        form=form,
+        back_link=back_link,
+        error_summary_enabled=True,
+    )
