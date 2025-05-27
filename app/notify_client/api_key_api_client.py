@@ -7,11 +7,6 @@ from werkzeug.local import LocalProxy
 from app import memo_resetters
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user
 
-# must match key types in notifications-api/app/models.py
-KEY_TYPE_NORMAL = "normal"
-KEY_TYPE_TEAM = "team"
-KEY_TYPE_TEST = "test"
-
 
 class ApiKeyApiClient(NotifyAdminAPIClient):
     def get_api_keys(self, service_id):
