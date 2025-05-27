@@ -23,7 +23,7 @@ certifi==2024.7.4
     # via
     #   requests
     #   sentry-sdk
-cffi==1.15.1
+cffi==1.17.1
     # via cryptography
 charset-normalizer==2.1.1
     # via requests
@@ -61,7 +61,7 @@ govuk-bank-holidays==0.15
     # via notifications-utils
 govuk-frontend-jinja==3.6.0
     # via -r requirements.in
-greenlet==3.0.3
+greenlet==3.2.2
     # via eventlet
 gunicorn==23.0.0
     # via notifications-utils
@@ -112,7 +112,7 @@ packaging==23.1
     # via gunicorn
 phonenumbers==8.13.50
     # via notifications-utils
-pillow==10.3.0
+pillow==11.2.1
     # via -r requirements.in
 prometheus-client==0.15.0
     # via
