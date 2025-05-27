@@ -207,6 +207,15 @@ def set_sender(service_id, template_id):
     if template.template_type == "letter":
         return redirect_to_one_off
 
+    if template.template_type == "email" and not template.attachments.uploaded:
+        return redirect(
+            url_for(
+                "main.email_template_manage_attachment_upload_needed",
+                service_id=current_service.id,
+                template_id=template_id,
+            )
+        )
+
     sender_details = get_sender_details(service_id, template.template_type)
 
     if len(sender_details) == 1:
@@ -805,6 +814,11 @@ def start_job(service_id, upload_id):
 def fields_to_fill_in(template, prefill_current_user=False):
     if "letter" == template.template_type:
         return InsensitiveSet(letter_address_columns + list(template.placeholders))
+
+    if template.template_type == "email":
+        for attachment in template.attachments:
+            if template.attachments[attachment]:
+                session["placeholders"][attachment] = template.attachments[attachment].url
 
     if not prefill_current_user:
         return InsensitiveSet(first_column_headings[template.template_type] + list(template.placeholders))

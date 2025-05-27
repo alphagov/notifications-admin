@@ -2525,6 +2525,22 @@ class SetServiceDataRetentionForm(StripWhitespaceForm):
     )
 
 
+class SetServiceAttachmentDataRetentionForm(StripWhitespaceForm):
+    weeks_of_retention = GovukIntegerField(
+        label="Number of weeks available to recipients",
+        things="the number of weeks",
+        validators=[
+            NotifyDataRequired(thing="a number of weeks"),
+            validators.NumberRange(min=1, max=78, message="The number of weeks must be between 1 and 78"),
+        ],
+        param_extensions={"hint": {"text": "Must be between 1 and 78 weeks (18 months)"}},
+    )
+
+
+class SetServiceAttachmentLinkText(StripWhitespaceForm):
+    link_text = GovukTextInputField("Link text (optional)")
+
+
 class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
     notification_type = GovukRadiosField(
         "What notification type?",
@@ -3041,3 +3057,13 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
 
         if field.data and self.report_completed:
             raise ValidationError("There is a problem. You have already marked the report as Completed")
+
+
+class EmailAttachmentForm(StripWhitespaceForm):
+    file = FileField(
+        "Add recipients",
+        validators=[
+            DataRequired(message="You need to chose a file to upload"),
+            FileSize(max_size=10 * 1024 * 1024, message="The file must be smaller than 10MB"),
+        ],
+    )
