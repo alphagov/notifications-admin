@@ -93,9 +93,7 @@ flask-redis==0.4.0
 flask-wtf==1.2.1
     # via -r requirements.txt
 freezegun==1.5.1
-    # via
-    #   -r requirements_for_test_common.in
-    #   pytest-freezegun
+    # via -r requirements_for_test_common.in
 gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
     # via -r requirements.txt
 govuk-bank-holidays==0.15
@@ -227,14 +225,11 @@ pytest==8.3.4
     # via
     #   -r requirements_for_test_common.in
     #   pytest-env
-    #   pytest-freezegun
     #   pytest-mock
     #   pytest-testmon
     #   pytest-xdist
 pytest-env==1.1.5
     # via -r requirements_for_test_common.in
-pytest-freezegun==0.4.2
-    # via -r requirements_for_test.in
 pytest-mock==3.14.0
     # via -r requirements_for_test_common.in
 pytest-testmon==2.1.1
