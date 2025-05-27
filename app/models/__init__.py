@@ -9,7 +9,7 @@ from notifications_utils.serialised_model import (
 
 
 @total_ordering
-class SortingAndEqualityMixin(ABC):
+class JSONModel(SerialisedModel, ABC):
     @property
     @abstractmethod
     def __sort_attribute__(self):
@@ -38,8 +38,6 @@ class SortingAndEqualityMixin(ABC):
     def __hash__(self):
         return hash(self.id)
 
-
-class JSONModel(SerialisedModel, SortingAndEqualityMixin):
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}
