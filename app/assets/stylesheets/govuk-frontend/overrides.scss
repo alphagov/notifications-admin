@@ -81,3 +81,12 @@ $link-colour-on-grey-background: #1852ab;
     top: 21px;
   }
 }
+
+
+// make 'GOV.UK Notify' logo sit on top of any content below it
+// mainly to stop the breadcrumb, which has a negative margin-top,
+// overlapping its focus style
+.govuk-header__link--homepage:focus {
+  position: relative;
+  z-index: 1;
+}
