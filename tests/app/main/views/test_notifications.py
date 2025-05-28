@@ -518,7 +518,7 @@ def test_notification_page_does_not_show_cancel_link_for_letter_which_cannot_be_
             "economy",
             "Postage: economy",
             "letter-postage-economy",
-            "Estimated delivery by Monday 11 January",
+            "Estimated delivery by Thursday 14 January",
         ),
         (
             "europe",
