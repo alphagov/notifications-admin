@@ -346,7 +346,7 @@ def test_should_show_disabled_go_live_button_if_checklist_not_complete(
     assert page.select_one("form button").text.strip() == "Send a request to go live"
 
     if disabled_button:
-        assert normalize_spaces(page.select("main p")[2].text) == (
+        assert normalize_spaces(page.select_one("main p:last-of-type").text) == (
             "You must complete all the tasks before you can send a request to go live."
         )
         assert len(page.select_one("form button[disabled]")) == 1
@@ -616,18 +616,10 @@ def test_should_check_for_mou_on_request_to_go_live(
     assert normalize_spaces(checklist_items[4].text) == expected_item
 
 
-@pytest.mark.parametrize(
-    "organisation_type",
-    (
-        "nhs_gp",
-        pytest.param("central", marks=pytest.mark.xfail(raises=IndexError)),
-    ),
-)
 def test_gp_without_organisation_is_shown_agreement_step(
     client_request,
     service_one,
     mocker,
-    organisation_type,
 ):
     mocker.patch(
         "app.models.service.Service.has_team_members_with_manage_service_permission",
@@ -661,14 +653,155 @@ def test_gp_without_organisation_is_shown_agreement_step(
     mocker.patch(
         "app.models.service.Service.organisation_type",
         new_callable=PropertyMock,
-        return_value=organisation_type,
+        return_value="nhs_gp",
     )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Make your service live"
-    assert normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[4].text) == (
-        "Accept our data processing and financial agreement Not completed"
+    assert normalize_spaces(
+        page.select_one(".govuk-task-list:nth-of-type(2) .govuk-task-list__item:last-of-type").text
+    ) == ("Accept our data processing and financial agreement Not completed")
+
+
+def test_service_without_organisation_is_shown_agreement_text(
+    client_request,
+    service_one,
+    mocker,
+):
+    mocker.patch(
+        "app.models.service.Service.has_team_members_with_manage_service_permission",
+        return_value=False,
     )
+    mocker.patch(
+        "app.models.service.Service.all_templates",
+        new_callable=PropertyMock,
+        return_value=[],
+    )
+    mocker.patch(
+        "app.service_api_client.get_sms_senders",
+        return_value=[],
+    )
+    mocker.patch(
+        "app.service_api_client.get_reply_to_email_addresses",
+        return_value=[],
+    )
+    for channel in {"email", "sms", "letter"}:
+        mocker.patch(
+            f"app.models.service.Service.volume_{channel}",
+            create=True,
+            new_callable=PropertyMock,
+            return_value=None,
+        )
+    mocker.patch(
+        "app.models.service.Service.organisation_id",
+        new_callable=PropertyMock,
+        return_value=None,
+    )
+    mocker.patch(
+        "app.models.service.Service.organisation_type",
+        new_callable=PropertyMock,
+        return_value=None,
+    )
+
+    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+    assert page.select_one("h1").text == "Make your service live"
+    assert normalize_spaces(page.select_one(".govuk-heading-m:last-of-type + p").text) == (
+        "When you send us a request to go live, "
+        "we’ll ask you the name of the public sector body responsible for your service."
+    )
+
+
+def test_service_where_organisation_has_agreement_accepted(
+    client_request,
+    mocker,
+    service_one,
+    mock_get_service_organisation,
+):
+    service_one["able_to_accept_agreement"] = False
+
+    mocker.patch(
+        "app.service_api_client.get_service_templates",
+        return_value={"data": [create_template(template_type="sms")]},
+    )
+
+    mocker.patch(
+        "app.models.service.Service.has_team_members_with_manage_service_permission",
+        return_value=True,
+    )
+
+    mocker.patch(
+        "app.service_api_client.get_sms_senders",
+        return_value=[],
+    )
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        side_effect=lambda org_id: organisation_json(
+            ORGANISATION_ID,
+            "Org 1",
+            agreement_signed=None,
+        ),
+    )
+    for channel in ("email", "sms", "letter"):
+        mocker.patch(
+            f"app.models.service.Service.volume_{channel}",
+            create=True,
+            new_callable=PropertyMock,
+            return_value=0,
+        )
+
+    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+
+    assert (
+        normalize_spaces(page.select_one(".govuk-heading-m:last-of-type ~ p").text)
+        == "Org 1 has already accepted our data processing and financial agreement."
+    )
+
+
+def test_service_where_organisation_has_agreement_accepted_by_same_user(
+    client_request,
+    mocker,
+    fake_uuid,
+    service_one,
+    mock_get_service_organisation,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_templates",
+        return_value={"data": [create_template(template_type="sms")]},
+    )
+
+    mocker.patch(
+        "app.models.service.Service.has_team_members_with_manage_service_permission",
+        return_value=True,
+    )
+
+    mocker.patch(
+        "app.service_api_client.get_sms_senders",
+        return_value=[],
+    )
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        side_effect=lambda org_id: organisation_json(
+            ORGANISATION_ID,
+            "Org 1",
+            agreement_signed=True,
+            agreement_signed_by_id=fake_uuid,
+        ),
+    )
+    for channel in ("email", "sms", "letter"):
+        mocker.patch(
+            f"app.models.service.Service.volume_{channel}",
+            create=True,
+            new_callable=PropertyMock,
+            return_value=0,
+        )
+
+    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(
+        page.select_one(".govuk-task-list:nth-of-type(2) .govuk-task-list__item:last-of-type").text
+    ) == ("Accept our data processing and financial agreement Completed")
 
 
 def test_non_gov_user_is_told_they_cant_go_live(
@@ -697,7 +830,7 @@ def test_non_gov_user_is_told_they_cant_go_live(
     )
     client_request.login(api_nongov_user_active)
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select("main p")[2].text) == (
+    assert normalize_spaces(page.select_one("main p:last-of-type").text) == (
         "Only team members with a government email address can request to go live."
     )
     assert len(page.select("main form")) == 0
