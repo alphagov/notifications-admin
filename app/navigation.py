@@ -164,7 +164,7 @@ class HeaderNavigation(Navigation):
             },
         ]
 
-        if current_user.platform_admin:
+        if current_user.platform_admin and False:
             nav_items.append(
                 {
                     "href": url_for("main.platform_admin_search"),

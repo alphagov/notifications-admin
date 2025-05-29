@@ -3,6 +3,7 @@
 {% set cspNonce = request.csp_nonce %}
 {# toggle to enable new styles for rebrand #}
 {% set govukRebrand = True %}
+{% from "govuk_frontend_jinja/components/service-navigation/macro.html" import govukServiceNavigation %}
 
 {% block headIcons %}
   <link rel="icon" sizes="48x48" href="{{ asset_url('images/favicon.ico') }}">
@@ -53,10 +54,12 @@
   {{ govukHeader({
     "homepageUrl": url_for('main.show_accounts_or_dashboard'),
     "productName": "Notify",
-    "navigation": header_navigation.visible_header_nav(),
-    "navigationClasses": "govuk-header__navigation--end",
     "assetsPath": asset_path + "images",
     "rebrand": govukRebrand
+  }) }}
+  {{ govukServiceNavigation({
+    serviceName: "foo",
+    "navigation": header_navigation.visible_header_nav()
   }) }}
 {% endblock %}
 
