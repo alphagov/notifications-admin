@@ -383,10 +383,8 @@ def test_should_not_show_go_live_button_if_service_already_has_go_live_request(
     else:
         assert not page.select("form")
         assert not page.select("form button")
-        assert len(page.select("main p")) == 3
-        assert normalize_spaces(page.select("main p")[2].text) == (
-            "Your team has already sent a request to go live for this service."
-        )
+        assert len(page.select("main p")) == 2
+        assert normalize_spaces(page.select_one("main p").text) == ("You sent a request to go live for this service.")
 
 
 @pytest.mark.parametrize(
@@ -693,22 +691,38 @@ def test_non_gov_users_cant_request_to_go_live(
 
 
 @freeze_time("2012-12-21 13:12:12.12354")
-def test_should_redirect_after_request_to_go_live(
+def test_should_render_the_same_page_after_request_to_go_live(
     client_request,
     mocker,
     active_user_with_permissions,
+    service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
     mock_get_organisations_and_services_for_user,
     single_sms_sender,
+    mock_get_service_organisation,
     mock_get_service_settings_page_common,
+    mock_get_service_templates,
     mock_get_users_by_service,
     mock_update_service,
+    mock_get_invites_without_manage_permission,
+    mock_notify_users_of_request_to_go_live_for_service,
 ):
+    service_one["go_live_user"] = active_user_with_permissions["id"]
+    service_one["has_active_go_live_request"] = True
     mocker.patch(
         "app.models.service.Service.go_live_checklist_completed",
         new_callable=PropertyMock,
         return_value=True,
+    )
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        side_effect=lambda org_id: organisation_json(
+            ORGANISATION_ID,
+            "Org 1",
+            agreement_signed=True,
+        ),
     )
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
@@ -723,7 +737,7 @@ def test_should_redirect_after_request_to_go_live(
         "\n"
         "---\n"
         "Organisation type: Central government\n"
-        "Agreement signed: Can’t tell (domain is user.gov.uk).\n"
+        "Agreement signed: Yes, for Org 1.\n"
         "\n"
         "Other live services for that user: No\n"
         "\n"
@@ -734,6 +748,7 @@ def test_should_redirect_after_request_to_go_live(
         service_id=SERVICE_ONE_ID,
         user_id=active_user_with_permissions["id"],
     )
+
     mock_create_ticket.assert_called_once_with(
         ANY,
         subject="Request to go live - service one",
@@ -743,7 +758,7 @@ def test_should_redirect_after_request_to_go_live(
         user_name=active_user_with_permissions["name"],
         user_email=active_user_with_permissions["email_address"],
         requester_sees_message_content=False,
-        org_id=None,
+        org_id=ORGANISATION_ID,
         org_type="central",
         service_id=SERVICE_ONE_ID,
         notify_task_type="notify_task_go_live_request",
@@ -754,7 +769,9 @@ def test_should_redirect_after_request_to_go_live(
     assert normalize_spaces(page.select_one(".banner-default").text) == (
         "Thanks for your request to go live. We’ll get back to you within one working day."
     )
-    assert normalize_spaces(page.select_one("h1").text) == "Settings"
+    assert normalize_spaces(page.select_one("main p").text) == ("You sent a request to go live for this service.")
+    assert normalize_spaces(page.select_one("h1").text) == "Make your service live"
+
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
         go_live_user=active_user_with_permissions["id"],
@@ -832,6 +849,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         new_callable=PropertyMock,
         return_value=True,
     )
+
     mocker.patch(
         "app.organisations_client.get_organisation",
         side_effect=lambda org_id: organisation_json(
@@ -897,6 +915,11 @@ def test_request_to_go_live_displays_mou_signatories(
     mock_get_service_organisation,
     mock_get_service_settings_page_common,
     mock_update_service,
+    active_user_with_permissions,
+    mock_get_service_templates,
+    mock_get_users_by_service,
+    mock_get_invites_without_manage_permission,
+    mock_notify_users_of_request_to_go_live_for_service,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation",
