@@ -1,11 +1,12 @@
 from datetime import datetime
-from unittest.mock import ANY, PropertyMock, call
+from unittest.mock import ANY, Mock, PropertyMock, call
 from uuid import uuid4
 
 import pytest
 import pytz
 from flask import url_for
 from freezegun import freeze_time
+from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
 from tests import invite_json, organisation_json, validate_route_permission
@@ -1021,3 +1022,68 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
     client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID)
 
     assert mock_notify_users_of_request_to_go_live_for_service.call_args_list == expected_call_args
+
+
+def test_confirm_service_is_unique_sets_confirmed_unique_and_updates_name(
+    client_request,
+    mock_update_service,
+    service_one,
+):
+    client_request.post(
+        "main.confirm_service_is_unique",
+        service_id=SERVICE_ONE_ID,
+        _data={"name": "Updated Service"},
+        _expected_status=302,
+        _expected_redirect=url_for("main.request_to_go_live", service_id=SERVICE_ONE_ID),
+    )
+
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="Updated Service", confirmed_unique=True)
+
+
+@pytest.mark.parametrize(
+    "name, error_message",
+    [
+        ("", "Error: Enter a service name"),
+        (".", "Service name must include at least 2 letters or numbers"),
+        ("GOV.UK Ειδοποίηση", "Service name cannot include characters from a non-Latin alphabet"),
+        ("a" * 150 + " " * 100 + "a", "Service name cannot be longer than 143 characters"),
+    ],
+)
+def test_confirm_service_is_unique_fails_validation(
+    client_request,
+    mock_update_service,
+    name,
+    error_message,
+):
+    page = client_request.post(
+        "main.confirm_service_is_unique",
+        service_id=SERVICE_ONE_ID,
+        _data={"name": name},
+        _expected_status=200,
+    )
+
+    assert not mock_update_service.called
+    assert error_message in page.select_one(".govuk-error-message").text
+
+
+def test_confirm_service_is_unique_doesnt_suppress_api_errors(client_request, mocker, service_one):
+    mocker.patch(
+        "app.main.views.service_settings.index.service_api_client.update_service",
+        side_effect=HTTPError(response=Mock(status_code=500)),
+    )
+
+    client_request.post(
+        "main.confirm_service_is_unique",
+        service_id=SERVICE_ONE_ID,
+        _data={"name": "Whatever"},
+        _expected_status=500,
+    )
+
+
+def test_confirm_service_is_unique_prefills_name(client_request, service_one):
+    page = client_request.get(
+        "main.confirm_service_is_unique",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert page.select_one("input[name=name]")["value"] == service_one["name"]
