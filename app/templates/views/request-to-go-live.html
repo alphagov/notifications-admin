@@ -88,22 +88,38 @@
             }
           )%}
         {% endif %}
-        {% if current_service.able_to_accept_agreement %}
-          {% do task_list_items.append(
-            {
-              "title": {
-                "text": "Accept our data processing and financial agreement",
-                "classes": "govuk-link--no-visited-state",
-              },
-              "href": url_for('main.service_agreement', service_id=current_service.id),
-              "status": completed_status if current_service.organisation.agreement_signed else not_completed_status,
-            }
-          )%}
-        {% endif %}
+        <h2 class="govuk-heading-m">Your service</h2>
         {{ govukTaskList({
-          "idPrefix": "request-to-go-live",
+          "idPrefix": "request-to-go-live-service",
           "items": task_list_items
         }) }}
+        <h2 class="govuk-heading-m">Your organisation</h2>
+        {# show task-list if agreement not accepted or #}
+        {# the current user signed the org-level agreement #}
+        {# this is because for other services in that org that want to go live #}
+        {# we want to show a different text if org-level agreement already accepted #}
+        {% if current_service.able_to_accept_agreement and (current_service.organisation.agreement_signed_by_id == current_user.id or not current_service.organisation.agreement_signed_by_id) %}
+          {{ govukTaskList({
+            "idPrefix": "request-to-go-live-organisation",
+            "items": [
+              {
+                "title": {
+                  "text": "Accept our data processing and financial agreement",
+                  "classes": "govuk-link--no-visited-state",
+                },
+                "href": url_for('main.service_agreement', service_id=current_service.id),
+                "status": completed_status if current_service.organisation.agreement_signed else not_completed_status,
+              }
+            ]
+          }) }}
+        {% elif not current_service.organisation %}
+          <p class="govuk-body">When you send us a request to go live, we’ll ask you the name of the public sector body responsible for your service.</p>
+          <p class="govuk-body">We may also ask you to accept our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_agreement', service_id=current_service.id) }}">data processing and financial agreement</a>.</p>
+          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        {% else %}
+          <p class="'govuk-body">{{current_service.organisation.name}} has already accepted our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_agreement', service_id=current_service.id) }}">data processing and financial agreement</a>.</p>
+          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        {% endif %}
         {% if not current_user.is_gov_user %}
           <p class="govuk-body">
             Only team members with a government email address can request to go live.
