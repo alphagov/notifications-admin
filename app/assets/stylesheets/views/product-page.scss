@@ -9,14 +9,12 @@ $button-shadow-size: $govuk-border-width-form-element;
     margin: 0 0 govuk-spacing(6) * 1.5 0;
     background: $product-page-blue;
     color: govuk-colour("white");
-    padding-top: 2px;
 
     &-wrapper {
 
       @include govuk-width-container;
       user-select: none;
       padding: govuk-spacing(6) 0 govuk-spacing(9) 0;
-      border-top: 1px solid rgba(govuk-colour("white"), 0.25);
 
       @include govuk-media-query($from: desktop) {
         background-image: file-url('product/proposition-illustration.png');
@@ -91,4 +89,22 @@ $button-shadow-size: $govuk-border-width-form-element;
   @include govuk-font($size: 24, $weight: bold);
   box-shadow: 0 $button-shadow-size 0 govuk-shade($colour: $product-page-blue, $percentage: 15%);
 
+}
+
+.govuk-template--rebranded {
+  .govuk-service-navigation--inverse {
+    background-color: govuk-colour("blue");
+    border-bottom-color: govuk-colour("blue");
+
+    .govuk-service-navigation__container {
+        border-top: 1px solid rgba(govuk-colour("white"), 0.25);;
+    }
+
+    .govuk-service-navigation__link {
+      color: govuk-colour("white");
+      &:focus {
+        color: govuk-colour("black")
+      }
+    }
+  }
 }
