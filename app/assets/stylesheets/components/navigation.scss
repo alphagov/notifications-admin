@@ -3,8 +3,8 @@
   @include govuk-font($size: 19);
   padding: 0 govuk-spacing(6) 0 0;
 
-  $padding-top: 14px;
-  $padding-bottom: 11px;
+  $padding-top: 18px;
+  $padding-bottom: 17px;
 
   &-service-name,
   &-organisation-link {
@@ -74,7 +74,7 @@
 
     box-sizing: border-box;
     margin-bottom: govuk-spacing(1);
-    
+
     &:focus:before {
       border-color: $govuk-focus-text-colour;
     }
