@@ -856,7 +856,7 @@ def test_should_redirect_after_service_name_change(
         ),
     )
 
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="New Name")
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="New Name", confirmed_unique=False)
 
 
 class TestServiceDataRetention:
