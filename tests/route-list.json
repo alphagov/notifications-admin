@@ -187,6 +187,7 @@
     "/services/<uuid:service_id>/make-service-live/service-name",
     "/services/<uuid:service_id>/make-service-live/unique-service",
     "/services/<uuid:service_id>/make-your-service-live",
+    "/services/<uuid:service_id>/make-your-service-live/confirm-service-unique",
     "/services/<uuid:service_id>/monthly",
     "/services/<uuid:service_id>/notes",
     "/services/<uuid:service_id>/notification/<uuid:notification_id>",

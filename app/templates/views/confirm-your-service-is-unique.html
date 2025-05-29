@@ -1,0 +1,54 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+
+{% set title = "Confirm that your service is unique" %}
+
+{% block service_page_title %}
+    {{ title }}
+{% endblock %}
+
+{% block backLink %}
+    {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+    {{ page_header(title) }}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-five-sixths">
+
+            <p class="govuk-body">
+                Your service must be the only one of its kind in your organisation.
+            </p>
+
+            <p class="govuk-body">
+                Before you send a request to go live, check that your service name describes what your messages are about, as well as who they’re from.
+            </p>
+
+            <p class="govuk-body">
+                This will help us to understand if your service is unique.
+            </p>
+
+            <p class="govuk-body">
+                Do not include:
+            </p>
+
+            <ul class="govuk-list govuk-list--bullet">
+                <li>acronyms, initialisms or abbreviations unless your recipients are familiar with them</li>
+                <li>your own name or the name of an individual</li>
+                <li>the name of a web application or back office system</li>
+            </ul>
+
+            {% call form_wrapper() %}
+                {{ form.name }}
+                {{ page_footer('Confirm') }}
+            {% endcall %}
+
+        </div>
+    </div>
+
+{% endblock %}
