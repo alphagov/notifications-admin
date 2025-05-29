@@ -98,7 +98,12 @@ def service_name_change(service_id):
 
     if form.validate_on_submit():
         try:
-            current_service.update(name=form.name.data)
+            update_fields = {"name": form.name.data}
+
+            if not current_service.live:
+                update_fields["confirmed_unique"] = False
+
+            current_service.update(**update_fields)
         except HTTPError as http_error:
             if http_error.status_code == 400 and (
                 error_message := service_api_client.parse_edit_service_http_error(http_error)

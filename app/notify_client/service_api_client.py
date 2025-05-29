@@ -101,6 +101,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             "billing_contact_email_addresses",
             "billing_contact_names",
             "billing_reference",
+            "confirmed_unique",
             "contact_link",
             "created_by",
             "count_as_live",

@@ -856,6 +856,28 @@ def test_should_redirect_after_service_name_change(
         ),
     )
 
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="New Name", confirmed_unique=False)
+
+
+def test_service_name_change_updates_name_field_only_for_live_services(
+    client_request,
+    mock_update_service,
+    service_one,
+):
+    # set service to live
+    service_one["restricted"] = False
+
+    client_request.post(
+        "main.service_name_change",
+        service_id=SERVICE_ONE_ID,
+        _data={"name": "New Name"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.service_settings",
+            service_id=SERVICE_ONE_ID,
+        ),
+    )
+
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="New Name")
 
 
