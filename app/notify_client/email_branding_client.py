@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient, cache
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session, cache
 
 
 class EmailBrandingClient(NotifyAdminAPIClient):
@@ -64,7 +64,7 @@ class EmailBrandingClient(NotifyAdminAPIClient):
 _email_branding_client_context_var: ContextVar[EmailBrandingClient] = ContextVar("email_branding_client")
 get_email_branding_client: LazyLocalGetter[EmailBrandingClient] = LazyLocalGetter(
     _email_branding_client_context_var,
-    lambda: EmailBrandingClient(current_app),
+    lambda: EmailBrandingClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_email_branding_client.clear())
 email_branding_client = LocalProxy(get_email_branding_client)

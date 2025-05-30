@@ -6,7 +6,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient, cache
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session, cache
 from app.utils.user_permissions import translate_permissions_from_ui_to_db
 
 ALLOWED_ATTRIBUTES = {
@@ -24,8 +24,8 @@ ALLOWED_ATTRIBUTES = {
 
 
 class UserApiClient(NotifyAdminAPIClient):
-    def __init__(self, app):
-        super().__init__(app)
+    def __init__(self, app, *args, **kwargs):
+        super().__init__(app, *args, **kwargs)
 
         self.admin_url = app.config["ADMIN_BASE_URL"]
 
@@ -246,7 +246,7 @@ class UserApiClient(NotifyAdminAPIClient):
 _user_api_client_context_var: ContextVar[UserApiClient] = ContextVar("user_api_client")
 get_user_api_client: LazyLocalGetter[UserApiClient] = LazyLocalGetter(
     _user_api_client_context_var,
-    lambda: UserApiClient(current_app),
+    lambda: UserApiClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_user_api_client.clear())
 user_api_client = LocalProxy(get_user_api_client)

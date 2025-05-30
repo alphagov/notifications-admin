@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient, cache
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session, cache
 
 
 class LetterBrandingClient(NotifyAdminAPIClient):
@@ -47,7 +47,7 @@ class LetterBrandingClient(NotifyAdminAPIClient):
 _letter_branding_client_context_var: ContextVar[LetterBrandingClient] = ContextVar("letter_branding_client")
 get_letter_branding_client: LazyLocalGetter[LetterBrandingClient] = LazyLocalGetter(
     _letter_branding_client_context_var,
-    lambda: LetterBrandingClient(current_app),
+    lambda: LetterBrandingClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_letter_branding_client.clear())
 letter_branding_client = LocalProxy(get_letter_branding_client)
