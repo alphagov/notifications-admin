@@ -152,7 +152,16 @@ class HeaderNavigation(Navigation):
     def visible_header_nav(self):
         from app import current_user
 
-        nav_items = [
+        nav_items = []
+
+        if current_user.is_authenticated:
+            nav_items += [
+                {"href": url_for("main.your_services"), "text": "Your services", "active": not any(
+                    self.is_selected(item) for item in self.mapping.keys()
+                ),},
+            ]
+
+        nav_items += [
             {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
             {"href": url_for("main.guidance_features"), "text": "Features", "active": self.is_selected("features")},
             {"href": url_for("main.guidance_pricing"), "text": "Pricing", "active": self.is_selected("pricing")},
@@ -163,7 +172,7 @@ class HeaderNavigation(Navigation):
             },
         ]
 
-        if current_user.platform_admin:
+        if current_user.platform_admin and False:
             nav_items.append(
                 {
                     "href": url_for("main.platform_admin_search"),
@@ -171,6 +180,7 @@ class HeaderNavigation(Navigation):
                     "active": self.is_selected("platform-admin"),
                 }
             )
+
 
         if current_user.is_authenticated:
             nav_items.append(
