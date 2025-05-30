@@ -1,11 +1,12 @@
 from datetime import datetime
-from unittest.mock import ANY, PropertyMock, call
+from unittest.mock import ANY, Mock, PropertyMock, call
 from uuid import uuid4
 
 import pytest
 import pytz
 from flask import url_for
 from freezegun import freeze_time
+from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
 from tests import invite_json, organisation_json, validate_route_permission
@@ -110,6 +111,32 @@ def test_route_for_platform_admin(
 
 
 @pytest.mark.parametrize(
+    "confirmed_unique, expected_status_text",
+    [
+        (False, "Confirm that your service is unique Not completed"),
+        (True, "Confirm that your service is unique Completed"),
+    ],
+)
+def test_should_check_confirm_service_is_unique_task(
+    client_request,
+    service_one,
+    single_sms_sender,
+    single_reply_to_email_address,
+    mock_get_service_templates,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    confirmed_unique,
+    expected_status_text,
+):
+    service_one["confirmed_unique"] = confirmed_unique
+
+    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+    assert page.select_one("h1").text == "Make your service live"
+
+    assert normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[0].text) == expected_status_text
+
+
+@pytest.mark.parametrize(
     "volumes, expected_estimated_volumes_item",
     [
         ((0, 0, 0), "Tell us how many messages you expect to send Not completed"),
@@ -141,7 +168,7 @@ def test_should_check_if_estimated_volumes_provided(
     assert page.select_one("h1").text == "Make your service live"
 
     assert (
-        normalize_spaces(page.select_one(".govuk-task-list .govuk-task-list__item").text)
+        normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[1].text)
         == expected_estimated_volumes_item
     )
 
@@ -193,7 +220,7 @@ def test_should_check_for_reply_to_on_go_live(
     assert page.select_one("h1").text == "Make your service live"
 
     checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
-    assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
+    assert normalize_spaces(checklist_items[4].text) == expected_reply_to_checklist_item
 
     if count_of_email_templates:
         mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
@@ -264,8 +291,8 @@ def test_should_check_for_sending_things_right(
     assert page.select_one("h1").text == "Make your service live"
 
     checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
-    assert normalize_spaces(checklist_items[1].text) == expected_user_checklist_item
-    assert normalize_spaces(checklist_items[2].text) == expected_templates_checklist_item
+    assert normalize_spaces(checklist_items[2].text) == expected_user_checklist_item
+    assert normalize_spaces(checklist_items[3].text) == expected_templates_checklist_item
 
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
     mock_get_invites.assert_called_once_with(SERVICE_ONE_ID)
@@ -527,7 +554,7 @@ def test_should_check_for_sms_sender_on_go_live(
     assert page.select_one("h1").text == "Make your service live"
 
     checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
-    assert normalize_spaces(checklist_items[3].text) == expected_sms_sender_checklist_item
+    assert normalize_spaces(checklist_items[4].text) == expected_sms_sender_checklist_item
 
     mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
 
@@ -586,7 +613,7 @@ def test_should_check_for_mou_on_request_to_go_live(
     assert page.select_one("h1").text == "Make your service live"
 
     checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
-    assert normalize_spaces(checklist_items[3].text) == expected_item
+    assert normalize_spaces(checklist_items[4].text) == expected_item
 
 
 @pytest.mark.parametrize(
@@ -639,7 +666,7 @@ def test_gp_without_organisation_is_shown_agreement_step(
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Make your service live"
-    assert normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[3].text) == (
+    assert normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[4].text) == (
         "Accept our data processing and financial agreement Not completed"
     )
 
@@ -1021,3 +1048,68 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
     client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID)
 
     assert mock_notify_users_of_request_to_go_live_for_service.call_args_list == expected_call_args
+
+
+def test_confirm_service_is_unique_sets_confirmed_unique_and_updates_name(
+    client_request,
+    mock_update_service,
+    service_one,
+):
+    client_request.post(
+        "main.confirm_service_is_unique",
+        service_id=SERVICE_ONE_ID,
+        _data={"name": "Updated Service"},
+        _expected_status=302,
+        _expected_redirect=url_for("main.request_to_go_live", service_id=SERVICE_ONE_ID),
+    )
+
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="Updated Service", confirmed_unique=True)
+
+
+@pytest.mark.parametrize(
+    "name, error_message",
+    [
+        ("", "Error: Enter a service name"),
+        (".", "Service name must include at least 2 letters or numbers"),
+        ("GOV.UK Ειδοποίηση", "Service name cannot include characters from a non-Latin alphabet"),
+        ("a" * 150 + " " * 100 + "a", "Service name cannot be longer than 143 characters"),
+    ],
+)
+def test_confirm_service_is_unique_fails_validation(
+    client_request,
+    mock_update_service,
+    name,
+    error_message,
+):
+    page = client_request.post(
+        "main.confirm_service_is_unique",
+        service_id=SERVICE_ONE_ID,
+        _data={"name": name},
+        _expected_status=200,
+    )
+
+    assert not mock_update_service.called
+    assert error_message in page.select_one(".govuk-error-message").text
+
+
+def test_confirm_service_is_unique_doesnt_suppress_api_errors(client_request, mocker, service_one):
+    mocker.patch(
+        "app.main.views.service_settings.index.service_api_client.update_service",
+        side_effect=HTTPError(response=Mock(status_code=500)),
+    )
+
+    client_request.post(
+        "main.confirm_service_is_unique",
+        service_id=SERVICE_ONE_ID,
+        _data={"name": "Whatever"},
+        _expected_status=500,
+    )
+
+
+def test_confirm_service_is_unique_prefills_name(client_request, service_one):
+    page = client_request.get(
+        "main.confirm_service_is_unique",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert page.select_one("input[name=name]")["value"] == service_one["name"]

@@ -267,6 +267,7 @@ class MainNavigation(Navigation):
             "add_organisation_from_nhs_local_service",
             "branding_nhs",
             "branding_option_preview",
+            "confirm_service_is_unique",
             "email_branding_choose_banner_colour",
             "email_branding_choose_banner_type",
             "email_branding_choose_logo",
