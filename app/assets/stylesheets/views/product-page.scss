@@ -14,7 +14,7 @@ $button-shadow-size: $govuk-border-width-form-element;
 
       @include govuk-width-container;
       user-select: none;
-      padding: govuk-spacing(6) 0 govuk-spacing(9) 0;
+      padding: govuk-spacing(4) 0 govuk-spacing(9) 0;
 
       @include govuk-media-query($from: desktop) {
         background-image: file-url('product/proposition-illustration.png');
