@@ -111,6 +111,32 @@ def test_route_for_platform_admin(
 
 
 @pytest.mark.parametrize(
+    "confirmed_unique, expected_status_text",
+    [
+        (False, "Confirm that your service is unique Not completed"),
+        (True, "Confirm that your service is unique Completed"),
+    ],
+)
+def test_should_check_confirm_service_is_unique_task(
+    client_request,
+    service_one,
+    single_sms_sender,
+    single_reply_to_email_address,
+    mock_get_service_templates,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    confirmed_unique,
+    expected_status_text,
+):
+    service_one["confirmed_unique"] = confirmed_unique
+
+    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+    assert page.select_one("h1").text == "Make your service live"
+
+    assert normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[0].text) == expected_status_text
+
+
+@pytest.mark.parametrize(
     "volumes, expected_estimated_volumes_item",
     [
         ((0, 0, 0), "Tell us how many messages you expect to send Not completed"),
@@ -142,7 +168,7 @@ def test_should_check_if_estimated_volumes_provided(
     assert page.select_one("h1").text == "Make your service live"
 
     assert (
-        normalize_spaces(page.select_one(".govuk-task-list .govuk-task-list__item").text)
+        normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[1].text)
         == expected_estimated_volumes_item
     )
 
@@ -194,7 +220,7 @@ def test_should_check_for_reply_to_on_go_live(
     assert page.select_one("h1").text == "Make your service live"
 
     checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
-    assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
+    assert normalize_spaces(checklist_items[4].text) == expected_reply_to_checklist_item
 
     if count_of_email_templates:
         mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
@@ -265,8 +291,8 @@ def test_should_check_for_sending_things_right(
     assert page.select_one("h1").text == "Make your service live"
 
     checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
-    assert normalize_spaces(checklist_items[1].text) == expected_user_checklist_item
-    assert normalize_spaces(checklist_items[2].text) == expected_templates_checklist_item
+    assert normalize_spaces(checklist_items[2].text) == expected_user_checklist_item
+    assert normalize_spaces(checklist_items[3].text) == expected_templates_checklist_item
 
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
     mock_get_invites.assert_called_once_with(SERVICE_ONE_ID)
@@ -528,7 +554,7 @@ def test_should_check_for_sms_sender_on_go_live(
     assert page.select_one("h1").text == "Make your service live"
 
     checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
-    assert normalize_spaces(checklist_items[3].text) == expected_sms_sender_checklist_item
+    assert normalize_spaces(checklist_items[4].text) == expected_sms_sender_checklist_item
 
     mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
 
@@ -587,7 +613,7 @@ def test_should_check_for_mou_on_request_to_go_live(
     assert page.select_one("h1").text == "Make your service live"
 
     checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
-    assert normalize_spaces(checklist_items[3].text) == expected_item
+    assert normalize_spaces(checklist_items[4].text) == expected_item
 
 
 @pytest.mark.parametrize(
@@ -640,7 +666,7 @@ def test_gp_without_organisation_is_shown_agreement_step(
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Make your service live"
-    assert normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[3].text) == (
+    assert normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[4].text) == (
         "Accept our data processing and financial agreement Not completed"
     )
 
