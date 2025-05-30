@@ -36,6 +36,14 @@
         {% set task_list_items =
           [{
             "title": {
+              "text": "Confirm that your service is unique",
+              "classes": "govuk-link--no-visited-state",
+            },
+            "href": url_for('main.confirm_service_is_unique', service_id=current_service.id),
+            "status": completed_status if current_service.confirmed_unique else not_completed_status,
+          },
+          {
+            "title": {
               "text": "Tell us how many messages you expect to send",
               "classes": "govuk-link--no-visited-state",
             },
