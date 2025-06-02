@@ -1,7 +1,7 @@
 import weakref
 from contextlib import suppress
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from functools import partial
 from itertools import chain
 from numbers import Number
@@ -127,20 +127,20 @@ def get_human_day(time):
 
     #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
     time = (time - timedelta(hours=1)).strftime(date_format)
-    if time == datetime.utcnow().strftime(date_format):
+    if time == datetime.now(UTC).strftime(date_format):
         return "Today"
-    if time == (datetime.utcnow() + timedelta(days=1)).strftime(date_format):
+    if time == (datetime.now(UTC) + timedelta(days=1)).strftime(date_format):
         return "Tomorrow"
 
     return time
 
 
 def get_furthest_possible_scheduled_time():
-    return (datetime.utcnow() + timedelta(days=7)).replace(hour=0)
+    return (datetime.now(UTC) + timedelta(days=7)).replace(hour=0)
 
 
 def get_next_hours_until(until):
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     hours = int((until - now).total_seconds() / (60 * 60))
     return [
         (now + timedelta(hours=i)).replace(minute=0, second=0, microsecond=0).replace(tzinfo=pytz.utc)
@@ -149,7 +149,7 @@ def get_next_hours_until(until):
 
 
 def get_next_days_until(until):
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     days = int((until - now).total_seconds() / (60 * 60 * 24))
 
     return [get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc)) for i in range(days + 1)]
