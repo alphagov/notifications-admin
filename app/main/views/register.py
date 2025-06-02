@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from flask import abort, redirect, render_template, session, url_for
 
@@ -88,7 +88,7 @@ def _do_registration(form, send_sms=True, send_email=True, organisation_id=None)
     if user:
         if send_email:
             user.send_already_registered_email()
-        session["expiry_date"] = str(datetime.utcnow() + timedelta(hours=1))
+        session["expiry_date"] = str(datetime.now(UTC) + timedelta(hours=1))
         session["user_details"] = {"email": user.email_address, "id": user.id}
     else:
         user = User.register(
@@ -104,7 +104,7 @@ def _do_registration(form, send_sms=True, send_email=True, organisation_id=None)
 
         if send_sms:
             user.send_verify_code()
-        session["expiry_date"] = str(datetime.utcnow() + timedelta(hours=1))
+        session["expiry_date"] = str(datetime.now(UTC) + timedelta(hours=1))
         session["user_details"] = {"email": user.email_address, "id": user.id}
     if organisation_id:
         session["organisation_id"] = organisation_id
