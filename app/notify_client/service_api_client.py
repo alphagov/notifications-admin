@@ -1,5 +1,5 @@
 from contextvars import ContextVar
-from datetime import datetime
+from datetime import UTC, datetime
 
 from flask import current_app
 from notifications_utils.clients.redis import daily_limit_cache_key
@@ -10,6 +10,7 @@ from app import memo_resetters
 from app.constants import LetterLanguageOptions
 from app.extensions import redis_client
 from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
+from app.utils.time import str_no_tz
 
 ALLOWED_TEMPLATE_ATTRIBUTES = {
     "content",
@@ -152,7 +153,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
             sms_message_limit=get_daily_limit(live, "sms"),
             letter_message_limit=get_daily_limit(live, "letter"),
             restricted=(not live),
-            go_live_at=str(datetime.utcnow()) if live else None,
+            go_live_at=str_no_tz(datetime.now(UTC)) if live else None,
             has_active_go_live_request=False,
         )
 

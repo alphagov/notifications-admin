@@ -1,5 +1,5 @@
 import calendar
-from datetime import datetime
+from datetime import UTC, datetime
 from functools import partial
 from itertools import groupby
 
@@ -452,7 +452,7 @@ def inbox_download(service_id):
         mimetype="text/csv",
         headers={
             "Content-Disposition": (
-                f'inline; filename="Received text messages {format_date_numeric(datetime.utcnow().isoformat())}.csv"'
+                f'inline; filename="Received text messages {format_date_numeric(datetime.now(UTC))}.csv"'
             )
         },
     )
@@ -599,7 +599,7 @@ def format_monthly_stats_to_list(historical_stats):
         (
             dict(
                 date=key,
-                future=yyyy_mm_to_datetime(key) > datetime.utcnow(),
+                future=yyyy_mm_to_datetime(key) > datetime.now(UTC),
                 name=yyyy_mm_to_datetime(key).strftime("%B"),
                 **aggregate_status_types(value),
             )
@@ -610,7 +610,7 @@ def format_monthly_stats_to_list(historical_stats):
 
 
 def yyyy_mm_to_datetime(string):
-    return datetime(int(string[0:4]), int(string[5:7]), 1)
+    return datetime(int(string[0:4]), int(string[5:7]), 1, tzinfo=UTC)
 
 
 def aggregate_status_types(counts_dict):

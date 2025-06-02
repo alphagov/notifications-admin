@@ -60,7 +60,7 @@ def format_time_24h(date):
 def get_human_day(time, date_prefix="", include_day_of_week=False):
     #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
     date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
 
     if date == (now + timedelta(days=1)).date():
         return "tomorrow"

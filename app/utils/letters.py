@@ -7,16 +7,13 @@ from notifications_utils.letter_timings import letter_can_be_cancelled
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.template import BaseLetterTemplate
 from notifications_utils.timezones import (
-    convert_bst_to_utc,
-    convert_utc_to_bst,
+    local_timezone,
     utc_string_to_aware_gmt_datetime,
 )
 
 
 def printing_today_or_tomorrow(created_at):
-    print_cutoff = convert_bst_to_utc(convert_utc_to_bst(datetime.utcnow()).replace(hour=17, minute=30)).replace(
-        tzinfo=UTC
-    )
+    print_cutoff = datetime.now(local_timezone).replace(hour=17, minute=30)
     created_at = utc_string_to_aware_gmt_datetime(created_at)
 
     if created_at < print_cutoff:

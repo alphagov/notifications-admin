@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from itertools import groupby
 from operator import itemgetter
 from statistics import mean
@@ -16,8 +16,8 @@ ORGS_TO_IGNORE = ["1556fd80-a1b2-4b79-8453-f6fcb6f00d0c"]  # TODO: Move this int
 @main.route("/features/performance.json", endpoint="performance_json")
 def performance():
     stats = performance_dashboard_api_client.get_performance_dashboard_stats(
-        start_date=(datetime.utcnow() - timedelta(days=7)).date(),
-        end_date=datetime.utcnow().date(),
+        start_date=(datetime.now(UTC) - timedelta(days=7)).date(),
+        end_date=datetime.now(UTC).date(),
     )
     stats["services_using_notify"] = list(
         filter(lambda d: d["organisation_id"] not in ORGS_TO_IGNORE, stats["services_using_notify"])
