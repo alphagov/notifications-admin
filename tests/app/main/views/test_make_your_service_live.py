@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import ANY, PropertyMock, call
 from uuid import uuid4
 
@@ -246,7 +246,7 @@ def test_should_check_for_sending_things_right(
         service_id=service_one["id"],
         email_address="invited_user@test.gov.uk",
         permissions="view_activity,send_messages,manage_service,manage_api_keys",
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
         status="pending",
         auth_type="sms_auth",
         folder_permissions=[],
