@@ -1,6 +1,6 @@
 import copy
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
@@ -1870,9 +1870,9 @@ def service_join_request_get_data(request_id, status, mock_requester, status_cha
             "email_address": mock_requester.get("email_address"),
         },
         "service_id": SERVICE_ONE_ID,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(UTC),
         "status": status,
-        "status_changed_at": datetime.utcnow(),
+        "status_changed_at": datetime.now(UTC),
         "status_changed_by": (
             {"id": status_changed_by.get("id"), "name": status_changed_by.get("name"), "belongs_to_service": []}
             if status_changed_by
@@ -2014,7 +2014,7 @@ def test_service_join_request_approved(
     assert f"{mock_requester['name']} has already joined your service" in page.text.strip()
     assert f"{mock_requester['name']} has already joined your service" in page.select_one("h1").text.strip()
 
-    today_date = format_date_short(datetime.utcnow())
+    today_date = format_date_short(datetime.now(UTC))
     assert f"{mock_service_user['name']} approved this request on {today_date}" in page.select_one("p").text.strip()
 
 
@@ -2060,7 +2060,7 @@ def test_service_join_request_rejected(
     assert f"{mock_requester['name']} join your service" in page.text.strip()
     assert f"{mock_requester['name']} join your service" in page.select_one("h1").text.strip()
 
-    today_date = format_date_short(datetime.utcnow())
+    today_date = format_date_short(datetime.now(UTC))
     assert (
         f"{mock_service_user['name']} already refused this request on {today_date}" in page.select_one("p").text.strip()
     )

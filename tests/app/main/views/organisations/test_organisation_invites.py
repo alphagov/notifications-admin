@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import ANY
 
 import pytest
@@ -429,7 +429,7 @@ def test_verified_org_user_redirects_to_dashboard(
     client_request.logout()
     invited_org_user = InvitedOrgUser(sample_org_invite)
     with client_request.session_transaction() as session:
-        session["expiry_date"] = str(datetime.utcnow() + timedelta(hours=1))
+        session["expiry_date"] = str(datetime.now(UTC) + timedelta(hours=1))
         session["user_details"] = {"email": invited_org_user.email_address, "id": invited_org_user.id}
         session["organisation_id"] = invited_org_user.organisation
 

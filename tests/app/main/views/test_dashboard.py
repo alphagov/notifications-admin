@@ -1,6 +1,6 @@
 import copy
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytest
 from flask import url_for
@@ -469,7 +469,7 @@ def test_download_inbox_strips_formulae(
                     "user_number": "elevenchars",
                     "notify_number": "foo",
                     "content": message_content,
-                    "created_at": datetime.utcnow().isoformat(),
+                    "created_at": datetime.now(UTC).isoformat(),
                     "id": fake_uuid,
                 }
             ],
