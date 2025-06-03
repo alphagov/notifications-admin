@@ -14,14 +14,6 @@
   <h1 class="heading-large">Personalisation</h1>
 
   <p class="govuk-body">You can send personalised messages using a single template.</p>
-  <p class="govuk-body">Use personalisation to add:</p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_optional_content') }}">optional content</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_qr_codes') }}">a QR code to a letter template</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_formatting') }}">custom bullet points to email and letter templates</a></li>
-  </ul>
-<h2 class="heading-medium" id="hide-personalised-content">How to personalise a message</h2>
   
 <p class="govuk-body">Use double brackets to add a placeholder to your content. For example:</p>
 
@@ -35,9 +27,16 @@
   </ul>
 
   <p class="govuk-body">If you upload a list of personal details, the column names in your spreadsheet need to match the placeholders in the template.</p>
+<p class="govuk-body">Use personalisation to add:</p>
 
-  <h3 class="heading-small">If you add information from your recipients in placeholders</h3>
-<p class="govuk-body">You can add information you get from your recipients into placeholders. This information can come from forms your recipients have completed online.</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_optional_content') }}">optional content</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_qr_codes') }}">a QR code to a letter template</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_formatting') }}">custom bullet points to email and letter templates</a></li>
+  </ul>
+
+  <h2 class="heading-medium">If you add information from your recipients in placeholders</h2>
+<p class="govuk-body">You can add information you get from your recipients into placeholders. For example, this information can come from forms your recipients have completed online.</p>
 <p class="govuk-body">To keep information in placeholders safe from harmful content such as phishing links, use:</p>
 <pre class="formatting-example"><code class="lang-md">((placeholder::make_safe))</code></pre>
 
