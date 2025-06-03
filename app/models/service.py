@@ -37,6 +37,7 @@ class Service(JSONModel):
     billing_contact_email_addresses: str
     billing_contact_names: str
     billing_reference: str
+    confirmed_unique: bool
     contact_link: str
     count_as_live: bool
     custom_email_sender_name: str
@@ -413,6 +414,7 @@ class Service(JSONModel):
                 self.has_templates,
                 not self.needs_to_add_email_reply_to_address,
                 not self.needs_to_change_sms_sender,
+                self.confirmed_unique,
             )
         )
 

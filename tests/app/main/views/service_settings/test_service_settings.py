@@ -856,7 +856,7 @@ def test_should_redirect_after_service_name_change(
         ),
     )
 
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="New Name")
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="New Name", confirmed_unique=False)
 
 
 class TestServiceDataRetention:
@@ -1431,6 +1431,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
         "volume_email,"
         "volume_sms,"
         "volume_letter,"
+        "confirmed_unique,"
         "expected_readyness,"
         "agreement_signed,"
     ),
@@ -1448,6 +1449,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             0,
             True,
             True,
+            True,
         ),
         (  # Needs to set reply to address
             True,
@@ -1460,6 +1462,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             1,
             0,
             1,
+            True,
             False,
             True,
         ),
@@ -1476,6 +1479,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             0,
             True,
             True,
+            True,
         ),
         (  # Needs to change SMS sender
             True,
@@ -1488,6 +1492,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             0,
             1,
             0,
+            True,
             False,
             True,
         ),
@@ -1502,6 +1507,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             1,
             0,
             0,
+            True,
             False,
             True,
         ),
@@ -1516,6 +1522,22 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             0,
             1,
             0,
+            True,
+            False,
+            True,
+        ),
+        (  # Just confirm unique service
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            1,
+            0,
+            0,
+            False,
             False,
             True,
         ),
@@ -1530,6 +1552,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             None,
             None,
             None,
+            False,
             False,
             False,
         ),
@@ -1549,6 +1572,7 @@ def test_ready_to_go_live(
     volume_email,
     volume_sms,
     volume_letter,
+    confirmed_unique,
     expected_readyness,
     agreement_signed,
 ):
@@ -1579,7 +1603,9 @@ def test_ready_to_go_live(
             return_value=volume,
         )
 
-    assert app.models.service.Service({"id": SERVICE_ONE_ID}).go_live_checklist_completed is expected_readyness
+    service = app.models.service.Service({"id": SERVICE_ONE_ID, "confirmed_unique": confirmed_unique})
+
+    assert service.go_live_checklist_completed is expected_readyness
 
 
 @pytest.mark.parametrize(

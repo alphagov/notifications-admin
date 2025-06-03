@@ -190,6 +190,7 @@ def service_json(
     purchase_order_number=None,
     has_active_go_live_request=False,
     go_live_user=None,
+    confirmed_unique=False,
 ):
     if users is None:
         users = []
@@ -235,6 +236,7 @@ def service_json(
         "purchase_order_number": purchase_order_number,
         "has_active_go_live_request": has_active_go_live_request,
         "go_live_user": go_live_user,
+        "confirmed_unique": confirmed_unique,
     }
 
 
