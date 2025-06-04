@@ -134,6 +134,7 @@ EXCLUDED_ENDPOINTS = set(
             "guidance_attach_pages",
             "guidance_billing_details",
             "guidance_bulk_sending",
+            "guidance_daily_limits",
             "guidance_data_retention_period",
             "guidance_delivery_times",
             "guidance_email_branding",

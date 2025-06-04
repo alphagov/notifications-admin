@@ -3919,6 +3919,18 @@ def test_show_international_sms_and_letters_as_radio_button(
     assert checked_radios[0]["value"] == expected_checked
 
 
+def test_set_international_sms_page_shows_services_international_sms_limit(
+    client_request,
+    service_one,
+):
+    service_one["permissions"] = ["international_sms"]
+    service_one["international_sms_message_limit"] = 56
+
+    page = client_request.get("main.service_set_international_sms", service_id=service_one["id"])
+
+    assert "56" in page.select(".govuk-body")[2].text
+
+
 @pytest.mark.parametrize(
     "permission",
     (

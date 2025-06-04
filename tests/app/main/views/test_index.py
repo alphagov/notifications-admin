@@ -366,15 +366,16 @@ def test_sms_price(
     ) in normalize_spaces(text_message_pricing_page.text)
 
 
-def test_bulk_sending_limits(client_request):
-    page = client_request.get("main.guidance_bulk_sending")
-    paragraphs = page.select("main p")
+def test_guidance_daily_limits(client_request):
+    page = client_request.get("main.guidance_daily_limits")
+    limits_table_rows = page.select("main tr")
 
-    assert normalize_spaces(paragraphs[0].text) == "You can send a batch of up to 100,000 messages at once."
-    assert normalize_spaces(paragraphs[1].text) == (
-        "There’s a default maximum limit of 250,000 emails, 250,000 text messages and 20,000 letters. "
-        "If you need to discuss these limits, contact us."
-    )
+    assert [normalize_spaces(row.text) for row in limits_table_rows] == [
+        "Message Daily limit",
+        "Emails 250,000",
+        "Text 250,000 text messages including a default 100 international text messages",
+        "Letters 20,000",
+    ]
 
 
 def test_trial_mode_sending_limits(client_request):
