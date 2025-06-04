@@ -2,15 +2,10 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/task-list/macro.html" import govukTaskList %}
 
 {% block service_page_title %}
   Make your service live
-{% endblock %}
-
-{% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
