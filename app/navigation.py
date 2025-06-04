@@ -338,11 +338,12 @@ class MainNavigation(Navigation):
             "guest_list",
             "old_guest_list",
         },
-        "make-service-live": {
-            "org_member_make_service_live_start",
-            "org_member_make_service_live_service_name",
+        "make-this-service-live": {
             "org_member_make_service_live_check_unique",
             "org_member_make_service_live_contact_user",
+            "org_member_make_service_live_decision",
+            "org_member_make_service_live_service_name",
+            "org_member_make_service_live_start",
         },
     }
 

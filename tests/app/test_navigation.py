@@ -602,7 +602,7 @@ def test_caseworkers_see_jobs_nav_if_jobs_exist(
     )
 
 
-def test_make_service_live_link_is_shown_in_limited_circumstances(
+def test_make_this_service_live_link_is_shown_in_limited_circumstances(
     client_request,
     service_one,
     platform_admin_user,
@@ -622,7 +622,7 @@ def test_make_service_live_link_is_shown_in_limited_circumstances(
     last_navigation_item = page.select(".navigation li")[-1]
 
     assert last_navigation_item["class"] == ["navigation__item", "navigation__item--with-separator"]
-    assert normalize_spaces(last_navigation_item.text) == "Make service live"
+    assert normalize_spaces(last_navigation_item.text) == "Make this service live"
     assert last_navigation_item.select_one("a")["href"] == url_for(
         "main.org_member_make_service_live_start",
         service_id=SERVICE_ONE_ID,
