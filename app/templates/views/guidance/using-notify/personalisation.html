@@ -15,7 +15,7 @@
 
   <p class="govuk-body">You can send personalised messages using a single template.</p>
 
-  <p class="govuk-body">To personalise a message, use double brackets to add a placeholder to your content. For example:</p>
+<p class="govuk-body">Use double brackets to add a placeholder to your content. For example:</p>
 
   <pre class="formatting-example"><code class="lang-md">Hello ((first name)), your reference is ((reference number)).</code></pre>
 
@@ -27,8 +27,7 @@
   </ul>
 
   <p class="govuk-body">If you upload a list of personal details, the column names in your spreadsheet need to match the placeholders in the template.</p>
-
-  <p class="govuk-body">You can use personalisation to add:</p>
+<p class="govuk-body">Use personalisation to add:</p>
 
   <ul class="govuk-list govuk-list--bullet">
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_optional_content') }}">optional content</a></li>
@@ -36,7 +35,12 @@
     <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_formatting') }}">custom bullet points to email and letter templates</a></li>
   </ul>
 
-  <h2 class="heading-medium" id="hide-personalised-content">Hide personalised content after sending</h2>
+  <h2 class="heading-medium">If you add information from your recipients in placeholders</h2>
+<p class="govuk-body">You can add information you get from your recipients into placeholders. For example, this information can come from online forms your recipients have completed.</p>
+<p class="govuk-body">To keep information in placeholders safe from harmful content such as phishing links, use:</p>
+<pre class="formatting-example"><code class="lang-md">((placeholder::secure))</code></pre>
+
+<h2 class="heading-medium" id="hide-personalised-content">Hide personalised content after sending</h2>
 
   <p class="govuk-body">Some placeholders include sensitive information like security codes or password reset links. To protect your users, you can choose to hide the content of these placeholders after sending.</p>
 
