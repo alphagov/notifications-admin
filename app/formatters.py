@@ -57,10 +57,11 @@ def format_time_24h(date):
     return utc_string_to_aware_gmt_datetime(date).strftime("%H:%M")
 
 
-def get_human_day(time, date_prefix=""):
+def get_human_day(time, date_prefix="", include_day_of_week=False):
     #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
     date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
     now = datetime.utcnow()
+    day_of_week = f"{date.strftime('%A')} " if include_day_of_week else ""
 
     if date == (now + timedelta(days=1)).date():
         return "tomorrow"
@@ -69,12 +70,13 @@ def get_human_day(time, date_prefix=""):
     if date == (now - timedelta(days=1)).date():
         return "yesterday"
     if date.strftime("%Y") != now.strftime("%Y"):
-        return "{} {} {}".format(
+        return "{} {}{} {}".format(
             date_prefix,
+            day_of_week,
             _format_datetime_short(date),
             date.strftime("%Y"),
         ).strip()
-    return f"{date_prefix} {_format_datetime_short(date)}".strip()
+    return f"{date_prefix} {day_of_week}{_format_datetime_short(date)}".strip()
 
 
 def format_time(date):
