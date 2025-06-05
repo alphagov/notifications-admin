@@ -20,9 +20,32 @@ WORKDIR /home/vcap/app
 
 ##### Frontend Build Image ###################################################
 ARG NOTIFY_ENVIRONMENT=development
-ARG NODE_VERSION=20
 
-FROM ghcr.io/alphagov/notify/unit-tests-image:python311-node20 as frontend_build
+FROM --platform=linux/amd64 node:20-slim AS node
+FROM --platform=linux/amd64 python:3.11-slim AS frontend_build
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        # TODO: this entire block was inlined from unit-tests-image's Dockerfile.
+        # Which of these are actually dependencies of admin,
+        # which are dependencies of document-download-frontend (and can be removed)?
+        make \
+        curl \
+        rlwrap \
+        git \
+        build-essential \
+        libmagic-dev \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libpng-dev \
+        zip \
+        openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=node /usr/local/lib /usr/local/lib
+COPY --from=node /usr/local/bin /usr/local/bin
 
 WORKDIR /usr/frontend
 COPY app app
