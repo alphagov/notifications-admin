@@ -23,7 +23,7 @@
   ) %}
     {% for message, limit in  [
     ("Emails", rate_limits.email),
-    ("Text", rate_limits.sms + " text messages including a default 100 international text messages"),
+    ("Text message", rate_limits.sms + " text messages including a default 100 international text messages"),
     ("Letters", rate_limits.letter)]
     %}
       {% call row() %}
@@ -50,7 +50,7 @@
  <li>how many international text messages your service needs to send each day</li>
  <li>any costs to your service if there is fraud</li>
  </ul>
-<p class="govuk-body">If you do not need to send international text messages, you can turn this off in <b class="govuk-!-font-weight-bold">Settings</b>.</p>
+<p class="govuk-body">If you do not need to send international text messages, you can turn this off on the settings page.</b>.</p>
 
 <h3 class="heading-medium">Help protect your service from Artificial Inflation of Traffic (AIT)</h3>
    <p class="govuk-body">AIT is a type of fraud. You should take steps to protect your service from an AIT attack, such as:</p>
@@ -58,6 +58,6 @@
       <li>track how many messages you send and set an alert in your system for anything that is not normal</li>
       <li>stop multiple messages being sent to the same number</li>
     </ul>
-  <p class="govuk-body">Find more information on <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/guidance/business-communications-sms-and-telephone-best-practice#section_4">AIT and how you can protect your service</a>.</p>
+  <p class="govuk-body">The National Cyber Security Centre has published guidance about ways you can<a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/guidance/business-communications-sms-and-telephone-best-practice#section_4">protect yourself from an AIT attack</a>.</p>
 
 {% endblock %}
