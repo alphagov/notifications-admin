@@ -70,12 +70,7 @@ def get_human_day(time, date_prefix="", include_day_of_week=False):
     if date == (now - timedelta(days=1)).date():
         return "yesterday"
     if date.strftime("%Y") != now.strftime("%Y"):
-        return "{} {}{} {}".format(
-            date_prefix,
-            day_of_week,
-            _format_datetime_short(date),
-            date.strftime("%Y"),
-        ).strip()
+        return f"{date_prefix} {day_of_week}{_format_datetime_short(date)} {date.strftime('%Y')}".strip()
     return f"{date_prefix} {day_of_week}{_format_datetime_short(date)}".strip()
 
 
