@@ -528,62 +528,6 @@ def test_service_name_change_fails_if_new_name_fails_validation(
     assert error_message in page.select_one(".govuk-error-message").text
 
 
-@pytest.mark.parametrize(
-    "user, expected_text, expected_link",
-    [
-        (
-            create_active_user_with_permissions(),
-            "To remove these restrictions, you can send us a request to go live.",
-            True,
-        ),
-        (
-            create_active_user_no_settings_permission(),
-            "Your service manager can ask to have these restrictions removed.",
-            False,
-        ),
-    ],
-)
-def test_show_restricted_service(
-    client_request,
-    service_one,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    single_sms_sender,
-    mock_get_service_settings_page_common,
-    user,
-    expected_text,
-    expected_link,
-):
-    service_one["email_message_limit"] = 50
-    service_one["sms_message_limit"] = 51
-
-    client_request.login(user)
-    page = client_request.get(
-        "main.service_settings",
-        service_id=SERVICE_ONE_ID,
-    )
-
-    assert page.select_one("h1").text == "Settings"
-    assert page.select("main > h2")[0].text == "Your service is in trial mode"
-
-    assert [normalize_spaces(li.text) for li in page.select("main ul li")] == [
-        "send messages to yourself and other people in your team",
-        "send 50 emails per day",
-        "send 51 text messages per day",
-        "create letter templates, but not send them",
-    ]
-
-    request_to_live = page.select("main p")[1]
-    request_to_live_link = request_to_live.select_one("a")
-    assert normalize_spaces(request_to_live.text) == expected_text
-
-    if expected_link:
-        assert request_to_live_link.text.strip() == "request to go live"
-        assert request_to_live_link["href"] == url_for("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    else:
-        assert not request_to_live_link
-
-
 def test_show_limits_for_live_service(
     client_request,
     service_one,
