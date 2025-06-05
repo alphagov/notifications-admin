@@ -18,7 +18,7 @@
 
   <div class="body-copy-table">
     {% call(item, row_number) list_table(
-      current_service.api_keys,
+      current_service.api_keys|sort,
       empty_message="You have not created any API keys yet",
       caption="API keys",
       caption_visible=false,
