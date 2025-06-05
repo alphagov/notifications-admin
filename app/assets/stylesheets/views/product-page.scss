@@ -97,7 +97,8 @@ $button-shadow-size: $govuk-border-width-form-element;
     border-bottom-color: govuk-colour("blue");
 
     .govuk-service-navigation__container {
-        border-top: 1px solid rgba(govuk-colour("white"), 0.25);;
+        border-top: 1px solid #8eb8dc;
+        border-bottom: 1px solid #8eb8dc;
     }
 
     .govuk-service-navigation__link {
