@@ -6,7 +6,7 @@ humanize==4.4.0
 Flask-WTF==1.2.1
 Flask-Login==0.6.3
 
-Pillow==10.3.0
+Pillow==11.2.1
 
 pyexcel==0.7.1
 pyexcel-io==0.6.7
