@@ -1,6 +1,7 @@
 {% extends "content_template.html" %}
 
 {% from "components/table.html" import mapping_table, row, text_field %}
+{% from "components/service-link.html" import service_link %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = "Using Notify" %}
@@ -23,7 +24,7 @@
   ) %}
     {% for message, limit in  [
     ("Emails", rate_limits.email),
-    ("Text", rate_limits.sms + " text messages including a default 100 international text messages"),
+    ("Text messages", rate_limits.sms + " (including up to 100 international text messages)"),
     ("Letters", rate_limits.letter)]
     %}
       {% call row() %}
@@ -36,28 +37,37 @@
 
 <p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">contact us</a>.</p>
 
-<h3 class="heading-medium">Change the international text message limit</h3>
-<p class="govuk-body">To change the number of international text messages you can send each day:</p>
+<h2 class="heading-medium">International text message limit</h2>
 
- <ol class="govuk-list govuk-list--number">
-   <li>Go to <b class="govuk-!-font-weight-bold">Settings</b></li>
-   <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">International text message limit</b> row</li>
+  <p class="govuk-body">You can only send 100 text messages a day to international phone numbers. This counts towards your total daily limit of 250,000 text messages.</p>
+
+  <p class="govuk-body">We set this limit to protect you from the threat of text message fraud.</p>
+
+  <p class="govuk-body">Fraud can cost your organisation a lot of money if you do not take steps to protect yourself.</p>
+
+  <p class="govuk-body">The National Cyber Security Centre (NCSC) has written a blog post called <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/blog-post/ait-fraud-what-you-need-to-know">‘AIT fraud: what you need to know’</a>.</p>
+
+<h3 class="heading-medium">If you need to change the international text message limit</h3>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Work out how many international text messages you need to send each day and base your new limit on that.</li>
+    <li>Go to {{ service_link(current_service, 'main.service_settings', 'Settings') }}.</li>
+   <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">International text message limit</b> row.</li>
  </ol>
 
-<p class="govuk-body">When changing the limit, you should think about:</p>
+ <p class="govuk-body">You should also:</p>
 
- <ul class="govuk-list govuk-list--bullet">
- <li>how many international text messages your service needs to send each day</li>
- <li>any costs to your service if there is fraud</li>
- </ul>
-<p class="govuk-body">If you do not need to send international text messages, you can turn this off in <b class="govuk-!-font-weight-bold">Settings</b>.</p>
-
-<h3 class="heading-medium">Help protect your service from Artificial Inflation of Traffic (AIT)</h3>
-   <p class="govuk-body">AIT is a type of fraud. You should take steps to protect your service from an AIT attack, such as:</p>
     <ul class="govuk-list govuk-list--bullet">
-      <li>track how many messages you send and set an alert in your system for anything that is not normal</li>
-      <li>stop multiple messages being sent to the same number</li>
+     <li>track how many messages you send each day</li>
+     <li>set an alert in your system for anything that is not normal</li>
+     <li>stop your service from repeatedly sending messages to the same number</li>
     </ul>
-  <p class="govuk-body">Find more information on <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/guidance/business-communications-sms-and-telephone-best-practice#section_4">AIT and how you can protect your service</a>.</p>
+
+<p class="govuk-body">If you do not need to send any international text messages:</p>
+
+  <ol class="govuk-list govuk-list--number">
+   <li>Go to {{ service_link(current_service, 'main.service_settings', 'Settings') }}.</li>
+   <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">Send international text messages</b> row.</li>
+ </ol>
 
 {% endblock %}
