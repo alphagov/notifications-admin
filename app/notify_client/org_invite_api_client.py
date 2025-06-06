@@ -5,12 +5,12 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient, _attach_current_user
+from app.notify_client import NotifyAdminAPIClient, _attach_current_user, api_client_request_session
 
 
 class OrgInviteApiClient(NotifyAdminAPIClient):
-    def __init__(self, app):
-        super().__init__(app)
+    def __init__(self, app, *args, **kwargs):
+        super().__init__(app, *args, **kwargs)
 
         self.admin_url = app.config["ADMIN_BASE_URL"]
 
@@ -53,7 +53,7 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
 _org_invite_api_client_context_var: ContextVar[OrgInviteApiClient] = ContextVar("org_invite_api_client")
 get_org_invite_api_client: LazyLocalGetter[OrgInviteApiClient] = LazyLocalGetter(
     _org_invite_api_client_context_var,
-    lambda: OrgInviteApiClient(current_app),
+    lambda: OrgInviteApiClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_org_invite_api_client.clear())
 org_invite_api_client = LocalProxy(get_org_invite_api_client)
