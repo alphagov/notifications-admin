@@ -1,0 +1,63 @@
+{% extends "content_template.html" %}
+
+{% from "components/table.html" import mapping_table, row, text_field %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = "Using Notify" %}
+
+{% block per_page_title %}
+  Daily limits
+{% endblock %}
+
+{% block content_column_content %}
+
+<h1 class="heading-large">Daily limits</h1>
+<div class="bottom-gutter-3-2">
+<p class="govuk-body">There’s a limit to the number of messages you can send each day. </p>
+  {% call mapping_table(
+    caption="Notification Daily limits",
+    field_headings=["Message", "Daily limit"],
+    field_headings_visible=True,
+    caption_visible=False,
+    equal_length=True,
+  ) %}
+    {% for message, limit in  [
+    ("Emails", rate_limits.email),
+    ("Text", rate_limits.sms + " text messages including a default 100 international text messages"),
+    ("Letters", rate_limits.letter)]
+    %}
+      {% call row() %}
+        {{ text_field(message) }}
+        {{ text_field(limit) }}
+      {% endcall %}
+    {% endfor %}
+  {% endcall %}
+  </div>
+
+<p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">contact us</a>.</p>
+
+<h3 class="heading-medium">Change the international text message limit</h3>
+<p class="govuk-body">To change the number of international text messages you can send each day:</p>
+
+ <ol class="govuk-list govuk-list--number">
+   <li>Go to <b class="govuk-!-font-weight-bold">Settings</b></li>
+   <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">International text message limit</b> row</li>
+ </ol>
+
+<p class="govuk-body">When changing the limit, you should think about:</p>
+
+ <ul class="govuk-list govuk-list--bullet">
+ <li>how many international text messages your service needs to send each day</li>
+ <li>any costs to your service if there is fraud</li>
+ </ul>
+<p class="govuk-body">If you do not need to send international text messages, you can turn this off in <b class="govuk-!-font-weight-bold">Settings</b>.</p>
+
+<h3 class="heading-medium">Help protect your service from Artificial Inflation of Traffic (AIT)</h3>
+   <p class="govuk-body">AIT is a type of fraud. You should take steps to protect your service from an AIT attack, such as:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>track how many messages you send and set an alert in your system for anything that is not normal</li>
+      <li>stop multiple messages being sent to the same number</li>
+    </ul>
+  <p class="govuk-body">Find more information on <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/guidance/business-communications-sms-and-telephone-best-practice#section_4">AIT and how you can protect your service</a>.</p>
+
+{% endblock %}

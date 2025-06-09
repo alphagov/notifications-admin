@@ -198,33 +198,6 @@ def test_letter_image_renderer_pagination(mocker, page_image_url):
     )
 
 
-# FIXME: current_service required
-# @pytest.mark.parametrize(
-#     "kwargs, expected_exception, expected_exception_value",
-#     (
-#         (
-#             {"image_url": "foo"},
-#             TypeError,
-#             "page_count is required to render TemplatedLetterImageTemplate",
-#         ),
-#         (
-#             {"image_url": "foo", "page_count": "foo"},
-#             TypeError,
-#             "'<' not supported between instances of 'int' and 'str'",
-#         ),
-#     ),
-# )
-# def test_letter_image_renderer_requires_page_count_to_render(
-#     mocker, kwargs, service_one, expected_exception, expected_exception_value
-# ):
-#     template = TemplatedLetterImageTemplate(
-#         {"service": SERVICE_ONE_ID, "content": "", "subject": "", "template_type": "letter"}, **kwargs
-#     )
-#     with pytest.raises(expected_exception) as exception:
-#         str(template)
-#     assert str(exception.value) == expected_exception_value
-
-
 def test_letter_image_renderer_requires_valid_postage():
     with pytest.raises(TypeError) as exception:
         TemplatedLetterImageTemplate(
@@ -334,7 +307,6 @@ def test_letter_image_renderer_passes_postage_to_html_attribute(
 
 
 @freeze_time("2012-12-12 12:12:12")
-# @mock.patch("app.utils.templates.TemplatedLetterImageTemplate.jinja_template.render")
 @pytest.mark.parametrize(
     "page_count, expected_oversized, expected_page_numbers",
     [

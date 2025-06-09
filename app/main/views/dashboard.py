@@ -11,6 +11,7 @@ from app import (
     billing_api_client,
     current_service,
     notification_api_client,
+    report_request_api_client,
     service_api_client,
     template_statistics_client,
 )
@@ -99,6 +100,27 @@ def redirect_to_main_view_notification(current_service, message_type, search_que
     )
 
 
+def post_report_request_and_redirect(current_service, report_type, message_type, status):
+    # post data to create report request, get back report_request_id and then redirect
+    report_request_id = report_request_api_client.create_report_request(
+        current_service.id,
+        report_type,
+        {
+            "user_id": current_user.id,
+            "report_type": report_type,
+            "notification_type": message_type,
+            "notification_status": status,
+        },
+    )
+    return redirect(
+        url_for(
+            "main.report_request",
+            service_id=current_service.id,
+            report_request_id=report_request_id,
+        )
+    )
+
+
 @main.route("/services/<uuid:service_id>/notifications", methods=["GET", "POST"])
 @main.route("/services/<uuid:service_id>/notifications/<template_type:message_type>", methods=["GET", "POST"])
 @user_has_permissions()
@@ -121,10 +143,24 @@ def view_notifications(service_id, message_type=None):
             message_type=message_type,
             status=request.args.get("status"),
         )
+    csv_report_request_type = request.form.get("report_type", "")
+    csv_report_message_status = (
+        "all"
+        if request.args.get("status") == "sending,delivered,failed" or request.args.get("status") == ""
+        else request.args.get("status")
+    )
 
     search_term = request.form.get("to", "")
     search_query_hash = request.args.get("search_query", "")
     cached_search_query_hash, cached_search_term = cache_search_query(search_term, service_id, search_query_hash)
+
+    if request.method == "POST" and csv_report_request_type:
+        return post_report_request_and_redirect(
+            current_service,
+            csv_report_request_type,
+            message_type,
+            csv_report_message_status,
+        )
 
     if request.method == "POST" and not search_term:
         return redirect_to_main_view_notification(current_service, message_type, None)
@@ -624,7 +660,7 @@ def get_monthly_usage_breakdown(year, monthly_usage):
 
 
 def get_monthly_usage_breakdown_for_letters(monthly_letters):
-    postage_order = {"first class": 0, "second class": 1, "international": 2}
+    postage_order = {"first class": 0, "second class": 1, "economy mail": 2, "international": 3}
 
     group_key = lambda row: (postage_order[get_monthly_usage_postage_description(row)], row["rate"])  # noqa: E731
 
@@ -649,6 +685,8 @@ def get_monthly_usage_breakdown_for_letters(monthly_letters):
 def get_monthly_usage_postage_description(row):
     if row["postage"] in ("first", "second"):
         return f"{row['postage']} class"
+    elif row["postage"] == "economy":
+        return "economy mail"
     return "international"
 
 

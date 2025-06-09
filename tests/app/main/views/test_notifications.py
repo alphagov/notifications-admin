@@ -263,7 +263,7 @@ def test_notification_page_shows_page_for_letter_notification(
     )
     assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == "Printing starts today at 5:30pm"
     assert normalize_spaces(page.select("main p:nth-of-type(3)")[0].text) == (
-        "Estimated delivery date: Wednesday 6 January"
+        "Estimated delivery by Thursday 7 January"
     )
     assert len(page.select(".letter-postage")) == 1
     assert normalize_spaces(page.select_one(".letter-postage").text) == "Postage: second class"
@@ -512,25 +512,25 @@ def test_notification_page_does_not_show_cancel_link_for_letter_which_cannot_be_
             "first",
             "Postage: first class",
             "letter-postage-first",
-            "Estimated delivery date: Tuesday 5 January",
+            "Estimated delivery by Tuesday 5 January",
         ),
         (
             "economy",
             "Postage: economy",
             "letter-postage-economy",
-            "Estimated delivery date: Thursday 7 January",
+            "Estimated delivery by Thursday 14 January",
         ),
         (
             "europe",
             "Postage: international",
             "letter-postage-international",
-            "Estimated delivery date: Friday 8 January",
+            "Estimated delivery by Monday 11 January",
         ),
         (
             "rest-of-world",
             "Postage: international",
             "letter-postage-international",
-            "Estimated delivery date: Monday 11 January",
+            "Estimated delivery by Wednesday 13 January",
         ),
     ),
 )
@@ -938,3 +938,26 @@ def test_should_show_reply_to_from_notification(
     )
 
     assert "reply to info" in page.text
+
+
+# before going live with this feature, update test to check
+# users with 'view activity' permissions
+def test_show_csv_request_form_to_users_with_correct_permissions(
+    client_request,
+    service_one,
+    mock_get_notifications,
+    mock_get_service_data_retention,
+    mock_get_service_statistics,
+    mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
+    platform_admin_user,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        "main.view_notifications",
+        service_id=service_one["id"],
+        message_type="email",
+        status="delivered",
+    )
+
+    assert len(page.select("form.csv-request-form")) == 1

@@ -1,0 +1,141 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/task-list/macro.html" import govukTaskList %}
+
+{% block service_page_title %}
+  Make your service live
+{% endblock %}
+
+{% block maincolumn_content %}
+  {# as options objects are different for completed vs not completed #}
+  {# we set them here to reuse them later #}
+  {% set completed_status = {"text": "Completed"} %}
+  {% set not_completed_status = {"tag": {"text": "Not completed"}} %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ page_header('Make your service live') }}
+      {% if current_service.has_active_go_live_request %}
+        {% set requester = 'You' if current_user.id == current_service.go_live_user.id else current_service.go_live_user.name %}
+        <p class="govuk-body">{{ requester }} sent a request to go live for this service.</p>
+        <p class="govuk-body">It can take up to one working day to make a service live. This is because we need to check that it meets our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a>.</p>
+      {% else %}
+        <p class="govuk-body">To remove the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a> restrictions and make your service live:</p>
+        <ol class="govuk-list govuk-list--number">
+          <li>Complete the tasks on this page.</li>
+          <li>Select ‘Send a request to go live’</li>
+        </ol>
+        <p class="govuk-body">It can take up to one working day to make a service live. This is because we need to check that it meets our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a>.</p>
+        {# core set of task for to do #}
+        {% set task_list_items =
+          [{
+            "title": {
+              "text": "Confirm that your service is unique",
+              "classes": "govuk-link--no-visited-state",
+            },
+            "href": url_for('main.confirm_service_is_unique', service_id=current_service.id),
+            "status": completed_status if current_service.confirmed_unique else not_completed_status,
+          },
+          {
+            "title": {
+              "text": "Tell us how many messages you expect to send",
+              "classes": "govuk-link--no-visited-state",
+            },
+            "href": url_for('main.estimate_usage', service_id=current_service.id),
+            "status": completed_status if current_service.has_estimated_usage else not_completed_status,
+          },
+          {
+            "title": {
+              "text": "Give another team member the ‘manage settings’ permission",
+              "classes": "govuk-link--no-visited-state",
+            },
+            "href": url_for('main.manage_users', service_id=current_service.id),
+            "status": completed_status if current_service.has_team_members_with_manage_service_permission else not_completed_status,
+          },
+          {
+            "title": {
+              "text": "Add templates with examples of your content",
+              "classes": "govuk-link--no-visited-state",
+            },
+            "href": url_for('main.choose_template', service_id=current_service.id),
+            "status": completed_status if current_service.has_templates else not_completed_status,
+          }]
+        %}
+
+        {# all the conditional task #}
+        {% if current_service.intending_to_send_email %}
+          {% do task_list_items.append(
+            {
+              "title": {
+                "text": "Add a reply-to email address",
+                "classes": "govuk-link--no-visited-state",
+              },
+              "href":  url_for('main.service_email_reply_to', service_id=current_service.id),
+              "status": completed_status if current_service.has_email_reply_to_address else not_completed_status,
+            }
+          )%}
+        {% endif %}
+        {% if (current_service.intending_to_send_sms and current_service.shouldnt_use_govuk_as_sms_sender) %}
+          {% do task_list_items.append(
+            {
+              "title": {
+                "text": "Change your Text message sender ID",
+                "classes": "govuk-link--no-visited-state",
+              },
+              "href": url_for('main.service_sms_senders', service_id=current_service.id),
+              "status": completed_status if not current_service.sms_sender_is_govuk else not_completed_status,
+            }
+          )%}
+        {% endif %}
+        <h2 class="govuk-heading-m">Your service</h2>
+        {{ govukTaskList({
+          "idPrefix": "request-to-go-live-service",
+          "items": task_list_items
+        }) }}
+        <h2 class="govuk-heading-m">Your organisation</h2>
+        {# show task-list if agreement not accepted or #}
+        {# the current user signed the org-level agreement #}
+        {# this is because for other services in that org that want to go live #}
+        {# we want to show a different text if org-level agreement already accepted #}
+        {% if current_service.able_to_accept_agreement and (current_service.organisation.agreement_signed_by_id == current_user.id or not current_service.organisation.agreement_signed_by_id) %}
+          {{ govukTaskList({
+            "idPrefix": "request-to-go-live-organisation",
+            "items": [
+              {
+                "title": {
+                  "text": "Accept our data processing and financial agreement",
+                  "classes": "govuk-link--no-visited-state",
+                },
+                "href": url_for('main.service_agreement', service_id=current_service.id),
+                "status": completed_status if current_service.organisation.agreement_signed else not_completed_status,
+              }
+            ]
+          }) }}
+        {% elif not current_service.organisation %}
+          <p class="govuk-body">When you send us a request to go live, we’ll ask you the name of the public sector body responsible for your service.</p>
+          <p class="govuk-body">We may also ask you to accept our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_agreement', service_id=current_service.id) }}">data processing and financial agreement</a>.</p>
+          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        {% else %}
+          <p class="'govuk-body">{{current_service.organisation.name}} has already accepted our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_agreement', service_id=current_service.id) }}">data processing and financial agreement</a>.</p>
+          <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+        {% endif %}
+        {% if not current_user.is_gov_user %}
+          <p class="govuk-body">
+            Only team members with a government email address can request to go live.
+          </p>
+        {% else %}
+          {% set go_live_disabled = True if (not current_service.go_live_checklist_completed) or (current_service.able_to_accept_agreement and not current_service.organisation.agreement_signed) else False %}
+          {% if go_live_disabled %}
+            <p class="govuk-body">
+              You must complete all the tasks before you can send a request to go live.
+            </p>
+          {% endif %}
+          {% call form_wrapper() %}
+            {{ page_footer('Send a request to go live', disabled=go_live_disabled) }}
+          {% endcall %}
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

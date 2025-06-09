@@ -3,6 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block service_page_title %}
   Change postage
@@ -31,18 +32,33 @@
       <h2 class="govuk-heading-m">
         Delivery times
       </h2>
-      <p class="govuk-body">
-        Letters sent before 5:30pm are dispatched the next working day (Monday to Friday).
-      </p>
-      <p class="govuk-body">
-        First class letters are delivered one day after they’re dispatched. Second class letters are delivered 2 days after they’re dispatched.
-      </p>
-      <p class="govuk-body">
-        Royal Mail delivers from Monday to Saturday, excluding bank holidays.
-      </p>
-      <p class="govuk-body">
-        See a list of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">postage prices</a>.
-      </p>
+  <p class="govuk-body">Letters are printed at 5:30pm and dispatched the next working day (Monday to Friday).</p>
+  <p class="govuk-body">Estimated delivery times are based on the date a letter is dispatched.</p>
+
+<div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Estimated delivery times for letters',
+      field_headings=['Postage', 'Estimated delivery time'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for column_heading, description in [
+        ('First class', '1 to 2 days'),
+        ('Second class', '2 to 3 days'),
+        ('Economy mail', 'Up to 8 days'),
+        ('International (Europe)', '3 to 5 days'),
+        ('International (rest of the world)', '6 to 7 days'),
+        ] %}
+        {% call row() %}
+          {{ text_field(column_heading) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+      
+  <p class="govuk-body">Royal Mail delivers from Monday to Saturday, excluding bank holidays.</p>
+  <p class="govuk-body">See a list of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">postage prices</a>.</p>
     </div>
   </div>
 

@@ -176,7 +176,6 @@ def service_json(
     branding="govuk",
     created_at=None,
     letter_contact_block=None,
-    inbound_api=None,
     service_callback_api=None,
     permissions=None,
     organisation_type="central",
@@ -191,6 +190,7 @@ def service_json(
     purchase_order_number=None,
     has_active_go_live_request=False,
     go_live_user=None,
+    confirmed_unique=False,
 ):
     if users is None:
         users = []
@@ -198,8 +198,6 @@ def service_json(
         permissions = ["email", "sms"]
     if service_callback_api is None:
         service_callback_api = []
-    if inbound_api is None:
-        inbound_api = []
     return {
         "id": id_,
         "name": name,
@@ -222,7 +220,6 @@ def service_json(
         "letter_branding": None,
         "letter_contact_block": letter_contact_block,
         "permissions": permissions,
-        "inbound_api": inbound_api,
         "service_callback_api": service_callback_api,
         "prefix_sms": prefix_sms,
         "contact_link": contact_link,
@@ -239,6 +236,7 @@ def service_json(
         "purchase_order_number": purchase_order_number,
         "has_active_go_live_request": has_active_go_live_request,
         "go_live_user": go_live_user,
+        "confirmed_unique": confirmed_unique,
     }
 
 

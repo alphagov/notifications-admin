@@ -1523,18 +1523,13 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
     choices = [
         ("first", "First class"),
         ("second", "Second class"),
+        ("economy", "Economy mail"),
     ]
-
-    def __init__(self, *args, show_economy_class, **kwargs):
-        super().__init__(*args, **kwargs)
-        if show_economy_class:
-            self.postage.choices.append(("economy", "Economy mail"))
-            self.postage.thing = "first class, second class or economy mail"
 
     postage = GovukRadiosField(
         "Choose the postage for this letter template",
         choices=choices,
-        thing="first class or second class",
+        thing="first class, second class or economy mail",
         validators=[DataRequired()],
     )
 
@@ -1551,13 +1546,8 @@ class LetterTemplateLanguagesForm(StripWhitespaceForm):
 
 
 class LetterUploadPostageForm(StripWhitespaceForm):
-    choices = [("first", "First class"), ("second", "Second class")]
-
-    def __init__(self, *args, postage_zone, show_economy_class, **kwargs):
+    def __init__(self, *args, postage_zone, **kwargs):
         super().__init__(*args, **kwargs)
-
-        if show_economy_class:
-            self.postage.choices.append(("economy", "Economy mail"))
 
         if postage_zone != Postage.UK:
             self.postage.choices = [(postage_zone, "")]
@@ -1569,7 +1559,11 @@ class LetterUploadPostageForm(StripWhitespaceForm):
 
     postage = GovukRadiosField(
         "Choose the postage for this letter",
-        choices=choices,
+        choices=[
+            ("first", "First class"),
+            ("second", "Second class"),
+            ("economy", "Economy mail"),
+        ],
         default="second",
         validators=[DataRequired()],
     )
