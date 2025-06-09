@@ -24,7 +24,7 @@
   ) %}
     {% for message, limit in  [
     ("Emails", rate_limits.email),
-    ("Text message", rate_limits.sms + " text messages including a default 100 international text messages"),
+    ("Text messages", rate_limits.sms + " (including up to 100 international text messages)"),
     ("Letters", rate_limits.letter)]
     %}
       {% call row() %}
