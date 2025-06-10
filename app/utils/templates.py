@@ -302,12 +302,6 @@ class EmailPreviewTemplate(BaseEmailTemplate):
         return super().placeholders
 
     @property
-    def file_placeholders(self):
-        return OrderedSet(
-            placeholder.name for placeholder in Field(self.content).placeholder_objects if placeholder.is_file
-        )
-
-    @property
     def placeholders(self):
         return OrderedSet(placeholder for placeholder in self.all_placeholders if placeholder not in self.attachments)
 

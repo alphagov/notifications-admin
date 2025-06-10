@@ -1,5 +1,8 @@
 import base64
 import json
+import uuid
+
+from typing import Any
 
 from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.insensitive_dict import InsensitiveSet as UtilsInsensitiveSet
@@ -21,13 +24,13 @@ class TemplateAttachment(JSONModel):
     weeks_of_retention: int
     email_confirmation: bool
     link_text: str
+    id: Any
 
     __sort_attribute__ = "file_name"
 
-    def __init__(self, *args, parent, placeholder_name, **kwargs):
+    def __init__(self, *args, parent, **kwargs):
         super().__init__(*args, **kwargs)
         self._parent = parent
-        self._placeholder_name = placeholder_name
 
     def __repr__(self):
         return f"{self.__class__.__name__}(<{self._dict}>)"
@@ -36,7 +39,7 @@ class TemplateAttachment(JSONModel):
         if name not in self.__annotations__.keys() or not hasattr(self, name):
             return super().__setattr__(name, value)
         self._dict[name] = value
-        self._parent[self._placeholder_name] = self._dict
+        self._parent[self.id] = self._dict
 
     def __bool__(self):
         return bool(self.file_name)
@@ -70,49 +73,47 @@ class TemplateAttachments(InsensitiveDict):
     def cache_key(self):
         return f"template-{self._template.id}-attachments"
 
-    def __getitem__(self, placeholder_name):
-        if placeholder_name not in self:
-            self[placeholder_name] = {
+    def __getitem__(self, id):
+        if id not in self:
+            self[id] = {
                 "file_name": None,
                 "weeks_of_retention": 26,
                 "email_confirmation": True,
                 "link_text": None,
+                "id": id
             }
         return TemplateAttachment(
-            super().__getitem__(placeholder_name),
+            super().__getitem__(id),
             parent=self,
-            placeholder_name=placeholder_name,
         )
 
-    def __setitem__(self, placeholder_name, value):
-        super().__setitem__(placeholder_name, value)
+    def __setitem__(self, id, value):
+        super().__setitem__(id, value)
         redis_client.set(self.cache_key, json.dumps(self))
 
-    def __delitem__(self, placeholder_name):
-        super().__delitem__(InsensitiveDict.make_key(placeholder_name))
+    def __delitem__(self, id):
+        super().__delitem__(InsensitiveDict.make_key(id))
         redis_client.set(self.cache_key, json.dumps(self))
 
     def __bool__(self):
         return self.count > 0
 
-    def __contains__(self, key):
-        if not super().__contains__(key):
-            return False
-        return bool(TemplateAttachment(super().__getitem__(key), parent=self, placeholder_name=key))
+    @property
+    def all(self):
+        return tuple(self[key] for key in self)
+
+    def create(self):
+        return self[str(uuid.uuid4())]
 
     @property
     def count(self):
-        return sum(bool(self[key]) for key in self if key in InsensitiveSet(self._template.all_placeholders))
-
-    @property
-    def uploaded(self):
-        return all(self[key] for key in InsensitiveSet(self._template.file_placeholders))
+        return len(self)
 
     @property
     def as_personalisation(self):
-        return {placeholder: self[placeholder].url for placeholder in self if self[placeholder]}
+        return {attachment.file_name: attachment.url for attachment in self.all}
 
     def prune_orphans(self):
-        for placeholder in self.keys():
-            if placeholder not in InsensitiveSet(self._template.file_placeholders):
-                del self[placeholder]
+        for attachment in self.all:
+            if attachment.file_name not in InsensitiveSet(self._template.all_placeholders):
+                del self[attachment.id]

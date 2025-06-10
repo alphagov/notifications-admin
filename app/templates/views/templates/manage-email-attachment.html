@@ -5,7 +5,8 @@
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/banner.html" import banner %}
-{% set title = 'Manage ‘' + placeholder + '’' if attachment else 'Add ‘' + placeholder + '’' %}
+{% from "components/form.html" import form_wrapper %}
+{% set title = attachment.file_name %}
 {% block service_page_title %}
   {{ title }}
 {% endblock %}
@@ -22,7 +23,7 @@
         'Are you sure you want to remove this file?',
         type='dangerous',
         delete_button='Yes, remove',
-        action=url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder, delete="true")
+        action=url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, attachment_id=attachment.id, delete="true")
       ) }}
     </div>
   {% endif %}
@@ -30,26 +31,6 @@
   {{ govukSummaryList({
     "classes": "notify-summary-list service-base-settings",
     "rows": [
-      {
-        "key": {
-            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "File"
-        },
-        "value": {
-            "html": attachment.file_name or file_upload(form.file),
-            "classes": ""
-        },
-        "actions": {
-          "items": [
-            {
-              "href": url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder, delete=true),
-              "text": "Remove",
-              "visuallyHiddenText": "this file",
-              "classes": "govuk-link govuk-link--destructive"
-            }
-          ] if attachment else []
-        }
-      },
       {
         "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
@@ -66,7 +47,7 @@
                       'main.email_template_manage_attachment_link_text',
                       service_id=current_service.id,
                       template_id=template.id,
-                      placeholder=placeholder.strip(),
+                      attachment_id=attachment.id,
                   ),
                   "text": "Change",
                   "visuallyHiddenText": "service name",
@@ -91,7 +72,7 @@
                       'main.email_template_manage_attachment_retention',
                       service_id=current_service.id,
                       template_id=template.id,
-                      placeholder=placeholder.strip(),
+                      attachment_id=attachment.id,
                   ),
                   "text": "Change",
                   "visuallyHiddenText": "service name",
@@ -116,7 +97,7 @@
                       'main.email_template_manage_attachment_email_confirmation',
                       service_id=current_service.id,
                       template_id=template.id,
-                      placeholder=placeholder.strip(),
+                      attachment_id=attachment.id,
                   ),
                   "text": "Change",
                   "visuallyHiddenText": "service name",
@@ -127,8 +108,17 @@
       }
     ]
   }) }}
-  {{ page_footer(
-    secondary_link=url_for('main.view_template', service_id=current_service.id, template_id=template.id),
-    secondary_link_text="Back to ‘" + template.name + "’"
-  )}}
+  {% if attachment.file_name in template.placeholders %}
+    {{ page_footer(
+      secondary_link=url_for('main.view_template', service_id=current_service.id, template_id=template.id),
+      secondary_link_text="Back to ‘" + template.name + "’",
+      delete_link_text="Remove this file",
+      delete_link=url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, attachment_id=attachment.id, delete=true),
+    )}}
+  {% else %}
+    {% call form_wrapper(class='top-gutter') %}
+      {{ page_footer("Save and add to template") }}
+    {% endcall %}
+  {% endif %}
+
 {% endblock %}

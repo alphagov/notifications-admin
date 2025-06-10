@@ -207,15 +207,6 @@ def set_sender(service_id, template_id):
     if template.template_type == "letter":
         return redirect_to_one_off
 
-    if template.template_type == "email" and not template.attachments.uploaded:
-        return redirect(
-            url_for(
-                "main.email_template_manage_attachment_upload_needed",
-                service_id=current_service.id,
-                template_id=template_id,
-            )
-        )
-
     sender_details = get_sender_details(service_id, template.template_type)
 
     if len(sender_details) == 1:

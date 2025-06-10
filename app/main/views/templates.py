@@ -19,7 +19,7 @@ from flask import (
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
-from notifications_utils.field import Field
+from notifications_utils.field import Field, PlainTextField
 from notifications_utils.insensitive_dict import InsensitiveSet
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.s3 import s3download
@@ -1406,15 +1406,21 @@ def letter_template_change_language(template_id, service_id):
 @user_has_permissions("manage_templates")
 def email_template_manage_attachments(template_id, service_id):
     template = current_service.get_template(template_id)
+    if not template.attachments:
+        return redirect(url_for(
+            "main.email_template_upload_attachment",
+            service_id=current_service.id,
+            template_id=template.id,
+        ))
     rows = [
         {
             "key": {
-                "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-                "html": Field(f"(({placeholder}))", with_brackets=False),
+                "classes": "notify-summary-list__key",
+                "text": attachment.file_name,
             },
             "value": {
-                "text": template.attachments[placeholder].file_name or "No file uploaded",
-                "classes": "" if template.attachments[placeholder] else "govuk-hint",
+                "text": "",
+                "classes": "",
             },
             "actions": {
                 "items": [
@@ -1423,16 +1429,16 @@ def email_template_manage_attachments(template_id, service_id):
                             "main.email_template_manage_attachment",
                             service_id=service_id,
                             template_id=template_id,
-                            placeholder=placeholder.strip(),
+                            attachment_id=attachment.id,
                         ),
-                        "text": "Manage" if template.attachments[placeholder] else "Upload file",
+                        "text": "Manage",
                         "visuallyHiddenText": "",
                         "classes": "govuk-link--no-visited-state",
                     }
                 ]
             },
         }
-        for placeholder in InsensitiveSet(template.file_placeholders)
+        for attachment in template.attachments.all
     ]
 
     return render_template(
@@ -1443,45 +1449,70 @@ def email_template_manage_attachments(template_id, service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachments/upload", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-def email_template_manage_attachment(template_id, service_id):
+def email_template_upload_attachment(template_id, service_id):
     template = current_service.get_template(template_id)
-    placeholder = request.args.get("placeholder", "")
-    attachment = template.attachments[placeholder]
-    delete = bool(request.args.get("delete"))
     form = EmailAttachmentForm()
-    if delete and request.method == "POST":
-        del template.attachments[placeholder]
-        return redirect(
-            url_for("main.email_template_manage_attachments", service_id=current_service.id, template_id=template.id)
-        )
     if form.validate_on_submit():
+        attachment = template.attachments.create()
         attachment.file_name = form.file.data.filename
-        return redirect(
-            url_for(
-                "main.email_template_manage_attachment",
-                service_id=current_service.id,
-                template_id=template.id,
-                placeholder=placeholder,
+        return redirect(url_for(
+            "main.email_template_manage_attachment",
+            service_id=current_service.id,
+            template_id=template.id,
+            attachment_id=attachment.id,
+        ))
+    return render_template(
+        "views/templates/upload-email-attachment.html",
+        template=template,
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/<uuid:attachment_id>", methods=["GET", "POST"])
+@user_has_permissions("manage_templates")
+def email_template_manage_attachment(service_id, template_id, attachment_id):
+    template = current_service.get_template(template_id)
+    attachment = template.attachments[attachment_id]
+    delete = bool(request.args.get("delete"))
+    if request.method == "POST":
+        if delete:
+            del template.attachments[attachment_id]
+            new_content = PlainTextField(
+                template.content,
+                {attachment.file_name: ""},
+                html="passthrough",
             )
+            service_api_client.update_service_template(
+                service_id=service_id,
+                template_id=template_id,
+                content=str(new_content),
+            )
+            return redirect(
+                url_for("main.view_template", service_id=current_service.id, template_id=template.id)
+            )
+        service_api_client.update_service_template(
+            service_id=service_id,
+            template_id=template_id,
+            content=f"{template.content}\n\n(({attachment.file_name}))",
         )
+        return redirect(url_for(
+            "main.view_template", service_id=current_service.id, template_id=template.id,
+        ))
     return render_template(
         "views/templates/manage-email-attachment.html",
         template=template,
-        placeholder=placeholder,
-        form=form,
         attachment=attachment,
         delete=delete,
     )
 
 
-@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/link-text", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/<uuid:attachment_id>/link-text", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-def email_template_manage_attachment_link_text(template_id, service_id):
+def email_template_manage_attachment_link_text(template_id, service_id, attachment_id):
     template = current_service.get_template(template_id)
-    placeholder = request.args.get("placeholder")
-    attachment = template.attachments[placeholder]
+    attachment = template.attachments[attachment_id]
     form = SetServiceAttachmentLinkText(link_text=attachment.link_text)
     if form.validate_on_submit():
         attachment.link_text = form.link_text.data
@@ -1490,23 +1521,22 @@ def email_template_manage_attachment_link_text(template_id, service_id):
                 "main.email_template_manage_attachment",
                 service_id=current_service.id,
                 template_id=template.id,
-                placeholder=placeholder,
+                attachment_id=attachment.id,
             )
         )
     return render_template(
         "views/templates/manage-email-attachment-link-text.html",
         template=template,
-        placeholder=placeholder,
+        attachment=attachment,
         form=form,
     )
 
 
-@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/retention", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/<uuid:attachment_id>/retention", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-def email_template_manage_attachment_retention(template_id, service_id):
+def email_template_manage_attachment_retention(template_id, service_id, attachment_id):
     template = current_service.get_template(template_id)
-    placeholder = request.args.get("placeholder")
-    attachment = template.attachments[placeholder]
+    attachment = template.attachments[attachment_id]
     form = SetServiceAttachmentDataRetentionForm(weeks_of_retention=attachment.weeks_of_retention)
     if form.validate_on_submit():
         attachment.weeks_of_retention = form.weeks_of_retention.data
@@ -1515,25 +1545,24 @@ def email_template_manage_attachment_retention(template_id, service_id):
                 "main.email_template_manage_attachment",
                 service_id=current_service.id,
                 template_id=template.id,
-                placeholder=placeholder,
+                attachment_id=attachment.id,
             )
         )
     return render_template(
         "views/templates/manage-email-attachment-retention.html",
         template=template,
-        placeholder=placeholder,
+        attachment=attachment,
         form=form,
     )
 
 
 @main.route(
-    "/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/email-confirmation", methods=["GET", "POST"]
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/<uuid:attachment_id>/email-confirmation", methods=["GET", "POST"]
 )
 @user_has_permissions("manage_templates")
-def email_template_manage_attachment_email_confirmation(template_id, service_id):
+def email_template_manage_attachment_email_confirmation(template_id, service_id, attachment_id):
     template = current_service.get_template(template_id)
-    placeholder = request.args.get("placeholder")
-    attachment = template.attachments[placeholder]
+    attachment = template.attachments[attachment_id]
     form = OnOffSettingForm(
         "Ask recipient for their email address",
         truthy="Yes",
@@ -1547,25 +1576,14 @@ def email_template_manage_attachment_email_confirmation(template_id, service_id)
                 "main.email_template_manage_attachment",
                 service_id=current_service.id,
                 template_id=template.id,
-                placeholder=placeholder,
+                attachment_id=attachment_id,
             )
         )
     return render_template(
         "views/templates/manage-email-attachment-email-confirmation.html",
         template=template,
-        placeholder=placeholder,
+        attachment=attachment,
         form=form,
-    )
-
-
-@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/attachment/upload-needed")
-@user_has_permissions("manage_templates")
-def email_template_manage_attachment_upload_needed(template_id, service_id):
-    template = current_service.get_template(template_id)
-
-    return render_template(
-        "views/templates/manage-email-attachment-upload-needed.html",
-        template=template,
     )
 
 

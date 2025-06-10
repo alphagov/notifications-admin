@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder) }) }}
+  {{ govukBackLink({ "href": url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, attachment_id=attachment.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
