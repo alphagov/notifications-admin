@@ -39,8 +39,11 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     (
         (
             0.0233,
-            "International text message rates have changed.",
-            "Find out what it costs to send text messages to international numbers.",
+            "Each unique service you add has an annual allowance of free text messages.",
+            (
+                "When a service has used its annual allowance, it costs 2.33 pence (plus VAT) "
+                "for each text message you send."
+            ),
         ),
     ),
 )
