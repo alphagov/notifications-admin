@@ -9,12 +9,11 @@ from app.main.views.report_requests import ReportRequest
 from tests.conftest import SERVICE_ONE_ID, create_report_request
 
 
-def test_report_request_download_gets_file_from_s3(client_request, fake_uuid, platform_admin_user, mocker):
+def test_report_request_download_gets_file_from_s3(client_request, fake_uuid, mocker):
     report_request = create_report_request(id="5bf2a1f9-0e6b-4d5e-b409-3509bf7a37b0", user_id=fake_uuid)
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": report_request})
     mocker.patch.object(ReportRequest, "download", return_value=BytesIO(b"my notifications file"))
 
-    client_request.login(platform_admin_user)
     response = client_request.get_response(
         "main.report_request_download",
         service_id=SERVICE_ONE_ID,
@@ -26,7 +25,7 @@ def test_report_request_download_gets_file_from_s3(client_request, fake_uuid, pl
     assert response.headers["Content-Disposition"] == (f"attachment; filename={report_request['id']}.csv")
 
 
-def test_report_request_download_when_report_does_not_exist(client_request, fake_uuid, platform_admin_user, mocker):
+def test_report_request_download_when_report_does_not_exist(client_request, fake_uuid, mocker):
     mocker.patch(
         "app.report_request_api_client.get_report_request",
         side_effect=HTTPError(
@@ -41,7 +40,6 @@ def test_report_request_download_when_report_does_not_exist(client_request, fake
         ),
     )
 
-    client_request.login(platform_admin_user)
     client_request.get(
         "main.report_request_download",
         service_id=SERVICE_ONE_ID,
@@ -50,11 +48,10 @@ def test_report_request_download_when_report_does_not_exist(client_request, fake
     )
 
 
-def test_report_request_download_for_wrong_user(client_request, platform_admin_user, mocker):
+def test_report_request_download_for_wrong_user(client_request, mocker):
     request = create_report_request(service_id=SERVICE_ONE_ID, user_id=uuid.uuid4())
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
 
-    client_request.login(platform_admin_user)
     client_request.get(
         "main.report_request_download",
         service_id=SERVICE_ONE_ID,
@@ -63,11 +60,10 @@ def test_report_request_download_for_wrong_user(client_request, platform_admin_u
     )
 
 
-def test_report_request_download_when_report_is_in_wrong_status(client_request, fake_uuid, platform_admin_user, mocker):
+def test_report_request_download_when_report_is_in_wrong_status(client_request, fake_uuid, mocker):
     request = create_report_request(user_id=fake_uuid, status="deleted")
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
 
-    client_request.login(platform_admin_user)
     client_request.get(
         "main.report_request_download",
         service_id=SERVICE_ONE_ID,
@@ -77,9 +73,8 @@ def test_report_request_download_when_report_is_in_wrong_status(client_request, 
 
 
 def test_report_request_renders_preparing_template_if_report_in_progress(
-    client_request, fake_uuid, mocker, mock_get_service_data_retention, platform_admin_user
+    client_request, fake_uuid, mocker, mock_get_service_data_retention
 ):
-    client_request.login(platform_admin_user)
     request = create_report_request(
         user_id=fake_uuid,
         status="in_progress",
@@ -97,11 +92,10 @@ def test_report_request_renders_preparing_template_if_report_in_progress(
     assert "text messages with the ‘sending’ status from the last 7 days" in page.select_one("p").text
 
 
-def test_report_request_redirects_to_ready_if_report_stored(client_request, fake_uuid, mocker, platform_admin_user):
+def test_report_request_redirects_to_ready_if_report_stored(client_request, fake_uuid, mocker):
     request = create_report_request(user_id=fake_uuid, status="stored")
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
 
-    client_request.login(platform_admin_user)
     response = client_request.get_response(
         "main.report_request",
         service_id=SERVICE_ONE_ID,
@@ -116,11 +110,10 @@ def test_report_request_redirects_to_ready_if_report_stored(client_request, fake
     )
 
 
-def test_report_request_renders_error_template_if_report_failed(client_request, fake_uuid, mocker, platform_admin_user):
+def test_report_request_renders_error_template_if_report_failed(client_request, fake_uuid, mocker):
     request = create_report_request(user_id=fake_uuid, status="failed")
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
 
-    client_request.login(platform_admin_user)
     page = client_request.get(
         "main.report_request",
         service_id=SERVICE_ONE_ID,
@@ -131,9 +124,7 @@ def test_report_request_renders_error_template_if_report_failed(client_request, 
     assert page.select_one(".banner-dangerous h1").text.strip() == "We could not create your report"
 
 
-def test_report_request_renders_unavailable_template_if_report_not_found(
-    client_request, fake_uuid, mocker, platform_admin_user
-):
+def test_report_request_renders_unavailable_template_if_report_not_found(client_request, fake_uuid, mocker):
     mocker.patch(
         "app.report_request_api_client.get_report_request",
         side_effect=HTTPError(
@@ -145,7 +136,6 @@ def test_report_request_renders_unavailable_template_if_report_not_found(
         ),
     )
 
-    client_request.login(platform_admin_user)
     page = client_request.get(
         "main.report_request",
         service_id=SERVICE_ONE_ID,
@@ -172,14 +162,13 @@ def test_report_request_raises_403_for_unauthorized_user(client_request, mocker)
 
 
 def test_report_ready_renders_ready_template_if_report_ready(
-    client_request, fake_uuid, mocker, mock_get_service_data_retention, platform_admin_user
+    client_request, fake_uuid, mocker, mock_get_service_data_retention
 ):
     request = create_report_request(
         user_id=fake_uuid, status="stored", parameter={"notification_type": "sms", "notification_status": "all"}
     )
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
 
-    client_request.login(platform_admin_user)
     page = client_request.get(
         "main.report_ready",
         service_id=SERVICE_ONE_ID,
@@ -190,13 +179,10 @@ def test_report_ready_renders_ready_template_if_report_ready(
     assert "all text messages from the last 7 days" in page.select_one("p").text.strip()
 
 
-def test_report_ready_redirects_to_report_request_if_report_not_ready(
-    client_request, fake_uuid, mocker, platform_admin_user
-):
+def test_report_ready_redirects_to_report_request_if_report_not_ready(client_request, fake_uuid, mocker):
     request = create_report_request(user_id=fake_uuid, status="in_progress")
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
 
-    client_request.login(platform_admin_user)
     response = client_request.get_response(
         "main.report_ready",
         service_id=SERVICE_ONE_ID,
@@ -211,9 +197,7 @@ def test_report_ready_redirects_to_report_request_if_report_not_ready(
     )
 
 
-def test_report_ready_redirects_to_report_request_if_report_not_found(
-    client_request, fake_uuid, mocker, platform_admin_user
-):
+def test_report_ready_redirects_to_report_request_if_report_not_found(client_request, fake_uuid, mocker):
     mocker.patch(
         "app.report_request_api_client.get_report_request",
         side_effect=HTTPError(
@@ -225,7 +209,6 @@ def test_report_ready_redirects_to_report_request_if_report_not_found(
         ),
     )
 
-    client_request.login(platform_admin_user)
     response = client_request.get_response(
         "main.report_ready",
         service_id=SERVICE_ONE_ID,
@@ -253,10 +236,9 @@ def test_report_ready_raises_403_for_unauthorized_user(client_request, mocker):
     assert response.status_code == 403
 
 
-def test_report_request_status_json_returns_status(client_request, fake_uuid, mocker, platform_admin_user):
+def test_report_request_status_json_returns_status(client_request, fake_uuid, mocker):
     request = create_report_request(user_id=fake_uuid, status="stored")
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
-    client_request.login(platform_admin_user)
     response = client_request.get_response(
         "main.report_request_status_json",
         service_id=SERVICE_ONE_ID,

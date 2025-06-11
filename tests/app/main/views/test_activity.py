@@ -2,6 +2,7 @@ import json
 import uuid
 from collections import namedtuple
 from functools import partial
+from unittest import mock
 from urllib.parse import parse_qs, urlparse
 
 import pytest
@@ -20,6 +21,7 @@ from app.utils import SEVEN_DAYS_TTL, get_sha512_hashed
 from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
+    create_active_user_empty_permissions,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
     create_notifications,
@@ -291,6 +293,7 @@ def test_can_show_notifications_if_data_retention_not_available(
         "Active user - notifications count above threshold, no download link",
     ],
 )
+@mock.patch("app.main.views.dashboard.REPORT_REQUEST_MAX_NOTIFICATIONS", 0)
 def test_link_to_download_notifications(
     client_request,
     mock_get_notifications,
@@ -310,6 +313,66 @@ def test_link_to_download_notifications(
     page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID, **query_parameters)
     download_link = page.select_one("a[href*='download-notifications.csv']")
     assert (download_link["href"] if download_link else None) == expected_download_link(service_id=SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    "user, notifications_count, expect_download_link",
+    [
+        (
+            create_active_user_view_permissions(),
+            900000,
+            True,
+        ),
+        (
+            create_active_user_empty_permissions(),
+            500,
+            False,
+        ),
+        (
+            create_active_user_empty_permissions(),
+            900002,  # Above the threshold, should return None
+            False,
+        ),
+    ],
+)
+@mock.patch("app.main.views.dashboard.REPORT_REQUEST_MAX_NOTIFICATIONS", 900001)
+def test_report_request_notifications_link(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_has_no_jobs,
+    mock_get_no_api_keys,
+    user,
+    mock_get_notifications_count_for_service,
+    notifications_count,
+    expect_download_link,
+):
+    client_request.login(user)
+    mock_get_notifications_count_for_service.return_value = notifications_count
+
+    page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID)
+    report_request_link = page.select_one("button.govuk-button--as-link")
+
+    if expect_download_link:
+        assert report_request_link is not None
+
+        mocker.patch("app.report_request_api_client.create_report_request", return_value=fake_uuid)
+        client_request.post(
+            "main.view_notifications",
+            service_id=SERVICE_ONE_ID,
+            _data={"report_type": "emails"},
+            _expected_status=302,
+            _expected_redirect=url_for(
+                "main.report_request",
+                service_id=SERVICE_ONE_ID,
+                report_request_id=fake_uuid,
+            ),
+        )
+    else:
+        assert report_request_link is None
 
 
 def test_download_not_available_to_users_without_dashboard(
@@ -914,6 +977,7 @@ CanDownloadLinkTestCase = namedtuple(
         "Above threshold - Download link not present, support link present",
     ],
 )
+@mock.patch("app.main.views.dashboard.REPORT_REQUEST_MAX_NOTIFICATIONS", 0)
 def test_view_notifications_can_download(
     client_request,
     mock_get_notifications,
@@ -934,6 +998,61 @@ def test_view_notifications_can_download(
         assert download_link is not None
     else:
         assert download_link is None
+
+    # check support link
+    support_link = page.select_one("a[href*='/support/ask-question-give-feedback']")
+    if test_case.expected_support_link_present:
+        assert support_link is not None
+    else:
+        assert support_link is None
+
+
+@pytest.mark.parametrize(
+    "test_case",
+    [
+        CanDownloadLinkTestCase(
+            notifications_count=100,
+            can_download=True,
+            expected_download_link_present=True,
+            expected_support_link_present=False,
+        ),
+        CanDownloadLinkTestCase(
+            notifications_count=900000,
+            can_download=True,
+            expected_download_link_present=False,
+            expected_support_link_present=True,
+        ),
+    ],
+    ids=[
+        "Below threshold - Report request download link present, support link not present",
+        "Above threshold - Report request download link not present, support link present",
+    ],
+)
+@mock.patch("app.main.views.dashboard.REPORT_REQUEST_MAX_NOTIFICATIONS", 850000)
+def test_download_link_and_report_request_notifications(
+    client_request,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_has_no_jobs,
+    mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
+    test_case: CanDownloadLinkTestCase,
+):
+    mock_get_notifications_count_for_service.return_value = test_case.notifications_count
+
+    page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID)
+
+    # check report request download link
+    report_request_link = page.select_one("button.govuk-button--as-link")
+    if test_case.expected_download_link_present:
+        assert report_request_link is not None
+    else:
+        assert report_request_link is None
+
+    # when report request feature is ON, the old download link should not be present
+    old_download_link = page.select_one("a[href*='download-notifications.csv']")
+    assert old_download_link is None
 
     # check support link
     support_link = page.select_one("a[href*='/support/ask-question-give-feedback']")
