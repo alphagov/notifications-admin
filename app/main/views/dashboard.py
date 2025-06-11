@@ -15,7 +15,7 @@ from app import (
     service_api_client,
     template_statistics_client,
 )
-from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD
+from app.constants import MAX_NOTIFICATION_FOR_DOWNLOAD, REPORT_REQUEST_MAX_NOTIFICATIONS
 from app.extensions import redis_client
 from app.formatters import format_date_numeric, format_datetime_numeric, format_phone_number_human_readable
 from app.main import json_updates, main
@@ -136,6 +136,11 @@ def view_notifications(service_id, message_type=None):
     can_download = notifications_count <= MAX_NOTIFICATION_FOR_DOWNLOAD
     download_link = None
 
+    # Feature flag to enable request report for phase 1a deployment
+    report_request_feature_flag = (
+        REPORT_REQUEST_MAX_NOTIFICATIONS > 0 and notifications_count <= REPORT_REQUEST_MAX_NOTIFICATIONS
+    )
+
     if can_download:
         download_link = url_for(
             ".download_notifications_csv",
@@ -197,6 +202,7 @@ def view_notifications(service_id, message_type=None):
         }.get(bool(current_service.api_keys)),
         download_link=download_link,
         can_download=can_download,
+        report_request_feature_flag=report_request_feature_flag,
     )
 
 
