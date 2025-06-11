@@ -67,6 +67,7 @@ from app.formatters import (
     sentence_case,
 )
 from app.main.validators import (
+    CannotContainURLsOrLinks,
     CharactersNotAllowed,
     CommonlyUsedPassword,
     CsvFileValidator,
@@ -587,7 +588,13 @@ class LoginForm(StripWhitespaceForm):
 
 
 class RegisterUserForm(StripWhitespaceForm):
-    name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
+    name = GovukTextInputField(
+        "Full name",
+        validators=[
+            NotifyDataRequired(thing="your full name"),
+            CannotContainURLsOrLinks(thing="your full name"),
+        ],
+    )
     email_address = make_email_address_field(gov_user=True, thing="your email address")
     mobile_number = valid_phone_number(international=True)
     password = make_password_field(thing="your password")
@@ -1604,7 +1611,10 @@ class CsvUploadForm(StripWhitespaceForm):
 class ChangeNameForm(StripWhitespaceForm):
     new_name = GovukTextInputField(
         "Change your name",
-        validators=[NotifyDataRequired(thing="your name")],
+        validators=[
+            NotifyDataRequired(thing="your name"),
+            CannotContainURLsOrLinks(thing="your name"),
+        ],
     )
 
 
