@@ -90,22 +90,3 @@ $button-shadow-size: $govuk-border-width-form-element;
   box-shadow: 0 $button-shadow-size 0 govuk-shade($colour: $product-page-blue, $percentage: 15%);
 
 }
-
-.govuk-template--rebranded {
-  .govuk-service-navigation--inverse {
-    background-color: govuk-colour("blue");
-    border-bottom-color: govuk-colour("blue");
-
-    .govuk-service-navigation__container {
-        border-top: 1px solid #8eb8dc;
-        border-bottom: 1px solid #8eb8dc;
-    }
-
-    .govuk-service-navigation__link {
-      color: govuk-colour("white");
-      &:focus {
-        color: govuk-colour("black")
-      }
-    }
-  }
-}
