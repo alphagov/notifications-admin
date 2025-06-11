@@ -62,6 +62,7 @@ from app.formatters import (
     format_auth_type,
     format_date_human,
     format_thousands,
+    get_human_day,
     guess_name_from_email_address,
     message_count_noun,
     sentence_case,
@@ -115,25 +116,12 @@ def get_time_value_and_label(future_time):
     timestamp = future_time.astimezone(pytz.timezone("Europe/London"))
     return (
         future_time.replace(tzinfo=None).isoformat(),
-        f"{get_human_day(timestamp)} at {get_human_time(timestamp)}",
+        f"{get_human_day(timestamp, include_day_of_week=True).title()} at {get_human_time(timestamp)}",
     )
 
 
 def get_human_time(time):
     return {"0": "midnight", "12": "midday"}.get(time.strftime("%-H"), time.strftime("%-I%p").lower())
-
-
-def get_human_day(time):
-    date_format = "%A %-d %B"  # for example "Monday 4 January"
-
-    #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
-    time = (time - timedelta(hours=1)).strftime(date_format)
-    if time == datetime.utcnow().strftime(date_format):
-        return "Today"
-    if time == (datetime.utcnow() + timedelta(days=1)).strftime(date_format):
-        return "Tomorrow"
-
-    return time
 
 
 def get_furthest_possible_scheduled_time():
@@ -153,7 +141,10 @@ def get_next_days_until(until):
     now = datetime.utcnow()
     days = int((until - now).total_seconds() / (60 * 60 * 24))
 
-    return [get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc)) for i in range(days + 1)]
+    return [
+        get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc), include_day_of_week=True).title()
+        for i in range(days + 1)
+    ]
 
 
 class RadioField(WTFormsRadioField):
