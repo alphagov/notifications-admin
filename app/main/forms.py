@@ -1,9 +1,10 @@
 import weakref
 from contextlib import suppress
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from functools import partial
 from itertools import chain
+from math import ceil
 from numbers import Number
 
 import pytz
@@ -21,6 +22,7 @@ from notifications_utils.recipient_validation.errors import InvalidEmailError, I
 from notifications_utils.recipient_validation.phone_number import PhoneNumber as PhoneNumberUtils
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
+from notifications_utils.timezones import local_timezone, utc_string_to_aware_gmt_datetime
 from ordered_set import OrderedSet
 from werkzeug.utils import cached_property
 from wtforms import (
@@ -113,24 +115,24 @@ from app.utils.user_permissions import (
 
 
 def get_time_value_and_label(future_time):
-    timestamp = future_time.astimezone(pytz.timezone("Europe/London"))
     return (
         future_time.replace(tzinfo=None).isoformat(),
-        f"{get_human_day(timestamp, include_day_of_week=True).title()} at {get_human_time(timestamp)}",
+        f"{get_human_day(future_time, include_day_of_week=True).title()} at {get_human_time(future_time)}",
     )
 
 
 def get_human_time(time):
+    time = utc_string_to_aware_gmt_datetime(time)
     return {"0": "midnight", "12": "midday"}.get(time.strftime("%-H"), time.strftime("%-I%p").lower())
 
 
 def get_furthest_possible_scheduled_time():
-    return (datetime.utcnow() + timedelta(days=7)).replace(hour=0)
+    return (datetime.now(local_timezone) + timedelta(days=7)).replace(hour=0, minute=0, second=0)
 
 
 def get_next_hours_until(until):
-    now = datetime.utcnow()
-    hours = int((until - now).total_seconds() / (60 * 60))
+    now = datetime.now(UTC)
+    hours = ceil((until - now).total_seconds() / (60 * 60))
     return [
         (now + timedelta(hours=i)).replace(minute=0, second=0, microsecond=0).replace(tzinfo=pytz.utc)
         for i in range(1, hours + 1)
@@ -138,7 +140,7 @@ def get_next_hours_until(until):
 
 
 def get_next_days_until(until):
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     days = int((until - now).total_seconds() / (60 * 60 * 24))
 
     return [
