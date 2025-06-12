@@ -369,3 +369,9 @@ class Length(WTFormsLength):
                 self.message = f"{sentence_case(thing)} must be at least {min} {unit} long"
             else:
                 self.message = f"{sentence_case(thing)} cannot be longer than {max} {unit}"
+
+
+class NoBracketsInFileName:
+    def __call__(self, form, field):
+        if "(" in field.data.filename or ")" in field.data.filename:
+            raise ValidationError("File name cannot contain brackets")

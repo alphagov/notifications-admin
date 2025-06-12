@@ -78,6 +78,7 @@ from app.main.validators import (
     IsNotLikeNHSNoReply,
     Length,
     MustContainAlphanumericCharacters,
+    NoBracketsInFileName,
     NoCommasInPlaceHolders,
     NoEmbeddedImagesInSVG,
     NoTextInSVG,
@@ -3065,5 +3066,6 @@ class EmailAttachmentForm(StripWhitespaceForm):
         validators=[
             DataRequired(message="You need to chose a file to upload"),
             FileSize(max_size=10 * 1024 * 1024, message="The file must be smaller than 10MB"),
+            NoBracketsInFileName(),
         ],
     )
