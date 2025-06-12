@@ -373,7 +373,7 @@ def test_guidance_daily_limits(client_request):
     assert [normalize_spaces(row.text) for row in limits_table_rows] == [
         "Message Daily limit",
         "Emails 250,000",
-        "Text 250,000 text messages including a default 100 international text messages",
+        "Text messages 250,000 (including up to 100 international text messages)",
         "Letters 20,000",
     ]
 
