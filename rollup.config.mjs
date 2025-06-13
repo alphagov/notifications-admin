@@ -6,7 +6,7 @@ import styles from "rollup-plugin-styler";
 import postCSSReplace from 'postcss-replace';
 
 // toggle to enable rebrand styles
-const enableRebrand = false;
+const enableRebrand = true;
 const paths = {
   src: 'app/assets/',
   dist: 'app/static/',

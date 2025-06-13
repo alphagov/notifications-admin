@@ -99,7 +99,7 @@ def email_template():
                 brand_logo=branding.logo_url,
                 brand_banner=branding.has_brand_banner,
                 brand_alt_text=branding.alt_text,
-                rebrand=False,
+                rebrand=True,
             )
         )
     )
