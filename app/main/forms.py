@@ -1292,7 +1292,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
 
 class CreateServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
-        "Service name",
+        "",
         validators=[
             DataRequired(message="Enter a service name"),
             MustContainAlphanumericCharacters(),
@@ -1300,6 +1300,17 @@ class CreateServiceForm(StripWhitespaceForm):
         ],
     )
     organisation_type = OrganisationTypeField("Who runs this service?")
+
+
+class ChooseOrganisationForm(StripWhitespaceForm):
+    name = GovukRadiosField(
+        "Who runs this service?",
+        choices=[
+            ("existing", "My organisation (based on my email)"),
+            ("other", "Other public sector body"),
+        ],
+        validators=[DataRequired(message="Select an organisation type")],
+    )
 
 
 class CreateNhsServiceForm(CreateServiceForm):

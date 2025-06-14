@@ -84,7 +84,7 @@ def activate_user(user_id):
     if user.default_organisation.can_ask_to_join_a_service:
         return redirect(url_for("main.your_services"))
 
-    return redirect(url_for("main.add_service"))
+    return redirect(url_for("main.add_service_choose_organisation"))
 
 
 def _add_invited_user_to_service(invitation):
