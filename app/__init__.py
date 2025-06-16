@@ -135,6 +135,8 @@ from app.notify_client.unsubscribe_api_client import unsubscribe_api_client  # n
 from app.notify_client.upload_api_client import upload_api_client  # noqa
 from app.notify_client.user_api_client import user_api_client  # noqa
 from app.notify_session import NotifyAdminSessionInterface
+from app.otel.metrics import otel_metrics
+from app.otel.traces import otel_traces
 from app.s3_client.logo_client import logo_client
 from app.template_previews import template_preview_client  # noqa
 from app.url_converters import (
@@ -178,6 +180,9 @@ def create_app(application):
     asset_fingerprinter._asset_root = application.config["ASSET_PATH"]
 
     init_app(application)
+
+    otel_metrics.init_app(application)
+    otel_traces.init_app(application)
 
     if "extensions" not in application.jinja_options:
         application.jinja_options["extensions"] = []
