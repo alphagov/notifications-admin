@@ -56,6 +56,13 @@ cryptography==44.0.1
     #   -r requirements.txt
     #   fido2
     #   moto
+deprecated==1.2.18
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-api
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+    #   opentelemetry-semantic-conventions
 dnspython==2.6.1
     # via
     #   -r requirements.txt
@@ -96,6 +103,11 @@ freezegun==1.5.1
     # via -r requirements_for_test_common.in
 gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
     # via -r requirements.txt
+googleapis-common-protos==1.70.0
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
 govuk-bank-holidays==0.15
     # via
     #   -r requirements.txt
@@ -106,6 +118,10 @@ greenlet==3.2.2
     # via
     #   -r requirements.txt
     #   eventlet
+grpcio==1.73.0
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-exporter-otlp-proto-grpc
 gunicorn==23.0.0
     # via
     #   -r requirements.txt
@@ -118,6 +134,10 @@ idna==3.7
     # via
     #   -r requirements.txt
     #   requests
+importlib-metadata==8.6.1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-api
 iniconfig==2.0.0
     # via pytest
 itsdangerous==2.2.0
@@ -169,6 +189,95 @@ openpyxl==3.1.5
     # via
     #   -r requirements.txt
     #   pyexcel-xlsx
+opentelemetry-api==1.33.1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-distro
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+    #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-celery
+    #   opentelemetry-instrumentation-flask
+    #   opentelemetry-instrumentation-redis
+    #   opentelemetry-instrumentation-requests
+    #   opentelemetry-instrumentation-sqlalchemy
+    #   opentelemetry-instrumentation-wsgi
+    #   opentelemetry-processor-baggage
+    #   opentelemetry-sdk
+    #   opentelemetry-semantic-conventions
+opentelemetry-distro==0.54b1
+    # via -r requirements.txt
+opentelemetry-exporter-otlp==1.33.1
+    # via -r requirements.txt
+opentelemetry-exporter-otlp-proto-common==1.33.1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+opentelemetry-exporter-otlp-proto-grpc==1.33.1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-exporter-otlp
+opentelemetry-exporter-otlp-proto-http==1.33.1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-exporter-otlp
+opentelemetry-instrumentation==0.54b1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-distro
+    #   opentelemetry-instrumentation-celery
+    #   opentelemetry-instrumentation-flask
+    #   opentelemetry-instrumentation-redis
+    #   opentelemetry-instrumentation-requests
+    #   opentelemetry-instrumentation-sqlalchemy
+    #   opentelemetry-instrumentation-wsgi
+opentelemetry-instrumentation-celery==0.54b1
+    # via -r requirements.txt
+opentelemetry-instrumentation-flask==0.54b1
+    # via -r requirements.txt
+opentelemetry-instrumentation-redis==0.54b1
+    # via -r requirements.txt
+opentelemetry-instrumentation-requests==0.54b1
+    # via -r requirements.txt
+opentelemetry-instrumentation-sqlalchemy==0.54b1
+    # via -r requirements.txt
+opentelemetry-instrumentation-wsgi==0.54b1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-instrumentation-flask
+opentelemetry-processor-baggage==0.54b1
+    # via -r requirements.txt
+opentelemetry-proto==1.33.1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-exporter-otlp-proto-common
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+opentelemetry-sdk==1.33.1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-distro
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+    #   opentelemetry-processor-baggage
+opentelemetry-semantic-conventions==0.54b1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-celery
+    #   opentelemetry-instrumentation-flask
+    #   opentelemetry-instrumentation-redis
+    #   opentelemetry-instrumentation-requests
+    #   opentelemetry-instrumentation-sqlalchemy
+    #   opentelemetry-instrumentation-wsgi
+    #   opentelemetry-sdk
+opentelemetry-util-http==0.54b1
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-instrumentation-flask
+    #   opentelemetry-instrumentation-requests
+    #   opentelemetry-instrumentation-wsgi
 ordered-set==4.1.0
     # via
     #   -r requirements.txt
@@ -177,6 +286,9 @@ packaging==23.1
     # via
     #   -r requirements.txt
     #   gunicorn
+    #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-flask
+    #   opentelemetry-instrumentation-sqlalchemy
     #   pytest
 phonenumbers==8.13.50
     # via
@@ -190,6 +302,11 @@ prometheus-client==0.15.0
     # via
     #   -r requirements.txt
     #   gds-metrics
+protobuf==5.29.5
+    # via
+    #   -r requirements.txt
+    #   googleapis-common-protos
+    #   opentelemetry-proto
 pycparser==2.21
     # via
     #   -r requirements.txt
@@ -266,6 +383,7 @@ requests==2.32.3
     #   moto
     #   notifications-python-client
     #   notifications-utils
+    #   opentelemetry-exporter-otlp-proto-http
     #   requests-mock
     #   responses
 requests-mock==1.12.1
@@ -303,6 +421,10 @@ texttable==1.6.4
     # via
     #   -r requirements.txt
     #   pyexcel
+typing-extensions==4.14.0
+    # via
+    #   -r requirements.txt
+    #   opentelemetry-sdk
 urllib3==1.26.19
     # via
     #   -r requirements.txt
@@ -318,6 +440,14 @@ werkzeug==3.1.3
     #   flask
     #   flask-login
     #   moto
+wrapt==1.17.2
+    # via
+    #   -r requirements.txt
+    #   deprecated
+    #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-redis
+    #   opentelemetry-instrumentation-sqlalchemy
+    #   opentelemetry-processor-baggage
 wtforms==3.1.0
     # via
     #   -r requirements.txt
@@ -332,3 +462,7 @@ xlwt==1.3.0
     #   pyexcel-xls
 xmltodict==0.14.2
     # via moto
+zipp==3.23.0
+    # via
+    #   -r requirements.txt
+    #   importlib-metadata

@@ -9,6 +9,10 @@ class Config:
     DANGEROUS_SALT = os.environ.get("DANGEROUS_SALT")
     ZENDESK_API_KEY = os.environ.get("ZENDESK_API_KEY")
 
+    OTEL_EXPORT_TYPE = os.getenv("OTEL_EXPORT_TYPE", "otlp")
+    OTEL_COLLECTOR_ENDPOINT = os.getenv("OTEL_COLLECTOR_ENDPOINT", "localhost:4317")
+    OTEL_INSTRUMENTATIONS = os.getenv("OTEL_INSTRUMENTATIONS", "wsgi,celery,flask,redis,sqlalchemy,requests")
+
     # if we're not on cloudfoundry, we can get to this app from localhost. but on cloudfoundry its different
     ADMIN_BASE_URL = os.environ.get("ADMIN_BASE_URL", "http://localhost:6012")
 
@@ -118,6 +122,7 @@ class Development(Config):
     S3_BUCKET_REPORT_REQUESTS_DOWNLOAD = "development-report-requests-download"
 
     LOGO_CDN_DOMAIN = "static-logos.notify.tools"
+    OTEL_EXPORT_TYPE = os.getenv("OTEL_EXPORT_TYPE", "none")
 
     ADMIN_CLIENT_SECRET = "dev-notify-secret-key"
     DANGEROUS_SALT = "dev-notify-salt"
@@ -155,6 +160,7 @@ class Test(Development):
 
     ASSET_DOMAIN = "static.example.com"
     ASSET_PATH = "https://static.example.com/"
+    OTEL_EXPORT_TYPE = os.getenv("OTEL_EXPORT_TYPE", "none")
 
 
 class CloudFoundryConfig(Config):
