@@ -6,7 +6,7 @@
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/banner.html" import banner %}
-{% set title = "Upload a file" %}
+{% set title = "Add a file" %}
 {% block service_page_title %}
   {{ title }}
 {% endblock %}
@@ -28,6 +28,33 @@
     </div>
   {% endif %}
   {{ page_header(title) }}
-  {{ file_upload(form.file) }}
+  <div class="govuk-!-margin-bottom-6">
+    {{ file_upload(
+      form.file,
+      allowed_file_extensions=("csv", "jpg", "jpeg", "png", "doc", "docx", "pdf", "json", "odt", "rtf", "txt", "xlsx", "xls", "ods", "xlsm", "tsv")
+    ) }}
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      <p class="govuk-body">
+        When you upload a file, Notify will add a link to this in the template. Recipients will need to click on the link to download the file.
+      </p>
+      <p class="govuk-body">
+        You can upload the following file types:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>CSV (.csv)</li>
+        <li>image (.jpeg, .jpg, .png)</li>
+        <li>Microsoft Excel Spreadsheet (.xlsx)</li>
+        <li>Microsoft Word Document (.doc, .docx)</li>
+        <li>PDF (.pdf)</li>
+        <li>text (.json, .odt, .rtf, .txt)</li>
+      </ul>
+      <p class="govuk-body">
+        Your file must be smaller than 2MB.
+      </p>
+    </div>
+  </div>
+
 
 {% endblock %}
