@@ -113,6 +113,10 @@ class TemplateAttachments(InsensitiveDict):
     def as_personalisation(self):
         return {attachment.file_name: attachment.url for attachment in self.all}
 
+    @property
+    def file_names(self):
+        return InsensitiveSet(self.as_personalisation.keys())
+
     def prune_orphans(self):
         for attachment in self.all:
             if attachment.file_name not in InsensitiveSet(self._template.all_placeholders):
