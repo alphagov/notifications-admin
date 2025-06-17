@@ -1487,7 +1487,7 @@ def email_template_manage_attachment(service_id, template_id, attachment_id):
             service_api_client.update_service_template(
                 service_id=service_id,
                 template_id=template_id,
-                content=str(new_content),
+                content=str(new_content).strip(),
             )
             return redirect(
                 url_for("main.view_template", service_id=current_service.id, template_id=template.id)
@@ -1495,7 +1495,7 @@ def email_template_manage_attachment(service_id, template_id, attachment_id):
         service_api_client.update_service_template(
             service_id=service_id,
             template_id=template_id,
-            content=f"{template.content}\n\n(({attachment.file_name}))",
+            content=f"{template.content.strip()}\n\n(({attachment.file_name}))",
         )
         return redirect(url_for(
             "main.view_template", service_id=current_service.id, template_id=template.id,
