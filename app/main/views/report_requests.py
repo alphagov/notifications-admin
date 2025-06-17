@@ -4,15 +4,22 @@ from notifications_python_client.errors import HTTPError
 from werkzeug.utils import redirect
 
 from app import current_service
-from app.constants import REPORT_REQUEST_FAILED, REPORT_REQUEST_STORED
+from app.constants import REPORT_REQUEST_FAILED, REPORT_REQUEST_MAX_NOTIFICATIONS, REPORT_REQUEST_STORED
 from app.main import main
 from app.models.report_request import ReportRequest
-from app.utils.user import user_is_platform_admin
+from app.utils.user import user_has_permissions
+
+
+def validate_report_request_enabled():
+    if REPORT_REQUEST_MAX_NOTIFICATIONS == 0 and not current_user.platform_admin:
+        abort(403)
 
 
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>", methods=["GET"])
-@user_is_platform_admin
+@user_has_permissions("view_activity")
 def report_request(service_id, report_request_id):
+    validate_report_request_enabled()
+
     try:
         report_request = ReportRequest.from_id(service_id, report_request_id)
     except HTTPError as e:
@@ -50,8 +57,10 @@ def report_request(service_id, report_request_id):
 
 
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>/ready", methods=["GET"])
-@user_is_platform_admin
+@user_has_permissions("view_activity")
 def report_ready(service_id, report_request_id):
+    validate_report_request_enabled()
+
     try:
         report_request = ReportRequest.from_id(service_id, report_request_id)
     except HTTPError as e:
@@ -88,8 +97,10 @@ def report_ready(service_id, report_request_id):
 
 
 @main.route("/services/<uuid:service_id>/report-request/<uuid:report_request_id>.csv")
-@user_is_platform_admin
+@user_has_permissions("view_activity")
 def report_request_download(service_id, report_request_id):
+    validate_report_request_enabled()
+
     report_request = ReportRequest.from_id(service_id, report_request_id)
 
     if report_request.user_id != current_user.id:
@@ -109,7 +120,9 @@ def report_request_download(service_id, report_request_id):
 
 # this endpoint is used by Javascript to poll for changes every N seconds
 @main.route("/services/<uuid:service_id>/download-report/<uuid:report_request_id>/status.json")
-@user_is_platform_admin
+@user_has_permissions("view_activity")
 def report_request_status_json(service_id, report_request_id):
+    validate_report_request_enabled()
+
     report_request_status = ReportRequest.from_id(service_id, report_request_id).status
     return jsonify({"status": report_request_status})

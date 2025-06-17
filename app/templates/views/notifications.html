@@ -73,7 +73,7 @@
     {% set retention_text %}
       Data available for {{ partials.service_data_retention_days }} days
     {% endset %}
-    {% if current_user.platform_admin %}
+    {% if report_request_feature_flag or current_user.platform_admin %}
       <div class="govuk-button-group govuk-button-group--flex-start">
         {% call form_wrapper(class='csv-request-form form--inline') %}
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
