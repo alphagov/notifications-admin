@@ -22,6 +22,9 @@ from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.s3 import s3download
 from notifications_utils.template import Template
+from opentelemetry import trace
+from opentelemetry.baggage import set_baggage
+from opentelemetry.context import attach, detach
 from pypdf.errors import PdfReadError
 from requests import RequestException
 
@@ -719,69 +722,80 @@ def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: str | 
 def edit_service_template(service_id, template_id, language=None):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
-    if template.template_type not in current_service.available_template_types:
-        return redirect(
-            url_for(
-                ".action_blocked",
-                service_id=service_id,
-                notification_type=template.template_type,
-                return_to="view_template",
-                template_id=template.id,
-            )
-        )
+    ctx = set_baggage("template_id", str(template_id))
+    token = attach(ctx)
 
-    abort_for_unauthorised_bilingual_letters_or_invalid_options(language, template)
-
-    form = get_template_form(template.template_type, language=language)(**template._template)
-
-    if form.validate_on_submit():
-        new_template = get_template(
-            template._template | form.new_template_data,
-            current_service,
-        )
-        template_change = template.compare_to(new_template)
-
-        if template_change.placeholders_added and not request.form.get("confirm") and current_service.api_keys:
-            return render_template(
-                "views/templates/breaking-change.html",
-                template_change=template_change,
-                new_template=new_template,
-                form=form,
-            )
+    with trace.get_tracer(__name__).start_as_current_span("edit_service_template") as span:
         try:
-            service_api_client.update_service_template(
-                service_id=service_id,
-                template_id=template_id,
-                **form.new_template_data,
-            )
-        except HTTPError as e:
-            if e.status_code == 400:
-                if "content" in e.message and any("character count greater than" in x for x in e.message["content"]):
-                    form.template_content.errors.extend(e.message["content"])
-                elif "content" in e.message and any(x == QR_CODE_TOO_LONG for x in e.message["content"]):
-                    form.template_content.errors.append(
-                        "Cannot create a usable QR code - the link you entered is too long"
+            if template.template_type not in current_service.available_template_types:
+                return redirect(
+                    url_for(
+                        ".action_blocked",
+                        service_id=service_id,
+                        notification_type=template.template_type,
+                        return_to="view_template",
+                        template_id=template.id,
                     )
-                else:
-                    raise e
-            else:
-                raise e
-        else:
-            editing_english_content_in_bilingual_letter = (
-                template.template_type == "letter" and template.welsh_page_count and language != "welsh"
-            )
-            return redirect(
-                url_for(
-                    "main.view_template",
-                    service_id=service_id,
-                    template_id=template_id,
-                    **(
-                        {"_anchor": "first-page-of-english-in-bilingual-letter"}
-                        if editing_english_content_in_bilingual_letter
-                        else {}
-                    ),
                 )
-            )
+
+            abort_for_unauthorised_bilingual_letters_or_invalid_options(language, template)
+
+            form = get_template_form(template.template_type, language=language)(**template._template)
+
+            if form.validate_on_submit():
+                new_template = get_template(
+                    template._template | form.new_template_data,
+                    current_service,
+                )
+                template_change = template.compare_to(new_template)
+
+                span.add_event("This is an example span event")
+
+                if template_change.placeholders_added and not request.form.get("confirm") and current_service.api_keys:
+                    return render_template(
+                        "views/templates/breaking-change.html",
+                        template_change=template_change,
+                        new_template=new_template,
+                        form=form,
+                    )
+                try:
+                    service_api_client.update_service_template(
+                        service_id=service_id,
+                        template_id=template_id,
+                        **form.new_template_data,
+                    )
+                except HTTPError as e:
+                    if e.status_code == 400:
+                        if "content" in e.message and any(
+                            "character count greater than" in x for x in e.message["content"]
+                        ):
+                            form.template_content.errors.extend(e.message["content"])
+                        elif "content" in e.message and any(x == QR_CODE_TOO_LONG for x in e.message["content"]):
+                            form.template_content.errors.append(
+                                "Cannot create a usable QR code - the link you entered is too long"
+                            )
+                        else:
+                            raise e
+                    else:
+                        raise e
+                else:
+                    editing_english_content_in_bilingual_letter = (
+                        template.template_type == "letter" and template.welsh_page_count and language != "welsh"
+                    )
+                    return redirect(
+                        url_for(
+                            "main.view_template",
+                            service_id=service_id,
+                            template_id=template_id,
+                            **(
+                                {"_anchor": "first-page-of-english-in-bilingual-letter"}
+                                if editing_english_content_in_bilingual_letter
+                                else {}
+                            ),
+                        )
+                    )
+        finally:
+            detach(token)
 
     return render_template(
         f"views/edit-{template.template_type}-template.html",
