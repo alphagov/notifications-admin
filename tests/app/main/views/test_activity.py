@@ -315,6 +315,53 @@ def test_link_to_download_notifications(
     assert (download_link["href"] if download_link else None) == expected_download_link(service_id=SERVICE_ONE_ID)
 
 
+@pytest.mark.parametrize("message_type", ["email", "sms", "letter"])
+@pytest.mark.parametrize(
+    "given_status, expected_status",
+    [
+        ("sending,delivered,failed", "all"),
+        (None, "all"),
+        ("sending", "sending"),
+        ("delivered", "delivered"),
+        ("failed", "failed"),
+    ],
+)
+def test_view_notifications_calls_report_request_method_with_expected_args(
+    client_request,
+    mock_get_notifications_count_for_service,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_get_notifications,
+    fake_uuid,
+    message_type,
+    given_status,
+    expected_status,
+    mocker,
+):
+    mock_create_report_request = mocker.patch("app.report_request_api_client.create_report_request")
+
+    kwargs = {
+        "message_type": message_type,
+        "service_id": SERVICE_ONE_ID,
+        "_data": {"report_type": "notifications_status_csv"},
+    }
+    if given_status:
+        kwargs["status"] = given_status
+
+    client_request.post("main.view_notifications", **kwargs)
+
+    mock_create_report_request.assert_called_once_with(
+        SERVICE_ONE_ID,
+        "notifications_status_csv",
+        {
+            "user_id": mocker.ANY,
+            "report_type": "notifications_status_csv",
+            "notification_type": message_type,
+            "notification_status": expected_status,
+        },
+    )
+
+
 @pytest.mark.parametrize(
     "user, notifications_count, expect_download_link",
     [
@@ -363,7 +410,8 @@ def test_report_request_notifications_link(
         client_request.post(
             "main.view_notifications",
             service_id=SERVICE_ONE_ID,
-            _data={"report_type": "emails"},
+            message_type="email",
+            _data={"report_type": "notifications_status_csv"},
             _expected_status=302,
             _expected_redirect=url_for(
                 "main.report_request",

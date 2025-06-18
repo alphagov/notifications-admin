@@ -152,7 +152,7 @@ def view_notifications(service_id, message_type=None):
     csv_report_message_status = (
         "all"
         if request.args.get("status") == "sending,delivered,failed" or request.args.get("status") == ""
-        else request.args.get("status")
+        else request.args.get("status", "all")
     )
 
     search_term = request.form.get("to", "")
