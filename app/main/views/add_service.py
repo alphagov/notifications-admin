@@ -4,7 +4,7 @@ from notifications_python_client.errors import HTTPError
 
 from app import service_api_client
 from app.main import main
-from app.main.forms import CreateNhsServiceForm, CreateServiceForm
+from app.main.forms import ChooseOrganisationForm, CreateNhsServiceForm, CreateServiceForm
 from app.models.organisation import Organisation
 from app.models.service import Service
 from app.utils.user import user_is_gov_user, user_is_logged_in
@@ -104,3 +104,16 @@ def _render_add_service_page(form, default_organisation_type):
         default_organisation_type=default_organisation_type,
         error_summary_enabled=True,
     )
+
+
+@main.route("/add-service/choose-organisation", methods=["GET", "POST"])
+@user_is_logged_in
+@user_is_gov_user
+def add_service_choose_organisation():
+    default_org = current_user.default_organisation
+    form = ChooseOrganisationForm(default_organisation=default_org.name)
+
+    if form.validate_on_submit():
+        return redirect(url_for("main.add_service_service_name"))
+
+    return render_template("views/add-service-choose-organisation.html", form=form)
