@@ -110,6 +110,7 @@ export default [
       paths.src + 'javascripts/authenticateSecurityKey.js',
       paths.src + 'javascripts/updateStatus.js',
       paths.src + 'javascripts/errorBanner.js',
+      paths.src + 'javascripts/notificationBanner.js',
       paths.src + 'javascripts/removeInPresenceOf.js',
       paths.src + 'javascripts/main.js',
     ],

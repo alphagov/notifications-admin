@@ -68,7 +68,26 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-large">
+    <br>
+
+    {% if new_user_account == 'yes' %}
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                You have created a GOV.UK Notify account
+            </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+                <strong>To update your sign-in details, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_account') }}">go to your account</a>.</strong>
+            </p>
+            <p>
+                <strong>Add or join a service to start sending messages.</strong>
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <h1 class="heading-large">
     Your {{ thing_to_choose_between }}
   </h1>
 
