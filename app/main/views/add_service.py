@@ -1,4 +1,4 @@
-from flask import current_app, redirect, render_template, session, url_for
+from flask import current_app, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
@@ -92,3 +92,21 @@ def add_service_choose_organisation():
         return redirect(url_for("main.add_service_service_name"))
 
     return render_template("views/add-service-choose-organisation.html", form=form)
+
+
+@main.route("/add-service/test-mode", methods=["GET", "POST"])
+@user_is_logged_in
+@user_is_gov_user
+def add_service_test_mode():
+    service_id = session.get("service_id")
+
+    if not service_id:
+        return redirect(url_for("main.add_service_service_name"))
+
+    if request.method == "POST":
+        example_sms_template = _create_example_template(service_id)
+        return redirect(
+            url_for("main.begin_tour", service_id=service_id, template_id=example_sms_template["data"]["id"])
+        )
+
+    return render_template("views/add-service-test-mode.html")
