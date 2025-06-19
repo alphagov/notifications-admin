@@ -1,0 +1,60 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% set caption = "Add a new service" %}
+{% set heading = 'Choose an organisation' %}
+
+{% block backLink %}
+    {% if request.args.get("back") == "your_services" %}
+        {{ govukBackLink({ "href": url_for('main.your_services') }) }}
+    {% endif %}
+{% endblock %}
+
+
+{% block maincolumn_content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+        <br>
+
+            <div>
+                <span class="govuk-caption-xl">{{ caption }}</span>
+                {{ govuk_page_header(heading) }}
+            </div>
+
+            {% call form_wrapper(class="govuk-!-margin-top-3") %}
+                {{ form.organisation(param_extensions={
+                    'fieldset': {
+                      'legend': {
+                        'isPageHeading': True,
+                        'classes': 'govuk-fieldset__legend--l'
+                      }
+                    }
+                  }) }}
+
+                {{ page_footer('Continue') }}
+            {% endcall %}
+
+            {% set service_name_visibility_details %}
+            <p>An organisation is the public sector body responsible for a service.</p>
+
+            <p>If your organisation is new to GOV.UK Notify, we’ll ask you to accept our data processing and financial agreement.</p>
+
+            <p>This is so we know who to invoice if you:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>exceed the free text message allowance</li>
+                <li>send any letters</li>
+            </ul>
+            {% endset %}
+
+            {{ govukDetails({
+              "summaryText": "What is an organisation?",
+              "html": service_name_visibility_details
+            }) }}
+
+        </div>
+    </div>
+{% endblock %}
