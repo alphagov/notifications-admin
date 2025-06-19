@@ -5,8 +5,6 @@ from notifications_python_client.errors import HTTPError
 from app import service_api_client
 from app.main import main
 from app.main.forms import ChooseOrganisationForm, CreateNhsServiceForm, CreateServiceForm
-from app.models.organisation import Organisation
-from app.models.service import Service
 from app.utils.user import user_is_gov_user, user_is_logged_in
 
 
@@ -46,10 +44,10 @@ def _create_example_template(service_id):
     return example_sms_template
 
 
-@main.route("/add-service", methods=["GET", "POST"])
+@main.route("/add-service/service-name", methods=["GET", "POST"])
 @user_is_logged_in
 @user_is_gov_user
-def add_service():
+def add_service_service_name():
     default_organisation_type = current_user.default_organisation_type
     if default_organisation_type == "nhs":
         form = CreateNhsServiceForm()
@@ -68,30 +66,7 @@ def add_service():
         if error:
             return _render_add_service_page(form, default_organisation_type)
 
-        new_service = Service.from_id(service_id)
-
-        # GPs have a zero message limit (to prevent them sending messages while in trial mode)
-        if form.organisation_type.data == Organisation.TYPE_NHS_GP:
-            new_service.update(sms_message_limit=0)
-
-        # show the tour if the user doesn't have any other services. Never show for NHS GPs
-        show_tour = (
-            len(service_api_client.get_active_services({"user_id": session["user_id"]}).get("data", [])) <= 1
-            and form.organisation_type.data != Organisation.TYPE_NHS_GP
-        )
-
-        if show_tour:
-            example_sms_template = _create_example_template(service_id)
-
-            return redirect(
-                url_for("main.begin_tour", service_id=service_id, template_id=example_sms_template["data"]["id"])
-            )
-        else:
-            # if user has email auth, it makes sense that people they invite to their new service can have it too
-            if current_user.email_auth:
-                new_service.force_permission("email_auth", on=True)
-
-            return redirect(url_for("main.service_dashboard", service_id=service_id))
+        return redirect(url_for("main.add_service_test_mode"))
 
     else:
         return _render_add_service_page(form, default_organisation_type)
