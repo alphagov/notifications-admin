@@ -25,6 +25,7 @@ def service_agreement(service_id):
     if current_service.organisation.agreement_signed:
         return render_template("views/agreement/service-agreement-signed.html")
     return render_template("views/agreement/service-agreement.html")
+    # TODO: private pharmacies agrrement not implemented yet, so we don't show the agreement page for them.
 
 
 @main.route("/services/<uuid:service_id>/agreement.pdf")
