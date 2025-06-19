@@ -6,7 +6,7 @@
     "/accessibility-statement",
     "/accounts",
     "/accounts-or-dashboard",
-    "/add-service",
+    "/add-service/choose-organisation",
     "/agreement/<agreement_type:variant>",
     "/agreement/<agreement_type:variant>.pdf",
     "/callbacks",
