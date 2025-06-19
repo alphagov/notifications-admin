@@ -1,0 +1,55 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% set caption = "Add a new service" %}
+{% set heading = 'Your service will start in test mode' %}
+
+{% block backLink %}
+    {% if request.args.get("back") == "your_services" %}
+        {{ govukBackLink({ "href": url_for('main.add_service_service_name') }) }}
+    {% endif %}
+{% endblock %}
+
+
+{% block maincolumn_content %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <br>
+
+        <div>
+            <span class="govuk-caption-xl">{{ caption }}</span>
+            {{ govuk_page_header(heading) }}
+        </div>
+
+        <p>You can only send messages to yourself and your team members.</p>
+        <p>There’s a daily limit of 50 emails and 50 text messages.</p>
+        <p>You cannot send any letters in test mode.</p>
+
+        <br>
+
+        {% call form_wrapper() %}
+            {{ page_footer('Continue') }}
+        {% endcall %}
+
+        <br>
+
+        {% set test_mode_visibility_details %}
+        <p>Complete the tasks on the ‘Make your service live’ page.</p>
+
+        <p>It can take up to one working day to make your service live.</p>
+
+        <p>This is so we can check that you’ve met our terms of use.</p>
+        {% endset %}
+
+        {{ govukDetails({
+              "summaryText": "How can I switch off test mode?",
+              "html": test_mode_visibility_details
+            }) }}
+
+    </div>
+</div>
+{% endblock %}
