@@ -33,7 +33,7 @@ def performance():
                 itemgetter("organisation_name"),
             )
         ],
-        key=itemgetter("organisation_name"),
+        key=lambda row: row["organisation_name"].lower(),
     )
     stats.pop("services_using_notify")
     stats["average_percentage_under_10_seconds"] = mean(
