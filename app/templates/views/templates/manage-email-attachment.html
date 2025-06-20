@@ -118,7 +118,11 @@
     Notify will add a link in the email to the file for recipients to download.
   </p>
     {% call form_wrapper(class='top-gutter') %}
-      {{ page_footer("Add to template") }}
+      {{ page_footer(
+        "Add to template",
+        delete_link_text="cancel",
+        delete_link=url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, attachment_id=attachment.id, delete=true),
+      ) }}
     {% endcall %}
   {% endif %}
 
