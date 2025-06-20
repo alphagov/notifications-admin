@@ -332,7 +332,13 @@ class SMSCode(GovukTextInputField):
     # the design system recommends against ever using `type="number"`. "tel" makes mobile browsers
     # show a phone keypad input rather than a full qwerty keyboard.
     input_type = "tel"
-    param_extensions = {"attributes": {"pattern": "[0-9]*"}}
+    param_extensions = {
+        "attributes": {
+            "pattern": "[0-9]*",
+            "data-notify-module": "autofocus",
+        },
+        "classes": "govuk-input govuk-input--width-5 govuk-input--extra-letter-spacing",
+    }
     validators = [
         NotifyDataRequired(thing="your text message code"),
         Regexp(regex=r"^\d+$", message="Numbers only"),

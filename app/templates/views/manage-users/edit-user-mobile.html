@@ -19,8 +19,8 @@
   <p class="govuk-body" id="user_name">This will change the mobile number for {{ user.name }}.</p>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      {% call form_wrapper(class="extra-tracking") %}
-        {{ form.mobile_number }}
+      {% call form_wrapper() %}
+        {{ form.mobile_number(param_extensions={"classes": "govuk-input--extra-letter-spacing"}) }}
         {{ page_footer('Save') }}
       {% endcall %}
     </div>

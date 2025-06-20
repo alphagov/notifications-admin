@@ -21,7 +21,7 @@
           {%  elif thing == "name" %}
               {{ form.new_name(param_extensions={"label": {"isPageHeading": True, "classes": "govuk-label--l"}}) }}
           {%  elif thing == "mobile number" %}
-              {{ form.mobile_number(param_extensions={"label": {"isPageHeading": True, "classes": "govuk-label--l"}}) }}
+              {{ form.mobile_number(param_extensions={"label": {"isPageHeading": True, "classes": "govuk-label--l"}, "classes": "govuk-input--extra-letter-spacing govuk-input--width-10"}) }}
            {%  endif %}
         {% if current_user.auth_type == 'email_auth' and (current_user.mobile_number and thing == "mobile number") %}
           {{ page_footer(
