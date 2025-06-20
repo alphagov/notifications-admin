@@ -108,7 +108,7 @@
       }
     ]
   }) }}
-  {% if attachment.file_name in template.placeholders %}
+  {% if attachment.file_name in template.all_placeholders %}
     {{ page_footer(
       delete_link_text="Remove this file",
       delete_link=url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, attachment_id=attachment.id, delete=true),
