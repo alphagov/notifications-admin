@@ -107,3 +107,9 @@ $link-colour-on-grey-background: #1852ab;
   }
 }
 
+// Makes numeric inputs easier to read
+.extra-tracking .govuk-input {
+  @include govuk-font(19, $tabular: true);
+  padding-left: 5px;
+  letter-spacing: 0.04em;
+}
