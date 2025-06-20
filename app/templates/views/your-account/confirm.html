@@ -22,11 +22,7 @@
         We’ve sent a security code to your new {{ thing }}.
       </p>
       {% call form_wrapper() %}
-        {{ form_field(param_extensions={
-            "classes": "govuk-input govuk-input--width-5",
-            "attributes": {"data-notify-module": "autofocus"}
-        }) }}
-
+        {{ form_field() }}
         {{ page_footer('Confirm') }}
       {% endcall %}
     </div>

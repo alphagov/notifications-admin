@@ -21,12 +21,10 @@ Create an account
         },
         error_message_with_html=True
       ) }}
-      <div class="extra-tracking">
-        {{ form.mobile_number(param_extensions={
-          "hint": {"text": "We’ll send you a security code by text message"},
-          "classes": "govuk-!-width-three-quarters"
-        }) }}
-      </div>
+      {{ form.mobile_number(param_extensions={
+        "hint": {"text": "We’ll send you a security code by text message"},
+        "classes": "govuk-!-width-three-quarters govuk-input--extra-letter-spacing"
+      }) }}
       {{ form.password(param_extensions={"hint": {"text": "At least 8 characters"}, "classes": "govuk-!-width-three-quarters", "autocomplete": "new-password"}) }}
       {{form.auth_type}}
       {{ page_footer("Continue") }}

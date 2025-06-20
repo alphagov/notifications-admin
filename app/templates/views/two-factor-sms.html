@@ -16,12 +16,9 @@
     <p class="govuk-body">We’ve sent you a text message with a security code.</p>
 
     <p class="govuk-body">Text messages can take a few minutes to arrive.</p>
-    
-    {% call form_wrapper(class="extra-tracking") %}
-      {{ form.sms_code(param_extensions={
-          "classes": "govuk-input govuk-input--width-5",
-          "attributes": {"data-notify-module": "autofocus"}
-      }) }}
+
+    {% call form_wrapper() %}
+      {{ form.sms_code() }}
       {{ page_footer(
         "Continue",
         secondary_link=url_for('main.check_and_resend_text_code', next=redirect_url),

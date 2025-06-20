@@ -35,7 +35,7 @@
 
   {% endif %}
 
-  <div class="govuk-grid-column-full {% if message_type == 'sms' %}extra-tracking{% endif %}">
+  <div class="govuk-grid-column-full">
   {% call form_wrapper(
     action=url_for('main.view_notifications', service_id=current_service.id, message_type=message_type, search_query=search_query),
     class="govuk-grid-row notify-simple-search-form"
@@ -53,7 +53,8 @@
                 prefix='Search by',
                 prefix_plural='Search by'
               )
-            }
+            },
+            "classes": "govuk-input--extra-letter-spacing" if message_type == "sms" else ""
           }
         )
       }}

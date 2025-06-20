@@ -22,8 +22,10 @@
     data_kwargs={'force-focus': True}
   ) %}
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-full {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
-        {{ form.placeholder_value(param_extensions={"classes": "govuk-!-width-full"}) }}
+      <div class="govuk-grid-column-full">
+        {{ form.placeholder_value(param_extensions={
+          "classes": "govuk-!-width-full govuk-input--extra-letter-spacing" if form.placeholder_value.label.text == "phone number" else "govuk-!-width-full"
+        }) }}
       </div>
       {% if skip_link or link_to_upload %}
         <div class="govuk-grid-column-full">
