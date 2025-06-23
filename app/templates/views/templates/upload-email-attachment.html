@@ -17,16 +17,6 @@
 
 {% block maincolumn_content %}
 
-  {% if delete %}
-    <div class="govuk-!-margin-bottom-6">
-      {{ banner(
-        'Are you sure you want to remove this file?',
-        type='dangerous',
-        delete_button='Yes, remove',
-        action=url_for('main.email_template_manage_attachment', service_id=current_service.id, template_id=template.id, placeholder=placeholder, delete="true")
-      ) }}
-    </div>
-  {% endif %}
   {{ page_header(title) }}
   <div class="govuk-!-margin-bottom-6">
     {{ file_upload(
