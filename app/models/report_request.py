@@ -6,6 +6,7 @@ from notifications_utils.s3 import s3download
 
 from app import report_request_api_client
 from app.models import JSONModel
+from app.s3_client import check_s3_object_exists
 
 
 class ReportRequest(JSONModel):
@@ -31,6 +32,13 @@ class ReportRequest(JSONModel):
     @staticmethod
     def download(report_request_id):
         return s3download(
+            bucket_name=ReportRequest.get_bucket_name(),
+            filename=f"notifications_report/{report_request_id}.csv",
+        )
+
+    @staticmethod
+    def exists_in_s3(report_request_id):
+        return check_s3_object_exists(
             bucket_name=ReportRequest.get_bucket_name(),
             filename=f"notifications_report/{report_request_id}.csv",
         )

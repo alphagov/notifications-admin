@@ -61,6 +61,11 @@ def report_request(service_id, report_request_id):
 def report_ready(service_id, report_request_id):
     validate_report_request_enabled()
 
+    if not ReportRequest.exists_in_s3(report_request_id):
+        return render_template(
+            "views/csv-report/unavailable.html",
+        )
+
     try:
         report_request = ReportRequest.from_id(service_id, report_request_id)
     except HTTPError as e:

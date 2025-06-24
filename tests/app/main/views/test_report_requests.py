@@ -168,6 +168,7 @@ def test_report_ready_renders_ready_template_if_report_ready(
         user_id=fake_uuid, status="stored", parameter={"notification_type": "sms", "notification_status": "all"}
     )
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
+    mocker.patch.object(ReportRequest, "exists_in_s3", return_value=True)
 
     page = client_request.get(
         "main.report_ready",
@@ -182,6 +183,7 @@ def test_report_ready_renders_ready_template_if_report_ready(
 def test_report_ready_redirects_to_report_request_if_report_not_ready(client_request, fake_uuid, mocker):
     request = create_report_request(user_id=fake_uuid, status="in_progress")
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
+    mocker.patch.object(ReportRequest, "exists_in_s3", return_value=True)
 
     response = client_request.get_response(
         "main.report_ready",
@@ -208,6 +210,7 @@ def test_report_ready_redirects_to_report_request_if_report_not_found(client_req
             message="No result found",
         ),
     )
+    mocker.patch.object(ReportRequest, "exists_in_s3", return_value=True)
 
     response = client_request.get_response(
         "main.report_ready",
@@ -225,6 +228,7 @@ def test_report_ready_redirects_to_report_request_if_report_not_found(client_req
 def test_report_ready_raises_403_for_unauthorized_user(client_request, mocker):
     request = create_report_request(user_id=uuid.uuid4(), status="stored")
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
+    mocker.patch.object(ReportRequest, "exists_in_s3", return_value=True)
 
     response = client_request.get_response(
         "main.report_ready",
@@ -234,6 +238,24 @@ def test_report_ready_raises_403_for_unauthorized_user(client_request, mocker):
     )
 
     assert response.status_code == 403
+
+
+def test_report_ready_redirects_not_found_when_report_does_not_exist(client_request, fake_uuid, mocker):
+    request = create_report_request(
+        user_id=fake_uuid, status="stored", parameter={"notification_type": "sms", "notification_status": "all"}
+    )
+    mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
+    mocker.patch.object(ReportRequest, "exists_in_s3", return_value=False)
+
+    page = client_request.get(
+        "main.report_ready",
+        service_id=SERVICE_ONE_ID,
+        report_request_id=request["id"],
+    )
+
+    assert page.select_one("h1").text == "Your report is no longer available"
+    assert page.select_one("main a.govuk-link").text == "Go back to the dashboard to download a new report"
+    assert page.select_one("main a.govuk-link")["href"] == url_for("main.service_dashboard", service_id=SERVICE_ONE_ID)
 
 
 def test_report_request_status_json_returns_status(client_request, fake_uuid, mocker):
