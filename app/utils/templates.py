@@ -141,10 +141,9 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
         image_url=None,
         contact_block=None,
         include_letter_edit_ui_overlay=False,
-        page_counts=None,
     ):
         super().__init__(template, values, image_url=image_url, page_count=None, contact_block=contact_block)
-        self._all_page_counts = page_counts
+        self._all_page_counts = None
         self.include_letter_edit_ui_overlay = include_letter_edit_ui_overlay
 
     @property
