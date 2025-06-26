@@ -94,7 +94,7 @@
 
   &--inverse {
     border-bottom: 1px govuk-colour("white") solid;
-    border-bottom-color: rgba(govuk-colour("white"), 0.25);
+    border-bottom-color: rgb(govuk-colour("white"), 0.25);
 
     .govuk-link--inverse {
       &:link,

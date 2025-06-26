@@ -58,7 +58,7 @@
   &-item--selected {
     background: inherit;
     border: 2px solid $govuk-input-border-colour;
-    outline: 1px solid rgba(govuk-colour("white"), 0.1);
+    outline: 1px solid rgb(govuk-colour("white"), 0.1);
     position: relative;
     z-index: 10;
 
