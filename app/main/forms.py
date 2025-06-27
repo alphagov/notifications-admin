@@ -6,6 +6,7 @@ from functools import partial
 from itertools import chain
 from math import ceil
 from numbers import Number
+from urllib.parse import urlparse
 
 import pytz
 from flask import request
@@ -2330,6 +2331,50 @@ class CallbackForm(StripWhitespaceForm):
 
     def validate(self, *args, **kwargs):
         return super().validate(*args, **kwargs) or self.url.data == ""
+
+
+class UrlForm(StripWhitespaceForm):
+    url = GovukTextInputField(
+        "URL",
+        validators=[
+            DataRequired(message="Cannot be empty"),
+            Regexp(regex="^https.*", message="Must be a valid https URL"),
+        ],
+    )
+
+    def validate(self, *args, **kwargs):
+        self.url.validators.append(self.check_url)
+        return super().validate(*args, **kwargs)
+
+    def check_url(self, *args, **kwargs):
+        parsed_url = urlparse(self.url.data)
+
+        if parsed_url.hostname == "docs.notifications.service.gov.uk" and parsed_url.fragment:
+            return parsed_url
+        else:
+            raise ValidationError("Must be a valid https URL, pointing to a section within the GOV.UK Notify API docs.")
+
+
+class ChooseDocsForm(StripWhitespaceForm):
+
+    def __init__(self, section_tag):
+        super().__init__(section_tag=section_tag)
+
+    docs_version = GovukRadiosField(
+        "Which version of the docs would you like to view?",
+        choices=[
+            ("python", "Python"),
+            ("ruby", "Ruby"),
+            ("java", "Java"),
+            ("node", "Node JS"),
+            ("net", ".Net"),
+            ("php", "PHP"),
+            ("rest-api", "Rest API"),
+            ("rest-api", "Any is fine"),
+        ],
+        thing="a language version of GOV.UK Notify's API docs",
+    )
+    section_tag = HiddenField("section tag")
 
 
 class SMSPrefixForm(StripWhitespaceForm):

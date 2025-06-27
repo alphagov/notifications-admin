@@ -387,3 +387,86 @@ def test_trial_mode_sending_limits(client_request):
         "send 50 text messages per day",
         "create letter templates, but not send them",
     ]
+
+
+def test_guidance_api_documentation_links_to_section_flow_for_platform_admins(client_request, platform_admin_user):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get("main.guidance_api_documentation")
+
+    assert len(page.select('a[href^="{link}"]'.format(link=url_for(".guidance_api_documentation_section")))) == 1
+
+
+def test_guidance_api_documentation_does_not_link_to_section_flow_for_non_platform_admins(client_request):
+    page = client_request.get("main.guidance_api_documentation")
+
+    assert len(page.select('a[href^="{link}"]'.format(link=url_for(".guidance_api_documentation_section")))) == 0
+
+
+def test_GET_guidance_api_documentation_section(client_request):
+    page = client_request.get("main.guidance_api_documentation_section")
+
+    assert page.select_one("h1").text == "Send a link to an API docs section"
+    assert page.select_one("input", attrs={"type": "text"})["name"] == "url"
+
+
+def test_POST_guidance_api_documentation_section(client_request):
+    client_request.post(
+        "main.guidance_api_documentation_section",
+        _data={"url": "https://docs.notifications.service.gov.uk/python.html#send-a-file-by-email"},
+        _expected_redirect=url_for(
+            "main.guidance_api_documentation_section_choose_docs",
+            section_tag="send-a-file-by-email",
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "url, expected_error_message",
+    [
+        ["", "Cannot be empty"],  # empty string
+        [
+            "https://docs.notifications.service.gov.uk/python.html",
+            "Must be a valid https URL, pointing to a section within the GOV.UK Notify API docs.",
+        ],  # no section
+        [
+            "https://docs.payments.service.gov.uk/making_payments/#creating-a-payment",
+            "Must be a valid https URL, pointing to a section within the GOV.UK Notify API docs.",
+        ],  # URL is notfor Notify's docs
+        [
+            "http://docs.notifications.service.gov.uk/python.html#send-a-file-by-email",
+            "Must be a valid https URL",
+        ],  # http instead of https
+    ],
+)
+def test_POST_guidance_api_documentation_section_with_incorrect_url(client_request, url, expected_error_message):
+    page = client_request.post(
+        "main.guidance_api_documentation_section",
+        _data={"url": url},
+        _expected_status=200,
+    )
+
+    assert expected_error_message in page.select_one(".govuk-error-message").text
+
+
+def test_GET_guidance_api_documentation_section_choose_docs(client_request):
+    page = client_request.get("main.guidance_api_documentation_section_choose_docs", section_tag="send-a-file-by-email")
+
+    assert page.select_one("h1").text == "You have been sent a link to GOV.UK Notify API documentation"
+
+    assert ["python", "ruby", "java", "node", "net", "php", "rest-api", "rest-api"] == [
+        radio["value"] for radio in page.select("input[type=radio]")
+    ]
+    form = page.select_one("form")
+    assert form["action"] == url_for(
+        "main.guidance_api_documentation_section_choose_docs",
+        section_tag="send-a-file-by-email",
+    )
+
+
+def test_POST_guidance_api_documentation_section_choose_docs(client_request):
+    client_request.post(
+        "main.guidance_api_documentation_section_choose_docs",
+        _data={"docs_version": "python", "section_tag": "send-a-file-by-email"},
+        _expected_redirect="https://docs.notifications.service.gov.uk/python.html#send-a-file-by-email",
+    )

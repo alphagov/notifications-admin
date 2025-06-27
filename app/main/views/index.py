@@ -15,7 +15,7 @@ from notifications_utils.template import HTMLEmailTemplate
 from app import status_api_client
 from app.formatters import format_thousands
 from app.main import main
-from app.main.forms import FieldWithNoneOption
+from app.main.forms import ChooseDocsForm, FieldWithNoneOption, UrlForm
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
@@ -158,6 +158,39 @@ def guidance_api_documentation():
     return render_template(
         "views/guidance/using-notify/api-documentation.html",
         navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/api-documentation/section", methods=["GET", "POST"])
+def guidance_api_documentation_section():
+
+    form = UrlForm()
+
+    if form.validate_on_submit():
+        section_tag = form.url.data.split("#")[-1]
+        return redirect(url_for(".guidance_api_documentation_section_choose_docs", section_tag=section_tag))
+
+    return render_template(
+        "views/guidance/using-notify/api-documentation-section.html",
+        navigation_links=using_notify_nav(),
+        form=form,
+    )
+
+
+@main.route("/using-notify/api-documentation/section/choose-docs", methods=["GET", "POST"])
+def guidance_api_documentation_section_choose_docs():
+    form = ChooseDocsForm(section_tag=request.args.get("section_tag"))
+
+    if form.validate_on_submit():
+        redirect_url = (
+            f"https://docs.notifications.service.gov.uk/{form.docs_version.data}.html#{form.section_tag.data}"
+        )
+        return redirect(redirect_url)
+
+    return render_template(
+        "views/guidance/using-notify/api-documentation-section-choose-docs.html",
+        navigation_links=using_notify_nav(),
+        form=form,
     )
 
 
