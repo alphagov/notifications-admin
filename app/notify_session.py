@@ -63,3 +63,6 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
             ).isoformat()
 
         super().save_session(app=app, session=session, response=response)
+
+    def should_set_cookie(self, app, session):
+        return request.blueprint not in (JSON_UPDATES_BLUEPRINT_NAME, "no_cookie")
