@@ -4,7 +4,7 @@ from flask import Flask, Request, Response, request
 from flask.sessions import SecureCookieSession, SecureCookieSessionInterface
 from flask_login import current_user
 
-from app.constants import JSON_UPDATES_BLUEPRINT_NAME
+from app.constants import JSON_UPDATES_BLUEPRINT_NAME, NO_COOKIE_BLUEPRINT_NAME
 
 
 class NotifyAdminSessionInterface(SecureCookieSessionInterface):
@@ -51,10 +51,7 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
 
     def save_session(self, app: Flask, session: SecureCookieSession, response: Response) -> None:
         # Catch anyone who is logged-in from before we started tracking session-start times.
-        # Ignore responses from the JSON api endpoints. These power things like the service dashboard or template
-        # usage and are passive views. We don't want the session to be refreshed when someone is inactive on an
-        # auto-refreshing page.
-        if "user_id" in session and request.blueprint != JSON_UPDATES_BLUEPRINT_NAME:
+        if "user_id" in session:
             now = datetime.now(UTC)
             if "session_start" not in session:
                 session["session_start"] = now.isoformat()
@@ -63,3 +60,11 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
             ).isoformat()
 
         super().save_session(app=app, session=session, response=response)
+
+    def should_set_cookie(self, app, session):
+        # Ignore responses from the JSON api endpoints. These power things like the service dashboard or template
+        # usage and are passive views. We don't want the session to be refreshed when someone is inactive on an
+        # auto-refreshing page. We also don’t want to serve session cookies on letter images (which are on the
+        # no_cookie blueprint). We have seen old requests overwrite session data for newer requests in the case
+        # of these slow endpoints which are often called in parallel.
+        return request.blueprint not in (JSON_UPDATES_BLUEPRINT_NAME, NO_COOKIE_BLUEPRINT_NAME)
