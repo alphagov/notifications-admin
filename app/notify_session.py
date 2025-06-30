@@ -4,7 +4,7 @@ from flask import Flask, Request, Response, request
 from flask.sessions import SecureCookieSession, SecureCookieSessionInterface
 from flask_login import current_user
 
-from app.constants import JSON_UPDATES_BLUEPRINT_NAME
+from app.constants import JSON_UPDATES_BLUEPRINT_NAME, NO_COOKIE_BLUEPRINT_NAME
 
 
 class NotifyAdminSessionInterface(SecureCookieSessionInterface):
@@ -65,4 +65,4 @@ class NotifyAdminSessionInterface(SecureCookieSessionInterface):
         super().save_session(app=app, session=session, response=response)
 
     def should_set_cookie(self, app, session):
-        return request.blueprint not in (JSON_UPDATES_BLUEPRINT_NAME, "no_cookie")
+        return request.blueprint not in (JSON_UPDATES_BLUEPRINT_NAME, NO_COOKIE_BLUEPRINT_NAME)
