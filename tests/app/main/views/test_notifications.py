@@ -24,8 +24,8 @@ from tests.conftest import (
     [
         (None, "created", False, "Sending"),
         (None, "created", True, "Sending via MMG"),
-        (None, "sending", False, "Sending"),
-        (None, "sending", True, "Sending via MMG"),
+        (None, "sending", False, "Delivering"),
+        (None, "sending", True, "Delivering via MMG"),
         (None, "delivered", False, "Delivered"),
         (None, "delivered", True, "Delivered via MMG"),
         (None, "failed", False, "Failed"),
@@ -40,8 +40,8 @@ from tests.conftest import (
         ("team", "delivered", True, "Delivered via MMG"),
         ("live", "delivered", False, "Delivered"),
         ("live", "delivered", True, "Delivered via MMG"),
-        ("test", "sending", False, "Sending (test)"),
-        ("test", "sending", True, "Sending via MMG (test)"),
+        ("test", "sending", False, "Delivering (test)"),
+        ("test", "sending", True, "Delivering via MMG (test)"),
         ("test", "delivered", False, "Delivered (test)"),
         ("test", "delivered", True, "Delivered via MMG (test)"),
         ("test", "permanent-failure", False, "Not delivered (test)"),
@@ -155,7 +155,7 @@ def test_notification_status_page_respects_redaction(
         ),
         (
             {"from_statuses": "sending"},
-            partial(url_for, "main.view_notifications", message_type="sms", status="sending"),
+            partial(url_for, "main.view_notifications", message_type="sms", status="delivering"),
         ),
         (
             {"from_statuses": "failed"},
