@@ -20,3 +20,14 @@ Government logo text requested: {{ logo_text }}
 {% endif %}Create this logo: {{ create_logo_url }}
 
 Apply branding to this service: {{ url_for('main.service_set_branding', service_id=current_service.id, branding_type='email', _external=True) }}
+
+<h2>How to add new branding</h2>
+<ol class="govuk-list govuk-list--number">
+<li>Click the link in ‘Create this logo’.</li>
+<li>Choose the name of the organisation which the service belongs to from the list. This is usually the same as the organisation name.
+</li>
+<li>Next, add the colour for the stripe. Use <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/">GOV.UK</a> or google to check what colour is used in their branding.</li>
+<li>Add text in <b class="govuk-!-font-weight-bold">Change</b>Logo text<b> using what is in ‘Government logo text requested’.</li>
+<li>Select <b class="govuk-!-font-weight-bold">Save</b> to apply branding to this service.</li>
+</ul>
+
