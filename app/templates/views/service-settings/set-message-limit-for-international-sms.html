@@ -1,9 +1,9 @@
 {% extends "withnav_template.html" %}
+{% from "components/ajax-block.html" import ajax_block %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {% set page_title = "Daily international text message limit" %}
 
@@ -24,7 +24,9 @@
         <p class="govuk-body">
             Number of international text messages the service is allowed to send each day.
         </p>
-        {{ govukInsetText({"text": "You have " + current_service.remaining_messages("international_sms")|string + " international text messages remaining today.", "classes": "govuk-!-margin-top-0"}) }}
+
+        {{ ajax_block(partials, updates_url, 'remaining_limit') }}
+
         <p class="govuk-body">
             When choosing a limit you should think about:
         </p>

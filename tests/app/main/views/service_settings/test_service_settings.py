@@ -3933,7 +3933,7 @@ def test_should_show_page_to_set_per_day_international_sms_message_limit(
         service_id=SERVICE_ONE_ID, notification_type="international_sms"
     )
     assert (
-        normalize_spaces(page.select_one(".govuk-inset-text").text)
+        normalize_spaces(page.select(".ajax-block-container")[0].text)
         == "You have 499 international text messages remaining today."
     )
 

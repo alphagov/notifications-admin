@@ -1,0 +1,11 @@
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+{% set remaining_limit = current_service.remaining_messages(notification_type) %}
+<div class="ajax-block-container">
+    {{ govukInsetText({
+        "text": "You have {} {} remaining today.".format(
+            remaining_limit|string,
+            remaining_limit|message_count_noun(notification_type)
+        ),
+        "classes": "govuk-!-margin-top-0"
+    }) }}
+</div>
