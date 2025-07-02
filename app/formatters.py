@@ -168,7 +168,7 @@ def format_notification_status(status, template_type):
             "temporary-failure": "Phone not accepting messages right now",
             "permanent-failure": "Not delivered",
             "delivered": "Delivered",
-            "sending": "Sent",
+            "sending": "Delivering",
             "created": "Sending",
             "pending": "Sending",
             "sent": "Sent to an international number",
