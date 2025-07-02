@@ -20,7 +20,7 @@ Service: {{ current_service.name }}
 
 1. Open this link to create the logo: {{ create_logo_url }}
 2. Select the coat of arms or insignia for {% if current_service.organisation -%}
-  {{ current_service.organisation.name }}. If the organisation is not listed, select ‘HM Government’.
+  {{ current_service.organisation.name }}. If this organisation is not listed, select ‘HM Government’.
 {%- else -%}
   the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
 3. Select the stripe colour for {% if current_service.organisation -%}
