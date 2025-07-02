@@ -24,7 +24,7 @@ Service: {{ current_service.name }}
 {%- else -%}
   the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
 3. Select the stripe colour for {% if current_service.organisation -%}
-  {{ current_service.organisation.name }}. If the organisation is not listed, select ‘HM Government’.
+  {{ current_service.organisation.name }}. If this organisation is not listed, select ‘HM Government’.
 {%- else -%}
   the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
 4. Check that the logo text says: {{ logo_text }}
