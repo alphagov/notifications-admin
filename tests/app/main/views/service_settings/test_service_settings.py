@@ -317,7 +317,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages On Change your settings for receiving text messages",
                 "Send international text messages On Change your settings for sending international text messages",
-                "International text message limit 500 per day Change daily international text message limit",
+                "International text message limit 500 per day 500 remaining today Change daily international text message limit",  # noqa
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
