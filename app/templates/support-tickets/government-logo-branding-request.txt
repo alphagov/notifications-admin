@@ -32,4 +32,7 @@ Service: {{ current_service.name }}
 {% elif branding_choice == "organisation" %}Branding only
 {% endif %}
 6. Select ‘Save’.
-7. Open this link to set the email branding for this service: {{ url_for('main.service_set_branding', service_id=current_service.id, branding_type='email', _external=True) }}
+
+You have created a new government identity logo.
+
+Now open this link to set the new email branding for {{ current_service.name }}: {{ url_for('main.service_set_branding', service_id=current_service.id, branding_type='email', _external=True) }}
