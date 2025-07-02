@@ -155,7 +155,7 @@ def test_notification_status_page_respects_redaction(
         ),
         (
             {"from_statuses": "sending"},
-            partial(url_for, "main.view_notifications", message_type="sms", status="sent"),
+            partial(url_for, "main.view_notifications", message_type="sms", status="delivering"),
         ),
         (
             {"from_statuses": "failed"},
