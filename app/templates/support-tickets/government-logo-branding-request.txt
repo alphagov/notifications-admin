@@ -18,7 +18,7 @@ Service: {{ current_service.name }}
 ) %}
 {% endif %}
 
-First, open this link to create the new government identity logo:
+Open this link to create a new government identity logo:
 
 {{ create_logo_url }}
 
