@@ -3916,15 +3916,26 @@ def test_switch_service_enable_international_sms_and_letters(
 def test_should_show_page_to_set_per_day_international_sms_message_limit(
     client_request,
     service_one,
+    mocker,
 ):
     service_one["permissions"] = ["international_sms"]
+    mock_get_notification_count = mocker.patch("app.service_api_client.get_notification_count", return_value=1)
 
     page = client_request.get(
         "main.set_per_day_international_sms_message_limit",
         service_id=SERVICE_ONE_ID,
     )
     assert normalize_spaces(page.select_one("label").text) == "Daily international text message limit"
+    # form prefilled with current limit
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "500"
+    # today's remaining limit pulled and displayed
+    assert mock_get_notification_count.called_once_with(
+        service_id=SERVICE_ONE_ID, notification_type="international_sms"
+    )
+    assert (
+        normalize_spaces(page.select_one(".govuk-inset-text").text)
+        == "You have 499 international text messages remaining today."
+    )
 
 
 @pytest.mark.parametrize(
