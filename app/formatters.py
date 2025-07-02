@@ -158,7 +158,7 @@ def format_notification_status(status, template_type):
             "temporary-failure": "Inbox not accepting messages right now",
             "permanent-failure": "Email address does not exist",
             "delivered": "Delivered",
-            "sending": "Sent",
+            "sending": "Delivering",
             "created": "Sending",
             "sent": "Delivered",
         },
