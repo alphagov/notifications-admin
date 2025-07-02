@@ -20,7 +20,7 @@ Service: {{ current_service.name }}
 
 First, open this link to create the new government identity logo:
 
-  {{ create_logo_url }}
+{{ create_logo_url }}
 
 1. Select the coat of arms or insignia for {% if current_service.organisation -%}
   {{ current_service.organisation.name }}. If this organisation is not listed, select ‘HM Government’.
