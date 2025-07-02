@@ -19,7 +19,7 @@
     {% set status_text_in_heading = 'Delivering since' %}
     {% set visual_status_text %}
       <time class="sms-message-status sms-message-status-outbound hint" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
-        sent
+        delivering
       </time>
     {% endset %}
   {% else %}
