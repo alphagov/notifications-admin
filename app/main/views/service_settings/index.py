@@ -611,27 +611,27 @@ def set_per_day_international_sms_message_limit(service_id):
         "views/service-settings/set-message-limit-for-international-sms.html",
         form=form,
         error_summary_enabled=True,
-        partials=get_daily_limit_partials(notification_type="international_sms"),
+        partials=get_daily_limit_partials(daily_limit_type="international_sms"),
         updates_url=url_for(
             "json_updates.view_remaining_limit",
             service_id=service_id,
-            notification_type="international_sms",
+            daily_limit_type="international_sms",
         ),
     )
 
 
 @json_updates.route(
-    "/services/<uuid:service_id>/service-settings/<template_type:notification_type>/remaining-today.json"
+    "/services/<uuid:service_id>/service-settings/<daily_limit_type:daily_limit_type>/remaining-today.json"
 )
 @user_has_permissions("manage_service")
-def view_remaining_limit(service_id, notification_type):
-    return jsonify(**get_daily_limit_partials(notification_type=notification_type))
+def view_remaining_limit(service_id, daily_limit_type):
+    return jsonify(**get_daily_limit_partials(daily_limit_type=daily_limit_type))
 
 
-def get_daily_limit_partials(notification_type):
+def get_daily_limit_partials(daily_limit_type):
     return {
         "remaining_limit": render_template(
-            "partials/daily-limits/remaining-limit.html", notification_type=notification_type
+            "partials/daily-limits/remaining-limit.html", daily_limit_type=daily_limit_type
         ),
     }
 

@@ -140,6 +140,7 @@ from app.template_previews import template_preview_client  # noqa
 from app.url_converters import (
     AgreementTypeConverter,
     BrandingTypeConverter,
+    DailyLimitTypeConverter,
     LetterFileExtensionConverter,
     SimpleDateTypeConverter,
     TemplateTypeConverter,
@@ -271,6 +272,7 @@ def init_app(application):
     application.url_map.converters["uuid"].to_python = lambda self, value: value.lower()
     application.url_map.converters["agreement_type"] = AgreementTypeConverter
     application.url_map.converters["template_type"] = TemplateTypeConverter
+    application.url_map.converters["daily_limit_type"] = DailyLimitTypeConverter
     application.url_map.converters["branding_type"] = BrandingTypeConverter
     application.url_map.converters["ticket_type"] = TicketTypeConverter
     application.url_map.converters["letter_file_extension"] = LetterFileExtensionConverter

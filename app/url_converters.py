@@ -13,11 +13,15 @@ class AgreementTypeConverter(BaseConverter):
 
 
 class TemplateTypeConverter(BaseConverter):
-    regex = f"(?:{'|'.join(Service.TEMPLATE_TYPES)}|international_sms)"
+    regex = f"(?:{'|'.join(Service.TEMPLATE_TYPES)})"
 
 
 class BrandingTypeConverter(BaseConverter):
     regex = "(?:email|letter)"
+
+
+class DailyLimitTypeConverter(BaseConverter):
+    regex = f"(?:{'|'.join(Service.TEMPLATE_TYPES)}|international_sms)"
 
 
 class TicketTypeConverter(BaseConverter):
