@@ -8,6 +8,10 @@ Service: {{ current_service.name }}
 
 ---
 
+<h2>Create a new government identity logo</h2>
+
+Open this link to create a new government identity logo:
+
 {% if branding_choice == "govuk_and_org" %}
 {% set create_logo_url = url_for(
   'main.create_email_branding_government_identity_logo', text=logo_text, brand_type="both", _external=True
@@ -17,11 +21,6 @@ Service: {{ current_service.name }}
   'main.create_email_branding_government_identity_logo', text=logo_text, _external=True
 ) %}
 {% endif %}
-
-<h2>Create a new government identity logo</h2>
-
-Open this link to create a new government identity logo:
-
 {{ create_logo_url }}
 
 1. Select the coat of arms or insignia for {% if current_service.organisation -%}
