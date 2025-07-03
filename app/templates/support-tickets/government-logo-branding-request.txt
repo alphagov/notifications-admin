@@ -38,4 +38,8 @@ Open this link to create a new government identity logo:
 5. Select ‘Save’.
 
 
-Now open this link to set the new email branding for {{ current_service.name }}: {{ url_for('main.service_set_branding', service_id=current_service.id, branding_type='email', _external=True) }}
+<h2>Set the email branding for this service</h2>
+
+Open this link to select the new email branding for {{ current_service.name }}:
+
+{{ url_for('main.service_set_branding', service_id=current_service.id, branding_type='email', _external=True) }}
