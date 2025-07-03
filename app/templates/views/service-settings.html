@@ -100,6 +100,13 @@
         {% endif %}
       {% endset %}
 
+      {% set email_limit_html %}
+        {{ "{} per day".format(current_service.get_message_limit("email")|format_thousands) }}
+        <div class="govuk-hint">
+          {{ current_service.sent_today("email")|string + " sent today" }}
+        </div>
+      {% endset %}
+
       {% set base_email_settings_row = [
         {
           "key": {
@@ -202,7 +209,27 @@
                 }
               ]
             }
-          }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Email limit",
+            },
+            "value": {
+              "text": email_limit_html,
+              "classes": "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for("main.set_daily_message_limit", service_id=current_service.id, daily_limit_type="email"),
+                  "text": "Change",
+                  "visuallyHiddenText": "daily {} limit".format("email"|format_notification_type|lower),
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
         ]%}
       {% endif %}
 
@@ -226,8 +253,15 @@
         {% endif %}
       {% endset %}
 
+      {% set text_message_limit_html %}
+        {{ "{} per day".format(current_service.get_message_limit("sms")|format_thousands) }}
+        <div class="govuk-hint">
+          {{ current_service.sent_today("sms")|string + " sent today" }}
+        </div>
+      {% endset %}
+
       {% set international_text_message_limit_html %}
-        {{ "{} per day".format(current_service.get_message_limit('international_sms')|format_thousands) }}
+        {{ "{} per day".format(current_service.get_message_limit("international_sms")|format_thousands) }}
         <div class="govuk-hint">
           {{ current_service.sent_today("international_sms")|string + " sent today" }}
         </div>
@@ -325,6 +359,26 @@
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "{} limit".format('sms'|format_notification_type),
+            },
+            "value": {
+              "text": text_message_limit_html,
+              "classes": "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for("main.set_daily_message_limit", service_id=current_service.id, daily_limit_type="sms"),
+                  "text": "Change",
+                  "visuallyHiddenText": "daily {} limit".format("sms"|format_notification_type|lower),
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
               "text": "Send international text messages"
             },
             "value": {
@@ -360,9 +414,9 @@
             "actions": {
               "items": [
                 {
-                  "href": url_for('main.set_per_day_international_sms_message_limit', service_id=current_service.id),
+                  "href": url_for("main.set_per_day_international_sms_message_limit", service_id=current_service.id),
                   "text": "Change",
-                  "visuallyHiddenText": "daily international {} limit".format('sms'|format_notification_type|lower),
+                  "visuallyHiddenText": "daily international {} limit".format("sms"|format_notification_type|lower),
                   "classes": "govuk-link--no-visited-state"
                 }
               ]
@@ -380,6 +434,14 @@
     {% endset %}
 
     {% set service_letter_settings %}
+
+    {% set letter_limit_html %}
+      {{ "{} per day".format(current_service.get_message_limit("letter")|format_thousands) }}
+      <div class="govuk-hint">
+        {{ current_service.sent_today("letter")|string + " sent today" }}
+      </div>
+    {% endset %}
+
       {% set base_letter_settings_row = [
         {
           "key": {
@@ -481,7 +543,27 @@
                 }
               ]
             }
-          }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "{} limit".format('letter'|format_notification_type),
+            },
+            "value": {
+              "text": letter_limit_html,
+              "classes": "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                "href": url_for("main.set_daily_message_limit", service_id=current_service.id, daily_limit_type="letter"),
+                "text": "Change",
+                "visuallyHiddenText": "daily {} limit".format("letter"|format_notification_type|lower),
+                "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
         ] %}
       {% endif %}
 
