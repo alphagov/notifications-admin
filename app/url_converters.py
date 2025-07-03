@@ -13,7 +13,7 @@ class AgreementTypeConverter(BaseConverter):
 
 
 class TemplateTypeConverter(BaseConverter):
-    regex = f"(?:{'|'.join(Service.TEMPLATE_TYPES)})"
+    regex = f"(?:{'|'.join(Service.TEMPLATE_TYPES)}|international_sms)"
 
 
 class BrandingTypeConverter(BaseConverter):
