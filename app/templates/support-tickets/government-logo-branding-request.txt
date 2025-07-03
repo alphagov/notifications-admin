@@ -18,6 +18,8 @@ Service: {{ current_service.name }}
 ) %}
 {% endif %}
 
+<h2>Create a new government identity logo</h2>
+
 Open this link to create a new government identity logo:
 
 {{ create_logo_url }}
