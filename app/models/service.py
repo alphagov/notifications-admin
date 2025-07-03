@@ -617,9 +617,10 @@ class Service(JSONModel):
     def remaining_messages(self, notification_type):
         if notification_type == "international_sms" and not self.has_permission("international_sms"):
             return 0
-        return self.get_message_limit(notification_type) - (
-            service_api_client.get_notification_count(self.id, notification_type=notification_type)
-        )
+        return self.get_message_limit(notification_type) - self.sent_today(notification_type)
+
+    def sent_today(self, notification_type):
+        return service_api_client.get_notification_count(self.id, notification_type=notification_type)
 
     @property
     def sign_in_method(self) -> str:

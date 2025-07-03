@@ -229,7 +229,7 @@
       {% set international_text_message_limit_html %}
         {{ "{} per day".format(current_service.get_message_limit('international_sms')|format_thousands) }}
         <div class="govuk-hint">
-          {{ current_service.remaining_messages("international_sms")|string + " remaining today" }}
+          {{ current_service.sent_today("international_sms")|string + " sent today" }}
         </div>
       {% endset %}
 
