@@ -2,9 +2,8 @@
 {% set remaining_limit = current_service.remaining_messages(notification_type) %}
 <div class="ajax-block-container">
     {{ govukInsetText({
-        "text": "You have {} {} remaining today.".format(
-            remaining_limit|string,
-            remaining_limit|message_count_noun(notification_type)
+        "text": "You have {} remaining today.".format(
+            remaining_limit|message_count(notification_type)
         ),
         "classes": "govuk-!-margin-top-0"
     }) }}
