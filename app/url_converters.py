@@ -20,6 +20,10 @@ class BrandingTypeConverter(BaseConverter):
     regex = "(?:email|letter)"
 
 
+class DailyLimitTypeConverter(BaseConverter):
+    regex = f"(?:{'|'.join(Service.TEMPLATE_TYPES)}|international_sms)"
+
+
 class TicketTypeConverter(BaseConverter):
     regex = f"(?:{PROBLEM_TICKET_TYPE}|{QUESTION_TICKET_TYPE}|{GENERAL_TICKET_TYPE})"
 

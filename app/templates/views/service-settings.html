@@ -216,6 +216,7 @@
     {% endset %}
 
     {% set service_text_message_settings %}
+
       {% set text_message_sender_ids_html %}
         {{ current_service.default_sms_sender | nl2br if current_service.default_sms_sender else 'None'}}
         {% if current_service.count_sms_senders > 1 %}
@@ -224,6 +225,14 @@
           </div>
         {% endif %}
       {% endset %}
+
+      {% set international_text_message_limit_html %}
+        {{ "{} per day".format(current_service.get_message_limit('international_sms')|format_thousands) }}
+        <div class="govuk-hint">
+          {{ current_service.sent_today("international_sms")|string + " sent today" }}
+        </div>
+      {% endset %}
+
 
       {% set base_text_message_setting_row = [
         {
@@ -345,7 +354,8 @@
                 "text": "International text message limit",
               },
             "value": {
-              "text": "{} per day".format(current_service.get_message_limit('international_sms')|format_thousands)
+              "text": international_text_message_limit_html,
+              "classes": "govuk-summary-list__value--truncate"
             },
             "actions": {
               "items": [

@@ -317,7 +317,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages On Change your settings for receiving text messages",
                 "Send international text messages On Change your settings for sending international text messages",
-                "International text message limit 500 per day Change daily international text message limit",
+                "International text message limit 500 per day 0 sent today Change daily international text message limit",  # noqa
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
@@ -3916,15 +3916,26 @@ def test_switch_service_enable_international_sms_and_letters(
 def test_should_show_page_to_set_per_day_international_sms_message_limit(
     client_request,
     service_one,
+    mocker,
 ):
     service_one["permissions"] = ["international_sms"]
+    mock_get_notification_count = mocker.patch("app.service_api_client.get_notification_count", return_value=1)
 
     page = client_request.get(
         "main.set_per_day_international_sms_message_limit",
         service_id=SERVICE_ONE_ID,
     )
     assert normalize_spaces(page.select_one("label").text) == "Daily international text message limit"
+    # form prefilled with current limit
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "500"
+    # today's remaining limit pulled and displayed
+    assert mock_get_notification_count.called_once_with(
+        service_id=SERVICE_ONE_ID, notification_type="international_sms"
+    )
+    assert (
+        normalize_spaces(page.select(".ajax-block-container")[0].text)
+        == "You have sent 1 international text message today (499 remaining)."
+    )
 
 
 @pytest.mark.parametrize(

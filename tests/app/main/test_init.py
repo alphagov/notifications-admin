@@ -11,6 +11,7 @@ class TestJsonUpdatesBlueprint:
             "template_type": "email",
             "message_type": "email",
             "job_id": fake_uuid,
+            "daily_limit_type": "email",
         }
         bad_views = []
         client_request.logout()
