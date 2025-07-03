@@ -3966,6 +3966,39 @@ def test_set_per_day_international_sms_message_limit(
 
 
 @pytest.mark.parametrize(
+    "daily_limit_type, limit_noun", (("sms", "text message"), ("email", "email"), ("letter", "letter"))
+)
+def test_should_show_daily_message_limit_page(
+    client_request,
+    service_one,
+    daily_limit_type,
+    limit_noun,
+    mocker,
+):
+    mock_get_notification_count = mocker.patch("app.service_api_client.get_notification_count", return_value=1)
+
+    page = client_request.get(
+        "main.set_daily_message_limit",
+        service_id=SERVICE_ONE_ID,
+        daily_limit_type=daily_limit_type,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == f"Daily {limit_noun} limit"
+
+    # full limit pulled in and displayed
+    assert normalize_spaces(page.select(".govuk-body")[1].text) == (
+        f"Your current sending limit is 1,000 {limit_noun}s per day."
+    )
+
+    # today's remaining limit pulled and displayed
+    assert mock_get_notification_count.called_once_with(service_id=SERVICE_ONE_ID, notification_type=daily_limit_type)
+    assert (
+        normalize_spaces(page.select(".ajax-block-container")[0].text)
+        == f"You have sent 1 {limit_noun} today (999 remaining)."
+    )
+
+
+@pytest.mark.parametrize(
     "user, is_trial_service",
     (
         [create_platform_admin_user(), True],
