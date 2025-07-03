@@ -32,7 +32,7 @@ Open this link to create a new government identity logo:
 {%- else -%}
   the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
 3. Check that the logo text says: {{ logo_text }}
-4. Check that the brand type selected is: {{% if branding_choice == "govuk_and_org" %}GOV.UK and branding
+4. Check that the brand type selected is: {{% if branding_choice == "govuk_and_org" -%}}GOV.UK and branding
 {% elif branding_choice == "organisation" %}Branding only
 {% endif %}
 5. Select ‘Save’.
