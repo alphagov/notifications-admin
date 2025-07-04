@@ -26,6 +26,7 @@ from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
 from notifications_utils import request_helper
 from notifications_utils.asset_fingerprinter import asset_fingerprinter
+from notifications_utils.clients.otel.otel_client import init_otel_app
 from notifications_utils.eventlet import EventletTimeout
 from notifications_utils.formatters import (
     formatted_list,
@@ -179,6 +180,7 @@ def create_app(application):
     asset_fingerprinter._asset_root = application.config["ASSET_PATH"]
 
     init_app(application)
+    init_otel_app(application)
 
     if "extensions" not in application.jinja_options:
         application.jinja_options["extensions"] = []
