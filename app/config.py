@@ -1,8 +1,10 @@
 import json
 import os
 
+from notifications_utils.config import BaseConfig
 
-class Config:
+
+class Config(BaseConfig):
     ADMIN_CLIENT_SECRET = os.environ.get("ADMIN_CLIENT_SECRET")
     API_HOST_NAME = os.environ.get("API_HOST_NAME")
     SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -14,6 +16,8 @@ class Config:
 
     TEMPLATE_PREVIEW_API_HOST = os.environ.get("TEMPLATE_PREVIEW_API_HOST", "http://localhost:6013")
     TEMPLATE_PREVIEW_API_KEY = os.environ.get("TEMPLATE_PREVIEW_API_KEY", "my-secret-key")
+
+    OTEL_EXPORT_TYPE = os.environ.get("OTEL_EXPORT_TYPE", "otlp").lower().strip()
 
     # Logging
     DEBUG = False
