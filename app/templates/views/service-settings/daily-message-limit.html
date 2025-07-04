@@ -29,7 +29,7 @@
 
         {{ ajax_block(partials, updates_url, 'remaining_limit') }}
 
-        <h2 class="heading-medium">Request an increase to your sending limit</h2>
+        <h2 class="heading-medium">If you need to change the daily {{ 1|message_count_noun(daily_limit_type) }} limit</h2>
 
         <p class="govuk-body">
             If you need to discuss an increase to your daily {{ 1|message_count_noun(daily_limit_type) }} limit, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
