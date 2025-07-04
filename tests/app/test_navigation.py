@@ -328,6 +328,7 @@ EXCLUDED_ENDPOINTS = set(
             "service_switch_live",
             "service_verify_reply_to_address",
             "services_or_dashboard",
+            "set_daily_message_limit",
             "set_free_sms_allowance",
             "set_per_day_international_sms_message_limit",
             "set_per_day_message_limit",
