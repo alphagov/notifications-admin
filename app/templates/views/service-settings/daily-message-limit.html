@@ -39,9 +39,19 @@
             Please let us know:
         </p>
         <ul class="govuk-list govuk-list--bullet">
-            <li>What you need to change your limit to</li>
-            <li>how long you need to increase your limit for</li>
-            <li>how many {{ 3|message_count_noun(daily_limit_type) }} per day your service will send during this time</li>
+            <li>what you need to change your limit to</li>
+
+            {% if daily_limit_type == "letter" %}
+                <li>the start and end dates of your letter campaign</li>
+                <li>the total volume of letters your service will send during this time</li>
+                <li>the number of sheets per template (2 pages in your template is equivalent to 1 double-sided sheet)</li>
+                <li>the postage class you will be using</li>
+
+            {% else %}
+                <li>how long you need to increase your limit for</li>
+                <li>the total volume of {{ 3|message_count_noun(daily_limit_type) }} your service will send during this time</li>
+            {% endif %}
+
         </ul>
     </div>
 </div>
