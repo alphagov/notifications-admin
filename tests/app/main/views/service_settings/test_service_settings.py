@@ -104,7 +104,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Text message limit 1,000 per day 0 sent today Change daily text message limit",
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
-                "Live No Organisation must accept the data processing and financial agreement first",
+                "Live On Change service status",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -136,7 +136,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
                 "Letter limit 1,000 per day 0 sent today Change daily letter limit",
-                "Live No Organisation must accept the data processing and financial agreement first",
+                "Live On Change service status",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -173,6 +173,7 @@ def test_should_show_overview(
         permissions=service_permissions,
         organisation_id=ORGANISATION_ID,
         contact_link="contact_us@gov.uk",
+        restricted=False,
     )
     mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
 
@@ -382,6 +383,7 @@ def test_should_show_overview_for_service_with_more_things_set(
 ):
     client_request.login(active_user_with_permissions)
     service_one["permissions"] = permissions
+    service_one["restricted"] = False
     service_one["email_branding"] = uuid4()
     page = client_request.get("main.service_settings", service_id=service_one["id"])
     assert [

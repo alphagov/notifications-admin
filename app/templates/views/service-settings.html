@@ -210,6 +210,12 @@
               ]
             }
           },
+        ]%}
+      {% endif %}
+
+      <!-- only show limit page for live services -->
+      {% if current_service.has_permission("email") and current_service.live %}
+        {% set _ = restricted_email_settings_rows.append(
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
@@ -230,7 +236,7 @@
               ]
             }
           },
-        ]%}
+        )%}
       {% endif %}
 
       {% set email_settings_rows = base_email_settings_row + restricted_email_settings_rows if restricted_email_settings_rows else base_email_settings_row %}
@@ -356,6 +362,12 @@
               ]
             }
           },
+        ]%}
+      {% endif %}
+
+    <!-- only show limit page for live services -->
+      {% if current_service.has_permission("sms") and current_service.live %}
+        {% set _ = restricted_text_message_settings_rows.append(
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
@@ -376,6 +388,11 @@
               ]
             }
           },
+        )%}
+      {% endif %}
+      <!-- we want international sms row to be after the daily limit row -->
+      {% if current_service.has_permission("sms") %}
+        {% set _ = restricted_text_message_settings_rows.append(
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
@@ -395,7 +412,7 @@
               ]
             }
           },
-        ]%}
+        )%}
       {% endif %}
 
       {% set restricted_international_text_message_settings_rows = [] %}
@@ -544,6 +561,11 @@
               ]
             }
           },
+        ] %}
+      {% endif %}
+      <!-- only show limit page for live services -->
+      {% if current_service.has_permission("letter") and current_service.live %}
+        {% set _ = restricted_letter_settings_rows.append(
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
@@ -564,7 +586,7 @@
               ]
             }
           },
-        ] %}
+        ) %}
       {% endif %}
 
       {% set letter_settings_rows = base_letter_settings_row + restricted_letter_settings_rows  if restricted_letter_settings_rows else base_letter_settings_row %}
