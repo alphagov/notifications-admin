@@ -558,14 +558,7 @@ def test_show_limits_for_live_service(
     )
 
     assert page.select_one("main > h2").text == "Your service is live"
-    assert normalize_spaces(page.select_one("main p").text) == "You can send up to:"
-    assert [normalize_spaces(li.text) for li in page.select("main ul li")] == [
-        "1,000 emails per day",
-        "2,000 text messages per day",
-        "3,000 letters per day",
-    ]
-    assert normalize_spaces(page.select_one("main ul + p").text) == "If you need to discuss these limits, contact us."
-    assert page.select_one("main ul + p a")["href"] == url_for("main.support")
+    assert normalize_spaces(page.select_one("main p").text) == "To delete this service, contact us."
 
 
 @pytest.mark.parametrize(

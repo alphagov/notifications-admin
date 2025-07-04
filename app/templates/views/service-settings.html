@@ -592,16 +592,7 @@
     {% if current_service.live %}
       <h2 class="heading-medium top-gutter-0">Your service is live</h2>
       <p class="govuk-body">
-        You can send up to:
-      </p>
-      <ul class="govuk-list govuk-list--bullet">
-        <li>{{ current_service.email_message_limit | message_count('email') }} per day</li>
-        <li>{{ current_service.sms_message_limit | message_count('sms') }} per day</li>
-        <li>{{ current_service.letter_message_limit | message_count('letter') }} per day</li>
-      </ul>
-      <p class="govuk-body">
-        If you need to discuss these limits,
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
+        To delete this service, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
       </p>
 
     {% endif %}
