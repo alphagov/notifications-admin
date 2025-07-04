@@ -182,7 +182,7 @@ phonenumbers==8.13.50
     # via
     #   -r requirements.txt
     #   notifications-utils
-pillow==11.2.1
+pillow==11.3.0
     # via -r requirements.txt
 pluggy==1.5.0
     # via pytest
