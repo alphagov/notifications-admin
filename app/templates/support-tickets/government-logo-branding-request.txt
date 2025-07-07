@@ -8,38 +8,26 @@ Service: {{ current_service.name }}
 
 ---
 
-<h2>Create a new government identity logo</h2>
-
-Open this link to create a new government identity logo:
-
+## Create a new government identity logo
 {% if branding_choice == "govuk_and_org" %}
 {% set create_logo_url = url_for(
-  'main.create_email_branding_government_identity_logo', text=logo_text, brand_type="both", _external=True
+'main.create_email_branding_government_identity_logo', text=logo_text, brand_type="both", _external=True
 ) %}
-{% elif branding_choice == "organisation" %}
+{% else %}
 {% set create_logo_url = url_for(
-  'main.create_email_branding_government_identity_logo', text=logo_text, _external=True
+'main.create_email_branding_government_identity_logo', text=logo_text, _external=True
 ) %}
 {% endif %}
-{{ create_logo_url }}
 
-1. Select the coat of arms or insignia for {% if current_service.organisation -%}
-  {{ current_service.organisation.name }}. If this organisation is not listed, select ‘HM Government’.
-{%- else -%}
-  the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
-2. Select the stripe colour for {% if current_service.organisation -%}
-  {{ current_service.organisation.name }}. If this organisation is not listed, select ‘HM Government’.
-{%- else -%}
-  the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
+Open this link to create a new government identity logo: {{ create_logo_url }}
+
+1. Select the coat of arms or insignia for {% if current_service.organisation %}{{current_service.organisation.name}}. If this organisation is not listed, select ‘HM Government’. {% else %}the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.{% endif %}
+2. Select the stripe colour for {% if current_service.organisation -%}{{current_service.organisation.name}}. If this organisation is not listed, select ‘HM Government’.{% else %}the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.{% endif %}
 3. Check that the logo text says: {{ logo_text }}
-4. Check that the brand type selected is: {{% if branding_choice == "govuk_and_org" -%}}GOV.UK and branding
-{% elif branding_choice == "organisation" %}Branding only
-{% endif %}
+4. Check that the brand type selected is: {% if branding_choice == "govuk_and_org" %}GOV.UK and branding{% else %}Branding only{% endif %}
 5. Select ‘Save’.
 
 
-<h2>Set the email branding for this service</h2>
+## Set the email branding for this service
 
-Open this link to select the new email branding for {{ current_service.name }}:
-
-{{ url_for('main.service_set_branding', service_id=current_service.id, branding_type='email', _external=True) }}
+Open this link to select the new email branding for {{ current_service.name }}: {{ url_for('main.service_set_branding', service_id=current_service.id, branding_type='email', _external=True) }}
