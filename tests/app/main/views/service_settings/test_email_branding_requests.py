@@ -940,53 +940,82 @@ def test_GET_email_branding_enter_government_identity_logo_text_protects_against
         (
             {"branding_choice": "something-else"},
             """
-        Organisation: Can’t tell (domain is user.gov.uk)
-        Service: service one
-        {service_dashboard}
+Organisation: Can’t tell (domain is user.gov.uk)
+Service: service one
+{service_dashboard}
 
-        ---
-        Government logo text requested: My lovely government identity
+---
 
-        Create this logo: {create_email_branding_government_identity_logo}
+## Create a new government identity logo\n\n
 
-        Apply branding to this service: {service_set_branding}
-    """,
+
+Open this link to create a new government identity logo: {create_email_branding_government_identity_logo}
+
+1. Select the coat of arms or insignia for the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
+2. Select the stripe colour for the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
+3. Check that the logo text says: My lovely government identity
+4. Check that the brand type selected is: Branding only
+5. Select ‘Save’.
+
+
+## Set the email branding for this service
+
+Open this link to select the new email branding for service one: {service_set_branding}
+            """,  # noqa
             {},
         ),
         (
             {"branding_choice": "govuk_and_org"},
             """
-        Organisation: Can’t tell (domain is user.gov.uk)
-        Service: service one
-        {service_dashboard}
+Organisation: Can’t tell (domain is user.gov.uk)
+Service: service one
+{service_dashboard}
 
-        ---
-        Government logo text requested: My lovely government identity
+---
 
-        This service requested for both GOV.UK and organisation logo to be visible.
+## Create a new government identity logo\n\n
 
-        Create this logo: {create_email_branding_government_identity_logo}
 
-        Apply branding to this service: {service_set_branding}
-    """,
+Open this link to create a new government identity logo: {create_email_branding_government_identity_logo}
+
+1. Select the coat of arms or insignia for the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
+2. Select the stripe colour for the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
+3. Check that the logo text says: My lovely government identity
+4. Check that the brand type selected is: GOV.UK and branding
+5. Select ‘Save’.
+
+
+## Set the email branding for this service
+
+Open this link to select the new email branding for service one: {service_set_branding}
+            """,  # noqa
             {"brand_type": "both"},
         ),
         (
             {"branding_choice": "organisation"},
             """
-        Organisation: Can’t tell (domain is user.gov.uk)
-        Service: service one
-        {service_dashboard}
+Organisation: Can’t tell (domain is user.gov.uk)
+Service: service one
+{service_dashboard}
 
-        ---
-        Government logo text requested: My lovely government identity
+---
 
-        This service requested organisation branding.
+## Create a new government identity logo\n\n
 
-        Create this logo: {create_email_branding_government_identity_logo}
 
-        Apply branding to this service: {service_set_branding}
-    """,
+Open this link to create a new government identity logo: {create_email_branding_government_identity_logo}
+
+1. Select the coat of arms or insignia for the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
+2. Select the stripe colour for the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.
+3. Check that the logo text says: My lovely government identity
+4. Check that the brand type selected is: Branding only
+5. Select ‘Save’.
+
+
+## Set the email branding for this service
+
+Open this link to select the new email branding for service one: {service_set_branding}
+            """,  # noqa
             {},
         ),
     ],
@@ -1014,6 +1043,7 @@ def test_POST_email_branding_enter_government_identity_logo_text(
 
     assert "Thanks for your branding request." in mock_flash.call_args_list[0][0][0]
     assert mock_send_ticket_to_zendesk.call_count == 1
+
     assert (
         mock_send_ticket_to_zendesk.call_args[0][0].message
         == dedent(expected_ticket_content)
