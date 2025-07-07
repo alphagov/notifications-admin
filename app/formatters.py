@@ -170,7 +170,7 @@ def format_notification_status(status, template_type):
             "delivered": "Delivered",
             "sending": "Delivering",
             "created": "Sending",
-            "pending": "Sending",
+            "pending": "Delivering",
             "sent": "Sent to an international number",
             "validation-failed": "Validation failed",
         },
