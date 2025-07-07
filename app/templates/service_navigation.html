@@ -1,10 +1,22 @@
-{% macro navigation_service_name(service) %}
-  <div class="navigation-service-name govuk-!-font-weight-bold">
-    {{ service.name }}
-    {% if not service.active %}
-      <span class="navigation-service-type navigation-service-type--suspended">Suspended</span>
-    {% endif %}
-  </div>
+{% from "govuk_frontend_jinja/components/tag/macro.html" import govukTag %}
+
+{% macro navigation_service_name(service, show_test_mode_tag=False) %}
+    <div class="navigation-service-name govuk-!-font-weight-bold">
+        {{ service.name }}
+        {% if not service.active %}
+            <span class="navigation-service-type navigation-service-type--suspended">Suspended</span>
+        {% endif %}
+        {% if show_test_mode_tag and not service.live %}
+            <a
+                    href="{{ url_for('main.guidance_trial_mode') }}"
+                    class="govuk-tag govuk-!-margin-left-2 govuk-link--no-visited-state"
+                    style="text-decoration: none; cursor: pointer;"
+            >
+                Test mode
+            </a>
+        {% endif %}
+
+    </div>
 {% endmacro %}
 
 {% macro service_navigation(user, service) %}
@@ -16,7 +28,7 @@
         <a href="{{ url_for('main.organisation_dashboard', org_id=service.organisation_id) }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-organisation-link">{{ service.organisation_name }}</a>
       {% endif %}
     {% endif %}
-    {{ navigation_service_name(service) }}
+      {{ navigation_service_name(service, show_test_mode_tag=True) }}
   </div>
 </div>
 {% endmacro %}
