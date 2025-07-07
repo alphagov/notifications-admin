@@ -132,13 +132,13 @@
 
     {% if current_user.trial_mode_services %}
       {{ service_list(
-        heading='Trial mode services',
+        heading='Test mode services',
         services=current_user.trial_mode_services
       ) }}
     {% else %}
       {{ no_service(
-        heading='Trial mode services',
-        no_live_service_text='No trial mode services'
+        heading='Test mode services',
+        no_live_service_text='No test mode services'
       ) }}
     {% endif %}
 

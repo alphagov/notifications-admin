@@ -171,7 +171,7 @@ def using_notify_nav():
                     "link": "main.guidance_text_message_sender",
                 },
                 {
-                    "name": "Trial mode",
+                    "name": "Test mode",
                     "link": "main.guidance_trial_mode",
                 },
                 {

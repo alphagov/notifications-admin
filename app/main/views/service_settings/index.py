@@ -1249,7 +1249,7 @@ def link_service_to_organisation(service_id):
         if form.organisations.data != current_service.organisation_id:
             organisations_client.update_service_organisation(service_id, form.organisations.data)
 
-            # if it's a GP in trial mode, we need to set their daily sms_message_limit to 0
+            # if it's a GP in test mode, we need to set their daily sms_message_limit to 0
             organisation = Organisation.from_id(form.organisations.data)
             if current_service.trial_mode and organisation.organisation_type == Organisation.TYPE_NHS_GP:
                 current_service.update(sms_message_limit=0)
