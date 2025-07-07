@@ -986,7 +986,7 @@ def _check_notification(service_id, template_id, exception=None):
 
 def get_template_error_dict(exception):
     # TODO: Make API return some computer-friendly identifier as well as the end user error messages
-    if "service is in trial mode" in exception.message:
+    if "service is in test mode" in exception.message:
         error = "not-allowed-to-send-to"
     elif "Exceeded send limits" in exception.message:
         if "international_sms" in exception.message:
