@@ -20,11 +20,7 @@
     <div class="govuk-grid-column-five-sixths">
         {{ page_header(page_title) }}
         <p class="govuk-body">
-            Number of {{ 3|message_count_noun(daily_limit_type) }} the service is allowed to send each day.
-        </p>
-
-        <p class="govuk-body">
-            Your current sending limit is {{ current_service.get_message_limit(daily_limit_type)|message_count(daily_limit_type) }} per day.
+            You can send up to {{ current_service.get_message_limit(daily_limit_type)|message_count(daily_limit_type) }} per day.
         </p>
 
         {{ ajax_block(partials, updates_url, 'remaining_limit') }}

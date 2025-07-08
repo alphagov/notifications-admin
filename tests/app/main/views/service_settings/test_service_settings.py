@@ -3992,9 +3992,7 @@ def test_should_show_daily_message_limit_page(
     assert normalize_spaces(page.select_one("h1").text) == f"Daily {limit_noun} limit"
 
     # full limit pulled in and displayed
-    assert normalize_spaces(page.select(".govuk-body")[1].text) == (
-        f"Your current sending limit is 1,000 {limit_noun}s per day."
-    )
+    assert normalize_spaces(page.select(".govuk-body")[0].text) == (f"You can send up to 1,000 {limit_noun}s per day.")
 
     # today's remaining limit pulled and displayed
     assert mock_get_notification_count.called_once_with(service_id=SERVICE_ONE_ID, notification_type=daily_limit_type)
