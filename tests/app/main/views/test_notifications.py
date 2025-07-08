@@ -31,7 +31,12 @@ from tests.conftest import (
         (None, "failed", False, "Failed"),
         (None, "failed", True, "Failed via MMG"),
         (None, "temporary-failure", False, "Phone not accepting messages right now"),
-        (None, "temporary-failure", True, "Phone not accepting messages right now via MMG"),
+        (
+            None,
+            "temporary-failure",
+            True,
+            "Phone not accepting messages right now via MMG",
+        ),
         (None, "permanent-failure", False, "Not delivered"),
         (None, "permanent-failure", True, "Not delivered via MMG"),
         (None, "technical-failure", False, "Technical failure"),
