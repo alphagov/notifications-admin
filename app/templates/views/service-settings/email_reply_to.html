@@ -9,19 +9,14 @@
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+  {{ govukBackLink({ "href": alternative_backlink or url_for('main.service_settings', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('Reply-to email addresses') }}
+  {{ page_header('Let recipients reply to your emails') }}
 
   <div class="user-list">
-    {% if not current_service.email_reply_to_addresses %}
-      <div class="user-list-item">
-        <p class="govuk-body user-list-item-blank hint">You have not added any reply-to email addresses yet</p>
-      </div>
-    {% endif %}
     {% for item in current_service.email_reply_to_addresses %}
       <div class="user-list-item">
         <div class="govuk-grid-row">
@@ -59,23 +54,31 @@
           {{ govukButton({
             "element": "a",
             "text": "Add reply-to email address",
-            "href": url_for('main.service_add_email_reply_to', service_id=current_service.id),
+            "href": url_for('main.service_add_email_reply_to', service_id=current_service.id, back="email_reply_to", template_id=template_id),
           }) }}
         </div>
       {% endif %}
     </div>
     <div class="govuk-grid-column-five-sixths">
       <p class="govuk-body">
-        You need to add at least one reply-to address so recipients can reply to your messages.
+          You must set up a reply-to email address for your service.
       </p>
       <p class="govuk-body">
-        Emails with a reply-to address:
+          Emails with a reply-to address are:
       </p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>are less likely to be labelled as spam</li>
-        <li>appear more trustworthy</li>
+          <li>more likely to be delivered</li>
+          <li>less likely to end up in a junk folder</li>
+          <li>less likely to be reported as spam</li>
       </ul>
     </div>
+      <div class="govuk-grid-column-five-sixths">
+          <p class="govuk-body">
+              <a href="{{ url_for('main.add_recipients', service_id=service_id, template_id=template_id, back="email_reply_to") }}" class="govuk-link govuk-link--no-visited-state">
+                  I’ll do this later
+              </a>
+          </p>
+      </div>
   </div>
 
 {% endblock %}

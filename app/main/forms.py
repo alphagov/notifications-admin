@@ -2381,6 +2381,21 @@ def get_placeholder_form_instance(
     return PlaceholderForm(placeholder_value=dict_to_populate_from.get(placeholder_name, ""))
 
 
+class AddRecipientForm(StripWhitespaceForm):
+    ADD_RECIPIENT_CHOICES = [
+        ("upload_csv", "Upload a list of email addresses"),
+        ("enter_single", "Enter a single email address"),
+        ("use_my_email", "Use my email address"),
+    ]
+
+    add_recipient_method = GovukRadiosField(
+        "",
+        choices=ADD_RECIPIENT_CHOICES,
+        thing="how to add recipients",
+        validators=[DataRequired()],
+    )
+
+
 class SetSenderForm(StripWhitespaceForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
