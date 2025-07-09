@@ -405,12 +405,26 @@ def service_email_reply_to(service_id):
             back="set_sender",
             template_id=template_id,
         )
-    return render_template("views/service-settings/email_reply_to.html", alternative_backlink=backlink)
+
+    return render_template(
+        "views/service-settings/email_reply_to.html",
+        alternative_backlink=backlink,
+        template_id=template_id,
+        service_id=current_service.id,
+    )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-reply-to/add", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_add_email_reply_to(service_id):
+    back = request.args.get("back")
+    template_id = request.args.get("template_id")
+
+    backlink = None
+
+    if back == "email_reply_to" and template_id:
+        backlink = url_for(".service_email_reply_to", service_id=service_id, template_id=template_id, back="from_name")
+
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
     is_default = first_email_address if first_email_address else form.is_default.data
@@ -451,6 +465,7 @@ def service_add_email_reply_to(service_id):
         form=form,
         first_email_address=first_email_address,
         error_summary_enabled=True,
+        alternative_backlink=backlink,
     )
 
 
