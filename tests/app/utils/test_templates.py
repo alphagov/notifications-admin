@@ -773,7 +773,7 @@ def test_email_preview_template_makes_links_out_of_URLs(url, url_with_entities_r
         f'<a style="word-wrap: break-word; color: #1D70B8;" href="{url_with_entities_replaced}">'
         f"{url_with_entities_replaced}"
         "</a>"
-    ) in str(EmailPreviewTemplate({"content": url, "subject": "", "template_type": "email"}))
+    ) in str(EmailPreviewTemplate({"content": url, "subject": "Required", "template_type": "email"}))
 
 
 @pytest.mark.parametrize(
