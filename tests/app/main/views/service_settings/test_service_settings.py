@@ -58,10 +58,12 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
+                "Email limit 1,000 per day 0 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Text message limit 1,000 per day 0 sent today Change daily text message limit",
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
             ],
@@ -79,6 +81,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
+                "Letter limit 1,000 per day 0 sent today Change daily letter limit",
             ],
         ),
         (
@@ -93,13 +96,15 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
+                "Email limit 1,000 per day 0 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Text message limit 1,000 per day 0 sent today Change daily text message limit",
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
-                "Live No Organisation must accept the data processing and financial agreement first",
+                "Live On Change service status",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -130,7 +135,8 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
-                "Live No Organisation must accept the data processing and financial agreement first",
+                "Letter limit 1,000 per day 0 sent today Change daily letter limit",
+                "Live On Change service status",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -167,6 +173,7 @@ def test_should_show_overview(
         permissions=service_permissions,
         organisation_id=ORGANISATION_ID,
         contact_link="contact_us@gov.uk",
+        restricted=False,
     )
     mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
 
@@ -312,10 +319,12 @@ def test_send_files_by_email_row_on_settings_page(
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Email branding Organisation name Change email branding",
                 "Send files by email Not set up Manage sending files by email",
+                "Email limit 1,000 per day 0 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages On Change your settings for receiving text messages",
+                "Text message limit 1,000 per day 0 sent today Change daily text message limit",
                 "Send international text messages On Change your settings for sending international text messages",
                 "International text message limit 500 per day 0 sent today Change daily international text message limit",  # noqa
                 "Send letters Off Change your settings for sending letters",
@@ -332,10 +341,12 @@ def test_send_files_by_email_row_on_settings_page(
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Email branding Organisation name Change email branding",
                 "Send files by email Not set up Manage sending files by email",
+                "Email limit 1,000 per day 0 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Text message limit 1,000 per day 0 sent today Change daily text message limit",
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
             ],
@@ -352,6 +363,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses 1 Example Street Manage sender addresses",
                 "Letter branding Not set Change letter branding",
+                "Letter limit 1,000 per day 0 sent today Change daily letter limit",
             ],
         ),
     ],
@@ -371,6 +383,7 @@ def test_should_show_overview_for_service_with_more_things_set(
 ):
     client_request.login(active_user_with_permissions)
     service_one["permissions"] = permissions
+    service_one["restricted"] = False
     service_one["email_branding"] = uuid4()
     page = client_request.get("main.service_settings", service_id=service_one["id"])
     assert [
@@ -547,14 +560,7 @@ def test_show_limits_for_live_service(
     )
 
     assert page.select_one("main > h2").text == "Your service is live"
-    assert normalize_spaces(page.select_one("main p").text) == "You can send up to:"
-    assert [normalize_spaces(li.text) for li in page.select("main ul li")] == [
-        "1,000 emails per day",
-        "2,000 text messages per day",
-        "3,000 letters per day",
-    ]
-    assert normalize_spaces(page.select_one("main ul + p").text) == "If you need to discuss these limits, contact us."
-    assert page.select_one("main ul + p a")["href"] == url_for("main.support")
+    assert normalize_spaces(page.select_one("main p").text) == "To delete this service, contact us."
 
 
 @pytest.mark.parametrize(
@@ -3963,6 +3969,37 @@ def test_set_per_day_international_sms_message_limit(
     assert mock_update_service.call_args_list == [
         mocker.call(SERVICE_ONE_ID, international_sms_message_limit=expected_api_argument)
     ]
+
+
+@pytest.mark.parametrize(
+    "daily_limit_type, limit_noun", (("sms", "text message"), ("email", "email"), ("letter", "letter"))
+)
+def test_should_show_daily_message_limit_page(
+    client_request,
+    service_one,
+    daily_limit_type,
+    limit_noun,
+    mocker,
+):
+    mock_get_notification_count = mocker.patch("app.service_api_client.get_notification_count", return_value=1)
+
+    page = client_request.get(
+        "main.set_daily_message_limit",
+        service_id=SERVICE_ONE_ID,
+        daily_limit_type=daily_limit_type,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == f"Daily {limit_noun} limit"
+
+    # full limit pulled in and displayed
+    assert normalize_spaces(page.select(".govuk-body")[0].text) == (f"You can send up to 1,000 {limit_noun}s per day.")
+
+    # today's remaining limit pulled and displayed
+    assert mock_get_notification_count.called_once_with(service_id=SERVICE_ONE_ID, notification_type=daily_limit_type)
+    assert (
+        normalize_spaces(page.select(".ajax-block-container")[0].text)
+        == f"You have sent 1 {limit_noun} today (999 remaining)."
+    )
 
 
 @pytest.mark.parametrize(
