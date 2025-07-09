@@ -638,6 +638,7 @@ class NotifyJinjaUndefined(jinja2.Undefined):
     __len__ = jinja2.Undefined._fail_with_undefined_error
     __hash__ = jinja2.Undefined._fail_with_undefined_error
     # __bool__: UndefinedErrors remain supressed
+    __contains__ = jinja2.Undefined._fail_with_undefined_error
 
     def __eq__(self, other):
         if isinstance(self._undefined_obj, dict):
