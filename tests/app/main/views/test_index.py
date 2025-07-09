@@ -371,7 +371,7 @@ def test_guidance_daily_limits(client_request):
     limits_table_rows = page.select("main tr")
 
     assert [normalize_spaces(row.text) for row in limits_table_rows] == [
-        "Message Daily limit",
+        "Message type Daily limit",
         "Emails 250,000",
         "Text messages 250,000",
         "Letters 20,000",
