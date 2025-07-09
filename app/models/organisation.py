@@ -113,6 +113,7 @@ class Organisation(JSONModel):
             self.name = None
             self.crown = None
             self.agreement_signed = None
+            self.agreement_signed_by_id = None
             self.domains = []
             self.organisation_type = None
             self.request_to_go_live_notes = None
