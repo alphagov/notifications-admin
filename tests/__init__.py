@@ -520,6 +520,7 @@ def notification_json(  # noqa: C901
     client_reference=None,
     created_by_name=None,
     postage=None,
+    key_name=None,
 ):
     if template is None:
         template = template_json(service_id=service_id, id_=str(generate_uuid()), type_=template_type)
@@ -581,6 +582,7 @@ def notification_json(  # noqa: C901
                 "reply_to_text": reply_to_text,
                 "client_reference": client_reference,
                 "created_by_name": created_by_name,
+                "key_name": key_name,
             }
             for i in range(rows)
         ],
