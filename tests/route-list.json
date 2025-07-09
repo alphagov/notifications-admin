@@ -239,7 +239,7 @@
     "/services/<uuid:service_id>/service-settings/email-reply-to/<uuid:reply_to_email_id>/delete",
     "/services/<uuid:service_id>/service-settings/email-reply-to/<uuid:reply_to_email_id>/edit",
     "/services/<uuid:service_id>/service-settings/email-reply-to/add",
-    "/services/<uuid:service_id>/service-settings/email-sender",
+    "/services/<uuid:service_id>/service-settings/from-name",
     "/services/<uuid:service_id>/service-settings/email-sender/preview-address",
     "/services/<uuid:service_id>/service-settings/letter-branding",
     "/services/<uuid:service_id>/service-settings/letter-branding/request",

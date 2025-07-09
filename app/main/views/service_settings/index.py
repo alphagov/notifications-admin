@@ -117,18 +117,41 @@ def service_name_change(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-sender", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/service-settings/from-name", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_email_sender_change(service_id):
+    from_sender_flow = request.args.get("back") == "set_sender"
+    template_id = request.args.get("template_id")
+    alternative_backlink = None
+
+    if from_sender_flow and template_id:
+        alternative_backlink = url_for("main.view_template", service_id=service_id, template_id=template_id)
+
+    sender_choice = determine_sender_choice(current_service)
+
     form = ServiceEmailSenderForm(
-        use_custom_email_sender_name=current_service.custom_email_sender_name is not None,
+        use_custom_email_sender_name=sender_choice,
         custom_email_sender_name=current_service.custom_email_sender_name,
     )
 
     if form.validate_on_submit():
-        new_sender = form.custom_email_sender_name.data if form.use_custom_email_sender_name.data else None
+        choice = form.use_custom_email_sender_name.data
+
+        new_sender = None
+
+        if choice == ServiceEmailSenderForm.CHOICE_CUSTOM:
+            new_sender = form.custom_email_sender_name.data
+        if choice == ServiceEmailSenderForm.CHOICE_ORGANISATION:
+            new_sender = current_service.organisation_name
+        if choice == ServiceEmailSenderForm.CHOICE_SERVICE:
+            new_sender = current_service.name
 
         current_service.update(custom_email_sender_name=new_sender)
+
+        if from_sender_flow and not current_service.email_reply_to_addresses:
+            return redirect(
+                url_for(".service_email_reply_to", service_id=service_id, back="from_name", template_id=template_id)
+            )
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
@@ -137,7 +160,18 @@ def service_email_sender_change(service_id):
         form=form,
         organisation_type=current_service.organisation_type,
         error_summary_enabled=True,
+        alternative_backlink=alternative_backlink,
     )
+
+
+def determine_sender_choice(service):
+    sender_name = service.custom_email_sender_name
+    if sender_name:
+        if sender_name == service.organisation_name:
+            return ServiceEmailSenderForm.CHOICE_ORGANISATION
+        if sender_name == service.name:
+            return ServiceEmailSenderForm.CHOICE_SERVICE
+    return ServiceEmailSenderForm.CHOICE_SERVICE
 
 
 @main.post("/services/<uuid:service_id>/service-settings/email-sender/preview-address")
@@ -151,6 +185,22 @@ def service_email_sender_preview(service_id):
             )
         }
     )
+
+
+@main.post("/services/<uuid:service_id>/service-settings/from-name-preview")
+@user_has_permissions("manage_service")
+def service_from_name_preview(service_id):
+    choice = request.form.get("use_custom_email_sender_name")
+    name = ""
+
+    if choice == ServiceEmailSenderForm.CHOICE_CUSTOM:
+        name = request.form.get("custom_email_sender_name", "")
+    elif choice == ServiceEmailSenderForm.CHOICE_ORGANISATION:
+        name = current_service.organisation_name
+    elif choice == ServiceEmailSenderForm.CHOICE_SERVICE:
+        name = current_service.name
+
+    return jsonify({"html": render_template("partials/preview-full-email-sender.html", email_sender_name=name)})
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-data-retention", methods=["GET", "POST"])
@@ -341,7 +391,21 @@ def service_set_reply_to_email(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-reply-to", methods=["GET"])
 @user_has_permissions("manage_service", "manage_api_keys")
 def service_email_reply_to(service_id):
-    return render_template("views/service-settings/email_reply_to.html")
+    back = request.args.get("back")
+    template_id = request.args.get("template_id")
+
+    backlink = None
+
+    if back == "set_sender" and template_id:
+        backlink = url_for("main.set_sender", service_id=service_id, template_id=template_id, from_back_link="yes")
+    if back == "from_name" and template_id:
+        backlink = url_for(
+            ".service_email_sender_change",
+            service_id=service_id,
+            back="set_sender",
+            template_id=template_id,
+        )
+    return render_template("views/service-settings/email_reply_to.html", alternative_backlink=backlink)
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-reply-to/add", methods=["GET", "POST"])

@@ -196,6 +196,16 @@ def _should_show_set_sender_page(service_id, template) -> bool:
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/set-sender", methods=["GET", "POST"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def set_sender(service_id, template_id):
+    # Step 1: If user doesn't have email_sender_name set, we want to guide them towards it
+    if current_service.email_sender_name is None:
+        return redirect(
+            url_for(
+                "main.service_email_sender_change",
+                service_id=service_id,
+                back="set_sender",
+                template_id=template_id,
+            )
+        )
     from_back_link = request.args.get("from_back_link") == "yes"
     # If we're returning to the page, we want to use the sender_id already in the session instead of resetting it
     session["sender_id"] = session.get("sender_id") if from_back_link else None
