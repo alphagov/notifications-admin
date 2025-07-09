@@ -636,3 +636,4 @@ class NotifyJinjaUndefined(jinja2.Undefined):
     __slots__ = ()
     __iter__ = jinja2.Undefined._fail_with_undefined_error
     __len__ = jinja2.Undefined._fail_with_undefined_error
+    __hash__ = jinja2.Undefined._fail_with_undefined_error
