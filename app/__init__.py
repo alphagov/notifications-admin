@@ -637,3 +637,4 @@ class NotifyJinjaUndefined(jinja2.Undefined):
     __iter__ = jinja2.Undefined._fail_with_undefined_error
     __len__ = jinja2.Undefined._fail_with_undefined_error
     __hash__ = jinja2.Undefined._fail_with_undefined_error
+    # __bool__: UndefinedErrors remain supressed
