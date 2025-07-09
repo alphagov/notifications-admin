@@ -3,16 +3,14 @@
 {% set email_meta = [] %}
 
 {% if show_recipient %}
-  {% if from_name %}
     {% do email_meta.append({
       "key": {
         "html": "From"
       },
       "value": {
-        "html": from_name
+        "html": from_name if from_name else "Not set"
       }
     }) %}
-  {% endif %}
 
   {% if reply_to %}
     {% do email_meta.append({

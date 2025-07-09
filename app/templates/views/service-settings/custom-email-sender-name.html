@@ -3,38 +3,25 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
-{% set heading = 'Email sender name' %}
+
+{% set heading = 'Choose a ‘from’ name' %}
 
 {% block service_page_title %}
     {{ heading }}
 {% endblock %}
 
 {% block backLink %}
-    {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+    {{ govukBackLink({ "href": alternative_backlink or url_for('main.service_settings', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-five-sixths">
-            {{ page_header(heading) }}
+            {{ page_header('Choose a ‘from’ name') }}
 
-            <p class="govuk-body">You should choose a sender name that tells people:</p>
-
-            <ul class="govuk-list govuk-list--bullet">
-                <li>who the email is from</li>
-                <li>what the email is about</li>
-            </ul>
-
-            <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
-
-            <p class="govuk-body">Adding a custom sender name will also change the email address for your service.</p>
-
-            {% set default_email_sender_name_hint %}
-                {% with email_sender_name = current_service.name %}
-                    {% include "partials/preview-email-sender-name.html" %}
-                {% endwith %}
-            {% endset %}
+            <p class="govuk-body">Recipients will see the ‘from’ name in their email inbox.</p>
 
             {% set custom_email_sender_name_field_html %}
                 {{ form.custom_email_sender_name(
@@ -42,31 +29,48 @@
                         "classes": "",
                         "label": {"classes": "govuk-visually-hidden"}, "hint": None,
                         "formGroup": {"classes": "govuk-!-margin-bottom-3"},
+                        "attributes": {"placeholder": "Example ‘from’ name"}
                     }
                 ) }}
-                <div class="govuk-hint" data-notify-module="update-status" data-target="custom_email_sender_name" data-updates-url="{{ url_for('main.service_email_sender_preview', service_id=current_service.id) }}" aria-live="polite">
-                    {% with email_sender_name = current_service.custom_email_sender_name or '' %}
-                        {% include "partials/preview-email-sender-name.html" %}
-                    {% endwith %}
-                </div>
             {% endset %}
 
             {% call form_wrapper() %}
                 {{ form.use_custom_email_sender_name(param_extensions={
                     "items": [
-                        {
-                            "hint": {
-                                "html": default_email_sender_name_hint,
-                            },
-                        },
-                        {
-                            "conditional": {
-                                "html": custom_email_sender_name_field_html,
-                            },
-                        },
+                      {
+                        "value": "custom",
+                        "conditional": {
+                          "html": custom_email_sender_name_field_html
+                        }
+                      },
+                      {
+                        "value": "organisation"
+                      },
+                      {
+                        "value": "service",
+                        "hint": {
+                          "html": default_email_sender_name_hint
+                        }
+                      }
                     ]
-                }) }}
-                {{ page_footer('Save') }}
+                  }) }}
+
+                <h2 class="govuk-heading-m">Preview</h2>
+
+                <p>GOV.UK Notify automatically converts the ‘from’ name into an email address for your service.</p>
+
+                <div
+                        class="email-message govuk-!-padding-2"
+                        id="email-sender-preview"
+                        data-notify-module="update-status"
+                        data-target="use_custom_email_sender_name"
+                        data-updates-url="{{ url_for('main.service_from_name_preview', service_id=current_service.id) }}"
+                        aria-live="polite"
+                >
+                    {% include "partials/preview-full-email-sender.html" %}
+                </div>
+
+                {{ page_footer('Save and continue' if alternative_backlink else 'Save') }}
             {% endcall %}
         </div>
     </div>

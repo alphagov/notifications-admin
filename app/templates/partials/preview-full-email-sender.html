@@ -1,0 +1,8 @@
+<dt class="govuk-summary-list__key govuk-!-font-weight-regular" style="color: #505a5f;">From</dt>
+<dd class="govuk-summary-list__value">
+    {% set name = email_sender_name or 'Example' %}
+    <span id="sender-name-preview-line-1">{{ name }}</span><br><br>
+    <span id="sender-name-preview-line-2">
+        {{ name|make_string_safe_for_email_local_part }}@notifications.service.gov.uk
+    </span>
+</dd>

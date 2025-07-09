@@ -1953,19 +1953,23 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
         "alert",
     }
 
-    use_custom_email_sender_name = OnOffField(
-        "Choose a sender name",
-        choices_for_error_message="same or custom",
+    CHOICE_CUSTOM = "custom"
+    CHOICE_ORGANISATION = "organisation"
+    CHOICE_SERVICE = "service"
+
+    use_custom_email_sender_name = GovukRadiosField(
+        "",
         choices=[
-            (False, "Use the name of your service"),
-            (True, "Enter a custom sender name"),
+            (CHOICE_CUSTOM, "Enter a ‘from’ name"),
+            (CHOICE_ORGANISATION, "Use the name of your organisation"),
+            (CHOICE_SERVICE, "Use the name of your service"),
         ],
     )
 
     custom_email_sender_name = GovukTextInputField("Sender name", validators=[])
 
     def validate(self, *args, **kwargs):
-        if self.use_custom_email_sender_name.data is True:
+        if self.use_custom_email_sender_name.data == self.CHOICE_CUSTOM:
             self.custom_email_sender_name.validators = [
                 NotifyDataRequired(thing="a sender name"),
                 MustContainAlphanumericCharacters(thing="sender name"),
@@ -1979,7 +1983,7 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
         Validate that the email from name ("Sender Name" <sender.name@notifications.service.gov.uk)
         is under 320 characters (if it's over, SES will reject the email and we'll end up with technical errors)
         """
-        if self.use_custom_email_sender_name.data is not True:
+        if self.use_custom_email_sender_name.data != self.CHOICE_CUSTOM:
             return
 
         normalised_sender_name = make_string_safe_for_email_local_part(field.data)
