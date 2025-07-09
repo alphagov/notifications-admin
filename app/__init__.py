@@ -633,6 +633,14 @@ def init_jinja(application):
 
 
 class NotifyJinjaUndefined(jinja2.Undefined):
+    """
+    The same as jinja2.StrictUndefined with a few exceptions, noted
+    in specific comments.
+
+    For more context see:
+    https://jinja.palletsprojects.com/en/stable/api/#undefined-types
+    """
+
     __slots__ = ()
     __iter__ = jinja2.Undefined._fail_with_undefined_error
     __len__ = jinja2.Undefined._fail_with_undefined_error
