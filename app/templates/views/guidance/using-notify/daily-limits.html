@@ -15,9 +15,11 @@
 <h1 class="heading-large">Daily limits</h1>
 <div class="bottom-gutter-3-2">
 <p class="govuk-body">There’s a limit to the number of messages you can send each day. </p>
+<p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">contact us</a>.</p>
+  
   {% call mapping_table(
     caption="Notification Daily limits",
-    field_headings=["Message", "Daily limit"],
+    field_headings=["Message type", "Daily limit"],
     field_headings_visible=True,
     caption_visible=False,
     equal_length=True,
@@ -35,8 +37,6 @@
   {% endcall %}
   </div>
 
-<p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">contact us</a>.</p>
-
 <h2 class="heading-medium">International text message limit</h2>
 
   <p class="govuk-body">By default, you can only send 100 text messages a day to international phone numbers. This counts towards your total daily limit of 250,000 text messages.</p>
@@ -47,7 +47,7 @@
 
   <p class="govuk-body">The National Cyber Security Centre (NCSC) has written a blog post called <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/blog-post/ait-fraud-what-you-need-to-know">‘AIT fraud: what you need to know’</a>.</p>
 
-<h3 class="heading-medium">If you need to change the international text message limit</h3>
+<h3 class="heading-small">If you need to change the international text message limit</h3>
 
   <ol class="govuk-list govuk-list--number">
     <li>Work out how many international text messages you need to send each day and base your new limit on that.</li>
@@ -63,7 +63,7 @@
      <li>stop your service from repeatedly sending messages to the same number</li>
     </ul>
 
-<p class="govuk-body">If you do not need to send any international text messages:</p>
+<h3 class="heading-small">If you do not need to send any international text messages:</h3>
 
   <ol class="govuk-list govuk-list--number">
    <li>Go to {{ service_link(current_service, 'main.service_settings', 'Settings') }}.</li>
