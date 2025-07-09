@@ -58,12 +58,12 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
-                "Email limit 1,000 per day 0 sent today Change daily email limit",
+                "Email limit 1,000 per day 1,234 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
-                "Text message limit 1,000 per day 0 sent today Change daily text message limit",
+                "Text message limit 1,000 per day 1,234 sent today Change daily text message limit",
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
             ],
@@ -81,7 +81,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
-                "Letter limit 1,000 per day 0 sent today Change daily letter limit",
+                "Letter limit 1,000 per day 1,234 sent today Change daily letter limit",
             ],
         ),
         (
@@ -96,12 +96,12 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
-                "Email limit 1,000 per day 0 sent today Change daily email limit",
+                "Email limit 1,000 per day 1,234 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
-                "Text message limit 1,000 per day 0 sent today Change daily text message limit",
+                "Text message limit 1,000 per day 1,234 sent today Change daily text message limit",
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
                 "Live On Change service status",
@@ -135,7 +135,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
-                "Letter limit 1,000 per day 0 sent today Change daily letter limit",
+                "Letter limit 1,000 per day 1,234 sent today Change daily letter limit",
                 "Live On Change service status",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
@@ -176,6 +176,7 @@ def test_should_show_overview(
         restricted=False,
     )
     mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch("app.service_api_client.get_notification_count", return_value=1_234)
 
     client_request.login(user, service_one)
     page = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
