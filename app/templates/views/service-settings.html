@@ -103,7 +103,7 @@
       {% set email_limit_html %}
         {{ "{} per day".format(current_service.get_message_limit("email")|format_thousands) }}
         <div class="govuk-hint">
-          {{ current_service.sent_today("email")|string + " sent today" }}
+          {{ current_service.sent_today("email")|format_thousands + " sent today" }}
         </div>
       {% endset %}
 
@@ -262,14 +262,14 @@
       {% set text_message_limit_html %}
         {{ "{} per day".format(current_service.get_message_limit("sms")|format_thousands) }}
         <div class="govuk-hint">
-          {{ current_service.sent_today("sms")|string + " sent today" }}
+          {{ current_service.sent_today("sms")|format_thousands + " sent today" }}
         </div>
       {% endset %}
 
       {% set international_text_message_limit_html %}
         {{ "{} per day".format(current_service.get_message_limit("international_sms")|format_thousands) }}
         <div class="govuk-hint">
-          {{ current_service.sent_today("international_sms")|string + " sent today" }}
+          {{ current_service.sent_today("international_sms")|format_thousands + " sent today" }}
         </div>
       {% endset %}
 
@@ -455,7 +455,7 @@
     {% set letter_limit_html %}
       {{ "{} per day".format(current_service.get_message_limit("letter")|format_thousands) }}
       <div class="govuk-hint">
-        {{ current_service.sent_today("letter")|string + " sent today" }}
+        {{ current_service.sent_today("letter")|format_thousands + " sent today" }}
       </div>
     {% endset %}
 
