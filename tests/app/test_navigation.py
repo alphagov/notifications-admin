@@ -132,6 +132,8 @@ EXCLUDED_ENDPOINTS = set(
             "go_to_dashboard_after_tour",
             "guest_list",
             "guidance_api_documentation",
+            "guidance_api_documentation_section",
+            "guidance_api_documentation_section_choose_docs",
             "guidance_attach_pages",
             "guidance_billing_details",
             "guidance_bulk_sending",

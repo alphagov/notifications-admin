@@ -1,0 +1,27 @@
+{% extends "content_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+{% set page_title = "Send a link to an API docs section" %}
+
+
+{% block per_page_title %}
+{{page_title}}
+{% endblock %}
+
+{% block content_column_content %}
+
+<h1 class="heading-large">{{page_title}}</h1>
+<p class="govuk-body">Below, copy paste the full URL for docs section you would like to send to a service user, and click "Submit".</p>
+
+<p class="govuk-body">You will be taken to
+a landing page for that section. Send link to that page to your user, and they will be able to choose which language version they want to see.</p>
+
+{% call form_wrapper() %}
+    {{ form.url }}
+    {{ page_footer('Submit') }}
+{% endcall %}
+
+{% endblock %}

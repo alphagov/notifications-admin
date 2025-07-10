@@ -392,6 +392,8 @@
     "/users/<uuid:user_id>/remove-platform-admin",
     "/using-notify",
     "/using-notify/api-documentation",
+    "/using-notify/api-documentation/section",
+    "/using-notify/api-documentation/section/choose-docs",
     "/using-notify/attach-pages",
     "/using-notify/bulk-sending",
     "/using-notify/daily-limits",
