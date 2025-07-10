@@ -4,19 +4,14 @@ from markupsafe import Markup
 from notifications_utils.safe_string import make_string_safe
 
 from app import (
-    api_key_api_client,
     current_service,
     service_api_client,
 )
 from app.constants import ServiceCallbackTypes
 from app.main import main
 from app.main.forms import CallbackForm, CreateKeyForm, GuestList
+from app.models.api_key import APIKey
 from app.models.notification import APINotifications
-from app.notify_client.api_key_api_client import (
-    KEY_TYPE_NORMAL,
-    KEY_TYPE_TEAM,
-    KEY_TYPE_TEST,
-)
 from app.utils.user import user_has_permissions
 
 dummy_bearer_token = "bearer_token_set"
@@ -67,9 +62,7 @@ def guest_list(service_id):
 @main.route("/services/<uuid:service_id>/api/keys")
 @user_has_permissions("manage_api_keys")
 def api_keys(service_id):
-    return render_template(
-        "views/api/keys.html",
-    )
+    return render_template("views/api/keys.html")
 
 
 @main.route("/services/<uuid:service_id>/api/keys/create", methods=["GET", "POST"])
@@ -77,9 +70,9 @@ def api_keys(service_id):
 def create_api_key(service_id):
     form = CreateKeyForm(current_service.api_keys)
     form.key_type.choices = [
-        (KEY_TYPE_NORMAL, "Live – sends to anyone"),
-        (KEY_TYPE_TEAM, "Team and guest list – limits who you can send to"),
-        (KEY_TYPE_TEST, "Test – pretends to send messages"),
+        (APIKey.TYPE_NORMAL, "Live – sends to anyone"),
+        (APIKey.TYPE_TEAM, "Team and guest list – limits who you can send to"),
+        (APIKey.TYPE_TEST, "Test – pretends to send messages"),
     ]
     # preserve order of items extended by starting with empty dicts
     form.key_type.param_extensions = {"items": [{}, {}]}
@@ -96,11 +89,11 @@ def create_api_key(service_id):
     if current_service.has_permission("letter"):
         form.key_type.param_extensions["items"][1]["hint"] = {"text": "Cannot be used to send letters"}
     if form.validate_on_submit():
-        if current_service.trial_mode and form.key_type.data == KEY_TYPE_NORMAL:
+        if current_service.trial_mode and form.key_type.data == APIKey.TYPE_NORMAL:
             abort(400)
-        secret = api_key_api_client.create_api_key(
+        secret = APIKey.create(
             service_id=service_id,
-            key_name=form.key_name.data,
+            name=form.key_name.data,
             key_type=form.key_type.data,
         )
         return render_template(
@@ -115,11 +108,11 @@ def create_api_key(service_id):
 @main.route("/services/<uuid:service_id>/api/keys/revoke/<uuid:key_id>", methods=["GET", "POST"])
 @user_has_permissions("manage_api_keys")
 def revoke_api_key(service_id, key_id):
-    key_name = current_service.get_api_key(key_id)["name"]
+    key = current_service.api_keys.get(key_id)
     if request.method == "GET":
         flash(
             [
-                f"Are you sure you want to revoke ‘{key_name}’?",
+                f"Are you sure you want to revoke ‘{key.name}’?",
                 "You will not be able to use this API key to connect to GOV.UK Notify.",
             ],
             "revoke this API key",
@@ -128,8 +121,8 @@ def revoke_api_key(service_id, key_id):
             "views/api/keys.html",
         )
     elif request.method == "POST":
-        api_key_api_client.revoke_api_key(service_id=service_id, key_id=key_id)
-        flash(f"‘{key_name}’ was revoked", "default_with_tick")
+        key.revoke(service_id=service_id)
+        flash(f"‘{key.name}’ was revoked", "default_with_tick")
         return redirect(url_for(".api_keys", service_id=service_id))
 
 

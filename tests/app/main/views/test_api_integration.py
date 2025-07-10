@@ -319,8 +319,9 @@ def test_should_show_api_keys_page(
     revoke_link = page.select_one("main tr a.govuk-link.govuk-link--destructive")
 
     assert rows[0] == "API keys Action"
-    assert rows[1] == "another key name Revoked 1 January at 1:00am"
-    assert rows[2] == "some key name Revoke some key name"
+    assert rows[1] == "another key name Test – pretends to send messages Revoked 1 January at 1:00am"
+    assert rows[2] == "some key name Live – sends to anyone Revoke some key name"
+    assert rows[3] == "third key Team and guest list – limits who you can send to Revoke third key"
 
     assert normalize_spaces(revoke_link.text) == "Revoke some key name"
     assert revoke_link["href"] == url_for(
@@ -399,7 +400,7 @@ def test_should_create_api_key_with_type_normal(
     fake_uuid,
     mocker,
 ):
-    post = mocker.patch("app.notify_client.api_key_api_client.ApiKeyApiClient.post", return_value={"data": fake_uuid})
+    post = mocker.patch("app.models.api_key.api_key_api_client.post", return_value={"data": fake_uuid})
 
     page = client_request.post(
         "main.create_api_key",
@@ -426,7 +427,7 @@ def test_cant_create_normal_api_key_in_trial_mode(
     mock_has_permissions,
     mocker,
 ):
-    mock_post = mocker.patch("app.notify_client.api_key_api_client.ApiKeyApiClient.post")
+    mock_post = mocker.patch("app.models.api_key.api_key_api_client.post")
 
     client_request.post(
         "main.create_api_key",

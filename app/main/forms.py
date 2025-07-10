@@ -16,7 +16,7 @@ from flask_wtf.file import FileField as FileField_wtf
 from markupsafe import Markup
 from notifications_utils.countries.data import Postage
 from notifications_utils.formatters import strip_all_whitespace
-from notifications_utils.insensitive_dict import InsensitiveDict
+from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
 from notifications_utils.recipient_validation.phone_number import PhoneNumber as PhoneNumberUtils
@@ -1664,7 +1664,7 @@ class ChooseTimeForm(StripWhitespaceForm):
 
 class CreateKeyForm(StripWhitespaceForm):
     def __init__(self, existing_keys, *args, **kwargs):
-        self.existing_key_names = [key["name"].lower() for key in existing_keys if not key["expiry_date"]]
+        self.existing_key_names = InsensitiveSet(key.name for key in existing_keys if not key.expiry_date)
         super().__init__(*args, **kwargs)
 
     key_name = GovukTextInputField(
@@ -1677,7 +1677,7 @@ class CreateKeyForm(StripWhitespaceForm):
     )
 
     def validate_key_name(self, key_name):
-        if key_name.data.lower() in self.existing_key_names:
+        if key_name.data in self.existing_key_names:
             raise ValidationError("A key with this name already exists")
 
 
