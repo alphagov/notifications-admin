@@ -68,7 +68,26 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-large">
+    <br>
+
+    {% if new_user_account == 'yes' %}
+    <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__header">
+            <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                You have created a GOV.UK Notify account
+            </h2>
+        </div>
+        <div class="govuk-notification-banner__content">
+                <strong>To update your sign-in details, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_account') }}">go to your account</a>.</strong>
+            </p>
+            <p>
+                <strong>Add or join a service to start sending messages.</strong>
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <h1 class="heading-large">
     Your {{ thing_to_choose_between }}
   </h1>
 
@@ -113,13 +132,13 @@
 
     {% if current_user.trial_mode_services %}
       {{ service_list(
-        heading='Trial mode services',
+        heading='Test mode services',
         services=current_user.trial_mode_services
       ) }}
     {% else %}
       {{ no_service(
-        heading='Trial mode services',
-        no_live_service_text='No trial mode services'
+        heading='Test mode services',
+        no_live_service_text='No test mode services'
       ) }}
     {% endif %}
 
@@ -135,7 +154,7 @@
         {{ govukButton({
           "element": "a",
           "text": "Add a new service",
-          "href": url_for('main.add_service'),
+          "href": url_for('main.add_service_choose_organisation'),
           "classes": "govuk-button--secondary govuk-!-margin-right-3"
         }) }}
         {% if current_user.default_organisation.can_ask_to_join_a_service %}

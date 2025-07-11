@@ -31,6 +31,7 @@ from app import (
 )
 from app.main import main, no_cookie
 from app.main.forms import (
+    AddRecipientForm,
     ChooseTimeForm,
     CsvUploadForm,
     LetterAddressForm,
@@ -101,6 +102,9 @@ def send_messages(service_id, template_id):
         ),
     )
 
+    if session["source_call"] == "add_recipients":
+        backlink = url_for(".add_recipients", service_id=service_id, template_id=template_id, back="email_reply_to")
+
     if template.template_type == "email":
         template.reply_to = get_email_reply_to_address_from_session()
     elif template.template_type == "sms":
@@ -162,6 +166,7 @@ def send_messages(service_id, template_id):
         form=form,
         allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
         error_summary_enabled=True,
+        alternative_backlink=backlink,
     )
 
 
@@ -196,6 +201,16 @@ def _should_show_set_sender_page(service_id, template) -> bool:
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/set-sender", methods=["GET", "POST"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def set_sender(service_id, template_id):
+    # Step 1: If user doesn't have email_sender_name set, we want to guide them towards it
+    if current_service.email_sender_name is None:
+        return redirect(
+            url_for(
+                "main.service_email_sender_change",
+                service_id=service_id,
+                back="set_sender",
+                template_id=template_id,
+            )
+        )
     from_back_link = request.args.get("from_back_link") == "yes"
     # If we're returning to the page, we want to use the sender_id already in the session instead of resetting it
     session["sender_id"] = session.get("sender_id") if from_back_link else None
@@ -398,6 +413,42 @@ def send_one_off_letter_address(service_id, template_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/send/<uuid:template_id>/add-recipients", methods=["GET", "POST"])
+@user_has_permissions("send_messages")
+def add_recipients(service_id, template_id):
+    form = AddRecipientForm()
+    back = request.args.get("back")
+
+    backlink = None
+
+    if back == "email_reply_to" and template_id:
+        backlink = url_for(
+            "main.service_email_reply_to", service_id=service_id, template_id=template_id, back="from_name"
+        )
+
+    if form.validate_on_submit():
+        choice = form.add_recipient_method.data
+        session["source_call"] = "add_recipients"
+        session["add_recipients_choice"] = choice
+
+        if choice == "upload_csv":
+            return redirect(url_for("main.send_messages", service_id=service_id, template_id=template_id))
+        elif choice == "enter_single":
+            return redirect(
+                url_for("main.send_one_off_step", service_id=service_id, template_id=template_id, step_index=0)
+            )
+        elif choice == "use_my_email":
+            return redirect(url_for("main.send_one_off_to_myself", service_id=service_id, template_id=template_id))
+
+    return render_template(
+        "views/add-recipients.html",
+        form=form,
+        template_id=template_id,
+        service_id=service_id,
+        alternative_backlink=backlink,
+    )
+
+
 @main.route(
     "/services/<uuid:service_id>/send/<uuid:template_id>/one-off/step-<int:step_index>",
     methods=["GET", "POST"],
@@ -526,6 +577,7 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
         back_link=back_link,
         link_to_upload=(request.endpoint == "main.send_one_off_step" and step_index == 0),
         error_summary_enabled=True,
+        hide_upload_links=session.get("source_call") == "add_recipients",
     )
 
 
@@ -863,6 +915,9 @@ def _get_set_sender_back_link(service_id, template):
 
 def get_back_link(service_id, template, step_index, placeholders=None):
     if step_index == 0:
+        if session.get("source_call") == "add_recipients":
+            return url_for(".add_recipients", service_id=service_id, template_id=template.id, back="email_reply_to")
+
         if _should_show_set_sender_page(service_id, template):
             return url_for("main.set_sender", service_id=service_id, template_id=template.id, from_back_link="yes")
         else:
@@ -968,7 +1023,10 @@ def _check_notification(service_id, template_id, exception=None):
 
     placeholders = fields_to_fill_in(template)
 
-    back_link = get_back_link(service_id, template, len(placeholders), placeholders)
+    if request.args.get("back") == "add_recipients":
+        back_link = url_for(".add_recipients", service_id=service_id, template_id=template.id, back="email_reply_to")
+    else:
+        back_link = get_back_link(service_id, template, len(placeholders), placeholders)
 
     if (not session.get("recipient") and template.template_type != "letter") or not all_placeholders_in_session(
         template.placeholders
@@ -986,7 +1044,7 @@ def _check_notification(service_id, template_id, exception=None):
 
 def get_template_error_dict(exception):
     # TODO: Make API return some computer-friendly identifier as well as the end user error messages
-    if "service is in trial mode" in exception.message:
+    if "service is in test mode" in exception.message:
         error = "not-allowed-to-send-to"
     elif "Exceeded send limits" in exception.message:
         if "international_sms" in exception.message:
