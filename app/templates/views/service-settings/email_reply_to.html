@@ -72,13 +72,15 @@
           <li>less likely to be reported as spam</li>
       </ul>
     </div>
-      <div class="govuk-grid-column-five-sixths">
-          <p class="govuk-body">
-              <a href="{{ url_for('main.add_recipients', service_id=service_id, template_id=template_id, back="email_reply_to") }}" class="govuk-link govuk-link--no-visited-state">
-                  I’ll do this later
-              </a>
-          </p>
-      </div>
+      {% if template_id %}
+          <div class="govuk-grid-column-five-sixths">
+              <p class="govuk-body">
+                  <a href="{{ url_for('main.add_recipients', service_id=service_id, template_id=template_id, back="email_reply_to") }}" class="govuk-link govuk-link--no-visited-state">
+                      I’ll do this later
+                  </a>
+              </p>
+          </div>
+      {% endif %}
   </div>
 
 {% endblock %}

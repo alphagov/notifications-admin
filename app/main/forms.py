@@ -8,7 +8,7 @@ from math import ceil
 from numbers import Number
 
 import pytz
-from flask import request
+from flask import request, session
 from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed, FileSize
@@ -2359,20 +2359,32 @@ def get_placeholder_form_instance(
     allow_international_phone_numbers=False,
     allow_sms_to_uk_landline=False,
 ):
-    if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template_type == "email":
+    placeholder_key = InsensitiveDict.make_key(placeholder_name)
+
+    if placeholder_key == "emailaddress" and template_type == "email":
+        default_value = dict_to_populate_from.get(placeholder_name)
+        if not default_value:
+            if (
+                session.get("source_call") == "add_recipients"
+                and session.get("add_recipients_choice") == "use_my_email"
+            ):
+                default_value = current_user.email_address
         field = make_email_address_field(label=placeholder_name, gov_user=False, thing="an email address")
-    elif InsensitiveDict.make_key(placeholder_name) == "phonenumber" and template_type == "sms":
+
+    elif placeholder_key == "phonenumber" and template_type == "sms":
+        default_value = dict_to_populate_from.get(placeholder_name, "")
         field = valid_phone_number(
             label=placeholder_name,
             international=allow_international_phone_numbers,
             sms_to_uk_landline=allow_sms_to_uk_landline,
         )
+
     else:
+        default_value = dict_to_populate_from.get(placeholder_name, "")
         field = GovukTextInputField(placeholder_name, validators=[DataRequired(message="Cannot be empty")])
 
     PlaceholderForm.placeholder_value = field
-
-    return PlaceholderForm(placeholder_value=dict_to_populate_from.get(placeholder_name, ""))
+    return PlaceholderForm(placeholder_value=default_value)
 
 
 class AddRecipientForm(StripWhitespaceForm):

@@ -287,6 +287,7 @@
     "/services/<uuid:service_id>/template-usage",
     "/services/<uuid:service_id>/template/<uuid:template_id>/notification/check",
     "/services/<uuid:service_id>/template/<uuid:template_id>/one-off/send-to-myself",
+    "/services/<uuid:service_id>/send/<uuid:template_id>/add-recipients",
     "/services/<uuid:service_id>/templates",
     "/services/<uuid:service_id>/templates/<template_type:template_type>",
     "/services/<uuid:service_id>/templates/<template_type:template_type>/folders/<uuid:template_folder_id>",
