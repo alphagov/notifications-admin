@@ -13,7 +13,7 @@
 
   <p class="govuk-body">When you add a new service it will start in trial mode.</p>
   <p class="govuk-body">While your service is in trial mode, you can only send messages to yourself and your team members.</p>
-  <p class="govuk-body">There’s a daily limit of {{ email_and_sms_daily_limit | message_count('email') }} emails and {{ email_and_sms_daily_limit | message_count('sms') }} text messages.</p>
+  <p class="govuk-body">There’s a daily limit of {{ email_and_sms_daily_limit | message_count('email') }} and {{ email_and_sms_daily_limit | message_count('sms') }}.</p>
   <p class="govuk-body">You cannot send any letters in trial mode, but you can still create letter templates and upload letters, to see how it works.</p>
 
   <div class="govuk-inset-text"> 
