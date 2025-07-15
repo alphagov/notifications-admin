@@ -381,8 +381,4 @@ def test_guidance_daily_limits(client_request):
 def test_trial_mode_sending_limits(client_request):
     page = client_request.get("main.guidance_trial_mode")
 
-    assert [normalize_spaces(li.text) for li in page.select_one("main ul").select("li")] == [
-        "confirm your service is the only one of its kind in your organisation",
-        "add examples of the messages you want to send",
-        "update your settings so you’re ready to send and receive messages",
-    ]
+    assert normalize_spaces("There’s a daily limit of 50 emails and 50 text messages.") in page.text
