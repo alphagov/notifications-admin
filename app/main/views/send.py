@@ -102,8 +102,13 @@ def send_messages(service_id, template_id):
         ),
     )
 
-    if session["source_call"] == "add_recipients":
-        backlink = url_for(".add_recipients", service_id=service_id, template_id=template_id, back="email_reply_to")
+    back = request.args.get("back")
+
+    if session.get("source_call") == "add_recipients":
+        if back == "set_sender":
+            backlink = url_for(".add_recipients", service_id=service_id, template_id=template_id, back="set_sender")
+        else:
+            backlink = url_for(".add_recipients", service_id=service_id, template_id=template_id, back="email_reply_to")
 
     if template.template_type == "email":
         template.reply_to = get_email_reply_to_address_from_session()
@@ -211,6 +216,15 @@ def set_sender(service_id, template_id):
                 template_id=template_id,
             )
         )
+
+    if current_service.email_reply_to_addresses:
+        return redirect(url_for(".add_recipients", service_id=service_id, template_id=template_id, back="templates"))
+
+    if not current_service.email_reply_to_addresses:
+        return redirect(
+            url_for("main.service_email_reply_to", service_id=service_id, back="view_template", template_id=template_id)
+        )
+
     from_back_link = request.args.get("from_back_link") == "yes"
     # If we're returning to the page, we want to use the sender_id already in the session instead of resetting it
     session["sender_id"] = session.get("sender_id") if from_back_link else None
@@ -227,8 +241,8 @@ def set_sender(service_id, template_id):
     if len(sender_details) == 1:
         session["sender_id"] = sender_details[0]["id"]
 
-    if len(sender_details) <= 1:
-        return redirect_to_one_off
+    # if len(sender_details) <= 1:
+    #     return redirect_to_one_off
 
     sender_context = get_sender_context(sender_details, template.template_type)
 
@@ -256,7 +270,7 @@ def set_sender(service_id, template_id):
 
     if form.validate_on_submit():
         session["sender_id"] = form.sender.data
-        return redirect(url_for(".send_one_off", service_id=service_id, template_id=template_id))
+        return redirect(url_for(".add_recipients", service_id=service_id, template_id=template_id, back="set_sender"))
 
     return render_template(
         "views/templates/set-sender.html",
@@ -271,7 +285,7 @@ def set_sender(service_id, template_id):
 def get_sender_context(sender_details, template_type):
     context = {
         "email": {
-            "title": "Where should replies come back to?",
+            "title": "Choose a reply-to email address",
             "description": "Where should replies come back to?",
             "field_name": "email_address",
         },
@@ -288,6 +302,13 @@ def get_sender_context(sender_details, template_type):
     }[template_type]
 
     sender_format = context["field_name"]
+
+    sender_format = context["field_name"]
+
+    if not sender_details:
+        context["default_id"] = None
+        context["value_and_label"] = []
+        return context
 
     context["default_id"] = next(sender["id"] for sender in sender_details if sender["is_default"])
     if template_type == "sms":
@@ -423,10 +444,26 @@ def add_recipients(service_id, template_id):
 
     backlink = None
 
-    if back == "email_reply_to" and template_id:
-        backlink = url_for(
-            "main.service_email_reply_to", service_id=service_id, template_id=template_id, back="from_name"
-        )
+    if template_id:
+        if back == "set_sender":
+            backlink = url_for("main.set_sender", service_id=service_id, template_id=template_id)
+
+        elif back == "email_reply_to":
+            backlink = url_for(
+                "main.service_email_reply_to", service_id=service_id, template_id=template_id, back="from_name"
+            )
+
+        elif back == "service_add_email_reply_to":
+            backlink = url_for(
+                "main.service_add_email_reply_to", service_id=service_id, template_id=template_id, back="email_reply_to"
+            )
+
+        elif back == "templates":
+            backlink = url_for(
+                "main.view_template",
+                service_id=service_id,
+                template_id=template_id,
+            )
 
     if form.validate_on_submit():
         choice = form.add_recipient_method.data
@@ -434,13 +471,13 @@ def add_recipients(service_id, template_id):
         session["add_recipients_choice"] = choice
 
         if choice == "upload_csv":
-            return redirect(url_for("main.send_messages", service_id=service_id, template_id=template_id))
+            return redirect(url_for("main.send_messages", service_id=service_id, template_id=template_id, back=back))
         elif choice == "enter_single":
-            return redirect(
-                url_for("main.send_one_off_step", service_id=service_id, template_id=template_id, step_index=0)
-            )
+            return redirect(url_for("main.send_messages", service_id=service_id, template_id=template_id, back=back))
         elif choice == "use_my_email":
-            return redirect(url_for("main.send_one_off_to_myself", service_id=service_id, template_id=template_id))
+            return redirect(
+                url_for("main.send_one_off_to_myself", service_id=service_id, template_id=template_id, back=back)
+            )
 
     return render_template(
         "views/add-recipients.html",
@@ -862,6 +899,9 @@ def fields_to_fill_in(template, prefill_current_user=False):
 
     if not prefill_current_user:
         return InsensitiveSet(first_column_headings[template.template_type] + list(template.placeholders))
+
+    if "placeholders" not in session:
+        session["placeholders"] = {}
 
     if template.template_type == "sms":
         session["recipient"] = current_user.mobile_number

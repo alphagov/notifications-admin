@@ -153,6 +153,9 @@ def service_email_sender_change(service_id):
                 url_for(".service_email_reply_to", service_id=service_id, back="from_name", template_id=template_id)
             )
 
+        elif from_sender_flow and current_service.email_reply_to_addresses:
+            return redirect(url_for(".set_sender", service_id=service_id, back="from_name", template_id=template_id))
+
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
@@ -451,12 +454,24 @@ def service_add_email_reply_to(service_id):
                 handle_reply_to_email_address_http_error(e, form)
 
             else:
+                # if back == "email_reply_to" and template_id:
+                #     return redirect(
+                #         url_for(
+                #             "main.add_recipients",
+                #             service_id=service_id,
+                #             template_id=template_id,
+                #             back="service_add_email_reply_to",
+                #         )
+                #     )
+                # else:
                 return redirect(
                     url_for(
                         ".service_verify_reply_to_address",
                         service_id=service_id,
                         notification_id=notification_id,
                         is_default=is_default,
+                        back="email_reply_to_add",
+                        template_id=template_id,
                     )
                 )
 
@@ -476,6 +491,12 @@ def service_add_email_reply_to(service_id):
 def service_verify_reply_to_address(service_id, notification_id):
     replace = request.args.get("replace", False)
     is_default = request.args.get("is_default", False)
+
+    redirect_on_continue = request.args.get("back") is not None
+    template_id = None
+    if redirect_on_continue:
+        template_id = request.args.get("template_id")
+
     return render_template(
         "views/service-settings/email-reply-to/verify.html",
         service_id=service_id,
@@ -483,6 +504,8 @@ def service_verify_reply_to_address(service_id, notification_id):
         partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
         replace=replace,
         is_default=is_default,
+        alternative_redirect_on_continue=redirect_on_continue,
+        template_id=template_id,
     )
 
 
@@ -504,6 +527,15 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
         existing_is_default = existing["is_default"]
     verification_status = "pending"
     is_default = True if (request.args.get("is_default", False) == "True") else False
+
+    redirect_after = request.args.get("add_recipients_redirect")
+    alternative_redirect_link = None
+    if redirect_after == "yes":
+        template_id = request.args.get("template_id")
+        alternative_redirect_link = url_for(
+            "main.add_recipients", service_id=service_id, template_id=template_id, back="set_sender"
+        )
+
     if notification["status"] in DELIVERED_STATUSES:
         verification_status = "success"
         if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
@@ -526,21 +558,24 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
         verification_status = "failure"
         form.email_address.data = notification["to"]
         form.is_default.data = is_default
-    return {
-        "status": render_template(
-            "views/service-settings/email-reply-to/_verify-updates.html",
-            reply_to_email_address=notification["to"],
-            service_id=current_service.id,
-            notification_id=notification_id,
-            verification_status=verification_status,
-            is_default=is_default,
-            existing_is_default=existing_is_default,
-            form=form,
-            first_email_address=first_email_address,
-            replace=replace,
-        ),
-        "stop": 0 if verification_status == "pending" else 1,
-    }
+
+    else:
+        return {
+            "status": render_template(
+                "views/service-settings/email-reply-to/_verify-updates.html",
+                reply_to_email_address=notification["to"],
+                service_id=current_service.id,
+                notification_id=notification_id,
+                verification_status=verification_status,
+                is_default=is_default,
+                existing_is_default=existing_is_default,
+                form=form,
+                first_email_address=first_email_address,
+                replace=replace,
+                alternative_redirect_link=alternative_redirect_link,
+            ),
+            "stop": 0 if verification_status == "pending" else 1,
+        }
 
 
 @main.route(

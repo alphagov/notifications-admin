@@ -33,13 +33,27 @@
         We’ve added ‘{{ reply_to_email_address }}’ to your reply-to email addresses.
       </p>
     </div>
-    <div class="js-stick-at-bottom-when-scrolling">
-      {{ govukButton({
-        "element": "a",
-        "text": "Continue",
-        "href": url_for('main.service_email_reply_to', service_id=service_id)
-      }) }}
-    </div>
+      {#if alternative link is provided AND Continue is clicked too fast AND
+      if "href" was defined inline (Eg. href: alternative_redirect_link or url_for('main.service_email_reply_to', ...)
+      we seem to automatically redirect to service_email_reply_to.
+        By separating these statements it prevents weird behaviour#}
+      {% if alternative_redirect_link %}
+          <div class="js-stick-at-bottom-when-scrolling">
+              {{ govukButton({
+      "element": "a",
+      "text": "Continue",
+      "href": alternative_redirect_link
+    }) }}
+          </div>
+      {% else %}
+          <div class="js-stick-at-bottom-when-scrolling">
+              {{ govukButton({
+      "element": "a",
+      "text": "Continue",
+      "href": url_for('main.service_email_reply_to', service_id=service_id)
+    }) }}
+          </div>
+      {% endif %}
   {% elif verification_status == "failure" %}
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
