@@ -28,9 +28,9 @@
                 <span class="heading-small">{{ user.name }}</span>&ensp;
               {%- endif -%}
               <span class="hint">
-                {%- if user.status == 'pending' -%}
+                {%- if user.is_invited_user and user.status == 'pending' -%}
                   {{ user.email_address }} (invited)
-                {%- elif user.status == 'cancelled' -%}
+                {%- elif user.is_invited_user and user.status == 'cancelled' -%}
                   {{ user.email_address }} (cancelled invite)
                 {%- elif user.id == current_user.id -%}
                   (you)
@@ -53,7 +53,7 @@
 
           </div>
           <div class="govuk-grid-column-one-quarter">
-            {% if user.status == 'pending' %}
+            {% if user.is_invited_user and user.status == 'pending' %}
               <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Cancel invitation<span class="govuk-visually-hidden"> for {{ user.email_address }}</span></a>
             {% elif user.is_editable_by(current_user) %}
               <a class="user-list-edit-link govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_organisation_user', org_id=current_org.id, user_id=user.id)}}">Change details<span class="govuk-visually-hidden"> for {{ user.name }} {{ user.email_address }}</span></a>

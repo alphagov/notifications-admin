@@ -23,7 +23,7 @@
 <div class="dashboard-table">
   {% call(item, row_number) list_table(
       returned_letters,
-      caption="Returned letters for {}".format(today),
+      caption="Returned letters for {}".format(reported_at|format_date_normal),
       caption_visible=False,
       empty_message='If you have returned letter reports they will be listed here',
       field_headings=['Template name', 'Originally sent'],

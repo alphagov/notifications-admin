@@ -47,7 +47,7 @@
 
       {% call(item, row_number) list_table(
         notifications,
-        caption=uploaded_file_name,
+        caption=job.original_file_name,
         caption_visible=False,
         empty_message='No messages to show yet…' if job.awaiting_processing_or_recently_processed else job.processing_started | message_finished_processing_notification(service_data_retention_days),
         field_headings=[
