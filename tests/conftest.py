@@ -306,10 +306,10 @@ def multiple_sms_senders(notify_admin, mocker):
             {
                 "id": "1234",
                 "service_id": service_id,
-                "sms_sender": "Example",
+                "sms_sender": "07812398712",
                 "is_default": True,
                 "created_at": datetime.utcnow(),
-                "inbound_number_id": "1234",
+                "inbound_number_id": "4321",
                 "updated_at": None,
             },
             {
@@ -2163,7 +2163,7 @@ def mock_get_most_recent_inbound_usage_date(mocker):
 @pytest.fixture(scope="function")
 def mock_get_inbound_number_for_service(notify_admin, mocker):
     return mocker.patch(
-        "app.inbound_number_client.get_inbound_sms_number_for_service", return_value={"data": {"number": "0781239871"}}
+        "app.inbound_number_client.get_inbound_sms_number_for_service", return_value={"data": {"number": "07812398712"}}
     )
 
 
