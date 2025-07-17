@@ -57,5 +57,5 @@ def test_header_navigation(
     page = client_request.get("main.guidance_features")
     assert [
         (normalize_spaces(link.text), link["href"])
-        for link in page.select(".govuk-header__navigation-list .govuk-header__navigation-item a")
+        for link in page.select(".govuk-service-navigation__list .govuk-service-navigation__item a")
     ] == [(label, url_for(endpoint)) for label, endpoint in expected_navigation_items]

@@ -450,7 +450,7 @@ def test_should_not_show_back_to_service_if_user_doesnt_belong_to_service(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one("header + .govuk-width-container").text).startswith(
+    assert normalize_spaces(page.select_one(".govuk-service-navigation + .govuk-width-container").text).startswith(
         normalize_spaces(expected_page_text)
     )
 
@@ -472,6 +472,6 @@ def test_should_show_back_to_service_if_user_belongs_to_service(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one("header + .govuk-width-container").text).startswith(
+    assert normalize_spaces(page.select_one(".govuk-service-navigation + .govuk-width-container").text).startswith(
         normalize_spaces(expected_page_text)
     )
