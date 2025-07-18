@@ -22,6 +22,7 @@ from tests.conftest import normalize_spaces
             True,
             False,
             (
+                ("Your services", ".your_services"),
                 ("Support", ".support"),
                 ("Features", ".guidance_features"),
                 ("Pricing", ".guidance_pricing"),
@@ -33,6 +34,7 @@ from tests.conftest import normalize_spaces
             True,
             True,
             (
+                ("Your services", ".your_services"),
                 ("Support", ".support"),
                 ("Features", ".guidance_features"),
                 ("Pricing", ".guidance_pricing"),
