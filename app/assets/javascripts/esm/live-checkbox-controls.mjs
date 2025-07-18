@@ -60,7 +60,7 @@ class LiveCheckboxControls {
 
     // Default behaviour - show a 'Select all' link/button if no checkboxes are selected
     onNothingSelected (state) {
-      let $clear = this.makeActionButton('Select all', {
+      const $clear = this.makeActionButton('Select all', {
         'onclick': () => {
 
           // uncheck all templates and folders
@@ -81,7 +81,7 @@ class LiveCheckboxControls {
 
     // Default behaviour - show a 'Clear' link/button if any checkboxes are selected
     onSomethingSelected (state) {
-      let $clear = this.makeActionButton('Clear', {
+      const $clear = this.makeActionButton('Clear', {
         'onclick': () => {
 
           // uncheck all templates and folders
@@ -113,7 +113,7 @@ class LiveCheckboxControls {
           }
         },
         'update': numSelected => {
-          let message = (numSelected > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default();
+          const message = (numSelected > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default();
 
           document.querySelector('.checkbox-list-selected-counter__count').innerHTML = message;
           this.$liveRegionCounter.innerHTML = message;
@@ -152,14 +152,14 @@ class LiveCheckboxControls {
     }
 
     stateHasChanged () {
-      let changed = this.currentState !== this._lastState;
+      const changed = this.currentState !== this._lastState;
 
       this._lastState = this.currentState;
       return changed;
     }
 
     onCheckboxChanged () {
-      let numSelected = this.countSelectedCheckboxes();
+      const numSelected = this.countSelectedCheckboxes();
 
       if (this.currentState === 'nothing-selected-hint' && numSelected !== 0) {
         // user has just selected first item
