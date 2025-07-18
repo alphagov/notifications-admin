@@ -87,7 +87,7 @@ def get_example_letter_address(key):
 
 
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/csv", methods=["GET", "POST"])
-@user_has_permissions("send_messages", restrict_admin_usage=True)
+@user_has_permissions("send_messages")
 def send_messages(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(
         template_id,
@@ -194,7 +194,7 @@ def _should_show_set_sender_page(service_id, template) -> bool:
 
 
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/set-sender", methods=["GET", "POST"])
-@user_has_permissions("send_messages", restrict_admin_usage=True)
+@user_has_permissions("send_messages")
 def set_sender(service_id, template_id):
     from_back_link = request.args.get("from_back_link") == "yes"
     # If we're returning to the page, we want to use the sender_id already in the session instead of resetting it
@@ -296,7 +296,7 @@ def get_sender_details(service_id, template_type):
 
 
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/one-off")
-@user_has_permissions("send_messages", restrict_admin_usage=True)
+@user_has_permissions("send_messages")
 def send_one_off(service_id, template_id):
     session["recipient"] = None
     session["placeholders"] = {}
@@ -338,7 +338,7 @@ def get_notification_check_endpoint(service_id, template):
 
 
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/one-off/address", methods=["GET", "POST"])
-@user_has_permissions("send_messages", restrict_admin_usage=True)
+@user_has_permissions("send_messages")
 def send_one_off_letter_address(service_id, template_id):
     if {"recipient", "placeholders"} - set(session.keys()):
         # if someone has come here via a bookmark or back button they might have some stuff still in their session
@@ -402,7 +402,7 @@ def send_one_off_letter_address(service_id, template_id):
     "/services/<uuid:service_id>/send/<uuid:template_id>/one-off/step-<int:step_index>",
     methods=["GET", "POST"],
 )
-@user_has_permissions("send_messages", restrict_admin_usage=True)
+@user_has_permissions("send_messages")
 def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
     if {"recipient", "placeholders"} - set(session.keys()):
         return redirect(
@@ -694,7 +694,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, emergency_c
 @main.route(
     "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>/row-<int:row_index>", methods=["GET"]
 )
-@user_has_permissions("send_messages", restrict_admin_usage=True)
+@user_has_permissions("send_messages")
 def check_messages(service_id, template_id, upload_id, row_index=2):
     emergency_contact = bool(request.args.get("emergency_contact"))
     data = _check_messages(service_id, template_id, upload_id, row_index, emergency_contact)
@@ -918,7 +918,7 @@ def get_skip_link(step_index, template):
 
 
 @main.route("/services/<uuid:service_id>/template/<uuid:template_id>/one-off/send-to-myself", methods=["GET"])
-@user_has_permissions("send_messages", restrict_admin_usage=True)
+@user_has_permissions("send_messages")
 def send_one_off_to_myself(service_id, template_id):
     # We aren't concerned with creating the exact template (for example adding recipient and sender names)
     # we just want to create enough to use `fields_to_fill_in`
@@ -940,7 +940,7 @@ def send_one_off_to_myself(service_id, template_id):
 
 
 @main.route("/services/<uuid:service_id>/template/<uuid:template_id>/notification/check", methods=["GET"])
-@user_has_permissions("send_messages", restrict_admin_usage=True)
+@user_has_permissions("send_messages")
 def check_notification(service_id, template_id):
     return render_template(
         "views/notifications/check.html",
