@@ -1,6 +1,6 @@
 <div class="ajax-block-container">
   {% for message in conversation %}
-  
+
   {% if message.status == 'delivered' %}
     {% set status_text_in_heading = 'Sent' %}
     {% set visual_status_text %}
@@ -8,11 +8,18 @@
         {{ message.created_at | format_datetime_relative }}
       </time>
     {% endset %}
-  {% elif message.status in ['pending', 'sending', 'created'] %}
+  {% elif message.status == 'created' %}
     {% set status_text_in_heading = 'Sending since' %}
     {% set visual_status_text %}
       <time class="sms-message-status sms-message-status-outbound hint" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
         sending
+      </time>
+    {% endset %}
+  {% elif message.status in ['pending', 'sending'] %}
+    {% set status_text_in_heading = 'Delivering since' %}
+    {% set visual_status_text %}
+      <time class="sms-message-status sms-message-status-outbound hint" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
+        delivering
       </time>
     {% endset %}
   {% else %}
@@ -23,7 +30,7 @@
       </time>
     {% endset %}
   {% endif %}
-  
+
     <div class="govuk-grid-row sms-message-row" id="n{{ message.id }}">
       {% if message.inbound %}
         <div class="govuk-grid-column-two-thirds sms-message-inbound">

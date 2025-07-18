@@ -774,7 +774,7 @@ def test_get_status_filters_calculates_stats(client_request):
 
     assert {label: count for label, _option, _link, count in ret} == {
         "total": 6,
-        "sending": 3,
+        "delivering": 3,
         "failed": 2,
         "delivered": 1,
     }
@@ -783,7 +783,7 @@ def test_get_status_filters_calculates_stats(client_request):
 def test_get_status_filters_in_right_order(client_request):
     ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS, None)
 
-    assert [label for label, _option, _link, _count in ret] == ["total", "sending", "delivered", "failed"]
+    assert [label for label, _option, _link, _count in ret] == ["total", "delivering", "delivered", "failed"]
 
 
 def test_get_status_filters_constructs_links(client_request):
@@ -914,13 +914,13 @@ def test_big_numbers_dont_show_for_letters(
 @pytest.mark.parametrize(
     "message_type, status, expected_hint_status, single_line",
     [
-        ("email", "created", "Sending since 27 September at 5:30pm", True),
-        ("email", "sending", "Sending since 27 September at 5:30pm", True),
+        ("email", "created", "Delivering since 27 September at 5:30pm", True),
+        ("email", "sending", "Delivering since 27 September at 5:30pm", True),
         ("email", "temporary-failure", "Inbox not accepting messages right now 27 September at 5:31pm", False),
         ("email", "permanent-failure", "Email address does not exist 27 September at 5:31pm", False),
         ("email", "delivered", "Delivered 27 September at 5:31pm", True),
-        ("sms", "created", "Sending since 27 September at 5:30pm", True),
-        ("sms", "sending", "Sending since 27 September at 5:30pm", True),
+        ("sms", "created", "Delivering since 27 September at 5:30pm", True),
+        ("sms", "sending", "Delivering since 27 September at 5:30pm", True),
         ("sms", "temporary-failure", "Phone not accepting messages right now 27 September at 5:31pm", False),
         ("sms", "permanent-failure", "Not delivered 27 September at 5:31pm", False),
         ("sms", "delivered", "Delivered 27 September at 5:31pm", True),
@@ -930,12 +930,37 @@ def test_big_numbers_dont_show_for_letters(
         ("letter", "delivered", "27 September at 5:30pm", True),
         ("letter", "received", "27 September at 5:30pm", True),
         ("letter", "accepted", "27 September at 5:30pm", True),
-        ("letter", "cancelled", "27 September at 5:30pm", False),  # The API won’t return cancelled letters
-        ("letter", "permanent-failure", "Permanent failure 27 September at 5:31pm", False),
-        ("letter", "temporary-failure", "27 September at 5:30pm", False),  # Not currently a real letter status
+        (
+            "letter",
+            "cancelled",
+            "27 September at 5:30pm",
+            False,
+        ),  # The API won’t return cancelled letters
+        (
+            "letter",
+            "permanent-failure",
+            "Permanent failure 27 September at 5:31pm",
+            False,
+        ),
+        (
+            "letter",
+            "temporary-failure",
+            "27 September at 5:30pm",
+            False,
+        ),  # Not currently a real letter status
         ("letter", "virus-scan-failed", "Virus detected 27 September at 5:30pm", False),
-        ("letter", "validation-failed", "Validation failed 27 September at 5:30pm", False),
-        ("letter", "technical-failure", "Technical failure 27 September at 5:30pm", False),
+        (
+            "letter",
+            "validation-failed",
+            "Validation failed 27 September at 5:30pm",
+            False,
+        ),
+        (
+            "letter",
+            "technical-failure",
+            "Technical failure 27 September at 5:30pm",
+            False,
+        ),
     ],
 )
 def test_sending_status_hint_displays_correctly_on_notifications_page(
