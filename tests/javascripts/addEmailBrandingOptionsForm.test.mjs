@@ -1,20 +1,18 @@
-const helpers = require('./support/helpers');
-
-beforeAll(() => {
-  require('../../app/assets/javascripts/liveCheckboxControls.js');
-  require('../../app/assets/javascripts/addBrandingOptionsForm.js');
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
-});
+import AddBrandingOptionsControls from '../../app/assets/javascripts/esm/add-branding-options-controls.mjs';
+import { jest } from '@jest/globals';
+import * as helpers from './support/helpers';
 
 describe('AddBrandingOptionsForm', () => {
 
-  let addBrandingOptionsForm;
-  let formControls;
-  let visibleCounter;
-  let hiddenCounter;
+  let $addBrandingOptionsForm;
+  let addBrandingOptionsControls;
+  let $formControls;
+  let $visibleCounter;
+  let $hiddenCounter;
+
+  beforeAll(() => {
+    document.body.classList.add('govuk-frontend-supported');
+  });
 
   beforeEach(() => {
 
@@ -60,7 +58,7 @@ describe('AddBrandingOptionsForm', () => {
 
     document.body.innerHTML = htmlFragment;
 
-    addBrandingOptionsForm = document.querySelector('form[data-notify-module=add-branding-options-form]');
+    $addBrandingOptionsForm = document.querySelector('form[data-notify-module=add-branding-options-form]');
 
   });
 
@@ -71,32 +69,31 @@ describe('AddBrandingOptionsForm', () => {
   });
 
   function getBrandingOptionsCheckboxes () {
-    return addBrandingOptionsForm.querySelectorAll('input[type=checkbox]');
+    return $addBrandingOptionsForm.querySelectorAll('input[type=checkbox]');
   };
 
   function getVisibleCounter () {
-    return formControls.querySelector('.checkbox-list-selected-counter__count');
+    return $formControls.querySelector('.checkbox-list-selected-counter__count');
   };
 
   function getHiddenCounter () {
-    return formControls.querySelector('[role=status]');
+    return $formControls.querySelector('[role=status]');
   };
 
   describe("When the module starts", () => {
 
     beforeEach(() => {
 
-      // start module
-      window.GOVUK.notifyModules.start();
+      addBrandingOptionsControls = new AddBrandingOptionsControls($addBrandingOptionsForm);
 
-      formControls = addBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
-      visibleCounter = getVisibleCounter();
+      $formControls = $addBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
+      $visibleCounter = getVisibleCounter();
 
     });
 
     test("the counter should be showing", () => {
 
-      expect(visibleCounter).not.toBeNull();
+      expect($visibleCounter).not.toBeNull();
 
     });
 
@@ -116,112 +113,112 @@ describe('AddBrandingOptionsForm', () => {
 
       beforeEach(() => {
 
-        hiddenCounter = getHiddenCounter();
+        $hiddenCounter = getHiddenCounter();
 
       })
 
       test("the visible counter should be hidden from assistive tech", () => {
 
-        expect(visibleCounter.getAttribute('aria-hidden')).toEqual("true");
+        expect($visibleCounter.getAttribute('aria-hidden')).toEqual("true");
 
       });
 
       test("the content of both visible and hidden counters should match", () => {
 
-        expect(visibleCounter.textContent.trim()).toEqual(hiddenCounter.textContent.trim());
+        expect($visibleCounter.textContent.trim()).toEqual($hiddenCounter.textContent.trim());
       });
 
       test("the content of the counter should reflect the selection", () => {
 
-        expect(visibleCounter.textContent.trim()).toEqual('No options selected');
+        expect($visibleCounter.textContent.trim()).toEqual('No options selected');
 
       });
 
     });
 
-    describe("When some branding options are selected", () => {
+  });
 
-      let BrandingOptionsCheckboxes;
+  describe("When some branding options are selected", () => {
+
+    let $brandingOptionsCheckboxes;
+
+    beforeEach(() => {
+
+      addBrandingOptionsControls = new AddBrandingOptionsControls($addBrandingOptionsForm);
+
+      $brandingOptionsCheckboxes = getBrandingOptionsCheckboxes();
+      $formControls = $addBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
+
+      helpers.triggerEvent($brandingOptionsCheckboxes[0], 'click');
+      helpers.triggerEvent($brandingOptionsCheckboxes[2], 'click');
+
+    });
+
+    describe("'Clear selection' link", () => {
+
+      let clearLink;
 
       beforeEach(() => {
 
-        // start module
-        window.GOVUK.notifyModules.start();
-
-        BrandingOptionsCheckboxes = getBrandingOptionsCheckboxes();
-
-        formControls = addBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
-
-        helpers.triggerEvent(BrandingOptionsCheckboxes[0], 'click');
-        helpers.triggerEvent(BrandingOptionsCheckboxes[2], 'click');
+        clearLink = $formControls.querySelector('.js-action');
 
       });
 
-      describe("'Clear selection' link", () => {
+      test("the link has been added with the right text", () => {
 
-        let clearLink;
-
-        beforeEach(() => {
-
-          clearLink = formControls.querySelector('.js-action');
-
-        });
-
-        test("the link has been added with the right text", () => {
-
-          expect(clearLink).not.toBeNull();
-          expect(clearLink.textContent.trim()).toEqual('Clear selection');
-
-        });
-
-        test("clicking the link clears the selection", () => {
-
-          helpers.triggerEvent(clearLink, 'click');
-
-          const checkedCheckboxes = Array.from(BrandingOptionsCheckboxes).filter(checkbox => checkbox.checked);
-
-          expect(checkedCheckboxes.length === 0).toBe(true);
-
-        });
-
-        test("clicking the link moves focus to first checkbox", () => {
-
-          helpers.triggerEvent(clearLink, 'click');
-
-          const firstCheckbox = BrandingOptionsCheckboxes[0];
-
-          expect(document.activeElement).toBe(firstCheckbox);
-
-        });
+        expect(clearLink).not.toBeNull();
+        expect(clearLink.textContent.trim()).toEqual('Clear selection');
 
       });
 
-      describe("Selection counter", () => {
+      test("clicking the link clears the selection", () => {
 
-        let visibleCounterText;
-        let hiddenCounterText;
+        helpers.triggerEvent(clearLink, 'click');
 
-        beforeEach(() => {
+        const checkedCheckboxes = Array.from($brandingOptionsCheckboxes).filter(checkbox => checkbox.checked);
 
-          visibleCounterText = getVisibleCounter().textContent.trim();
-          hiddenCounterText = getHiddenCounter().textContent.trim();
-
-        });
-
-        test("the content of both visible and hidden counters should match", () => {
-
-          expect(visibleCounterText).toEqual(hiddenCounterText);
-
-        });
-
-        test("the content of the counter should reflect the selection", () => {
-
-          expect(visibleCounterText).toEqual('2 options selected');
-
-        });
+        expect(checkedCheckboxes.length === 0).toBe(true);
 
       });
 
-   });
+      test("clicking the link moves focus to first checkbox", () => {
+
+        helpers.triggerEvent(clearLink, 'click');
+
+        const firstCheckbox = $brandingOptionsCheckboxes[0];
+
+        expect(document.activeElement).toBe(firstCheckbox);
+
+      });
+
+    });
+
+    describe("Selection counter", () => {
+
+      let $visibleCounterText;
+      let $hiddenCounterText;
+
+      beforeEach(() => {
+
+        $visibleCounterText = getVisibleCounter().textContent.trim();
+        $hiddenCounterText = getHiddenCounter().textContent.trim();
+
+      });
+
+      test("the content of both visible and hidden counters should match", () => {
+
+        expect($visibleCounterText).toEqual($hiddenCounterText);
+
+      });
+
+      test("the content of the counter should reflect the selection", () => {
+
+        expect($visibleCounterText).toEqual('2 options selected');
+
+      });
+
+    });
+
   });
-})
+
+});

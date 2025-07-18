@@ -15,6 +15,8 @@ import RadiosWithImages from './radios-with-images.mjs';
 import LiveSearch from './live-search.mjs';
 import EnhancedTextbox from './enhanced-textbox.mjs';
 import CheckReportStatus from './check-report-status.mjs';
+import LiveCheckboxControls from './live-checkbox-controls.mjs';
+import AddBrandingOptionsControls from './add-branding-options-controls.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -87,6 +89,16 @@ if ($enhancedTextboxArray.length > 0) {
 const $checkReportStatusEl = document.querySelector('[data-notify-module="check-report-status"]');
 if ($checkReportStatusEl) {
   new CheckReportStatus($checkReportStatusEl).checkStatus();
+}
+
+const $authTypeForm = document.querySelector('[data-notify-module="set-auth-type-form"]');
+if ($authTypeForm) {
+  new LiveCheckboxControls($authTypeForm);
+}
+
+const $addBrandingOptionsForm = document.querySelector('[data-notify-module="add-branding-options-form"]');
+if ($addBrandingOptionsForm) {
+  new AddBrandingOptionsControls($addBrandingOptionsForm);
 }
 
 const focusBanner = new FocusBanner();
