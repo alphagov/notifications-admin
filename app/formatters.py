@@ -159,7 +159,7 @@ def format_notification_status(status, template_type):
             "permanent-failure": "Email address does not exist",
             "delivered": "Delivered",
             "sending": "Delivering",
-            "created": "Sending",
+            "created": "Delivering",
             "sent": "Delivered",
         },
         "sms": {
@@ -169,7 +169,7 @@ def format_notification_status(status, template_type):
             "permanent-failure": "Not delivered",
             "delivered": "Delivered",
             "sending": "Delivering",
-            "created": "Sending",
+            "created": "Delivering",
             "pending": "Delivering",
             "sent": "Sent to an international number",
             "validation-failed": "Validation failed",

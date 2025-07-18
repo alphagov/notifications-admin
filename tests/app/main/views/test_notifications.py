@@ -22,8 +22,8 @@ from tests.conftest import (
 @pytest.mark.parametrize(
     "key_type, notification_status, platform_admin, expected_status",
     [
-        (None, "created", False, "Sending"),
-        (None, "created", True, "Sending via MMG"),
+        (None, "created", False, "Delivering"),
+        (None, "created", True, "Delivering via MMG"),
         (None, "sending", False, "Delivering"),
         (None, "sending", True, "Delivering via MMG"),
         (None, "delivered", False, "Delivered"),
