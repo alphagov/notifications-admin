@@ -1682,7 +1682,7 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
     )
     assert (
         get_row(page, "Text message sender IDs")
-        == "Text message sender IDs Example …and 2 more Manage text message sender IDs"
+        == "Text message sender IDs 07812398712 …and 2 more Manage text message sender IDs"
     )
     assert get_row(page, "Sender addresses") == "Sender addresses 1 Example Street …and 2 more Manage sender addresses"
 
@@ -4895,8 +4895,8 @@ def test_service_receive_text_messages_stop(client_request, service_one, mock_ge
     )
 
     assert page.select_one("h1").text == "When you stop receiving text messages"
-    assert normalize_spaces(page.select_one(".govuk-inset-text").text) == "0781239871"
-    assert "You can make 0781239871 the default sender again at any time." in page.text
+    assert normalize_spaces(page.select_one(".govuk-inset-text").text) == "07812398712"
+    assert "You can make 07812398712 the default sender again at any time." in page.text
 
     support_link = page.select("p a")[-1]
     assert support_link["href"] == url_for(".support")
@@ -4948,6 +4948,7 @@ def test_service_receive_text_messages_stop_success_redirect(
     platform_admin_user,
     service_one,
     mock_get_inbound_number_for_service,
+    multiple_sms_senders_with_diff_default,
     mocker,
 ):
     service_one["permissions"] = ["inbound_sms"]
@@ -4960,7 +4961,7 @@ def test_service_receive_text_messages_stop_success_redirect(
         service_id=SERVICE_ONE_ID,
         _data={"removal_options": "true"},
         _expected_redirect=url_for(
-            ".service_receive_text_messages_stop_success", service_id=SERVICE_ONE_ID, inbound_number="0781239871"
+            ".service_receive_text_messages_stop_success", service_id=SERVICE_ONE_ID, inbound_number="07812398712"
         ),
     )
 
@@ -4978,13 +4979,13 @@ def service_receive_text_messages_stop_success(
     page = client_request.get(
         ".service_receive_text_messages_stop_success",
         service_id=SERVICE_ONE_ID,
-        inbound_number="0781239871",
+        inbound_number="07812398712",
     )
 
     assert page.select_one("h1").text == "You’ve stopped receiving text messages"
 
     inset_text = page.select_one(".govuk-inset-text")
-    assert inset_text and normalize_spaces(inset_text.text) == "0781239871"
+    assert inset_text and normalize_spaces(inset_text.text) == "07812398712"
 
     service_settings_link = page.select_one("a.govuk-link")
     assert service_settings_link["href"] == url_for("main.service_settings", service_id=SERVICE_ONE_ID)
@@ -4997,6 +4998,7 @@ def test_service_receive_text_messages_stop_handles_error(
     service_one,
     mock_get_inbound_number_for_service,
     mock_get_most_recent_inbound_usage_date,
+    multiple_sms_senders_with_diff_default,
     mocker,
 ):
     service_one["permissions"] = ["inbound_sms"]
@@ -5020,6 +5022,39 @@ def test_service_receive_text_messages_stop_handles_error(
     assert error_summary is not None
     assert "There is a problem" in error_summary.text
     assert "Failed to remove number from service" in error_summary.text
+
+    radios = page.select("input[type=radio]")
+    assert len(radios) == 2
+    assert radios[0]["value"] == "true"
+    assert radios[1]["value"] == "false"
+
+
+def test_service_receive_text_messages_stop_fails_when_inbound_number_is_default_sender(
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_inbound_number_for_service,
+    mock_get_most_recent_inbound_usage_date,
+    multiple_sms_senders,
+    mocker,
+):
+    service_one["permissions"] = ["inbound_sms"]
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        ".service_receive_text_messages_stop",
+        service_id=SERVICE_ONE_ID,
+        _data={"removal_options": "true"},
+        _expected_status=200,
+    )
+
+    error_summary = page.select_one(".govuk-error-summary")
+    assert error_summary is not None
+    assert "There is a problem" in error_summary.text
+    assert (
+        "You must change default text message sender ID before you can stop receiving text messages"
+        in error_summary.text
+    )
 
     radios = page.select("input[type=radio]")
     assert len(radios) == 2
