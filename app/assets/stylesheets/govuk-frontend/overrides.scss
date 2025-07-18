@@ -96,14 +96,9 @@ $link-colour-on-grey-background: #1852ab;
   display: none;
 }
 
-
-.govuk-template--rebranded .govuk-header__navigation-item--active:not(:last-child) {
-
-  @include govuk-media-query($from: tablet) {
-    // These 2 lines stop the width of the item jumping so much
-    // between selected and unselected states
-    margin-right: 14.5px;
-    letter-spacing: -0.012em;
+// align last item in the service navigation to the right on large vieport
+ @include govuk-media-query($from: tablet) {
+  .govuk-service-navigation__item:last-child {
+    margin-left: auto;
   }
-}
-
+ }
