@@ -59,7 +59,8 @@
   }) }}
 
   {{ govukServiceNavigation({
-    "navigation": header_navigation.visible_header_nav()
+    "navigation": header_navigation.visible_header_nav(),
+    "classes": "govuk-service-navigation--inverse" if request.endpoint == "main.index" else ""
   }) }}
 {% endblock %}
 
