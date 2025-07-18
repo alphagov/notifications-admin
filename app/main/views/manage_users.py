@@ -189,17 +189,21 @@ def service_join_request_choose_permissions(service_id, request_id):
         disable_sms_auth=False if requested_by_user.mobile_number else True,
     )
 
-    if not current_service.has_permission("email_auth"):
+    if not current_service.has_permission("email_auth") and not requested_by_user.webauthn_auth:
         form.login_authentication.data = "sms_auth"
 
     if form.validate_on_submit():
-        service_join_request.update(
-            status=SERVICE_JOIN_REQUEST_APPROVED,
-            status_changed_by_id=current_user.id,
-            permissions=translate_permissions_from_ui_to_db(form.permissions_field.data),
-            folder_permissions=form.folder_permissions.data,
-            auth_type=form.login_authentication.data,
-        )
+        update_kwargs = {
+            "status": SERVICE_JOIN_REQUEST_APPROVED,
+            "status_changed_by_id": current_user.id,
+            "permissions": translate_permissions_from_ui_to_db(form.permissions_field.data),
+            "folder_permissions": form.folder_permissions.data,
+        }
+
+        if not requested_by_user.webauthn_auth:
+            update_kwargs["auth_type"] = form.login_authentication.data
+
+        service_join_request.update(**update_kwargs)
 
         flash(f"{requested_by_user.name} has joined this service", "default_with_tick")
         return redirect(url_for(".manage_users", service_id=service_id))
