@@ -712,7 +712,7 @@ def service_receive_text_messages_stop(service_id):
     if form.validate_on_submit():
         if current_service.default_sms_sender == current_service.inbound_number:
             form.removal_options.errors.append(
-                "You must change default text message sender ID before you can stop receiving text messages"
+                "You need to change your default text message sender ID before you can continue"
             )
 
         else:

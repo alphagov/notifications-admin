@@ -5051,10 +5051,7 @@ def test_service_receive_text_messages_stop_fails_when_inbound_number_is_default
     error_summary = page.select_one(".govuk-error-summary")
     assert error_summary is not None
     assert "There is a problem" in error_summary.text
-    assert (
-        "You must change default text message sender ID before you can stop receiving text messages"
-        in error_summary.text
-    )
+    assert "You need to change your default text message sender ID before you can continue" in error_summary.text
 
     radios = page.select("input[type=radio]")
     assert len(radios) == 2
