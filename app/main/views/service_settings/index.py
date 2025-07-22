@@ -710,21 +710,29 @@ def service_receive_text_messages_stop(service_id):
     inbound_number = current_service.inbound_number
 
     if form.validate_on_submit():
-        archive = form.removal_options.data == "true"
+        if current_service.default_sms_sender == current_service.inbound_number:
+            form.removal_options.errors.append(
+                "You need to change your default text message sender ID before you can continue"
+            )
 
-        try:
-            service_api_client.remove_service_inbound_sms(service_id, archive)
-            return redirect(
-                url_for(
-                    ".service_receive_text_messages_stop_success", service_id=service_id, inbound_number=inbound_number
+        else:
+            archive = form.removal_options.data == "true"
+
+            try:
+                service_api_client.remove_service_inbound_sms(service_id, archive)
+                return redirect(
+                    url_for(
+                        ".service_receive_text_messages_stop_success",
+                        service_id=service_id,
+                        inbound_number=inbound_number,
+                    )
                 )
-            )
 
-        except Exception as e:
-            current_app.logger.error(
-                "Error removing inbound number %s for service %s: %s", inbound_number, service_id, e
-            )
-            form.removal_options.errors.append("Failed to remove number from service")
+            except Exception as e:
+                current_app.logger.error(
+                    "Error removing inbound number %s for service %s: %s", inbound_number, service_id, e
+                )
+                form.removal_options.errors.append("Failed to remove number from service")
 
     recent_use_date = None
 

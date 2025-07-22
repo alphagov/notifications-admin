@@ -345,7 +345,7 @@ def test_empty_inbox(
     )
 
     assert normalize_spaces(page.select("tbody tr")) == (
-        "When users text your service’s phone number (0781239871) you’ll see the messages here"
+        "When users text your service’s phone number (07812398712) you’ll see the messages here"
     )
     assert not page.select("a[download]")
     assert not page.select("li.next-page")
