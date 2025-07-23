@@ -31,6 +31,7 @@ from app import (
 )
 from app.main import main, no_cookie
 from app.main.forms import (
+    AddRecipientForm,
     ChooseTimeForm,
     CsvUploadForm,
     LetterAddressForm,
@@ -206,6 +207,12 @@ def set_sender(service_id, template_id):
                 template_id=template_id,
             )
         )
+
+    if not current_service.email_reply_to_addresses:
+        return redirect(
+            url_for("main.service_email_reply_to", service_id=service_id, back="view_template", template_id=template_id)
+        )
+
     from_back_link = request.args.get("from_back_link") == "yes"
     # If we're returning to the page, we want to use the sender_id already in the session instead of resetting it
     session["sender_id"] = session.get("sender_id") if from_back_link else None
@@ -266,7 +273,7 @@ def set_sender(service_id, template_id):
 def get_sender_context(sender_details, template_type):
     context = {
         "email": {
-            "title": "Where should replies come back to?",
+            "title": "Choose a reply-to email address",
             "description": "Where should replies come back to?",
             "field_name": "email_address",
         },
@@ -283,6 +290,11 @@ def get_sender_context(sender_details, template_type):
     }[template_type]
 
     sender_format = context["field_name"]
+
+    if not sender_details:
+        context["default_id"] = None
+        context["value_and_label"] = []
+        return context
 
     context["default_id"] = next(sender["id"] for sender in sender_details if sender["is_default"])
     if template_type == "sms":
@@ -523,6 +535,9 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
     back_link = get_back_link(service_id, template, step_index, placeholders)
     template.values[current_placeholder] = None
 
+    if step_index == 0 and template.template_type == "email":
+        return render_email_add_recipients(service_id, template_id, template, placeholders)
+
     return render_template(
         "views/send-test.html",
         page_title=get_send_test_page_title(
@@ -537,6 +552,76 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
         link_to_upload=(request.endpoint == "main.send_one_off_step" and step_index == 0),
         error_summary_enabled=True,
     )
+
+
+def render_email_add_recipients(service_id, template_id, template, placeholders):
+    session["placeholders"] = {}
+    back = request.args.get("back")
+
+    backlink = get_add_recipients_backlink(service_id, template_id, back)
+
+    form = AddRecipientForm()
+
+    if form.validate_on_submit():
+        choice = form.add_recipient_method.data
+
+        if choice == AddRecipientForm.CHOICE_UPLOAD_CSV:
+            return redirect(url_for("main.send_messages", service_id=service_id, template_id=template_id))
+
+        email_placeholder = placeholders[0]
+
+        if choice == AddRecipientForm.CHOICE_USE_OWN_EMAIL:
+            session["recipient"] = current_user.email_address
+
+        elif choice == AddRecipientForm.CHOICE_ENTER_SINGLE_EMAIL:
+            session["recipient"] = form.enter_single_address.data
+
+        session["placeholders"][email_placeholder] = session["recipient"]
+        template.values[email_placeholder] = session["recipient"]
+
+        return redirect(
+            url_for(
+                ".send_one_off_step",
+                service_id=service_id,
+                template_id=template_id,
+                step_index=1,
+            )
+        )
+
+    return render_template(
+        "views/add-recipients.html",
+        form=form,
+        template_id=template_id,
+        service_id=service_id,
+        alternative_backlink=backlink,
+    )
+
+
+def get_add_recipients_backlink(service_id, template_id, back):
+    backlink = None
+
+    if template_id:
+        if back == "set_sender_email_reply_to":
+            backlink = url_for("main.set_sender", service_id=service_id, template_id=template_id)
+
+        elif back == "from_name_email_reply_to":
+            backlink = url_for(
+                "main.service_email_reply_to", service_id=service_id, template_id=template_id, back="from_name"
+            )
+
+        elif back == "service_add_email_reply_to":
+            backlink = url_for(
+                "main.service_add_email_reply_to", service_id=service_id, template_id=template_id, back="email_reply_to"
+            )
+
+        elif back == "view_template_email_reply_to":
+            backlink = url_for(
+                "main.view_template",
+                service_id=service_id,
+                template_id=template_id,
+            )
+
+    return backlink
 
 
 @no_cookie.route(
