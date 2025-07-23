@@ -2,7 +2,11 @@
 
 if [ "$1" == "web" ]
 then
-  exec gunicorn --error-logfile - -c /home/vcap/app/gunicorn_config.py application
+  exec opentelemetry-instrument \
+    --traces_exporter otlp,console \
+    --metrics_exporter otlp,console \
+    --service_name admin \
+  gunicorn --error-logfile - -c /home/vcap/app/gunicorn_config.py application
 
 elif [ "$1" == "web-local" ]
 then
