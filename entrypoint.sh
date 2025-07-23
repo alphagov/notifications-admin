@@ -7,7 +7,12 @@ then
 elif [ "$1" == "web-local" ]
 then
   npm run build
-  exec flask run --host 0.0.0.0 --port $PORT
+  exec opentelemetry-instrument \
+    --traces_exporter otlp \
+    --metrics_exporter otlp \
+    --service_name admin \
+    --exporter_otlp_endpoint otel-sidecar:4317 \
+  flask run --host 0.0.0.0 --port $PORT
 
 else
   echo "Running custom command"
