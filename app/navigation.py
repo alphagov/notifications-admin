@@ -154,7 +154,6 @@ class HeaderNavigation(Navigation):
         from app import current_user
 
         nav_items = [
-            {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
             {"href": url_for("main.guidance_features"), "text": "Features", "active": self.is_selected("features")},
             {"href": url_for("main.guidance_pricing"), "text": "Pricing", "active": self.is_selected("pricing")},
             {
@@ -162,6 +161,7 @@ class HeaderNavigation(Navigation):
                 "text": "Using Notify",
                 "active": self.is_selected("using-notify"),
             },
+            {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
         ]
 
         if current_user.platform_admin:
