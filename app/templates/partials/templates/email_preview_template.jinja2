@@ -12,17 +12,15 @@
       }
     }) %}
 
-  {% if reply_to %}
     {% do email_meta.append({
       "key": {
         "html": "Reply&nbsp;to" | safe
       },
       "value": {
         "classes": "email-message-meta__reply-to",
-        "html": reply_to
+        "html": reply_to if reply_to else "Not set"
       }
     }) %}
-  {% endif %}
 {% endif %}
 
 {% do email_meta.append({

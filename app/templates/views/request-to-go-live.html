@@ -3,9 +3,17 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/task-list/macro.html" import govukTaskList %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
 
 {% block service_page_title %}
   Make your service live
+{% endblock %}
+
+{% block backLink %}
+    {% if alternative_backlink %}
+        {{ govukBackLink({ "href": alternative_backlink }) }}
+    {% endif %}
 {% endblock %}
 
 {% block maincolumn_content %}

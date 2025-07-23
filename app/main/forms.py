@@ -2382,10 +2382,14 @@ def get_placeholder_form_instance(
 
 
 class AddRecipientForm(StripWhitespaceForm):
+    CHOICE_UPLOAD_CSV = "upload_csv"
+    CHOICE_ENTER_SINGLE_EMAIL = "enter_single"
+    CHOICE_USE_OWN_EMAIL = "use_my_email"
+
     ADD_RECIPIENT_CHOICES = [
-        ("upload_csv", "Upload a list of email addresses"),
-        ("enter_single", "Enter a single email address"),
-        ("use_my_email", "Use my email address"),
+        (CHOICE_UPLOAD_CSV, "Upload a list of email addresses"),
+        (CHOICE_ENTER_SINGLE_EMAIL, "Enter a single email address"),
+        (CHOICE_USE_OWN_EMAIL, "Use my email address"),
     ]
 
     add_recipient_method = GovukRadiosField(
@@ -2394,6 +2398,24 @@ class AddRecipientForm(StripWhitespaceForm):
         thing="how to add recipients",
         validators=[DataRequired()],
     )
+
+    enter_single_address = make_email_address_field(
+        gov_user=False,
+        thing="an email address",
+        label="Email address",
+    )
+
+    def validate(self, *args, **kwargs):
+        self.enter_single_address.validators = []
+
+        if self.add_recipient_method.data == self.CHOICE_ENTER_SINGLE_EMAIL:
+            self.enter_single_address.validators = [
+                NotifyDataRequired(thing="an email address"),
+                ValidEmail(),
+                ValidGovEmail(),
+            ]
+
+        return super().validate(*args, **kwargs)
 
 
 class SetSenderForm(StripWhitespaceForm):

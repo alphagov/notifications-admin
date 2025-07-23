@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask import (
     abort,
     current_app,
@@ -13,7 +11,6 @@ from flask import (
 from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
-from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
     billing_api_client,
@@ -67,7 +64,7 @@ from app.models.branding import (
 from app.models.letter_rates import LetterRates
 from app.models.organisation import Organisation
 from app.models.sms_rate import SMSRate
-from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
+from app.utils import DELIVERED_STATUSES, SENDING_STATUSES
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
 from app.utils.user import user_has_permissions, user_is_platform_admin
 
@@ -127,10 +124,10 @@ def service_email_sender_change(service_id):
     if from_sender_flow and template_id:
         alternative_backlink = url_for("main.view_template", service_id=service_id, template_id=template_id)
 
-    sender_choice = determine_sender_choice(current_service)
+    # sender_choice = determine_sender_choice(current_service)
 
     form = ServiceEmailSenderForm(
-        use_custom_email_sender_name=sender_choice,
+        use_custom_email_sender_name="custom",
         custom_email_sender_name=current_service.custom_email_sender_name,
     )
 
@@ -152,6 +149,9 @@ def service_email_sender_change(service_id):
             return redirect(
                 url_for(".service_email_reply_to", service_id=service_id, back="from_name", template_id=template_id)
             )
+
+        elif from_sender_flow and current_service.email_reply_to_addresses:
+            return redirect(url_for(".set_sender", service_id=service_id, back="from_name", template_id=template_id))
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
@@ -395,10 +395,22 @@ def service_email_reply_to(service_id):
     template_id = request.args.get("template_id")
 
     backlink = None
+    source = None
 
     if back == "set_sender" and template_id:
         backlink = url_for("main.set_sender", service_id=service_id, template_id=template_id, from_back_link="yes")
-    if back == "from_name" and template_id:
+        source = "set_sender_email_reply_to"
+
+    elif back == "view_template" and template_id:
+        backlink = url_for(
+            "main.view_template",
+            service_id=service_id,
+            template_id=template_id,
+        )
+
+        source = "view_template_email_reply_to"
+
+    elif back == "from_name" and template_id:
         backlink = url_for(
             ".service_email_sender_change",
             service_id=service_id,
@@ -406,11 +418,14 @@ def service_email_reply_to(service_id):
             template_id=template_id,
         )
 
+        source = "from_name_email_reply_to"
+
     return render_template(
         "views/service-settings/email_reply_to.html",
         alternative_backlink=backlink,
         template_id=template_id,
         service_id=current_service.id,
+        source=source,
     )
 
 
@@ -420,45 +435,52 @@ def service_add_email_reply_to(service_id):
     back = request.args.get("back")
     template_id = request.args.get("template_id")
 
-    backlink = None
+    backlink = url_for(
+        "main.service_email_reply_to", service_id=service_id, template_id=template_id, back="view_template"
+    )
+    redirect_back = "email_reply_to"
 
-    if back == "email_reply_to" and template_id:
-        backlink = url_for(".service_email_reply_to", service_id=service_id, template_id=template_id, back="from_name")
+    if back and "from_name" in back:
+        redirect_back = f"from_name_{redirect_back}"
+    elif back and "view_template":
+        redirect_back = f"view_template_{redirect_back}"
 
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
     is_default = first_email_address if first_email_address else form.is_default.data
 
     if form.validate_on_submit():
-        if current_user.platform_admin:
-            try:
-                service_api_client.add_reply_to_email_address(
-                    service_id, email_address=form.email_address.data, is_default=is_default
-                )
-
-            except HTTPError as e:
-                handle_reply_to_email_address_http_error(e, form)
-
-            else:
-                return redirect(url_for(".service_email_reply_to", service_id=service_id))
+        # if current_user.platform_admin:
+        #     try:
+        #         service_api_client.add_reply_to_email_address(
+        #             service_id, email_address=form.email_address.data, is_default=is_default
+        #         )
+        #
+        #     except HTTPError as e:
+        #         handle_reply_to_email_address_http_error(e, form)
+        #
+        #     else:
+        #         return redirect(url_for(".service_email_reply_to", service_id=service_id))
+        #
+        # else:
+        try:
+            notification_id = service_api_client.verify_reply_to_email_address(service_id, form.email_address.data)[
+                "data"
+            ]["id"]
+        except HTTPError as e:
+            handle_reply_to_email_address_http_error(e, form)
 
         else:
-            try:
-                notification_id = service_api_client.verify_reply_to_email_address(service_id, form.email_address.data)[
-                    "data"
-                ]["id"]
-            except HTTPError as e:
-                handle_reply_to_email_address_http_error(e, form)
-
-            else:
-                return redirect(
-                    url_for(
-                        ".service_verify_reply_to_address",
-                        service_id=service_id,
-                        notification_id=notification_id,
-                        is_default=is_default,
-                    )
+            return redirect(
+                url_for(
+                    ".service_verify_reply_to_address",
+                    service_id=service_id,
+                    notification_id=notification_id,
+                    is_default=is_default,
+                    back=redirect_back,
+                    template_id=template_id,
                 )
+            )
 
     return render_template(
         "views/service-settings/email-reply-to/add.html",
@@ -476,6 +498,24 @@ def service_add_email_reply_to(service_id):
 def service_verify_reply_to_address(service_id, notification_id):
     replace = request.args.get("replace", False)
     is_default = request.args.get("is_default", False)
+
+    back = request.args.get("back")
+    template_id = request.args.get("template_id")
+    backlink = None
+    add_recipients_redirect = "no"
+
+    if back:
+        add_recipients_redirect = "yes"
+        if back == "from_name_email_reply_to_add":
+            backlink = url_for(
+                ".service_add_email_reply_to", service_id=service_id, back="from_name", template_id=template_id
+            )
+
+        if back == "view_template_email_reply_to_add":
+            backlink = url_for(
+                ".service_add_email_reply_to", service_id=service_id, back="view_template", template_id=template_id
+            )
+
     return render_template(
         "views/service-settings/email-reply-to/verify.html",
         service_id=service_id,
@@ -483,6 +523,9 @@ def service_verify_reply_to_address(service_id, notification_id):
         partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
         replace=replace,
         is_default=is_default,
+        template_id=template_id,
+        alternative_backlink=backlink,
+        add_recipients_redirect=add_recipients_redirect,
     )
 
 
@@ -499,12 +542,24 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
     replace = request.args.get("replace", False)
     replace = False if replace == "False" else replace
     existing_is_default = False
+    redirect_after = request.args.get("add_recipients_redirect")
+
+    alternative_redirect_link = None
+    if redirect_after == "yes":
+        template_id = request.args.get("template_id")
+        alternative_redirect_link = url_for(
+            "main.send_one_off_step",
+            service_id=service_id,
+            template_id=template_id,
+            step_index=0,
+        )
+
     if replace:
         existing = current_service.get_email_reply_to_address(replace)
         existing_is_default = existing["is_default"]
     verification_status = "pending"
     is_default = True if (request.args.get("is_default", False) == "True") else False
-    if notification["status"] in DELIVERED_STATUSES:
+    if notification["status"] in DELIVERED_STATUSES or SENDING_STATUSES:
         verification_status = "success"
         if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
             if replace:
@@ -515,17 +570,17 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
                 service_api_client.add_reply_to_email_address(
                     current_service.id, email_address=notification["to"], is_default=is_default
                 )
-    seconds_since_sending = (
-        utc_string_to_aware_gmt_datetime(datetime.utcnow().isoformat())
-        - utc_string_to_aware_gmt_datetime(notification["created_at"])
-    ).seconds
-    if notification["status"] in FAILURE_STATUSES or (
-        notification["status"] in SENDING_STATUSES
-        and seconds_since_sending > current_app.config["REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT"]
-    ):
-        verification_status = "failure"
-        form.email_address.data = notification["to"]
-        form.is_default.data = is_default
+    # seconds_since_sending = (
+    #     utc_string_to_aware_gmt_datetime(datetime.utcnow().isoformat())
+    #     - utc_string_to_aware_gmt_datetime(notification["created_at"])
+    # ).seconds
+    # if notification["status"] in FAILURE_STATUSES or (
+    #     notification["status"] in SENDING_STATUSES
+    #     and seconds_since_sending > current_app.config["REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT"]
+    # ):
+    #     verification_status = "failure"
+    #     form.email_address.data = notification["to"]
+    #     form.is_default.data = is_default
     return {
         "status": render_template(
             "views/service-settings/email-reply-to/_verify-updates.html",
@@ -538,6 +593,7 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
             form=form,
             first_email_address=first_email_address,
             replace=replace,
+            alternative_redirect_link=alternative_redirect_link,
         ),
         "stop": 0 if verification_status == "pending" else 1,
     }

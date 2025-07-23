@@ -10,17 +10,25 @@
   {% if replace %}
     {% set back_link_href = url_for('main.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
   {% else %}
-    {% set back_link_href = url_for('main.service_add_email_reply_to', service_id=service_id) %}
+    {% set back_link_href = alternative_backlink or url_for('main.service_add_email_reply_to', service_id=service_id) %}
   {% endif %}
 
   {{ govukBackLink({ "href": back_link_href }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ ajax_block(
-      partials,
-      url_for('json_updates.service_verify_reply_to_address_updates', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace),
-      'status',
-      finished=finished
-    ) }}
+    {{ ajax_block(
+    partials,
+    url_for(
+      "json_updates.service_verify_reply_to_address_updates",
+      service_id=service_id,
+      notification_id=notification_id,
+      is_default=is_default,
+      replace=replace,
+      template_id=template_id,
+      add_recipients_redirect=add_recipients_redirect
+    ),
+    "status",
+    finished=finished
+  ) }}
 {% endblock %}
