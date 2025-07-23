@@ -63,10 +63,10 @@ class LiveCheckboxControls {
       const $clear = this.makeActionButton('Select all', {
         'onclick': () => {
 
-          // uncheck all templates and folders
+          // check all templates and folders
           this.$form.querySelectorAll('input[type=checkbox]').forEach(el => {
-            el.removeAttribute('checked');
-            el.checked = false;
+            el.setAttribute('checked', 'checked');
+            el.checked = true;
           });
 
           // move focus to the first checkbox

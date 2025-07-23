@@ -63,7 +63,7 @@ describe('SetAuthTypeForm', () => {
 
   });
 
-  function get$userCheckboxes () {
+  function getUserCheckboxes () {
     return $setAuthTypeForm.querySelectorAll('input[type=checkbox]');
   };
 
@@ -136,6 +136,15 @@ describe('SetAuthTypeForm', () => {
 
       });
 
+      test("Clicking 'Select All' should select all the options", () => {
+        helpers.triggerEvent($formControls.querySelector('.js-action'), 'click');
+
+        const $userCheckboxes = getUserCheckboxes();
+        const $selectedCheckboxes = Array.from($userCheckboxes).filter($el => $el.checked && $el.hasAttribute('checked'));
+
+        expect($selectedCheckboxes.length).toEqual($userCheckboxes.length);
+      });
+
     });
 
     describe("When some team members are selected", () => {
@@ -144,7 +153,7 @@ describe('SetAuthTypeForm', () => {
 
       beforeEach(() => {
 
-        $userCheckboxes = get$userCheckboxes();
+        $userCheckboxes = getUserCheckboxes();
         $formControls = $setAuthTypeForm.querySelector('.js-stick-at-bottom-when-scrolling');
 
         [0,1].forEach(idx => {
@@ -199,7 +208,7 @@ describe('SetAuthTypeForm', () => {
 
       beforeEach(() => {
 
-        $userCheckboxes = get$userCheckboxes();
+        $userCheckboxes = getUserCheckboxes();
         $formControls = $setAuthTypeForm.querySelector('.js-stick-at-bottom-when-scrolling');
 
         setAuthTypeControls = new LiveCheckboxControls($setAuthTypeForm);
@@ -286,7 +295,7 @@ describe('SetAuthTypeForm', () => {
 
     beforeEach(() => {
 
-      $userCheckboxes = get$userCheckboxes();
+      $userCheckboxes = getUserCheckboxes();
       $formControls = $setAuthTypeForm.querySelector('.js-stick-at-bottom-when-scrolling');
 
       setAuthTypeControls = new LiveCheckboxControls($setAuthTypeForm);
