@@ -31,6 +31,12 @@ click==8.1.3
     # via flask
 cryptography==44.0.1
     # via fido2
+deprecated==1.2.18
+    # via
+    #   opentelemetry-api
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+    #   opentelemetry-semantic-conventions
 dnspython==2.6.1
     # via eventlet
 docopt==0.6.2
@@ -57,18 +63,26 @@ flask-wtf==1.2.1
     # via -r requirements.in
 gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
     # via -r requirements.in
+googleapis-common-protos==1.70.0
+    # via
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
 govuk-bank-holidays==0.15
     # via notifications-utils
 govuk-frontend-jinja==3.6.0
     # via -r requirements.in
 greenlet==3.2.2
     # via eventlet
+grpcio==1.73.1
+    # via opentelemetry-exporter-otlp-proto-grpc
 gunicorn==23.0.0
     # via notifications-utils
 humanize==4.4.0
     # via -r requirements.in
 idna==3.7
     # via requests
+importlib-metadata==8.6.1
+    # via opentelemetry-api
 itsdangerous==2.2.0
     # via
     #   flask
@@ -102,14 +116,91 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==10.0.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@a97b36f6a32e7bb917152c8cd716fe65fa15ac9f
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@c59a85f44ad83ee0d4e4f09499b5b58b5239cf2c
     # via -r requirements.in
 openpyxl==3.1.5
     # via pyexcel-xlsx
+opentelemetry-api==1.33.1
+    # via
+    #   opentelemetry-distro
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+    #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-botocore
+    #   opentelemetry-instrumentation-flask
+    #   opentelemetry-instrumentation-redis
+    #   opentelemetry-instrumentation-requests
+    #   opentelemetry-instrumentation-wsgi
+    #   opentelemetry-processor-baggage
+    #   opentelemetry-propagator-aws-xray
+    #   opentelemetry-sdk
+    #   opentelemetry-semantic-conventions
+opentelemetry-distro==0.54b1
+    # via notifications-utils
+opentelemetry-exporter-otlp==1.33.1
+    # via notifications-utils
+opentelemetry-exporter-otlp-proto-common==1.33.1
+    # via
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+opentelemetry-exporter-otlp-proto-grpc==1.33.1
+    # via opentelemetry-exporter-otlp
+opentelemetry-exporter-otlp-proto-http==1.33.1
+    # via opentelemetry-exporter-otlp
+opentelemetry-instrumentation==0.54b1
+    # via
+    #   opentelemetry-distro
+    #   opentelemetry-instrumentation-botocore
+    #   opentelemetry-instrumentation-flask
+    #   opentelemetry-instrumentation-redis
+    #   opentelemetry-instrumentation-requests
+    #   opentelemetry-instrumentation-wsgi
+opentelemetry-instrumentation-botocore==0.54b1
+    # via notifications-utils
+opentelemetry-instrumentation-flask==0.54b1
+    # via notifications-utils
+opentelemetry-instrumentation-redis==0.54b1
+    # via notifications-utils
+opentelemetry-instrumentation-requests==0.54b1
+    # via notifications-utils
+opentelemetry-instrumentation-wsgi==0.54b1
+    # via opentelemetry-instrumentation-flask
+opentelemetry-processor-baggage==0.54b1
+    # via notifications-utils
+opentelemetry-propagator-aws-xray==1.0.2
+    # via opentelemetry-instrumentation-botocore
+opentelemetry-proto==1.33.1
+    # via
+    #   opentelemetry-exporter-otlp-proto-common
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+opentelemetry-sdk==1.33.1
+    # via
+    #   opentelemetry-distro
+    #   opentelemetry-exporter-otlp-proto-grpc
+    #   opentelemetry-exporter-otlp-proto-http
+    #   opentelemetry-processor-baggage
+opentelemetry-semantic-conventions==0.54b1
+    # via
+    #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-botocore
+    #   opentelemetry-instrumentation-flask
+    #   opentelemetry-instrumentation-redis
+    #   opentelemetry-instrumentation-requests
+    #   opentelemetry-instrumentation-wsgi
+    #   opentelemetry-sdk
+opentelemetry-util-http==0.54b1
+    # via
+    #   opentelemetry-instrumentation-flask
+    #   opentelemetry-instrumentation-requests
+    #   opentelemetry-instrumentation-wsgi
 ordered-set==4.1.0
     # via notifications-utils
 packaging==23.1
-    # via gunicorn
+    # via
+    #   gunicorn
+    #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-flask
 phonenumbers==8.13.50
     # via notifications-utils
 pillow==11.3.0
@@ -118,6 +209,10 @@ prometheus-client==0.15.0
     # via
     #   -r requirements.in
     #   gds-metrics
+protobuf==5.29.5
+    # via
+    #   googleapis-common-protos
+    #   opentelemetry-proto
 pycparser==2.21
     # via cffi
 pyexcel==0.7.1
@@ -141,8 +236,10 @@ pyjwt==2.4.0
     # via notifications-python-client
 pypdf==3.13.0
     # via notifications-utils
-python-dateutil==2.8.2
-    # via botocore
+python-dateutil==2.9.0.post0
+    # via
+    #   botocore
+    #   notifications-utils
 python-json-logger==3.3.0
     # via notifications-utils
 pytz==2024.2
@@ -156,6 +253,7 @@ requests==2.32.3
     #   govuk-bank-holidays
     #   notifications-python-client
     #   notifications-utils
+    #   opentelemetry-exporter-otlp-proto-http
 s3transfer==0.10.1
     # via boto3
 segno==1.6.1
@@ -170,6 +268,8 @@ statsd==4.0.1
     # via notifications-utils
 texttable==1.6.4
     # via pyexcel
+typing-extensions==4.14.0
+    # via opentelemetry-sdk
 urllib3==1.26.19
     # via
     #   botocore
@@ -179,9 +279,17 @@ werkzeug==3.1.3
     # via
     #   flask
     #   flask-login
+wrapt==1.17.2
+    # via
+    #   deprecated
+    #   opentelemetry-instrumentation
+    #   opentelemetry-instrumentation-redis
+    #   opentelemetry-processor-baggage
 wtforms==3.1.0
     # via flask-wtf
 xlrd==2.0.1
     # via pyexcel-xls
 xlwt==1.3.0
     # via pyexcel-xls
+zipp==3.23.0
+    # via importlib-metadata
