@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import (
     abort,
     current_app,
@@ -11,6 +13,7 @@ from flask import (
 from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
+from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
     billing_api_client,
@@ -67,7 +70,7 @@ from app.models.letter_rates import LetterRates
 from app.models.organisation import Organisation
 from app.models.sms_rate import SMSRate
 from app.notify_client import cache
-from app.utils import DELIVERED_STATUSES, SENDING_STATUSES
+from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
 from app.utils.user import user_has_permissions, user_is_platform_admin
 
@@ -484,37 +487,37 @@ def service_add_email_reply_to(service_id):
     is_default = first_email_address if first_email_address else form.is_default.data
 
     if form.validate_on_submit():
-        # if current_user.platform_admin:
-        #     try:
-        #         service_api_client.add_reply_to_email_address(
-        #             service_id, email_address=form.email_address.data, is_default=is_default
-        #         )
-        #
-        #     except HTTPError as e:
-        #         handle_reply_to_email_address_http_error(e, form)
-        #
-        #     else:
-        #         return redirect(url_for(".service_email_reply_to", service_id=service_id))
-        #
-        # else:
-        try:
-            notification_id = service_api_client.verify_reply_to_email_address(service_id, form.email_address.data)[
-                "data"
-            ]["id"]
-        except HTTPError as e:
-            handle_reply_to_email_address_http_error(e, form)
+        if current_user.platform_admin:
+            try:
+                service_api_client.add_reply_to_email_address(
+                    service_id, email_address=form.email_address.data, is_default=is_default
+                )
+
+            except HTTPError as e:
+                handle_reply_to_email_address_http_error(e, form)
+
+            else:
+                return redirect(url_for(".service_email_reply_to", service_id=service_id))
 
         else:
-            return redirect(
-                url_for(
-                    ".service_verify_reply_to_address",
-                    service_id=service_id,
-                    notification_id=notification_id,
-                    is_default=is_default,
-                    back=redirect_back,
-                    template_id=template_id,
+            try:
+                notification_id = service_api_client.verify_reply_to_email_address(service_id, form.email_address.data)[
+                    "data"
+                ]["id"]
+            except HTTPError as e:
+                handle_reply_to_email_address_http_error(e, form)
+
+            else:
+                return redirect(
+                    url_for(
+                        ".service_verify_reply_to_address",
+                        service_id=service_id,
+                        notification_id=notification_id,
+                        is_default=is_default,
+                        back=redirect_back,
+                        template_id=template_id,
+                    )
                 )
-            )
 
     return render_template(
         "views/service-settings/email-reply-to/add.html",
@@ -593,7 +596,7 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
         existing_is_default = existing["is_default"]
     verification_status = "pending"
     is_default = True if (request.args.get("is_default", False) == "True") else False
-    if notification["status"] in DELIVERED_STATUSES or SENDING_STATUSES:
+    if notification["status"] in DELIVERED_STATUSES:
         verification_status = "success"
         if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
             if replace:
@@ -604,17 +607,17 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
                 service_api_client.add_reply_to_email_address(
                     current_service.id, email_address=notification["to"], is_default=is_default
                 )
-    # seconds_since_sending = (
-    #     utc_string_to_aware_gmt_datetime(datetime.utcnow().isoformat())
-    #     - utc_string_to_aware_gmt_datetime(notification["created_at"])
-    # ).seconds
-    # if notification["status"] in FAILURE_STATUSES or (
-    #     notification["status"] in SENDING_STATUSES
-    #     and seconds_since_sending > current_app.config["REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT"]
-    # ):
-    #     verification_status = "failure"
-    #     form.email_address.data = notification["to"]
-    #     form.is_default.data = is_default
+    seconds_since_sending = (
+        utc_string_to_aware_gmt_datetime(datetime.utcnow().isoformat())
+        - utc_string_to_aware_gmt_datetime(notification["created_at"])
+    ).seconds
+    if notification["status"] in FAILURE_STATUSES or (
+        notification["status"] in SENDING_STATUSES
+        and seconds_since_sending > current_app.config["REPLY_TO_EMAIL_ADDRESS_VALIDATION_TIMEOUT"]
+    ):
+        verification_status = "failure"
+        form.email_address.data = notification["to"]
+        form.is_default.data = is_default
     return {
         "status": render_template(
             "views/service-settings/email-reply-to/_verify-updates.html",
