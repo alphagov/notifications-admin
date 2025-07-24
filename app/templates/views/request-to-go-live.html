@@ -51,7 +51,7 @@
               "classes": "govuk-link--no-visited-state",
             },
             "href": url_for('main.estimate_usage', service_id=current_service.id),
-            "status": completed_status if current_service.has_estimated_usage else not_completed_status,
+            "status": completed_status if current_service.go_live_sending_options_complete else not_completed_status,
           },
           {
             "title": {

@@ -13,6 +13,7 @@ from app.constants import (
     SIGN_IN_METHOD_TEXT,
     SIGN_IN_METHOD_TEXT_OR_EMAIL,
 )
+from app.extensions import redis_client
 from app.models import JSONModel
 from app.models.api_key import APIKeys
 from app.models.branding import EmailBranding, LetterBranding
@@ -406,10 +407,26 @@ class Service(JSONModel):
         return {channel: getattr(self, f"volume_{channel}") for channel in ("email", "sms", "letter")}
 
     @property
+    def will_send_emails(self):
+        return redis_client.get(f"{self.id}_will_send_emails")
+
+    @property
+    def will_send_texts(self):
+        return redis_client.get(f"{self.id}_will_send_texts")
+
+    @property
+    def will_send_letters(self):
+        return redis_client.get(f"{self.id}_will_send_letters")
+
+    @property
+    def go_live_sending_options_complete(self):
+        return any([self.will_send_emails, self.will_send_texts, self.will_send_letters])
+
+    @property
     def go_live_checklist_completed(self):
         return all(
             (
-                any(self.volumes_by_channel.values()),
+                self.go_live_sending_options_complete,
                 self.has_team_members_with_manage_service_permission,
                 self.has_templates,
                 not self.needs_to_add_email_reply_to_address,

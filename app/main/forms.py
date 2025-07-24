@@ -1762,6 +1762,29 @@ class EstimateUsageForm(StripWhitespaceForm):
         return super().validate(*args, **kwargs)
 
 
+class ExpectToSendForm(StripWhitespaceForm):
+    message_types = GovukCheckboxesField(
+        "",
+        validators=[DataRequired(message="Select at least 1 option")],
+        choices=[
+            ("emails", "Emails"),
+            ("texts", "Text messages"),
+            ("letters", "Letters"),
+        ],
+    )
+
+
+class EmailUsageForm(StripWhitespaceForm):
+    high_volume_emails = GovukRadiosField(
+        "",
+        choices=[
+            ("yes", "Yes"),
+            ("no", "No"),
+            ("maybe", "Maybe"),
+        ],
+    )
+
+
 class AdminProviderRatioForm(OrderableFieldsForm):
     def __init__(self, providers):
         self._providers = providers

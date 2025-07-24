@@ -6,21 +6,21 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  What do you expect to send?
+  Do you plan to send over 250,000 emails a year?
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id) }) }}
+  {{ govukBackLink({ "href": url_for('main.estimate_usage', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {{ page_header('What do you expect to send?') }}
+      {{ page_header('Do you plan to send over 250,000 emails a year?') }}
 
       {% call form_wrapper() %}
         <div class="form-group">
-          {{ form.message_types }}
+          {{ form.high_volume_emails }}
         </div>
         {{ page_footer('Continue') }}
       {% endcall %}
