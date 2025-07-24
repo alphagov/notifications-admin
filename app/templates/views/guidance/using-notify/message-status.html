@@ -40,7 +40,7 @@
       caption_visible=False
     ) %}
       {% for message_status, description in [
-        ('Sending', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient for up to 72 hours. Notify is waiting for delivery information.'),
+        ('Delivering', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient for up to 72 hours. Notify is waiting for delivery information.'),
         ('Delivered', 'The message was successfully delivered. Notify will not tell you if a user has opened or read a message.'),
         ('Email address does not exist', 'The provider could not deliver the message because the email address was wrong. You should remove these email addresses from your database.'),
         ('Inbox not accepting messages right now', 'The provider could not deliver the message. This can happen when the recipient’s inbox is full or their anti-spam filter rejects your email. <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#protect-your-users-from-spam-and-phishing">Check your content does not look like spam</a> before you try to send the message again.' | safe),
@@ -63,7 +63,7 @@
       caption_visible=False
     ) %}
       {% for message_status, description in [
-        ('Sending', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient for up to 72 hours. Notify is waiting for delivery information.'),
+        ('Delivering', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient for up to 72 hours. Notify is waiting for delivery information.'),
         ('Sent to an international number', 'The mobile networks in some countries do not provide any more delivery information.'),
         ('Delivered', 'The message was successfully delivered. Notify will not tell you if a user has opened or read a message.'),
         ('Not delivered', ('The provider could not deliver the message. This can happen if the phone number was wrong or if the network operator rejects the message. If you’re sure that these phone numbers are correct, you should <a class="govuk-link govuk-link--no-visited-state" href="' + url_for(".support") + '">contact us</a>. If not, you should remove them from your database. You’ll still be charged for text messages that cannot be delivered.')|safe),
