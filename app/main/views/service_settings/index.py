@@ -22,6 +22,7 @@ from app import (
 )
 from app.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.event_handlers import Events
+from app.extensions import redis_client
 from app.main import json_updates, main
 from app.main.forms import (
     AdminBillingDetailsForm,
@@ -38,7 +39,8 @@ from app.main.forms import (
     AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
     AdminSetOrganisationForm,
-    EstimateUsageForm,
+    EmailUsageForm,
+    ExpectToSendForm,
     OnOffSettingForm,
     RenameServiceForm,
     SearchByNameForm,
@@ -64,6 +66,7 @@ from app.models.branding import (
 from app.models.letter_rates import LetterRates
 from app.models.organisation import Organisation
 from app.models.sms_rate import SMSRate
+from app.notify_client import cache
 from app.utils import DELIVERED_STATUSES, SENDING_STATUSES
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
 from app.utils.user import user_has_permissions, user_is_platform_admin
@@ -231,18 +234,30 @@ def service_data_retention(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/request-to-go-live/estimate-usage", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def estimate_usage(service_id):
-    form = EstimateUsageForm(
-        volume_email=current_service.volume_email,
-        volume_sms=current_service.volume_sms,
-        volume_letter=current_service.volume_letter,
-    )
+    form = ExpectToSendForm()
+
+    if request.method == "GET":
+        form.message_types.data = []
+
+        if current_service.will_send_emails:
+            form.message_types.data.append("emails")
+        if current_service.will_send_texts:
+            form.message_types.data.append("texts")
+        if current_service.will_send_letters:
+            form.message_types.data.append("letters")
 
     if form.validate_on_submit():
-        current_service.update(
-            volume_email=form.volume_email.data,
-            volume_sms=form.volume_sms.data,
-            volume_letter=form.volume_letter.data,
-        )
+        selected_message_types = form.message_types.data
+
+        for message_type in ("emails", "texts", "letters"):
+            if message_type in selected_message_types:
+                redis_client.set(f"{service_id}_will_send_{message_type}", b"true", ex=cache.DEFAULT_TTL)
+            else:
+                redis_client.delete(f"{service_id}_will_send_{message_type}")
+
+        if "emails" in selected_message_types:
+            return redirect(url_for("main.email_usage", service_id=service_id))
+
         return redirect(
             url_for(
                 "main.request_to_go_live",
@@ -252,6 +267,25 @@ def estimate_usage(service_id):
 
     return render_template(
         "views/service-settings/estimate-usage.html",
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live/email-usage", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_usage(service_id):
+    form = EmailUsageForm()
+
+    if form.validate_on_submit():
+        return redirect(
+            url_for(
+                "main.request_to_go_live",
+                service_id=service_id,
+            )
+        )
+
+    return render_template(
+        "views/service-settings/email-usage.html",
         form=form,
     )
 
