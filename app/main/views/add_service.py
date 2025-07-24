@@ -88,6 +88,8 @@ def add_service_choose_organisation():
     default_org = current_user.default_organisation
     form = ChooseOrganisationForm(default_organisation=default_org.name)
 
+    form.organisation.data = "default"
+
     if form.validate_on_submit():
         return redirect(url_for("main.add_service_service_name"))
 
