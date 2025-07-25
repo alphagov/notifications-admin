@@ -391,7 +391,7 @@ def test_your_services_should_not_show_back_to_service_link_if_no_service_in_ses
     assert len(page.select(".navigation-service a")) == 0
 
 
-def test_your_services_should_not_show_back_to_service_link_if_not_signed_in(
+def test_your_services_should_not_show_your_services_navigation_link_if_not_signed_in(
     client_request,
     mock_get_service,
 ):
@@ -402,7 +402,7 @@ def test_your_services_should_not_show_back_to_service_link_if_not_signed_in(
     page = client_request.get("main.sign_in")
 
     assert page.select_one("h1").text == "Sign in"  # We’re not signed in
-    assert page.select_one(".navigation-service a") is None
+    assert normalize_spaces(page.select_one(".govuk-service-navigation__list a:first-child").text) != "Your services"
 
 
 @pytest.mark.parametrize(
@@ -450,12 +450,12 @@ def test_should_not_show_back_to_service_if_user_doesnt_belong_to_service(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one("header + .govuk-width-container").text).startswith(
+    assert normalize_spaces(page.select_one(".govuk-service-navigation + .govuk-width-container").text).startswith(
         normalize_spaces(expected_page_text)
     )
 
 
-def test_should_show_back_to_service_if_user_belongs_to_service(
+def test_should_show_your_services_navigation_link_if_user_belongs_to_service(
     client_request,
     fake_uuid,
     mock_get_service,
@@ -463,7 +463,6 @@ def test_should_show_back_to_service_if_user_belongs_to_service(
     service_one,
 ):
     mock_get_service.return_value = service_one
-    expected_page_text = "service one   Your services Dashboard Templates Uploads Team members"
 
     page = client_request.get(
         "main.view_template",
@@ -472,6 +471,4 @@ def test_should_show_back_to_service_if_user_belongs_to_service(
         _test_page_title=False,
     )
 
-    assert normalize_spaces(page.select_one("header + .govuk-width-container").text).startswith(
-        normalize_spaces(expected_page_text)
-    )
+    assert normalize_spaces(page.select_one(".govuk-service-navigation__list a:first-child").text) == "Your services"

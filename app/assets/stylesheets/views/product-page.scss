@@ -5,14 +5,6 @@ $button-shadow-size: $govuk-border-width-form-element;
 
 .product-page {
 
-  .govuk-template--rebranded & .govuk-header {
-    border-bottom-color: $product-page-underline-colour;
-
-    @include govuk-media-query($from: tablet) {
-      border-bottom: none
-    }
-  }
-
   &-intro {
 
     margin: 0 0 govuk-spacing(6) * 1.5 0;
@@ -25,10 +17,6 @@ $button-shadow-size: $govuk-border-width-form-element;
       @include govuk-width-container;
       user-select: none;
       padding: govuk-spacing(6) 0 govuk-spacing(9) 0;
-
-      @include govuk-media-query($from: tablet) {
-        border-top: 1px solid $product-page-underline-colour;
-      }
 
       @include govuk-media-query($from: desktop) {
         background-image: file-url('product/proposition-illustration.png');

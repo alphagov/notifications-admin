@@ -146,7 +146,7 @@ class HeaderNavigation(Navigation):
         },
     }
 
-    # header HTML now comes from GOVUK Frontend so requires a boolean, not an attribute
+    # ServiceNavigation items require Boolean for "active" state
     def is_selected(self, navigation_item):
         return request.endpoint in self.mapping[navigation_item]
 
@@ -154,7 +154,6 @@ class HeaderNavigation(Navigation):
         from app import current_user
 
         nav_items = [
-            {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
             {"href": url_for("main.guidance_features"), "text": "Features", "active": self.is_selected("features")},
             {"href": url_for("main.guidance_pricing"), "text": "Pricing", "active": self.is_selected("pricing")},
             {
@@ -162,6 +161,7 @@ class HeaderNavigation(Navigation):
                 "text": "Using Notify",
                 "active": self.is_selected("using-notify"),
             },
+            {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
         ]
 
         if current_user.platform_admin:
@@ -174,6 +174,16 @@ class HeaderNavigation(Navigation):
             )
 
         if current_user.is_authenticated:
+            # we want the item first in the list
+            nav_items.insert(
+                0,
+                {
+                    "href": url_for("main.your_services"),
+                    "text": "Your services",
+                    "active": not any(self.is_selected(item) for item in self.mapping.keys()),
+                },
+            )
+
             nav_items.append(
                 {
                     "href": url_for("main.your_account"),
