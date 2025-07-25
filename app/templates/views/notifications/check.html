@@ -3,6 +3,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {% block service_page_title %}
   {{ "Error" if error else "Preview of ‘{}’".format(template.name) }}
@@ -68,6 +69,20 @@
   {% endif %}
 
   {{ template|string }}
+
+  {% if current_service.trial_mode %}
+    {% set insetHtml %}
+      <p>Your service is in test mode. You can only:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>send 50 emails per day</li>
+        <li>send test emails to yourself and your team members</li>
+      </ul>
+      <p>To lift these restrictions, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">make your service live</a></p>
+
+    {% endset %}
+
+    {{ govukInsetText({"html": insetHtml}) }}
+  {% endif %}
 
   <div class="js-stick-at-bottom-when-scrolling">
     <form method="post" enctype="multipart/form-data" action="{{url_for(

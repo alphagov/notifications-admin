@@ -112,6 +112,7 @@ def view_template(service_id, template_id):
         ),
         show_recipient=True,
         include_letter_edit_ui_overlay=True,
+        email_reply_to=current_service.default_email_reply_to_address,
     )
 
     if template._template["archived"]:
