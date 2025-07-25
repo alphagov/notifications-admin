@@ -188,6 +188,42 @@ def test_should_show_overview(
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
 
 
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "main.service_sms_senders",
+        "main.service_settings",
+        "main.service_email_reply_to",
+        "main.service_letter_contact_details",
+    ],
+)
+def test_user_with_manage_api_keys_permission_but_no_settings_permission_can_view_certain_settings_pages(
+    client_request,
+    service_one,
+    active_user_no_settings_permission,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_organisation,
+    single_sms_sender,
+    mocker,
+    endpoint,
+):
+    mocker.patch("app.models.user.Users._get_items", return_value=[active_user_no_settings_permission])
+    mocker.patch("app.service_api_client.get_notification_count", return_value=1_234)
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service_data_retention",
+        return_value=[],
+    )
+
+    client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        branding_type="letter",
+        _expected_status=200,
+    )
+
+
 def test_shows_individual_data_retentions_if_different(
     client_request,
     mocker,
