@@ -26,3 +26,22 @@ prometheus-client==0.15.0
 git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
 
 sentry-sdk[flask]==1.45.1
+
+opentelemetry-distro==0.56b0
+opentelemetry-exporter-otlp==1.35.0
+# opentelemetry-instrumentation-asyncio==0.56b0
+# opentelemetry-instrumentation-dbapi==0.56b0
+opentelemetry-instrumentation-logging==0.56b0
+# opentelemetry-instrumentation-sqlite3==0.56b0
+opentelemetry-instrumentation-threading==0.56b0
+opentelemetry-instrumentation-urllib==0.56b0
+opentelemetry-instrumentation-wsgi==0.56b0
+opentelemetry-instrumentation-boto3sqs==0.56b0
+opentelemetry-instrumentation-botocore==0.56b0
+opentelemetry-instrumentation-click==0.56b0
+opentelemetry-instrumentation-flask==0.56b0
+opentelemetry-instrumentation-grpc==0.56b0
+opentelemetry-instrumentation-jinja2==0.56b0
+opentelemetry-instrumentation-redis==0.56b0
+opentelemetry-instrumentation-requests==0.56b0
+opentelemetry-instrumentation-urllib3==0.56b0
