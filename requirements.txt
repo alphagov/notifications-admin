@@ -102,7 +102,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==10.0.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@a97b36f6a32e7bb917152c8cd716fe65fa15ac9f
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@bb31f41dd194802ced5ea814f84cc25855467234
     # via -r requirements.in
 openpyxl==3.1.5
     # via pyexcel-xlsx
@@ -110,7 +110,7 @@ ordered-set==4.1.0
     # via notifications-utils
 packaging==23.1
     # via gunicorn
-phonenumbers==8.13.50
+phonenumbers==9.0.10
     # via notifications-utils
 pillow==11.3.0
     # via -r requirements.in
@@ -141,8 +141,10 @@ pyjwt==2.4.0
     # via notifications-python-client
 pypdf==3.13.0
     # via notifications-utils
-python-dateutil==2.8.2
-    # via botocore
+python-dateutil==2.9.0.post0
+    # via
+    #   botocore
+    #   notifications-utils
 python-json-logger==3.3.0
     # via notifications-utils
 pytz==2024.2
