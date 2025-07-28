@@ -321,7 +321,7 @@ def test_should_show_letter_job(
         "1 Example Street template subject 1 January at 11:09am"
     )
     assert normalize_spaces(page.select(".keyline-block")[0].text) == "1 Letter"
-    assert normalize_spaces(page.select(".keyline-block")[1].text) == "7 January Estimated delivery date"
+    assert normalize_spaces(page.select(".keyline-block")[1].text) == "11 January Estimated delivery date"
     assert page.select_one("a[id=download-job-report]")["href"] == url_for(
         "main.view_job_csv",
         service_id=SERVICE_ONE_ID,

@@ -267,9 +267,7 @@ def test_notification_page_shows_page_for_letter_notification(
         "‘sample template’ was sent by Test User today at 1:01am"
     )
     assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == "Printing starts today at 5:30pm"
-    assert normalize_spaces(page.select("main p:nth-of-type(3)")[0].text) == (
-        "Estimated delivery by Thursday 7 January"
-    )
+    assert normalize_spaces(page.select("main p:nth-of-type(3)")[0].text) == "Estimated delivery by Monday 11 January"
     assert len(page.select(".letter-postage")) == 1
     assert normalize_spaces(page.select_one(".letter-postage").text) == "Postage: second class"
     assert page.select_one(".letter-postage")["class"] == ["letter-postage", "letter-postage-second"]
@@ -523,19 +521,19 @@ def test_notification_page_does_not_show_cancel_link_for_letter_which_cannot_be_
             "economy",
             "Postage: economy",
             "letter-postage-economy",
-            "Estimated delivery by Thursday 14 January",
+            "Estimated delivery by Wednesday 13 January",
         ),
         (
             "europe",
             "Postage: international",
             "letter-postage-international",
-            "Estimated delivery by Monday 11 January",
+            "Estimated delivery by Tuesday 12 January",
         ),
         (
             "rest-of-world",
             "Postage: international",
             "letter-postage-international",
-            "Estimated delivery by Wednesday 13 January",
+            "Estimated delivery by Thursday 14 January",
         ),
     ),
 )
