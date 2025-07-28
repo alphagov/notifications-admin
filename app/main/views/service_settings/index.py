@@ -150,6 +150,7 @@ def service_email_sender_change(service_id):
             new_sender = current_service.name
 
         current_service.update(custom_email_sender_name=new_sender)
+        redis_client.set(f"{service_id}_has_confirmed_email_sender", b"true", ex=cache.DEFAULT_TTL)
 
         if from_sender_flow and not current_service.email_reply_to_addresses:
             return redirect(
