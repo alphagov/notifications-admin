@@ -2,6 +2,9 @@
 
 if [ "$1" == "web" ]
 then
+  export OTEL_TRACES_EXPORTER=otlp
+  export OTEL_METRICS_EXPORTER=otlp
+  export OTEL_SERVICE_NAME=admin
   exec gunicorn --error-logfile - -c /home/vcap/app/gunicorn_config.py application
 
 elif [ "$1" == "web-local" ]

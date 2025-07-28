@@ -179,6 +179,8 @@ def create_app(application):
     asset_fingerprinter._asset_root = application.config["ASSET_PATH"]
 
     init_app(application)
+    from opentelemetry.instrumentation import auto_instrumentation
+    auto_instrumentation.initialize()
 
     if "extensions" not in application.jinja_options:
         application.jinja_options["extensions"] = []
