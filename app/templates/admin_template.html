@@ -1,4 +1,5 @@
 {% extends "govuk_frontend_jinja/template.html"%}
+{% from "govuk_frontend_jinja/components/service-navigation/macro.html" import govukServiceNavigation %}
 
 {% set cspNonce = request.csp_nonce %}
 {# toggle to enable new styles for rebrand #}
@@ -53,10 +54,13 @@
   {{ govukHeader({
     "homepageUrl": url_for('main.show_accounts_or_dashboard'),
     "productName": "Notify",
-    "navigation": header_navigation.visible_header_nav(),
-    "navigationClasses": "govuk-header__navigation--end",
     "assetsPath": asset_path + "images",
     "rebrand": govukRebrand
+  }) }}
+
+  {{ govukServiceNavigation({
+    "navigation": header_navigation.visible_header_nav(),
+    "classes": "govuk-service-navigation--inverse" if request.endpoint == "main.index" else ""
   }) }}
 {% endblock %}
 

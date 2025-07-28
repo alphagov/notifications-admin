@@ -1,5 +1,5 @@
 // GOVUK Frontend modules
-import { createAll, Header, Button, Radios, ErrorSummary, SkipLink, Tabs } from 'govuk-frontend';
+import { createAll, Header, Button, Radios, ErrorSummary, SkipLink, Tabs, ServiceNavigation } from 'govuk-frontend';
 
 import CollapsibleCheckboxes from './collapsible-checkboxes.mjs';
 import FocusBanner from './focus-banner.mjs';
@@ -27,6 +27,7 @@ createAll(Radios);
 createAll(ErrorSummary);
 createAll(SkipLink);
 createAll(Tabs);
+createAll(ServiceNavigation);
 
 const $livesearch = document.querySelector('[data-notify-module="live-search"]');
 if ($livesearch) {
