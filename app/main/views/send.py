@@ -1147,6 +1147,8 @@ def get_email_reply_to_address_from_session():
     if session.get("sender_id"):
         return current_service.get_email_reply_to_address(session["sender_id"])["email_address"]
 
+    return current_service.default_email_reply_to_address
+
 
 def get_sms_sender_from_session():
     if session.get("sender_id"):

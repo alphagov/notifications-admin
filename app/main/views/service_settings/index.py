@@ -556,7 +556,7 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
         existing_is_default = existing["is_default"]
     verification_status = "pending"
     is_default = True if (request.args.get("is_default", False) == "True") else False
-    if notification["status"] in DELIVERED_STATUSES:
+    if notification["status"] in (DELIVERED_STATUSES + SENDING_STATUSES):
         verification_status = "success"
         if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
             if replace:
