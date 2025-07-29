@@ -1,0 +1,34 @@
+{% from "components/banner.html" import banner %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      {% if category in [
+        'cancel',
+        'delete',
+        'suspend',
+        'resume',
+        'remove',
+        'remove default letter branding',
+        'revoke this API key',
+        'make this email branding the default',
+        'make this letter branding the default',
+      ] %}
+        {% set delete_button_text = "Yes, {}".format(category) %}
+      {% elif category == 'try again' %}
+        {% set delete_button_text = category|capitalize %}
+      {% else %}
+        {% set delete_button_text = None %}
+      {% endif %}
+      <div class="bottom-gutter">
+        {{ banner(
+          message if message is string else message[0],
+          'default' if ((category == 'default') or (category == 'default_with_tick')) else 'dangerous',
+          delete_button=delete_button_text,
+          with_tick=True if category == 'default_with_tick' else False,
+          context=message[1] if message is not string,
+          thing=message[2] if message is not string and message[2]
+        )}}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}

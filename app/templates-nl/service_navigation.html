@@ -1,0 +1,23 @@
+{% macro navigation_service_name(service) %}
+  <div class="navigation-service-name govuk-!-font-weight-bold">
+    {{ service.name }}
+    {% if not service.active %}
+      <span class="navigation-service-type navigation-service-type--suspended">Suspended</span>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro service_navigation(user, service) %}
+<div class="navigation-service">
+  <div class="navigation-service__container">
+    {% if service.organisation_id %}
+      {% if user.platform_admin or
+        (user.belongs_to_organisation(service.organisation_id) and service.live) %}
+        <a href="{{ url_for('main.organisation_dashboard', org_id=service.organisation_id) }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-organisation-link">{{ service.organisation_name }}</a>
+      {% endif %}
+    {% endif %}
+    {{ navigation_service_name(service) }}
+  </div>
+  <a href="{{ url_for('main.your_services') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-service-switch">Your services</a>
+</div>
+{% endmacro %}

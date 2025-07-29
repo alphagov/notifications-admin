@@ -1,0 +1,44 @@
+{% extends "withoutnav_template.html" %}
+
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  The GOV.UK Notify service is for people who work in the government
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.support') }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {{ page_header('GOV.UK Notify is for people who work in the government') }}
+
+    <p class="govuk-body">
+      We cannot give advice to the public. We do not have access to information about you held by government departments.
+    </p>
+
+    <p class="govuk-body">
+      There are other pages on GOV.UK where you can get help:
+    </p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-1">
+      <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/contact">Contact the government</a>
+    </h2>
+    <p class="govuk-body">
+      Ask about benefits, driving, transport, tax, and more.
+    </p>
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-1">
+      <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/report-suspicious-emails-websites-phishing">Report internet scams and phishing</a>
+    </h2>
+    <p class="govuk-body">
+      Advice on suspicious emails and text messages.
+    </p>
+  </div>
+</div>
+
+{% endblock %}

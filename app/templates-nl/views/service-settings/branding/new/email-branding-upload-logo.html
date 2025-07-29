@@ -1,0 +1,37 @@
+{% extends "withnav_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ form.logo.label.text }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(form.logo.label.text) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <p class="govuk-body">
+      Your logo must be:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>a PNG file</li>
+        <li>at least 108 pixels high</li>
+        <li>a landscape image with a transparent background</li>
+      </ul>
+      <p class="govuk-body">
+        We do not recommend portrait images because they’ll look very small. This is because the space for email branding has a fixed height.
+      </p>
+      {{ file_upload(form.logo, allowed_file_extensions=[form.EXPECTED_LOGO_FORMAT], button_text='Upload logo') }}
+      <p class="govuk-body govuk-!-margin-top-4">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ abandon_flow_link }}">I do not have a file to upload</a>
+      </p>
+    </div>
+  </div>
+
+{% endblock %}

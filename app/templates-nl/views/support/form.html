@@ -1,0 +1,49 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+{{ govuk_page_header(page_title) }}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        {% if show_status_page_banner %}
+          {% set insetHtml %}
+          <p class="govuk-body">First, check the <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">
+            GOV.UK Notify status page</a>.</p>
+          <p class="govuk-body">You do not need to contact us if your problem is already listed on that page.</p>
+          {% endset %}
+          {{ govukInsetText({"html": insetHtml, classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-3"}) }}
+        {% endif %}
+        {% call form_wrapper() %}
+            {{ form.feedback(param_extensions={
+              "classes": "govuk-!-width-full",
+              "rows": "10",
+              "attributes": {
+                "data-notify-module": "enhanced-textbox",
+                "data-highlight-placeholders": "false"
+              }
+            }) }}
+            {% if not current_user.is_authenticated %}
+              {{ form.name(param_extensions={"classes": "govuk-!-width-full"}) }}
+              {{ form.email_address(param_extensions={"classes": "govuk-!-width-full"}) }}
+            {% else %}
+              <p class="govuk-body">We’ll reply to {{ current_user.email_address }}</p>
+            {% endif %}
+            {{ sticky_page_footer('Send') }}
+        {% endcall %}
+      </div>
+    </div>
+
+{% endblock %}

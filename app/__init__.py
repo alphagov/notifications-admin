@@ -615,7 +615,7 @@ def add_template_filters(application):
 def init_jinja(application):
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     template_folders = [
-        os.path.join(repo_root, "app/templates"),
+        os.path.join(repo_root, "app/templates-nl"),
     ]
 
     application.jinja_loader = jinja2.ChoiceLoader(

@@ -1,0 +1,47 @@
+{% extends "withoutnav_template.html" %}
+
+{% block per_page_title %}
+  Cookies
+{% endblock %}
+
+{% block cookie_message %}{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-large">Cookies</h1>
+    <p class="summary">
+      Cookies are small files saved on your phone, tablet or computer when you visit a website.
+    </p>
+    <p class="govuk-body">We use an essential cookie to keep your data secure while you use GOV.UK Notify.</p>
+    <p class="govuk-body">
+      We do not need to ask permission to use essential cookies.
+    </p>
+    <table>
+        <caption class="govuk-visually-hidden">Essential cookies</caption>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Purpose</th>
+                <th>Expires</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                  notify_admin_session
+                </td>
+                <td width="50%">
+                  Used to keep you signed in
+                </td>
+                <td>
+                  20 hours
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

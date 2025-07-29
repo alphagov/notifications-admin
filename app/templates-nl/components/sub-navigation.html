@@ -1,0 +1,41 @@
+{% macro sub_navigation_item(item, with_top_border=False) %}
+  <li class="navigation__item {% if with_top_border %} navigation__item--with-separator {% endif %}"
+      itemprop="itemListElement"
+      itemscope
+      itemtype="http://schema.org/ListItem"
+  >
+    <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline {% if item['link'] == request.endpoint %} selected {% endif %}" href="{{ url_for(item['link']) }}" itemprop="item">
+      <span itemprop="name">{{item['name']}}</span>
+    </a>
+    {% if caller %}
+      {{ caller() }}
+    {% endif %}
+  </li>
+{% endmacro %}
+
+{% macro sub_navigation_item_sub_navigation(item) %}
+  <ol itemscope itemtype="http://schema.org/ItemList">
+    {% for sub_item in item.sub_navigation_items %}
+      {{ sub_navigation_item(sub_item) }}
+    {% endfor %}
+  </ol>
+{% endmacro %}
+
+{% macro sub_navigation(
+  item_set,
+  nav_label_prefix
+) %}
+  <nav class="navigation govuk-!-margin-top-7 govuk-!-padding-bottom-12" aria-label="{{ nav_label_prefix }}">
+    <ol itemscope itemtype="http://schema.org/ItemList">
+      {% for item in item_set %}
+        {% if item.sub_navigation_items %}
+          {% call sub_navigation_item(item, with_top_border=(not loop.first)) %}
+            {{ sub_navigation_item_sub_navigation(item) }}
+          {% endcall %}
+        {% else %}
+          {{ sub_navigation_item(item, with_top_border=(not loop.first)) }}
+        {% endif %}
+      {% endfor %}
+    </ol>
+  </nav>
+{% endmacro %}

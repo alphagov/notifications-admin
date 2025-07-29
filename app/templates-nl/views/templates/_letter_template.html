@@ -1,0 +1,44 @@
+{% from "components/banner.html" import banner_wrapper %}
+
+{% if template.too_many_pages %}
+  <div class="govuk-!-margin-bottom-6">
+    {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/letter-too-long.html" %}
+    {% endcall %}
+  </div>
+{% endif %}
+
+{#
+  In a slight change from the email/text templates, we render the edit UI elements inside the template's built-in Jinja
+  template. This is because rendering a letter's preview via images is more complex, and there are more complex UI
+  requirements - specifically, we show the 'Edit' body button next to the appropriate body of the letter. We show
+  'edit' buttons for potentially multiple languages (Welsh and English), and those can be on arbitrary pages.
+  So we need to be inside the central rendering logic to get those placed correctly.
+#}
+{{ template|string }}
+
+<div class="govuk-!-margin-bottom-2">
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ govukButton({
+    "element": "a",
+    "text": "Manage attachment" if template.attachment else "Attach pages",
+    "href": url_for(
+        '.letter_template_attach_pages',
+        service_id=current_service.id,
+        template_id=template.id
+      ),
+    "classes": "govuk-button--secondary edit-template-link-attachment"
+    }) }}
+
+    {{ govukButton({
+    "element": "a",
+    "text": "Change language",
+    "href": url_for(
+    '.letter_template_change_language',
+    service_id=current_service.id,
+    template_id=template.id
+    ),
+    "classes": "govuk-button--secondary change-language"
+    }) }}
+  </div>
+</div>

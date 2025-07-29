@@ -1,0 +1,105 @@
+{% extends "content_template.html" %}
+
+{% from "components/pill.html" import pill %}
+{% from "components/service-link.html" import service_link %}
+{% from "components/table.html" import mapping_table, row, text_field %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+{% set page_title = 'Message status' %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">{{ page_title }}</h1>
+
+  <p class="govuk-body">Use the {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }} to check the status of a message.</p>
+      <p class="govuk-body">This page describes the statuses you’ll see when you’re signed-in to GOV.UK Notify.</p>
+  <p class="govuk-body">If you’re using the Notify API, read our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">documentation</a> for a list of API statuses.</p>
+
+  <div class="govuk-!-margin-bottom-3">
+    {{ pill(
+      (
+        ("Emails", "email", url_for(".guidance_message_status"), 0),
+        ("Text messages", "sms", url_for(".guidance_message_status", notification_type="sms"), 0),
+        ("Letters", "letter", url_for(".guidance_message_status", notification_type="letter"), 0),
+      ),
+      current_value=notification_type,
+      show_count=False,
+    ) }}
+  </div>
+
+  {% if notification_type == "email" %}
+    {% call mapping_table(
+      caption='Message statuses – emails',
+      field_headings=['Status', 'Description'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_status, description in [
+        ('Sending', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient for up to 72 hours. Notify is waiting for delivery information.'),
+        ('Delivered', 'The message was successfully delivered. Notify will not tell you if a user has opened or read a message.'),
+        ('Email address does not exist', 'The provider could not deliver the message because the email address was wrong. You should remove these email addresses from your database.'),
+        ('Inbox not accepting messages right now', 'The provider could not deliver the message. This can happen when the recipient’s inbox is full or their anti-spam filter rejects your email. <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#protect-your-users-from-spam-and-phishing">Check your content does not look like spam</a> before you try to send the message again.' | safe),
+        ('Technical failure', 'Your message was not sent because there was a problem between Notify and the provider. You’ll have to try sending your messages again.'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_status) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+
+  {% endif %}
+  {% if notification_type == "sms" %}
+
+    {% call mapping_table(
+      caption='Message statuses – text messages',
+      field_headings=['Status', 'Description'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_status, description in [
+        ('Sending', 'Notify has sent the message to the provider. The provider will try to deliver the message to the recipient for up to 72 hours. Notify is waiting for delivery information.'),
+        ('Sent to an international number', 'The mobile networks in some countries do not provide any more delivery information.'),
+        ('Delivered', 'The message was successfully delivered. Notify will not tell you if a user has opened or read a message.'),
+        ('Not delivered', ('The provider could not deliver the message. This can happen if the phone number was wrong or if the network operator rejects the message. If you’re sure that these phone numbers are correct, you should <a class="govuk-link govuk-link--no-visited-state" href="' + url_for(".support") + '">contact us</a>. If not, you should remove them from your database. You’ll still be charged for text messages that cannot be delivered.')|safe),
+        ('Phone not accepting messages right now', 'The provider could not deliver the message. This can happen when the recipient’s phone is off, has no signal, or their text message inbox is full. You can try to send the message again. You’ll still be charged for text messages to phones that are not accepting messages.'),
+        ('Technical failure', 'Your message was not sent because there was a problem between Notify and the provider. You’ll have to try sending your messages again. You will not be charged for text messages that are affected by a technical failure.'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_status) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+
+  {% endif %}
+  {% if notification_type == "letter" %}
+
+    {% call mapping_table(
+      caption='Message statuses – letters',
+      field_headings=['Status', 'Description'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_status, description in [
+        ('Sent', 'Notify has sent the letter to the provider to be printed.'),
+        ('Printed', 'The provider has printed the letter. Letters are printed at 5:30pm and dispatched the next working day.'),
+        ('Cancelled', 'Sending cancelled. Your letter will not be printed or dispatched.'),
+        ('Technical failure', 'Notify had an unexpected error while sending the letter to our printing provider.'),
+        ('Permanent failure', 'The provider cannot print the letter. Your letter will not be dispatched.')
+      ] %}
+        {% call row() %}
+          {{ text_field(message_status) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+
+  {% endif %}
+
+{% endblock %}

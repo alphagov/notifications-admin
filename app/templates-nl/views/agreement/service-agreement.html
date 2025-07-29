@@ -1,0 +1,45 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Accept our data processing and financial agreement
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-five-sixths">
+
+    {{ page_header('Accept our data processing and financial agreement')}}
+
+    <p class="govuk-body">
+      Before you can use GOV.UK Notify, you need to accept our data processing and financial agreement.
+    </p>
+    <p class="govuk-body">
+      This must be done by, or on behalf of, someone with the authority to sign contracts for {{ current_service.organisation.name }}.
+    </p>
+    <p class="govuk-body">
+      Once accepted, the agreement covers all Notify services from {{ current_service.organisation.name }}.
+    </p>
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download a copy of the data processing and financial agreement (PDF)</a>.
+    </p>
+    <p class="govuk-body">
+      The agreement is confidential and should not be shared outside your organisation.
+    </p>
+    {{ govukButton({
+      "element": "a",
+      "text": "Continue",
+      "href": url_for('main.service_accept_agreement', service_id=current_service.id),
+    }) }}
+
+  </div>
+</div>
+
+{% endblock %}

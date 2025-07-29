@@ -1,0 +1,120 @@
+{% extends "withnav_template.html" %}
+{% from "components/ajax-block.html" import ajax_block %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ 1|message_count_label(template.template_type, suffix='') | capitalize }}
+{% endblock %}
+
+{% block backLink %}
+  {% if back_link %}
+    {{ govukBackLink({ "href": back_link }) }}
+  {% endif %}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ page_header(
+      1|message_count_label(template.template_type, suffix='') | capitalize
+    ) }}
+    <p class="govuk-body">
+      {% if notification.is_precompiled_letter %}
+        {% if notification.created_by %}
+          Uploaded
+        {% else %}
+          Provided as PDF
+        {% endif %}
+      {% else %}
+        {% if help %}
+          ‘{{ template.name }}’
+        {% else %}
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_template', service_id=current_service.id, template_id=template.id) }}">‘{{ template.name }}’</a>
+        {% endif %}
+        was sent
+      {% endif %}
+      {% if notification.job and notification.job.original_file_name != 'Report' %}
+        {% set destination =
+          {'letter': 'an address', 'email': 'an email address', 'sms': 'a phone number'} %}
+        to {{ destination[template.template_type] }} from
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job', service_id=current_service.id, job_id=notification.job.id) }}">{{ notification.job.original_file_name }}</a>
+      {% elif notification.created_by %}
+        by {{ notification.created_by.name }}
+      {% endif %}
+      {{ notification.created_at|format_datetime_human }}
+    </p>
+
+    {% if template.template_type == 'letter' %}
+      {% if notification.status == 'cancelled' %}
+        <p class="notification-status-cancelled">
+          Cancelled {{ notification.updated_at|format_datetime_short }}
+        </p>
+      {% elif notification.status == 'validation-failed' %}
+        <p class="notification-status-cancelled">
+          {{ message.summary | safe }}
+        </p>
+      {% elif notification.status == 'permanent-failure' %}
+         <p class="notification-status-cancelled">
+          Permanent failure – The provider cannot print the letter. Your letter will not be dispatched.
+         </p>
+      {% elif notification.status == 'technical-failure' %}
+        <p class="notification-status-cancelled">
+          Technical failure – Notify will resend once the team have
+          fixed the problem
+        </p>
+      {% else %}
+        {% if notification.sent_with_test_key %}
+          {% if notification.is_precompiled_letter %}
+            <p class="govuk-body">
+              This letter passed our checks, but we will not print it because you used a test key.
+            </p>
+          {% else %}
+            <p class="govuk-body">
+              We will not print this letter because you used a test key.
+            </p>
+          {% endif %}
+        {% else %}
+          <p class="govuk-body">
+            {{ notification.letter_print_day }}
+          </p>
+          <p class="govuk-body">
+            Estimated delivery date: {{ notification.estimated_letter_delivery_date|format_day_of_week }} {{ notification.estimated_letter_delivery_date|format_date_short }}
+          </p>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+
+    <div class="{{ 'letter-sent' if template.template_type == 'letter' else '' }}">
+      {{ template|string }}
+    </div>
+
+    {% if template.template_type == 'letter' %}
+      <div class="js-stick-at-bottom-when-scrolling">
+        <div class="page-footer">
+          {% if notification.letter_can_be_cancelled %}
+            <span class="page-footer-delete-link page-footer-delete-link-without-button">
+              <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification.id) }}">Cancel sending this letter</a>
+            </span>
+          {% else %}
+            <div>&nbsp;</div>
+          {% endif %}
+          <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link-without-button" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification.id, filetype='pdf') }}" download>Download as a PDF</a>
+        </div>
+      </div>
+    {% elif template.template_type == 'email' %}
+      <div class="js-stick-at-bottom-when-scrolling" role="status">
+        {{ ajax_block(partials, updates_url, 'status', finished=notification.finished) }}
+      </div>
+    {% elif template.template_type == 'sms' %}
+      <div role="status">
+      {{ ajax_block(partials, updates_url, 'status', finished=notification.finished) }}
+      </div>
+    {% endif %}
+
+    {% if current_user.has_permissions('send_messages') and current_user.has_permissions('view_activity') and template.template_type == 'sms' and current_service.has_permission("inbound_sms") %}
+      <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.conversation', service_id=current_service.id, notification_id=notification.id, _anchor='n{}'.format(notification.id)) }}">See all text messages sent to this phone number</a>
+      </p>
+    {% endif %}
+
+{% endblock %}

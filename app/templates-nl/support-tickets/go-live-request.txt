@@ -1,0 +1,28 @@
+{% set service = current_service -%}
+{% set organisation = service.organisation -%}
+{% set user = current_user -%}
+
+Service: {{ service.name }}
+{{ url_for('main.service_dashboard', service_id=service.id, _external=True) }}
+
+---
+Organisation type: {{ service.organisation_type_label }}
+Agreement signed: {{ organisation.agreement_signed|format_yes_no(none='Can’t tell') }}
+{%- if organisation.agreement_signed %}, for {{ current_service.organisation.name }}
+{%- elif organisation.name %} (organisation is {{ organisation.name }}, {{ organisation.crown|format_yes_no(yes='a crown body', no='a non-crown body', none='crown status unknown') }})
+{%- else %} (domain is {{ user.email_domain }})
+{%- endif %}.
+{%- if organisation.can_approve_own_go_live_requests %} This organisation can approve its own go live requests. No action should be needed from us.{% endif %}
+{%- if organisation.request_to_go_live_notes %} {{ organisation.request_to_go_live_notes }}{% endif %}
+{%- if organisation.agreement_signed_by %}
+Agreement signed by: {{ organisation.agreement_signed_by.email_address }}
+{% endif -%}
+{%- if organisation.agreement_signed_on_behalf_of_email_address -%}
+Agreement signed on behalf of: {{ organisation.agreement_signed_on_behalf_of_email_address }}
+{%- endif %}
+
+Other live services for that user: {{ user.live_services|format_yes_no }}
+
+---
+Request sent by {{ user.email_address }}
+Requester’s user page: {{ url_for('main.user_information', user_id=user.id, _external=True) }}

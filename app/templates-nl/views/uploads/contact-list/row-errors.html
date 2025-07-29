@@ -1,0 +1,101 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/table.html" import list_table, field, text_field, index_field %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Error
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.upload_contact_list', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="bottom-gutter-1-2">
+    {% call banner_wrapper(type='dangerous') %}
+      {% if row_errors|length == 1 %}
+        <h1 class='banner-title'>
+          There’s a problem with {{ original_file_name }}
+        </h1>
+        <p class="govuk-body">
+          You need to {{ row_errors[0] }}.
+        </p>
+      {% else %}
+        <h1 class='banner-title'>
+          There are some problems with {{ original_file_name }}
+        </h1>
+        <p class="govuk-body">
+          You need to:
+        </p>
+        <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
+          {% for error in row_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endcall %}
+  </div>
+
+  <div class="js-stick-at-top-when-scrolling">
+    <div class="form-group">
+      {{ file_upload(
+        form.file,
+        allowed_file_extensions=allowed_file_extensions,
+        action=url_for('main.upload_contact_list', service_id=current_service.id),
+        button_text='Upload your file again'
+      ) }}
+    </div>
+    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
+  </div>
+
+  {% call(item, row_number) list_table(
+    recipients.displayed_rows,
+    caption=original_file_name,
+    caption_visible=False,
+    field_headings=[
+      '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true" class="table-field-invisible-error">1</span>'|safe
+    ] + recipients.column_headers
+  ) %}
+    {% call index_field() %}
+      <span class="{% if item.has_errors %}table-field-error{% endif %}">
+        {{ item.index + 2 }}
+      </span>
+    {% endcall %}
+    {% for column in recipients.column_headers %}
+      {% if item[column].error and not recipients.missing_column_headers %}
+        {% call field() %}
+          <span>
+            <span class="table-field-error-label">{{ item[column].error }}</span>
+            {{ item[column].data if item[column].data != None }}
+          </span>
+        {% endcall %}
+      {% elif item[column].ignore %}
+        {{ text_field(item[column].data or '', status='default') }}
+      {% else %}
+        {{ text_field(item[column].data or '') }}
+      {% endif %}
+    {% endfor %}
+    {% if item[None].data %}
+      {% for column in item[None].data %}
+        {{ text_field(column, status='default') }}
+      {% endfor %}
+    {% endif %}
+  {% endcall %}
+
+  {% if recipients.displayed_rows|list|length < recipients|length %}
+    {% if recipients.displayed_rows|list|length < recipients.rows_with_errors|list|length %}
+      <p class="table-show-more-link">
+        Only showing the first {{ recipients.displayed_rows|list|length }} rows with errors
+      </p>
+    {% else %}
+      <p class="table-show-more-link">
+        Only showing rows with errors
+      </p>
+    {% endif %}
+  {% endif %}
+
+
+{% endblock %}

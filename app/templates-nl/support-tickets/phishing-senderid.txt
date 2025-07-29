@@ -1,0 +1,14 @@
+Service: {{ current_service.name }}
+{{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+
+---
+The user - {{current_user.email_address}} asked for a sender ID that is potentially used for phishing - {{ senderID }}. It has been blocked.
+
+Check whether this is just testing, if not raise a security incident:
+
+Security Incident runbook: https://github.com/alphagov/notifications-manuals/wiki/What-to-do-during-an-incident#security-incidents-and-data-breaches'
+
+To determine the extent of the problem:
+ - look at sender ids both current and archived : https://github.com/alphagov/notifications-manuals/wiki/Support-Runbook#look-at-senderid-history
+ - look at emails: {{url_for("main.view_notifications", service_id=current_service.id, message_type='email', status='delivered', _external=True)}}
+ - look at text messages: {{url_for("main.view_notifications", service_id=current_service.id, message_type='sms', status='delivered', _external=True)}}

@@ -1,0 +1,36 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Before you start receiving text messages
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_receive_text_messages', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('Before you start receiving text messages') }}
+      <p class="govuk-body">
+        The messages you receive will only be available to download for {{ current_service.get_days_of_retention('sms') }} days.
+      </p>
+      <p class="govuk-body">
+        You are responsible for processing unsubscribe requests.
+      </p>
+      <p class="govuk-body">
+        Recipients may expect you to reply to their messages.
+      </p>
+
+      {% call form_wrapper() %}
+        {{ page_footer('I understand – continue') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

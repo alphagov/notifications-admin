@@ -1,0 +1,57 @@
+{% extends "withoutnav_template.html" %}
+
+{% from "components/error-summary.html" import errorSummary %}
+
+{% block main %}
+<div class="govuk-width-container {{ mainClasses }}">
+    <div class="navigation-service">
+      <div class="navigation-service__container">
+        <div class="navigation-service-name govuk-!-font-weight-bold">
+          Platform admin
+        </div>
+      </div>
+      <a href="{{ url_for('main.your_services') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-service-switch">Your services</a>
+    </div>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-quarter">
+        <nav class="navigation" aria-label="Platform admin">
+          <ul class="govuk-list">
+          {% for link_text, selected_class, url in [
+            ('Search', platform_admin_navigation.is_selected('search'), url_for('main.platform_admin_search')),
+            ('Organisations', platform_admin_navigation.is_selected('organisations'), url_for('main.organisations')),
+            ('Providers', platform_admin_navigation.is_selected('providers'), url_for('main.view_providers')),
+            ('Reports', platform_admin_navigation.is_selected('reports'), url_for('main.platform_admin_reports')),
+            ('Email branding', platform_admin_navigation.is_selected('email-branding'), url_for('main.email_branding')),
+            ('Letter branding',platform_admin_navigation.is_selected('letter-branding'), url_for('main.letter_branding')),
+            ('Inbound SMS numbers', platform_admin_navigation.is_selected('inbound-sms-numbers'), url_for('main.inbound_sms_admin')),
+            ('Email complaints', platform_admin_navigation.is_selected('email-complaints'), url_for('main.platform_admin_list_complaints')),
+            ('Returned letters', platform_admin_navigation.is_selected('returned-letters'), url_for('main.platform_admin_returned_letters')),
+            ('Clear cache', platform_admin_navigation.is_selected('clear-cache'), url_for('main.clear_cache')),
+          ] %}
+            <li>
+              <a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{selected_class}}" href="{{ url }}">
+                {{ link_text }}
+              </a>
+            </li>
+          {% endfor %}
+          </ul>
+        </nav>
+      </div>
+      <div class="govuk-grid-column-three-quarters">
+      {% block backLink %}{% endblock %}
+        <main class="govuk-main-wrapper column-main govuk-!-padding-top-0 govuk-!-padding-bottom-0" id="main-content" role="main">
+          {% block content %}
+            {% include 'flash_messages.html' %}
+            {% block errorSummary %}
+              {% if error_summary_enabled %}
+                {% if form and form.errors %}{{ errorSummary(form) }}{% endif %}
+              {% endif %}
+            {% endblock %}
+            {% block platform_admin_content %}{% endblock %}
+          {% endblock %}
+        </main>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

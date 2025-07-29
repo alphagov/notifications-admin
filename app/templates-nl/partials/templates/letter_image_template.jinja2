@@ -1,0 +1,83 @@
+{% if template.include_letter_edit_ui_overlay %}
+<div class="template-container template-container--with-attach-pages-button">
+  {% if current_user.has_permissions('manage_service') %}
+    {% if not current_service.letter_branding_id %}
+      <a href="{{ url_for(".letter_branding_options", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-branding">Add logo</a>
+    {% endif %}
+  {% endif %}
+  {% if current_user.has_permissions('manage_templates') %}
+    <a href="{{ url_for(".edit_template_postage", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-postage">Change postage</a>
+  {% endif %}
+  {#
+    we break the permissions block here to to be able to add the get ready to send button,
+    so that it appears in a more logical keyboard tab order
+  #}
+  {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not template.too_many_pages %}
+    <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-get-ready-to-send">
+      Get ready to send<span class="govuk-visually-hidden"> a letter using this template</span>
+    </a>
+  {% endif %}
+  {% if current_user.has_permissions('manage_templates') %}
+    {% if current_service.count_letter_contact_details %}
+      <a href="{{ url_for(".set_template_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Change your contact details</a>
+    {% else %}
+      <a href="{{ url_for(".service_add_letter_contact", service_id=current_service.id, from_template=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-contact">Add your contact details</a>
+    {% endif %}
+    {% if template.welsh_page_count %}
+      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id, language='welsh') }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="visually-hidden-on-tablet-and-up"> Welsh body text</span></a>
+    {% else %}
+      <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="visually-hidden-on-tablet-and-up"> body text</span></a>
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% for page_number in page_numbers %}
+  <div class="letter page--{{ loop.cycle('odd', 'even') }}{% if loop.first %} page--first{% endif %}{% if loop.last %} page--last{% endif %}">
+    {% if loop.first and show_postage %}
+      <p class="letter-postage {{ postage_class_value }}">
+        Postage: {{ postage_description }}
+      </p>
+    {% endif %}
+    {% if template.welsh_page_count and page_number == first_page_of_english %}
+      <div id="first-page-of-english-in-bilingual-letter"></div>
+      {% if template.include_letter_edit_ui_overlay  %}
+        <a href="{{ url_for(".edit_service_template", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-letter-body">Edit<span class="visually-hidden-on-tablet-and-up"> English body text</span></a>
+      {% endif %}
+    {% endif %}
+    {% if page_number == first_page_of_attachment %}
+    <div id="first-page-of-attachment"></div>
+    {% endif %}
+    <img src="{{ image_url }}?page={{ page_number }}" alt="" loading="{{ 'eager' if page_number in (1, first_page_of_attachment, first_page_of_english) else 'lazy' }}">
+  </div>
+{% endfor %}
+
+<div class="govuk-visually-hidden">
+  <h3>
+    Recipient address
+  </h3>
+  <ul>
+  {%- for line in address -%}
+    <li>{{ line }}</li>
+  {%- endfor -%}
+  </ul>
+  <h3>
+    Your contact details
+  </h3>
+  <p>
+    {{ contact_block }}
+  </p>
+  <h3>
+    Content
+  </h3>
+  <p>
+    {{ date }}
+  </p>
+  <h3>
+    {{ subject }}
+  </h3>
+  {{ message }}
+</div>
+
+{% if template.include_letter_edit_ui_overlay %}
+</div>
+{% endif %}

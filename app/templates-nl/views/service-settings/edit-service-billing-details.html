@@ -1,0 +1,39 @@
+
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Change billing details
+{% endblock %}
+
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Change billing details') }}
+
+  {% call form_wrapper() %}
+    {{ form.billing_contact_names(param_extensions={"classes": "govuk-!-width-full"}) }}
+    {{ form.billing_contact_email_addresses(param_extensions={"classes": "govuk-!-width-full"}) }}
+  <div class="extra-tracking">
+      {{ form.billing_reference(param_extensions={"classes": "govuk-!-width-full"}) }}
+      {{ form.purchase_order_number(param_extensions={"classes": "govuk-!-width-full"}) }}
+  </div>
+    {{ form.notes(param_extensions={
+      "classes": "govuk-!-width-full",
+      "rows": "4",
+      "attributes": {
+        "data-notify-module": "enhanced-textbox",
+        "data-highlight-placeholders": "false"
+      }
+    }) }}
+    {{ page_footer('Save') }}
+  {% endcall %}
+
+{% endblock %}

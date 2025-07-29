@@ -1,0 +1,46 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Add your contact details
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Add your contact details') }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% call form_wrapper() %}
+        {{ form.letter_contact_block(param_extensions={
+          "classes": "govuk-!-width-one-half govuk-textarea-highlight__textbox",
+          "rows": "10",
+          "attributes": {
+            "data-notify-module": "enhanced-textbox",
+            "data-highlight-placeholders": "true"
+          },
+          "label": {
+            "text": "This will appear as the sender address on your letters"
+          },
+          "hint": {
+            "text": "10 lines maximum"
+          },
+          "formGroup": {
+            "classes": "govuk-textarea-highlight",
+          }
+        }) }}
+        {% if not first_contact_block %}
+          {{ form.is_default }}
+        {% endif %}
+        {{ page_footer('Add') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

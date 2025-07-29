@@ -1,0 +1,68 @@
+{% extends "withnav_template.html" %}
+{% from "components/table.html" import list_table, field %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  API keys
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.api_integration', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('API keys') }}
+
+  <div class="body-copy-table">
+    {% call(item, row_number) list_table(
+      current_service.api_keys,
+      empty_message="You have not created any API keys yet",
+      caption="API keys",
+      caption_visible=false,
+      field_headings=[
+        'API keys',
+        'Action'
+      ],
+      field_headings_visible=False
+    ) %}
+      {% call field() %}
+        <div class="file-list">
+          {{ item.name }}
+          <div class="hint">
+            {% if item.key_type == 'normal' %}
+              Live – sends to anyone
+            {% elif item.key_type == 'team' %}
+              Team and guest list – limits who you can send to
+            {% elif item.key_type == 'test' %}
+              Test – pretends to send messages
+            {% endif %}
+          </div>
+        </div>
+      {% endcall %}
+      {% if item.expiry_date %}
+        {% call field(align='right') %}
+          <span class='hint'>Revoked {{ item.expiry_date|format_datetime_short }}</span>
+        {% endcall %}
+      {% else %}
+        {% call field(align='right', status='error') %}
+          <a class="govuk-link govuk-link--destructive" href='{{ url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>
+            Revoke<span class="govuk-visually-hidden"> {{ item.name }}</span>
+          </a>
+        {% endcall %}
+      {% endif %}
+    {% endcall %}
+  </div>
+
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ govukButton({
+      "element": "a",
+      "text": "Create an API key",
+      "href": url_for('main.create_api_key', service_id=current_service.id),
+      "classes": "govuk-button--secondary"
+    }) }}
+  </div>
+
+{% endblock %}

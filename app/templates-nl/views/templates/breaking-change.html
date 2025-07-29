@@ -1,0 +1,47 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/list.html" import list_of_placeholders, list_of_code_snippets %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Confirm changes
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Confirm changes') }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {% if template_change.placeholders_removed %}
+        <p class="govuk-body">
+          You removed {{ list_of_placeholders(template_change.placeholders_removed) }}
+        </p>
+      {% endif %}
+      <p class="govuk-body">
+        You added {{ list_of_placeholders(template_change.placeholders_added) }}
+      </p>
+      <p class="govuk-body">
+        Before you send any messages, make sure your API calls include {{ list_of_code_snippets(template_change.placeholders_added) }}.
+      </p>
+    </div>
+  </div>
+
+  {% call form_wrapper() %}
+    <input type="hidden" name="name" value="{{ new_template.name }}" />
+    {% if form.subject %}
+      <input type="hidden" name="subject" value="{{ form.subject.data or '' }}" />
+    {% endif %}
+    <input type="hidden" name="template_content" value="{{ form.template_content.data }}" />
+    <input type="hidden" name="template_id" value="{{ new_template.id }}" />
+
+    <input type="hidden" name="confirm" value="true" />
+    {{ page_footer('Save changes to template') }}
+  {% endcall %}
+
+{% endblock %}

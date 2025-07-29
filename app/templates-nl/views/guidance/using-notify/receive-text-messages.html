@@ -1,0 +1,31 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Receive text messages
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Receive text messages</h1>
+
+  <p class="govuk-body">You can let people send messages to your service or reply to your texts.</p>
+
+  <p class="govuk-body">The messages you send will come from a unique 11-digit phone number.</p>
+
+  <p class="govuk-body">When someone replies to the number, you’ll see it on your dashboard. If you’re using our API, you can set up your own automated processes to manage replies.</p>
+
+  <p class="govuk-body">It does not cost you anything to receive text messages. Your users will pay their standard text message rate.</p>
+
+  <p class="govuk-body">To receive text messages:</p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Go to the <b class="govuk-!-font-weight-bold">Text message settings</b> section of the {{ service_link(current_service, 'main.service_settings', 'settings') }} page.</li>
+    <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">Receive text messages</b> row.</li>
+  </ol>
+
+{% endblock %}

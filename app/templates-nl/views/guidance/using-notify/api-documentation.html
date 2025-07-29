@@ -1,0 +1,33 @@
+{% extends "content_template.html" %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Documentation
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Documentation</h1>
+    <p class="govuk-body">This documentation is for developers who want to integrate the GOV.UK Notify API with a web application or back office system.</p>
+  <h2 class="heading-medium" id="client-libraries">Client libraries</h2>
+    <p class="govuk-body">Links to documentation open in a new tab.</p>
+  <ul class="govuk-list govuk-list--bullet">
+    {% for key, label in [
+      ('java', 'Java'),
+      ('net', '.NET'),
+      ('node', 'Node JS'),
+      ('php', 'PHP'),
+      ('python', 'Python'),
+      ('ruby', 'Ruby'),
+    ] %}
+      <li><a class="govuk-link govuk-link--no-visited-state" href="https://docs.notifications.service.gov.uk/{{ key }}.html" target="_blank" rel="noopener">{{ label }}</a></li>
+    {% endfor %}
+  </ul>
+    <p class="govuk-body">A developer should be able to set up the API client and start sending test messages in around 30 minutes. A full integration can take a few days, depending on the other systems you’re using.</p>
+  <h2 class="heading-medium" id="integrate-directly-with-the-api">Integrate directly with the API</h2>
+    <p class="govuk-body">If you cannot use the client libraries, you can integrate directly with the API instead.</p>
+<p class="govuk-body">Read the <a class="govuk-link govuk-link--no-visited-state" href="https://docs.notifications.service.gov.uk/rest-api.html" target="_blank" rel="noopener">REST API documentation</a> (this link opens in a new tab).</p>
+
+{% endblock %}

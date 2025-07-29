@@ -1,0 +1,33 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+
+{% block per_page_title %}
+  Confirm change of mobile number
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.edit_user_mobile_number', service_id=service_id, user_id=user.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+{{ page_header('Confirm change of mobile number') }}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+  {% call form_wrapper() %}
+    <p class="govuk-body">New mobile number:</p>
+
+    {{ govukInsetText({"text": new_mobile_number, "classes": "govuk-!-margin-top-0"}) }}
+
+    <p class="govuk-body">We will send {{ user.name }} a text message to tell them about the change.</p>
+    {{ page_footer('Confirm') }}
+  {% endcall %}
+  </div>
+</div>
+
+{% endblock %}

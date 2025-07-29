@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/list-entry.html" import list_entry %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Guest list
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.api_integration', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Guest list') }}
+
+  <p class="govuk-body">
+    You can use a team and guest list key to send real messages to your team and up to 5 other email addresses or phone numbers.
+  </p>
+
+  <p class="govuk-body">
+    You do not need to add yourself or your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to the guest list.
+  </p>
+
+  {% call form_wrapper() %}
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+
+        {{ list_entry(
+          form.email_addresses,
+          item_name='email address',
+          autocomplete=False
+        ) }}
+
+        {{ list_entry(
+          form.phone_numbers,
+          item_name='phone number',
+          autocomplete=False
+        ) }}
+
+      </div>
+    </div>
+
+    {{ page_footer('Save') }}
+
+  {% endcall %}
+
+{% endblock %}

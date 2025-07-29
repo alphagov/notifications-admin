@@ -1,0 +1,21 @@
+{% extends "org_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block org_page_title %}
+  Organisation sector
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.organisation_settings', org_id=current_org.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header("Organisation sector") }}
+  {% call form_wrapper() %}
+    {{ form.organisation_type }}
+    {{ page_footer('Save') }}
+  {% endcall %}
+{% endblock %}

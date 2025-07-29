@@ -1,0 +1,82 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/table.html" import list_table, text_field, index_field %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Error
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.upload_contact_list', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="bottom-gutter-1-2">
+    {% call banner_wrapper(type='dangerous') %}
+
+      {% if recipients.too_many_rows %}
+
+        <h1 class='banner-title'>
+          Your file has too many rows
+        </h1>
+        <p class="govuk-body">
+          Notify can store files up to
+          {{ recipients.max_rows|format_thousands }} rows in size. Your
+          file has {{ recipients|length|format_thousands }} rows.
+        </p>
+
+      {% elif not recipients.allowed_to_send_to %}
+
+        <h1 class='banner-title'>
+          You cannot save
+          {{ 'this' if recipients|length == 1 else 'these' }}
+          {{ recipients|length|recipient_count_label(recipients.template_type) }}
+        </h1>
+        <p class="govuk-body">
+          In <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a> you can only
+          send to yourself and members of your team
+        </p>
+
+      {% endif %}
+    {% endcall %}
+  </div>
+
+
+  <div class="js-stick-at-top-when-scrolling">
+    <div class="form-group">
+      {{ file_upload(
+        form.file,
+        allowed_file_extensions=allowed_file_extensions,
+        action=url_for('main.upload_contact_list', service_id=current_service.id),
+        button_text='Upload your file again'
+      ) }}
+    </div>
+    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
+  </div>
+
+    <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
+
+    {% call(item, row_number) list_table(
+      recipients.displayed_rows,
+      caption=original_file_name,
+      caption_visible=False,
+      field_headings=[
+        '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true">1</span>'|safe
+      ] + recipients.column_headers
+    ) %}
+      {{ index_field(item.index + 2) }}
+      {% for column in recipients.column_headers %}
+        {{ text_field(item[column].data or '') }}
+      {% endfor %}
+    {% endcall %}
+
+  {% if recipients.displayed_rows|list|length < recipients|length %}
+    <p class="table-show-more-link">
+      Only showing the first {{ recipients.displayed_rows|list|length }} rows
+    </p>
+  {% endif %}
+
+{% endblock %}

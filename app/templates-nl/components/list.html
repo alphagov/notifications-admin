@@ -1,0 +1,15 @@
+{% macro list_of_placeholders(placeholders) %}
+  {{ placeholders | formatted_list(
+    before_each="<span class='placeholder'>((",
+    after_each='))</span>',
+    separator=' '
+  ) }}
+{%- endmacro %}
+
+{% macro list_of_code_snippets(variables) %}
+  {{ variables | formatted_list(
+    before_each="<code>",
+    after_each='</code>',
+    separator=', '
+  ) }}
+{%- endmacro %}

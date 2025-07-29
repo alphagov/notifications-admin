@@ -1,0 +1,79 @@
+{% extends "withnav_template.html" %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Sender addresses
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="bottom-gutter">
+    {{ page_header('Sender addresses') }}
+  </div>
+  <div class="user-list">
+    <div class="user-list-item">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+          <p class="user-list-item-blank govuk-body hint">
+            Blank
+            {% if not current_service.default_letter_contact_block %}
+              (default)
+            {% endif %}
+          </p>
+        </div>
+        <div class="govuk-grid-column-one-quarter">
+          {% if current_service.default_letter_contact_block and current_user.has_permissions('manage_service') %}
+              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.service_make_blank_default_letter_contact', service_id =current_service.id) }}">Make default</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% for item in letter_contact_details %}
+      <div class="user-list-item">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            <p class="govuk-body">
+              {{ item.contact_block | nl2br }}
+            </p>
+            <p class="govuk-body hint">
+              {%- if item.is_default -%}
+                (default)
+              {% endif %}
+            </p>
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {% if current_user.has_permissions('manage_service') %}
+            <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.service_edit_letter_contact', service_id =current_service.id, letter_contact_id = item.id) }}">
+              Change<span class="govuk-visually-hidden"> {{ item.contact_block }}</span>
+            </a>
+            {% endif %}
+          </div>
+        </div>
+        {% if letter_contact_details|length  > 1 %}
+          {% set first_line_of_contact_block = item.contact_block|get_lines_with_normalised_whitespace|first %}
+          {{ copy_to_clipboard(item.id, name=first_line_of_contact_block, thing="ID") }}
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  {% if current_user.has_permissions('manage_service') %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <div class="js-stick-at-bottom-when-scrolling">
+          {{ govukButton({
+            "element": "a",
+            "text": "Add a new address",
+            "href": url_for('main.service_add_letter_contact', service_id=current_service.id)
+          }) }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

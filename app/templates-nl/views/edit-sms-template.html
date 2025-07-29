@@ -1,0 +1,63 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ heading_action }} text message template
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": back_link
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ page_header('{} text message template'.format(heading_action)) }}
+
+    {% if current_service.prefix_sms %}
+      {% set content_hint = 'Your message will start with your service name' %}
+    {% endif %}
+
+    {% call form_wrapper() %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          {{ form.name(param_extensions={
+            "classes": "govuk-!-width-full",
+            "hint": {"text": "Your recipients will not see this"}
+          }) }}
+          {{ form.template_content(param_extensions={
+            "classes": "govuk-!-width-full govuk-textarea-highlight__textbox",
+            "attributes": {
+              "data-notify-module": "enhanced-textbox",
+              "data-highlight-placeholders": "true"
+            },
+            "rows": "5",
+            "hint": {"text": content_hint},
+            "formGroup": {
+              "classes": "govuk-textarea-highlight govuk-!-margin-bottom-2",
+            }
+          }) }}
+        </div>
+        <div class="govuk-grid-column-full">
+          <div class="template-content-count">
+            <div data-notify-module="update-status" data-target="template_content" data-updates-url="{{ url_for('main.count_content_length', service_id=current_service.id, template_type='sms') }}" aria-live="polite">
+              &nbsp;
+            </div>
+          </div>
+          {{ page_footer('Save') }}
+        </div>
+        <div class="govuk-grid-column-full">
+          {% include "partials/templates/guidance-personalisation.html" %}
+          {% include "partials/templates/guidance-optional-content.html" %}
+          {% include "partials/templates/guidance-links-urls-sms.html" %}
+          {% include "partials/templates/guidance-character-count.html" %}
+        </div>
+      </div>
+    {% endcall %}
+
+
+{% endblock %}

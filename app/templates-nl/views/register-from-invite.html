@@ -1,0 +1,51 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+Create an account
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ govuk_page_header("Create an account") }}
+    <p class="govuk-body">
+      Your account will be created with this email address:
+      <span class="nowrap">{{invited_user.email_address}}</span>
+    </p>
+    {% call form_wrapper() %}
+      {#
+        This field is to enable password managers to capture the username as
+        well as the password, but should not be visible to users, nor should
+        the view process the input.
+      #}
+      <div class="govuk-visually-hidden">
+        <label for="username" aria-hidden="true">Email</label>
+        <input type="email" name="username" id="username" value="{{ invited_user.email_address }}" disabled="disabled" tabindex="-1" aria-hidden="true" autocomplete="username" />
+      </div>
+      {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
+      {% if invited_user.auth_type == 'sms_auth' %}
+        <div class="extra-tracking">
+          {{ form.mobile_number(param_extensions={
+              "classes": "govuk-!-width-three-quarters",
+              "hint": {"text": "We’ll send you a security code by text message"}
+          }) }}
+        </div>
+      {% endif %}
+      {{ form.password(param_extensions={
+          "classes": "govuk-!-width-three-quarters",
+          "hint": {"text": "At least 8 characters"},
+          "autocomplete": "new-password"
+        }) }}
+      {{ page_footer("Continue") }}
+      {{form.service}}
+      {{form.email_address}}
+      {{form.auth_type}}
+    {% endcall %}
+  </div>
+</div>
+
+{% endblock %}

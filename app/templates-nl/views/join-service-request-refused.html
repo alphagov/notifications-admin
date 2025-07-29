@@ -1,0 +1,18 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% block service_page_title %}
+  {{ 'Tell {} you have refused their request'.format(requester.name) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Tell {} you have refused their request'.format(requester.name)) }}
+
+  <p class="govuk-body">
+    To let {{ requester.name }} know that they cannot join your service, email them directly at {{ requester.email_address }}
+  </p>
+
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Back to your services</a>
+
+{% endblock %}

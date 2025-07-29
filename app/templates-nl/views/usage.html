@@ -1,0 +1,147 @@
+{% from "components/big-number.html" import big_number %}
+{% from "components/table.html" import list_table, field, hidden_field_heading, row_heading %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/pill.html" import pill %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Usage
+{% endblock %}
+
+{% set is_high_volume = emails_sent >= 1_000_000_000 or sms_cost >= 1_000_000 or letter_cost >= 1_000_000 %}
+{% set big_number_kwargs = {"smaller": not is_high_volume, "smallest": is_high_volume} %}
+
+{% block maincolumn_content %}
+
+    {{ page_header('Usage', size='medium') }}
+
+    <div class="bottom-gutter">
+      {{ pill(years, selected_year, big_number_args={'smallest': True}) }}
+    </div>
+    <div id='pill-selected-item'>
+      <div class='govuk-grid-row'>
+        <div class='govuk-grid-column-one-third'>
+          <h2 class='heading-small'>Emails</h2>
+          <div class="keyline-block">
+            {{ big_number(emails_sent, 'sent', **big_number_kwargs) }}
+            {{ big_number("Unlimited", 'free allowance', **big_number_kwargs) }}
+          </div>
+        </div>
+        <div class='govuk-grid-column-one-third'>
+          <h2 class='heading-small'>Text messages</h2>
+          <div class="keyline-block">
+            {{ big_number(sms_sent, 'sent', **big_number_kwargs) }}
+            {{ big_number(sms_free_allowance, 'free allowance', **big_number_kwargs) }}
+            {% if sms_free_allowance > 0 %}
+              {{ big_number(sms_allowance_remaining, 'free allowance remaining', **big_number_kwargs) }}
+            {% endif %}
+            {% for row in sms_breakdown %}
+              {% if row.charged_units > 0 %}
+                {{ big_number(
+                  row.charged_units,
+                  'at {:.2f} pence per message'.format(row.rate * 100),
+                  **big_number_kwargs
+                ) }}
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        <div class='govuk-grid-column-one-third'>
+          <h2 class='heading-small'>Letters</h2>
+          <div class="keyline-block">
+            {{ big_number(letter_sent, 'sent', **big_number_kwargs) }}
+          </div>
+        </div>
+      </div>
+
+      <div class='govuk-grid-row'>
+        <div class='govuk-grid-column-one-third'>
+          <div class="keyline-block">
+            &nbsp;
+          </div>
+        </div>
+        <div class='govuk-grid-column-one-third'>
+          <div class="keyline-block">
+            {{ big_number(
+              sms_cost,
+              'spent',
+              currency="£",
+              **big_number_kwargs
+            ) }}
+          </div>
+        </div>
+        <div class='govuk-grid-column-one-third'>
+          <div class="keyline-block">
+            {{ big_number(
+                letter_cost,
+                'spent',
+                currency="£",
+                **big_number_kwargs
+              ) }}
+          </div>
+        </div>
+
+      </div>
+
+      {% if months %}
+        <div class="dashboard-table usage-table body-copy-table">
+          {% call(item, row_index) list_table(
+            months,
+            caption="Total spend",
+            caption_visible=False,
+            empty_message='',
+            field_headings=[
+              'By month',
+              hidden_field_heading('Cost'),
+            ],
+            field_headings_visible=True
+          ) %}
+            {% call row_heading() %}
+              {{ item.month }}
+            {% endcall %}
+            {% call field(align='left') %}
+              {{ big_number(
+                item.sms_cost + item.letter_cost,
+                currency="£",
+                smallest=True
+              ) }}
+              <ul class="govuk-list">
+              {% if item.sms_free_allowance_used %}
+                <li class="tabular-numbers">{{ item.sms_free_allowance_used|format_thousands }} free {{ item.sms_free_count|message_count_label('sms', suffix='') }}</li>
+              {% endif %}
+              {% for sms in item.sms_breakdown %}
+                  <li class="tabular-numbers">{{ sms.charged_units|message_count('sms') }} at
+                  {{- ' {:.2f}p'.format(sms.rate * 100) }}</li>
+              {% endfor %}
+              {% for letter in item.letter_breakdown %}
+                {% if letter.sent %}
+                  <li class="tabular-numbers">{{ letter.sent|format_thousands}} {{ letter.postage_description }} {{ letter.sent|message_count_label('letter', suffix='') }} at
+                  {{ letter.rate | format_pounds_as_currency }}</li>
+                {% endif %}
+              {% endfor %}
+              {% if not (item.sms_free_allowance_used or item.sms_cost or item.letter_breakdown) %}
+                <li aria-hidden="true">–</li>
+              {% endif %}
+              </ul>
+            {% endcall %}
+          {% endcall %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-one-third">
+        <p class="align-with-heading-copy">
+          Financial year ends 31&nbsp;March
+        </p>
+      </div>
+      <div class="govuk-grid-column-two-thirds">
+        <p class="align-with-heading-copy">
+          What counts as 1 text message?<br />
+          See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">pricing</a>.
+        </p>
+      </div>
+    </div>
+
+{% endblock %}

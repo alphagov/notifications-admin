@@ -1,0 +1,58 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/table.html" import list_table, text_field %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  {{ provider_versions[0].display_name }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_providers') }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {{ page_header(provider_versions[0].display_name) }}
+
+    <p class="govuk-body">
+      Only showing the latest 100 versions.
+    </p>
+
+    {% call(item, row_number) list_table(
+        provider_versions,
+        caption='',
+        caption_visible=False,
+        empty_message='No history for this provider',
+        field_headings=['Version', 'Last Updated', 'Updated By', 'Priority', 'Active'],
+        field_headings_visible=True,
+        give_rows_ids=False,
+      ) %}
+
+        {{ text_field(item.version) }}
+
+        {% if item.updated_at %}
+            {{ text_field(item.updated_at|format_datetime_short) }}
+        {% else %}
+            {{ text_field('None') }}
+        {% endif %}
+
+        {% if item.created_by %}
+            {{ text_field(item.created_by.name) }}
+        {% else %}
+            {{ text_field('None') }}
+        {% endif %}
+
+        {{ text_field(item.priority) }}
+
+        {{ text_field(item.active) }}
+
+      {% endcall %}
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% block service_page_title %}
+  {{ "Error" if error else "Preview of ‘{}’".format(template.name) }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% if template.template_type == 'letter' and current_service.trial_mode %}
+    {% set error = 'trial-mode-letters' %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% with
+          count_of_recipients=1
+        %}
+          {% include "partials/check/trying-to-send-letters-in-trial-mode.html" %}
+        {% endwith %}
+      {% endcall %}
+    </div>
+  {% elif error == 'not-allowed-to-send-to' %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% with
+          count_of_recipients=1,
+          template_type_label=(
+            'phone number' if template.template_type == 'sms' else 'email address'
+          )
+        %}
+          {% include "partials/check/not-allowed-to-send-to.html" %}
+        {% endwith %}
+      {% endcall %}
+    </div>
+  {% elif error == 'too-many-messages' %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/too-many-messages.html" %}
+      {% endcall %}
+    </div>
+  {% elif error == 'too-many-international-sms-messages' %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/too-many-international-sms-messages.html" %}
+      {% endcall %}
+    </div>
+  {% elif error == 'message-too-long' %}
+    {# the only row_errors we can get when sending one off messages is that the message is too long #}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/message-too-long.html" %}
+      {% endcall %}
+    </div>
+  {% elif template.too_many_pages %}
+    {% set error = 'letter-too-long' %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+          {% include "partials/check/letter-too-long.html" %}
+      {% endcall %}
+    </div>
+  {% else %}
+    {{ page_header('Preview of ‘{}’'.format(template.name)) }}
+  {% endif %}
+
+  {{ template|string }}
+
+  <div class="js-stick-at-bottom-when-scrolling">
+    <form method="post" enctype="multipart/form-data" action="{{url_for(
+        'main.send_notification',
+        service_id=current_service.id,
+        template_id=template.id,
+        help='3' if help else 0
+      )}}" class='page-footer'>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      {% if not error %}
+        {% set button_text %}Send 1 {{ 1|message_count_label(template.template_type, suffix='') }}{% endset %}
+        {{ govukButton({ "text": button_text }) }}
+      {% endif %}
+      {% if template.template_type == 'letter' %}
+        <a href="{{ url_for('no_cookie.check_notification_preview', service_id=current_service.id, template_id=template.id, filetype='pdf') }}" download class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link{% if error %}-without-button{% endif %}">Download as a PDF</a>
+      {% endif %}
+    </form>
+  </div>
+
+{% endblock %}

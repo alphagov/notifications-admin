@@ -1,0 +1,33 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ form.hex_colour.label.text }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% call form_wrapper() %}
+    {{
+      form.hex_colour(
+        param_extensions={
+          "label": {
+              "isPageHeading": True,
+              "classes": "govuk-label--l",
+          },
+          "hint": {"text": "Enter a hex colour code. For example, #1d70b8"}
+        })
+      }}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+
+  <p class="govuk-body">
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ abandon_flow_link }}">I do not know the hex colour code</a>
+  </p>
+
+{% endblock %}

@@ -1,0 +1,211 @@
+{% macro mapping_table(caption='', field_headings=[], field_headings_visible=True, caption_visible=True, equal_length=False, output_tbody_tags=True) -%}
+  <table class="table table-font-xsmall">
+    <caption class="heading-medium table-heading{{ ' govuk-visually-hidden' if not caption_visible}}">
+      {{ caption }}
+    </caption>
+    <thead class="table-field-headings{% if field_headings_visible %}-visible{% endif %}">
+      <tr>
+        {% for field_heading in field_headings %}
+        {% set fieldHeadingText = field_heading.text if field_heading.text else field_heading %}
+        {% set fieldHeadingClasses = field_heading.classes if field_heading.classes %}
+          <th scope="col" class="table-field-heading{% if loop.first %}-first{% endif %} {{ fieldHeadingClasses }}" width="{% if equal_length %}{{ (100 / field_headings|length)|int }}%{% endif %}">
+            {% if field_headings_visible %}
+              {{ fieldHeadingText }}
+            {% else %}
+              <span class="govuk-visually-hidden">{{ fieldHeadingText }}</span>
+            {% endif %}
+          </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    {% if output_tbody_tags %}
+    <tbody>
+    {% endif %}
+      {{ caller() }}
+    {% if output_tbody_tags %}
+    </tbody>
+    {% endif %}
+  </table>
+{%- endmacro %}
+
+{% macro list_table(items, caption='', empty_message='', field_headings=[], field_headings_visible=True, caption_visible=True, equal_length=False, give_rows_ids=True) -%}
+  {% set parent_caller = caller %}
+
+  {% call mapping_table(caption, field_headings, field_headings_visible, caption_visible, equal_length) %}
+    {% for item in items %}
+      {% call row(item.id if give_rows_ids else None) %}
+        {{ parent_caller(item, loop.index + 1) }}
+      {% endcall %}
+    {% endfor %}
+    {% if not items %}
+      {% call row() %}
+        <td class="table-empty-message" colspan="{{ field_headings | length }}">
+          {{ empty_message }}
+        </td>
+      {% endcall %}
+    {% endif %}
+  {%- endcall %}
+
+{%- endmacro %}
+
+{% macro row(id=None) -%}
+  <tr class="table-row" {% if id and id is string %}id="{{id}}"{% endif %}>
+    {{ caller() }}
+  </tr>
+{%- endmacro %}
+
+{% macro row_group(id=None) %}
+  <tbody class="table-row-group" {% if id %}id="{{id}}"{% endif %}>
+    {{ caller() }}
+  </tbody>
+{%- endmacro %}
+
+{% macro settings_row(if_has_permission='') -%}
+  {% set parent_caller = caller %}
+  {% if current_service.has_permission(if_has_permission) %}
+    {% call row() %}
+      {{ parent_caller() }}
+    {% endcall %}
+  {% endif %}
+{%- endmacro %}
+
+{% macro field(align='left', status='', border=True, colspan=None, wrap=False) -%}
+
+    {% set field_alignment = 'table-field-right-aligned' if align == 'right' else 'table-field-left-aligned' %}
+    {% set border = '' if border else 'table-field-noborder' %}
+    {% set wrap = 'table-field-wrap-text' if wrap else '' %}
+
+    <td class="{{ [field_alignment, border, wrap]|join(' ') }}" {% if colspan %}colspan="{{ colspan }}"{% endif %}>
+      <div class="{{ 'table-field-status-' + status if status }}">{{ caller() }}</div>
+    </td>
+{%- endmacro %}
+
+{% macro row_heading() -%}
+  <th class="table-field" scope="row">
+    {{ caller() }}
+  </th>
+{%- endmacro %}
+
+{% macro index_field(text=None, rowspan=None) -%}
+  <td class="table-field-index" {% if rowspan %}rowspan="{{ rowspan }}"{% endif %}>
+    {{ text if text != None else caller()  }}
+  </td>
+{%- endmacro %}
+
+{% macro text_field(text, status='', truncate=false, wrap=False) -%}
+  {% call field(status=status, wrap=wrap) %}
+    {% if text is iterable and text is not string %}
+      <ul>
+        {% for item in text %}
+          {% if item %}
+            <li>{{ item }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      {% if truncate %}
+        <div class="truncate-text" title="{{ text }}">{{text}}</div>
+      {% else %}
+        {{ text }}
+      {% endif %}
+    {% endif %}
+  {% endcall %}
+{%- endmacro %}
+
+{% macro callable_text_field(status='', truncate=false, wrap=False) %}
+  {{ text_field(caller(), status=status, truncate=truncate, wrap=wrap) }}
+{% endmacro %}
+
+
+{% macro optional_text_field(text, default='Not set', truncate=false, wrap=False) -%}
+  {{ text_field(
+    text or default,
+    status='' if text else 'default',
+    truncate=truncate,
+    wrap=wrap
+  ) }}
+{%- endmacro %}
+
+{% macro link_field(text, link) -%}
+  {% call field() %}
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ link }}">{{ text }}</a>
+  {% endcall %}
+{%- endmacro %}
+
+{% macro edit_field(text, link, permissions=[], suffix=None) -%}
+  {% call field(align='right') %}
+    {% if not permissions or current_user.has_permissions(*permissions) %}
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ link }}">
+        {{ text }}
+        {%- if suffix %}<span class="govuk-visually-hidden"> {{ suffix }}</span>{% endif -%}
+      </a>
+    {% endif %}
+  {% endcall %}
+{%- endmacro %}
+
+{% macro boolean_field(value) -%}
+  {{ text_field('On' if value else 'Off') }}
+{%- endmacro %}
+
+{% macro right_aligned_field_heading(text) %}
+  <span class="table-field-heading-right-aligned">{{ text }}</span>
+{%- endmacro %}
+
+{% macro hidden_field_heading(text) %}
+  <span class="govuk-visually-hidden">{{ text }}</span>
+{%- endmacro %}
+
+
+{% macro notification_status_field(notification) %}
+
+  {% set displayed_on_single_line = notification.status in ['created', 'pending', 'pending-virus-check', 'sending', 'delivered', 'returned-letter', 'accepted', 'received'] %}
+
+  {% if not notification %}
+    {% call field(align='right') %}{% endcall %}
+  {% else %}
+    {% set status = notification.status|format_notification_status_as_field_status(notification.notification_type) %}
+    {% call field(
+      status=status,
+      align='right'
+    ) %}
+      {% if displayed_on_single_line %}<span class="align-with-message-body">{% endif %}
+      {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
+        <a class="govuk-link govuk-link--{% if status == 'error' %}destructive{% else %}no-visited-state{% endif %}" href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
+      {% endif %}
+      {{ notification.status|format_notification_status(notification.template.template_type) }}
+      {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
+        </a>
+      {% endif %}
+      <span class="status-hint">
+        {% if notification['notification_type'] == "letter" %}
+          {% if notification.status == 'permanent-failure' %}
+            {{ (notification.updated_at)|format_datetime_short }}
+          {% else %}
+            {{ (notification.created_at)|format_datetime_short }}
+          {% endif %}
+        {% else %}
+          {{ notification.status|format_notification_status_as_time(
+            notification.created_at|format_datetime_short,
+            (notification.updated_at or notification.created_at)|format_datetime_short
+          ) }}
+        {% endif %}
+      </span>
+      {% if displayed_on_single_line %}</span>{% endif %}
+    {% endcall %}
+  {% endif %}
+{% endmacro %}
+
+
+{% macro spark_bar_field(
+  count,
+  max_count,
+  id=None
+) %}
+  {% call field(align='right') %}
+    <span {% if id %}id="{{ id }}"{% endif %} class="spark-bar">
+      <span class="spark-bar-bar" style="width: {{ count / max_count * 100 }}%">
+        {{ '{:,.0f}'.format(count) }}
+      </span>
+    </span>
+  {% endcall %}
+{% endmacro %}

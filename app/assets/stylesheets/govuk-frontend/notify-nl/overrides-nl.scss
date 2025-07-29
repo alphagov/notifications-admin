@@ -1,0 +1,155 @@
+@import '@rijkshuisstijl-community/design-tokens/dist/index.css';
+
+// NotifyNl overrides
+
+
+@font-face {
+  font-family: "FiraSans";
+  font-weight: 600;
+  src:
+    local("FiraSans-Bold"),
+    url("../../../fonts/FiraSans-Bold.ttf") format("truetype");
+}
+
+/* Add different weights of the same font */
+@font-face {
+  font-family: "FiraSans";
+  font-weight: 400;
+  src:
+    local("FiraSans-Regular"),
+    url("../../../fonts/FiraSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "FiraSans";
+  font-weight: 400;
+  font-style: italic;
+  src:("FiraSans-Italic"),
+    url("../../../fonts/FiraSans-italic.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "IBMPlexSans";
+  font-weight: 600;
+  src:
+    local("IBMPlexSans-Bold"),
+    url("../../../fonts/IBMPlexSans-Bold.ttf") format("truetype");
+}
+
+/* Add different weights of the same font */
+@font-face {
+  font-family: "IBMPlexSans";
+  font-weight: 400;
+  src:
+    local("IBMPlexSans-Regular"),
+    url("../../../fonts/IBMPlexSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "IBMPlexSans";
+  font-weight: 400;
+  font-style: italic;
+  src:
+    local("IBMPlexSans-Italic"),
+    url("../../../fonts/IBMPlexSans-italic.ttf") format("truetype");
+}
+
+.rhc-theme {
+    * {font-family: FiraSans, IBMPlexSans, sans-serif !important;}
+
+    // hide inconcistent data with NL service
+    .nl-hide {
+       display: none;
+    }
+
+    .dutch-logo-above-header {
+        display: flex;
+         align-items: center;
+        justify-content: center;
+
+        .logo-bg {
+            width: 80px;
+            height: 110px;
+            display: inline-flex;
+            align-items: center;
+
+            svg {
+                fill: var(--rhc-color-lintblauw-500);
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    }
+
+    .govuk-footer__licence-logo {
+        display: none;
+    }
+    .govuk-header {
+        background-color: var(--rhc-color-lintblauw-500);
+
+        .govuk-header__container{
+            border: none;
+            padding-bottom: 10px;
+        }
+    }
+
+    // .product-page-intro,
+    // .product-page-intro-wrapper {
+    //     background: none !important;
+    //     border: none !important;
+    // }
+
+    .product-page-intro {
+        background-color: #e0e0e0;
+        padding-top: 20px;
+        color: var(--rhc-color-lintblauw-500);
+
+        .breadcrumbs.breadcrumbs--inverse a,
+        .govuk-body,
+        .govuk-link.govuk-link--inverse {
+            color: var(--rhc-color-lintblauw-500);
+        }
+    }
+
+
+    .govuk-button {
+        &.govuk-button--inverse {
+            color:  var(--utrecht-button-primary-action-focus-color);
+            border-color:  var(--utrecht-button-primary-action-focus-border-color);
+            background-color:  var(--utrecht-button-primary-action-focus-background-color);
+
+
+        }
+    }
+
+    .govuk-footer{
+        background: #1d70b8;
+
+        .govuk-footer__section,
+        .govuk-footer__section-break,
+        .govuk-footer__heading {
+            border-color: var(--rhc-color-lintblauw-500);
+        }
+    }
+}
+//   --utrecht-button-primary-action-pressed-color: #fff;
+//   --utrecht-button-primary-action-pressed-border-color: transparent;
+//   --utrecht-button-primary-action-pressed-background-color: #162945;
+//   --utrecht-button-primary-action-line-height: 1.875rem;
+//   --utrecht-button-primary-action-font-size: 1.25rem;
+//   --utrecht-button-primary-action-active-color: #fff;
+//   --utrecht-button-primary-action-active-border-color: transparent;
+//   --utrecht-button-primary-action-active-background-color: #0d2845;
+//   --utrecht-button-primary-action-font-weight: 700;
+//   --utrecht-button-primary-action-focus-color: #fff;
+//   --utrecht-button-primary-action-focus-border-color: transparent;
+//   --utrecht-button-primary-action-focus-background-color: #162f50;
+//   --utrecht-button-primary-action-disabled-color: #4f7196;
+//   --utrecht-button-primary-action-disabled-border-color: transparent;
+//   --utrecht-button-primary-action-disabled-background-color: #b8c6d5;
+//   --utrecht-button-primary-action-color: #fff;
+//   --utrecht-button-primary-action-border-color: transparent;
+//   --utrecht-button-primary-action-background-color: #154273;
+//   --utrecht-button-primary-action-hover-color: #fff;
+//   --utrecht-button-primary-action-hover-border-color: transparent;
+//   --utrecht-button-primary-action-hover-background-color: #162f50;

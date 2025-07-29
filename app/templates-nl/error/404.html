@@ -1,0 +1,20 @@
+{% extends "withoutnav_template.html" %}
+{% block per_page_title %}Page not found{% endblock %}
+{% block maincolumn_content %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="heading-large">
+          Page not found
+        </h1>
+        <p class="govuk-body">
+          If you typed the web address, check it is correct.
+        </p>
+        <p class="govuk-body">
+          If you pasted the web address, check you copied the entire address.
+        </p>
+        <p class="govuk-body">
+          If the web address is correct or you selected a link or button, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
+        </p>
+      </div>
+    </div>
+{% endblock %}

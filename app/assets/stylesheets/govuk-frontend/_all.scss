@@ -34,3 +34,5 @@ $govuk-assets-path: "/static/";
 
 // Styles for GOV.UK Frontend components specific to this application
 @import "./overrides";
+
+@import "./notify-nl/overrides-nl";

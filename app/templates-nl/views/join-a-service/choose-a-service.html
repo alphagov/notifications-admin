@@ -1,0 +1,58 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/live-search.html" import live_search %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% set heading = 'Choose the service you want to join' %}
+
+{% block per_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block backLink %}
+    {{ govukBackLink({ "href": url_for('main.your_services') }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-large">
+      {{ heading }}
+    </h1>
+    <p class="govuk-body govuk-!-margin-bottom-6">
+      {{ current_user.default_organisation.name }} has {{ current_user.default_organisation.live_services | length }} live service{{ '' if current_user.default_organisation.live_services | length == 1 else 's' }}</p>
+
+    {% set wrongOrganisationCallout %}
+      <p class="govuk-body">GOV.UK Notify uses your email address to decide which services to show you.</p>
+      <p class="govuk-body">If the organisation you work for has changed, <a class="govuk-link govuk-link--no-visited-state"
+          href="{{ url_for('main.support') }}">contact us</a>.</p>
+    {% endset %}
+
+    {{ govukDetails({
+      "summaryText": "I do not work for " + current_user.default_organisation.name,
+      "html": wrongOrganisationCallout
+    }) }}
+
+    {{ live_search(
+      target_selector='.browse-list-item',
+      show=current_user.default_organisation.live_services | length > 7,
+      form=_search_form,
+      label='Search by name',
+    ) }}
+
+    <ul>
+      {% for service in current_user.default_organisation.live_services | sort %}
+        <li class="browse-list-item">
+          <a href="{{ url_for('main.join_service_ask', service_to_join_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
+          <p class="browse-list-hint">
+              {% if current_user.belongs_to_service(service.id) %}
+                You are already a team member of this service
+              {% endif %}
+          </p>
+        </li>
+
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

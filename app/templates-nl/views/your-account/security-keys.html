@@ -1,0 +1,114 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/table.html" import edit_field, mapping_table, row, field %}
+{% from "components/webauthn-api-check.html" import webauthn_api_check %}
+{% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
+
+{% set page_title = 'Security keys' %}
+{% set credentials = current_user.webauthn_credentials %}
+
+{% block extra_javascripts_before_body %}
+  {{ webauthn_api_check() }}
+{% endblock %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.your_account') }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+{% set webauthn_button %}
+  {{ govukButton({
+    "element": "button",
+    "text": "Register a key",
+    "classes": "govuk-button--secondary webauthn__api-required",
+    "attributes": {
+      "data-notify-module": "register-security-key",
+      "data-csrf-token": csrf_token(),
+    }
+  }) }}
+{% endset %}
+
+{% set errorSummaries %}
+  {{ govukErrorSummary({
+    "classes": "webauthn__api-missing",
+    "titleText": "There’s a problem",
+    "descriptionText": "Your browser does not support security keys. Try signing in to Notify using a different browser."
+  }) }}
+
+  {{ govukErrorSummary({
+    "classes": "webauthn__no-js",
+    "titleText": "There’s a problem",
+    "descriptionText": "JavaScript is not available for this page. Security keys need JavaScript to work."
+  }) }}
+
+  {% set keyProblemDescription %}
+    Check you have the right key and try again. If this does not work,
+     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
+  {% endset %}
+
+  {{ govukErrorSummary({
+    "classes": "govuk-!-display-none",
+    "attributes": { "aria-live": "polite", "tabindex":"-1" },
+    "titleText": "There’s a problem with your security keys",
+    "descriptionHtml": keyProblemDescription
+  }) }}
+{% endset %}
+
+  <div class="govuk-grid-row">
+
+    {% if credentials %}
+      <div class="govuk-grid-column-five-sixths">
+        {{ errorSummaries }}
+        {{ page_header(page_title) }}
+        <div class="body-copy-table">
+          {% call mapping_table(
+            caption=page_title,
+            field_headings=['Security key details', 'Action'],
+            field_headings_visible=False,
+            caption_visible=False,
+          ) %}
+            {% for credential in credentials %}
+              {% call row() %}
+                {% call field() %}
+                  <div class="govuk-body govuk-!-margin-bottom-2">{{ credential.name }}</div>
+                  <div class="govuk-hint govuk-!-margin-bottom-2">
+                    {% if credential.logged_in_at %}
+                      Last used {{ credential.logged_in_at|format_delta }}
+                    {% else %}
+                      Never used (registered {{ credential.created_at|format_delta }})
+                    {% endif %}
+                  </div>
+                {% endcall %}
+                {{ edit_field('Manage', url_for('main.your_account_manage_security_key', key_id=credential.id)) }}
+              {% endcall %}
+            {% endfor %}
+          {% endcall %}
+        </div>
+        {{ webauthn_button }}
+      </div>
+    {% else %}
+      <div class="govuk-grid-column-one-half">
+        {{ page_header(page_title) }}
+        <p class="govuk-body">
+          Security keys are an alternative way of signing in to Notify,
+          instead of getting a code in a text message
+        </p>
+        <p class="govuk-body">
+          You can buy any key that’s compatible with the WebAuthn
+          standard.
+        </p>
+        {{ webauthn_button }}
+      </div>
+      <div class="govuk-grid-column-one-quarter">
+        <img src="{{ asset_url('images/security-key.svg') }}" alt="" class="webauthn-illustration" width="149" height="150">
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% macro big_number(number, label, link=None, currency='', smaller=False, smallest=False) %}
+  {% if link %}
+    <a class="govuk-link govuk-link--inverse big-number-link" href="{{ link }}">
+  {% endif %}
+      <span class="big-number{% if smaller %}-smaller{% endif %}{% if smallest %}-smallest{% endif %}">
+        <span class="big-number-number">
+          {% if number is number %}
+            {% if currency %}
+              {{ "{}{:,.2f}".format(currency, number) | insert_wbr }}
+            {% else %}
+              {{ number | format_thousands | insert_wbr }}
+            {% endif %}
+          {% else %}
+            {{ number }}
+          {% endif %}
+        </span>
+        {% if label %}
+          <span class="big-number-label">{{ label }}</span>
+        {% endif %}
+      </span>
+  {% if link %}
+    </a>
+  {% endif %}
+{% endmacro %}
+
+
+{% macro big_number_with_status(
+  number,
+  label,
+  failures,
+  failure_percentage,
+  danger_zone=False,
+  failure_link=None,
+  link=None,
+  show_failures=True,
+  smaller=False,
+  smallest=False
+) %}
+  <span class="big-number-with-status">
+    {{ big_number(number, label, link=link, smaller=smaller, smallest=smallest) }}
+    {% if show_failures %}
+      <span class="big-number-status{% if danger_zone %}-failing{% endif %}{% if failures and failure_link %} big-number-status--with-link{% endif %}">
+        {% if failures %}
+          {% if failure_link %}
+            <a class="govuk-link govuk-link--inverse" href="{{ failure_link }}">
+              {{ failures | format_thousands | insert_wbr  }}
+              failed – {{ failure_percentage }}%
+            </a>
+          {% else %}
+            {{ failures | format_thousands | insert_wbr  }}
+            failed – {{ failure_percentage }}%
+          {% endif %}
+        {% else %}
+          No failures
+        {% endif %}
+      </span>
+    {% endif %}
+  </span>
+{% endmacro %}
+
+
+{% macro big_number_simple(number, label) %}
+  <span class="big-number-dark bottom-gutter-2-3">
+    <span class="big-number-number">
+      {% if number is number %}
+        {{ number | format_thousands | insert_wbr  }}
+      {% else %}
+        {{ number }}
+      {% endif %}
+    </span>
+    {% if label %}
+      <span class="big-number-label">{{ label }}</span>
+    {% endif %}
+  </span>
+{% endmacro %}

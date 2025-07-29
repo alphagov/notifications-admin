@@ -1,0 +1,114 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/table.html" import list_table, text_field, row_heading %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/skip-link/macro.html" import govukSkipLink %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set file_contents_header_id = 'file-preview' %}
+
+{% block service_page_title %}
+  {{ "Preview of {}".format(template.name) }}
+{% endblock %}
+
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Preview of {}'.format(template.name)) }}
+
+  {% if template.too_many_pages %}
+    {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/letter-too-long.html" %}
+    {% endcall %}
+  {% endif %}
+
+  {{ govukSkipLink({
+    "text": "Skip to file contents",
+    "href": "#" + file_contents_header_id
+  }) }}
+
+  {{ template|string }}
+  <div class="bottom-gutter-3-2">
+    <form method="post" enctype="multipart/form-data" action="{{url_for('main.start_job', service_id=current_service.id, upload_id=upload_id)}}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="hidden" name="contact_list_id" value="{{ request.args.get('contact_list_id', '') }}" />
+      {% if _choose_time_form and template.template_type != 'letter' %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-half">
+            {{ _choose_time_form.scheduled_for(param_extensions={
+              'formGroup': {'classes': 'bottom-gutter-2-3'},
+              'classes': 'radio-select',
+              'attributes': {
+                'data-notify-module': 'radio-select',
+                'data-days': _choose_time_form.scheduled_for.days|join(','),
+              }
+            }) }}
+          </div>
+        </div>
+      {% endif %}
+      {% if (template.template_type != 'letter' or not request.args.from_test) and not template.too_many_pages %}
+        {% set button_text %}
+          Send {{ count_of_recipients|message_count(template.template_type) }}
+        {% endset %}
+        {{ govukButton({ "text": button_text }) }}
+      {% else %}
+        {{ govukButton({
+          "element": "a",
+          "text": "Download as a PDF",
+          "href": url_for('no_cookie.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf'),
+        }) }}
+      {% endif %}
+    </form>
+  </div>
+
+  {% if not request.args.from_test %}
+
+    <h2 class="heading-medium" id="{{ file_contents_header_id }}">{{ original_file_name }}</h2>
+
+    <div class="fullscreen-content" data-notify-module="fullscreen-table">
+      {% call(item, row_number) list_table(
+        recipients.displayed_rows,
+        caption=original_file_name,
+        caption_visible=False,
+        field_headings=[
+          '<span class="govuk-visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
+        ] + recipients.column_headers
+      ) %}
+        {% call row_heading() %}
+          <span>
+            {% if (item.index + 2) == preview_row %}
+              {{ item.index + 2 }}
+            {% else %}
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.check_messages', service_id=current_service.id, template_id=template.id, upload_id=upload_id, row_index=(item.index + 2), original_file_name=original_file_name) }}">{{ item.index + 2 }}</a>
+            {% endif %}
+          </span>
+        {% endcall %}
+        {% for column in recipients.column_headers %}
+          {% if item[column].ignore %}
+            {{ text_field(item[column].data or '', status='default') }}
+          {% else %}
+            {{ text_field(item[column].data or '') }}
+          {% endif %}
+        {% endfor %}
+        {% if item[None].data %}
+          {% for column in item[None].data %}
+            {{ text_field(column, status='default') }}
+          {% endfor %}
+        {% endif %}
+      {% endcall %}
+    </div>
+
+  {% endif %}
+
+  {% if count_of_displayed_recipients < count_of_recipients %}
+    <p class="table-show-more-link">
+      Only showing the first {{ count_of_displayed_recipients }} rows
+    </p>
+  {% endif %}
+
+{% endblock %}

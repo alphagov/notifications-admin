@@ -1,0 +1,40 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+ Change reply-to email address
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_email_reply_to', service_id=current_service.id) }) }}
+{% endblock %}
+{% block maincolumn_content %}
+
+  {{ page_header('Change reply-to email address') }}
+  {% call form_wrapper() %}
+    {{ form.email_address(
+        param_extensions={
+          "hint": {"text": "This should be a shared inbox managed by your team, not your own email address"},
+          "classes": "govuk-!-width-full"
+        },
+        error_message_with_html=True
+    ) }}
+    {% if not show_choice_of_default_checkbox %}
+      <p class="form-group">
+        This is the default reply-to address for {{ current_service.name }} emails
+      </p>
+      {{ page_footer('Save') }}
+    {% else %}
+      {{ form.is_default }}
+      {{ page_footer(
+        'Save',
+        delete_link=url_for('main.service_confirm_delete_email_reply_to', service_id=current_service.id, reply_to_email_id=reply_to_email_address_id),
+        delete_link_text='Delete'
+      ) }}
+    {% endif %}
+  {% endcall %}
+
+{% endblock %}

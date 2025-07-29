@@ -1,0 +1,85 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/big-number.html" import big_number %}
+{% from "components/table.html" import mapping_table, field, row_group, row, right_aligned_field_heading %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% macro services_table(services, caption) %}
+  {% call(item, row_number) mapping_table(
+    caption=caption,
+    caption_visible=False,
+    field_headings=[
+    right_aligned_field_heading('Emails'),
+    right_aligned_field_heading('Text messages'),
+    right_aligned_field_heading('Letters')
+    ],
+    field_headings_visible=False,
+    output_tbody_tags=False,
+  ) %}
+
+    {% for service in services %}
+
+      {% call row_group() %}
+
+        {% call row() %}
+          {% call field(border=False, colspan=3) %}
+            <a href="{{ url_for('main.service_dashboard', service_id=service['id']) }}" class="file-list-filename-large govuk-link govuk-link--no-visited-state govuk-!-padding-bottom-4">{{ service['name'] }}</a>
+            {% if not service['active'] %}
+              <span class="heading-medium hint">&ensp;Archived</span>
+            {% endif %}
+          {% endcall %}
+
+        {% endcall %}
+
+        {% call row() %}
+          {% for channel in ('email', 'sms', 'letter') %}
+            {% call field(border=False) %}
+              {{ big_number(
+                service['stats'][channel]['requested'],
+                smallest=True,
+                label=service['stats'][channel]['requested']|message_count_label(channel)
+              ) }}
+            {% endcall %}
+          {% endfor %}
+        {% endcall %}
+
+      {% endcall %}
+
+    {% endfor %}
+
+  {% endcall %}
+{% endmacro %}
+
+
+{% block per_page_title %}
+  {{ page_title|capitalize }}
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-medium">
+    {{ page_title|capitalize }}
+  </h1>
+
+
+  {% set details_content %}
+    {% call form_wrapper(method="get") %}
+      {{ form.start_date(param_extensions={"hint": {"text": "Enter start date in format YYYY-MM-DD"}}) }}
+      {{ form.end_date(param_extensions={"hint": {"text": "Enter end date in format YYYY-MM-DD"}}) }}
+      {{ form.include_from_test_key }}
+      {{ govukButton({ "text": "Filter" }) }}
+    {% endcall %}
+  {% endset %}
+
+  {{ govukDetails({
+    "summaryText": "Apply filters",
+    "html": details_content,
+    "open": form.errors | convert_to_boolean
+  }) }}
+
+  {% include "views/platform-admin/_global_stats.html" %}
+
+  {{ services_table(services, page_title|capitalize) }}
+
+{% endblock %}

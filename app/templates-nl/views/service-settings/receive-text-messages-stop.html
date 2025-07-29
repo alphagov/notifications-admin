@@ -1,0 +1,78 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/error-summary.html" import errorSummary %}
+
+{% block service_page_title %}
+  When you stop receiving text messages
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_receive_text_messages', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ errorSummary(form) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('When you stop receiving text messages') }}
+
+      <p class="govuk-body">
+        The Notify team will delete your unique phone number:
+      </p>
+      {% set new_number = current_service.inbound_number %}
+      {{ govukInsetText({
+        "text": new_number,
+        "classes": "govuk-!-margin-top-0"})
+      }}
+      <p class="govuk-body">
+        You will no longer be able to send text messages using this number.
+      </p>
+      <p class="govuk-body">
+        If one of your users sends you a text message:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>you will not receive it</li>
+        <li>the sender will not know this, and may still expect a response</li>
+      </ul>
+
+      <h2 class="heading heading-medium">If you might need to use this number again</h2>
+      <p class="govuk-body">
+        Change your text message sender ID to send messages that no one can reply to.
+      </p>
+      <p class="govuk-body">
+        You can make {{ current_service.inbound_number }} the default sender again at any time.
+      </p>
+      <p class="govuk-body">
+        Add a new <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">text message sender ID</a>.
+      </p>
+
+      <h2 class="heading heading-medium">If you’re sure you want to delete your number</h2>
+        {% if current_user.platform_admin %}
+            {% if not recent_use_date %}
+            <p class="hint">This number has never been used</p>
+            {% else %}
+            <p class="govuk-body">This number was last used
+                <time class="timeago" datetime="{{ recent_use_date}}">
+                    {{ recent_use_date|format_delta }}
+                </time>
+            </p>
+            {% endif %}
+            {% call form_wrapper() %}
+                {{ form.removal_options }}
+                {{ page_footer('Save') }}
+            {% endcall %}
+        {% else %}
+          <p class="govuk-body">
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact the Notify team</a>.
+          </p>
+        {% endif %}
+    </div>
+  </div>
+
+{% endblock %}

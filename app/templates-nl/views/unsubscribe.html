@@ -1,0 +1,49 @@
+{% from "components/page-footer.html" import page_footer %}
+
+{% extends "unbranded_template.html" %}
+
+{% block pageTitle %}
+  {% if confirmed %}
+    We have your request to unsubscribe
+  {% else %}
+    Are you sure you want to unsubscribe?
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+  {% if confirmed %}
+    <h1>
+      We have your request to unsubscribe
+    </h1>
+    <p>
+      It can take a few days to unsubscribe you from these emails.
+    </p>
+  {% else %}
+    <h1>
+      Are you sure you want to unsubscribe?
+    </h1>
+    <p>
+      If you want to unsubscribe you will no longer receive these emails.
+    </p>
+    <form method="post" action="{{ request.url | extract_path_from_url }}" id="confirm-unsubscription">
+      {{ page_footer('Confirm') }}
+    </form>
+    <p>
+      This can take a few days.
+    </p>
+{% endif %}
+
+{% endblock %}
+
+{% block footer %}
+
+  {% if example %}
+    <footer>
+      <p>
+        This is an example page only with no further action needed.
+      </p>
+    </footer>
+  {% endif %}
+
+{% endblock %}

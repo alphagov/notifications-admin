@@ -1,0 +1,105 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/table.html" import list_table, text_field, row_heading %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Error
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.upload_contact_list', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="bottom-gutter-1-2">
+    {% call banner_wrapper(type='dangerous') %}
+
+      {% if not recipients|length %}
+
+        <h1 class='banner-title'>
+          Your file is missing some rows
+        </h1>
+        <p class="govuk-body">
+          It needs at least one row of data
+          {%- if template_type %}.{% else %}, in a column called ‘email address’ or ‘phone number’.{% endif %}
+        </p>
+
+      {% elif recipients.column_headers|length == 1 %}
+
+        <h1 class='banner-title'>
+          Your file needs a column called ‘email address’ or ‘phone number’.
+        </h1>
+        <p class="govuk-body">
+          Right now it has 1 column called ‘{{ recipients._raw_column_headers[0] }}’.
+        </p>
+
+      {% else %}
+
+        <h1 class='banner-title'>
+          Your file has too many columns
+        </h1>
+        <p class="govuk-body">
+          It needs to have 1 column, called ‘email address’ or ‘phone number’.
+        </p>
+        <p class="govuk-body">
+          Right now it has {{ recipients._raw_column_headers|length }} columns called {{ recipients._raw_column_headers | formatted_list }}.
+        </p>
+
+      {% endif %}
+    {% endcall %}
+  </div>
+
+
+  <div class="js-stick-at-top-when-scrolling">
+    <div class="form-group">
+      {{ file_upload(
+        form.file,
+        allowed_file_extensions=allowed_file_extensions,
+        action=url_for('main.upload_contact_list', service_id=current_service.id),
+        button_text='Upload your file again'
+      ) }}
+    </div>
+    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
+  </div>
+
+    {% set column_headers = recipients._raw_column_headers if recipients.duplicate_recipient_column_headers else recipients.column_headers %}
+
+    <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
+
+    <div class="fullscreen-content" data-notify-module="fullscreen-table">
+      {% call(item, row_number) list_table(
+        recipients.displayed_rows,
+        caption=original_file_name,
+        caption_visible=False,
+        field_headings=[
+          '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true">1</span>'|safe
+        ] + recipients._raw_column_headers
+      ) %}
+        {% call row_heading() %}
+        {{ item.index + 2 }}
+        {% endcall %}
+        {% for column in column_headers %}
+          {% if item[column].ignore %}
+            {{ text_field(item[column].data or '', status='default') }}
+          {% else %}
+            {{ text_field(item[column].data or '') }}
+          {% endif %}
+        {% endfor %}
+        {% if item[None].data %}
+          {% for column in item[None].data %}
+            {{ text_field(column, status='default') }}
+          {% endfor %}
+        {% endif %}
+      {% endcall %}
+  </div>
+
+  {% if recipients.displayed_rows|list|length < recipients|length %}
+    <p class="table-show-more-link">
+      Only showing the first {{ recipients.displayed_rows|list|length }} rows
+    </p>
+  {% endif %}
+
+{% endblock %}

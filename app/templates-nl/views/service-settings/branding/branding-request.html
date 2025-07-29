@@ -1,0 +1,22 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Describe the branding you want
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link}) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {% call form_wrapper(class="govuk-!-margin-top-3") %}
+    {{ form.branding_request }}
+    <p class="form-group">We’ll email you when your branding is ready, or if we need any more information.</p>
+    {{ page_footer('Request new branding') }}
+  {% endcall %}
+
+{% endblock %}

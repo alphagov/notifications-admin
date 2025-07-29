@@ -1,0 +1,36 @@
+{% extends "org_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block org_page_title %}
+  Edit request to go live notes
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.organisation_settings', org_id=current_org.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header("Edit request to go live notes") }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      <p class="govuk-body">
+        Text entered here will be displayed in the Zendesk ticket when a service
+        belonging to this organisation requests to go live.
+      </p>
+      {% call form_wrapper() %}
+        {{ form.request_to_go_live_notes(param_extensions={
+          "classes": "govuk-!-width-full",
+          "rows": "3",
+          "attributes": {
+            "data-notify-module": "enhanced-textbox",
+            "data-highlight-placeholders": "false"
+          },
+        }) }}
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

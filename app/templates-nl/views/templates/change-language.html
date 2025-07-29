@@ -1,0 +1,27 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% set title = 'Change language' %}
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+  {% call form_wrapper(class="govuk-!-margin-bottom-7") %}
+    {{ form.languages(param_extensions={
+      "fieldset": {
+          "legend": {
+              "classes": "",
+          },
+      }
+    }) }}
+    {{ page_footer('Save') }}
+  {% endcall %}
+{% endblock %}

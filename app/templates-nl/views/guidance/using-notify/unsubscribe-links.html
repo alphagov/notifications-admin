@@ -1,0 +1,48 @@
+{% extends "content_template.html" %}
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Using Notify' %}
+
+{% block per_page_title %}
+  Unsubscribe links
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Unsubscribe links</h1>
+
+  <p class="govuk-body">You must let people opt out of receiving subscription emails, otherwise they might report you for sending spam.</p>
+ <p class="govuk-body">With GOV.UK Notify you can:</p>
+<ul class="govuk-list govuk-list--bullet">
+    <li>add an unsubscribe link in your emails</li>
+    <li>get a list of the recipients who request to unsubscribe</li>
+  </ul>
+  <p class="govuk-body">It is your responsibility to stop sending emails to anyone who asks to unsubscribe.</p>
+
+ <p class="govuk-body">If you do not, we can stop you from using GOV.UK Notify.</p>
+
+<div class="govuk-inset-text">
+ <p class="govuk-body">Read the GOV.​UK Service Manual to help decide if your emails are <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#transactional-messages">transactional or subscription messages</a>.</p></div>
+
+  <h2 class="govuk-heading-m">How to add an unsubscribe link</h2>
+  <ol class="govuk-list govuk-list--number">
+    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
+    <li>Add a new email template or choose an existing email template.</li>
+    <li>Select the <b class="govuk-!-font-weight-bold">Add an unsubscribe link</b> checkbox.</li>
+  </ol>
+  <p class="govuk-body">Recipients can request to opt out of unwanted emails by clicking on the unsubscribe link. </p>
+  <p class="govuk-body">We will report any email unsubscribe requests on the {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }}.</p>
+<p class="govuk-body">You should download the report and remove the recipients from your mailing list. Do this before you send any more emails to these recipients.</p>
+<p class="govuk-body">This report is available for up to 90 days.</p>
+
+   <h3 class="govuk-heading-m">If you want to add a custom unsubscribe link</h3>
+<p class="govuk-body">This is an API only feature. Follow the instructions in our <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.notifications.service.gov.uk/using-notify/api-documentation">API documentation</a>.</p>
+   <p class="govuk-body">You’ll need a developer on your team to set it up for you.</p>
+
+
+
+
+{% endblock %}

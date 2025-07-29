@@ -1,0 +1,44 @@
+{% from "components/table.html" import list_table, row_heading, spark_bar_field %}
+{% from "components/show-more.html" import show_more %}
+
+<div class="ajax-block-container">
+  {% if template_statistics|length > 1 %}
+    <div class='template-statistics-table'>
+      {% call(item, row_number) list_table(
+        template_statistics,
+        caption="By template",
+        caption_visible=True,
+        empty_message='',
+        field_headings=[
+          'Template',
+          'Messages sent'
+        ],
+        field_headings_visible=False
+      ) %}
+
+        {% call row_heading() %}
+          {% if item.is_precompiled_letter %}
+          <span class="template-statistics-table-template-name">
+          Provided as PDF
+          </span>
+          <span class="template-statistics-table-hint">
+            Letter
+          </span>
+          {% else %}
+          <a class="govuk-link govuk-link--no-visited-state template-statistics-table-template-name" href="{{ url_for('main.view_template', service_id=current_service.id, template_id=item.template_id) }}">{{ item.template_name }}</a>
+          <span class="template-statistics-table-hint">
+            {{ 1|message_count_label(item.template_type, suffix='template')|capitalize }}
+          </span>
+          {% endif %}
+        {% endcall %}
+
+        {{ spark_bar_field(item.count, most_used_template_count, id=item.template_id) }}
+      {% endcall %}
+      {{ show_more(
+        url_for('main.template_usage', service_id=current_service.id),
+        'See templates used by month',
+        with_border=False
+      ) }}
+    </div>
+  {% endif %}
+</div>

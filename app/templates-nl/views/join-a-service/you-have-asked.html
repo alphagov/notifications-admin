@@ -1,0 +1,29 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% set heading = 'You have asked to join an existing service' %}
+{% set number_of_users_emailed = request.args.get('number_of_users_emailed') %}
+
+{% block per_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {{ page_header(heading) }}
+      <p class="govuk-body">
+        We have sent your request to {{ number_of_users_emailed }} member{{ '' if number_of_users_emailed == '1' else 's' }} of ‘{{ service.name }}’.
+      </p>
+      <p class="govuk-body">
+        We’ve also sent you a confirmation email.
+      </p>
+      <p class="govuk-body">
+        You’ll get another email if your request is approved.
+      </p>
+      <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Back to your services</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

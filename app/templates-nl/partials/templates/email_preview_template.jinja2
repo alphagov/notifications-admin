@@ -1,0 +1,57 @@
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+
+{% set email_meta = [] %}
+
+{% if show_recipient %}
+  {% if from_name %}
+    {% do email_meta.append({
+      "key": {
+        "html": "From"
+      },
+      "value": {
+        "html": from_name
+      }
+    }) %}
+  {% endif %}
+
+  {% if reply_to %}
+    {% do email_meta.append({
+      "key": {
+        "html": "Reply&nbsp;to" | safe
+      },
+      "value": {
+        "classes": "email-message-meta__reply-to",
+        "html": reply_to
+      }
+    }) %}
+  {% endif %}
+{% endif %}
+
+{% do email_meta.append({
+    "key": {
+      "html": "To"
+    },
+    "value": {
+      "classes": "email-message-meta__send-to",
+      "html": recipient
+    }
+}) %}
+
+{% do email_meta.append({
+    "key": {
+      "html": "Subject"
+    },
+    "value": {
+      "html": subject
+    }
+}) %}
+
+<div class="email-message">
+  {{ govukSummaryList({
+    "classes": "email-message-meta",
+    "rows": email_meta
+  }) }}
+  <div class="email-message-body">
+    {{ body }}
+  </div>
+</div>

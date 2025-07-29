@@ -1,0 +1,36 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Enter the text that will appear in your logo
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% call form_wrapper() %}
+    {% set html %}
+      This is usually the full name of your organisation.
+      <br/>
+      <br/>
+      For example, {{ current_service.organisation.name }}
+    {% endset %}
+    {{
+      form.logo_text(
+        param_extensions={
+          "label": {
+            "isPageHeading": True,
+            "classes": "govuk-label--l",
+          },
+          "hint": {"html": html},
+        },
+      )
+    }}
+    {{ page_footer('Request new branding') }}
+  {% endcall %}
+
+{% endblock %}

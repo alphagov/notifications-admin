@@ -1,0 +1,38 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set heading = 'Sign-in method' %}
+
+{% block service_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header(heading) }}
+
+      <p class="govuk-body">
+        Your team members can sign in with an email link or text message code.
+      </p>
+      <p class="govuk-body">
+        You cannot switch off the email link sign-in method for the whole team until these members add a mobile phone number:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+      {% for user in users_without_phone_numbers %}
+        <li>{{ user.name }}</li>
+      {% endfor %}
+      </ul>
+      <p class="govuk-body">
+        If you need to change an individual’s sign-in method, go to the
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a>
+        page.
+      </p>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Your organisation has already accepted the agreement
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-five-sixths">
+
+    {{ page_header('Your organisation has already accepted the agreement')}}
+
+    <p class="govuk-body">
+      {{ current_service.organisation.name }} has already accepted the GOV.UK
+      Notify data processing and financial agreement.
+    </p>
+    <p class="govuk-body">For more information, you can <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">download a copy of the agreement (PDF)</a>.
+    </p>
+    <p class="govuk-body">
+      The agreement is confidential and should not be shared outside your organisation.
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

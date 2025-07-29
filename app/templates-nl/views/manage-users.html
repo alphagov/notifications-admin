@@ -1,0 +1,105 @@
+{% extends "withnav_template.html" %}
+{% from "components/tick-cross.html" import tick_cross %}
+{% from "components/live-search.html" import live_search %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% block service_page_title %}
+  Team members
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-medium">
+    Team members
+  </h1>
+
+  {% if show_search_box %}
+    <div data-notify-module="autofocus">
+      {{ live_search(target_selector='.user-list-item', show=True, form=form) }}
+    </div>
+  {% endif %}
+
+  <div class="user-list">
+    {% for user in users|sort %}
+      <div class="user-list-item">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            <h2 class="user-list-item-heading" title="{{ user.email_address }}">
+              {%- if user.name -%}
+                <span class="heading-small live-search-relevant">
+                  {% if current_user.platform_admin and not user.is_invited_user %}
+                    <a class="govuk-link govuk-link--text-colour" href="{{ url_for('main.user_information', user_id=user.id) }}">
+                      {{ user.name }}
+                    </a>
+                  {% else %}
+                    {{ user.name }}
+                  {% endif %}
+                </span>&ensp;
+              {%- endif -%}
+              <span class="hint">
+              {%- if user.status == 'pending' -%}
+                <span class="live-search-relevant">{{ user.email_address }}</span> (invited)
+              {%- elif user.status == 'cancelled' -%}
+                <span class="live-search-relevant">{{ user.email_address }}</span> (cancelled invite)
+              {%- elif user.id == current_user.id -%}
+                <span class="live-search-relevant">(you)</span>
+              {% else %}
+                <span class="live-search-relevant">{{ user.email_address }}</span>
+              {% endif %}
+              </span>
+            </h2>
+            <ul class="tick-cross__list">
+              {% for permission, label in permissions %}
+                {{ tick_cross(
+                  user.has_permission_for_service(current_service.id, permission),
+                  label
+                ) }}
+              {% endfor %}
+            </ul>
+            {# only show if the service has folders #}
+            {% if current_service.all_template_folders %}
+              <p class="govuk-body tick-cross__hint">
+                {% set folder_count = user.template_folders_for_service(current_service) | length %}
+
+                {% if folder_count == 0 %}
+                  Cannot see any folders
+                {% elif folder_count != current_service.all_template_folders | length %}
+                  Can see {{ folder_count }} folder{% if folder_count > 1 %}s{% endif %}
+                {% else %}
+                  Can see all folders
+                {% endif%}
+              </p>
+            {% endif %}
+            {% if current_service.has_permission('email_auth') %}
+              <p class="govuk-body tick-cross__hint">
+                Signs in with
+                {{ user.auth_type | format_auth_type(with_indefinite_article=True) }}
+              </p>
+            {% endif %}
+            </div>
+            <div class="govuk-grid-column-one-quarter">
+              {% if current_user.has_permissions('manage_service') %}
+                {% if user.status == 'pending' %}
+                  <a class="user-list-edit-link govuk-link govuk-link--no-visited-state" href="{{ url_for('main.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Cancel invitation<span class="govuk-visually-hidden"> for {{ user.email_address }}</span></a>
+                {% elif user.is_editable_by(current_user) %}
+                  <a class="user-list-edit-link govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Change details<span class="govuk-visually-hidden"> for {{ user.name }} {{ user.email_address }}</span></a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if current_user.has_permissions('manage_service') %}
+    <div class="js-stick-at-bottom-when-scrolling">
+      {{ govukButton({
+        "element": "a",
+        "text": "Invite a team member",
+        "href": url_for('main.invite_user', service_id=current_service.id),
+        "classes": "govuk-button--secondary"
+      }) }}
+    </div>
+  {% endif %}
+
+{% endblock %}

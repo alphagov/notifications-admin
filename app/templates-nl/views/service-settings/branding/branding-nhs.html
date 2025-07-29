@@ -1,0 +1,49 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/branding-preview.html" import email_branding_preview %}
+{% from "components/branding-preview.html" import letter_branding_preview %}
+
+{% set page_title %}
+  Confirm {{ branding_type }} branding
+{% endset %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": back_link_url
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(page_title) }}
+
+  <p class="govuk-body">
+    {{ branding_type|capitalize }}s from {{ current_service.name }} will look like this.
+  </p>
+
+  {% if branding_type == 'email' %}
+    {{ email_branding_preview(nhs_branding_id, title="Preview of new email branding") }}
+  {% else %}
+    {{ letter_branding_preview(nhs_branding_id, title="Preview of new letter branding") }}
+  {% endif %}
+
+  <h2 class="heading-medium">Before you continue</h2>
+
+  <p class="govuk-body">Make sure you’re allowed to use NHS branding.</p>
+
+  <p class="govuk-body">
+    If you’re not sure, <a class="govuk-link govuk-link--no-visited-state" href="https://www.england.nhs.uk/nhsidentity/identity-guidelines/who-can-use-the-nhs-identity/">check the guidance on the NHS website</a>.
+  </p>
+
+  {% call form_wrapper() %}
+    {{ page_footer(page_title) }}
+  {% endcall %}
+
+{% endblock %}

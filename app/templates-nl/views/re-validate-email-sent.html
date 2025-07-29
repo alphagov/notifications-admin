@@ -1,0 +1,23 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block per_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-large">{{ title }}</h1>
+    <p class="govuk-body">For security, we need to check if you still have access to your email address.</p>
+    <p class="govuk-body">We’ve sent you a link to sign in to Notify. The link will open in a new browser window, so you can close this one.</p>
+
+    {{ page_footer(
+      secondary_link=url_for('main.email_not_received', next=redirect_url),
+      secondary_link_text='Not received an email?'
+    ) }}
+  </div>
+</div>
+
+{% endblock %}

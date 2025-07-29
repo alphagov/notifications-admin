@@ -1,0 +1,39 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+  Support
+{% endblock %}
+
+{% block maincolumn_content %}
+
+   {{ govuk_page_header("Support") }}
+  <p class="govuk-body">GOV.UK Notify provides 24/7 support for emergencies.</p>
+  <p class="govuk-body">If you have an emergency we’ll reply within 30 minutes.</p>
+  <p class="govuk-body">If it’s not an emergency we’ll reply by the end of the next working day.</p>
+  <p class="govuk-body">Our working days are Monday to Friday, 9:30am to 5:30pm, excluding bank holidays.</p>
+
+  {% call form_wrapper() %}
+    {% if current_user.is_authenticated %}
+      {{ form.support_type }}
+    {% else %}
+      {{ form.who }}
+    {% endif %}
+    {{ page_footer('Continue') }}
+  {% endcall %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="heading-medium">What counts as an emergency?</h2>
+    <p class="govuk-body">A problem is only classed as an emergency if you have a live service and:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>a ‘technical difficulties’ error appears when you try to upload a file</li>
+      <li>a 500 response code appears when you try to send messages using the API</li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}

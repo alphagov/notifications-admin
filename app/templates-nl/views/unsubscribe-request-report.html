@@ -1,0 +1,70 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% block meta %}
+    {% if report.is_a_batched_report and request.args.get("force_download") %}
+        <meta http-equiv="refresh" content="0;URL='{{ url_for("main.download_unsubscribe_request_report", service_id=current_service.id, batch_id=report.batch_id)}}'" />
+    {% endif %}
+{% endblock %}
+
+{% block service_page_title %}
+    {{ report.title|sentence_case }}
+{% endblock %}
+
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.unsubscribe_request_reports_summary', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ page_header(report.title|sentence_case) }}
+
+
+{% if not report.completed %}
+    <p class="govuk-body" id="report-unsubscribe-requests-count">
+     {{ report.count|format_thousands}} new unsubscribe {{ report.count | message_count_label('request', suffix='') }}
+    </p>
+
+    <p class="govuk-body govuk-!-margin-bottom-2">You must: </p>
+      <ol class="govuk-list govuk-list--number govuk-!-margin-bottom-6">
+        <li class="bottom-gutter"><a href="{{ url_for('main.download_unsubscribe_request_report', service_id=current_service.id, batch_id=report.batch_id) }}" class="govuk-link govuk-link--no-visited-state heading-small">
+            Download the report</a>
+        </li>
+        <li>Remove the email addresses from your mailing list before you send any further emails</li>
+      </ol>
+{%  else %}
+    <p class="govuk-body" id="report-unsubscribe-requests-count">
+        {{ report.count|format_thousands}} unsubscribe {{ report.count | message_count_label('request', suffix='') }}
+    </p>
+    <p class="bottom-gutter"><a download href="{{ url_for('main.download_unsubscribe_request_report', service_id=current_service.id, batch_id=report.batch_id) }}" class="govuk-link govuk-link--no-visited-state heading-small" >
+        Download the report</a>
+    </p>
+
+ {% endif %}
+
+{% call form_wrapper(class="govuk-!-margin-bottom-6") %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    {{ form.report_has_been_processed }}
+    {% if report.is_a_batched_report %}
+        {{  govukButton({ "text": "Update", "id":"process_unsubscribe_report" })}}
+    {% endif %}
+
+{% endcall %}
+<div id="unsubscribe_report_availability">
+    {% if report.is_a_batched_report %}
+        This report will be deleted {{ report.will_be_archived_at|format_delta_days(numeric_prefix="in ")}}.
+    {% else %}
+        <p class="govuk-body">
+            Once downloaded, reports are available for 7 days.
+        </p>
+        <p class="govuk-body">
+            Requests which have not been downloaded will be deleted after 90 days.
+        </p>
+    {% endif %}
+</div>
+
+{% endblock %}

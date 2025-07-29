@@ -1,0 +1,29 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+If you do not receive a security code
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-large">If you do not receive a security code</h1>
+
+    <ol class="govuk-list govuk-list--number">
+      <li>Check that you can receive text messages from other numbers.</li>
+      <li>Switch your phone off and then back on again.</li>
+      <li>Check the mobile phone number you entered is correct.</li>
+      <li>Request a new security code.</li>
+    </ol>
+
+      {% call form_wrapper() %}
+        {{ form.mobile_number }}
+        {{ page_footer("Resend security code") }}
+      {% endcall %}
+  </div>
+</div>
+
+{% endblock %}

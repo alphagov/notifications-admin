@@ -1,0 +1,145 @@
+{% extends "content_template.html" %}
+
+{% from "components/page-header.html" import page_header %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Pricing information' %}
+
+{% block per_page_title %}
+  Billing details
+{% endblock %}
+
+{% block content_column_content %}
+
+    {{ page_header('Billing details') }}
+
+    <p class="govuk-body">
+      You can use the information on this page to add the Department for Science, Innovation and Technology (DSIT) as a supplier. Your organisation may need to do this before you can raise a purchase order (PO).
+    </p>
+
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact us</a> if you need any other details.
+    </p>
+
+    <h2 class="heading-medium govuk-!-margin-top-7" id="supplier-details">
+      Supplier details
+    </h2>
+
+    <p class="govuk-body">
+      Department for Science, Innovation and Technology
+    </p>
+
+    <p class="govuk-body">
+      100 Parliament Street <br>
+      London <br>
+      SW1A 2BQ
+    </p>
+
+    <h3 class="heading-small" id="email-addresses">
+      Email address
+    </h3>
+
+    <p class="govuk-body">
+      {{ billing_details['notify_billing_email_address'] }}
+    </p>
+
+    <h3 class="heading-small" id="vat-number">
+      <abbr title="Value Added Tax">VAT</abbr> number
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        'GB 888 8255 50',
+        thing='<abbr title="Value Added Tax">VAT</abbr> number',
+    ) }}
+    </div>
+
+    <h2 class="heading-medium govuk-!-margin-top-7" id="bank-details">
+      Bank details
+    </h2>
+
+    <p class="govuk-body">
+      National Westminster Bank PLC <br>
+      NatWest Customer Service Centre <br>
+      Brampton Road <br>
+      Newcastle-under-Lyme <br>
+      Staffordshire <br>
+      ST5 0QX
+    </p>
+
+    <h3 class="heading-small" id="account-name">
+      Account name
+    </h3>
+
+    <p class="govuk-body">
+      Department for Science, Innovation and Technology
+    </p>
+
+    <h3 class="heading-small" id="account-number">
+      Account number
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['account_number'],
+        thing='account number',
+      ) }}
+    </div>
+
+    <h3 class="heading-small" id="sort-code">
+      Sort code
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['sort_code'],
+        thing='sort code',
+      ) }}
+    </div>
+
+
+    <h3 class="heading-small" id="iban">
+      <abbr title="International Bank Account Number">IBAN</abbr>
+    </h3>
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['IBAN'],
+        thing='IBAN',
+      ) }}
+    </div>
+
+    <h3 class="heading-small" id="swift-code">
+      Swift code
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['swift'],
+        thing='Swift code',
+      ) }}
+    </div>
+
+    <h3 class="heading-small" id="duns-number">
+      D-U-N-S number
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        '227331642',
+        thing='<abbr title="Data Universal Numbering System">D-U-N-S</abbr> number',
+    ) }}
+    </div>
+
+    <h2 class="heading-medium govuk-!-margin-top-7" id="invoice-address">
+      Invoice address
+    </h2>
+
+    <p class="govuk-body">
+      Department for Science, Innovation and Technology <br>
+      100 Parliament Street <br>
+      London <br>
+      SW1A 2BQ
+    </p>
+
+{% endblock %}

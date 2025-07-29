@@ -1,0 +1,62 @@
+{% extends "withoutnav_template.html" %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% block per_page_title %}
+  If you do not receive a security code
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-large">If you do not receive a security code</h1>
+
+    <ol class="govuk-list govuk-list--number">
+      <li>Check that you can receive text messages from other numbers.</li>
+      <li>Switch your phone off and then back on again.</li>
+      <li>If you still do not receive a security code, we can send you a new one.</li>
+    </ol>
+
+    <p class="govuk-body">
+      {{ govukButton({
+        "element": "a",
+        "text": "Resend security code",
+        "href": url_for('main.check_and_resend_verification_code', next=redirect_url)
+      }) }}
+    </p>
+
+    <p class="govuk-body">If this does not work, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.</p>
+
+    {% set change_number %}
+        <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to update your phone number.</p>
+
+        <p class="govuk-body">To do this, they should:</p>
+
+
+        <ol class="govuk-list govuk-list--number">
+          <li>Sign in to GOV.UK Notify.</li>
+          <li>Go to the <span class="govuk-body govuk-!-font-weight-bold">Team members</span> page.</li>
+          <li>Find your name and select <span class="govuk-body govuk-!-font-weight-bold">Change details</span>.</li>
+          <li>Select <span class="govuk-body govuk-!-font-weight-bold">Change</span> next to your phone number.</li>
+        </ol>
+    {% endset %}
+
+    {{ govukDetails({
+      "summaryText": "If your phone number has changed",
+      "html": change_number
+    }) }}
+
+    {% set email_link %}
+        <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">change your sign-in method</a>.</p>
+    {% endset %}
+
+    {{ govukDetails({
+      "summaryText": "If you want to sign in with an email link instead",
+      "html": email_link
+    }) }}
+
+  </div>
+</div>
+
+{% endblock %}

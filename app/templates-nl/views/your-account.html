@@ -1,0 +1,206 @@
+{% extends "withoutnav_template.html" %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+
+{% block per_page_title %}
+  Your account
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">Your account</h1>
+
+  {% if can_see_edit %}
+    {% set email_address_row =
+      {
+        "key": {
+          "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+          "text": "Email address"
+        },
+        "value": {
+          "text": current_user.email_address
+        },
+        "actions": {
+          "items": [{
+            "href": url_for('main.your_account_email'),
+            "text": "Change",
+            "visuallyHiddenText": "email address",
+            "classes": "govuk-link--no-visited-state"
+          }]
+        }
+      }
+    %}
+  {% else %}
+    {% set email_address_row =
+      {
+        "classes": "govuk-summary-list__row--no-actions",
+        "key": {
+          "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+          "text": "Email address"
+        },
+        "value": {
+          "text": current_user.email_address
+        },
+      }
+    %}
+  {% endif %}
+
+  {% set rows = [
+    {
+      "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+        "text": "Name"
+      },
+      "value": {
+        "text": current_user.name
+      },
+      "actions": {
+        "items": [
+          {
+            "href": url_for('main.your_account_name'),
+            "text": "Change",
+            "visuallyHiddenText": "name",
+            "classes": "govuk-link--no-visited-state"
+          }
+        ]
+      }
+    },
+    email_address_row,
+    {
+      "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+        "text": "Mobile number"
+      },
+      "value": {
+        "text": current_user.mobile_number or "Not set",
+        "classes": "" if current_user.mobile_number else "table-field-status-default"
+      },
+      "actions": {
+        "items": [
+        {
+          "href": url_for('main.your_account_mobile_number'),
+          "text": "Change",
+          "visuallyHiddenText": "mobile number",
+          "classes": "govuk-link--no-visited-state"
+        }
+
+        ]
+      }
+    },
+    {
+      "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+        "text": "Password"
+      },
+      "value": {
+        "text": ('Last changed ' + current_user.password_changed_at|format_delta)
+      },
+      "actions": {
+        "items": [
+          {
+            "href": url_for('main.your_account_password'),
+            "text": "Change",
+            "visuallyHiddenText": "password",
+            "classes": "govuk-link--no-visited-state"
+          }
+        ]
+      }
+    },
+    {
+      "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+        "text": "Take part in user research"
+      },
+      "value": {
+        "text": "Yes" if current_user.take_part_in_research else "No"
+      },
+      "actions": {
+        "items": [
+          {
+          "href": url_for('main.your_account_take_part_in_user_research'),
+          "text": "Change",
+          "visuallyHiddenText": "consent to take part in user research",
+          "classes": "govuk-link--no-visited-state"
+          }
+        ]
+      }
+    },
+    {
+      "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+        "text": "Get emails about new features"
+      },
+      "value": {
+        "text": "Yes" if current_user.receives_new_features_email else "No"
+      },
+      "actions": {
+        "items": [
+          {
+          "href": url_for('main.your_account_get_emails_about_new_features'),
+          "text": "Change",
+          "visuallyHiddenText": "consent to get emails about new features",
+          "classes": "govuk-link--no-visited-state"
+          }
+        ]
+      }
+    },
+  ] %}
+
+ {% if current_user.can_use_webauthn %}
+  {% do rows.append(
+    {
+      "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+        "text": "Security keys"
+      },
+      "value": {
+        "text": ('{} registered'.format(current_user.webauthn_credentials|length)) if current_user.webauthn_credentials else "None registered",
+        "classes": "" if current_user.webauthn_credentials else "table-field-status-default"
+      },
+      "actions": {
+        "items": [
+          {
+            "href": url_for('main.your_account_security_keys'),
+            "text": "Change",
+            "visuallyHiddenText": "security keys",
+            "classes": "govuk-link--no-visited-state"
+          }
+        ]
+      }
+    }
+  ) %}
+ {% endif %}
+
+ {% if current_user.platform_admin or session.get('disable_platform_admin_view') %}
+  {% do rows.append(
+    {
+      "key": {
+        "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+        "text": "Use platform admin view"
+      },
+      "value": {
+        "text": (not session.get('disable_platform_admin_view'))|format_yes_no
+      },
+      "actions": {
+        "items": [
+          {
+            "href": url_for('main.your_account_disable_platform_admin_view'),
+            "text": "Change",
+            "visuallyHiddenText": "whether to use platform admin view",
+            "classes": "govuk-link--no-visited-state"
+          }
+        ]
+      }
+    },
+  ) %}
+{% endif %}
+
+{{ govukSummaryList({
+  "classes": "notify-summary-list",
+  "rows": rows
+}) }}
+
+<p class="govuk-body">
+  <a href="{{ url_for('main.sign_out') }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">Sign out</a>
+</p>
+
+{% endblock %}

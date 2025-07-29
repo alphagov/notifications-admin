@@ -1,0 +1,25 @@
+{% macro live_search(
+    target_selector=None,
+    show=False,
+    form=None,
+    label=None,
+    autofocus=False
+) %}
+    {%- set search_label = label or form.search.label.text %}
+
+    {%- set param_extensions = {
+      "label": {"text": search_label},
+      "autocomplete": "off",
+    } %}
+
+    {% if autofocus %}
+      {% set x=param_extensions.__setitem__("attributes", {"data-notify-module": "autofocus"}) %}
+    {% endif %}
+
+    {% if show %}
+        <div class="live-search js-header" data-notify-module="live-search" data-targets="{{ target_selector }}">
+          {{ form.search(param_extensions=param_extensions) }}
+          <div aria-live="polite" class="live-search__status govuk-visually-hidden"></div>
+        </div>
+    {% endif %}
+{% endmacro %}

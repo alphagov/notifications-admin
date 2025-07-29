@@ -1,0 +1,30 @@
+{% extends "content_template.html" %}
+
+{% from "components/page-header.html" import page_header %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Pricing information' %}
+
+{% block per_page_title %}
+  Billing details
+{% endblock %}
+
+{% block content_column_content %}
+
+    {{ page_header('Billing details') }}
+
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in', next=url_for('main.guidance_billing_details')) }}">Sign in</a> to see our:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>supplier details</li>
+      <li>bank details</li>
+      <li>invoice address</li>
+    </ul>
+
+    <p class="govuk-body">
+      You can use this information to add the Department for Science, Innovation and Technology (DSIT) as a supplier. Your organisation may need to do this before you can raise a purchase order.
+    </p>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% block service_page_title %}
+  You cannot let {{requested_by.name}} join your service
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('You cannot let {} join your service'.format(requested_by.name)) }}
+
+  <p class="govuk-body">
+    {{ rejected_by.name }} already refused this request on {{ rejected_at|format_date_short }}.
+  </p>
+
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Back to your services</a>
+
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "withnav_template.html" %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% block service_page_title %}
+  API integration
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-medium bottom-gutter-3-2">
+    API integration
+  </h1>
+
+  <nav class="govuk-grid-row bottom-gutter-1-2">
+    <div class="govuk-grid-column-one-third">
+      <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('main.api_keys', service_id=current_service.id) }}">API keys</a>
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('main.guest_list', service_id=current_service.id) }}">Guest list</a>
+    </div>
+    <div class="govuk-grid-column-one-third">
+      <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for(callbacks_link, service_id=current_service.id) }}">Callbacks</a>
+    </div>
+  </nav>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+      <h2 class="heading-small">
+        Message log
+      </h2>
+    </div>
+    <div class="govuk-grid-column-one-half align-with-heading-copy-right">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.api_integration', service_id=current_service.id) }}">Refresh</a>
+    </div>
+  </div>
+  <div class="api-notifications">
+    {% if not api_notifications.notifications %}
+      <div class="api-notifications-item govuk-!-padding-top-2">
+        <p class="api-notifications-item__meta">
+          When you send messages via the API they’ll appear here.
+        </p>
+        {% if current_service.get_consistent_data_retention_period() %}
+        <p class="api-notifications-item__meta">
+          Notify deletes messages after {{ current_service.get_consistent_data_retention_period() }} days.
+        </p>
+        {% endif %}
+      </div>
+    {% endif %}
+    {% for notification in api_notifications %}
+      {% set summary_html %}
+      <h3>
+        <span class="api-notifications-item__recipient">
+        {{ notification.to }}
+        </span>
+        <span class="govuk-grid-row api-notifications-item__meta">
+          <span class="govuk-grid-column-one-half api-notifications-item__meta-key">
+            {{ notification.key_name }}
+          </span>
+          <span class="govuk-grid-column-one-half api-notifications-item__meta-time">
+            <time class="timeago" datetime="{{ notification.created_at }}">
+              {{ notification.created_at|format_delta }}
+            </time>
+          </span>
+        </span>
+      </h3>
+      {% endset %}
+
+      {% set htmlcontent %}
+        <dl id="notification-{{ notification.id }}">
+          {% for key in [
+            'id', 'client_reference', 'notification_type', 'created_at', 'updated_at', 'sent_at', 'status'
+            ] %}
+            {% if notification[key] %}
+            <dt class="api-notifications-item__data-name">{{ key }}:</dt>
+            <dd class="api-notifications-item__data-value">{{ notification[key] }}</dd>
+            {% endif %}
+            {% endfor %}
+            {% if notification.status not in ('pending-virus-check', 'virus-scan-failed') %}
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_notification', service_id=current_service.id, notification_id=notification.id) }}">View {{ 1|message_count_label(notification.template.template_type, suffix='') }}</a>
+            {% endif %}
+          </dl>
+      {% endset %}
+
+      {{ govukDetails({
+        "summaryHtml": summary_html,
+        "html": htmlcontent,
+        "classes": "api-notifications-item govuk-details govuk-!-margin-bottom-0"
+      }) }}
+    {% endfor %}
+    {% if api_notifications %}
+      <div class="api-notifications-item govuk-!-padding-top-2">
+        {% if api_notifications|length == 50 %}
+          <p class="api-notifications-item__meta">
+            Only showing the first 50 messages.
+          </p>
+        {% endif %}
+        {% if current_service.get_consistent_data_retention_period() %}
+        <p class="api-notifications-item__meta">
+          Notify deletes messages after {{ current_service.get_consistent_data_retention_period() }} days.
+        </p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+{% endblock %}

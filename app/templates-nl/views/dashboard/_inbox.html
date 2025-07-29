@@ -1,0 +1,44 @@
+<div class="ajax-block">
+  {% if current_service.inbound_sms_summary != None %}
+    <a id="total-received" class="govuk-link govuk-link--no-visited-state banner-dashboard" href="{{ url_for('main.inbox', service_id=current_service.id) }}">
+      <span class="banner-dashboard-count">
+        {{ current_service.inbound_sms_summary.count|format_thousands }}
+      </span>
+      <span class="banner-dashboard-count-label">
+        {{ current_service.inbound_sms_summary.count|message_count_label('sms', suffix='received') }}
+      </span>
+      {% if current_service.inbound_sms_summary.most_recent %}
+        <span class="banner-dashboard-meta">
+          latest message {{ current_service.inbound_sms_summary.most_recent | format_delta }}
+        </span>
+      {% endif %}
+    </a>
+  {% endif %}
+  {% if current_service.has_returned_letters %}
+    <a id="total-returned-letters" class="govuk-link govuk-link--no-visited-state banner-dashboard" href="{{ url_for('main.returned_letter_summary', service_id=current_service.id) }}">
+      <span class="banner-dashboard-count">
+        {{ current_service.count_of_returned_letters_in_last_7_days|format_thousands }}
+      </span>
+      <span class="banner-dashboard-count-label">
+        returned {{ current_service.count_of_returned_letters_in_last_7_days|message_count_label('letter', suffix='') }}
+      </span>
+      <span class="banner-dashboard-meta">
+        latest report {{ current_service.date_of_most_recent_returned_letter_report|format_delta_days }}
+      </span>
+    </a>
+  {% endif %}
+ {% if current_service.unsubscribe_requests_statistics %}
+  <a id="total-unsubscribe-requests" class="govuk-link govuk-link--no-visited-state banner-dashboard"
+     href="{{ url_for('main.unsubscribe_request_reports_summary', service_id=current_service.id) }}">
+    <span class="banner-dashboard-count">
+      {{ current_service.unsubscribe_requests_count|format_thousands }}
+    </span>
+    <span class="banner-dashboard-count-label">
+        email {{ current_service.unsubscribe_requests_count | message_count_label('unsubscribe request', suffix='') }}
+    </span>
+    <span class="banner-dashboard-meta">
+      latest report {{ current_service.datetime_of_latest_unsubscribe_request|format_delta_days }}
+    </span>
+  </a>
+{%  endif %}
+</div>

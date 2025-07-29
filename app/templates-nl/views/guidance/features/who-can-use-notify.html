@@ -1,0 +1,78 @@
+{% extends "content_template.html" %}
+
+{% from "components/page-header.html" import page_header %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'About Notify' %}
+
+{% block per_page_title %}
+Who can use Notify
+{% endblock %}
+
+{% block content_column_content %}
+
+{{ page_header(
+'Who can use Notify'
+) }}
+
+<p class="govuk-body">
+  GOV.UK Notify is available to teams from:
+</p>
+<ul class="govuk-list govuk-list--bullet">
+  <li>central government departments</li>
+  <li>local authorities</li>
+  <li>the armed forces</li>
+  <li>the NHS</li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#gp">GP surgeries</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#gp">pharmacies</a></li>
+  <li>the emergency services</li>
+  <li>state-funded schools</li>
+</ul>
+<p class="govuk-body">
+  If you work for one of these organisations but get an error when you try to create an account, <a
+    class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact support</a>.
+</p>
+
+<p class="govuk-body">GOV.UK Notify is not for personal use.</p>
+
+<p class="govuk-body">
+  GOV.UK Notify is not available to:
+</p>
+<ul class="govuk-list govuk-list--bullet">
+  <li>charities</li>
+  <li>hospices</li>
+  <li>housing associations</li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#public">members of the public</a></li>
+  <li>universities</li>
+</ul>
+
+<h2 class="govuk-heading-m" id="suppliers">Suppliers</h2>
+<p class="govuk-body">
+  If you’re doing work for a public sector organisation you can use GOV.UK&nbsp;Notify.
+</p>
+<p class="govuk-body">
+  Someone from the public sector organisation you’re working with needs to create an account and add the service first.
+  Then they can invite you to join as a team member.
+</p>
+<div class="nl-hide">
+  <h2 class="govuk-heading-m" id="gp">GP surgeries and pharmacies</h2>
+  <p class="govuk-body">
+    NHS-funded GP surgeries and pharmacies can use GOV.UK Notify, but they:
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>do not get an <a class="govuk-link govuk-link--no-visited-state"
+        href="{{ url_for('main.guidance_pricing_text_messages') }}">annual allowance of free text messages</a></li>
+    <li>cannot send any text messages in <a class="govuk-link govuk-link--no-visited-state"
+        href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a></li>
+  </ul>
+</div>
+<h2 class="govuk-heading-m" id="public">Members of the public</h2>
+<p class="govuk-body">
+  GOV.UK Notify is only for people who work in the government or other public sector organisations.
+</p>
+<p class="govuk-body">
+  <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk">Find government services and information
+    on GOV.UK</a>.
+</p>
+
+{% endblock %}

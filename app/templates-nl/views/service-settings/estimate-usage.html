@@ -1,0 +1,47 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Tell us how many messages you expect to send
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if not form.at_least_one_volume_filled %}
+        {% call banner_wrapper(type='dangerous') %}
+          <h1 class='banner-title'>
+            Enter the number of messages you expect to send in the next year
+          </h1>
+        {% endcall %}
+      {% else %}
+        {{ page_header('Tell us how many messages you expect to send') }}
+      {% endif %}
+      {% call form_wrapper() %}
+        <div class="form-group">
+          {{ form.volume_email(param_extensions={
+            "classes": "govuk-!-width-one-half",
+            "hint": {"text": "For example, 50,000"},
+          }) }}
+          {{ form.volume_sms(param_extensions={
+            "classes": "govuk-!-width-one-half",
+            "hint": {"text": "For example, 50,000"},
+          }) }}
+          {{ form.volume_letter(param_extensions={
+            "classes": "govuk-!-width-one-half",
+            "hint": {"text": "For example, 50,000"},
+          }) }}
+        </div>
+        {{ page_footer('Continue') }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

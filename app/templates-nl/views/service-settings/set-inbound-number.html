@@ -1,0 +1,39 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = 'Set inbound number' %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% if current_service.has_inbound_number or no_available_numbers %}
+    {{ page_header(page_title) }}
+  {% endif %}
+  {% if current_service.has_inbound_number %}
+    <p class="govuk-body"> This service already has an inbound number </p>
+  {% elif no_available_numbers %}
+    <p class="govuk-body"> No available inbound numbers </p>
+  {% else %}
+    {% call form_wrapper(class="govuk-!-margin-top-3") %}
+      {{ form.inbound_number(param_extensions={
+        'fieldset': {
+          'legend': {
+            'isPageHeading': True,
+            'classes': 'govuk-fieldset__legend--l'
+          }
+        }
+      }) }}
+      {{ sticky_page_footer('Save') }}
+    {% endcall %}
+  {% endif %}
+
+{% endblock %}

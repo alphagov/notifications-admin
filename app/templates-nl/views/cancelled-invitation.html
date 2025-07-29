@@ -1,0 +1,17 @@
+{% extends "withoutnav_template.html" %}
+{% block per_page_title %}The invitation you were sent has been cancelled{% endblock %}
+{% block maincolumn_content %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="heading-large">
+          The invitation you were sent has been cancelled
+        </h1>
+        <p class="govuk-body">
+          {{ from_user }} decided to cancel this invitation.
+        </p>
+        <p class="govuk-body">
+          If you need access to {{ service_name or organisation_name }}, you’ll have to ask them to invite you again.
+        </p>
+      </div>
+    </div>
+{% endblock %}

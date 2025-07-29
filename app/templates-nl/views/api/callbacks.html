@@ -1,0 +1,47 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/table.html" import mapping_table, row, text_field, edit_field, optional_text_field with context %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Callbacks
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.api_integration', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header('Callbacks') }}
+  <div class="bottom-gutter-3-2 dashboard-table body-copy-table">
+    {% call mapping_table(
+      caption='General',
+      field_headings=['Label', 'Value', 'Action'],
+      field_headings_visible=False,
+      caption_visible=False
+    ) %}
+      {% call row() %}
+        {{ text_field('Delivery receipts') }}
+        {{ optional_text_field(current_service.delivery_status_callback_details.url, truncate=true) }}
+        {{ edit_field('Change', url_for('main.delivery_status_callback', service_id=current_service.id)) }}
+      {% endcall %}
+
+      {% if current_service.has_permission("inbound_sms") %}
+        {% call row() %}
+          {{ text_field('Received text messages') }}
+          {{ optional_text_field(current_service.inbound_sms_callback_details.url, truncate=true) }}
+          {{ edit_field('Change', url_for('main.received_text_messages_callback', service_id=current_service.id)) }}
+        {% endcall %}
+      {% endif %}
+
+      {% if current_service.has_permission("letter") %}
+        {% call row() %}
+          {{ text_field('Returned letters') }}
+          {{ optional_text_field(current_service.returned_letters_callback_details.url, truncate=true) }}
+          {{ edit_field('Change', url_for('main.returned_letters_callback', service_id=current_service.id)) }}
+        {% endcall %}
+      {% endif %}
+
+    {% endcall %}
+  </div>
+{% endblock %}

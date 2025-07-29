@@ -1,0 +1,35 @@
+{% extends "org_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/list-entry.html" import list_entry %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block org_page_title %}
+  Known email domains
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.organisation_settings', org_id=current_org.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header("Known email domains") }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      <p class="govuk-body">
+        If a user’s email addresses ends with one of these domains then
+        any services they create will be associated with this organisation.
+      </p>
+      {% call form_wrapper() %}
+        {{ list_entry(
+          form.domains,
+          item_name='domain',
+          autocomplete=False,
+          hint='For example cabinet-office.gov.uk'
+        ) }}
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}
