@@ -54,7 +54,7 @@
           {{ govukButton({
             "element": "a",
             "text": "Add reply-to email address",
-            "href": url_for('main.service_add_email_reply_to', service_id=current_service.id, back=source, template_id=template_id),
+            "href": url_for('main.service_add_email_reply_to', service_id=current_service.id, template_id=template_id),
           }) }}
         </div>
       {% endif %}
@@ -75,7 +75,7 @@
       {% if template_id %}
           <div class="govuk-grid-column-five-sixths">
               <p class="govuk-body">
-                  <a href="{{ url_for('main.send_one_off_step', service_id=service_id, template_id=template_id, step_index=0, back=source) }}" class="govuk-link govuk-link--no-visited-state">
+                  <a href="{{ url_for('main.send_one_off_step', service_id=service_id, template_id=template_id, step_index=0) }}" class="govuk-link govuk-link--no-visited-state">
                       I’ll do this later
                   </a>
               </p>

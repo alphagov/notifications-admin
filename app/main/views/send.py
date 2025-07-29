@@ -38,6 +38,7 @@ from app.main.forms import (
     SetSenderForm,
     get_placeholder_form_instance,
 )
+from app.main.views.backlink_manager import get_backlink_email_sender, get_previous_backlink
 from app.models.contact_list import ContactList, ContactListsAlphabetical
 from app.models.user import Users
 from app.s3_client.s3_csv_client import (
@@ -197,21 +198,26 @@ def _should_show_set_sender_page(service_id, template) -> bool:
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/set-sender", methods=["GET", "POST"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def set_sender(service_id, template_id):
-    # Step 1: If user doesn't have email_sender_name set, we want to guide them towards it
     if current_service.email_sender_name is None:
+        session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
+
         return redirect(
             url_for(
                 "main.service_email_sender_change",
                 service_id=service_id,
-                back="set_sender",
+                from_sender_flow="yes",
                 template_id=template_id,
             )
         )
 
     if not current_service.email_reply_to_addresses:
-        return redirect(
-            url_for("main.service_email_reply_to", service_id=service_id, back="view_template", template_id=template_id)
-        )
+        session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
+        return redirect(url_for("main.service_email_reply_to", service_id=service_id, template_id=template_id))
+
+    backlinks = session.get("email_sender_backlinks", [])
+
+    if len(backlinks) == 0:
+        session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
 
     from_back_link = request.args.get("from_back_link") == "yes"
     # If we're returning to the page, we want to use the sender_id already in the session instead of resetting it
@@ -260,13 +266,18 @@ def set_sender(service_id, template_id):
         session["sender_id"] = form.sender.data
         return redirect(url_for(".send_one_off", service_id=service_id, template_id=template_id))
 
+    backlink = _get_set_sender_back_link(service_id, template)
+
+    if template.template_type == "email" and len(backlinks) > 0:
+        backlink = get_previous_backlink(service_id, template_id)
+
     return render_template(
         "views/templates/set-sender.html",
         form=form,
         template_id=template_id,
         sender_context={"title": sender_context["title"], "description": sender_context["description"]},
         option_hints=option_hints,
-        back_link=_get_set_sender_back_link(service_id, template),
+        back_link=backlink,
     )
 
 
@@ -556,9 +567,12 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
 
 def render_email_add_recipients(service_id, template_id, template, placeholders):
     session["placeholders"] = {}
-    back = request.args.get("back")
 
-    backlink = get_add_recipients_backlink(service_id, template_id, back)
+    session["email_sender_backlinks"].append(
+        url_for("main.send_one_off_step", service_id=service_id, template_id=template_id, step_index=0)
+    )
+
+    backlink = get_previous_backlink(service_id, template_id)
 
     form = AddRecipientForm()
 
@@ -595,33 +609,6 @@ def render_email_add_recipients(service_id, template_id, template, placeholders)
         service_id=service_id,
         alternative_backlink=backlink,
     )
-
-
-def get_add_recipients_backlink(service_id, template_id, back):
-    backlink = None
-
-    if template_id:
-        if back == "set_sender_email_reply_to":
-            backlink = url_for("main.set_sender", service_id=service_id, template_id=template_id)
-
-        elif back == "from_name_email_reply_to":
-            backlink = url_for(
-                "main.service_email_reply_to", service_id=service_id, template_id=template_id, back="from_name"
-            )
-
-        elif back == "service_add_email_reply_to":
-            backlink = url_for(
-                "main.service_add_email_reply_to", service_id=service_id, template_id=template_id, back="email_reply_to"
-            )
-
-        elif back == "view_template_email_reply_to":
-            backlink = url_for(
-                "main.view_template",
-                service_id=service_id,
-                template_id=template_id,
-            )
-
-    return backlink
 
 
 @no_cookie.route(

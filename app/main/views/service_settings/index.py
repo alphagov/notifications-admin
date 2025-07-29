@@ -8,6 +8,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 from flask_login import current_user
@@ -60,6 +61,7 @@ from app.main.forms import (
     SMSPrefixForm,
     YesNoSettingForm,
 )
+from app.main.views.backlink_manager import get_previous_backlink
 from app.models.branding import (
     AllEmailBranding,
     AllLetterBranding,
@@ -123,14 +125,9 @@ def service_name_change(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/from-name", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_email_sender_change(service_id):
-    from_sender_flow = request.args.get("back") == "set_sender"
+    from_sender_flow = request.args.get("from_sender_flow") == "yes"
     template_id = request.args.get("template_id")
-    alternative_backlink = None
-
-    if from_sender_flow and template_id:
-        alternative_backlink = url_for("main.view_template", service_id=service_id, template_id=template_id)
-
-    # sender_choice = determine_sender_choice(current_service)
+    alternative_backlink = get_previous_backlink(current_service.id, template_id)
 
     form = ServiceEmailSenderForm(
         use_custom_email_sender_name="custom",
@@ -153,12 +150,10 @@ def service_email_sender_change(service_id):
         redis_client.set(f"{service_id}_has_confirmed_email_sender", b"true", ex=cache.DEFAULT_TTL)
 
         if from_sender_flow and not current_service.email_reply_to_addresses:
-            return redirect(
-                url_for(".service_email_reply_to", service_id=service_id, back="from_name", template_id=template_id)
-            )
+            return redirect(url_for(".service_email_reply_to", service_id=service_id, template_id=template_id))
 
         elif from_sender_flow and current_service.email_reply_to_addresses:
-            return redirect(url_for(".set_sender", service_id=service_id, back="from_name", template_id=template_id))
+            return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
@@ -429,59 +424,28 @@ def service_set_reply_to_email(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-reply-to", methods=["GET"])
 @user_has_permissions("manage_service", "manage_api_keys")
 def service_email_reply_to(service_id):
-    back = request.args.get("back")
     template_id = request.args.get("template_id")
 
-    backlink = None
-    source = None
-
-    if back == "set_sender" and template_id:
-        backlink = url_for("main.set_sender", service_id=service_id, template_id=template_id, from_back_link="yes")
-        source = "set_sender_email_reply_to"
-
-    elif back == "view_template" and template_id:
-        backlink = url_for(
-            "main.view_template",
-            service_id=service_id,
-            template_id=template_id,
-        )
-
-        source = "view_template_email_reply_to"
-
-    elif back == "from_name" and template_id:
-        backlink = url_for(
-            ".service_email_sender_change",
-            service_id=service_id,
-            back="set_sender",
-            template_id=template_id,
-        )
-
-        source = "from_name_email_reply_to"
+    backlink = get_previous_backlink(service_id, template_id)
 
     return render_template(
         "views/service-settings/email_reply_to.html",
         alternative_backlink=backlink,
         template_id=template_id,
         service_id=current_service.id,
-        source=source,
     )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-reply-to/add", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_add_email_reply_to(service_id):
-    back = request.args.get("back")
     template_id = request.args.get("template_id")
 
-    backlink = url_for(
-        "main.service_email_reply_to", service_id=service_id, template_id=template_id, back="view_template"
-    )
-    redirect_back = "email_reply_to"
+    session["email_sender_backlinks"] = session["email_sender_backlinks"] + [
+        url_for("main.service_add_email_reply_to", service_id=service_id, template_id=template_id)
+    ]
 
-    if back and "from_name" in back:
-        redirect_back = f"from_name_{redirect_back}"
-    elif back and "view_template":
-        redirect_back = f"view_template_{redirect_back}"
+    backlink = get_previous_backlink(service_id, template_id)
 
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
@@ -515,7 +479,6 @@ def service_add_email_reply_to(service_id):
                         service_id=service_id,
                         notification_id=notification_id,
                         is_default=is_default,
-                        back=redirect_back,
                         template_id=template_id,
                     )
                 )
@@ -536,23 +499,20 @@ def service_add_email_reply_to(service_id):
 def service_verify_reply_to_address(service_id, notification_id):
     replace = request.args.get("replace", False)
     is_default = request.args.get("is_default", False)
-
-    back = request.args.get("back")
     template_id = request.args.get("template_id")
-    backlink = None
-    add_recipients_redirect = "no"
 
-    if back:
-        add_recipients_redirect = "yes"
-        if back == "from_name_email_reply_to_add":
-            backlink = url_for(
-                ".service_add_email_reply_to", service_id=service_id, back="from_name", template_id=template_id
-            )
+    session["email_sender_backlinks"].append(
+        url_for(
+            "main.service_verify_reply_to_address",
+            service_id=service_id,
+            notification_id=notification_id,
+            is_default=is_default,
+            template_id=template_id,
+            replace=replace,
+        )
+    )
 
-        if back == "view_template_email_reply_to_add":
-            backlink = url_for(
-                ".service_add_email_reply_to", service_id=service_id, back="view_template", template_id=template_id
-            )
+    backlink = get_previous_backlink(service_id, template_id)
 
     return render_template(
         "views/service-settings/email-reply-to/verify.html",
@@ -563,7 +523,6 @@ def service_verify_reply_to_address(service_id, notification_id):
         is_default=is_default,
         template_id=template_id,
         alternative_backlink=backlink,
-        add_recipients_redirect=add_recipients_redirect,
     )
 
 
@@ -580,10 +539,10 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
     replace = request.args.get("replace", False)
     replace = False if replace == "False" else replace
     existing_is_default = False
-    redirect_after = request.args.get("add_recipients_redirect")
+    redirect_after = True if session.get("email_sender_backlinks") else False
 
     alternative_redirect_link = None
-    if redirect_after == "yes":
+    if redirect_after is True:
         template_id = request.args.get("template_id")
         alternative_redirect_link = url_for(
             "main.send_one_off_step",
