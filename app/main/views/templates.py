@@ -104,6 +104,7 @@ class LetterAttachmentFormError(Exception):
 @user_has_permissions(allow_org_user=True)
 def view_template(service_id, template_id):
     session["email_sender_backlinks"] = []
+    session["from_sender_flow_check"] = False
 
     template = current_service.get_template(
         template_id,

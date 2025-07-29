@@ -70,7 +70,7 @@
 
   {{ template|string }}
 
-  {% if current_service.trial_mode %}
+  {% if current_service.trial_mode and from_sender_flow and template.template_type == "email" %}
     {% set insetHtml %}
       <p>Your service is in test mode. You can only:</p>
       <ul class="govuk-list govuk-list--bullet">

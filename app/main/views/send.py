@@ -164,6 +164,7 @@ def send_messages(service_id, template_id):
         form=form,
         allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
         error_summary_enabled=True,
+        from_sender_flow=session.get("from_sender_flow_check", False),
     )
 
 
@@ -198,6 +199,8 @@ def _should_show_set_sender_page(service_id, template) -> bool:
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/set-sender", methods=["GET", "POST"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def set_sender(service_id, template_id):
+    session["from_sender_flow_check"] = True
+
     if current_service.email_sender_name is None:
         session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
 
@@ -562,6 +565,7 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
         back_link=back_link,
         link_to_upload=(request.endpoint == "main.send_one_off_step" and step_index == 0),
         error_summary_enabled=True,
+        from_sender_flow=session.get("from_sender_flow_check", False),
     )
 
 
@@ -1027,6 +1031,7 @@ def check_notification(service_id, template_id):
     return render_template(
         "views/notifications/check.html",
         **_check_notification(service_id, template_id),
+        from_sender_flow=session.get("from_sender_flow_check", False),
     )
 
 
@@ -1124,6 +1129,7 @@ def send_notification(service_id, template_id):
         return render_template(
             "views/notifications/check.html",
             **_check_notification(service_id, template_id, exception),
+            from_sender_flow=session.get("from_sender_flow_check", False),
         )
 
     session.pop("placeholders")
