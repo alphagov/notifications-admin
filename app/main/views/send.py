@@ -562,9 +562,6 @@ def render_email_add_recipients(service_id, template_id, template, placeholders)
 
     form = AddRecipientForm()
 
-    if request.method == "GET":
-        form.add_recipient_method.data = AddRecipientForm.CHOICE_ENTER_SINGLE_EMAIL
-
     if form.validate_on_submit():
         choice = form.add_recipient_method.data
 
