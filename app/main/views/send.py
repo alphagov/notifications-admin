@@ -199,23 +199,26 @@ def _should_show_set_sender_page(service_id, template) -> bool:
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/set-sender", methods=["GET", "POST"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def set_sender(service_id, template_id):
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
     session["from_sender_flow_check"] = True
 
-    if current_service.email_sender_name is None:
-        session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
+    if template.template_type == "email":
+        if current_service.email_sender_name is None:
+            session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
 
-        return redirect(
-            url_for(
-                "main.service_email_sender_change",
-                service_id=service_id,
-                from_sender_flow="yes",
-                template_id=template_id,
+            return redirect(
+                url_for(
+                    "main.service_email_sender_change",
+                    service_id=service_id,
+                    from_sender_flow="yes",
+                    template_id=template_id,
+                )
             )
-        )
 
-    if not current_service.email_reply_to_addresses:
-        session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
-        return redirect(url_for("main.service_email_reply_to", service_id=service_id, template_id=template_id))
+        if not current_service.email_reply_to_addresses:
+            session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
+            return redirect(url_for("main.service_email_reply_to", service_id=service_id, template_id=template_id))
 
     backlinks = session.get("email_sender_backlinks", [])
 
@@ -227,8 +230,6 @@ def set_sender(service_id, template_id):
     session["sender_id"] = session.get("sender_id") if from_back_link else None
 
     redirect_to_one_off = redirect(url_for(".send_one_off", service_id=service_id, template_id=template_id))
-
-    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if template.template_type == "letter":
         return redirect_to_one_off
