@@ -100,7 +100,7 @@
     // }
 
     .product-page-intro {
-        background-color: #e0e0e0;
+        background-color: var(--rhc-color-lichtblauw-100);
         padding-top: 20px;
         color: var(--rhc-color-lintblauw-500);
 
@@ -111,19 +111,56 @@
         }
     }
 
+    a.govuk-link {
+        color:var(--utrecht-link-color);
+        text-decoration-color:  var(--utrecht-link-text-decoration-color);
+
+        &.govuk-link--no-visited-state:link,
+        &.govuk-link--no-visited-state:visited{
+            color:var(--utrecht-link-color);
+        }
+
+        &:focus{
+            border: 0!important;
+            box-shadow: none!important;
+            background-color: transparent!important;
+            text-decoration-thickness:var(--utrecht-link-focus-text-decoration-thickness);
+            text-decoration:var(--utrecht-link-focus-text-decoration);
+            color:var(--utrecht-link-focus-color);
+            background-color:var(--utrecht-link-focus-background-color);
+        }
+
+        :visited {
+            color:var(--utrecht-link-visited-color);
+        }
+    }
+
 
     .govuk-button {
-        &.govuk-button--inverse {
+        color:  var(--utrecht-button-primary-action-color);
+        border-color:  var(--utrecht-button-primary-action-border-color);
+        background-color:  var(--utrecht-button-primary-action-background-color);
+        min-height: var(--utrecht-button-min-block-size);
+
+
+        &:hover{
+            color:  var(--utrecht-button-primary-action-hover-color);
+            border-color:  var(--utrecht-button-primary-action-hover-border-color);
+            background-color:  var(--utrecht-button-primary-action-hover-background-color);
+        }
+
+        &.govuk-button--inverse,
+        &:focus:not(:active):not(:hover) {
             color:  var(--utrecht-button-primary-action-focus-color);
             border-color:  var(--utrecht-button-primary-action-focus-border-color);
             background-color:  var(--utrecht-button-primary-action-focus-background-color);
 
-
         }
+
     }
 
     .govuk-footer{
-        background: #1d70b8;
+        background: var( --rhc-color-lichtblauw-100);
 
         .govuk-footer__section,
         .govuk-footer__section-break,
