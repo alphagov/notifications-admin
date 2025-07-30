@@ -8,6 +8,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 from flask_login import current_user
@@ -25,6 +26,7 @@ from app import (
 )
 from app.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.event_handlers import Events
+from app.extensions import redis_client
 from app.main import json_updates, main
 from app.main.forms import (
     AdminBillingDetailsForm,
@@ -41,7 +43,8 @@ from app.main.forms import (
     AdminSetEmailBrandingForm,
     AdminSetLetterBrandingForm,
     AdminSetOrganisationForm,
-    EstimateUsageForm,
+    EmailUsageForm,
+    ExpectToSendForm,
     OnOffSettingForm,
     RenameServiceForm,
     SearchByNameForm,
@@ -58,6 +61,7 @@ from app.main.forms import (
     SMSPrefixForm,
     YesNoSettingForm,
 )
+from app.main.views.backlink_manager import get_previous_backlink
 from app.models.branding import (
     AllEmailBranding,
     AllLetterBranding,
@@ -67,6 +71,7 @@ from app.models.branding import (
 from app.models.letter_rates import LetterRates
 from app.models.organisation import Organisation
 from app.models.sms_rate import SMSRate
+from app.notify_client import cache
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
 from app.utils.user import user_has_permissions, user_is_platform_admin
@@ -117,18 +122,38 @@ def service_name_change(service_id):
     )
 
 
-@main.route("/services/<uuid:service_id>/service-settings/email-sender", methods=["GET", "POST"])
+@main.route("/services/<uuid:service_id>/service-settings/from-name", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_email_sender_change(service_id):
+    from_sender_flow = request.args.get("from_sender_flow") == "yes"
+    template_id = request.args.get("template_id")
+    alternative_backlink = get_previous_backlink(current_service.id, template_id)
+
     form = ServiceEmailSenderForm(
-        use_custom_email_sender_name=current_service.custom_email_sender_name is not None,
+        use_custom_email_sender_name="custom",
         custom_email_sender_name=current_service.custom_email_sender_name,
     )
 
     if form.validate_on_submit():
-        new_sender = form.custom_email_sender_name.data if form.use_custom_email_sender_name.data else None
+        choice = form.use_custom_email_sender_name.data
+
+        new_sender = None
+
+        if choice == ServiceEmailSenderForm.CHOICE_CUSTOM:
+            new_sender = form.custom_email_sender_name.data
+        if choice == ServiceEmailSenderForm.CHOICE_ORGANISATION:
+            new_sender = current_service.organisation_name
+        if choice == ServiceEmailSenderForm.CHOICE_SERVICE:
+            new_sender = current_service.name
 
         current_service.update(custom_email_sender_name=new_sender)
+        redis_client.set(f"{service_id}_has_confirmed_email_sender", b"true", ex=cache.DEFAULT_TTL)
+
+        if from_sender_flow and not current_service.email_reply_to_addresses:
+            return redirect(url_for(".service_email_reply_to", service_id=service_id, template_id=template_id))
+
+        elif from_sender_flow and current_service.email_reply_to_addresses:
+            return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
         return redirect(url_for(".service_settings", service_id=service_id))
 
@@ -137,7 +162,18 @@ def service_email_sender_change(service_id):
         form=form,
         organisation_type=current_service.organisation_type,
         error_summary_enabled=True,
+        alternative_backlink=alternative_backlink,
     )
+
+
+def determine_sender_choice(service):
+    sender_name = service.custom_email_sender_name
+    if sender_name:
+        if sender_name == service.organisation_name:
+            return ServiceEmailSenderForm.CHOICE_ORGANISATION
+        if sender_name == service.name:
+            return ServiceEmailSenderForm.CHOICE_SERVICE
+    return ServiceEmailSenderForm.CHOICE_SERVICE
 
 
 @main.post("/services/<uuid:service_id>/service-settings/email-sender/preview-address")
@@ -151,6 +187,22 @@ def service_email_sender_preview(service_id):
             )
         }
     )
+
+
+@main.post("/services/<uuid:service_id>/service-settings/from-name-preview")
+@user_has_permissions("manage_service")
+def service_from_name_preview(service_id):
+    choice = request.form.get("use_custom_email_sender_name")
+    name = ""
+
+    if choice == ServiceEmailSenderForm.CHOICE_CUSTOM:
+        name = request.form.get("custom_email_sender_name", "")
+    elif choice == ServiceEmailSenderForm.CHOICE_ORGANISATION:
+        name = current_service.organisation_name
+    elif choice == ServiceEmailSenderForm.CHOICE_SERVICE:
+        name = current_service.name
+
+    return jsonify({"html": render_template("partials/preview-full-email-sender.html", email_sender_name=name)})
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-data-retention", methods=["GET", "POST"])
@@ -181,18 +233,30 @@ def service_data_retention(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/request-to-go-live/estimate-usage", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def estimate_usage(service_id):
-    form = EstimateUsageForm(
-        volume_email=current_service.volume_email,
-        volume_sms=current_service.volume_sms,
-        volume_letter=current_service.volume_letter,
-    )
+    form = ExpectToSendForm()
+
+    if request.method == "GET":
+        form.message_types.data = []
+
+        if current_service.will_send_emails:
+            form.message_types.data.append("emails")
+        if current_service.will_send_texts:
+            form.message_types.data.append("texts")
+        if current_service.will_send_letters:
+            form.message_types.data.append("letters")
 
     if form.validate_on_submit():
-        current_service.update(
-            volume_email=form.volume_email.data,
-            volume_sms=form.volume_sms.data,
-            volume_letter=form.volume_letter.data,
-        )
+        selected_message_types = form.message_types.data
+
+        for message_type in ("emails", "texts", "letters"):
+            if message_type in selected_message_types:
+                redis_client.set(f"{service_id}_will_send_{message_type}", b"true", ex=cache.DEFAULT_TTL)
+            else:
+                redis_client.delete(f"{service_id}_will_send_{message_type}")
+
+        if "emails" in selected_message_types:
+            return redirect(url_for("main.email_usage", service_id=service_id))
+
         return redirect(
             url_for(
                 "main.request_to_go_live",
@@ -202,6 +266,25 @@ def estimate_usage(service_id):
 
     return render_template(
         "views/service-settings/estimate-usage.html",
+        form=form,
+    )
+
+
+@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live/email-usage", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def email_usage(service_id):
+    form = EmailUsageForm()
+
+    if form.validate_on_submit():
+        return redirect(
+            url_for(
+                "main.request_to_go_live",
+                service_id=service_id,
+            )
+        )
+
+    return render_template(
+        "views/service-settings/email-usage.html",
         form=form,
     )
 
@@ -341,12 +424,29 @@ def service_set_reply_to_email(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/email-reply-to", methods=["GET"])
 @user_has_permissions("manage_service", "manage_api_keys")
 def service_email_reply_to(service_id):
-    return render_template("views/service-settings/email_reply_to.html")
+    template_id = request.args.get("template_id")
+
+    backlink = get_previous_backlink(service_id, template_id)
+
+    return render_template(
+        "views/service-settings/email_reply_to.html",
+        alternative_backlink=backlink,
+        template_id=template_id,
+        service_id=current_service.id,
+    )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/email-reply-to/add", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_add_email_reply_to(service_id):
+    template_id = request.args.get("template_id")
+
+    session["email_sender_backlinks"] = session["email_sender_backlinks"] + [
+        url_for("main.service_add_email_reply_to", service_id=service_id, template_id=template_id)
+    ]
+
+    backlink = get_previous_backlink(service_id, template_id)
+
     form = ServiceReplyToEmailForm()
     first_email_address = current_service.count_email_reply_to_addresses == 0
     is_default = first_email_address if first_email_address else form.is_default.data
@@ -379,6 +479,7 @@ def service_add_email_reply_to(service_id):
                         service_id=service_id,
                         notification_id=notification_id,
                         is_default=is_default,
+                        template_id=template_id,
                     )
                 )
 
@@ -387,6 +488,7 @@ def service_add_email_reply_to(service_id):
         form=form,
         first_email_address=first_email_address,
         error_summary_enabled=True,
+        alternative_backlink=backlink,
     )
 
 
@@ -397,6 +499,21 @@ def service_add_email_reply_to(service_id):
 def service_verify_reply_to_address(service_id, notification_id):
     replace = request.args.get("replace", False)
     is_default = request.args.get("is_default", False)
+    template_id = request.args.get("template_id")
+
+    session["email_sender_backlinks"].append(
+        url_for(
+            "main.service_verify_reply_to_address",
+            service_id=service_id,
+            notification_id=notification_id,
+            is_default=is_default,
+            template_id=template_id,
+            replace=replace,
+        )
+    )
+
+    backlink = get_previous_backlink(service_id, template_id)
+
     return render_template(
         "views/service-settings/email-reply-to/verify.html",
         service_id=service_id,
@@ -404,6 +521,8 @@ def service_verify_reply_to_address(service_id, notification_id):
         partials=get_service_verify_reply_to_address_partials(service_id, notification_id),
         replace=replace,
         is_default=is_default,
+        template_id=template_id,
+        alternative_backlink=backlink,
     )
 
 
@@ -420,12 +539,24 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
     replace = request.args.get("replace", False)
     replace = False if replace == "False" else replace
     existing_is_default = False
+    redirect_after = True if session.get("email_sender_backlinks") else False
+
+    alternative_redirect_link = None
+    if redirect_after is True:
+        template_id = request.args.get("template_id")
+        alternative_redirect_link = url_for(
+            "main.send_one_off_step",
+            service_id=service_id,
+            template_id=template_id,
+            step_index=0,
+        )
+
     if replace:
         existing = current_service.get_email_reply_to_address(replace)
         existing_is_default = existing["is_default"]
     verification_status = "pending"
     is_default = True if (request.args.get("is_default", False) == "True") else False
-    if notification["status"] in DELIVERED_STATUSES:
+    if notification["status"] in (DELIVERED_STATUSES + SENDING_STATUSES):
         verification_status = "success"
         if notification["to"] not in [i["email_address"] for i in current_service.email_reply_to_addresses]:
             if replace:
@@ -459,6 +590,7 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
             form=form,
             first_email_address=first_email_address,
             replace=replace,
+            alternative_redirect_link=alternative_redirect_link,
         ),
         "stop": 0 if verification_status == "pending" else 1,
     }
@@ -1249,7 +1381,7 @@ def link_service_to_organisation(service_id):
         if form.organisations.data != current_service.organisation_id:
             organisations_client.update_service_organisation(service_id, form.organisations.data)
 
-            # if it's a GP in trial mode, we need to set their daily sms_message_limit to 0
+            # if it's a GP in test mode, we need to set their daily sms_message_limit to 0
             organisation = Organisation.from_id(form.organisations.data)
             if current_service.trial_mode and organisation.organisation_type == Organisation.TYPE_NHS_GP:
                 current_service.update(sms_message_limit=0)

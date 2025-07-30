@@ -92,6 +92,7 @@ def tour_step(service_id, template_id, step_index):
         back_link=back_link,
         help="2",
         error_summary_enabled=True,
+        from_sender_flow=session.get("from_sender_flow_check", False),
     )
 
 
@@ -130,6 +131,7 @@ def check_tour_notification(service_id, template_id):
         template=template,
         back_link=back_link,
         help="2",
+        from_sender_flow=session.get("from_sender_flow_check", False),
     )
 
 
