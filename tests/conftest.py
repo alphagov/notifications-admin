@@ -3210,6 +3210,8 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
 
 
 def normalize_spaces(input):
+    if input is None:
+        return None
     if isinstance(input, str):
         return " ".join(input.split())
     return normalize_spaces(" ".join(item.text for item in input))
