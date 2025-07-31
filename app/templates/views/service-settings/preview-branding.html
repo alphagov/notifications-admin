@@ -4,12 +4,12 @@
 {% from "components/branding-preview.html" import email_branding_preview, letter_branding_preview %}
 
 {% block per_page_title %}
-  Preview {{ branding_type }} branding
+  Preview {{ notification_type }} branding
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-large">Preview {{ branding_type }} branding</h1>
+  <h1 class="heading-large">Preview {{ notification_type }} branding</h1>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% if notification_type == 'email' %}

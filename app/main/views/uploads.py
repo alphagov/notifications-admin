@@ -127,6 +127,7 @@ def uploaded_letters(service_id, letter_print_day):
             service_id=current_service.id,
             from_uploaded_letters=letter_print_day,
         ),
+        limit_days=None,
     )
 
 

@@ -629,3 +629,42 @@ def init_jinja(application):
 
     application.jinja_env.filters["format_provider"] = format_provider
     application.jinja_env.add_extension("jinja2.ext.do")
+    application.jinja_env.undefined = NotifyJinjaUndefined
+
+
+class NotifyJinjaUndefined(jinja2.Undefined):
+    """
+    The same as jinja2.StrictUndefined with a few exceptions, noted
+    in specific comments.
+
+    For more context see:
+    https://jinja.palletsprojects.com/en/stable/api/#undefined-types
+    """
+
+    __slots__ = ()
+    __iter__ = jinja2.Undefined._fail_with_undefined_error
+    __len__ = jinja2.Undefined._fail_with_undefined_error
+    __hash__ = jinja2.Undefined._fail_with_undefined_error
+    # __bool__: UndefinedErrors remain supressed
+    __contains__ = jinja2.Undefined._fail_with_undefined_error
+    __str__ = jinja2.Undefined._fail_with_undefined_error
+
+    def __eq__(self, other):
+        if isinstance(self._undefined_obj, dict):
+            # Accessing a missing field on a dict, we do this too
+            # often to be strict about it
+            return super().__eq__(other)
+
+        if isinstance(other, NotifyJinjaUndefined):
+            # Comparing to something else which is undefined, you are
+            # probably doing this on purpose
+            return True
+
+        if isinstance(self._undefined_obj, jinja2.utils._MissingType):
+            # Comparing to an internal Jinja type, you are probably
+            # doing this on purpose
+            return False
+
+        # In any other case comparing undefined to something is bad
+        # so raise an exception
+        jinja2.Undefined._fail_with_undefined_error(self, other)
