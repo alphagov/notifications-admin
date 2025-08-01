@@ -1998,9 +1998,15 @@ def test_should_let_letter_contact_block_be_changed_for_the_template(
     )
 
 
-@pytest.mark.parametrize("prefix_sms", [True, pytest.param(False, marks=pytest.mark.xfail())])
+@pytest.mark.parametrize(
+    "prefix_sms, expected_hint",
+    [
+        (True, "Your message will start with your service name"),
+        (False, None),
+    ],
+)
 def test_should_show_message_with_prefix_hint_if_enabled_for_service(
-    client_request, mock_get_service_template, service_one, fake_uuid, prefix_sms
+    client_request, mock_get_service_template, service_one, fake_uuid, prefix_sms, expected_hint
 ):
     service_one["prefix_sms"] = prefix_sms
 
@@ -2010,7 +2016,7 @@ def test_should_show_message_with_prefix_hint_if_enabled_for_service(
         template_id=fake_uuid,
     )
 
-    assert "Your message will start with your service name" in page.text
+    assert normalize_spaces(page.select_one(".govuk-hint#template_content-hint")) == expected_hint
 
 
 @pytest.mark.parametrize("filetype", ["pdf", "png"])

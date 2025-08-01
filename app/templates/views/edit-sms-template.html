@@ -18,9 +18,7 @@
 
     {{ page_header('{} text message template'.format(heading_action)) }}
 
-    {% if current_service.prefix_sms %}
-      {% set content_hint = 'Your message will start with your service name' %}
-    {% endif %}
+    {% set content_hint = {"text": "Your message will start with your service name"} if current_service.prefix_sms else {} %}
 
     {% call form_wrapper() %}
       <div class="govuk-grid-row">
@@ -36,7 +34,7 @@
               "data-highlight-placeholders": "true"
             },
             "rows": "5",
-            "hint": {"text": content_hint},
+            "hint": content_hint,
             "formGroup": {
               "classes": "govuk-textarea-highlight govuk-!-margin-bottom-2",
             }
