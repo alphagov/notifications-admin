@@ -184,6 +184,7 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
     white-space: pre-wrap;
     overflow-wrap: break-word;
     word-wrap: break-word;
+    box-sizing: border-box;
     padding: 4px 4px govuk-spacing(6) 4px;
     border: 2px solid transparent;
     z-index: 10;
