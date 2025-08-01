@@ -1,19 +1,19 @@
 <h1 class='banner-title'>
   {% if original_file_name %}
-    Too many international phone numbers
+    Te veel internationale telefoonnummers
   {% else %}
-    Daily limit reached
+    Daglimiet bereikt
   {% endif %}
 </h1>
 <p class="govuk-body">
-  You can only send {{ current_service.get_message_limit("international_sms") | message_count("international_sms") }} per day.
+  U kunt per dag slechts {{ current_service.get_message_limit("international_sms") | message_count("international_sms") }} versturen.
 </p>
 {% if original_file_name %}
   <p class="govuk-body">
     {% if (current_service.get_message_limit("international_sms")) != remaining_international_sms_messages %}
-      You can still send {{ remaining_international_sms_messages|format_thousands }} {{ remaining_international_sms_messages|message_count_noun("international_sms") }} today, but
+      U kunt vandaag nog {{ remaining_international_sms_messages|format_thousands }} {{ remaining_international_sms_messages|message_count_noun("international_sms") }} versturen, maar
     {% endif %}
-    ‘{{ original_file_name }}’ contains
+    ‘{{ original_file_name }}’ bevat
     {{ recipients.international_sms_count|recipient_count("international_sms") }}.
   </p>
 {% endif %}

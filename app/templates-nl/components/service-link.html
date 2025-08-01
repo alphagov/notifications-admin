@@ -2,6 +2,6 @@
   {%- if service -%}
     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for(endpoint, service_id=service.id) }}">{{ link_text }}</a>
   {%- else -%}
-    <b class="govuk-!-font-weight-bold">{{ link_text|capitalize }}</b>
+    <b class="govuk-!-font-weight-bold">{{ link_text | capitalize | translate }}</b>
   {%- endif -%}
 {%- endmacro %}

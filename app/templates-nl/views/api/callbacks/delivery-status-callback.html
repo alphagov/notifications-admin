@@ -1,44 +1,45 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/page-footer.html" import page_footer %}
-{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Callbacks for delivery receipts
+  Accepteer onze verwerkers- en financiële overeenkomst
 {% endblock %}
 
-
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for(back_link, service_id=current_service.id) }) }}
+  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
-  <div class="govuk-grid-row">
-    <div class="govuk-grid-column-five-sixths">
 
-      {{ page_header('Callbacks for delivery receipts') }}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-five-sixths">
 
-      <p class="govuk-body">
-        When you send an email or text message, we can tell you if Notify was able to deliver it.
-        Read the Callbacks section of our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API documentation</a> for more information.
-      </p>
+    {{ page_header('Accepteer onze verwerkers- en financiële overeenkomst') }}
 
-      {% call form_wrapper() %}
-        {{ form.url(param_extensions={
-          "classes": "govuk-!-width-full",
-          "hint": {"text": "Must start with https://"}
-        }) }}
+    <p class="govuk-body">
+      Voordat u GOV.UK Notify kunt gebruiken, moet u onze verwerkers- en financiële overeenkomst accepteren.
+    </p>
+    <p class="govuk-body">
+      Dit moet worden gedaan door, of namens, iemand met de bevoegdheid om contracten te ondertekenen voor {{ current_service.organisation.name }}.
+    </p>
+    <p class="govuk-body">
+      Na acceptatie geldt de overeenkomst voor alle Notify-diensten van {{ current_service.organisation.name }}.
+    </p>
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download een kopie van de verwerkers- en financiële overeenkomst (PDF)</a>.
+    </p>
+    <p class="govuk-body">
+      De overeenkomst is vertrouwelijk en mag niet buiten uw organisatie worden gedeeld.
+    </p>
+    {{ govukButton({
+      "element": "a",
+      "text": "Doorgaan",
+      "href": url_for('main.service_accept_agreement', service_id=current_service.id),
+    }) }}
 
-        {{ form.bearer_token(param_extensions={
-          "classes": "govuk-!-width-full",
-          "hint": {"text": "At least 10 characters"},
-          "autocomplete": "new-password"
-        }) }}
-
-        {{ page_footer('Save') }}
-      {% endcall %}
-    </div>
   </div>
+</div>
 
 {% endblock %}

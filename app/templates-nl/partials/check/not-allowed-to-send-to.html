@@ -1,12 +1,12 @@
 <h1 class='banner-title'>
-  You cannot send to
-  {{ 'this' if count_of_recipients == 1 else 'these' }}
+  U kunt niet verzenden naar
+  {{ 'deze' if count_of_recipients == 1 else 'deze' }}
   {{ template_type_label }}
   {%- if count_of_recipients != 1 -%}
-    {{ 'es' if 'email address' == template_type_label else 's' }}
+    {{ 's' if 'emailadres' == template_type_label else 's' }}
   {%- endif %}
 </h1>
 <p class="govuk-body">
-  In <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a> you can only
-  send to yourself and members of your team
+  In de <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">proefmodus</a> kunt u alleen
+  naar uzelf en leden van uw team verzenden
 </p>

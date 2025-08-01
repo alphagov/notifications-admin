@@ -44,14 +44,14 @@
           {% if failure_link %}
             <a class="govuk-link govuk-link--inverse" href="{{ failure_link }}">
               {{ failures | format_thousands | insert_wbr  }}
-              failed – {{ failure_percentage }}%
+              mislukt – {{ failure_percentage }}%
             </a>
           {% else %}
             {{ failures | format_thousands | insert_wbr  }}
-            failed – {{ failure_percentage }}%
+            mislukt – {{ failure_percentage }}%
           {% endif %}
         {% else %}
-          No failures
+          Geen mislukkingen
         {% endif %}
       </span>
     {% endif %}

@@ -3,34 +3,34 @@
 {% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
 
 {% block service_page_title %}
-  New API key
+  Nieuwe API-sleutel
 {% endblock %}
 
 {% block maincolumn_content %}
 
 
     <h1 class="heading-large">
-      New API key
+      Nieuwe API-sleutel
     </h1>
 
     <p class="govuk-body">
-      Copy your key to somewhere safe.
+      Kopieer uw sleutel en bewaar deze op een veilige plek.
     </p>
     <p class="govuk-body">
-      You will not be able to see it again once you leave this page.
+      U kunt deze niet meer terugzien zodra u deze pagina verlaat.
     </p>
 
     <div class="bottom-gutter-2">
 
       {{ copy_to_clipboard(
         '{}-{}-{}'.format(key_name, service_id, secret),
-        name='API key',
-        thing='API key'
+        name='API-sleutel',
+        thing='API-sleutel'
       ) }}
 
       {{ page_footer(
         secondary_link=url_for('main.api_keys', service_id=current_service.id),
-        secondary_link_text='Back to API keys'
+        secondary_link_text='Terug naar API-sleutels'
       ) }}
 
     </div>

@@ -1,24 +1,31 @@
+**Dit is een voorbeeld van een e-mail die is verzonden via Notify van de Rijksoverheid.**
 
-This is an example of an email sent using GOV.UK Notify.
+De e-mailhuisstijl verschijnt bovenaan de e-mail, boven de tekst.
 
-The email branding appears at the top of the email, above the text.
+Wilt u de huisstijl van uw e-mails aanpassen? Ga dan naar de instellingen van uw dienst.
 
-To change your email branding, go to your service settings.
+---
 
-# Create a government identity logo
+## Een overheidslogo aanmaken
 
-A government identity logo is made up of:
-* a coloured line
-* a symbol, for example the Royal Coat of Arms
-* text, usually the organisation name
+Een overheidslogo bestaat uit:
 
-# Upload a logo
+- een gekleurde lijn  
+- een symbool, bijvoorbeeld het Rijkswapen  
+- tekst, meestal de naam van de organisatie  
 
-If you do not want to use a government identity logo, you can add your own branding in 3 easy steps:
-1. Choose a colour banner.
-2. Upload a logo.
-3. Add alternative text for your logo.
+---
 
-^ Alternative text (alt text) is a written description of an image for users who cannot see it.
+## Een logo uploaden
 
-Try it for yourself at https://www.notifications.service.gov.uk
+Wilt u geen overheidslogo gebruiken? U kunt ook uw eigen huisstijl toevoegen in 3 eenvoudige stappen:
+
+1. Kies een kleur voor de banner.  
+2. Upload een logo.  
+3. Voeg alternatieve tekst toe voor uw logo.
+
+^ *Alternatieve tekst (alt-tekst) is een beschrijving van een afbeelding, bedoeld voor gebruikers die de afbeelding niet kunnen zien.*
+
+---
+
+Probeer het zelf op [https://www.admin.notifyNL.nl](https://admin.notifyNL.nl)

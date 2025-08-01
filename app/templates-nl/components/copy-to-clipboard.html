@@ -4,9 +4,17 @@
       {{ name }}
     </h2>
   {% endif %}
-  <div data-notify-module="copy-to-clipboard" data-value="{{ value }}" data-thing="{{ thing }}" data-name="{{ name }}">
+  <div 
+    data-notify-module="copy-to-clipboard" 
+    data-value="{{ value }}" 
+    data-thing="{{ thing }}" 
+    data-name="{{ name }}"
+  >
     <span class="copy-to-clipboard__value">
-      {%- if name|lower != thing|lower %}<span class="govuk-visually-hidden">{{ thing }}: </span>{% endif %}{{ value -}}
+      {% if name|lower != thing|lower %}
+        <span class="govuk-visually-hidden">{{ thing }}: </span> {# visually hidden label #}
+      {% endif %}
+      {{ value }}
     </span>
     <span class="copy-to-clipboard__notice" aria-live="assertive"></span>
   </div>

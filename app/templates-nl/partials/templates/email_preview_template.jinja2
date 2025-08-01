@@ -6,7 +6,7 @@
   {% if from_name %}
     {% do email_meta.append({
       "key": {
-        "html": "From"
+        "html": "Van"
       },
       "value": {
         "html": from_name
@@ -17,7 +17,7 @@
   {% if reply_to %}
     {% do email_meta.append({
       "key": {
-        "html": "Reply&nbsp;to" | safe
+        "html": "Beantwoorden&nbsp;aan" | safe
       },
       "value": {
         "classes": "email-message-meta__reply-to",
@@ -29,7 +29,7 @@
 
 {% do email_meta.append({
     "key": {
-      "html": "To"
+      "html": "Aan"
     },
     "value": {
       "classes": "email-message-meta__send-to",
@@ -39,7 +39,7 @@
 
 {% do email_meta.append({
     "key": {
-      "html": "Subject"
+      "html": "Onderwerp"
     },
     "value": {
       "html": subject

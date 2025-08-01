@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Error
+  Foutmelding
 {% endblock %}
 
 {% block backLink %}
@@ -20,82 +20,82 @@
       {% if recipients.too_many_rows %}
 
         <h1 class='banner-title'>
-          Your file has too many rows
+          Uw bestand bevat te veel rijen
         </h1>
         <p class="govuk-body">
-          Notify can process up to
-          {{ recipients.max_rows|format_thousands }} rows at once. Your
-          file has {{ recipients|length|format_thousands }} rows.
+          Notify kan maximaal
+          {{ recipients.max_rows|format_thousands }} rijen tegelijk verwerken. Uw bestand
+          bevat {{ recipients|length|format_thousands }} rijen.
         </p>
 
       {% elif not count_of_recipients %}
 
         <h1 class='banner-title'>
-          Your file is missing some rows
+          Uw bestand mist enkele rijen
         </h1>
         {% if recipients.missing_column_headers %}
           <p class="govuk-body">
-            It needs at least one row of data, and {{ recipients.missing_column_headers | sort() | formatted_list(
-              prefix='a column called',
-              prefix_plural='columns called'
+            Er is minimaal één rij met gegevens nodig, en {{ recipients.missing_column_headers | sort() | formatted_list(
+              prefix='een kolom met de naam',
+              prefix_plural='kolommen met de namen'
             ) }}.
           </p>
         {% else %}
           <p class="govuk-body">
-            It needs at least one row of data.
+            Er is minimaal één rij met gegevens nodig.
           </p>
         {% endif %}
 
       {% elif not recipients.has_recipient_columns %}
 
         <h1 class='banner-title'>
-          There’s a problem with your column names
+          Er is een probleem met uw kolomnamen
         </h1>
         {% if template.template_type == 'letter' %}
           <p class="govuk-body">
-            Your file needs at least 3 address columns, for example ‘address line 1’,
-            ‘address line 2’ and ‘address line 3’.
+            Uw bestand moet ten minste 3 adreskolommen bevatten, bijvoorbeeld ‘adresregel 1’,
+            ‘adresregel 2’ en ‘adresregel 3’.
           </p>
         {% else %}
           <p class="govuk-body">
-            Your file needs a column called ‘{{ first_recipient_column }}’.
+            Uw bestand moet een kolom bevatten met de naam ‘{{ first_recipient_column }}’.
           </p>
         {% endif %}
           <p class="govuk-body">
-            Right now it has {{ recipients.column_headers | formatted_list(
-              prefix='one column, called ',
-              prefix_plural='columns called '
+            Op dit moment bevat het bestand {{ recipients.column_headers | formatted_list(
+              prefix='een kolom met de naam ',
+              prefix_plural='kolommen met de namen '
             ) }}.
           </p>
 
       {% elif recipients.duplicate_recipient_column_headers %}
 
         <h1 class='banner-title'>
-          There’s a problem with your column names
+          Er is een probleem met uw kolomnamen
         </h1>
            <p class="govuk-body">
-            We found more than one column called {{ (
+            We hebben meer dan één kolom gevonden met de naam {{ (
             recipients.duplicate_recipient_column_headers
             ) | formatted_list(
-              conjunction='or',
+              conjunction='of',
               prefix='',
               prefix_plural=''
             ) }}.
           </p>
         <p class="govuk-body">
-          Delete or rename one of these columns and try again.
+          Verwijder of hernoem een van deze kolommen en probeer het opnieuw.
         </p>
 
       {% elif recipients.missing_column_headers %}
 
         <h1 class='banner-title'>
-          Your column names need to match the double brackets in your template
+          Uw kolomnamen moeten overeenkomen met de dubbele accolades in uw sjabloon
         </h1>
           <p class="govuk-body">
-            Your file is missing {{ recipients.missing_column_headers | formatted_list(
-              conjunction='and',
-              prefix='a column called ',
-              prefix_plural='columns called '
+            Uw bestand mist {{ recipients.missing_column_headers | formatted_list(
+              conjunction='en',
+              prefix='een kolom met de naam ',
+              prefix_plural='kolommen met de namen '
             ) }}.
           </p>
 
@@ -143,11 +143,11 @@
           form.file,
           allowed_file_extensions=allowed_file_extensions,
           action=url_for('main.send_messages', service_id=current_service.id, template_id=template.id),
-          button_text='Upload your file again'
+          button_text='Upload uw bestand opnieuw'
         ) }}
       {% endif %}
     </div>
-    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link" data-module="govuk-skip-link">Back to top</a>
+    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link" data-module="govuk-skip-link">Terug naar boven</a>
   </div>
 
   {% if not request.args.from_test %}
@@ -162,7 +162,7 @@
         caption=original_file_name,
         caption_visible=False,
         field_headings=[
-          '<span class="govuk-visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
+          '<span class="govuk-visually-hidden">Rij in bestand</span><span aria-hidden="true">1</span>'|safe
         ] + column_headers
       ) %}
         {% call row_heading() %}
@@ -204,23 +204,23 @@
 
   {% if recipients.too_many_rows %}
     <p class="table-show-more-link">
-        Only showing the first {{ count_of_displayed_recipients }} rows
+        Er worden alleen de eerste {{ count_of_displayed_recipients }} rijen getoond
     </p>
   {% elif count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
       {% if row_errors and not recipients.missing_column_headers %}
-        Only showing the first {{ count_of_displayed_recipients }} rows with errors
+        Er worden alleen de eerste {{ count_of_displayed_recipients }} rijen met fouten getoond
       {% else %}
-        Only showing the first {{ count_of_displayed_recipients }} rows
+        Er worden alleen de eerste {{ count_of_displayed_recipients }} rijen getoond
       {% endif %}
     </p>
   {% elif row_errors and not recipients.missing_column_headers %}
     <p class="table-show-more-link">
-      Only showing rows with errors
+      Er worden alleen rijen met fouten getoond
     </p>
   {% endif %}
 
-  <h2 class="heading-medium">Preview of {{ template.name }}</h2>
+  <h2 class="heading-medium">Voorbeeld van {{ template.name }}</h2>
   {{ template|string }}
 
 {% endblock %}

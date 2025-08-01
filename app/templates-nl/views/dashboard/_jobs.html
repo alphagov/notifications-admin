@@ -4,13 +4,13 @@
 <div class='dashboard-table ajax-block-container'>
   {% call(item, row_number) list_table(
     jobs,
-    caption="Recent files uploaded",
+    caption="Recent geüploade bestanden",
     caption_visible=False,
     empty_message=(
-      'Upload a letter and Notify will print, pack and post it for you.' if current_service.has_permission('letter') else 'You have not uploaded any files yet.'
+      'Upload een brief en Notify print, verpakt en verstuurt deze voor u.' if current_service.has_permission('letter') else 'U heeft nog geen bestanden geüpload.'
     ),
     field_headings=[
-      'File',
+      'Bestand',
       'Status'
     ],
     field_headings_visible=False,
@@ -29,23 +29,23 @@
         {% endif %}
         {% if item.scheduled %}
           <span class="file-list-hint-large">
-            Sending {{
+            Verzending gepland voor {{
               item.scheduled_for|format_datetime_relative
             }}
           </span>
         {% elif item.upload_type == 'contact_list' %}
           <span class="file-list-hint-large">
             {% if item.recent_job_count %}
-              Used {{ item.recent_job_count|iteration_count }}
-              in the last
+              Gebruikt {{ item.recent_job_count|iteration_count }}
+              in de afgelopen
               {{ current_service.get_days_of_retention(item.template_type) }}
-              days
+              dagen
             {% elif item.has_jobs %}
-              Not used in the last
+              Niet gebruikt in de afgelopen
               {{ current_service.get_days_of_retention(item.template_type) }}
-              days
+              dagen
             {% else %}
-              Not used yet
+              Nog niet gebruikt
             {% endif %}
           </span>
         {% elif item.upload_type == 'letter_day' %}
@@ -54,7 +54,7 @@
           </span>
         {% else %}
           <span class="file-list-hint-large">
-            Sent {{
+            Verzonden {{
               (item.scheduled_for or item.created_at)|format_datetime_relative
             }}
           </span>
@@ -69,7 +69,7 @@
           smallest=True,
           label=item.notification_count|message_count_label(
             item.template_type,
-            suffix='waiting to send'
+            suffix='in wachtrij om te versturen'
           )
         ) }}
       {% elif item.template_type == 'letter' %}
@@ -85,7 +85,7 @@
         {{ big_number(
           item.row_count,
           smallest=True,
-          label="saved {}".format(item.row_count|recipient_count_label(item.template_type))
+          label="opgeslagen {}".format(item.row_count|recipient_count_label(item.template_type))
         ) }}
       {% elif item.pdf_letter %}
         <p class="govuk-body letter-recipient-summary">
@@ -101,15 +101,16 @@
             {{ big_number(
               item.notifications_sending,
               smallest=True,
-              label='sending',
+              label='bezig met versturen',
             ) }}
           </div>
           <div class="govuk-grid-column-one-third">
-        {{ big_number(item.notifications_delivered, smallest=True, label='delivered') }}
-      </div>
-      <div class="govuk-grid-column-one-third">
-        {{ big_number(item.notifications_failed, smallest=True, label='failed') }}
-      </div></div>
+            {{ big_number(item.notifications_delivered, smallest=True, label='verzonden') }}
+          </div>
+          <div class="govuk-grid-column-one-third">
+            {{ big_number(item.notifications_failed, smallest=True, label='mislukt') }}
+          </div>
+        </div>
 
       {% endif %}
     {% endcall %}

@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Callbacks for delivery receipts
+  Callbacks voor bezorgbevestigingen
 {% endblock %}
 
 
@@ -17,28 +17,28 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
 
-      {{ page_header('Callbacks for returned letters') }}
+      {{ page_header('Callbacks voor retouren van brieven') }}
 
       <p class="govuk-body">
-        When a letter you sent is returned, Notify will send details of the returned letter to your callback url.
+        Wanneer een door u verstuurde brief wordt geretourneerd, stuurt Notify details van de retour ontvangen brief naar uw callback-url.
       </p>
       <p class="govuk-body">
-        Read the callbacks section of our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API documentation</a> for more information
+        Lees de sectie over callbacks in onze <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API-documentatie</a> voor meer informatie.
       </p>
 
       {% call form_wrapper() %}
         {{ form.url(param_extensions={
           "classes": "govuk-!-width-full",
-          "hint": {"text": "Must start with https://"}
+          "hint": {"text": "Moet beginnen met https://"}
         }) }}
 
         {{ form.bearer_token(param_extensions={
           "classes": "govuk-!-width-full",
-          "hint": {"text": "At least 10 characters"},
+          "hint": {"text": "Minimaal 10 tekens"},
           "autocomplete": "new-password"
         }) }}
 
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
       {% endcall %}
     </div>
   </div>

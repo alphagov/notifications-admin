@@ -5,7 +5,7 @@
     <div id="total-email" class="govuk-grid-column-one-third">
       {{ big_number_with_status(
         statistics['email']['requested'],
-        statistics['email']['requested']|message_count_label('email', suffix='sent'),
+        statistics['email']['requested']|message_count_label('e-mail', suffix='verstuurd'),
         statistics['email']['failed'],
         statistics['email']['failed_percentage'],
         statistics['email']['show_warning'],
@@ -17,7 +17,7 @@
     <div id="total-sms" class="govuk-grid-column-one-third">
       {{ big_number_with_status(
         statistics['sms']['requested'],
-        statistics['sms']['requested']|message_count_label('sms', suffix='sent'),
+        statistics['sms']['requested']|message_count_label('sms', suffix='verstuurd'),
         statistics['sms']['failed'],
         statistics['sms']['failed_percentage'],
         statistics['sms']['show_warning'],
@@ -29,7 +29,7 @@
     <div id="total-letters" class="govuk-grid-column-one-third">
       {{ big_number_with_status(
         statistics['letter']['requested'],
-        statistics['letter']['requested']|message_count_label('letter', suffix='sent'),
+        statistics['letter']['requested']|message_count_label('brief', suffix='verstuurd'),
         statistics['letter']['failed'],
         statistics['letter']['failed_percentage'],
         statistics['letter']['show_warning'],

@@ -39,7 +39,7 @@
 {% endblock %}
 
 {% block pageTitle %}
-{% block errorPrefix %}{% if form and form.errors %}Error: {% endif %}{% endblock %}
+{% block errorPrefix %}{% if form and form.errors %}Fout: {% endif %}{% endblock %}
 {% block per_page_title %}{% endblock %} – GOV.UK Notify
 {% endblock %}
 
@@ -66,11 +66,11 @@
 },
 {
 "href": url_for("main.accessibility_statement"),
-"text": "Accessibility statement"
+"text": "Toegankelijkheidsverklaring"
 },
 {
 "href": url_for("main.terms_of_use"),
-"text": "Terms of use"
+"text": "Gebruiksvoorwaarden"
 },
 {
 "href": url_for("main.cookies"),
@@ -78,28 +78,29 @@
 }
 ] %}
 
-{% set meta_suffix = 'Built by the <a href="https://www.gov.uk/government/organisations/government-digital-service"
-  class="govuk-footer__link">Government Digital Service</a>' %}
+{% set meta_suffix = 'Ontwikkeld door de <a
+  href="https://www.gov.uk/government/organisations/government-digital-service" class="govuk-footer__link">Government
+  Digital Service</a>' %}
 
 {{ govukFooter({
 "classes": "js-footer",
 "navigation": [
 {
-"title": "About Notify",
+"title": "Over Notify",
 "columns": 1,
 "width": "one-half",
 "items": [
 {
 "href": url_for("main.guidance_features"),
-"text": "Features"
+"text": "Functionaliteiten"
 },
 {
 "href": url_for("main.guidance_pricing"),
-"text": "Pricing"
+"text": "Kosten"
 },
 {
 "href": url_for("main.guidance_using_notify"),
-"text": "Using Notify"
+"text": "Gebruik van Notify"
 },
 {
 "href": "https://gds.blog.gov.uk/category/gov-uk-notify/",
@@ -108,25 +109,25 @@
 ]
 },
 {
-"title": "Support",
+"title": "Ondersteuning",
 "columns": 1,
 "width": "one-half",
 "items": [
 {
 "href": url_for('main.support'),
-"text": "Contact support"
+"text": "Neem contact op met ondersteuning"
 },
 {
 "href": "https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC",
-"text": "Chat to us on Slack"
+"text": "Chat met ons op Slack"
 },
 {
 "href": "https://status.notifications.service.gov.uk",
-"text": "System status"
+"text": "Systeemstatus"
 },
 {
 "href": url_for("main.guidance_api_documentation"),
-"text": "API documentation"
+"text": "API-documentatie"
 }
 ]
 },

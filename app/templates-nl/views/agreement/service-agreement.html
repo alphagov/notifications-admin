@@ -4,7 +4,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Accept our data processing and financial agreement
+  Accepteer onze verwerkers- en financiële overeenkomst
 {% endblock %}
 
 {% block backLink %}
@@ -16,26 +16,26 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-five-sixths">
 
-    {{ page_header('Accept our data processing and financial agreement')}}
+    {{ page_header('Accepteer onze verwerkers- en financiële overeenkomst') }}
 
     <p class="govuk-body">
-      Before you can use GOV.UK Notify, you need to accept our data processing and financial agreement.
+      Voordat u GOV.UK Notify kunt gebruiken, moet u onze verwerkers- en financiële overeenkomst accepteren.
     </p>
     <p class="govuk-body">
-      This must be done by, or on behalf of, someone with the authority to sign contracts for {{ current_service.organisation.name }}.
+      Dit moet worden gedaan door, of namens, iemand met de bevoegdheid om contracten te ondertekenen voor {{ current_service.organisation.name }}.
     </p>
     <p class="govuk-body">
-      Once accepted, the agreement covers all Notify services from {{ current_service.organisation.name }}.
+      Na acceptatie geldt de overeenkomst voor alle Notify-diensten van {{ current_service.organisation.name }}.
     </p>
     <p class="govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download a copy of the data processing and financial agreement (PDF)</a>.
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">Download een kopie van de verwerkers- en financiële overeenkomst (PDF)</a>.
     </p>
     <p class="govuk-body">
-      The agreement is confidential and should not be shared outside your organisation.
+      De overeenkomst is vertrouwelijk en mag niet buiten uw organisatie worden gedeeld.
     </p>
     {{ govukButton({
       "element": "a",
-      "text": "Continue",
+      "text": "Doorgaan",
       "href": url_for('main.service_accept_agreement', service_id=current_service.id),
     }) }}
 

@@ -1,50 +1,50 @@
-Hi {{ current_user.name }}
+Hallo {{ current_user.name }}
 
-# Contact the team member that made this request to go live
+# Neem contact op met het teamlid dat dit verzoek heeft ingediend om live te gaan
 
-Service name: {{ current_service.name }}
+Servicenaam: {{ current_service.name }}
 
 {% if check_if_unique and unclear_service_name %}
-You told us that:
+U heeft ons verteld dat:
 
-* this service might not be unique
-* the service name is not easy to understand
+* deze service mogelijk niet uniek is
+* de servicenaam niet makkelijk te begrijpen is
 {% elif check_if_unique %}
-You told us that this service might not be unique.
+U heeft ons verteld dat deze service mogelijk niet uniek is.
 {% else %}
-You told us that the service name is not easy to understand.
+U heeft ons verteld dat de servicenaam niet makkelijk te begrijpen is.
 {% endif %}
 
-Before you can accept or reject the request to go live, you need to speak to {{ current_service.go_live_user.name }}.
+Voordat u het verzoek om live te gaan kunt accepteren of afwijzen, moet u contact opnemen met {{ current_service.go_live_user.name }}.
 
-Their email address is {{ current_service.go_live_user.email_address }}
+Hun e-mailadres is {{ current_service.go_live_user.email_address }}
 
 {% if check_if_unique %}
-# Find out if the service is unique
+# Controleer of de service uniek is
 
-{{ current_service.organisation.name }} cannot have more than one live service for the same thing.
+{{ current_service.organisation.name }} mag niet meer dan één actieve service voor hetzelfde doel hebben.
 
-If this service is not unique, you must reject the request to go live.
+Als deze service niet uniek is, moet u het verzoek om live te gaan afwijzen.
 {% endif %}
 
 {% if unclear_service_name %}
-# Update the service name
+# Werk de servicenaam bij
 
 {% if check_if_unique %}
-If the service is unique, you need to ask {{ current_service.go_live_user.name }} to:
+Als de service uniek is, moet u {{ current_service.go_live_user.name }} vragen om:
 {% else %}
-Ask {{ current_service.go_live_user.name }} to:
+Vraag {{ current_service.go_live_user.name }} om:
 {% endif %}
 
-1. Go to the Settings page for their service.
-2. Select ‘Change’ on the ‘Service name’ row.
-3. Follow the guidance for naming their service.
-4. Tell you when they have done this.
+1. Ga naar de pagina ‘Instellingen’ voor hun service.
+2. Selecteer ‘Wijzigen’ bij ‘Servicenaam’.
+3. Volg de richtlijnen voor het benoemen van hun service.
+4. Geef u door wanneer dit is gedaan.
 {% endif %}
 
-^ [Approve or reject the request to go live]( {{ url_for('.org_member_make_service_live_start', service_id=current_service.id, _external=True) }} )
+^ [Goedkeuren of afwijzen van het verzoek om live te gaan]( {{ url_for('.org_member_make_service_live_start', service_id=current_service.id, _external=True) }} )
 
-Thanks
+Bedankt
 
-GOV.UK Notify team
-https://www.gov.uk/notify
+Het NotifyNL team
+https://admin.notifynl.nl

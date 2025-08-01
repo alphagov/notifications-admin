@@ -6,7 +6,7 @@
   {% if job.scheduled %}
 
     <p class="govuk-body">
-      Sending
+      Verzenden van
       <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_template_version', service_id=current_service.id, template_id=job.template.id, version=job.template_version) }}">{{ job.template.name }}</a>
       {{ job.scheduled_for|format_datetime_relative }}
     </p>
@@ -15,7 +15,7 @@
         action=url_for("main.cancel_job", service_id=current_service.id, job_id=job.id)
       ) %}
         {{ page_footer(
-          button_text="Cancel sending",
+          button_text="Verzending annuleren",
           destructive=True
         ) }}
       {% endcall %}
@@ -32,11 +32,11 @@
       {% endif %}
         {% if job.still_processing %}
           <p class="{% if job.template_type != 'letter' %}bottom-gutter{% endif %} hint">
-            Report is {{ "{:.0f}%".format(job.percentage_complete * 0.99) }} complete…
+            Rapport is {{ "{:.0f}%".format(job.percentage_complete * 0.99) }} voltooid…
           </p>
         {% elif notifications %}
           <p class="{% if job.template_type != 'letter' %}bottom-gutter{% endif %}">
-            <a href="{{ download_link }}" id="download-job-report" class="govuk-link govuk-link--no-visited-state heading-small">Download this report (<abbr title="Comma separated values">CSV</abbr>)</a>
+            <a href="{{ download_link }}" id="download-job-report" class="govuk-link govuk-link--no-visited-state heading-small">Download dit rapport (<abbr title="Comma separated values">CSV</abbr>)</a>
             &emsp;
             <span id="time-left">{{ time_left }}</span>
           </p>
@@ -49,9 +49,9 @@
         notifications,
         caption=uploaded_file_name,
         caption_visible=False,
-        empty_message='No messages to show yet…' if job.awaiting_processing_or_recently_processed else job.processing_started | message_finished_processing_notification(service_data_retention_days),
+        empty_message='Nog geen berichten om te tonen…' if job.awaiting_processing_or_recently_processed else job.processing_started | message_finished_processing_notification(service_data_retention_days),
         field_headings=[
-          'Recipient',
+          'Ontvanger',
           'Status'
         ],
         field_headings_visible=False
@@ -67,7 +67,7 @@
 
       {% if more_than_one_page %}
         <p class="table-show-more-link">
-          Only showing the first 50 rows
+          Alleen de eerste 50 rijen worden getoond
         </p>
       {% endif %}
 

@@ -6,12 +6,12 @@
     <div class='template-statistics-table'>
       {% call(item, row_number) list_table(
         template_statistics,
-        caption="By template",
+        caption="Per template",
         caption_visible=True,
         empty_message='',
         field_headings=[
           'Template',
-          'Messages sent'
+          'Verzonden berichten'
         ],
         field_headings_visible=False
       ) %}
@@ -19,10 +19,10 @@
         {% call row_heading() %}
           {% if item.is_precompiled_letter %}
           <span class="template-statistics-table-template-name">
-          Provided as PDF
+          Aangeleverd als pdf
           </span>
           <span class="template-statistics-table-hint">
-            Letter
+            Brief
           </span>
           {% else %}
           <a class="govuk-link govuk-link--no-visited-state template-statistics-table-template-name" href="{{ url_for('main.view_template', service_id=current_service.id, template_id=item.template_id) }}">{{ item.template_name }}</a>
@@ -36,7 +36,7 @@
       {% endcall %}
       {{ show_more(
         url_for('main.template_usage', service_id=current_service.id),
-        'See templates used by month',
+        'Bekijk templates per maand',
         with_border=False
       ) }}
     </div>

@@ -6,13 +6,13 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Messages sent,
-  {{ selected_year }} to {{ selected_year + 1 }} financial year
+  Verzonden berichten,
+  {{ selected_year }} tot {{ selected_year + 1 }} begrotingsjaar
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('Messages sent') }}
+  {{ page_header('Verzonden berichten') }}
   <div class="bottom-gutter">
     {{ pill(
       items=years,
@@ -24,14 +24,14 @@
     <div class="body-copy-table" id='pill-selected-item'>
       {% call(month, row_index) list_table(
         months,
-        caption="Total spend",
+        caption="Totale uitgaven",
         caption_visible=False,
         empty_message='',
         field_headings=[
-          'Month',
-          'Emails',
-          'Text messages',
-          'letters',
+          'Maand',
+          'E-mails',
+          'Sms-berichten',
+          'Brieven',
         ],
         field_headings_visible=False,
         equal_length=True
@@ -53,7 +53,7 @@
               ) }}
               {% if counts.requested %}
                 <span class="{{ 'failure-highlight' if counts.show_warning else '' }}">
-                  {{ counts.failed|format_thousands }} failed
+                  {{ counts.failed|format_thousands }} mislukt
                 </span>
               {% else %}
                 –
@@ -66,7 +66,7 @@
   {% endif %}
 
   <p class="align-with-heading-copy">
-    Financial year ends 31 March.
+    Het begrotingsjaar eindigt op 31 maart.
   </p>
 
 {% endblock %}

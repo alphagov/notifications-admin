@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Confirm that you accept the agreement
+  Bevestig dat u akkoord gaat met de overeenkomst
 {% endblock %}
 
 
@@ -18,21 +18,21 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-five-sixths">
 
-    {{ page_header('Confirm that you accept the agreement') }}
+    {{ page_header('Bevestig dat u akkoord gaat met de overeenkomst') }}
 
     {% call form_wrapper(class='top-gutter') %}
 
       {% if current_service.organisation.agreement_signed_on_behalf_of_name and current_service.organisation.agreement_signed_on_behalf_of_email_address %}
         <p class="govuk-body">
-          I confirm that I have the legal authority to accept the GOV.UK Notify data processing and financial agreement (version {{ current_service.organisation.agreement_signed_version }}) on behalf of {{ current_service.organisation.agreement_signed_on_behalf_of_name }} ({{ current_service.organisation.agreement_signed_on_behalf_of_email_address }}) and that {{ current_service.organisation.name }} will be bound by it.
+          Ik bevestig dat ik de wettelijke bevoegdheid heb om namens {{ current_service.organisation.agreement_signed_on_behalf_of_name }} ({{ current_service.organisation.agreement_signed_on_behalf_of_email_address }}) de GOV.UK Notify verwerkersovereenkomst en financiële overeenkomst (versie {{ current_service.organisation.agreement_signed_version }}) te accepteren en dat {{ current_service.organisation.name }} hieraan gebonden zal zijn.
         </p>
       {% else %}
         <p class="govuk-body">
-          I confirm that I have the legal authority to accept the GOV.UK Notify data processing and financial agreement (version {{ current_service.organisation.agreement_signed_version }}) and that {{ current_service.organisation.name }} will be bound by it.
+          Ik bevestig dat ik de wettelijke bevoegdheid heb om de GOV.UK Notify verwerkersovereenkomst en financiële overeenkomst (versie {{ current_service.organisation.agreement_signed_version }}) te accepteren en dat {{ current_service.organisation.name }} hieraan gebonden zal zijn.
         </p>
       {% endif %}
 
-      {{ page_footer('Accept this agreement') }}
+      {{ page_footer('Accepteer deze overeenkomst') }}
 
     {% endcall %}
 

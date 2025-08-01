@@ -2,13 +2,13 @@ Service: {{ current_service.name }}
 {{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
 
 ---
-The user - {{current_user.email_address}} asked for a sender ID that is potentially used for phishing - {{ senderID }}. It has been blocked.
+De gebruiker - {{current_user.email_address}} vroeg om een afzender-ID die mogelijk wordt gebruikt voor phishing - {{ senderID }}. Deze is geblokkeerd.
 
-Check whether this is just testing, if not raise a security incident:
+Controleer of dit alleen een test is; zo niet, meld dan een beveiligingsincident:
 
-Security Incident runbook: https://github.com/alphagov/notifications-manuals/wiki/What-to-do-during-an-incident#security-incidents-and-data-breaches'
+Handleiding voor beveiligingsincidenten: https://github.com/alphagov/notifications-manuals/wiki/What-to-do-during-an-incident#security-incidents-and-data-breaches
 
-To determine the extent of the problem:
- - look at sender ids both current and archived : https://github.com/alphagov/notifications-manuals/wiki/Support-Runbook#look-at-senderid-history
- - look at emails: {{url_for("main.view_notifications", service_id=current_service.id, message_type='email', status='delivered', _external=True)}}
- - look at text messages: {{url_for("main.view_notifications", service_id=current_service.id, message_type='sms', status='delivered', _external=True)}}
+Om de omvang van het probleem te bepalen:
+ - bekijk afzender-ID’s, zowel huidige als gearchiveerde: https://github.com/alphagov/notifications-manuals/wiki/Support-Runbook#look-at-senderid-history
+ - bekijk e-mails: {{url_for("main.view_notifications", service_id=current_service.id, message_type='email', status='delivered', _external=True)}}
+ - bekijk sms-berichten: {{url_for("main.view_notifications", service_id=current_service.id, message_type='sms', status='delivered', _external=True)}}

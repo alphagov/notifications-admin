@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  API keys
+  API-sleutels
 {% endblock %}
 
 {% block backLink %}
@@ -14,17 +14,17 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('API keys') }}
+  {{ page_header('API-sleutels') }}
 
   <div class="body-copy-table">
     {% call(item, row_number) list_table(
       current_service.api_keys,
-      empty_message="You have not created any API keys yet",
-      caption="API keys",
+      empty_message="U heeft nog geen API-sleutels aangemaakt",
+      caption="API-sleutels",
       caption_visible=false,
       field_headings=[
-        'API keys',
-        'Action'
+        'API-sleutels',
+        'Actie'
       ],
       field_headings_visible=False
     ) %}
@@ -33,23 +33,23 @@
           {{ item.name }}
           <div class="hint">
             {% if item.key_type == 'normal' %}
-              Live – sends to anyone
+              Live – verzendt naar iedereen
             {% elif item.key_type == 'team' %}
-              Team and guest list – limits who you can send to
+              Team en gastenlijst – beperkt wie u kunt benaderen
             {% elif item.key_type == 'test' %}
-              Test – pretends to send messages
+              Test – simuleert het verzenden van berichten
             {% endif %}
           </div>
         </div>
       {% endcall %}
       {% if item.expiry_date %}
         {% call field(align='right') %}
-          <span class='hint'>Revoked {{ item.expiry_date|format_datetime_short }}</span>
+          <span class='hint'>Ingetrokken op {{ item.expiry_date|format_datetime_short }}</span>
         {% endcall %}
       {% else %}
         {% call field(align='right', status='error') %}
           <a class="govuk-link govuk-link--destructive" href='{{ url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>
-            Revoke<span class="govuk-visually-hidden"> {{ item.name }}</span>
+            Intrekken<span class="govuk-visually-hidden"> {{ item.name }}</span>
           </a>
         {% endcall %}
       {% endif %}
@@ -59,7 +59,7 @@
   <div class="js-stick-at-bottom-when-scrolling">
     {{ govukButton({
       "element": "a",
-      "text": "Create an API key",
+      "text": "Maak een API-sleutel aan",
       "href": url_for('main.create_api_key', service_id=current_service.id),
       "classes": "govuk-button--secondary"
     }) }}

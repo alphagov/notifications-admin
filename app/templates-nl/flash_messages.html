@@ -1,21 +1,21 @@
-{% from "components/banner.html" import banner %}
+{% set category_translations = {
+  'cancel': 'annuleren',
+  'delete': 'verwijderen',
+  'suspend': 'onderbreken',
+  'resume': 'hervatten',
+  'remove': 'verwijderen',
+  'remove default letter branding': 'standaard huisstijl voor brieven verwijderen',
+  'revoke this API key': 'deze API-sleutel intrekken',
+  'make this email branding the default': 'deze e-mailhuisstijl als standaard instellen',
+  'make this letter branding the default': 'deze brievenhuisstijl als standaard instellen',
+  'try again': 'Opnieuw proberen'
+} %}
+
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
-      {% if category in [
-        'cancel',
-        'delete',
-        'suspend',
-        'resume',
-        'remove',
-        'remove default letter branding',
-        'revoke this API key',
-        'make this email branding the default',
-        'make this letter branding the default',
-      ] %}
-        {% set delete_button_text = "Yes, {}".format(category) %}
-      {% elif category == 'try again' %}
-        {% set delete_button_text = category|capitalize %}
+      {% if category in category_translations %}
+        {% set delete_button_text = "Ja, {}".format(category_translations[category]) %}
       {% else %}
         {% set delete_button_text = None %}
       {% endif %}

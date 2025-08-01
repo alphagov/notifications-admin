@@ -1,16 +1,16 @@
 {% if platform_admin %}
-      <h2 class="banner-title">Are you sure you want to delete ‘{{service_name}}’?</h2>
+      <h2 class="banner-title">Weet u zeker dat u ‘{{service_name}}’ wilt verwijderen?</h2>
       <br>
-      <p class="govuk-body">Before you delete this service: </p>
+      <p class="govuk-body">Voordat u deze dienst verwijdert: </p>
            <ul class="govuk-list govuk-list--bullet">
-             <li>confirm the exact name of the service the user wants to delete</li>
-             <li>check the user has the ‘Manage settings, team and usage’ permission for this service</li>
-             <li>confirm the request with another team member who has the ‘Manage settings, team and usage’ permission</li>
-             <li>check if we need to raise an invoice</li>
+             <li>controleer de exacte naam van de dienst die de gebruiker wil verwijderen</li>
+             <li>controleer of de gebruiker de machtiging ‘Instellingen, team en gebruik beheren’ heeft voor deze dienst</li>
+             <li>bevestig het verzoek met een ander teamlid met dezelfde machtiging</li>
+             <li>controleer of we een factuur moeten opstellen</li>
            </ul>
-       <p class="govuk-body">If the service can receive text messages, tell the user that the phone number for this service will stop working.</p>
+       <p class="govuk-body">Als de dienst sms-berichten kan ontvangen, informeer de gebruiker dat het telefoonnummer voor deze dienst niet meer zal werken.</p>
 {% else %}
       <h2 class="govuk-body govuk-!-font-weight-bold">
-          Are you sure you want to delete ‘{{current_service.name}}’? There’s no way to undo this.
+          Weet u zeker dat u ‘{{current_service.name}}’ wilt verwijderen? Dit kan niet ongedaan worden gemaakt.
       </h2>
 {% endif %}

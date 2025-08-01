@@ -11,13 +11,13 @@
     <div class="navigation-service">
       <div class="navigation-service__container">
         {% if current_user.platform_admin %}
-          <a href="{{ url_for('main.organisations') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-organisation-link">Organisations</a>
+          <a href="{{ url_for('main.organisations') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-organisation-link">Organisaties</a>
         {% endif %}
         <div class="navigation-service-name govuk-!-font-weight-bold">
           {{ current_org.name }}
         </div>
       </div>
-      <a href="{{ url_for('main.your_services') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-service-switch">Your services</a>
+      <a href="{{ url_for('main.your_services') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-service-switch">Uw diensten</a>
     </div>
     <div class="govuk-grid-row govuk-!-padding-bottom-12">
       <div class="govuk-grid-column-one-quarter">

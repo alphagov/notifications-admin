@@ -1,14 +1,14 @@
 {% from "components/banner.html" import banner_wrapper %}
 
 {% call banner_wrapper(type='tour') %}
-    <p class="heading-medium">Try sending yourself this example</p>
+    <p class="heading-medium">Probeer dit voorbeeld naar jezelf te sturen</p>
     <div class="govuk-grid-row bottom-gutter {% if help != '1' %}greyed-out-step{% endif %}">
       <div class="govuk-grid-column-one-sixth">
         <p class="heading-large" style="float: left;">1.</p>
       </div>
       <div class="govuk-grid-column-five-sixths">
         <p class="govuk-body">
-          Every message is sent from a template
+          Elk bericht wordt verstuurd vanuit een sjabloon
         </p>
       </div>
     </div>
@@ -18,7 +18,7 @@
       </div>
       <div class="govuk-grid-column-five-sixths">
         <p class="govuk-body">
-          The template pulls in the data you provide
+          Het sjabloon haalt de gegevens op die u levert
         </p>
       </div>
     </div>
@@ -28,11 +28,11 @@
       </div>
       <div class="govuk-grid-column-five-sixths">
         <p class="govuk-body">
-          Notify delivers the message
+          Notify levert het bericht
         </p>
         {% if help == '3' %}
           <a class="govuk-link govuk-link--inverse" href='{{ url_for(".go_to_dashboard_after_tour", service_id=current_service.id, example_template_id=template.id) }}'>
-            Now go to your dashboard
+            Ga nu naar uw dashboard
           </a>
         {% endif %}
       </div>

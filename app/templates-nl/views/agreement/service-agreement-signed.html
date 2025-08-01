@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Your organisation has already accepted the agreement
+  Uw organisatie heeft de overeenkomst al geaccepteerd
 {% endblock %}
 
 {% block backLink %}
@@ -15,16 +15,16 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-five-sixths">
 
-    {{ page_header('Your organisation has already accepted the agreement')}}
+    {{ page_header('Uw organisatie heeft de overeenkomst al geaccepteerd')}}
 
     <p class="govuk-body">
-      {{ current_service.organisation.name }} has already accepted the GOV.UK
-      Notify data processing and financial agreement.
+      {{ current_service.organisation.name }} heeft de GOV.UK
+      Notify verwerkersovereenkomst en financiële overeenkomst al geaccepteerd.
     </p>
-    <p class="govuk-body">For more information, you can <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">download a copy of the agreement (PDF)</a>.
+    <p class="govuk-body">Voor meer informatie kunt u <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">een kopie van de overeenkomst downloaden (PDF)</a>.
     </p>
     <p class="govuk-body">
-      The agreement is confidential and should not be shared outside your organisation.
+      De overeenkomst is vertrouwelijk en mag niet buiten uw organisatie worden gedeeld.
     </p>
 
   </div>

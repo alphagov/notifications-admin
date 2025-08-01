@@ -5,12 +5,12 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Templates used
+  Gebruikte sjablonen
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header("Templates used") }}
+  {{ page_header("Gebruikte sjablonen") }}
 
   <div class="bottom-gutter-3-2">
     {{ pill(
@@ -25,7 +25,7 @@
       <h2>{{ month.name }}</h2>
       {% if not month.templates_used %}
         <p class="table-no-data">
-          No messages sent
+          Geen berichten verzonden
         </p>
       {% else %}
         <div class='template-statistics-table'>
@@ -35,15 +35,15 @@
             caption_visible=False,
             empty_message='',
             field_headings=[
-              'Template',
-              'Messages sent'
+              'Sjabloon',
+              'Verzonden berichten'
             ],
             field_headings_visible=False
           ) %}
             {% call row_heading() %}
               <a class="govuk-link govuk-link--no-visited-state template-statistics-table-template-name" href="{{ url_for('main.view_template', service_id=current_service.id, template_id=item.id) }}">{{ item.name }}</a>
               <span class="template-statistics-table-hint">
-                {{ 1|message_count_label(item.type, suffix='template')|capitalize }}
+                {{ 1|message_count_label(item.type, suffix='sjabloon')|capitalize }}
               </span>
             {% endcall %}
             {{ spark_bar_field(item.requested_count, most_used_template_count) }}

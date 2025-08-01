@@ -4,7 +4,7 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Text message conversation with {{ user_number }}
+  Sms-gesprek met {{ user_number }}
 {% endblock %}
 
 {% block backLink %}
@@ -17,7 +17,7 @@
 
     <div class="bottom-gutter js-stick-at-top-when-scrolling">
       <h1 class="heading-large govuk-!-margin-top-0">
-        <span class="govuk-visually-hidden">Text message conversation with</span>
+        <span class="govuk-visually-hidden">Sms-gesprek met</span>
         {{ user_number }}
       </h1>
     </div>
@@ -30,7 +30,7 @@
 
     {% if current_user.has_permissions('send_messages') %}
       <p class="sms-message-reply-link">
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id) }}">Send a text message to this phone number</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id) }}">Stuur een sms naar dit telefoonnummer</a>
       </p>
     {% endif %}
 

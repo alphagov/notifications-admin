@@ -15,30 +15,30 @@
   {{ page_header('Callbacks') }}
   <div class="bottom-gutter-3-2 dashboard-table body-copy-table">
     {% call mapping_table(
-      caption='General',
-      field_headings=['Label', 'Value', 'Action'],
+      caption='Algemeen',
+      field_headings=['Label', 'Waarde', 'Actie'],
       field_headings_visible=False,
       caption_visible=False
     ) %}
       {% call row() %}
-        {{ text_field('Delivery receipts') }}
+        {{ text_field('Bezorgbevestigingen') }}
         {{ optional_text_field(current_service.delivery_status_callback_details.url, truncate=true) }}
-        {{ edit_field('Change', url_for('main.delivery_status_callback', service_id=current_service.id)) }}
+        {{ edit_field('Wijzigen', url_for('main.delivery_status_callback', service_id=current_service.id)) }}
       {% endcall %}
 
       {% if current_service.has_permission("inbound_sms") %}
         {% call row() %}
-          {{ text_field('Received text messages') }}
+          {{ text_field('Ontvangen sms-berichten') }}
           {{ optional_text_field(current_service.inbound_sms_callback_details.url, truncate=true) }}
-          {{ edit_field('Change', url_for('main.received_text_messages_callback', service_id=current_service.id)) }}
+          {{ edit_field('Wijzigen', url_for('main.received_text_messages_callback', service_id=current_service.id)) }}
         {% endcall %}
       {% endif %}
 
       {% if current_service.has_permission("letter") %}
         {% call row() %}
-          {{ text_field('Returned letters') }}
+          {{ text_field('Geretourneerde brieven') }}
           {{ optional_text_field(current_service.returned_letters_callback_details.url, truncate=true) }}
-          {{ edit_field('Change', url_for('main.returned_letters_callback', service_id=current_service.id)) }}
+          {{ edit_field('Wijzigen', url_for('main.returned_letters_callback', service_id=current_service.id)) }}
         {% endcall %}
       {% endif %}
 

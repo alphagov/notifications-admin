@@ -8,15 +8,15 @@
   {% endif %}
     {% call(item, row_number) list_table(
       notifications,
-      caption="Recent activity",
+      caption="Recente activiteit",
       caption_visible=False,
-      empty_message='No messages found &thinsp;(messages are kept for {} days)'.format(limit_days)|safe,
-      field_headings=['Recipient', 'Status'],
+      empty_message='Geen berichten gevonden &thinsp;(berichten worden {} dagen bewaard)'.format(limit_days)|safe,
+      field_headings=['Ontvanger', 'Status'],
       field_headings_visible=False
     ) %}
       {% call row_heading() %}
         {% if item.status in ('pending-virus-check', 'virus-scan-failed') %}
-          <span class="file-list-filename loading-indicator">Checking</span>
+          <span class="file-list-filename loading-indicator">Controleren</span>
         {% else %}
           <a class="govuk-link govuk-link--no-visited-state file-list-filename" href="{{ single_notification_url(notification_id=item.id) }}">{{ item.to.splitlines()|join(', ') if item.to else '' }}</a>
         {% endif %}
@@ -36,7 +36,7 @@
     {{ previous_next_navigation(prev_page, next_page) }}
   {% elif next_page %}
     <p class="table-show-more-link">
-      Only showing the first 50 messages
+      Alleen de eerste 50 berichten worden getoond
     </p>
   {% endif %}
 

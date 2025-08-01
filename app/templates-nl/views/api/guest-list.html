@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Guest list
+  Gastenlijst
 {% endblock %}
 
 {% block backLink %}
@@ -15,14 +15,14 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Guest list') }}
+  {{ page_header('Gastenlijst') }}
 
   <p class="govuk-body">
-    You can use a team and guest list key to send real messages to your team and up to 5 other email addresses or phone numbers.
+    U kunt een team- en gastenlijst-sleutel gebruiken om echte berichten te versturen naar uw team en maximaal 5 andere e-mailadressen of telefoonnummers.
   </p>
 
   <p class="govuk-body">
-    You do not need to add yourself or your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a> to the guest list.
+    U hoeft uzelf of uw <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">teamleden</a> niet toe te voegen aan de gastenlijst.
   </p>
 
   {% call form_wrapper() %}
@@ -32,20 +32,20 @@
 
         {{ list_entry(
           form.email_addresses,
-          item_name='email address',
+          item_name='e-mailadres',
           autocomplete=False
         ) }}
 
         {{ list_entry(
           form.phone_numbers,
-          item_name='phone number',
+          item_name='telefoonnummer',
           autocomplete=False
         ) }}
 
       </div>
     </div>
 
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
 
   {% endcall %}
 

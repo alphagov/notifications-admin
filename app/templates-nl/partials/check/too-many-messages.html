@@ -1,23 +1,23 @@
 <h1 class='banner-title'>
   {% if original_file_name %}
-    Too many recipients
+    Te veel ontvangers
   {% else %}
-    Daily limit reached
+    Daglimiet bereikt
   {% endif %}
 </h1>
 <p class="govuk-body">
-  You can only send {{ current_service.get_message_limit(template.template_type) | message_count(template.template_type) }} per day
+  U kunt per dag slechts {{ current_service.get_message_limit(template.template_type) | message_count(template.template_type) }} versturen
   {%- if current_service.trial_mode %}
-    in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode')}}">trial mode</a>
+    in de <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode')}}">proefmodus</a>
   {%- endif -%}
   .
 </p>
 {% if original_file_name %}
   <p class="govuk-body">
     {% if (current_service.get_message_limit(template.template_type)) != remaining_messages %}
-      You can still send {{ remaining_messages|format_thousands }} {{ remaining_messages|message_count_noun(template.template_type) }} today, but
+      U kunt vandaag nog {{ remaining_messages|format_thousands }} {{ remaining_messages|message_count_noun(template.template_type) }} versturen, maar
     {% endif %}
-    ‘{{ original_file_name }}’ contains
+    ‘{{ original_file_name }}’ bevat
     {{ count_of_recipients|recipient_count(template.template_type) }}.
   </p>
 {% endif %}

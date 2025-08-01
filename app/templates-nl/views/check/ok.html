@@ -9,7 +9,7 @@
 {% set file_contents_header_id = 'file-preview' %}
 
 {% block service_page_title %}
-  {{ "Preview of {}".format(template.name) }}
+  {{ "Voorbeeld van {}".format(template.name) }}
 {% endblock %}
 
 
@@ -19,7 +19,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Preview of {}'.format(template.name)) }}
+  {{ page_header('Voorbeeld van {}'.format(template.name)) }}
 
   {% if template.too_many_pages %}
     {% call banner_wrapper(type='dangerous') %}
@@ -28,7 +28,7 @@
   {% endif %}
 
   {{ govukSkipLink({
-    "text": "Skip to file contents",
+    "text": "Sla door naar de inhoud van het bestand",
     "href": "#" + file_contents_header_id
   }) }}
 
@@ -53,13 +53,13 @@
       {% endif %}
       {% if (template.template_type != 'letter' or not request.args.from_test) and not template.too_many_pages %}
         {% set button_text %}
-          Send {{ count_of_recipients|message_count(template.template_type) }}
+          Verstuur {{ count_of_recipients|message_count(template.template_type) }}
         {% endset %}
         {{ govukButton({ "text": button_text }) }}
       {% else %}
         {{ govukButton({
           "element": "a",
-          "text": "Download as a PDF",
+          "text": "Download als PDF",
           "href": url_for('no_cookie.check_messages_preview', service_id=current_service.id, template_id=template.id, upload_id=upload_id, filetype='pdf'),
         }) }}
       {% endif %}
@@ -76,7 +76,7 @@
         caption=original_file_name,
         caption_visible=False,
         field_headings=[
-          '<span class="govuk-visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
+          '<span class="govuk-visually-hidden">Rij in bestand</span><span aria-hidden="true">1</span>'|safe
         ] + recipients.column_headers
       ) %}
         {% call row_heading() %}
@@ -107,7 +107,7 @@
 
   {% if count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
-      Only showing the first {{ count_of_displayed_recipients }} rows
+      Er worden alleen de eerste {{ count_of_displayed_recipients }} rijen getoond
     </p>
   {% endif %}
 

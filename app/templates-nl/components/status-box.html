@@ -2,9 +2,11 @@
   <div class="big-number-with-status">
     <div class="big-number-status{% if failing %}-failing{% endif %}">
       {% if url %}
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url }}">{{ number }} {{ label }}</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url }}">
+          {{ number }} {{ label | translate }}
+        </a>
       {% else %}
-        {{ number }} {{ label }}
+        {{ number }} {{ label | translate }}
       {% endif %}
 
       {% if percentage %}

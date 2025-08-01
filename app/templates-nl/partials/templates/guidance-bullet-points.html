@@ -1,51 +1,50 @@
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
-<h3 class="heading-small" id="bullets">Bullet points</h3>
+<h3 class="heading-small" id="bullets">Opsommingstekens</h3>
 
-<p class="govuk-body">Use bullet points to help words or phrases stand out in your emails and letters.</p>
+<p class="govuk-body">Gebruik opsommingstekens om woorden of zinnen in uw e-mails en brieven te laten opvallen.</p>
 
-<p class="govuk-body">You can either:</p>
+<p class="govuk-body">U kunt het volgende doen:</p>
     <ul class="govuk-list govuk-list--bullet">
-        <li>add the same bullet points to every message you send</li>
-        <li>add personalised bullet points each time you send a message</li>
+        <li>dezelfde opsommingstekens aan elke verzonden boodschap toevoegen</li>
+        <li>persoonlijke opsommingstekens toevoegen bij elke verzending</li>
     </ul>
 
 <!-- TEMPLATED BULLET POINTS -->
-<p class="govuk-body">Copy this example to add bullet points:</p>
+<p class="govuk-body">Kopieer dit voorbeeld om opsommingstekens toe te voegen:</p>
 
-<pre class="formatting-example"><code class="lang-md">Introduce bullet points with a lead-in line ending in a colon:
+<pre class="formatting-example"><code class="lang-md">Introduceer opsommingstekens met een inleidende regel die eindigt op een dubbele punt:
 
-* leave one empty line space after the lead-in line
-* use an asterisk or a dash followed by a space to add an item
-* start each item with a lowercase letter, do not end with a full stop
-* leave one empty line space after the last item
+* laat één lege regel over na de inleidende regel
+* gebruik een sterretje (*) of streepje (-) gevolgd door een spatie om een item toe te voegen
+* begin elk item met een kleine letter, eindig niet met een punt
+* laat één lege regel over na het laatste item
 </code></pre>
 
-<p class="govuk-body">To create sub-items, add an indent of 2 spaces before the asterisk or dash.</p>
+<p class="govuk-body">Om sub-items te maken, voegt u een inspringing van 2 spaties toe vóór het sterretje of streepje.</p>
 
 <!-- PERSONALISED BULLET POINTS -->
 {% set personalisedBullets %}
-    <p class="govuk-body">Copy this example to add a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_personalisation') }}">placeholder</a> to your message template:</p>
+    <p class="govuk-body">Kopieer dit voorbeeld om een <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_personalisation') }}">placeholder</a> aan uw berichtsjabloon toe te voegen:</p>
 
-    <pre class="formatting-example"><code class="lang-md">Introduce bullet points with a lead-in line ending in a colon:
+    <pre class="formatting-example"><code class="lang-md">Introduceer opsommingstekens met een inleidende regel die eindigt op een dubbele punt:
 
 ((bullet points))
 
-Leave one empty line space before the next paragraph.
+Laat één lege regel over voor de volgende alinea.
 </code></pre>
 
-    <p class="govuk-body">To send the message, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">upload a list of recipient details</a>.</p>
+    <p class="govuk-body">Om het bericht te verzenden, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">upload een lijst met ontvangersgegevens</a>.</p>
 
-    <p class="govuk-body">Your spreadsheet should include one column for each bullet point. The column names must match the placeholder in the template.</p>
-    <p class="govuk-body">Notify will fill in the placeholder with your bullet points.</p>
+    <p class="govuk-body">Uw spreadsheet moet één kolom per opsommingsteken bevatten. De kolomnamen moeten overeenkomen met de placeholder in het sjabloon.</p>
+    <p class="govuk-body">Notify vult de placeholder in met uw opsommingstekens.</p>
 
 {% endset %}
 
 {{ govukDetails({
-    "summaryText": "How to add personalised bullet points",
+    "summaryText": "Hoe voeg ik persoonlijke opsommingstekens toe",
     "html": personalisedBullets
 }) }}
 
-<p class="govuk-body">There’s more <a class="govuk-link govuk-link--no-visited-state"
-        href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#bullet-points-steps">guidance about bullet
-        points on GOV.UK</a>.</p>
+<p class="govuk-body">Er is meer <a class="govuk-link govuk-link--no-visited-state"
+        href="https://www.gov.uk/guidance/style-guide/a-to-z-of-gov-uk-style#bullet-points-steps">richtlijn over opsommingstekens op GOV.UK</a>.</p>

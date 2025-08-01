@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Create an API key
+  Maak een API-sleutel aan
 {% endblock %}
 
 {% block backLink %}
@@ -14,12 +14,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Create an API key') }}
+  {{ page_header('Maak een API-sleutel aan') }}
 
   {% call form_wrapper() %}
     {{ form.key_name }}
     {{ form.key_type }}
-    {{ page_footer('Continue') }}
+    {{ page_footer('Doorgaan') }}
   {% endcall %}
 
 {% endblock %}

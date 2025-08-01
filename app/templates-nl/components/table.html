@@ -40,7 +40,7 @@
     {% if not items %}
       {% call row() %}
         <td class="table-empty-message" colspan="{{ field_headings | length }}">
-          {{ empty_message }}
+          Geen gegevens beschikbaar
         </td>
       {% endcall %}
     {% endif %}
@@ -117,7 +117,7 @@
 {% endmacro %}
 
 
-{% macro optional_text_field(text, default='Not set', truncate=false, wrap=False) -%}
+{% macro optional_text_field(text, default='Niet ingesteld', truncate=false, wrap=False) -%}
   {{ text_field(
     text or default,
     status='' if text else 'default',
@@ -144,7 +144,7 @@
 {%- endmacro %}
 
 {% macro boolean_field(value) -%}
-  {{ text_field('On' if value else 'Off') }}
+  {{ text_field('Aan' if value else 'Uit') }}
 {%- endmacro %}
 
 {% macro right_aligned_field_heading(text) %}

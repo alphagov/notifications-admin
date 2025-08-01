@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Error
+  Foutmelding
 {% endblock %}
 
 {% block backLink %}
@@ -18,17 +18,17 @@
     {% call banner_wrapper(type='dangerous') %}
       {% if row_errors|length == 1 %}
         <h1 class='banner-title'>
-          There’s a problem with {{ original_file_name }}
+          Er is een probleem met {{ original_file_name }}
         </h1>
         <p class="govuk-body">
-          You need to {{ row_errors[0] }}.
+          U moet {{ row_errors[0] }}.
         </p>
       {% else %}
         <h1 class='banner-title'>
-          There are some problems with {{ original_file_name }}
+          Er zijn enkele problemen met {{ original_file_name }}
         </h1>
         <p class="govuk-body">
-          You need to:
+          U moet het volgende doen:
         </p>
         <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
           {% for error in row_errors %}
@@ -45,18 +45,18 @@
         form.file,
         allowed_file_extensions=allowed_file_extensions,
         action=url_for('main.send_messages', service_id=current_service.id, template_id=template.id),
-        button_text='Upload your file again'
+        button_text='Upload uw bestand opnieuw'
       ) }}
     </div>
-    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
+    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Terug naar boven</a>
   </div>
 
   <div class="fullscreen-content" data-notify-module="fullscreen-table">
     {% call(item, row_number) mapping_table(
-      caption="Errors in " + original_file_name,
+      caption="Fouten in " + original_file_name,
       caption_visible=False,
       field_headings=[
-        '<span class="govuk-visually-hidden">Row in file</span><span aria-hidden="true" class="table-field-invisible-error">1</span>'|safe
+        '<span class="govuk-visually-hidden">Rij in bestand</span><span aria-hidden="true" class="table-field-invisible-error">1</span>'|safe
       ] + recipients.column_headers
     ) %}
       {% for item in recipients.displayed_rows %}
@@ -70,28 +70,28 @@
             {% call field(colspan=recipients.column_headers|length) %}
               <span class="table-field-error-label">
                 {% if item.message_empty %}
-                  No content for this message
+                  Geen inhoud voor dit bericht
                 {% elif item.message_too_long %}
-                  Message is too long
+                  Bericht is te lang
                 {% elif item.as_postal_address.has_invalid_country_for_bfpo_address %}
-                  The last line of a BFPO address must not be a country.
+                  De laatste regel van een BFPO-adres mag geen land zijn.
                 {% elif not item.as_postal_address.has_enough_lines %}
-                  Address must be at least {{ letter_min_address_lines }} lines long
+                  Adres moet minstens {{ letter_min_address_lines }} regels lang zijn
                 {% elif item.as_postal_address.has_too_many_lines %}
-                  Address must be no more than {{ letter_max_address_lines }} lines long
+                  Adres mag maximaal {{ letter_max_address_lines }} regels bevatten
                 {% elif not item.as_postal_address.has_valid_last_line %}
                   {% if item.as_postal_address.allow_international_letters %}
-                    Last line of the address must be a UK postcode or another country
+                    De laatste regel van het adres moet een postcode uit het VK of een ander land zijn
                   {% elif item.as_postal_address.international %}
-                    You do not have permission to send letters to other countries
+                    U heeft geen toestemming om brieven naar andere landen te versturen
                   {% else %}
-                    Last line of the address must be a real UK postcode
+                    De laatste regel van het adres moet een geldige postcode uit het VK zijn
                   {% endif %}
                 {% elif item.as_postal_address.has_invalid_characters %}
-                  Address lines must not start with any of the following characters:
+                  Adresregels mogen niet beginnen met een van de volgende tekens:
                   {{ " ".join(item.as_postal_address.INVALID_CHARACTERS_AT_START_OF_ADDRESS_LINE) }}
                 {% elif item.has_no_fixed_abode_address %}
-                  This is not a real address
+                  Dit is geen geldig adres
                 {% endif %}
               </span>
             {% endcall %}
@@ -131,14 +131,14 @@
   {% if count_of_displayed_recipients < count_of_recipients %}
     <p class="table-show-more-link">
       {% if row_errors and not recipients.missing_column_headers %}
-        Only showing the first {{ count_of_displayed_recipients }} rows with errors
+        Er worden alleen de eerste {{ count_of_displayed_recipients }} rijen met fouten getoond
       {% else %}
-        Only showing the first {{ count_of_displayed_recipients }} rows
+        Er worden alleen de eerste {{ count_of_displayed_recipients }} rijen getoond
       {% endif %}
     </p>
   {% elif row_errors and not recipients.missing_column_headers %}
     <p class="table-show-more-link">
-      Only showing rows with errors
+      Er worden alleen rijen met fouten getoond
     </p>
   {% endif %}
 

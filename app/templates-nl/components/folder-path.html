@@ -27,7 +27,7 @@
             </span>
           {% endif %}
         {% else %}
-          <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type) }}" title="Templates" class="govuk-link govuk-link--no-visited-state {% if loop.length > 2 %}folder-heading-folder-root-truncated{% endif %}">Templates</a>
+          <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type) }}" title="Sjablonen" class="govuk-link govuk-link--no-visited-state {% if loop.length > 2 %}folder-heading-folder-root-truncated{% endif %}">Sjablonen</a>
         {% endif %}
         {{ folder_path_separator() }}
       </li>
@@ -69,7 +69,7 @@
     <ol class="folder-heading-breadcrumb">
     {% if folder_path|length == 1 %}
       <li>
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id, to_folder_id=to_folder_id) }}">Services</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.choose_template_to_copy', service_id=current_service_id, to_folder_id=to_folder_id) }}">Diensten</a>
         {{ folder_path_separator() }}
       </li>
     {% endif %}
