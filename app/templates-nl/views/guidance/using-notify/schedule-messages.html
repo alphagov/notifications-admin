@@ -3,25 +3,25 @@
 {% from "components/service-link.html" import service_link %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Using Notify' %}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
 
 {% block per_page_title %}
-  Schedule emails and text messages
+  E-mails en sms-berichten plannen
 {% endblock %}
 
 {% block content_column_content %}
-  <h1 class="heading-large">Schedule emails and text messages</h1>
+  <h1 class="heading-large">E-mails en sms-berichten plannen</h1>
 
-  <p class="govuk-body">You can schedule messages up to one week in advance.</p>
+  <p class="govuk-body">U kunt berichten tot een week van tevoren inplannen.</p>
 
-  <p class="govuk-body">To schedule a batch of emails or text messages:</p>
+  <p class="govuk-body">Om een batch e-mails of sms-berichten te plannen:</p>
   <ol class="govuk-list govuk-list--number">
-    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
-    <li>Add a new template or choose an existing template.</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Get ready to send</b>.</li>
-    <li>Upload a list of recipients.</li>
-    <li>Set the date and time you want to send your messages.</li>
+    <li>Ga naar de {{ service_link(current_service, 'main.choose_template', 'sjablonen') }} pagina.</li>
+    <li>Voeg een nieuw sjabloon toe of kies een bestaand sjabloon.</li>
+    <li>Selecteer <b class="govuk-!-font-weight-bold">Klaar om te verzenden</b>.</li>
+    <li>Upload een lijst met ontvangers.</li>
+    <li>Stel de datum en tijd in waarop u uw berichten wilt verzenden.</li>
   </ol>
 
-  <p class="govuk-body">Your scheduled messages will appear on the {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }} and {{ service_link(current_service, 'main.uploads', 'uploads') }} pages.</p>
+  <p class="govuk-body">Uw ingeplande berichten verschijnen op de {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }} en {{ service_link(current_service, 'main.uploads', 'uploads') }} pagina’s.</p>
 {% endblock %}

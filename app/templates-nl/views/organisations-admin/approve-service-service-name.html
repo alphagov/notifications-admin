@@ -4,8 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-
-{% set title = "Check the service name" %}
+{% set title = "Controleer de naam van de dienst" %}
 
 {% block service_page_title %}
   {{ title }}
@@ -22,34 +21,34 @@
     <div class="govuk-grid-column-five-sixths">
 
       <p class="govuk-body">
-        The service name must not include:
+        De naam van de dienst mag geen:
       </p>
 
       <ul class="govuk-list govuk-list--bullet">
-        <li>acronyms, initialisms or abbreviations, unless they’re well known</li>
-        <li>your own name or the name of someone on your team</li>
-        <li>the name of a web application or back office system</li>
+        <li>afkortingen of initialen bevatten, tenzij deze algemeen bekend zijn</li>
+        <li>uw eigen naam of de naam van iemand uit uw team bevatten</li>
+        <li>de naam van een webapplicatie of backofficesysteem bevatten</li>
       </ul>
 
       <p class="govuk-body">
-        A service name should tell the recipient what the message is about, as well as who it’s from. For example:
+        Een dienstnaam moet aan de ontvanger duidelijk maken waar de boodschap over gaat en van wie deze afkomstig is. Bijvoorbeeld:
       </p>
 
       <ul class="govuk-list govuk-list--bullet">
         {% if organisation.organisation_type == 'local' %}
-          <li>School admissions - {{ organisation.name }}</li>
-          <li>Electoral services - {{ organisation.name }}</li>
-          <li>Blue Badge - {{ organisation.name }}</li>
+          <li>Toelating tot school – {{ organisation.name }}</li>
+          <li>Verkiezingsdiensten – {{ organisation.name }}</li>
+          <li>Blauwe parkeerkaart – {{ organisation.name }}</li>
         {% else %}
-          <li>Register to vote</li>
-          <li>Renew your Passport</li>
-          <li>Check your state pension</li>
+          <li>Inschrijven om te stemmen</li>
+          <li>Verleng uw paspoort</li>
+          <li>Controleer uw AOW-uitkering</li>
         {% endif %}
       </ul>
 
     {% call form_wrapper() %}
       {{ form.enabled }}
-      {{ page_footer('Continue') }}
+      {{ page_footer('Doorgaan') }}
     {% endcall %}
 
     </div>

@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set heading = 'Ask to join this service' %}
+{% set heading = 'Vraag om lid te worden van deze dienst' %}
 
 {% block per_page_title %}
   {{ heading }}
@@ -19,23 +19,23 @@
     <div class="govuk-grid-column-two-thirds">
       {{ govuk_page_header(heading) }}
       <p class="govuk-body">
-        You’re asking to join ‘{{ service.name }}’.
+        U vraagt om lid te worden van ‘{{ service.name }}’.
       </p>
 
       {% if service.active_users_with_permission("manage_service") %}
         {% call form_wrapper() %}
           {{ form.users }}
           {{ form.reason }}
-        {{ page_footer('Ask to join this service') }}
+        {{ page_footer('Vraag om lid te worden van deze dienst') }}
         {% endcall %}
       {% else %}
         <p class="govuk-body">
-          No one on that service has permission to approve your request.
+          Niemand binnen deze dienst heeft toestemming om uw verzoek goed te keuren.
         </p>
         <p class="govuk-body">
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact GOV.UK Notify support</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact op met GOV.UK Notify ondersteuning</a>
         </p>
-        {% endif %}
+      {% endif %}
 
     </div>
   </div>

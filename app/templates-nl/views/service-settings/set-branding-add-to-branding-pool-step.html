@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = "Apply ‘{}’ branding".format(branding_name) %}
+{% set page_title = "‘{}’ branding toepassen".format(branding_name) %}
 
 {% block backLink %}
   {{ govukBackLink({ "href": back_link }) }}
@@ -20,17 +20,17 @@
     {% call form_wrapper() %}
       {% set hint_1 %}
         <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
-          <li>Apply this branding to ‘{{current_service.name}}’</li>
-          <li class="govuk-!-margin-bottom-0">Let other {{current_service.organisation.name}} teams apply this branding themselves</li>
+          <li>Deze branding toepassen op ‘{{current_service.name}}’</li>
+          <li class="govuk-!-margin-bottom-0">Andere teams binnen {{current_service.organisation.name}} deze branding zelf laten toepassen</li>
         </ul>
       {% endset %}
       {% set hint_2 %}
         <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
-          <li class="govuk-!-margin-bottom-0">Only apply this branding to ‘{{current_service.name}}’</li>
+          <li class="govuk-!-margin-bottom-0">Deze branding alleen toepassen op ‘{{current_service.name}}’</li>
         </ul>
       {% endset %}
       {% set label_text %}
-        Should other teams in {{current_service.organisation.name}} have the option to use this branding?
+        Moeten andere teams binnen {{current_service.organisation.name}} de mogelijkheid hebben om deze branding te gebruiken?
       {% endset %}
 
       {{
@@ -46,7 +46,7 @@
           }
         )
       }}
-      {{ page_footer('Continue') }}
+      {{ page_footer('Doorgaan') }}
     {% endcall %}
 
 {% endblock %}

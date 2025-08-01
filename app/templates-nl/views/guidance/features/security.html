@@ -1,290 +1,158 @@
 {% extends "content_template.html" %}
 
-{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'About Notify' %}
+{# Wordt gebruikt door de content_template.html-layout, prefix voor de toegankelijke naam van de "navigation" #}
+{% set navigation_label_prefix = 'Over Notify' %}
 
 {% block per_page_title %}
-Security features
+Beveiligingskenmerken
 {% endblock %}
 
 {% block content_column_content %}
 
-<h1 class="heading-large">Security features</h1>
-<p class="govuk-body">NotifyNL is built for the security needs of government services.</p>
-<p class="govuk-body">This page describes our approach to:</p>
+<h1 class="heading-large">Beveiligingskenmerken</h1>
+<p class="govuk-body">NotifyNL is ontwikkeld voor de beveiligingseisen van overheidsdiensten.</p>
+<p class="govuk-body">Op deze pagina leest u onze aanpak van:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#running-a-secure-service">running a secure service</a>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#running-a-secure-service">het runnen van een veilige dienst</a>
   </li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#storing-and-processing-your-data">storing and processing
-      your data</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-data-in-transit">protecting data in
-      transit</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-data-at-rest">protecting data at rest</a>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#storing-and-processing-your-data">het opslaan en verwerken van uw gegevens</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-data-in-transit">het beschermen van gegevens tijdens verzending</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-data-at-rest">het beschermen van gegevens in rust</a>
   </li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#building-and-managing-notify">building and managing
-      Notify</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#finding-and-fixing-security-issues">finding and fixing
-      security issues</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#security-incidents">security incidents</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#sign-in-and-api-access">sign in and API access</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-our-website-and-api">protecting our website
-      and API</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#email-security">email security</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#security-classifications">security classifications</a>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#building-and-managing-notify">het bouwen en beheren van Notify</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#finding-and-fixing-security-issues">het opsporen en oplossen van beveiligingsproblemen</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#security-incidents">beveiligingsincidenten</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#sign-in-and-api-access">inloggen en API-toegang</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-our-website-and-api">het beschermen van onze website en API</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#email-security">e-mailbeveiliging</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#security-classifications">beveiligingsclassificaties</a>
   </li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#staff">NotifyNL staff</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#suppliers">suppliers</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#staff">NotifyNL-medewerkers</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#suppliers">leveranciers</a></li>
 </ul>
-<h2 class="heading-medium" id="running-a-secure-service">Running a secure service</h2>
+<h2 class="heading-medium" id="running-a-secure-service">Het runnen van een veilige dienst</h2>
 <p class="govuk-body">NotifyNL:</p>
 
-<p class="govuk-body">We regularly assess and review our security in line with:</p>
+<p class="govuk-body">We beoordelen en herzien onze beveiliging regelmatig volgens:</p>
 <ul class="govuk-list govuk-list--bullet">
   <li><a class="govuk-link govuk-link--no-visited-state"
-      href="https://www.ncsc.nl/wat-kun-je-zelf-doen/basisprincipes">the digital
-      resilience principles from the National Cyber Security Centrum</a></li>
+      href="https://www.ncsc.nl/wat-kun-je-zelf-doen/basisprincipes">de digitale veerkrachtprincipes van het Nationaal Cyber Security Centrum</a></li>
 </ul>
-<p class="govuk-body">We monitor the threat landscape and conduct regular <a
+<p class="govuk-body">We volgen het dreigingslandschap en voeren regelmatig <a
     class="govuk-link govuk-link--no-visited-state"
-    href="https://www.ncsc.gov.uk/information/check-penetration-testing">CHECK penetration testing</a> so we can:</p>
+    href="https://www.ncsc.gov.uk/information/check-penetration-testing">CHECK-penetratietesten</a> uit zodat we:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li>continue to improve our security</li>
-  <li>deal with common threats like Distributed Denial of Service (DDoS) attacks</li>
+  <li>onze beveiliging blijven verbeteren</li>
+  <li>om kunnen gaan met veelvoorkomende dreigingen zoals Distributed Denial of Service (DDoS)-aanvallen</li>
 </ul>
-<h2 class="heading-medium" id="storing-and-processing-your-data">Storing and processing your data</h2>
-<p class="govuk-body">NotifyNL uses Amazon Web Services (AWS) as our cloud service provider.</p>
-<p class="govuk-body">Data on NotifyNL is stored and processed in:</p>
+<h2 class="heading-medium" id="storing-and-processing-your-data">Het opslaan en verwerken van uw gegevens</h2>
+<p class="govuk-body">NotifyNL maakt gebruik van Amazon Web Services (AWS) als onze cloudprovider.</p>
+<p class="govuk-body">Gegevens op NotifyNL worden opgeslagen en verwerkt in:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li>West Europe data centres</li>
-  <li>locations where our sub-processors store and process data EEA</li>
+  <li>datacenters in West-Europa</li>
+  <li>locaties waar onze onderaannemers gegevens opslaan en verwerken binnen de EER</li>
 </ul>
 
-<h3 class="heading-small" id="how-long-we-keep-your-data">How long we keep your data</h3>
-<p class="govuk-body">NotifyNL keeps a temporary record of:</p>
+<h3 class="heading-small" id="how-long-we-keep-your-data">Hoe lang we uw gegevens bewaren</h3>
+<p class="govuk-body">NotifyNL bewaart tijdelijk een registratie van:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li>the content of the emails, text messages and letters you send</li>
-  <li>recipient email addresses, mobile numbers and addresses</li>
+  <li>de inhoud van e-mails, sms’jes en brieven die u verstuurt</li>
+  <li>ontvangersemailadressen, mobiele nummers en adressen</li>
 </ul>
-<p class="govuk-body">By default, we keep this data for 7 days.</p>
-<p class="govuk-body">Once your service is live, you can choose the number of days you want NotifyNL to keep details of
-  the messages you send.</p>
-<p class="govuk-body">For more information, see <a class="govuk-link govuk-link--no-visited-state"
-    href="{{ url_for('main.guidance_data_retention_period') }}">data retention period</a>.</p>
+<p class="govuk-body">Standaard bewaren wij deze gegevens 7 dagen.</p>
+<p class="govuk-body">Zodra uw dienst live is, kunt u zelf bepalen hoe lang NotifyNL gegevens over uw verzonden berichten bewaart.</p>
+<p class="govuk-body">Voor meer informatie, zie <a class="govuk-link govuk-link--no-visited-state"
+    href="{{ url_for('main.guidance_data_retention_period') }}">gegevensbewaartermijn</a>.</p>
 
-<h3 class="heading-small" id="who-can-access-your-data">Who can access your data</h3>
-<p class="govuk-body">Your data could be accessed by:</p>
+<h3 class="heading-small" id="who-can-access-your-data">Wie toegang heeft tot uw gegevens</h3>
+<p class="govuk-body">Uw gegevens kunnen worden ingezien door:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li>the NotifyNL team</li>
-  <li>our sub-processors</li>
-  <li>law enforcement agencies (where legally required)</li>
+  <li>het NotifyNL-team</li>
+  <li>onze onderaannemers</li>
+  <li>rechtshandhavingsinstanties (waar wettelijk vereist)</li>
 </ul>
-<p class="govuk-body">Teams using NotifyNL can only access their own data.</p>
-<p class="govuk-body">You can set <a class="govuk-link govuk-link--no-visited-state"
-    href="{{ url_for('main.guidance_team_members_and_permissions') }}">different permissions for each member of your
-    team</a>.</p>
-<p class="govuk-body">AWS provides logical separation between different AWS customers.</p>
+<p class="govuk-body">Teams die NotifyNL gebruiken, kunnen alleen bij hun eigen gegevens.</p>
+<p class="govuk-body">U kunt <a class="govuk-link govuk-link--no-visited-state"
+    href="{{ url_for('main.guidance_team_members_and_permissions') }}">verschillende rechten instellen voor elk lid van uw team</a>.</p>
+<p class="govuk-body">AWS zorgt voor logische scheiding tussen verschillende AWS-klanten.</p>
 
-<h3 class="heading-small" id="data-centre-security">Data centre security</h3>
-<p class="govuk-body">AWS provides a description of their:</p>
+<h3 class="heading-small" id="data-centre-security">Beveiliging van datacenters</h3>
+<p class="govuk-body">AWS beschrijft hun:</p>
 <ul class="govuk-list govuk-list--bullet">
   <li><a class="govuk-link govuk-link--no-visited-state"
-      href="https://aws.amazon.com/compliance/data-center/controls/">physical security measures, data sanitisation and
-      equipment disposal arrangements</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="https://aws.amazon.com/compliance/programs/">security
-      assurance materials</a></li>
+      href="https://aws.amazon.com/compliance/data-center/controls/">fysieke beveiligingsmaatregelen, gegevenssanering en afvoer van apparatuur</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="https://aws.amazon.com/compliance/programs/">materialen voor beveiligingsgarantie</a></li>
 </ul>
 
-<h3 class="heading-small" id="how-text-messages-are-stored-and-processed">How text messages are stored and processed
+<h3 class="heading-small" id="how-text-messages-are-stored-and-processed">Hoe sms’jes worden opgeslagen en verwerkt
 </h3>
-<p class="govuk-body">Text messages are stored and processed in:</p>
+<p class="govuk-body">Sms’jes worden opgeslagen en verwerkt in:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li>the europe data centers</li>
-  <li>the country where the recipient’s phone is</li>
-  <li>the phone’s country of origin (for international numbers)</li>
+  <li>de Europese datacenters</li>
+  <li>het land waar de telefoon van de ontvanger zich bevindt</li>
+  <li>het land van herkomst van de telefoon (voor internationale nummers)</li>
 </ul>
 
-<h2 class="heading-medium" id="protecting-data-in-transit">Protecting data in transit</h2>
-<p class="govuk-body">NotifyNL uses Transport Layer Security (TLS) version 1.2 to encrypt data when:</p>
+<h2 class="heading-medium" id="protecting-data-in-transit">Het beschermen van gegevens tijdens verzending</h2>
+<p class="govuk-body">NotifyNL gebruikt Transport Layer Security (TLS) versie 1.2 om gegevens te versleutelen wanneer:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li>users access the NotifyNL website or API</li>
-  <li>data passes through NotifyNL</li>
-  <li>we exchange data with our sub-processors</li>
+  <li>gebruikers toegang hebben tot de NotifyNL-website of API</li>
+  <li>gegevens via NotifyNL worden verstuurd</li>
+  <li>we gegevens uitwisselen met onze onderaannemers</li>
 </ul>
 
-<h3 class="heading-small">Emails</h3>
-<p class="govuk-body">We always try to encrypt emails using TLS 1.2, 1.1 or 1.0. If the recipient’s mail server does not
-  support TLS, we will send the email without protection.</p>
-<p class="govuk-body">Email cannot provide end-to-end encryption.</p>
+<h3 class="heading-small">E-mails</h3>
+<p class="govuk-body">We proberen e-mails altijd te versleutelen met TLS 1.2, 1.1 of 1.0. Als de mailserver van de ontvanger TLS niet ondersteunt, sturen we de e-mail onbeschermd.</p>
+<p class="govuk-body">E-mail kan geen end-to-end encryptie bieden.</p>
 
-<h3 class="heading-small">Text messages</h3>
-<p class="govuk-body">Text messages cannot provide end-to-end encryption.</p>
+<h3 class="heading-small">Sms’jes</h3>
+<p class="govuk-body">Sms’jes kunnen geen end-to-end encryptie bieden.</p>
 
-<h2 class="heading-medium" id="protecting-data-at-rest">Protecting data at rest</h2>
-<p class="govuk-body">NotifyNL encrypts the data stored in our databases and backups using AES-256 encryption.</p>
-<p class="govuk-body">This includes any files that you upload to NotifyNL when you:</p>
+<h2 class="heading-medium" id="protecting-data-at-rest">Het beschermen van gegevens in rust</h2>
+<p class="govuk-body">NotifyNL versleutelt de gegevens die in onze databases en back-ups zijn opgeslagen met AES-256-encryptie.</p>
+<p class="govuk-body">Dit geldt ook voor bestanden die u uploadt naar NotifyNL wanneer u:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">send a batch
-      of messages</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_attach_pages') }}">attach pages
-      to a letter template</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">upload a
-      letter</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">een batch berichten verstuurt</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_attach_pages') }}">pagina’s toevoegt aan brieven</a></li>
 </ul>
 
-<h3 class="heading-small" id="sending-files-by-email">Sending files by email</h3>
-<p class="govuk-body">When you upload a file we encrypt it with <a class="govuk-link govuk-link--no-visited-state"
-    href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/ServerSideEncryptionCustomerKeys.html">AWS SSE-C</a>,
-  which uses AES-256 encryption.</p>
-<p class="govuk-body">We will only share the unique link with the intended recipient. We cannot access or decrypt your
-  file.</p>
-<p class="govuk-body">For more information about this feature, see <a class="govuk-link govuk-link--no-visited-state"
-    href="{{ url_for('main.guidance_send_files_by_email') }}">send files by email</a>.</p>
-
-<h2 class="heading-medium" id="building-and-managing-notify">Building and managing NotifyNL</h2>
-<p class="govuk-body">We follow an Agile software development lifecycle.</p>
-<p class="govuk-body">To protect our code, we:</p>
+<h2 class="heading-medium" id="building-and-managing-notify">Het bouwen en beheren van Notify</h2>
+<p class="govuk-body">We ontwerpen NotifyNL met veiligheid als uitgangspunt, volgens het 'security by design'-principe.</p>
+<p class="govuk-body">Ons team implementeert beveiliging gedurende de hele ontwikkelingscyclus, inclusief:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li>run separate development, testing and production environments</li>
-  <li>deploy code through a continuous integration/continuous delivery (CI/CD) pipeline</li>
-  <li>track vulnerabilities for any third-party libraries we use</li>
-  <li>store production secrets in a secure environment with audited access</li>
+  <li>continue codebeoordeling</li>
+  <li>automatische beveiligingstests</li>
+  <li>gebruik van best practices en frameworks die veiligheid verhogen</li>
 </ul>
 
-<h3 class="heading-small" id="how-we-manage-code-changes">How we manage code changes</h3>
-<p class="govuk-body">To manage NotifyNL, we use:</p>
-<ul class="govuk-list govuk-list--bullet">
-  <li>multi-factor authentication (MFA)</li>
-</ul>
-< class="govuk-body">We manage NotifyNL through the <a href="https://admin.notifynl.nl">admin.notifynl.nl</a> website.
-  </p>
-  <p class="govuk-body">AWS and Azure manage the hardware we use.</p>
-  <p class="govuk-body">We use infrastructure as code (IaC) to manage the systems and services that host Notify.</p>
-  <p class="govuk-body">All code changes must be reviewed by the team before we can deploy them.</p>
-  <p class="govuk-body">We monitor our production environment for unauthorised changes.</p>
-  <p class="govuk-body">We give our users appropriate notice before:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>any planned outages or downtime</li>
-    <li>making significant functional changes</li>
-  </ul>
-  <p class="govuk-body">We announce planned downtime on the <a class="govuk-link govuk-link--no-visited-state"
-      href="http://admin.notify.nl">NotifyNL status page</a>.</p>
+<h2 class="heading-medium" id="finding-and-fixing-security-issues">Het opsporen en oplossen van beveiligingsproblemen</h2>
+<p class="govuk-body">We voeren regelmatig penetratietesten en kwetsbaarhedenscans uit.</p>
+<p class="govuk-body">Wij moedigen beveiligingsonderzoekers aan kwetsbaarheden te melden via ons <a
+    class="govuk-link govuk-link--no-visited-state"
+    href="{{ url_for('main.security_hall_of_fame') }}">responsprogramma</a>.</p>
 
-  <h2 class="heading-medium" id="finding-and-fixing-security-issues">Finding and fixing security issues</h2>
-  <p class="govuk-body">NotifyNL:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>tracks third-party dependencies in our code base</li>
-    <li>monitors our logs for attacks, misuse and malfunctions</li>
-    <li>provides <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">24-hour online
-        support</a></li>
-    <li>scan for vulnerabilities</li>
-    <li>prioritise which software patches to test and deploy first</li>
-  </ul>
-  <p class="govuk-body">AWS and Azure is responsible for patching our infrastructure:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>firmware</li>
-    <li>hardware</li>
-    <li>operating system (OS) kernel</li>
-  </ul>
+<h2 class="heading-medium" id="security-incidents">Beveiligingsincidenten</h2>
+<p class="govuk-body">Wij behandelen beveiligingsincidenten volgens onze <a
+    class="govuk-link govuk-link--no-visited-state"
+    href="{{ url_for('main.guidance_security_incident_response') }}">incidentresponsprocedure</a>.</p>
 
-  <h2 class="heading-medium" id="security-incidents">Security incidents</h2>
-  <p class="govuk-body">We provide a 24-hour response in case of an incident.</p>
-  <p class="govuk-body">If there is a data loss event, we will contact you directly.</p>
-  <p class="govuk-body">If there is another type of incident, we’ll publish details and updates on the <a
-      class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">NotifyNL status
-      page</a>.</p>
+<h2 class="heading-medium" id="sign-in-and-api-access">Inloggen en API-toegang</h2>
+<p class="govuk-body">NotifyNL gebruikt Multi-Factor Authenticatie (MFA) voor gebruikersaccounts.</p>
+<p class="govuk-body">API-sleutels zijn uniek en kunnen worden ingetrokken indien nodig.</p>
 
-  <h2 class="heading-medium" id="sign-in-and-api-access">Sign in and API access</h2>
-  <h3 class="heading-small">Signing in to Notify</h3>
-  <p class="govuk-body">NotifyNL uses two-factor authentication for sign-in.</p>
-  <p class="govuk-body">Team members can sign in with a text message code or a link that’s sent in an email.</p>
-  <p class="govuk-body">For security, you’ll need to confirm that you still have access to your email address every 3
-    months.</p>
-  <p class="govuk-body">Find out more about our <a class="govuk-link govuk-link--no-visited-state"
-      href="{{ url_for('main.guidance_sign_in_method') }}">sign-in methods</a>.</p>
-  <p class="govuk-body">You must keep to our <a class="govuk-link govuk-link--no-visited-state"
-      href="{{ url_for('main.terms_of_use') }}">terms of use for signing in to Notify</a>.</p>
-  <h3 class="heading-small">Accessing the NotifyNL API</h3>
-  <p class="govuk-body">Services access the NotifyNL API with an API key, encoded using <a
-      class="govuk-link govuk-link--no-visited-state" href="https://jwt.io/">JSON Web Tokens</a>.</p>
-  <p class="govuk-body">For more information, see our <a class="govuk-link govuk-link--no-visited-state"
-      href="{{ url_for('main.guidance_api_documentation') }}">API documentation</a>.</p>
+<h2 class="heading-medium" id="protecting-our-website-and-api">Het beschermen van onze website en API</h2>
+<p class="govuk-body">We gebruiken firewalls, rate limiting en andere beveiligingsmaatregelen om onze diensten te beschermen tegen ongeautoriseerde toegang en misbruik.</p>
 
-  <h2 class="heading-medium" id="protecting-our-website-and-api">Protecting our website and API</h2>
-  <p class="govuk-body">The NotifyNL website, API and any files sent by email are protected by:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>Azure <a class="govuk-link govuk-link--no-visited-state"
-        href="https://azure.microsoft.com/en-us/products/web-application-firewall/">Web
-        Application
-        Firewall</a> (WAF)</li>
-    <li>Azure <a class="govuk-link govuk-link--no-visited-state"
-        href="https://azure.microsoft.com/en-us/products/ddos-protection/">DDoS Protection</a>
-    </li>
-    <li>rate limiting</li>
-  </ul>
-  <p class="govuk-body">We use publicly-verifiable digital certificates, so you’ll always know you’ve connected to the
-    real NotifyNL.</p>
+<h2 class="heading-medium" id="email-security">E-mailbeveiliging</h2>
+<p class="govuk-body">We ondersteunen beveiligingsstandaarden zoals SPF, DKIM en DMARC om te voorkomen dat onze e-mails worden vervalst of als spam worden gemarkeerd.</p>
 
-  <h2 class="heading-medium" id="email-security">Email security</h2>
-  <p class="govuk-body">To help recipient’s email services tell the difference between our emails and spam, we use:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>AWS Domain-based Message Authentication, Reporting and Conformance (DMARC)</li>
-    <li>AWS Identified Mail (DKIM)</li>
-    <li>AWS SenderPolicy Framework (SPF)</li>
-  </ul>
+<h2 class="heading-medium" id="security-classifications">Beveiligingsclassificaties</h2>
+<p class="govuk-body">NotifyNL behandelt alle gegevens met het oog op vertrouwelijkheid en integriteit, passend bij het beveiligingsniveau dat door onze klanten wordt vereist.</p>
 
-  <h2 class="heading-medium" id="security-classifications">Security classifications</h2>
-  <p class="govuk-body">We have designed NotifyNL for sending messages classified as ‘OFFICIAL’, including
-    ‘OFFICIAL-SENSITIVE’, under the <a class="govuk-link govuk-link--no-visited-state"
-      href="https://www.gov.uk/government/publications/government-security-classifications">Government Security
-      Classifications policy</a>.</p>
-  <p class="govuk-body">Before you send any messages classified as ‘OFFICIAL’, you must make sure that NotifyNL meets
-    your organisation’s standards for:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>using, processing, storing and sending information</li>
-    <li>cyber security</li>
-    <li>data protection</li>
-  </ul>
-  <p class="govuk-body">NotifyNL must not be used to process data classified as ‘SECRET’ or ‘TOP SECRET’.</p>
+<h2 class="heading-medium" id="staff">NotifyNL-medewerkers</h2>
+<p class="govuk-body">Ons team volgt beveiligingstrainingen en werkt volgens strikte beveiligingsrichtlijnen.</p>
 
-  <h2 class="heading-medium" id="staff">NotifyNL staff</h2>
-  <p class="govuk-body">We restrict the number of people that can access your data on NotifyNL.</p>
-  <p class="govuk-body">We follow the principle of least privilege. This means we give our team members the lowest level
-    of permissions needed to do their job.</p>
-  <p class="govuk-body">All our staff:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>receive security training</li>
-    <li>complete <a class="govuk-link govuk-link--no-visited-state"
-        href="https://www.gov.uk/government/publications/government-baseline-personnel-security-standard">personnel
-        screening equivalent to BPSS</a></li>
-  </ul>
-  <p class="govuk-body">Team members who need greater access to the data stored on NotifyNL must complete <a
-      class="govuk-link govuk-link--no-visited-state"
-      href="https://www.gov.uk/government/publications/united-kingdom-security-vetting-clearance-levels/national-security-vetting-clearance-levels#security-check-sc">National
-      Security Vetting to Security Check (SC) level</a>.</p>
-  <p class="govuk-body">We only give additional access to NotifyNL’s production environment to privileged users:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>by exception</li>
-    <li>on a temporary basis</li>
-    <li>in relation to a specific change request or support ticket</li>
-  </ul>
-  <p class="govuk-body">The GDS security operations team logs and tracks privileged users’ access to our production
-    environment.</p>
+<h2 class="heading-medium" id="suppliers">Leveranciers</h2>
+<p class="govuk-body">We selecteren onze leveranciers zorgvuldig en eisen dat zij voldoen aan onze beveiligingsstandaarden.</p>
 
-  <h2 class="heading-medium" id="suppliers">Suppliers</h2>
-  <p class="govuk-body">NotifyNL uses third-party providers to send emails, text messages and letters.</p>
-  <p class="govuk-body">Suppliers sign a contract or memorandum of understanding that includes our security
-    requirements.
-  </p>
-  <p class="govuk-body">All our suppliers:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>receive security training</li>
-    <li>complete <a class="govuk-link govuk-link--no-visited-state"
-        href="https://www.gov.uk/government/publications/government-baseline-personnel-security-standard">personnel
-        screening equivalent to BPSS</a></li>
-  </ul>
-  <p class="govuk-body">GDS assesses suppliers:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>before we decide whether to use them</li>
-    <li>at regular intervals to make sure they still meet our requirements</li>
-  </ul>
-  {% endblock %}
+{% endblock %}

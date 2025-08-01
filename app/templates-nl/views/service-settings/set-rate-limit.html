@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Rate limit
+  Limiet voor aantal aanvragen
 {% endblock %}
 
 {% block backLink %}
@@ -15,9 +15,9 @@
 {% block maincolumn_content %}
 
   {% call form_wrapper() %}
-    {{ page_header('Rate limit') }}
+    {{ page_header('Limiet voor aantal aanvragen') }}
     {{ form.rate_limit }}
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 
 {% endblock %}

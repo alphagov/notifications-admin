@@ -7,7 +7,7 @@
 {% from "components/branding-preview.html" import letter_branding_preview %}
 
 {% set page_title %}
-  Confirm {{ branding_type }} branding
+  Bevestig {{ branding_type }}-huisstijl
 {% endset %}
 
 {% block service_page_title %}
@@ -25,21 +25,21 @@
   {{ page_header(page_title) }}
 
   <p class="govuk-body">
-    {{ branding_type|capitalize }}s from {{ current_service.name }} will look like this.
+    {{ branding_type|capitalize }}-uitingen van {{ current_service.name }} zien er als volgt uit.
   </p>
 
   {% if branding_type == 'email' %}
-    {{ email_branding_preview(nhs_branding_id, title="Preview of new email branding") }}
+    {{ email_branding_preview(nhs_branding_id, title="Voorbeeld van nieuwe e-mailhuisstijl") }}
   {% else %}
-    {{ letter_branding_preview(nhs_branding_id, title="Preview of new letter branding") }}
+    {{ letter_branding_preview(nhs_branding_id, title="Voorbeeld van nieuwe briefehuisstijl") }}
   {% endif %}
 
-  <h2 class="heading-medium">Before you continue</h2>
+  <h2 class="heading-medium">Voordat u verder gaat</h2>
 
-  <p class="govuk-body">Make sure you’re allowed to use NHS branding.</p>
+  <p class="govuk-body">Controleer of u toestemming heeft om NHS-huisstijl te gebruiken.</p>
 
   <p class="govuk-body">
-    If you’re not sure, <a class="govuk-link govuk-link--no-visited-state" href="https://www.england.nhs.uk/nhsidentity/identity-guidelines/who-can-use-the-nhs-identity/">check the guidance on the NHS website</a>.
+    Als u dit niet zeker weet, <a class="govuk-link govuk-link--no-visited-state" href="https://www.england.nhs.uk/nhsidentity/identity-guidelines/who-can-use-the-nhs-identity/">raadpleeg dan de richtlijnen op de NHS-website</a>.
   </p>
 
   {% call form_wrapper() %}

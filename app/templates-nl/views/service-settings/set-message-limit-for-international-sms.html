@@ -4,8 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = "Daily international text message limit" %}
-
+{% set page_title = "Dagelijkse limiet voor internationale sms-berichten" %}
 
 {% block service_page_title %}
 {{ page_title }}
@@ -21,24 +20,23 @@
     <div class="govuk-grid-column-five-sixths">
         {{ page_header(page_title) }}
         <p class="govuk-body">
-            Number of international text meesages the service is allowed to send each day.
+            Aantal internationale sms-berichten dat deze dienst per dag mag versturen.
         </p>
         <p class="govuk-body">
-            When choosing a limit you should think about:
+            Bij het kiezen van een limiet moet u rekening houden met:
         </p>
         <ul class="govuk-list govuk-list--bullet">
-            <li>how many international messages your service needs to send</li>
-            <li>any costs to your service if there is fraud, such as
+            <li>hoeveel internationale berichten uw dienst moet versturen</li>
+            <li>de mogelijke kosten voor uw dienst bij fraude, zoals
                 <a class="govuk-link govuk-link--no-visited-state"
-                    href="https://www.ncsc.gov.uk/blog-post/ait-fraud-what-you-need-to-know">artificial inflation of
-                    traffic</a>
+                    href="https://www.ncsc.gov.uk/blog-post/ait-fraud-what-you-need-to-know">kunstmatige toename van verkeer</a>
             </li>
         </ul>
         {% call form_wrapper() %}
         {{
         form.message_limit()
         }}
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
         {% endcall %}
     </div>
 </div>

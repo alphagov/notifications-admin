@@ -2,47 +2,44 @@
 {% from "components/service-link.html" import service_link %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Using Notify' %}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
 
 {% block per_page_title %}
-  Unsubscribe links
+  Afmeldlinks
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Unsubscribe links</h1>
+  <h1 class="heading-large">Afmeldlinks</h1>
 
-  <p class="govuk-body">You must let people opt out of receiving subscription emails, otherwise they might report you for sending spam.</p>
- <p class="govuk-body">With GOV.UK Notify you can:</p>
-<ul class="govuk-list govuk-list--bullet">
-    <li>add an unsubscribe link in your emails</li>
-    <li>get a list of the recipients who request to unsubscribe</li>
+  <p class="govuk-body">U moet mensen de mogelijkheid geven om zich af te melden voor abonnementsemails, anders kunnen zij u melden voor het versturen van spam.</p>
+  <p class="govuk-body">Met GOV.UK Notify kunt u:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>een afmeldlink toevoegen aan uw e-mails</li>
+    <li>een lijst krijgen van ontvangers die zich afmelden</li>
   </ul>
-  <p class="govuk-body">It is your responsibility to stop sending emails to anyone who asks to unsubscribe.</p>
+  <p class="govuk-body">Het is uw verantwoordelijkheid om te stoppen met het versturen van e-mails naar iedereen die zich afmeldt.</p>
 
- <p class="govuk-body">If you do not, we can stop you from using GOV.UK Notify.</p>
+  <p class="govuk-body">Doet u dit niet, dan kunnen wij uw gebruik van GOV.UK Notify stopzetten.</p>
 
-<div class="govuk-inset-text">
- <p class="govuk-body">Read the GOV.​UK Service Manual to help decide if your emails are <a class="govuk-link govuk-link--no-visited-state"
-    href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#transactional-messages">transactional or subscription messages</a>.</p></div>
+  <div class="govuk-inset-text">
+    <p class="govuk-body">Lees de <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#transactional-messages">GOV.UK Service Manual</a> om te bepalen of uw e-mails <em>transactionele</em> of abonnementsemails zijn.</p>
+  </div>
 
-  <h2 class="govuk-heading-m">How to add an unsubscribe link</h2>
+  <h2 class="govuk-heading-m">Hoe u een afmeldlink toevoegt</h2>
   <ol class="govuk-list govuk-list--number">
-    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
-    <li>Add a new email template or choose an existing email template.</li>
-    <li>Select the <b class="govuk-!-font-weight-bold">Add an unsubscribe link</b> checkbox.</li>
+    <li>Ga naar de {{ service_link(current_service, 'main.choose_template', 'sjablonen') }} pagina.</li>
+    <li>Voeg een nieuw e-mailsjabloon toe of kies een bestaand e-mailsjabloon.</li>
+    <li>Selecteer het selectievakje <b class="govuk-!-font-weight-bold">Afmeldlink toevoegen</b>.</li>
   </ol>
-  <p class="govuk-body">Recipients can request to opt out of unwanted emails by clicking on the unsubscribe link. </p>
-  <p class="govuk-body">We will report any email unsubscribe requests on the {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }}.</p>
-<p class="govuk-body">You should download the report and remove the recipients from your mailing list. Do this before you send any more emails to these recipients.</p>
-<p class="govuk-body">This report is available for up to 90 days.</p>
 
-   <h3 class="govuk-heading-m">If you want to add a custom unsubscribe link</h3>
-<p class="govuk-body">This is an API only feature. Follow the instructions in our <a class="govuk-link govuk-link--no-visited-state"
-    href="https://www.notifications.service.gov.uk/using-notify/api-documentation">API documentation</a>.</p>
-   <p class="govuk-body">You’ll need a developer on your team to set it up for you.</p>
+  <p class="govuk-body">Ontvangers kunnen zich afmelden voor ongewenste e-mails door op de afmeldlink te klikken.</p>
+  <p class="govuk-body">We rapporteren alle afmeldverzoeken op de {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }}.</p>
+  <p class="govuk-body">U dient het rapport te downloaden en de ontvangers uit uw verzendlijst te verwijderen. Doe dit voordat u opnieuw e-mails naar deze ontvangers stuurt.</p>
+  <p class="govuk-body">Dit rapport is tot 90 dagen beschikbaar.</p>
 
-
-
+  <h3 class="govuk-heading-m">Als u een eigen afmeldlink wilt toevoegen</h3>
+  <p class="govuk-body">Dit is een API-only functie. Volg de instructies in onze <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/using-notify/api-documentation">API-documentatie</a>.</p>
+  <p class="govuk-body">U heeft een ontwikkelaar in uw team nodig om dit voor u in te stellen.</p>
 
 {% endblock %}

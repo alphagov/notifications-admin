@@ -3,26 +3,26 @@
 {% from "components/service-link.html" import service_link %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Using Notify' %}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
 
 {% block per_page_title %}
-  Text message sender ID
+  Afzender-ID voor sms-berichten
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Text message sender ID</h1>
+  <h1 class="heading-large">Afzender-ID voor sms-berichten</h1>
 
-<p class="govuk-body">The text message sender ID tells your users who the message is from.</p>
+  <p class="govuk-body">De afzender-ID van een sms-bericht vertelt uw gebruikers van wie het bericht afkomstig is.</p>
 
-  <p class="govuk-body">To change the text message sender ID from the default of ‘GOVUK’:</p>
+  <p class="govuk-body">Om de afzender-ID van sms-berichten te wijzigen vanaf de standaard ‘GOVUK’:</p>
 
   <ol class="govuk-list govuk-list--number">
-    <li>Go to the <b class="govuk-!-font-weight-bold">Text message settings</b> section of the {{ service_link(current_service, 'main.service_settings', 'settings') }} page.</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Manage</b> on the <b class="govuk-!-font-weight-bold">Text message sender IDs</b> row.</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Change</b> or <b class="govuk-!-font-weight-bold">Add text message sender ID</b>.</li>
-</ol>
+    <li>Ga naar de sectie <b class="govuk-!-font-weight-bold">Instellingen sms-berichten</b> op de {{ service_link(current_service, 'main.service_settings', 'instellingen') }} pagina.</li>
+    <li>Selecteer <b class="govuk-!-font-weight-bold">Beheren</b> bij de rij <b class="govuk-!-font-weight-bold">Afzender-IDs sms-berichten</b>.</li>
+    <li>Selecteer <b class="govuk-!-font-weight-bold">Wijzigen</b> of <b class="govuk-!-font-weight-bold">Afzender-ID sms-bericht toevoegen</b>.</li>
+  </ol>
 
-<p class="govuk-body">If you want to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_receive_text_messages') }}">receive text messages</a>, your sender ID will be an 11-digit phone number.</p>
+  <p class="govuk-body">Als u <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_receive_text_messages') }}">sms-berichten wilt ontvangen</a>, is uw afzender-ID een 11-cijferig telefoonnummer.</p>
 
 {% endblock %}

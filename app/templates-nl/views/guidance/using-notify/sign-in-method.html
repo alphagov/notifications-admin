@@ -2,41 +2,41 @@
 {% from "components/service-link.html" import service_link %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Using Notify' %}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
 
 {% block per_page_title %}
-  Sign-in method
+  Aanmeldmethode
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Sign-in method</h1>
+  <h1 class="heading-large">Aanmeldmethode</h1>
 
-  <p class="govuk-body">When you sign in to Notify, you’ll need to enter:</p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li>your email address</li>
-    <li>your password</li>
-    <li>a text message code that Notify sends to your phone</li>
-  </ul>
-
-  <p class="govuk-body">If signing in with a text message is a problem for your team, you can also sign in using a link that’s sent in an email.</p>
-
-  <p class="govuk-body">For security, you should only do this if you use:</p>
+  <p class="govuk-body">Als u zich aanmeldt bij Notify, moet u het volgende invoeren:</p>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>a work-managed device</li>
-    <li>a work email address protected by multi-factor authentication (MFA)</li>
+    <li>uw e-mailadres</li>
+    <li>uw wachtwoord</li>
+    <li>een code per sms die Notify naar uw telefoon stuurt</li>
+  </ul>
+
+  <p class="govuk-body">Als aanmelden met een sms-code lastig is voor uw team, kunt u zich ook aanmelden met een link die per e-mail wordt gestuurd.</p>
+
+  <p class="govuk-body">Om veiligheidsredenen mag u dit alleen doen als u gebruikmaakt van:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>een apparaat dat door het werk wordt beheerd</li>
+    <li>een werk-e-mailadres dat beschermd wordt door multi-factor authenticatie (MFA)</li>
   </ul>
 
 
-  <h2 class="heading-medium">How to change the sign-in method for your team</h2>
+  <h2 class="heading-medium">Hoe u de aanmeldmethode voor uw team wijzigt</h2>
 
   <ol class="govuk-list govuk-list--number">
-    <li>Go to the {{ service_link(current_service, 'main.service_settings', 'Settings') }} page.</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">Sign-in method</b> row.</li>
+    <li>Ga naar de {{ service_link(current_service, 'main.service_settings', 'Instellingen') }} pagina.</li>
+    <li>Selecteer <b class="govuk-!-font-weight-bold">Wijzigen</b> bij de rij <b class="govuk-!-font-weight-bold">Aanmeldmethode</b>.</li>
   </ol>
 
-  <p class="govuk-body">Now go to the <b class="govuk-!-font-weight-bold">Team members</b> page to choose the sign-in method for each person on your team.</p>
+  <p class="govuk-body">Ga vervolgens naar de pagina <b class="govuk-!-font-weight-bold">Teamleden</b> om de aanmeldmethode voor elke persoon in uw team te kiezen.</p>
 
 {% endblock %}

@@ -21,9 +21,9 @@
     <p class="govuk-body">
       {% if notification.is_precompiled_letter %}
         {% if notification.created_by %}
-          Uploaded
+          Geüpload
         {% else %}
-          Provided as PDF
+          Aangeleverd als PDF
         {% endif %}
       {% else %}
         {% if help %}
@@ -31,15 +31,15 @@
         {% else %}
           <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_template', service_id=current_service.id, template_id=template.id) }}">‘{{ template.name }}’</a>
         {% endif %}
-        was sent
+        is verzonden
       {% endif %}
       {% if notification.job and notification.job.original_file_name != 'Report' %}
         {% set destination =
-          {'letter': 'an address', 'email': 'an email address', 'sms': 'a phone number'} %}
-        to {{ destination[template.template_type] }} from
+          {'letter': 'een adres', 'email': 'een e-mailadres', 'sms': 'een telefoonnummer'} %}
+        naar {{ destination[template.template_type] }} van
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job', service_id=current_service.id, job_id=notification.job.id) }}">{{ notification.job.original_file_name }}</a>
       {% elif notification.created_by %}
-        by {{ notification.created_by.name }}
+        door {{ notification.created_by.name }}
       {% endif %}
       {{ notification.created_at|format_datetime_human }}
     </p>
@@ -47,7 +47,7 @@
     {% if template.template_type == 'letter' %}
       {% if notification.status == 'cancelled' %}
         <p class="notification-status-cancelled">
-          Cancelled {{ notification.updated_at|format_datetime_short }}
+          Geannuleerd {{ notification.updated_at|format_datetime_short }}
         </p>
       {% elif notification.status == 'validation-failed' %}
         <p class="notification-status-cancelled">
@@ -55,22 +55,21 @@
         </p>
       {% elif notification.status == 'permanent-failure' %}
          <p class="notification-status-cancelled">
-          Permanent failure – The provider cannot print the letter. Your letter will not be dispatched.
+          Permanente fout – De leverancier kan de brief niet printen. Uw brief wordt niet verzonden.
          </p>
       {% elif notification.status == 'technical-failure' %}
         <p class="notification-status-cancelled">
-          Technical failure – Notify will resend once the team have
-          fixed the problem
+          Technische fout – Notify probeert opnieuw zodra het team het probleem heeft opgelost
         </p>
       {% else %}
         {% if notification.sent_with_test_key %}
           {% if notification.is_precompiled_letter %}
             <p class="govuk-body">
-              This letter passed our checks, but we will not print it because you used a test key.
+              Deze brief is gecontroleerd, maar wordt niet geprint omdat u een testcode gebruikte.
             </p>
           {% else %}
             <p class="govuk-body">
-              We will not print this letter because you used a test key.
+              We printen deze brief niet omdat u een testcode gebruikte.
             </p>
           {% endif %}
         {% else %}
@@ -78,7 +77,7 @@
             {{ notification.letter_print_day }}
           </p>
           <p class="govuk-body">
-            Estimated delivery date: {{ notification.estimated_letter_delivery_date|format_day_of_week }} {{ notification.estimated_letter_delivery_date|format_date_short }}
+            Geschatte bezorgdatum: {{ notification.estimated_letter_delivery_date|format_day_of_week }} {{ notification.estimated_letter_delivery_date|format_date_short }}
           </p>
         {% endif %}
       {% endif %}
@@ -93,12 +92,12 @@
         <div class="page-footer">
           {% if notification.letter_can_be_cancelled %}
             <span class="page-footer-delete-link page-footer-delete-link-without-button">
-              <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification.id) }}">Cancel sending this letter</a>
+              <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter', service_id=current_service.id, notification_id=notification.id) }}">Verzending van deze brief annuleren</a>
             </span>
           {% else %}
             <div>&nbsp;</div>
           {% endif %}
-          <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link-without-button" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification.id, filetype='pdf') }}" download>Download as a PDF</a>
+          <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link-without-button" href="{{ url_for('main.view_letter_notification_as_preview', service_id=current_service.id, notification_id=notification.id, filetype='pdf') }}" download>Download als PDF</a>
         </div>
       </div>
     {% elif template.template_type == 'email' %}
@@ -113,7 +112,7 @@
 
     {% if current_user.has_permissions('send_messages') and current_user.has_permissions('view_activity') and template.template_type == 'sms' and current_service.has_permission("inbound_sms") %}
       <p class="govuk-body">
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.conversation', service_id=current_service.id, notification_id=notification.id, _anchor='n{}'.format(notification.id)) }}">See all text messages sent to this phone number</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.conversation', service_id=current_service.id, notification_id=notification.id, _anchor='n{}'.format(notification.id)) }}">Bekijk alle sms-berichten die naar dit telefoonnummer zijn gestuurd</a>
       </p>
     {% endif %}
 

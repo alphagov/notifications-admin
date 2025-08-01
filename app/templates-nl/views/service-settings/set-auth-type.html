@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set heading = 'Sign-in method' %}
+{% set heading = 'Inlogmethode' %}
 
 {% block service_page_title %}
   {{ heading }}
@@ -21,21 +21,21 @@
       {{ page_header(heading) }}
 
       <p class="govuk-body">
-        The most secure way to sign in to Notify is with a text message code.
+        De veiligste manier om in te loggen bij Notify is met een code via sms.
       </p>
       <p class="govuk-body">
-        Team members can also sign in using a link that’s sent in an email.
-        For security, you should only do this if they access their email accounts using:
+        Teamleden kunnen ook inloggen met een link die per e-mail wordt verzonden.
+        Uit veiligheidsoverwegingen doet u dit alleen als zij hun e-mailaccount openen via:
       </p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>a work-issued device</li>
-        <li>an office network or VPN</li>
-        <li>another type of two-factor authentication</li>
+        <li>een door het werk verstrekt apparaat</li>
+        <li>een kantoornetwerk of VPN</li>
+        <li>een andere vorm van tweefactorauthenticatie</li>
       </ul>
 
       {% call form_wrapper() %}
         {{ form.sign_in_method }}
-        {{ page_footer('Continue') }}
+        {{ page_footer('Doorgaan') }}
       {% endcall %}
 
     </div>

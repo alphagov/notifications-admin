@@ -4,7 +4,7 @@
 {% from "govuk_frontend_jinja/components/tabs/macro.html" import govukTabs %}
 
 {% block per_page_title %}
-  Search
+  Zoeken
 {% endblock %}
 
 {% block platform_admin_content %}
@@ -23,14 +23,14 @@
               "formGroup": {"classes": "notify-simple-search-form__form-group"},
               "classes": "notify-simple-search-form__textbox",
               "hint": {
-                "text": "Search for users, services, and organisations by name or partial name, or find any other Notify object by UUID."
+                "text": "Zoek naar gebruikers, diensten en organisaties op naam of deel van de naam, of vind een ander Notify-object via UUID."
               },
             }
           )
         }}
         {{ govukButton({
           "classes": "notify-simple-search-form__button",
-          "html": "Search <span class=\"govuk-visually-hidden\">for services</span>"
+          "html": "Zoeken <span class=\"govuk-visually-hidden\">naar diensten</span>"
         }) }}
       {% endcall %}
     </div>
@@ -39,7 +39,7 @@
       {% set items = [] %}
       {% if users %}
         {% set users_html %}
-          <h2 class="govuk-heading-m">Users</h2>
+          <h2 class="govuk-heading-m">Gebruikers</h2>
           <div class="browse-list browse-list--tabbed">
             <ul>
             {% for user in users %}
@@ -53,7 +53,7 @@
         {% endset %}
 
         {% do items.append({
-            "label": "Users (" + (users | count | string) + ")",
+            "label": "Gebruikers (" + (users | count | string) + ")",
             "id": "search-users",
             "panel": {"html": users_html},
           })
@@ -62,7 +62,7 @@
 
       {% if services %}
         {% set services_html %}
-          <h2 class="govuk-heading-m">Services</h2>
+          <h2 class="govuk-heading-m">Diensten</h2>
           <div class="browse-list browse-list--tabbed">
             <ul>
             {% for service in services %}
@@ -75,7 +75,7 @@
         {% endset %}
 
         {% do items.append({
-            "label": "Services (" + (services | count | string) + ")",
+            "label": "Diensten (" + (services | count | string) + ")",
             "id": "search-services",
             "panel": {"html": services_html},
           })
@@ -84,7 +84,7 @@
 
       {% if organisations %}
         {% set organisations_html %}
-          <h2 class="govuk-heading-m">Organisations</h2>
+          <h2 class="govuk-heading-m">Organisaties</h2>
           <div class="browse-list browse-list--tabbed">
             <ul>
             {% for organisation in organisations %}
@@ -97,7 +97,7 @@
         {% endset %}
 
         {% do items.append({
-            "label": "Organisations (" + (organisations | count | string) + ")",
+            "label": "Organisaties (" + (organisations | count | string) + ")",
             "id": "search-organisations",
             "panel": {"html": organisations_html},
           })
@@ -109,7 +109,7 @@
           {{ govukTabs({"items": items}) }}
         {% else %}
           <p class="govuk-body">
-            No results found.
+            Geen resultaten gevonden.
           </p>
         {% endif %}
       </div>

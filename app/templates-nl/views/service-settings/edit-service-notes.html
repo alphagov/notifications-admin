@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Edit service notes
+  Service-opmerkingen bewerken
 {% endblock %}
 
 {% block backLink %}
@@ -14,7 +14,7 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Edit service notes') }}
+    {{ page_header('Service-opmerkingen bewerken') }}
     {% call form_wrapper(
       module="autofocus",
       data_kwargs={'force-focus': True}
@@ -28,7 +28,7 @@
           "data-autofocus-textbox": "true"
         }
       }) }}
-      {{ page_footer('Save') }}
+      {{ page_footer('Opslaan') }}
     {% endcall %}
 
 {% endblock %}

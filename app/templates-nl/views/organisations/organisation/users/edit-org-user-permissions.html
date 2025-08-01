@@ -17,9 +17,9 @@
 {% block maincolumn_content %}
   {% if delete %}
     {{ banner(
-      'Are you sure you want to remove {}?'.format(user.name),
+      'Weet u zeker dat u {} wilt verwijderen?'.format(user.name),
       type='dangerous',
-      delete_button='Yes, remove',
+      delete_button='Ja, verwijderen',
       action=url_for('main.remove_user_from_organisation', org_id=current_organisation.id, user_id=user.id)
     ) }}
   {% endif %}
@@ -36,9 +36,9 @@
     {% include 'views/organisations/organisation/users/permissions.html' %}
 
     {{ page_footer(
-      'Save',
+      'Opslaan',
       delete_link=url_for('main.edit_organisation_user', org_id=current_organisation.id, user_id=user.id, delete='yes'),
-      delete_link_text='Remove this team member'
+      delete_link_text='Dit teamlid verwijderen'
     ) }}
 
   {% endcall %}

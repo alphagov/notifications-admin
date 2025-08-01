@@ -7,7 +7,7 @@
 {%  from "components/branding-preview.html" import letter_branding_preview %}
 
 {% block org_page_title %}
-  Letter branding
+  Briefhuisstijl
 {% endblock %}
 
 {% block backLink %}
@@ -15,10 +15,10 @@
 {%  endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Letter branding") }}
+  {{ page_header("Briefhuisstijl") }}
 
   <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
-    {{ current_org.letter_branding.name or "No branding" }}<span class="hint govuk-!-font-weight-regular">&ensp;(default)</span>
+    {{ current_org.letter_branding.name or "Geen huisstijl" }}<span class="hint govuk-!-font-weight-regular">&ensp;(standaard)</span>
   </h2>
 
   {% if current_org.letter_branding_id %}
@@ -28,7 +28,7 @@
         class="govuk-link govuk-link--no-visited-state"
         href="{{ url_for('main.organisation_letter_branding', org_id=current_org.id) }}?change_default_branding_to_none"
       >
-        Use no branding as default instead
+        Gebruik geen huisstijl als standaard
       </a>
     </p>
   {% else %}
@@ -47,7 +47,7 @@
           {{ form.letter_branding_id(value=option.id) }}
           {{ govukButton({
             "element": "input",
-            "text": "Make default",
+            "text": "Standaard maken",
             "classes": "govuk-button--secondary"
           }) }}
         {% endcall %}
@@ -56,7 +56,7 @@
         <p class="govuk-body govuk-!-text-align-right">
           <a href="{{ url_for('main.organisation_letter_branding', org_id=current_org.id) }}?remove_branding_id={{ option.id }}"
            class="govuk-link govuk-link govuk-link--destructive govuk-link--no-visited-state">
-            Remove <span class="govuk-visually-hidden">this branding option</span>
+            Verwijderen <span class="govuk-visually-hidden">van deze huisstijloptie</span>
           </a>
         </p>
       </div>
@@ -67,7 +67,7 @@
 
   <div class="js-stick-at-bottom-when-scrolling">
     {{ page_footer(
-        button_text='Add branding options',
+        button_text='Huisstijlopties toevoegen',
         button_url=url_for('main.add_organisation_letter_branding_options', org_id=current_org.id)
       )
     }}

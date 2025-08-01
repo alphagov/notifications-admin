@@ -2,11 +2,11 @@
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% block org_page_title %}
-  Settings
+  Instellingen
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-medium">Settings</h1>
+  <h1 class="heading-medium">Instellingen</h1>
   <div class="bottom-gutter-3-2">
 
     {% set billing_details_html %}
@@ -19,7 +19,7 @@
           {% endfor %}
         </ul>
       {% else %}
-        None
+        Geen
       {% endif %}
     {% endset %}
 
@@ -28,7 +28,7 @@
         {{ current_org.email_branding.name }}
         <br>
         <span class="govuk-hint">
-          Default
+          Standaard
         </span>
       </div>
 
@@ -43,10 +43,10 @@
 
     {% set letter_branding_html %}
       <div {% if current_org.letter_branding_pool_excluding_default %}class="govuk-!-margin-bottom-3"{% endif %}>
-        {{ current_org.letter_branding.name or "No branding" }}
+        {{ current_org.letter_branding.name or "Geen huisstijl" }}
         <br>
         <span class="govuk-hint">
-          Default
+          Standaard
         </span>
       </div>
       {% for item in current_org.letter_branding_pool_excluding_default %}
@@ -68,7 +68,7 @@
           {% endfor %}
         </ul>
       {% else %}
-        None
+        Geen
       {% endif %}
     {% endset %}
 
@@ -78,7 +78,7 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Name"
+            "text": "Naam"
           },
           "value": {
             "text": current_org.name
@@ -87,8 +87,8 @@
             "items": [
               {
                 "href": url_for('main.edit_organisation_name', org_id=current_org.id),
-                "text": "Change",
-                "visuallyHiddenText": "organisation name",
+                "text": "Wijzigen",
+                "visuallyHiddenText": "naam van de organisatie",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -100,14 +100,14 @@
             "text": "Sector"
           },
           "value": {
-            "text": current_org.organisation_type_label or "Not set"
+            "text": current_org.organisation_type_label or "Niet ingesteld"
           },
           "actions": {
             "items": [
               {
                 "href": url_for('main.edit_organisation_type', org_id=current_org.id),
-                "text": "Change",
-                "visuallyHiddenText": "sector for the organisation",
+                "text": "Wijzigen",
+                "visuallyHiddenText": "sector van de organisatie",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -116,18 +116,18 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Crown organisation"
+            "text": "Rijksorganisatie"
           },
           "value": {
-            "text": "Not sure" if current_org.crown is none else "Yes" if current_org.crown else "No",
+            "text": "Onbekend" if current_org.crown is none else "Ja" if current_org.crown else "Nee",
             "classes": "govuk-summary-list__value--default" if current_org.crown is none
           },
           "actions": {
             "items": [
               {
                 "href":  url_for('main.edit_organisation_crown_status', org_id=current_org.id),
-                "text": "Change",
-                "visuallyHiddenText": "organisation crown status",
+                "text": "Wijzigen",
+                "visuallyHiddenText": "status Rijksorganisatie",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -136,18 +136,18 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Data processing and financial agreement"
+            "text": "Verwerking- en financiële overeenkomst"
           },
           "value": {
-            "text": "Not signed (but we have some service-specific agreements in place)" if current_org.agreement_signed is none else "Signed" if current_org.agreement_signed else "Not signed",
+            "text": "Niet ondertekend (maar er zijn enkele diensten-specifieke overeenkomsten)" if current_org.agreement_signed is none else "Ondertekend" if current_org.agreement_signed else "Niet ondertekend",
             "classes": "govuk-summary-list__value--truncate" if current_org.agreement_signed is none
           },
           "actions": {
             "items": [
               {
                 "href": url_for('main.edit_organisation_agreement', org_id=current_org.id),
-                "text": "Change",
-                "visuallyHiddenText": "data processing and financial agreement for the organisation",
+                "text": "Wijzigen",
+                "visuallyHiddenText": "verwerking- en financiële overeenkomst van de organisatie",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -156,18 +156,18 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Request to go live notes"
+            "text": "Opmerkingen bij livegang-verzoek"
           },
           "value": {
-            "text": current_org.request_to_go_live_notes or "None",
+            "text": current_org.request_to_go_live_notes or "Geen",
             "classes": "govuk-summary-list__value--default" if current_org.request_to_go_live_notes is none else "govuk-summary-list__value--truncate"
           },
           "actions": {
             "items": [
               {
                 "href": url_for('main.edit_organisation_go_live_notes', org_id=current_org.id),
-                "text": "Change",
-                "visuallyHiddenText": "go live notes for the organisation",
+                "text": "Wijzigen",
+                "visuallyHiddenText": "opmerkingen bij livegang-verzoek",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -176,7 +176,7 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Can approve own go-live requests"
+            "text": "Kan eigen livegang-verzoeken goedkeuren"
           },
           "value": {
             "text": current_org.can_approve_own_go_live_requests|format_yes_no
@@ -185,8 +185,8 @@
             "items": [
               {
                 "href": url_for('main.edit_organisation_can_approve_own_go_live_requests', org_id=current_org.id),
-                "text": "Change",
-                "visuallyHiddenText": "whether this organisation can approve its own go-live requests",
+                "text": "Wijzigen",
+                "visuallyHiddenText": "of deze organisatie eigen livegang-verzoeken kan goedkeuren",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -195,7 +195,7 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Users can ask to join services"
+            "text": "Gebruikers kunnen verzoeken om diensten te joinen"
           },
           "value": {
             "text": current_org.can_ask_to_join_a_service|format_yes_no
@@ -204,8 +204,8 @@
             "items": [
               {
                 "href": url_for('main.edit_organisation_can_ask_to_join_a_service', org_id=current_org.id),
-                "text": "Change",
-                "visuallyHiddenText": "whether this users can ask to join services in this organisation",
+                "text": "Wijzigen",
+                "visuallyHiddenText": "of gebruikers kunnen vragen om diensten te joinen binnen deze organisatie",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -214,7 +214,7 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Billing details"
+            "text": "Facturatiegegevens"
           },
           "value": {
             "text": billing_details_html
@@ -223,8 +223,8 @@
             "items": [
               {
                 "href": url_for('main.edit_organisation_billing_details', org_id=current_org.id),
-                "text": "Change",
-                "visuallyHiddenText": "billing details for the organisation",
+                "text": "Wijzigen",
+                "visuallyHiddenText": "facturatiegegevens van de organisatie",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -233,18 +233,18 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Notes"
+            "text": "Notities"
           },
           "value": {
-            "text": current_org.notes or "None",
+            "text": current_org.notes or "Geen",
             "classes": "govuk-summary-list__value--default" if current_org.notes is none
           },
           "actions": {
             "items": [
               {
                 "href": url_for('main.edit_organisation_notes', org_id=current_org.id),
-                "text": "Change",
-                "visuallyHiddenText": "the notes for the organisation",
+                "text": "Wijzigen",
+                "visuallyHiddenText": "de notities voor de organisatie",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -253,7 +253,7 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Email branding options"
+            "text": "E-mail huisstijl opties"
           },
           "value": {
             "text": email_branding_html
@@ -262,8 +262,8 @@
             "items": [
               {
                 "href": url_for('main.organisation_email_branding', org_id=current_org.id),
-                "text": "Manage",
-                "visuallyHiddenText": "email branding options for the organisation",
+                "text": "Beheren",
+                "visuallyHiddenText": "e-mail huisstijl opties voor de organisatie",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -272,7 +272,7 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Letter branding options"
+            "text": "Brief huisstijl opties"
           },
           "value": {
             "text": letter_branding_html
@@ -281,8 +281,8 @@
             "items": [
               {
                 "href": url_for('main.organisation_letter_branding', org_id=current_org.id),
-                "text": "Manage",
-                "visuallyHiddenText": "letter branding options for the organisation",
+                "text": "Beheren",
+                "visuallyHiddenText": "brief huisstijl opties voor de organisatie",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -291,7 +291,7 @@
         {
           "key": {
             "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-            "text": "Known email domains"
+            "text": "Bekende e-maildomeinen"
           },
           "value": {
             "text": known_domains_html,
@@ -301,8 +301,8 @@
             "items": [
               {
                 "href": url_for('main.edit_organisation_domains', org_id=current_org.id),
-                "text": "Change",
-                "visuallyHiddenText": "known email domains for the organisation",
+                "text": "Wijzigen",
+                "visuallyHiddenText": "bekende e-maildomeinen voor de organisatie",
                 "classes": "govuk-link--no-visited-state"
               }
             ]
@@ -314,7 +314,7 @@
       <p class="top-gutter-1-2">
         <span class="page-footer-link page-footer-delete-link-without-button">
           <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.archive_organisation', org_id=current_org.id) }}">
-            Delete this organisation
+            Deze organisatie verwijderen
           </a>
         </span>
       </p>

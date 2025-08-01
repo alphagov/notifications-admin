@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set heading = 'Change your service name' %}
+{% set heading = 'Wijzig uw dienstnaam' %}
 
 {% block service_page_title %}
   {{ heading }}
@@ -16,31 +16,31 @@
 
 {% block maincolumn_content %}
   {{ page_header(heading) }}
-  <p class="govuk-body">This is the name your emails will come from.</p>
-  <p class="govuk-body">You can also display it at the start of every text message you send.</p>
+  <p class="govuk-body">Dit is de naam waar uw e-mails vandaan komen.</p>
+  <p class="govuk-body">U kunt deze ook weergeven aan het begin van elk sms-bericht dat u verzendt.</p>
 
   {% if organisation_type == 'central' or organisation_type == 'local'  %}
-    <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
+    <p class="govuk-body">De naam van uw dienst moet de ontvanger vertellen waar uw bericht over gaat, en van wie het afkomstig is. Bijvoorbeeld:</p>
 
     <ul class="govuk-list govuk-list--bullet">
     {% if organisation_type == 'central' %}
-      <li>Register to vote</li>
-      <li>Renew your Passport</li>
-      <li>Check your state pension</li>
+      <li>Inschrijven om te stemmen</li>
+      <li>Vernieuw uw paspoort</li>
+      <li>Controleer uw AOW-uitkering</li>
     {% elif organisation_type == 'local' %}
-      <li>School admissions - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
-      <li>Electoral services - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
-      <li>Blue Badge - {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+      <li>Schoolinschrijvingen – {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+      <li>Verkiezingsdiensten – {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
+      <li>Blauwe parkeervergunning – {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
     {% endif %}
     </ul>
   {% else %}
-    <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from.</p>
+    <p class="govuk-body">De naam van uw dienst moet de ontvanger vertellen waar uw bericht over gaat, en van wie het afkomstig is.</p>
   {% endif %}
 
-  <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
+  <p class="govuk-body">Gebruik geen acroniem of afkorting, tenzij uw gebruikers daar al mee bekend zijn.</p>
 
   {% call form_wrapper() %}
     {{ form.name }}
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 {% endblock %}

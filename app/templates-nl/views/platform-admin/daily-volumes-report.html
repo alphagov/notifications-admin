@@ -4,39 +4,39 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block per_page_title %}
-  Daily volumes report
+  Dagelijks volumerapport
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-large">
-    Daily volumes Report
+    Dagelijks volumerapport
   </h1>
 
   {% call form_wrapper() %}
-    {{ form.start_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
-    {{ form.end_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
-    {{ page_footer('Download report (CSV)') }}
+    {{ form.start_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ page_footer('Download rapport (CSV)') }}
   {% endcall %}
 
   <h2 class="heading-medium">
-    Data included in the report
+    Gegevens opgenomen in het rapport
   </h2>
 <div class="bottom-gutter-3-2">
     {% call mapping_table(
-      caption='Descriptions of daily volumes data',
-      field_headings=['Name', 'Description'],
+      caption='Beschrijving van dagelijkse volumegegevens',
+      field_headings=['Naam', 'Beschrijving'],
       field_headings_visible=True,
       caption_visible=False
     ) %}
       {% for column_heading, description in [
-        ('day', 'The whole business day in BST.'),
-        ('sms totals', 'The number of text messages sent'),
-        ('sms fragments', 'The number of text message fragments sent times the rate multiplier'),
-        ('sms chargeable units', 'The number of text message fragments sent'),
-        ('email totals', 'The number of emails sent'),
-        ('letter totals', 'The number of letters sent'),
-        ('letter sheet totals', 'The number of sheets sent')
+        ('day', 'De hele werkdag in BST.'),
+        ('sms totals', 'Het aantal verzonden sms-berichten'),
+        ('sms fragments', 'Het aantal verzonden sms-fragmenten vermenigvuldigd met de tariefvermenigvuldiger'),
+        ('sms chargeable units', 'Het aantal verzonden sms-fragmenten'),
+        ('email totals', 'Het aantal verzonden e-mails'),
+        ('letter totals', 'Het aantal verzonden brieven'),
+        ('letter sheet totals', 'Het aantal verzonden pagina\'s')
       ] %}
         {% call row() %}
           {{ text_field(column_heading) }}

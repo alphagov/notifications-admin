@@ -1,42 +1,42 @@
 {% extends "content_template.html" %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Using Notify' %}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
 
 {% block per_page_title %}
-  Optional content
+  Optionele inhoud
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Optional content</h1>
+  <h1 class="heading-large">Optionele inhoud</h1>
 
-  <p class="govuk-body">Add optional content to a template to tailor your messages for different audiences.</p>
+  <p class="govuk-body">Voeg optionele inhoud toe aan een template om uw berichten af te stemmen op verschillende doelgroepen.</p>
 
-  <p class="govuk-body">For example, if you only want to show a sentence to people who are under 18:</p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li>put it inside double brackets</li>
-    <li>give it a unique placeholder name, followed by 2 question marks</li>
-  </ul>
-
-  <p class="govuk-body">Your optional content should look like this:</p>
-
-  <pre class="formatting-example">((under18??Please get your application signed by a parent or guardian.))</code></pre>
-
-<div class="govuk-inset-text">
-    <p class="govuk-body">You cannot add a placeholder for personalisation within optional content. </p>
- </div>
-
-<p class="govuk-body">For each person you send the message to, specify ‘yes’ or ‘no’ to show or hide the optional content.</p>
-
-  <p class="govuk-body">You can either:</p>
+  <p class="govuk-body">Bijvoorbeeld, als u een zin alleen wilt tonen aan mensen jonger dan 18 jaar:</p>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>do this yourself when you send the message</li>
-    <li>upload a list of personal details and let Notify do it for you</li>
+    <li>plaats deze tussen dubbele haakjes</li>
+    <li>geef het een unieke plaatsaanduiding, gevolgd door 2 vraagtekens</li>
   </ul>
 
-  <p class="govuk-body">If you upload a list of personal details, the column names need to match the placeholder names in your template.</p>
+  <p class="govuk-body">Uw optionele inhoud ziet er zo uit:</p>
+
+  <pre class="formatting-example">((under18??Please get your application signed by a parent or guardian.))</pre>
+
+  <div class="govuk-inset-text">
+    <p class="govuk-body">U kunt binnen optionele inhoud geen plaatsaanduiding voor personalisatie toevoegen.</p>
+  </div>
+
+  <p class="govuk-body">Voor elke persoon aan wie u het bericht verstuurt, geeft u ‘yes’ of ‘no’ op om de optionele inhoud te tonen of te verbergen.</p>
+
+  <p class="govuk-body">U kunt dit op twee manieren doen:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>dit zelf aangeven bij het versturen van het bericht</li>
+    <li>een lijst met persoonsgegevens uploaden en Notify dit laten regelen</li>
+  </ul>
+
+  <p class="govuk-body">Als u een lijst met persoonsgegevens uploadt, moeten de kolomnamen overeenkomen met de plaatsaanduidingen in uw template.</p>
 
 {% endblock %}

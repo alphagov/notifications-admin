@@ -13,11 +13,11 @@
         {% include 'views/dashboard/_jobs.html' %}
       {% else %}
         <p class="govuk-body">
-          You have not uploaded any files recently.
+          U heeft recent geen bestanden geüpload.
         </p>
         {% if current_user.has_permissions('send_messages') and current_service.has_permission('letter')%}
           <p class="govuk-body">
-            Upload a letter and Notify will print, pack and post it for you.
+            Upload een brief en Notify zal deze voor u afdrukken, verpakken en versturen.
           </p>
         {% endif %}
       {% endif %}
@@ -27,14 +27,14 @@
           {% if current_service.has_permission('letter') %}
             {{ govukButton({
               "element": "a",
-              "text": "Upload a letter",
+              "text": "Upload een brief",
               "href": url_for('main.upload_letter', service_id=current_service.id),
               "classes": "govuk-button--secondary govuk-!-margin-right-3"
             }) }}
           {% endif %}
           {{ govukButton({
             "element": "a",
-            "text": "Upload an emergency contact list",
+            "text": "Upload een noodcontactlijst",
             "href": url_for('main.upload_contact_list', service_id=current_service.id),
             "classes": "govuk-button--secondary"
           }) }}

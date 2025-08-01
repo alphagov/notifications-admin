@@ -5,9 +5,8 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Change team member’s email address
+  E-mailadres teamlid wijzigen
 {% endblock %}
-
 
 {% block backLink %}
   {{ govukBackLink({ "href": url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id) }) }}
@@ -15,12 +14,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change team member’s email address') }}
+  {{ page_header('E-mailadres teamlid wijzigen') }}
 
-  <p class="govuk-body" id="user_name">This will change the email address for {{ user.name }}.</p>
+  <p class="govuk-body" id="user_name">Dit verandert het e-mailadres van {{ user.name }}.</p>
   {% call form_wrapper() %}
     {{ form.email_address(param_extensions={"classes": "govuk-!-width-full"}, error_message_with_html=True) }}
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 
 {% endblock %}

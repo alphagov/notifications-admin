@@ -5,7 +5,7 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  Before you start receiving text messages
+  Voordat u begint met het ontvangen van sms-berichten
 {% endblock %}
 
 {% block backLink %}
@@ -16,19 +16,19 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header('Before you start receiving text messages') }}
+      {{ page_header('Voordat u begint met het ontvangen van sms-berichten') }}
       <p class="govuk-body">
-        The messages you receive will only be available to download for {{ current_service.get_days_of_retention('sms') }} days.
+        De berichten die u ontvangt, zijn alleen {{ current_service.get_days_of_retention('sms') }} dagen beschikbaar om te downloaden.
       </p>
       <p class="govuk-body">
-        You are responsible for processing unsubscribe requests.
+        U bent verantwoordelijk voor het verwerken van afmeldverzoeken.
       </p>
       <p class="govuk-body">
-        Recipients may expect you to reply to their messages.
+        Ontvangers verwachten mogelijk dat u op hun berichten reageert.
       </p>
 
       {% call form_wrapper() %}
-        {{ page_footer('I understand – continue') }}
+        {{ page_footer('Ik begrijp het – doorgaan') }}
       {% endcall %}
     </div>
   </div>

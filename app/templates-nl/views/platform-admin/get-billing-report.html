@@ -4,37 +4,37 @@
 {% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block per_page_title %}
-  Billing Report
+  Facturatie Rapport
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-large">
-    Billing Report
+    Facturatie Rapport
   </h1>
 
   {% call form_wrapper() %}
-    {{ form.start_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
-    {{ form.end_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
-    {{ page_footer('Download report (CSV)') }}
+    {{ form.start_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ page_footer('Download rapport (CSV)') }}
   {% endcall %}
 
   <h2 class="heading-medium">
-    Data included in the report
+    Gegevens opgenomen in het rapport
   </h2>
 <div class="bottom-gutter-3-2">
     {% call mapping_table(
-      caption='Descriptions of billing report data',
-      field_headings=['Name', 'Description'],
+      caption='Beschrijving van facturatierapportgegevens',
+      field_headings=['Naam', 'Beschrijving'],
       field_headings_visible=True,
       caption_visible=False
     ) %}
       {% for column_heading, description in [
-        ('sms cost', 'The total cost of text messages sent after a service has used its free allowance.'),
-        ('sms chargeable units', 'The number of fragments sent after a service has used its free allowance. This number takes into account the cost multiplier for <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/pricing#international-numbers">sending international text messages</a>.' | safe),
-        ('letter cost', 'The total cost of letters sent by a service.'),
-        ('letter breakdown', 'The number of letters sent by a service, grouped by postage and unit cost.'),
-        ('purchase order number, contact names, contact email addresses and billing reference', 'We add this data manually based on the information we get from services. You can help by adding it to the service settings page.'),
+        ('sms cost', 'De totale kosten van verzonden sms-berichten nadat een dienst zijn gratis tegoed heeft gebruikt.'),
+        ('sms chargeable units', 'Het aantal verzonden fragmenten nadat een dienst zijn gratis tegoed heeft gebruikt. Dit aantal houdt rekening met de kostvermenigvuldiger voor <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/pricing#international-numbers">internationale sms-berichten</a>.' | safe),
+        ('letter cost', 'De totale kosten van door een dienst verzonden brieven.'),
+        ('letter breakdown', 'Het aantal door een dienst verzonden brieven, gegroepeerd op posttarief en eenheidsprijs.'),
+        ('purchase order number, contact names, contact email addresses and billing reference', 'Deze gegevens voegen wij handmatig toe op basis van informatie die we van diensten ontvangen. U kunt helpen door deze gegevens toe te voegen op de instellingenpagina van de dienst.'),
       ] %}
         {% call row() %}
           {{ text_field(column_heading) }}

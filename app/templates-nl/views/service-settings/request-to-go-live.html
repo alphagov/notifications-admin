@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Before you request to go live
+  Voordat u een livegang aanvraagt
 {% endblock %}
 
 {% block backLink %}
@@ -16,27 +16,27 @@
 {% block maincolumn_content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-      {{ page_header('Before you request to go live') }}
+      {{ page_header('Voordat u een livegang aanvraagt') }}
       {% call task_list_wrapper() %}
         {{ task_list_item(
           current_service.has_estimated_usage,
-          'Tell us how many messages you expect to send',
+          'Geef een schatting van het aantal berichten dat u verwacht te versturen',
           url_for('main.estimate_usage', service_id=current_service.id),
         ) }}
         {{ task_list_item(
           current_service.has_team_members_with_manage_service_permission,
-          'Add a team member who can manage settings, team and usage',
+          'Voeg een teamlid toe dat instellingen, team en gebruik kan beheren',
           url_for('main.manage_users', service_id=current_service.id),
         ) }}
         {{ task_list_item(
           current_service.has_templates,
-          'Add templates with examples of the content you plan to send',
+          'Voeg sjablonen toe met voorbeelden van de content die u wilt versturen',
           url_for('main.choose_template', service_id=current_service.id),
         ) }}
         {% if current_service.intending_to_send_email %}
           {{ task_list_item(
             current_service.has_email_reply_to_address,
-            'Add a reply-to email address',
+            'Voeg een reply-to e-mailadres toe',
             url_for('main.service_email_reply_to', service_id=current_service.id),
           ) }}
         {% endif %}
@@ -46,36 +46,36 @@
         ) %}
           {{ task_list_item(
             not current_service.sms_sender_is_govuk,
-            'Change your Text message sender ID',
+            'Wijzig uw sms-afzender-ID',
             url_for('main.service_sms_senders', service_id=current_service.id),
           ) }}
         {% endif %}
         {% if current_service.able_to_accept_agreement %}
           {{ task_list_item(
             current_service.organisation.agreement_signed,
-            'Accept our data processing and financial agreement',
+            'Accepteer onze overeenkomst voor gegevensverwerking en financiën',
             url_for('main.service_agreement', service_id=current_service.id),
           ) }}
         {% endif %}
       {% endcall %}
       {% if not current_user.is_gov_user %}
         <p class="govuk-body">
-          Only team members with a government email address can request to go live.
+          Alleen teamleden met een overheidse-mailadres kunnen een livegang aanvragen.
         </p>
       {% elif (not current_service.go_live_checklist_completed) or (current_service.able_to_accept_agreement and not current_service.organisation.agreement_signed) %}
         <p class="govuk-body">
-          You must complete these steps before you can request to go live.
+          U moet deze stappen afronden voordat u een livegang kunt aanvragen.
         </p>
       {% elif current_service.has_active_go_live_request %}
         <p class="govuk-body">
-          Your team has already sent a request to go live for this service.
+          Uw team heeft al een verzoek tot livegang voor deze dienst ingediend.
         </p>
       {% else %}
         <p class="govuk-body">
-          When we receive your request we’ll get back to you by the end of the next working day.
+          Wanneer wij uw verzoek ontvangen, nemen wij uiterlijk de volgende werkdag contact met u op.
         </p>
         {% call form_wrapper() %}
-          {{ page_footer('Request to go live') }}
+          {{ page_footer('Livegang aanvragen') }}
         {% endcall %}
       {% endif %}
     </div>

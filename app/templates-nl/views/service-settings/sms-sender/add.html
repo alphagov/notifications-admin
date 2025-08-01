@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Add text message sender ID
+  Afzender-ID voor sms toevoegen
 {% endblock %}
 
 {% block backLink %}
@@ -14,17 +14,17 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Add text message sender ID') }}
+  {{ page_header('Afzender-ID voor sms toevoegen') }}
 
   {% call form_wrapper() %}
     {{ form.sms_sender(param_extensions={
       "classes": "govuk-!-width-one-quarter",
-      "hint": {"text": "Text message sender ID can only include letters, numbers, spaces, and the following characters: & . - _"}
+      "hint": {"text": "De afzender-ID mag alleen letters, cijfers, spaties en de volgende tekens bevatten: & . - _"}
     }) }}
     {% if not first_sms_sender %}
       {{ form.is_default }}
     {% endif %}
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 
 {% endblock %}

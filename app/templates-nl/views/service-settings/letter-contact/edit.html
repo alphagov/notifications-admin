@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Change sender address
+  Wijzig afzendadres
 {% endblock %}
 
 {% block backLink %}
@@ -16,7 +16,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change sender address') }}
+  {{ page_header('Wijzig afzendadres') }}
   {% call form_wrapper() %}
       {{ form.letter_contact_block(param_extensions={
         "classes": "govuk-!-width-one-half govuk-textarea-highlight__textbox",
@@ -26,10 +26,10 @@
           "data-highlight-placeholders": "true"
         },
         "label": {
-          "text": "This will appear as the sender address on your letters"
+          "text": "Dit wordt het afzendadres op uw brieven"
         },
         "hint": {
-          "text": "10 lines maximum"
+          "text": "Maximaal 10 regels"
         },
         "formGroup": {
           "classes": "govuk-textarea-highlight",
@@ -38,16 +38,16 @@
 
     {% if form.is_default.data %}
       <p class="form-group">
-        This is currently your default address for {{ current_service.name }}.
+        Dit is momenteel het standaardadres voor {{ current_service.name }}.
       </p>
     {% else %}
       {{ form.is_default }}
     {% endif %}
 
     {{ page_footer(
-      'Save',
+      'Opslaan',
       delete_link=url_for('main.service_confirm_delete_letter_contact', service_id=current_service.id, letter_contact_id=letter_contact_id),
-      delete_link_text='Delete'
+      delete_link_text='Verwijderen'
     ) }}
 
   {% endcall %}

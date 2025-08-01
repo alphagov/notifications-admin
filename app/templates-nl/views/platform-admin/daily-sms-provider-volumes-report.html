@@ -4,38 +4,38 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block per_page_title %}
-  Daily SMS provider volumes Report
+  Dagelijks rapport SMS-provider volumes
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-large">
-    Daily SMS provider volumes Report
+    Dagelijks rapport SMS-provider volumes
   </h1>
 
   {% call form_wrapper() %}
-    {{ form.start_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
-    {{ form.end_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
-    {{ page_footer('Download report (CSV)') }}
+    {{ form.start_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ page_footer('Download rapport (CSV)') }}
   {% endcall %}
 
   <h2 class="heading-medium">
-    Data included in the report
+    Gegevens opgenomen in het rapport
   </h2>
 <div class="bottom-gutter-3-2">
     {% call mapping_table(
-      caption='Descriptions of daily SMS provider volumes data',
-      field_headings=['Name', 'Description'],
+      caption='Beschrijving van dagelijkse SMS-provider volumes',
+      field_headings=['Naam', 'Beschrijving'],
       field_headings_visible=True,
       caption_visible=False
     ) %}
       {% for column_heading, description in [
-        ('day', 'The whole business day in BST'),
-        ('provider', 'The SMS provider'),
-        ('sms totals', 'The number of text messages sent'),
-        ('sms fragments', 'The number of text message fragments sent'),
-        ('sms chargeable units', 'The number of text message fragments sent times the rate multiplier'),
-        ('sms cost', 'The cost to Notify’s users of text messages sent'),
+        ('day', 'De hele werkdag in BST'),
+        ('provider', 'De SMS-provider'),
+        ('sms totals', 'Het aantal verzonden sms-berichten'),
+        ('sms fragments', 'Het aantal verzonden sms-fragmenten'),
+        ('sms chargeable units', 'Het aantal verzonden sms-fragmenten vermenigvuldigd met de tariefvermenigvuldiger'),
+        ('sms cost', 'De kosten voor Notify-gebruikers van verzonden sms-berichten'),
       ] %}
         {% call row() %}
           {{ text_field(column_heading) }}

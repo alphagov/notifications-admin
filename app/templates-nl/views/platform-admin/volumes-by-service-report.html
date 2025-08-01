@@ -4,39 +4,39 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block per_page_title %}
-  Volumes by service report
+  Rapport volumes per dienst
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-large">
-    Volumes by service Report
+    Rapport volumes per dienst
   </h1>
 
   {% call form_wrapper() %}
-    {{ form.start_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
-    {{ form.end_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
-    {{ page_footer('Download report (CSV)') }}
+    {{ form.start_date(param_extensions={"hint": {"text": "Gebruik het formaat YYYY-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Gebruik het formaat YYYY-MM-DD"}}) }}
+    {{ page_footer('Download rapport (CSV)') }}
   {% endcall %}
 
   <h2 class="heading-medium">
-    Data included in the report
+    Gegevens opgenomen in het rapport
   </h2>
 <div class="bottom-gutter-3-2">
     {% call mapping_table(
-      caption='Descriptions of volumes by service data',
-      field_headings=['Name', 'Description'],
+      caption='Omschrijving van volumes per dienst',
+      field_headings=['Naam', 'Omschrijving'],
       field_headings_visible=True,
       caption_visible=False
     ) %}
       {% for column_heading, description in [
-        ('free allowance', 'Free allowance set for the service. This is the latest free allowance for the date range given'),
-        ('sms notifications', 'The number of text messages sent by the service.'),
-        ('sms chargeable units', 'The number of text message fragments times the rate multiplier sent by the service.'),
-        ('email totals', 'The number of emails sent by a service'),
-        ('letter totals', 'The number of letters sent by a service'),
-        ('letter costs', 'The cost of the letters, rate * letter totals'),
-        ('letter sheet totals', 'The number of sheet sent by a service')
+        ('gratis tegoed', 'Gratis tegoed ingesteld voor de dienst. Dit is het laatste gratis tegoed binnen de opgegeven datumbereik'),
+        ('sms-meldingen', 'Het aantal verzonden sms-berichten door de dienst.'),
+        ('sms kostenunits', 'Het aantal sms-berichtfragmenten vermenigvuldigd met de tariefvermenigvuldiger verzonden door de dienst.'),
+        ('e-mail totaal', 'Het aantal verzonden e-mails door een dienst'),
+        ('brief totaal', 'Het aantal verzonden brieven door een dienst'),
+        ('briefkosten', 'De kosten van de brieven, tarief × aantal brieven'),
+        ('aantal vellen brieven', 'Het aantal verzonden vellen door een dienst')
       ] %}
         {% call row() %}
           {{ text_field(column_heading) }}

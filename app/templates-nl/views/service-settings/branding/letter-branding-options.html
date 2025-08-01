@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/branding-preview.html" import letter_branding_preview %}
 
-{% set page_title = 'Change letter branding' %}
+{% set page_title = 'Briefhuisstijl wijzigen' %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -22,22 +22,22 @@
   {{ page_header(page_title) }}
 
   <p class="govuk-body">
-    Your letters currently have {{ current_service.letter_branding.name or 'no' }} branding.
+    Uw brieven hebben momenteel {{ current_service.letter_branding.name or 'geen' }} huisstijl.
   </p>
 
   {% if current_service.letter_branding %}
-    {{ letter_branding_preview(current_service.letter_branding_id, title='Preview of current letter branding') }}
+    {{ letter_branding_preview(current_service.letter_branding_id, title='Voorbeeld van de huidige briefhuisstijl') }}
   {% endif %}
 
   {% call form_wrapper() %}
-    {# make something_else always selected if it's the only thing available #}
+    {# selecteer 'iets anders' altijd als dat de enige optie is #}
     {% if form.something_else_is_only_option %}
       <input type="hidden" name="options" value="something_else"/>
     {% else %}
       {{ form.options }}
     {% endif %}
 
-    {{ page_footer('Continue') }}
+    {{ page_footer('Doorgaan') }}
   {% endcall %}
 
 {% endblock %}

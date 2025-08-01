@@ -3,55 +3,55 @@
 {% from "components/service-link.html" import service_link %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Using Notify' %}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
 
 {% block per_page_title %}
-  Personalisation
+  Personalisatie
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Personalisation</h1>
+  <h1 class="heading-large">Personalisatie</h1>
 
-  <p class="govuk-body">You can send personalised messages using a single template.</p>
+  <p class="govuk-body">U kunt gepersonaliseerde berichten versturen met één template.</p>
 
-  <p class="govuk-body">To personalise a message, use double brackets to add a placeholder to your content. For example:</p>
+  <p class="govuk-body">Gebruik dubbele haakjes om een plaatsaanduiding toe te voegen aan uw inhoud. Bijvoorbeeld:</p>
 
-  <pre class="formatting-example"><code class="lang-md">Hello ((first name)), your reference is ((reference number)).</code></pre>
+  <pre class="formatting-example"><code class="lang-md">Hallo ((voornaam)), uw referentie is ((referentienummer)).</code></pre>
 
-  <p class="govuk-body">Each time you send the message, you can either:</p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li>fill in the placeholders yourself</li>
-    <li>upload a list of personal details and let Notify do it for you</li>
-  </ul>
-
-  <p class="govuk-body">If you upload a list of personal details, the column names in your spreadsheet need to match the placeholders in the template.</p>
-
-  <p class="govuk-body">You can use personalisation to add:</p>
+  <p class="govuk-body">Elke keer dat u het bericht verstuurt, kunt u:</p>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_optional_content') }}">optional content</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_qr_codes') }}">a QR code to a letter template</a></li>
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_formatting') }}">custom bullet points to email and letter templates</a></li>
+    <li>de plaatsaanduidingen zelf invullen</li>
+    <li>een lijst met persoonsgegevens uploaden en Notify dit voor u laten doen</li>
   </ul>
 
-  <h2 class="heading-medium" id="hide-personalised-content">Hide personalised content after sending</h2>
+  <p class="govuk-body">Als u een lijst met persoonsgegevens uploadt, moeten de kolomnamen in uw spreadsheet overeenkomen met de plaatsaanduidingen in de template.</p>
 
-  <p class="govuk-body">Some placeholders include sensitive information like security codes or password reset links. To protect your users, you can choose to hide the content of these placeholders after sending.</p>
+  <p class="govuk-body">U kunt personalisatie gebruiken om toe te voegen:</p>
 
-  <p class="govuk-body">Only the recipient will be able to see the sensitive information you’ve sent them. You and your team will see a redacted version of the message.</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_optional_content') }}">optionele inhoud</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_qr_codes') }}">een QR-code aan een lettertemplate</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_formatting') }}">aangepaste opsommingstekens voor e-mail- en lettertemplates</a></li>
+  </ul>
 
-  <p class="govuk-body">To hide personalised content after sending:</p>
+  <h2 class="heading-medium" id="hide-personalised-content">Persoonlijke inhoud verbergen na verzending</h2>
+
+  <p class="govuk-body">Sommige plaatsaanduidingen bevatten gevoelige informatie zoals beveiligingscodes of links voor het opnieuw instellen van wachtwoorden. Om uw gebruikers te beschermen, kunt u ervoor kiezen deze inhoud na verzending te verbergen.</p>
+
+  <p class="govuk-body">Alleen de ontvanger kan de gevoelige informatie zien die u hebt verstuurd. U en uw team zien een geanonimiseerde versie van het bericht.</p>
+
+  <p class="govuk-body">Om persoonlijke inhoud na verzending te verbergen:</p>
 
   <ol class="govuk-list govuk-list--number">
-    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
-    <li>Add a new template or choose an existing template.</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Hide personalisation after sending</b>.</li>
+    <li>Ga naar de {{ service_link(current_service, 'main.choose_template', 'templates') }} pagina.</li>
+    <li>Voeg een nieuwe template toe of kies een bestaande template.</li>
+    <li>Selecteer <b class="govuk-!-font-weight-bold">Persoonlijke inhoud verbergen na verzending</b>.</li>
   </ol>
 
-  <p class="govuk-body">You cannot undo this change.</p>
+  <p class="govuk-body">Deze wijziging kunt u niet ongedaan maken.</p>
 
-  <p class="govuk-body">Read more about <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">Notify’s security features</a>.</p>
+  <p class="govuk-body">Lees meer over de <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">beveiligingsfuncties van Notify</a>.</p>
 
 {% endblock %}

@@ -3,18 +3,18 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block per_page_title %}
-  Clear cache
+  Cache wissen
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-medium">
-    Clear cache
+    Cache wissen
   </h1>
 
   {% call form_wrapper() %}
     {{ form.model_type }}
-    {{ page_footer('Clear') }}
+    {{ page_footer('Wissen') }}
   {% endcall %}
 
 {% endblock %}

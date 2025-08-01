@@ -4,15 +4,15 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-  Edit SMS provider priorities
+  Prioriteiten SMS-provider bewerken
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  {{ page_header('Edit SMS provider priorities') }}
+  {{ page_header('Prioriteiten SMS-provider bewerken') }}
 
   <p class="govuk-body">
-    If you change one priority you will need to change the others so they add up to 100%.
+    Als u één prioriteit wijzigt, moet u de overige aanpassen zodat ze samen 100% vormen.
   </p>
 
   {% call form_wrapper() %}
@@ -20,6 +20,6 @@
       {{ field }}
     {% endfor %}
 
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 {% endblock %}

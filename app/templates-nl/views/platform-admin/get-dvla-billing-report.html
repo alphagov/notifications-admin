@@ -4,39 +4,39 @@
 {% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block per_page_title %}
-  DVLA Billing Report
+  DVLA Facturatie Rapport
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-large">
-    DVLA Billing Report
+    DVLA Facturatie Rapport
   </h1>
 
   {% call form_wrapper() %}
-    {{ form.start_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
-    {{ form.end_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}
-    {{ page_footer('Download report (CSV)') }}
+    {{ form.start_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ page_footer('Download rapport (CSV)') }}
   {% endcall %}
 
   <h2 class="heading-medium">
-    Data included in the report
+    Gegevens opgenomen in het rapport
   </h2>
 <div class="bottom-gutter-3-2">
     {% call mapping_table(
-      caption='Descriptions of billing report data',
-      field_headings=['Name', 'Description'],
+      caption='Beschrijving van facturatierapportgegevens',
+      field_headings=['Naam', 'Beschrijving'],
       field_headings_visible=True,
       caption_visible=False
     ) %}
       {% for column_heading, description in [
-        ('despatch date', 'The date these letters were despatched by DVLA'),
-        ('postage', 'The postage of the letters (eg first, second, europe, rest-of-world)'),
-        ('DVLA cost threshold', 'A DVLA-internal pricing threshold (sorted, unsorted).'),
-        ('sheets', 'The number of sheets for each letter (1-5 pages)'),
-        ('rate (£)', 'The unit cost per letter in £ (GBP)'),
-        ('letters', 'The number of letters sent'),
-        ('cost (£)', 'The cost for sending these letters in £ (GBP)'),
+        ('despatch date', 'De datum waarop deze brieven door DVLA zijn verzonden'),
+        ('postage', 'De postzegelsoort van de brieven (bijv. eerste, tweede, Europa, rest van de wereld)'),
+        ('DVLA cost threshold', 'Een intern DVLA prijsdrempel (gesorteerd, ongesorteerd).'),
+        ('sheets', 'Het aantal pagina’s per brief (1-5 pagina’s)'),
+        ('rate (€)', 'De eenheidsprijs per brief in € (Eur)'),
+        ('letters', 'Het aantal verzonden brieven'),
+        ('cost (€)', 'De kosten voor het verzenden van deze brieven in € (Eur)'),
       ] %}
         {% call row() %}
           {{ text_field(column_heading) }}

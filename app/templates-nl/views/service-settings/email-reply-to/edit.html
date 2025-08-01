@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
- Change reply-to email address
+ Antwoordadres wijzigen
 {% endblock %}
 
 {% block backLink %}
@@ -13,26 +13,26 @@
 {% endblock %}
 {% block maincolumn_content %}
 
-  {{ page_header('Change reply-to email address') }}
+  {{ page_header('Antwoordadres wijzigen') }}
   {% call form_wrapper() %}
     {{ form.email_address(
         param_extensions={
-          "hint": {"text": "This should be a shared inbox managed by your team, not your own email address"},
+          "hint": {"text": "Dit moet een gedeelde inbox zijn die door uw team wordt beheerd, niet uw persoonlijke e-mailadres"},
           "classes": "govuk-!-width-full"
         },
         error_message_with_html=True
     ) }}
     {% if not show_choice_of_default_checkbox %}
       <p class="form-group">
-        This is the default reply-to address for {{ current_service.name }} emails
+        Dit is het standaardantwoordadres voor e-mails van {{ current_service.name }}
       </p>
-      {{ page_footer('Save') }}
+      {{ page_footer('Opslaan') }}
     {% else %}
       {{ form.is_default }}
       {{ page_footer(
-        'Save',
+        'Opslaan',
         delete_link=url_for('main.service_confirm_delete_email_reply_to', service_id=current_service.id, reply_to_email_id=reply_to_email_address_id),
-        delete_link_text='Delete'
+        delete_link_text='Verwijderen'
       ) }}
     {% endif %}
   {% endcall %}

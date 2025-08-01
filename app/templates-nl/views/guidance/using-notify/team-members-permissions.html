@@ -3,29 +3,29 @@
 {% from "components/service-link.html" import service_link %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Using Notify' %}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
 
 {% block per_page_title %}
-  Team members and permissions
+  Teamleden en rechten
 {% endblock %}
 
 {% block content_column_content %}
-  <h1 class="heading-large">Team members and permissions</h1>
+  <h1 class="heading-large">Teamleden en rechten</h1>
 
-  <p class="govuk-body">Notify lets you set different permissions for each member of your team.</p>
+  <p class="govuk-body">Notify stelt u in staat om verschillende rechten toe te wijzen aan elk lid van uw team.</p>
 
-  <p class="govuk-body">Go to the {{ service_link(current_service, 'main.manage_users', 'team members') }} page to:</p>
+  <p class="govuk-body">Ga naar de {{ service_link(current_service, 'main.manage_users', 'teamleden') }} pagina om:</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>invite people to your service</li>
-    <li>control who can see, add, edit and send messages</li>
-    <li>let other team members change your service settings</li>
-    <li>update a team member’s email address and phone number</li>
-    <li>change each team member’s sign-in method</li>
-    <li>remove team members who have left</li>
+    <li>mensen uit te nodigen voor uw dienst</li>
+    <li>te bepalen wie berichten mag zien, toevoegen, bewerken en verzenden</li>
+    <li>andere teamleden toe te staan om uw dienstinstellingen te wijzigen</li>
+    <li>het e-mailadres en telefoonnummer van een teamlid bij te werken</li>
+    <li>de aanmeldmethode van elk teamlid te wijzigen</li>
+    <li>teamleden te verwijderen die niet meer werkzaam zijn</li>
   </ul>
   <p class="govuk-body">
-    You must add at least one team member with the ‘manage settings, team and usage’ permission.
-    This person will be responsible for your service if you’re unable to sign in to Notify.
+    U moet minimaal één teamlid toevoegen met de rechten ‘instellingen, team en gebruik beheren’. 
+    Deze persoon is verantwoordelijk voor uw dienst als u zich niet kunt aanmelden bij Notify.
   </p>
-  <p class="govuk-body">You can invite team members who do not have a government email address.</p>
+  <p class="govuk-body">U kunt teamleden uitnodigen die geen e-mailadres van de overheid hebben.</p>
 {% endblock %}

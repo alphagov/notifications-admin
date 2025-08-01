@@ -5,17 +5,17 @@
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {% block per_page_title %}
-    Users List
+    Gebruikerslijst
 {% endblock %}
 
 {% block platform_admin_content %}
 
 <h1 class="govuk-heading-l">
-    Export Users List
+    Exporteren gebruikerslijst
 </h1>
 
 <p class="govuk-body">
-    Filter and download the list of users.
+    Filter en download de lijst met gebruikers.
 </p>
 
 {% call form_wrapper() %}
@@ -32,7 +32,7 @@
     </div>
     {% endset %}
     {{ govukDetails({
-                "summaryText": "Filter by creation date",
+                "summaryText": "Filter op aanmaakdatum",
                 "html": creation_date_content,
                 "open": (form.created_from_date.value or form.created_to_date.value) or ('created_from_date' in form.errors) or ('created_to_date' in form.errors)
             }) }}
@@ -48,7 +48,7 @@
     </div>
     {% endset %}
     {{ govukDetails({
-                "summaryText": "Filter by last login date",
+                "summaryText": "Filter op datum van laatste aanmelding",
                 "html": login_date_content,
                 "open": (form.logged_from_date.value or form.logged_to_date.value) or ('logged_from_date' in form.errors) or ('logged_to_date' in form.errors)
             }) }}
@@ -61,7 +61,7 @@
     </fieldset>
     {% endset %}
     {{ govukDetails({
-                "summaryText": "Filter by permissions",
+                "summaryText": "Filter op machtigingen",
                 "html": permissions_content,
                 "open": (form.permissions_field.value) or ('permissions_field' in form.errors)
             }) }}
@@ -70,30 +70,30 @@
     {{ form.take_part_in_research }}
     {% endset %}
     {{ govukDetails({
-                "summaryText": "Filter by research opt-in",
+                "summaryText": "Filter op deelname aan onderzoek",
                 "html": research_content,
                 "open": (form.take_part_in_research.value) or ('take_part_in_research' in form.errors)
             }) }}
 
-    {{ page_footer('Download report (CSV)') }}
+    {{ page_footer('Download rapport (CSV)') }}
 </fieldset>
 {% endcall %}
 
 <div class="bottom-gutter-3-2">
     {% call mapping_table(
-          caption="Data included in the report",
-          field_headings=['Field', 'Description'],
+          caption="Gegevens opgenomen in het rapport",
+          field_headings=['Veld', 'Beschrijving'],
           field_headings_visible=True,
           caption_visible=True
         ) %}
         {% for column_heading, description in [
-            ('Name', 'The full name of the user'),
-            ('Email', 'The email address associated with the user'),
-            ('Created At', 'The date the user account was created'),
-            ('Research Opt In', 'Whether the user has opted in to research'),
-            ('Is Org Team Member', 'Indicates if the user is a member of an organisation'),
-            ('Number of Live Services', 'The number of live services the user has access to'),
-            ('Live Service Permissions', 'The services and associated permissions assigned to the user'),
+            ('Naam', 'De volledige naam van de gebruiker'),
+            ('E-mailadres', 'Het e-mailadres dat aan de gebruiker is gekoppeld'),
+            ('Aangemaakt op', 'De datum waarop het gebruikersaccount is aangemaakt'),
+            ('Deelname aan onderzoek', 'Of de gebruiker heeft ingestemd met deelname aan onderzoek'),
+            ('Is lid van organisatie', 'Geeft aan of de gebruiker lid is van een organisatie'),
+            ('Aantal actieve diensten', 'Het aantal actieve diensten waartoe de gebruiker toegang heeft'),
+            ('Rechten binnen actieve diensten', 'De diensten en bijbehorende rechten die aan de gebruiker zijn toegekend'),
           ] %}
             {% call row() %}
                 {{ text_field(column_heading) }}

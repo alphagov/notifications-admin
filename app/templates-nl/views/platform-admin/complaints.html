@@ -3,22 +3,21 @@
 {% from "components/table.html" import list_table, text_field, link_field %}
 
 {% block per_page_title %}
-  Email complaints
+  E-mailklachten
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-medium">
-    Email complaints
+    E-mailklachten
   </h1>
-
 
   {% call(item, row_number) list_table(
       complaints,
-      caption="Complaints",
+      caption="Klachten",
       caption_visible=False,
-      empty_message='No complaints',
-      field_headings=['Notification Id', 'Service', 'Complaint type', 'Complaint Date'],
+      empty_message='Geen klachten',
+      field_headings=['Melding-ID', 'Dienst', 'Type klacht', 'Datum klacht'],
       field_headings_visible=True
   ) %}
 

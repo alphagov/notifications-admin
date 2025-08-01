@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  Data retention period
+  Bewaartermijn van gegevens
 {% endblock %}
 
 {% block backLink %}
@@ -12,55 +12,55 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-large">Data retention period</h1>
+  <h1 class="heading-large">Bewaartermijn van gegevens</h1>
 
   {% if single_retention_period %}
-    <p class="govuk-body">Your current data retention period is {{ single_retention_period }} days.</p>
+    <p class="govuk-body">Uw huidige bewaartermijn is {{ single_retention_period }} dagen.</p>
   {% else %}
-    <p class="govuk-body">Your current data retention period is:</p>
+    <p class="govuk-body">Uw huidige bewaartermijn is:</p>
     <ul class="govuk-list govuk-list--bullet">
-      <li>{{ current_service.get_days_of_retention('email') }} days for {{ 2|message_count_noun("email") }}</li>
-      <li>{{ current_service.get_days_of_retention('sms') }} days for {{ 2|message_count_noun("sms") }}</li>
-      <li>{{ current_service.get_days_of_retention('letter') }} days for {{ 2|message_count_noun("letter") }}</li>
+      <li>{{ current_service.get_days_of_retention('email') }} dagen voor {{ 2|message_count_noun("email") }}</li>
+      <li>{{ current_service.get_days_of_retention('sms') }} dagen voor {{ 2|message_count_noun("sms") }}</li>
+      <li>{{ current_service.get_days_of_retention('letter') }} dagen voor {{ 2|message_count_noun("letter") }}</li>
     </ul>
   {% endif %}
 
   {% if current_service.trial_mode %}
     <p class="govuk-body">
-      You cannot change your data retention period while your service is in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a>.
+      U kunt de bewaartermijn niet wijzigen zolang uw dienst in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">proefmodus</a> is.
     </p>
-    <p class="govuk-body">Once your service is live, you can choose the number of days you want Notify to keep:</p>
+    <p class="govuk-body">Zodra uw dienst actief is, kunt u het aantal dagen kiezen dat Notify bewaart:</p>
     <ul class="govuk-list govuk-list--bullet">
-      <li>the content of the emails, text messages and letters you send</li>
-      <li>recipient email addresses, mobile numbers and addresses</li>
+      <li>de inhoud van de e-mails, sms-berichten en brieven die u verstuurt</li>
+      <li>e-mailadressen, mobiele nummers en adressen van ontvangers</li>
     </ul>
 
-    <p class="govuk-body">The number of days must be between 3 and 90.</p>
+    <p class="govuk-body">Het aantal dagen moet tussen 3 en 90 liggen.</p>
 
   {% elif high_volume_service %}
     <p class="govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact the team</a>
-      to change the number of days Notify stores:
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact op met het team</a>
+      om het aantal dagen te wijzigen dat Notify bewaart:
     </p>
     <ul class="govuk-list govuk-list--bullet">
-      <li>the content of the emails, text messages and letters you send</li>
-      <li>recipient email addresses, mobile numbers and addresses</li>
+      <li>de inhoud van de e-mails, sms-berichten en brieven die u verstuurt</li>
+      <li>e-mailadressen, mobiele nummers en adressen van ontvangers</li>
     </ul>
-    <p class="govuk-body">You cannot change the data retention period yourself. This is because your service is likely to send over 1 million messages this year.</p>
+    <p class="govuk-body">U kunt de bewaartermijn niet zelf wijzigen. Dit komt omdat uw dienst waarschijnlijk meer dan 1 miljoen berichten per jaar verstuurt.</p>
     <p class="govuk-body">
-      For security, Notify does not store large amounts of personal data for long periods of time.
+      Uit veiligheidsoverwegingen bewaart Notify geen grote hoeveelheden persoonsgegevens voor langere tijd.
     </p>
 
   {% else %}
-    <p class="govuk-body">Choose the number of days you want Notify to keep:</p>
+    <p class="govuk-body">Kies het aantal dagen dat Notify bewaart:</p>
     <ul class="govuk-list govuk-list--bullet">
-      <li>the content of the emails, text messages and letters you send</li>
-      <li>recipient email addresses, mobile numbers and addresses</li>
+      <li>de inhoud van de e-mails, sms-berichten en brieven die u verstuurt</li>
+      <li>e-mailadressen, mobiele nummers en adressen van ontvangers</li>
     </ul>
 
     {% call form_wrapper(class='top-gutter') %}
       {{ form.days_of_retention }}
-      {{ page_footer('Continue') }}
+      {{ page_footer('Doorgaan') }}
     {% endcall %}
   {% endif %}
 {% endblock %}

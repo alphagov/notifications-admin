@@ -3,30 +3,30 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/table.html" import field, list_table %}
 
-{% set navigation_label_prefix = 'Features' %}
+{% set navigation_label_prefix = 'Functionaliteiten' %}
 {% set content_column_width = 'three-quarters' %}
 {% set bodyClasses = 'performance' %}
 
 {% block per_page_title %}
-  Performance data
+  Prestatiegegevens
 {% endblock %}
 
 {% block content_column_content %}
 
   <div class="govuk-grid-row govuk-!-margin-bottom-8">
     <div class="govuk-grid-column-two-thirds">
-      {{ page_header('Performance data') }}
+      {{ page_header('Prestatiegegevens') }}
     </div>
   </div>
 
   <h2 class="govuk-heading-m" id='messages-sent-since-may-2016'>
-    Messages sent since May 2016
+    Berichten verstuurd sinds mei 2016
   </h2>
 
   <div class="totals totals--4-column">
     <p class="totals__all">
       <span class="product-page-big-number">{{ total_notifications|format_billions }}</span>
-      total
+      in totaal
     </p>
     <p class="totals__set-type">
       {{ big_number(
@@ -54,15 +54,15 @@
   <div class="dashboard-table dashboard-table--4-column">
     {% call(item, row_number) list_table(
       notifications_by_type|reverse,
-      caption='Messages sent since May 2016',
+      caption='Berichten verstuurd sinds mei 2016',
       caption_visible=False,
       field_headings=[
-        'Date',
+        'Datum',
         99|message_count_noun('email')|capitalize,
         99|message_count_noun('sms')|capitalize,
         99|message_count_noun('letter')|capitalize,
       ],
-      empty_message='No data to show'
+      empty_message='Geen gegevens om weer te geven'
     ) %}
       {% call field() %}
         {{ item.date | format_date_normal }}
@@ -78,30 +78,30 @@
       {% endcall %}
     {% endcall %}
     <p class="table-show-more-link">
-      Only showing the last {{ notifications_by_type|length }} days
+      Er worden alleen de laatste {{ notifications_by_type|length }} dagen weergegeven
     </p>
   </div>
 
   <h2 class="govuk-heading-m" id='messages-sent-within-10-seconds'>
-    Messages sent within 10 seconds
+    Berichten verstuurd binnen 10 seconden
   </h2>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-half">
       {{ big_number(
         '{:.2f}%'.format(average_percentage_under_10_seconds),
-        label='on average',
+        label='gemiddeld',
       ) }}
     </div>
   </div>
   <div class="dashboard-table dashboard-table--2-column">
     {% call(item, row_number) list_table(
       processing_time | reverse,
-      caption='Messages sent within 10 seconds',
+      caption='Berichten verstuurd binnen 10 seconden',
       caption_visible=False,
       field_headings=[
-        'Date', 'Percentage'
+        'Datum', 'Percentage'
       ],
-      empty_message='No data to show'
+      empty_message='Geen gegevens om weer te geven'
     ) %}
       {% call field() %}
         {{ item.date | format_date_normal }}
@@ -111,35 +111,35 @@
       {% endcall %}
     {% endcall %}
     <p class="table-show-more-link">
-      Only showing the last {{ processing_time|length }} days
+      Er worden alleen de laatste {{ processing_time|length }} dagen weergegeven
     </p>
   </div>
 
   <h2 class="govuk-heading-m" id='organisations-using-notify'>
-    Organisations using Notify
+    Organisaties die Notify gebruiken
   </h2>
   <p class="totals totals--2-column bottom-gutter">
     <span class="totals__all">
-      <span class="govuk-visually-hidden">There are</span>
+      <span class="govuk-visually-hidden">Er zijn</span>
       <span class="product-page-big-number">{{ count_of_live_services_and_organisations.organisations|format_thousands }}</span>
-      organisations
+      organisaties
     </span>
     <span class="totals__set-type">
-      <span class="govuk-visually-hidden">and</span>
+      <span class="govuk-visually-hidden">en</span>
       <span class="product-page-big-number">{{ count_of_live_services_and_organisations.services|format_thousands }}</span>
-      services
-      <span class="govuk-visually-hidden">using Notify.</span>
+      diensten
+      <span class="govuk-visually-hidden">die Notify gebruiken.</span>
     </span>
   </p>
   <div class="dashboard-table dashboard-table--2-column">
     {% call(item, row_number) list_table(
       organisations_using_notify,
-      caption='Organisations using Notify',
+      caption='Organisaties die Notify gebruiken',
       caption_visible=False,
       field_headings=[
-        'Organisation', 'Number of live services'
+        'Organisatie', 'Aantal actieve diensten'
       ],
-      empty_message='No data to show'
+      empty_message='Geen gegevens om weer te geven'
     ) %}
       {% call field() %}
         {{ item.organisation_name }}

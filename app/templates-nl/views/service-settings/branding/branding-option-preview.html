@@ -7,7 +7,7 @@
 {% from "components/branding-preview.html" import letter_branding_preview %}
 
 {% set page_title %}
-  Confirm {{ branding_type }} branding
+  Bevestig {{ branding_type }}-huisstijl
 {% endset %}
 
 {% block service_page_title %}
@@ -25,13 +25,13 @@
   {{ page_header(page_title) }}
 
   <p class="govuk-body">
-    If you confirm, your {{ branding_type }}s will come with {{ chosen_branding.name }} branding.
+    Als u bevestigt, zullen uw {{ branding_type }}-uitingen de huisstijl van {{ chosen_branding.name }} bevatten.
   </p>
 
   {% if branding_type == 'email' %}
-    {{ email_branding_preview(chosen_branding.id, title='Preview of new email branding') }}
+    {{ email_branding_preview(chosen_branding.id, title='Voorbeeld van nieuwe e-mailhuisstijl') }}
   {% else %}
-    {{ letter_branding_preview(chosen_branding.id, title='Preview of new letter branding') }}
+    {{ letter_branding_preview(chosen_branding.id, title='Voorbeeld van nieuwe briefehuisstijl') }}
   {% endif %}
 
 

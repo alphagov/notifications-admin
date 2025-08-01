@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Send text messages
+  Sms-berichten verzenden
 {% endblock %}
 
 {% block backLink %}
@@ -16,22 +16,22 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header('Send text messages') }}
+      {{ page_header('Sms-berichten verzenden') }}
       <p class="govuk-body">
-        You have a free allowance of
-        {{ current_service.free_sms_fragment_limit|format_thousands }} text messages each
-        financial year.
+        U heeft een gratis tegoed van
+        {{ current_service.free_sms_fragment_limit|format_thousands }} sms-berichten per
+        begrotingsjaar.
       </p>
       <p class="govuk-body">
-        It costs {{ sms_rate }} pence (plus VAT) for each text message you send
-        after your free allowance.
+        Het kost {{ sms_rate }} cent (excl. btw) voor elk sms-bericht dat u verstuurt
+        nadat uw gratis tegoed is opgebruikt.
       </p>
       <p class="govuk-body">
-        See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">pricing</a> for more details.
+        Zie <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">tarieven</a> voor meer informatie.
       </p>
       {% call form_wrapper() %}
         {{ form.enabled }}
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
       {% endcall %}
     </div>
   </div>

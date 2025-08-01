@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Add reply-to email address
+  Antwoordadres toevoegen
 {% endblock %}
 
 {% block backLink %}
@@ -14,12 +14,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Add reply-to email address') }}
+  {{ page_header('Antwoordadres toevoegen') }}
 
   {% call form_wrapper() %}
     {{ form.email_address(
         param_extensions={
-          "hint": {"text": "This should be a shared inbox managed by your team, not your own email address"},
+          "hint": {"text": "Dit moet een gedeelde inbox zijn die door uw team wordt beheerd, niet uw persoonlijke e-mailadres"},
           "classes": "govuk-!-width-full"
         },
         error_message_with_html=True
@@ -27,7 +27,7 @@
     {% if not first_email_address %}
       {{ form.is_default }}
     {% endif %}
-    {{ page_footer('Add') }}
+    {{ page_footer('Toevoegen') }}
   {% endcall %}
 
 {% endblock %}

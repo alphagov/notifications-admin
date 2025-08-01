@@ -10,9 +10,9 @@
     caption=caption,
     caption_visible=False,
     field_headings=[
-    right_aligned_field_heading('Emails'),
-    right_aligned_field_heading('Text messages'),
-    right_aligned_field_heading('Letters')
+    right_aligned_field_heading('E-mails'),
+    right_aligned_field_heading('Sms-berichten'),
+    right_aligned_field_heading('Brieven')
     ],
     field_headings_visible=False,
     output_tbody_tags=False,
@@ -26,7 +26,7 @@
           {% call field(border=False, colspan=3) %}
             <a href="{{ url_for('main.service_dashboard', service_id=service['id']) }}" class="file-list-filename-large govuk-link govuk-link--no-visited-state govuk-!-padding-bottom-4">{{ service['name'] }}</a>
             {% if not service['active'] %}
-              <span class="heading-medium hint">&ensp;Archived</span>
+              <span class="heading-medium hint">&ensp;Gearchiveerd</span>
             {% endif %}
           {% endcall %}
 
@@ -65,15 +65,15 @@
 
   {% set details_content %}
     {% call form_wrapper(method="get") %}
-      {{ form.start_date(param_extensions={"hint": {"text": "Enter start date in format YYYY-MM-DD"}}) }}
-      {{ form.end_date(param_extensions={"hint": {"text": "Enter end date in format YYYY-MM-DD"}}) }}
+      {{ form.start_date(param_extensions={"hint": {"text": "Voer de begindatum in in het formaat JJJJ-MM-DD"}}) }}
+      {{ form.end_date(param_extensions={"hint": {"text": "Voer de einddatum in in het formaat JJJJ-MM-DD"}}) }}
       {{ form.include_from_test_key }}
       {{ govukButton({ "text": "Filter" }) }}
     {% endcall %}
   {% endset %}
 
   {{ govukDetails({
-    "summaryText": "Apply filters",
+    "summaryText": "Filters toepassen",
     "html": details_content,
     "open": form.errors | convert_to_boolean
   }) }}

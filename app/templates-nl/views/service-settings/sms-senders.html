@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Text message sender IDs
+  Sms-bericht afzender-ID's
 {% endblock %}
 
 {% block backLink %}
@@ -14,12 +14,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Text message sender IDs') }}
+  {{ page_header('Sms-bericht afzender-ID\'s') }}
 
   <div class="user-list">
     {% if not current_service.sms_senders %}
       <div class="user-list-item">
-        <p class="govuk-body user-list-item-blank hint">You have not added any text message sender IDs yet</p>
+        <p class="govuk-body user-list-item-blank hint">U heeft nog geen sms-afzender-ID's toegevoegd</p>
       </div>
     {% endif %}
     {% for item in current_service.sms_senders_with_hints %}
@@ -39,7 +39,7 @@
           <div class="govuk-grid-column-one-quarter">
             {% if current_user.has_permissions('manage_service') %}
               <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.service_edit_sms_sender', service_id=current_service.id, sms_sender_id = item.id) }}">
-               Change<span class="govuk-visually-hidden"> {{ item.sms_sender }}</span>
+               Wijzigen<span class="govuk-visually-hidden"> {{ item.sms_sender }}</span>
               </a>
             {% endif %}
           </div>
@@ -56,13 +56,13 @@
       <div class="govuk-grid-column-full">
         {{ govukButton({
           "element": "a",
-          "text": "Add text message sender ID",
+          "text": "Sms-afzender-ID toevoegen",
           "href": url_for('main.service_add_sms_sender', service_id=current_service.id)
         }) }}
       </div>
     </div>
   {% endif %}
   <p class="govuk-body">
-    The text message sender ID tells your users who the message is from.
+    Het sms-afzender-ID vertelt uw gebruikers van wie het bericht afkomstig is.
   </p>
 {% endblock %}

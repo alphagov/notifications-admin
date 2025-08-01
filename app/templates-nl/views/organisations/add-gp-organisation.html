@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Accept our data processing and financial agreement
+  Accepteer onze verwerkersovereenkomst en financiële voorwaarden
 {% endblock %}
 
 {% block backLink %}
@@ -13,10 +13,10 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header('Accept our data processing and financial agreement') }}
+  {{ page_header('Accepteer onze verwerkersovereenkomst en financiële voorwaarden') }}
   {% call form_wrapper() %}
       {{ form.same_as_service_name }}
-      {{ page_footer('Continue') }}
+      {{ page_footer('Doorgaan') }}
   {% endcall %}
 
 {% endblock %}

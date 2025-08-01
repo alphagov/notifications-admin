@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Tell us how many messages you expect to send
+  Geef aan hoeveel berichten u verwacht te versturen
 {% endblock %}
 
 {% block backLink %}
@@ -19,28 +19,28 @@
       {% if not form.at_least_one_volume_filled %}
         {% call banner_wrapper(type='dangerous') %}
           <h1 class='banner-title'>
-            Enter the number of messages you expect to send in the next year
+            Vul het aantal berichten in dat u verwacht het komende jaar te versturen
           </h1>
         {% endcall %}
       {% else %}
-        {{ page_header('Tell us how many messages you expect to send') }}
+        {{ page_header('Geef aan hoeveel berichten u verwacht te versturen') }}
       {% endif %}
       {% call form_wrapper() %}
         <div class="form-group">
           {{ form.volume_email(param_extensions={
             "classes": "govuk-!-width-one-half",
-            "hint": {"text": "For example, 50,000"},
+            "hint": {"text": "Bijvoorbeeld 50.000"},
           }) }}
           {{ form.volume_sms(param_extensions={
             "classes": "govuk-!-width-one-half",
-            "hint": {"text": "For example, 50,000"},
+            "hint": {"text": "Bijvoorbeeld 50.000"},
           }) }}
           {{ form.volume_letter(param_extensions={
             "classes": "govuk-!-width-one-half",
-            "hint": {"text": "For example, 50,000"},
+            "hint": {"text": "Bijvoorbeeld 50.000"},
           }) }}
         </div>
-        {{ page_footer('Continue') }}
+        {{ page_footer('Doorgaan') }}
       {% endcall %}
     </div>
   </div>

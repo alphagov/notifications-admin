@@ -7,7 +7,7 @@
 {% from "components/error-summary.html" import errorSummary %}
 
 {% block service_page_title %}
-  When you stop receiving text messages
+  Wanneer u stopt met het ontvangen van sms-berichten
 {% endblock %}
 
 {% block backLink %}
@@ -20,10 +20,10 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header('When you stop receiving text messages') }}
+      {{ page_header('Wanneer u stopt met het ontvangen van sms-berichten') }}
 
       <p class="govuk-body">
-        The Notify team will delete your unique phone number:
+        Het Notify-team verwijdert uw unieke telefoonnummer:
       </p>
       {% set new_number = current_service.inbound_number %}
       {{ govukInsetText({
@@ -31,33 +31,33 @@
         "classes": "govuk-!-margin-top-0"})
       }}
       <p class="govuk-body">
-        You will no longer be able to send text messages using this number.
+        U kunt geen sms-berichten meer versturen met dit nummer.
       </p>
       <p class="govuk-body">
-        If one of your users sends you a text message:
+        Als een van uw gebruikers u een sms stuurt:
       </p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>you will not receive it</li>
-        <li>the sender will not know this, and may still expect a response</li>
+        <li>ontvangt u deze niet</li>
+        <li>weet de afzender dit niet en kan nog steeds een reactie verwachten</li>
       </ul>
 
-      <h2 class="heading heading-medium">If you might need to use this number again</h2>
+      <h2 class="heading heading-medium">Als u het nummer misschien weer nodig heeft</h2>
       <p class="govuk-body">
-        Change your text message sender ID to send messages that no one can reply to.
+        Wijzig uw sms-afzender-ID zodat u berichten kunt sturen waar niemand op kan reageren.
       </p>
       <p class="govuk-body">
-        You can make {{ current_service.inbound_number }} the default sender again at any time.
+        U kunt {{ current_service.inbound_number }} op elk moment weer als standaard afzender instellen.
       </p>
       <p class="govuk-body">
-        Add a new <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">text message sender ID</a>.
+        Voeg een nieuwe <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">sms-afzender-ID</a> toe.
       </p>
 
-      <h2 class="heading heading-medium">If you’re sure you want to delete your number</h2>
+      <h2 class="heading heading-medium">Als u zeker weet dat u het nummer wilt verwijderen</h2>
         {% if current_user.platform_admin %}
             {% if not recent_use_date %}
-            <p class="hint">This number has never been used</p>
+            <p class="hint">Dit nummer is nooit gebruikt</p>
             {% else %}
-            <p class="govuk-body">This number was last used
+            <p class="govuk-body">Dit nummer is voor het laatst gebruikt
                 <time class="timeago" datetime="{{ recent_use_date}}">
                     {{ recent_use_date|format_delta }}
                 </time>
@@ -65,11 +65,11 @@
             {% endif %}
             {% call form_wrapper() %}
                 {{ form.removal_options }}
-                {{ page_footer('Save') }}
+                {{ page_footer('Opslaan') }}
             {% endcall %}
         {% else %}
           <p class="govuk-body">
-              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact the Notify team</a>.
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact op met het Notify-team</a>.
           </p>
         {% endif %}
     </div>

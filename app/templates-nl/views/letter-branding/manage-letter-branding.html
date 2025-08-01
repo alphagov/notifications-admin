@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block errorPrefix %}
-  {% if file_upload_form.errors or letter_branding_details_form.errors %}Error: {% endif %}
+  {% if file_upload_form.errors or letter_branding_details_form.errors %}Fout: {% endif %}
 {% endblock %}
 
 {% block errorSummary %}
@@ -20,7 +20,7 @@
 {% endblock %}
 
 {% block per_page_title %}
-  {{ '{} letter branding'.format('Update' if is_update else 'Add')}}
+  {{ '{} briefhuisstijl'.format('Bijwerken' if is_update else 'Toevoegen') }}
 {% endblock %}
 
 {% block backLink %}
@@ -28,7 +28,7 @@
 {% endblock %}
 
 {% block platform_admin_content %}
-  {{ page_header('{} letter branding'.format('Update' if is_update else 'Add')) }}
+  {{ page_header('{} briefhuisstijl'.format('Bijwerken' if is_update else 'Toevoegen')) }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       {% if logo %}
@@ -37,16 +37,16 @@
         </div>
       {% endif %}
       <p class="govuk-body">
-        Logos should be SVG files, cropped to artwork bounds and with all fonts outlined.
+        Logo’s moeten SVG-bestanden zijn, bijgesneden op de werkelijke afbeelding en met alle lettertypen omgezet in contouren.
       </p>
-      {{ file_upload(file_upload_form.file, allowed_file_extensions=['svg'], button_text='{} logo'.format('Update' if is_update else 'Upload')) }}
+      {{ file_upload(file_upload_form.file, allowed_file_extensions=['svg'], button_text='{} logo'.format('Bijwerken' if is_update else 'Uploaden')) }}
       {% call form_wrapper() %}
         <div class="form-group">
           {{ letter_branding_details_form.name(param_extensions={
             "formGroup": {"classes": "govuk-!-margin-top-3"}
           }) }}
           {{ page_footer(
-            'Save',
+            'Opslaan',
             button_name='operation',
             button_value='branding-details'
           ) }}

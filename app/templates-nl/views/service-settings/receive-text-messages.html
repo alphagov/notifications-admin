@@ -6,7 +6,7 @@
 
 
 {% block service_page_title %}
-  Receive text messages
+  Sms-berichten ontvangen
 {% endblock %}
 
 {% block backLink %}
@@ -17,11 +17,11 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header('Receive text messages') }}
+      {{ page_header('Sms-berichten ontvangen') }}
 
       {% if current_service.has_permission("inbound_sms") %}
         <p class="govuk-body">
-          Your service will receive text messages sent to:
+          Uw dienst ontvangt sms-berichten die worden gestuurd naar:
         </p>
           {% set new_number = current_service.inbound_number %}
           {{ govukInsetText({
@@ -29,40 +29,40 @@
             "classes": "govuk-!-margin-top-0"})
           }}
         <p class="govuk-body">
-          You can see the number of received messages on your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_dashboard', service_id=current_service.id) }}">dashboard</a>.
+          U kunt het aantal ontvangen berichten zien op uw <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_dashboard', service_id=current_service.id) }}">dashboard</a>.
         </p>
         <p class="govuk-body">
-          You can also download the last {{ current_service.get_days_of_retention('sms') }} days’ worth of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.inbox', service_id=current_service.id) }}">received text messages</a>.
+          U kunt ook de ontvangen sms-berichten van de afgelopen {{ current_service.get_days_of_retention('sms') }} dagen downloaden via <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.inbox', service_id=current_service.id) }}">de inbox</a>.
         </p>
         {% if current_service.api_keys %}
           <p class="govuk-body">
-            If you’re using the API, you can fetch received messages or set up a callback to push the message to your service.
+            Als u de API gebruikt, kunt u ontvangen berichten ophalen of een callback instellen om berichten naar uw dienst te sturen.
           </p>
         {% endif %}
         <p class="govuk-body">
-          You can still send text messages from a <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">sender ID</a> if you need to, but people will not be able to reply to those messages.
+          U kunt nog steeds sms-berichten versturen vanaf een <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">afzender-ID</a> indien nodig, maar mensen kunnen niet op die berichten reageren.
         </p>
         <p class="govuk-body">
-          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.service_receive_text_messages_stop', service_id=current_service.id) }}">Stop receiving text messages</a>
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.service_receive_text_messages_stop', service_id=current_service.id) }}">Stop met het ontvangen van sms-berichten</a>
         </p>
 
       {% else %}
 
         <p class="govuk-body">
-          If you want to receive text messages, Notify will give you a unique 11-digit phone number.
+          Als u sms-berichten wilt ontvangen, krijgt u van Notify een uniek telefoonnummer van 11 cijfers.
         </p>
         <p class="govuk-body">
-          You can send text messages from this number instead of your current sender ID.
+          U kunt vanaf dit nummer sms-berichten versturen in plaats van uw huidige afzender-ID.
         </p>
         <p class="govuk-body">
-          When someone replies to the number, you’ll see it on your dashboard.
+          Wanneer iemand op dit nummer reageert, ziet u dat op uw dashboard.
         </p>
         <p class="govuk-body">
-          It does not cost you anything to receive text messages. Your users will pay their standard text message rate.
+          Het ontvangen van sms-berichten kost u niets. Uw gebruikers betalen hun standaard sms-tarief.
         </p>
         {{ govukButton({
           "element": "a",
-          "text": "Start receiving text messages",
+          "text": "Begin met het ontvangen van sms-berichten",
           "href": url_for('main.service_receive_text_messages_start', service_id=current_service.id),
         }) }}
 

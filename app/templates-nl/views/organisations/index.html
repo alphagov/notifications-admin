@@ -3,14 +3,14 @@
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% block per_page_title %}
-  Organisations
+  Organisaties
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-medium">Organisations</h1>
+  <h1 class="heading-medium">Organisaties</h1>
 
-  {{ live_search(target_selector='.browse-list-item', show=True, form=_search_form, label='Search by name') }}
+  {{ live_search(target_selector='.browse-list-item', show=True, form=_search_form, label='Zoek op naam') }}
 
   <nav class="browse-list">
     <ul>
@@ -18,11 +18,11 @@
         <li class="browse-list-item">
           <a href="{{ url_for('main.organisation_dashboard', org_id=org.id) }}" class="govuk-link govuk-link--no-visited-state">{{ org.name }}</a>
           {% if not org.active %}
-            <span class="table-field-status-default heading-medium">- archived</span>
+            <span class="table-field-status-default heading-medium">- gearchiveerd</span>
           {% endif %}
           <p class="browse-list-hint">
             {{ org.count_of_live_services }}
-            live service{% if org.count_of_live_services != 1 %}s{% endif %}
+            actieve dienst{% if org.count_of_live_services != 1 %}en{% endif %}
           </p>
         </li>
       {% endfor %}
@@ -32,7 +32,7 @@
   <div class="js-stick-at-bottom-when-scrolling">
     {{ govukButton({
       "element": "a",
-      "text": "New organisation",
+      "text": "Nieuwe organisatie",
       "href": url_for('main.add_organisation'),
       "classes": "govuk-button--secondary"
     }) }}

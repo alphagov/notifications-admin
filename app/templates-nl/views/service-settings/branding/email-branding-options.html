@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/branding-preview.html" import email_branding_preview %}
 
-{% set page_title = 'Change email branding' %}
+{% set page_title = 'E-mailhuisstijl wijzigen' %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -22,17 +22,17 @@
   {{ page_header(page_title) }}
 
   <p class="govuk-body">
-    Your emails currently have {{ current_service.email_branding.name }} branding.
+    Uw e-mails hebben momenteel de huisstijl {{ current_service.email_branding.name }}.
   </p>
 
   {{ email_branding_preview(
     current_service.email_branding_id if current_service.email_branding else '__NONE__',
-    title='Preview of current email branding'
+    title='Voorbeeld van de huidige e-mailhuisstijl'
   ) }}
 
   {% if current_service.needs_to_change_email_branding %}
     <p class="govuk-body">
-      You should be using your own branding instead.
+      U dient in plaats daarvan uw eigen huisstijl te gebruiken.
     </p>
   {% endif %}
 
@@ -42,7 +42,7 @@
     {% else %}
       {{ form.options }}
     {% endif %}
-    {{ page_footer('Continue') }}
+    {{ page_footer('Doorgaan') }}
   {% endcall %}
 
 {% endblock %}

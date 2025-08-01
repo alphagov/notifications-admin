@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  New organisation
+  Nieuwe organisatie
 {% endblock %}
 
 {% block backLink %}
@@ -13,11 +13,11 @@
 {% endblock %}
 
 {% block platform_admin_content %}
-    {{ page_header('New organisation') }}
+    {{ page_header('Nieuwe organisatie') }}
     {% call form_wrapper() %}
         {{ form.name }}
         {{ form.organisation_type }}
         {{ form.crown_status }}
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
     {% endcall %}
 {% endblock %}

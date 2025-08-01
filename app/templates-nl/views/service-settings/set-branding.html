@@ -5,7 +5,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = "Set " + branding_type + " branding" %}
+{% set page_title = branding_type + " branding instellen" %}
 
 {% block backLink %}
   {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
@@ -29,13 +29,13 @@
           target_selector='.govuk-radios__item',
           show=True,
           form=_search_form,
-          label='Search branding styles by name',
+          label='Zoek brandingstijlen op naam',
           autofocus=True
         ) }}
         {{ form.branding_style }}
       </div>
     </div>
-    {{ sticky_page_footer('Preview') }}
+    {{ sticky_page_footer('Voorbeeld') }}
   {% endcall %}
 
 {% endblock %}

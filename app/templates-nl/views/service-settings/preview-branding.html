@@ -4,12 +4,12 @@
 {% from "components/branding-preview.html" import email_branding_preview, letter_branding_preview %}
 
 {% block per_page_title %}
-  Preview {{ branding_type }} branding
+  Voorbeeld van {{ branding_type }} huisstijl
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-large">Preview {{ branding_type }} branding</h1>
+  <h1 class="heading-large">Voorbeeld van {{ branding_type }} huisstijl</h1>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% if notification_type == 'email' %}
@@ -25,8 +25,8 @@
         <div class="form-group">
           {{ form.hidden_tag() }}
           <div class="page-footer">
-            {{ govukButton({ "text": "Save", "classes": "govuk-!-margin-right-2" }) }}
-            <a class="govuk-link govuk-link--no-visited-state page-footer-back-link" href="{{ url_for('main.service_settings', service_id=service_id) }}">Back to service settings</a>
+            {{ govukButton({ "text": "Opslaan", "classes": "govuk-!-margin-right-2" }) }}
+            <a class="govuk-link govuk-link--no-visited-state page-footer-back-link" href="{{ url_for('main.service_settings', service_id=service_id) }}">Terug naar dienstinstellingen</a>
           </div>
         </div>
       {% endcall %}

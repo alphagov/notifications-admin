@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = 'Set inbound number' %}
+{% set page_title = 'Inkomend nummer instellen' %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -19,9 +19,9 @@
     {{ page_header(page_title) }}
   {% endif %}
   {% if current_service.has_inbound_number %}
-    <p class="govuk-body"> This service already has an inbound number </p>
+    <p class="govuk-body"> Deze dienst heeft al een inkomend nummer </p>
   {% elif no_available_numbers %}
-    <p class="govuk-body"> No available inbound numbers </p>
+    <p class="govuk-body"> Geen beschikbare inkomende nummers </p>
   {% else %}
     {% call form_wrapper(class="govuk-!-margin-top-3") %}
       {{ form.inbound_number(param_extensions={
@@ -32,7 +32,7 @@
           }
         }
       }) }}
-      {{ sticky_page_footer('Save') }}
+      {{ sticky_page_footer('Opslaan') }}
     {% endcall %}
   {% endif %}
 

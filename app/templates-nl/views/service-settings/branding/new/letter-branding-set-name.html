@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Preview your letter branding
+  Voorbeeld van uw briefhuisstijl
 {% endblock %}
 
 {% block backLink %}
@@ -14,21 +14,21 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header('Preview your letter branding') }}
+  {{ page_header('Voorbeeld van uw briefhuisstijl') }}
 
   <p class="govuk-body">
-    This is a preview of what letters from {{ current_service.name }} will look like.
+    Dit is een voorbeeld van hoe brieven van {{ current_service.name }} eruit zullen zien.
   </p>
 
-  {{ custom_letter_branding_preview(temp_filename, title="Preview of new letter branding") }}
+  {{ custom_letter_branding_preview(temp_filename, title="Voorbeeld van nieuwe briefhuisstijl") }}
 
-  <h2 class="heading-medium">Add name</h2>
+  <h2 class="heading-medium">Naam toevoegen</h2>
   {% call form_wrapper() %}
     {{ form.name(param_extensions={
-      'label': {'text': 'Enter the name of your branding'},
-      'hint': {'text': 'For example, ' + (current_service.organisation_name if current_service.organisation_id else 'Department for Education')}
+      'label': {'text': 'Voer de naam van uw huisstijl in'},
+      'hint': {'text': 'Bijvoorbeeld ' + (current_service.organisation_name if current_service.organisation_id else 'Ministerie van Onderwijs')}
     }) }}
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 
 {% endblock %}

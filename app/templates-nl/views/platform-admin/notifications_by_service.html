@@ -3,19 +3,19 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block per_page_title %}
-  Monthly notification statuses for live services
+  Maandelijkse status van meldingen voor actieve diensten
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-large">
-    Monthly notification statuses for live services
+    Maandelijkse status van meldingen voor actieve diensten
   </h1>
 
   {% call form_wrapper() %}
-    {{ form.start_date(param_extensions={"hint": {"text": "Enter start date in format YYYY-MM-DD"}}) }}
-    {{ form.end_date(param_extensions={"hint": {"text": "Enter end date in format YYYY-MM-DD"}}) }}
-    {{ page_footer('Download report (CSV)') }}
+    {{ form.start_date(param_extensions={"hint": {"text": "Voer de begindatum in het formaat JJJJ-MM-DD in"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Voer de einddatum in het formaat JJJJ-MM-DD in"}}) }}
+    {{ page_footer('Rapport downloaden (CSV)') }}
   {% endcall %}
 
 {% endblock %}

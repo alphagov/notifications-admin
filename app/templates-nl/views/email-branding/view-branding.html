@@ -9,7 +9,6 @@
 {{ page_title }}
 {% endblock %}
 
-
 {% block backLink %}
 {{ govukBackLink({ "href": url_for('main.email_branding') }) }}
 {% endblock %}
@@ -22,7 +21,7 @@
 
         {{ email_branding_preview(email_branding.id) }}
 
-        <h2 class="heading-medium">Organisations using this branding as their default</h2>
+        <h2 class="heading-medium">Organisaties die deze branding als standaard gebruiken</h2>
         <nav class="browse-list">
             {% if branding_orgs %}
                 <ul>
@@ -36,11 +35,11 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <p class="hint">No organisations use this branding as their default.</p>
+                <p class="hint">Geen organisaties gebruiken deze branding als standaard.</p>
             {% endif %}
         </nav>
 
-        <h2 class="heading-medium">Services using this branding</h2>
+        <h2 class="heading-medium">Diensten die deze branding gebruiken</h2>
         <nav class="browse-list">
             {% if branding_services %}
             <ul>
@@ -53,7 +52,7 @@
                 {% endfor %}
             </ul>
             {% else %}
-            <p class="hint">No services use this branding.</p>
+            <p class="hint">Geen diensten gebruiken deze branding.</p>
             {% endif %}
         </nav>
 
@@ -61,15 +60,15 @@
 
         {% if email_branding.created_by %}
             <p class="govuk-body">
-                Created by <a class="govuk-link govuk-link--no-visited-state"
+                Gemaakt door <a class="govuk-link govuk-link--no-visited-state"
                     href="{{ url_for('main.user_information', user_id=email_branding.created_by) }}">
                     {{ email_branding.created_by_user.name }}
-                </a> {% if email_branding.created_at %}on {{ email_branding.created_at | format_date }}{% endif %}
+                </a>{% if email_branding.created_at %} op {{ email_branding.created_at | format_date }}{% endif %}
             </p>
         {% endif %}
         {% if email_branding.updated_at %}
             <p class="govuk-body">
-                Last updated on {{ email_branding.updated_at | format_date }}
+                Laatst bijgewerkt op {{ email_branding.updated_at | format_date }}
             </p>
         {% endif %}
 
@@ -77,14 +76,14 @@
             <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter-2-3">
                 <a class="govuk-link govuk-link--no-visited-state"
                     href="{{ url_for('main.platform_admin_update_email_branding', branding_id=email_branding.id) }}">
-                    Edit this branding</a>
+                    Deze branding bewerken</a>
             </span>
             &emsp;
-            <!-- Should not be shown if email branding already archived -->
+            <!-- Moet niet worden getoond als de e-mailbranding al gearchiveerd is -->
             <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter-2-3">
                 <a class="govuk-link govuk-link--destructive"
                     href="{{ url_for('main.platform_admin_confirm_archive_email_branding', branding_id=email_branding.id) }}">
-                    Delete this branding</a>
+                    Deze branding verwijderen</a>
             </span>
             &emsp;
         </div>

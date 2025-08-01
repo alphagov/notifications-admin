@@ -1,37 +1,37 @@
 {% extends "views/platform-admin/_base_template.html" %}
 
 {% block per_page_title %}
-  Reports
+  Rapporten
 {% endblock %}
 
 {% block platform_admin_content %}
 
   <h1 class="heading-medium">
-    Reports
+    Rapporten
   </h1>
 
 <p class="govuk-body">
-  <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ url_for('main.live_services_csv') }}">Download live services csv report</a>
+  <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ url_for('main.live_services_csv') }}">Live services CSV-rapport downloaden</a>
 </p>
 <p class="govuk-body">
-  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.notifications_sent_by_service') }}">Monthly notification statuses for live services</a>
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.notifications_sent_by_service') }}">Maandelijkse status van meldingen voor actieve diensten</a>
 </p>
 <p class="govuk-body">
-  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_billing_report') }}">Billing Report</a>
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_billing_report') }}">Facturatieoverzicht</a>
 </p>
 <p class="govuk-body">
-  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_dvla_billing_report') }}">DVLA Billing Report</a>
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_dvla_billing_report') }}">Facturatieoverzicht DVLA</a>
 </p>
 <p class="govuk-body">
-  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_volumes_by_service') }}">Volumes by service Report</a>
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_volumes_by_service') }}">Rapport volumes per dienst</a>
 </p>
 <p class="govuk-body">
-  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_daily_volumes') }}">Daily volumes Report</a>
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_daily_volumes') }}">Dagelijks volume rapport</a>
 </p>
 <p class="govuk-body">
-  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_daily_sms_provider_volumes') }}">Daily SMS provider volumes Report</a>
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_daily_sms_provider_volumes') }}">Dagelijks SMS-provider volume rapport</a>
 </p>
 <p class="govuk-body">
-    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.platform_admin_users_list') }}">Users List</a>
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.platform_admin_users_list') }}">Gebruikerslijst</a>
 </p>
 {% endblock %}

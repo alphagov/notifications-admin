@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {% block per_page_title %}
-  Confirm change of mobile number
+  Bevestig wijziging mobiel nummer
 {% endblock %}
 
 {% block backLink %}
@@ -15,17 +15,17 @@
 
 {% block maincolumn_content %}
 
-{{ page_header('Confirm change of mobile number') }}
+{{ page_header('Bevestig wijziging mobiel nummer') }}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
   {% call form_wrapper() %}
-    <p class="govuk-body">New mobile number:</p>
+    <p class="govuk-body">Nieuw mobiel nummer:</p>
 
     {{ govukInsetText({"text": new_mobile_number, "classes": "govuk-!-margin-top-0"}) }}
 
-    <p class="govuk-body">We will send {{ user.name }} a text message to tell them about the change.</p>
-    {{ page_footer('Confirm') }}
+    <p class="govuk-body">We sturen {{ user.name }} een sms om hen te informeren over deze wijziging.</p>
+    {{ page_footer('Bevestigen') }}
   {% endcall %}
   </div>
 </div>

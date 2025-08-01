@@ -5,7 +5,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/branding-preview.html" import email_branding_preview %}
 
-{% set page_title = 'Confirm email branding ' %}
+{% set page_title = 'Bevestig e-mailhuisstijl' %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -22,20 +22,20 @@
   {{ page_header(page_title) }}
 
   <p class="govuk-body">
-    Emails from {{ current_service.name }} will look like this.
+    E-mails van {{ current_service.name }} zien er als volgt uit.
   </p>
 
-  {{ email_branding_preview('__NONE__', title="Preview of new email branding") }}
+  {{ email_branding_preview('__NONE__', title="Voorbeeld van nieuwe e-mailhuisstijl") }}
 
-  <h2 class="heading-medium">Before you continue</h2>
+  <h2 class="heading-medium">Voordat u doorgaat</h2>
 
-  <p class="govuk-body">You can only use GOV.UK branding if people go to GOV.UK to access your service.</p>
+  <p class="govuk-body">U mag alleen GOV.UK-huisstijl gebruiken als mensen via GOV.UK toegang hebben tot uw dienst.</p>
 
   <p class="govuk-body">
-    You cannot use GOV.UK branding if your organisation is
+    U mag geen GOV.UK-huisstijl gebruiken als uw organisatie
     <a class="govuk-link govuk-link--no-visited-state"
-      href="https://www.gov.uk/government/publications/govuk-proposition/govuk-proposition#organisations-independent-from-government">independent
-      from government</a>.
+      href="https://www.gov.uk/government/publications/govuk-proposition/govuk-proposition#organisations-independent-from-government">onafhankelijk
+      is van de overheid</a>.
   </p>
 
   {% call form_wrapper() %}

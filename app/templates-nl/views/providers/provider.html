@@ -19,15 +19,15 @@
     {{ page_header(provider_versions[0].display_name) }}
 
     <p class="govuk-body">
-      Only showing the latest 100 versions.
+      Er worden slechts de laatste 100 versies getoond.
     </p>
 
     {% call(item, row_number) list_table(
         provider_versions,
         caption='',
         caption_visible=False,
-        empty_message='No history for this provider',
-        field_headings=['Version', 'Last Updated', 'Updated By', 'Priority', 'Active'],
+        empty_message='Geen geschiedenis beschikbaar voor deze provider',
+        field_headings=['Versie', 'Laatst bijgewerkt', 'Bijgewerkt door', 'Prioriteit', 'Actief'],
         field_headings_visible=True,
         give_rows_ids=False,
       ) %}
@@ -37,13 +37,13 @@
         {% if item.updated_at %}
             {{ text_field(item.updated_at|format_datetime_short) }}
         {% else %}
-            {{ text_field('None') }}
+            {{ text_field('Geen') }}
         {% endif %}
 
         {% if item.created_by %}
             {{ text_field(item.created_by.name) }}
         {% else %}
-            {{ text_field('None') }}
+            {{ text_field('Geen') }}
         {% endif %}
 
         {{ text_field(item.priority) }}

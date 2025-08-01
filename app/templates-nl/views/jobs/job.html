@@ -35,7 +35,7 @@
             caption=job.original_file_name,
             caption_visible=False,
             field_headings=[
-              '<span class="govuk-visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
+              '<span class="govuk-visually-hidden">Rij in bestand</span><span aria-hidden="true">1</span>'|safe
             ] + scheduled_recipients.column_headers
           ) %}
             {% call row_heading() %}
@@ -60,9 +60,9 @@
 
         <div class="table-show-more-link">
           {% if scheduled_recipients|length > scheduled_recipients.displayed_rows|list|length %}
-            <p class="govuk-!-margin-bottom-1">Only showing the first {{ scheduled_recipients.displayed_rows|list|length }} rows</p>
+            <p class="govuk-!-margin-bottom-1">Er worden alleen de eerste {{ scheduled_recipients.displayed_rows|list|length }} rijen getoond</p>
           {% endif %}
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job_original_file_csv', service_id=current_service.id, job_id=job.id) }}" download>Download this file (CSV)</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job_original_file_csv', service_id=current_service.id, job_id=job.id) }}" download>Download dit bestand (CSV)</a>
         </div>
       </div>
     {% endif %}
@@ -71,7 +71,7 @@
       <div class="js-stick-at-bottom-when-scrolling">
         <div class="page-footer">
           <span class="page-footer-link page-footer-delete-link-without-button">
-            <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job.id) }}">Cancel sending these letters</a>
+            <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job.id) }}">Verzending van deze brieven annuleren</a>
           </span>
         </div>
       </div>

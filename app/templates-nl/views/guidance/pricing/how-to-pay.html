@@ -2,108 +2,108 @@
 
 {% from "components/page-header.html" import page_header %}
 
-{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Pricing information' %}
+{# Wordt gebruikt door de content_template.html-layout, prefix voor de toegankelijke naam van de "navigation" #}
+{% set navigation_label_prefix = 'Prijsinformatie' %}
 
 {% block per_page_title %}
-  How to pay
+  Betalen
 {% endblock %}
 
 {% block content_column_content %}
 
-    {{ page_header('How to pay') }}
+    {{ page_header('Betalen') }}
 
     <p class="govuk-body">
-      You must send GOV.UK Notify a purchase order (PO) before you spend any money on text messages or letters.
+      U moet GOV.UK Notify een inkooporder (PO) sturen voordat u kosten maakt voor sms’jes of brieven.
     </p>
 
     <h2 class="heading-medium" id="purchase-orders">
-      Purchase orders
+      Inkooporders
     </h2>
 
     <p class="govuk-body">
-      Your organisation should raise a single <abbr title="purchase order">PO</abbr> for the estimated cost of all its services. You can update the <abbr title="purchase order">PO</abbr> any time if your usage increases.
+      Uw organisatie moet een enkele <abbr title="purchase order">inkooporder (PO)</abbr> aanmaken voor de geschatte kosten van al haar diensten. U kunt de <abbr title="purchase order">PO</abbr> op elk moment aanpassen als uw gebruik toeneemt.
     </p>
 
     <p class="govuk-body">
-      If your organisation can process invoices without a <abbr title="purchase order">PO</abbr> number, <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">contact us and let us know</a>.
+      Als uw organisatie facturen kan verwerken zonder een <abbr title="purchase order">PO</abbr>-nummer, <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">neem dan contact met ons op</a> en laat het ons weten.
     </p>
 
     <h3 class="heading-small" id="billing-details">
-      Make sure you have our billing details
+      Zorg dat u onze factuurgegevens heeft
     </h3>
 
     <p class="govuk-body">
-      GOV.UK Notify is run by the Government Digital Service (GDS).
+      GOV.UK Notify wordt beheerd door de Government Digital Service (GDS).
     </p>
 
     <p class="govuk-body">
-      GDS is moving from the Cabinet Office to the Department for Science, Innovation and Technology (DSIT).
+      GDS verhuist van het Cabinet Office naar het Department for Science, Innovation and Technology (DSIT).
     </p>
 
     <p class="govuk-body">
-      Before you can send us a <abbr title="purchase order">PO</abbr> your organisation may need to add DSIT as a supplier.
+      Voordat u een <abbr title="purchase order">PO</abbr> naar ons kunt sturen, moet uw organisatie mogelijk DSIT als leverancier toevoegen.
     </p>
 
     <p class="govuk-body">
-      To do this, they’ll need the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">DSIT billing details</a>.
+      Hiervoor heeft u de <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_billing_details') }}">factuurgegevens van DSIT</a> nodig.
     </p>
 
     <h3 class="heading-small" id="where-to-send-your-po">
-      Where to send your purchase order
+      Waar u uw inkooporder naartoe stuurt
     </h3>
 
     <p class="govuk-body">
-      Send <abbr title="Government Digital Service">GDS</abbr> Business Operations:
+      Stuur het naar <abbr title="Government Digital Service">GDS</abbr> Business Operations:
     </p>
 
     <ul class="govuk-list govuk-list--bullet">
-      <li>your <abbr title="purchase order">PO</abbr> number</li>
-      <li>the name and email address of your finance contact</li>
-      <li>a copy of your <abbr title="purchase order">PO</abbr></li>
+      <li>uw <abbr title="purchase order">PO</abbr>-nummer</li>
+      <li>de naam en het e-mailadres van uw financiële contactpersoon</li>
+      <li>een kopie van uw <abbr title="purchase order">PO</abbr></li>
     </ul>
 
     {% if current_user.is_authenticated %}
     <p class="govuk-body">
-      Their email address is {{ billing_details['notify_billing_email_address'] }}
+      Hun e-mailadres is {{ billing_details['notify_billing_email_address'] }}
     </p>
     {% else %}
     <p class="govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in', next=url_for('main.guidance_how_to_pay') )}}">Sign in</a> to see their email address.
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in', next=url_for('main.guidance_how_to_pay') )}}">Log in</a> om hun e-mailadres te zien.
     </p>
     {% endif %}
 
     <p class="govuk-body">
-      If you do not have a copy of your <abbr title="purchase order">PO</abbr> yet, send <abbr title="Government Digital Service">GDS</abbr> the <abbr title="purchase order">PO</abbr> number and contact details. You can then provide a copy of the <abbr title="purchase order">PO</abbr> at a later date.
+      Heeft u nog geen kopie van uw <abbr title="purchase order">PO</abbr>? Stuur dan het <abbr title="purchase order">PO</abbr>-nummer en contactgegevens naar <abbr title="Government Digital Service">GDS</abbr>. U kunt de kopie later aanleveren.
     </p>
 
     <h2 class="heading-medium" id="invoices">
-      Invoices
+      Facturen
     </h2>
 
     <p class="govuk-body">
-      We will send your organisation an invoice each quarter if you:
+      Wij sturen uw organisatie elk kwartaal een factuur als u:
     </p>
 
     <ul class="govuk-list govuk-list--bullet">
-      <li>exceed the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">free text message allowance</a></li>
-      <li>send <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">letters</a></li>
+      <li>de <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">gratis sms-tekstaanvraag</a> overschrijdt</li>
+      <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">brieven verzendt</a></li>
     </ul>
 
     <p class="govuk-body">
-      The invoice will show a breakdown of each service’s spend from your organisation.
+      De factuur bevat een specificatie van de kosten per dienst binnen uw organisatie.
     </p>
 
     <p class="govuk-body">
-      If the value of an invoice is less than £500 (before <abbr title="Value Added Tax">VAT</abbr>), we’ll add it to the total for the next quarter to save time and effort.
+      Is het factuurbedrag lager dan &euro;500 (exclusief <abbr title="Value Added Tax">btw</abbr>)? Dan voegen wij dit toe aan de factuur van het volgende kwartaal om tijd en moeite te besparen.
     </p>
 
     <p class="govuk-body">
-      You can pay by <abbr title="Bankers’ automated clearing system">BACS</abbr>, debit card, or credit card.
+      U kunt betalen via <abbr title="Bankers’ automated clearing system">BACS</abbr>, pinpas of creditcard.
     </p>
 
     <p class="govuk-body">
-      Please start your payment reference with the invoice number.
+      Begin uw betalingsreferentie met het factuurnummer.
     </p>
 
 {% endblock %}

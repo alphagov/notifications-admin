@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block org_page_title %}
-  Edit organisation notes
+  Notities van de organisatie bewerken
 {% endblock %}
 
 {% block backLink %}
@@ -14,13 +14,13 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Edit organisation notes') }}
+    {{ page_header('Notities van de organisatie bewerken') }}
     {% call form_wrapper() %}
       {{ form.notes(param_extensions={
         "classes": "govuk-!-width-full",
         "rows": "4"
       }) }}
-      {{ page_footer('Save') }}
+      {{ page_footer('Opslaan') }}
     {% endcall %}
 
 {% endblock %}

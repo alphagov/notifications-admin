@@ -2,7 +2,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set heading = 'Sign-in method' %}
+{% set heading = 'Aanmeldmethode' %}
 
 {% block service_page_title %}
   {{ heading }}
@@ -18,10 +18,10 @@
       {{ page_header(heading) }}
 
       <p class="govuk-body">
-        Your team members can sign in with an email link or text message code.
+        Uw teamleden kunnen zich aanmelden met een e-maillink of met een toegangscode via sms.
       </p>
       <p class="govuk-body">
-        You cannot switch off the email link sign-in method for the whole team until these members add a mobile phone number:
+        U kunt de aanmelding via e-maillink voor het hele team niet uitschakelen zolang deze leden geen mobiel telefoonnummer hebben toegevoegd:
       </p>
       <ul class="govuk-list govuk-list--bullet">
       {% for user in users_without_phone_numbers %}
@@ -29,9 +29,9 @@
       {% endfor %}
       </ul>
       <p class="govuk-body">
-        If you need to change an individual’s sign-in method, go to the
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">team members</a>
-        page.
+        Als u de aanmeldmethode van een individuele gebruiker wilt wijzigen, ga dan naar de
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">teamleden</a>
+        pagina.
       </p>
     </div>
   </div>

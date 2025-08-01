@@ -4,7 +4,7 @@
   <div class="govuk-grid-column-one-third">
     {{ big_number_with_status(
       global_stats.email.delivered + global_stats.email.failed,
-      global_stats.email.delivered|message_count_label('email'),
+      global_stats.email.delivered|message_count_label('e-mail'),
       global_stats.email.failed,
       global_stats.email.failure_rate,
       global_stats.email.failure_rate|float > 3,
@@ -24,7 +24,7 @@
   <div class="govuk-grid-column-one-third">
     {{ big_number_with_status(
       global_stats.letter.requested,
-      global_stats.letter.requested|message_count_label('letter'),
+      global_stats.letter.requested|message_count_label('brief'),
       global_stats.letter.failed,
       global_stats.letter.failure_rate,
       global_stats.letter.failure_rate|float > 3,

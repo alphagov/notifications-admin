@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
 
-{% set title = "Your service is already live" if current_user.belongs_to_service(current_service.id) else "This service is already live" %}
+{% set title = "Uw dienst is al actief" if current_user.belongs_to_service(current_service.id) else "Deze dienst is al actief" %}
 
 {% block service_page_title %}
   {{ title }}
@@ -14,16 +14,16 @@
 
       <p class="govuk-body">
         {% if current_service.go_live_at %}
-          ‘{{ current_service.name }}’ went live on {{ current_service.go_live_at | format_date_normal }}.
+          ‘{{ current_service.name }}’ is actief sinds {{ current_service.go_live_at | format_date_normal }}.
         {% else %}
-          ‘{{ current_service.name }}’ is already live.
+          ‘{{ current_service.name }}’ is al actief.
         {% endif %}
         </p>
 
       {% if prompt_to_switch_service %}
       <p class="govuk-body">
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Switch service</a>
-         if you want to make a different service live.
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Overschakelen naar een andere dienst</a>
+         als u een andere dienst actief wilt maken.
       </p>
       {% endif %}
 

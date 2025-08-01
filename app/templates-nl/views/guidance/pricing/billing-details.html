@@ -3,27 +3,27 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
 
-{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Pricing information' %}
+{# Wordt gebruikt door de content_template.html-layout, prefix voor de toegankelijke naam van de "navigation" #}
+{% set navigation_label_prefix = 'Prijsinformatie' %}
 
 {% block per_page_title %}
-  Billing details
+  Facturatiegegevens
 {% endblock %}
 
 {% block content_column_content %}
 
-    {{ page_header('Billing details') }}
+    {{ page_header('Facturatiegegevens') }}
 
     <p class="govuk-body">
-      You can use the information on this page to add the Department for Science, Innovation and Technology (DSIT) as a supplier. Your organisation may need to do this before you can raise a purchase order (PO).
+      U kunt de informatie op deze pagina gebruiken om het Department for Science, Innovation and Technology (DSIT) toe te voegen als leverancier. Uw organisatie moet dit mogelijk doen voordat u een inkooporder (PO) kunt aanmaken.
     </p>
 
     <p class="govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact us</a> if you need any other details.
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact op</a> als u andere gegevens nodig heeft.
     </p>
 
     <h2 class="heading-medium govuk-!-margin-top-7" id="supplier-details">
-      Supplier details
+      Gegevens van de leverancier
     </h2>
 
     <p class="govuk-body">
@@ -37,7 +37,7 @@
     </p>
 
     <h3 class="heading-small" id="email-addresses">
-      Email address
+      E-mailadres
     </h3>
 
     <p class="govuk-body">
@@ -45,18 +45,18 @@
     </p>
 
     <h3 class="heading-small" id="vat-number">
-      <abbr title="Value Added Tax">VAT</abbr> number
+      <abbr title="Value Added Tax">Btw</abbr>-nummer
     </h3>
 
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
         'GB 888 8255 50',
-        thing='<abbr title="Value Added Tax">VAT</abbr> number',
+        thing='<abbr title="Value Added Tax">Btw</abbr>-nummer',
     ) }}
     </div>
 
     <h2 class="heading-medium govuk-!-margin-top-7" id="bank-details">
-      Bank details
+      Bankgegevens
     </h2>
 
     <p class="govuk-body">
@@ -69,7 +69,7 @@
     </p>
 
     <h3 class="heading-small" id="account-name">
-      Account name
+      Rekeninghouder
     </h3>
 
     <p class="govuk-body">
@@ -77,24 +77,24 @@
     </p>
 
     <h3 class="heading-small" id="account-number">
-      Account number
+      Rekeningnummer
     </h3>
 
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
         billing_details['account_number'],
-        thing='account number',
+        thing='rekeningnummer',
       ) }}
     </div>
 
     <h3 class="heading-small" id="sort-code">
-      Sort code
+      Sortcode
     </h3>
 
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
         billing_details['sort_code'],
-        thing='sort code',
+        thing='sortcode',
       ) }}
     </div>
 
@@ -110,29 +110,29 @@
     </div>
 
     <h3 class="heading-small" id="swift-code">
-      Swift code
+      Swiftcode
     </h3>
 
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
         billing_details['swift'],
-        thing='Swift code',
+        thing='Swiftcode',
       ) }}
     </div>
 
     <h3 class="heading-small" id="duns-number">
-      D-U-N-S number
+      D-U-N-S-nummer
     </h3>
 
     <div class="govuk-!-margin-bottom-4">
     {{ copy_to_clipboard(
         '227331642',
-        thing='<abbr title="Data Universal Numbering System">D-U-N-S</abbr> number',
+        thing='<abbr title="Data Universal Numbering System">D-U-N-S</abbr>-nummer',
     ) }}
     </div>
 
     <h2 class="heading-medium govuk-!-margin-top-7" id="invoice-address">
-      Invoice address
+      Factuuradres
     </h2>
 
     <p class="govuk-body">

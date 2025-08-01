@@ -2,7 +2,7 @@
 {% from "components/live-search.html" import live_search %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
-{% set page_title = "Email branding" %}
+{% set page_title = "E-mailbranding" %}
 
 {% block per_page_title %}
   {{ page_title }}
@@ -16,7 +16,7 @@
     {% for brand in email_brandings|sort %}
       <div class="browse-list-item">
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.platform_admin_view_email_branding', branding_id=brand.id) }}">
-          {{ brand.name or 'Unnamed' }}
+          {{ brand.name or 'Naam onbekend' }}
         </a>
       </div>
     {% endfor %}
@@ -24,13 +24,13 @@
   <div class="js-stick-at-bottom-when-scrolling">
     {{ govukButton({
       "element": "a",
-      "text": "Add email branding",
+      "text": "E-mailbranding toevoegen",
       "href": url_for('main.platform_admin_create_email_branding'),
       "classes": "govuk-button--secondary"
     }) }}
     {{ govukButton({
       "element": "a",
-      "text": "Add a government identity logo",
+      "text": "Logo van overheidsidentiteit toevoegen",
       "href": url_for('main.create_email_branding_government_identity_logo'),
       "classes": "govuk-button--secondary govuk-!-margin-left-3"
     }) }}

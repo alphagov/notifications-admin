@@ -3,71 +3,70 @@
 {% from "components/service-link.html" import service_link %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Using Notify' %}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
 
 {% block per_page_title %}
-  Links and URLs
+  Links en URL’s
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Links and URLs</h1>
+  <h1 class="heading-large">Links en URL’s</h1>
 
-  <p class="govuk-body">To add a link to a message, write the URL in full. For example:</p>
+  <p class="govuk-body">Om een link toe te voegen aan een bericht, schrijf de volledige URL. Bijvoorbeeld:</p>
 
-  <pre class="formatting-example"><code class="lang-md">Apply now at https://www.gov.uk/example</code></pre>
+  <pre class="formatting-example"><code class="lang-md">Meld u nu aan via https://www.gov.uk/example</code></pre>
 
-  <p class="govuk-body">GOV.UK Notify will convert the URL into a link for you.</p>
+  <p class="govuk-body">GOV.UK Notify zet de URL automatisch om in een klikbare link.</p>
 
-  <p class="govuk-body">URLs should be easy to read.</p>
+  <p class="govuk-body">URL’s moeten makkelijk leesbaar zijn.</p>
 
-  <p class="govuk-body">If you have a long, complex web address, you may want to set up a short URL.</p>
+  <p class="govuk-body">Heeft u een lange, complexe webadres? Dan kunt u overwegen een korte URL te gebruiken.</p>
 
-  <p class="govuk-body">If your webpage is published on GOV.UK, you can contact <abbr title="Government Digital Service">GDS</abbr> to <a class="govuk-link govuk-link--no-visited-state"
-    href="https://www.gov.uk/guidance/contact-the-government-digital-service/request-a-thing#short-url">request a short URL</a>.
+  <p class="govuk-body">Als uw webpagina gepubliceerd is op GOV.UK, kunt u contact opnemen met <abbr title="Government Digital Service">GDS</abbr> om een <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.gov.uk/guidance/contact-the-government-digital-service/request-a-thing#short-url">korte URL aan te vragen</a>.
   </p>
 
-  <p class="govuk-body">If your webpage is not published on GOV.UK, ask your IT department to set up a short URL for you.</p>
+  <p class="govuk-body">Is uw webpagina niet gepubliceerd op GOV.UK? Vraag uw ICT-afdeling om een korte URL voor u aan te maken.</p>
 
-  <p class="govuk-body">Do not use a third-party link shortening service because:</p>
+  <p class="govuk-body">Gebruik geen diensten van derden voor het inkorten van links, omdat:</p>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>your users cannot see where the link will take them</li>
-    <li>your link might stop working if there’s a service outage</li>
-    <li>you can no longer control where the redirect goes</li>
+    <li>gebruikers niet kunnen zien waar de link naartoe leidt</li>
+    <li>de link kan stoppen met werken bij een storing</li>
+    <li>u geen controle meer heeft over waar de link heen verwijst</li>
   </ul>
 
-  <h2 class="heading-medium" id="link-text-in-emails">Link text in emails</h2>
+  <h2 class="heading-medium" id="link-text-in-emails">Linktekst in e-mails</h2>
 
-  <p class="govuk-body">When writing an email, you can convert text into a link instead of writing the full web address.</p>
+  <p class="govuk-body">Bij het schrijven van een e-mail kunt u tekst omzetten in een link in plaats van het volledige webadres te tonen.</p>
 
-  <p class="govuk-body">Link text may be useful if you have:</p>
+  <p class="govuk-body">Linktekst kan handig zijn bij:</p>
   <ul class="govuk-list govuk-list--bullet">
-  <li>long, complex URLs</li>
-  <li>unsubscribe links</li>
-  <li>emails that contain more than 2 links</li>
+  <li>lange, complexe URL’s</li>
+  <li>afmeldlinks</li>
+  <li>e-mails met meer dan 2 links</li>
   </ul>
 
-  <p class="govuk-body">If the recipient is not expecting to receive an email from you, we recommend using the URL instead of link text.</p>
+  <p class="govuk-body">Als de ontvanger geen e-mail verwacht van u, raden we aan de URL te gebruiken in plaats van linktekst.</p>
 
-  <p class="govuk-body">Link text should tell the recipient what action they need to take and where the link goes.</p>
+  <p class="govuk-body">Linktekst moet duidelijk maken welke actie de ontvanger moet nemen en waar de link naartoe leidt.</p>
 
-  <p class="govuk-body">Never use ‘click here’, ‘click link’, ‘this link’ or ‘more’, as these do not make sense when read out of context.</p>
+  <p class="govuk-body">Gebruik nooit ‘klik hier’, ‘klik link’, ‘deze link’ of ‘meer’, want deze zinnen zijn onduidelijk buiten de context.</p>
 
-  <h3 class="heading-small">How to add link text to an email</h3>
-  <p class="govuk-body">GOV.UK Notify uses Markdown to format link text.</p>
-  <p class="govuk-body">To convert text into a link, use square brackets around the link text and round brackets around the URL. Make sure there are no spaces between the brackets or the link will not work. For example:</p>
+  <h3 class="heading-small">Hoe voegt u linktekst toe aan een e-mail</h3>
+  <p class="govuk-body">GOV.UK Notify gebruikt Markdown om linktekst op te maken.</p>
+  <p class="govuk-body">Om tekst om te zetten in een link, gebruikt u vierkante haken om de linktekst en ronde haken om de URL. Zorg dat er geen spaties tussen de haken staan, anders werkt de link niet. Bijvoorbeeld:</p>
 
-  <pre class="formatting-example"><code class="lang-md">[Apply now](https://www.gov.uk/example)</code></pre>
+  <pre class="formatting-example"><code class="lang-md">[Meld u nu aan](https://www.gov.uk/example)</code></pre>
 
-  <p class="govuk-body">You cannot use Markdown to add link text to a text message or letter template.</p>
+  <p class="govuk-body">Markdown kan niet worden gebruikt om linktekst toe te voegen aan sms- of brieftemplates.</p>
 
-  <p class="govuk-body">To see formatting instructions while you’re editing an email template:</p>
+  <p class="govuk-body">Om de opmaakinstructies te zien tijdens het bewerken van een e-mailtemplate:</p>
    <ol class="govuk-list govuk-list--number">
-    <li>Go to the {{ service_link(current_service, 'main.choose_template', 'templates') }} page.</li>
-    <li>Add a new email template or choose an existing email template and select <b class="govuk-!-font-weight-bold">Edit</b>.</li>
-    <li>Scroll down to see a guide to the available Markdown.</li>
+    <li>Ga naar de {{ service_link(current_service, 'main.choose_template', 'templates') }}-pagina.</li>
+    <li>Voeg een nieuwe e-mailtemplate toe of kies een bestaande en selecteer <b class="govuk-!-font-weight-bold">Bewerken</b>.</li>
+    <li>Scroll naar beneden om de beschikbare Markdown-handleiding te zien.</li>
   </ol>
-
 
 {% endblock %}

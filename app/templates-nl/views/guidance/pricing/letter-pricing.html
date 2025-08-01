@@ -3,47 +3,47 @@
 {% from "components/content-metadata.html" import content_metadata %}
 {% from "components/table.html" import mapping_table, row, text_field, row_heading %}
 
-{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Pricing information' %}
+{# Wordt gebruikt door de content_template.html-layout, prefix voor de toegankelijke naam van de "navigation" #}
+{% set navigation_label_prefix = 'Prijsinformatie' %}
 
 {% block per_page_title %}
-  Letter pricing
+  Prijzen voor brieven
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Letter pricing</h1>
+  <h1 class="heading-large">Prijzen voor brieven</h1>
 
     {{ content_metadata(
       data={
-        "Last updated": letter_rates.last_updated | format_date_normal
+        "Laatst bijgewerkt": letter_rates.last_updated | format_date_normal
       }
     ) }}
 
-  <p class="govuk-body">The cost of sending a letter depends on the postage you choose and how many sheets of paper you need.</p>
+  <p class="govuk-body">De kosten voor het versturen van een brief hangen af van het door u gekozen tarief en het aantal vellen papier dat u nodig heeft.</p>
 
-  <p class="govuk-body">Prices include:</p>
+  <p class="govuk-body">De prijzen zijn inclusief:</p>
   <ul class="govuk-list govuk-list--bullet">
-     <li>paper</li>
-     <li>postage</li>
-     <li>double-sided colour printing</li>
-     <li>C5 size envelopes with an address window</li>
+     <li>papier</li>
+     <li>postzegel</li>
+     <li>kleurendruk aan beide zijden</li>
+     <li>C5-enveloppen met venster voor het adres</li>
   </ul>
 
-<p class="govuk-body">Letters must be 10 pages or less (5 double-sided sheets of paper).</p>
+<p class="govuk-body">Brieven mogen maximaal 10 pagina’s bevatten (5 vellen papier, dubbelzijdig bedrukt).</p>
 
   <div>
     {% call mapping_table(
-      caption='Letter pricing',
-      field_headings=['Paper'] + letter_rates.post_classes.values()|list,
+      caption='Prijzen voor brieven',
+      field_headings=['Aantal vellen'] + letter_rates.post_classes.values()|list,
       field_headings_visible=True,
       caption_visible=False
     ) %}
       {% for sheets in letter_rates.sheet_counts %}
         {% call row() %}
-          {% call row_heading() %} {{ sheets }} sheet{{ 's' if sheets > 1 else '' }} {% endcall %}
+          {% call row_heading() %} {{ sheets }} vel{{ 'len' if sheets > 1 else '' }} {% endcall %}
           {% for post_class in letter_rates.post_classes.keys() %}
-            {{ text_field(letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False) + ' + VAT') }}
+            {{ text_field(letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False) + ' + BTW') }}
           {% endfor %}
         {% endcall %}
       {% endfor %}

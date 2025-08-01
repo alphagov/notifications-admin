@@ -2,7 +2,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
-{% set title = "Make this service live" %}
+{% set title = "Maak deze dienst live" %}
 
 {% block service_page_title %}
   {{ title }}
@@ -15,36 +15,36 @@
     <div class="govuk-grid-column-five-sixths">
 
       <p class="govuk-body">
-        {{ current_service.go_live_user.name }} has sent a request to go live for ‘{{ current_service.name }}’.
+        {{ current_service.go_live_user.name }} heeft een verzoek ingediend om ‘{{ current_service.name }}’ live te zetten.
       </p>
 
       <p class="govuk-body">
-        They estimate that this service will send:
+        Zij schatten dat deze dienst het volgende aantal berichten zal versturen:
       </p>
       <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
         {% for channel, volumes in current_service.volumes_by_channel.items() %}
           <li>
             {% if volumes %}
-              {{ volumes|message_count(channel) }} per year
+              {{ volumes|message_count(channel) }} per jaar
             {% else %}
-              No {{ 0|message_count_noun(channel) }}
+              Geen {{ 0|message_count_noun(channel) }}
             {% endif %}
           </li>
         {% endfor %}
       </ul>
 
       <p class="govuk-body">
-        Before you approve this request, you’ll need to check that:
+        Voordat u dit verzoek goedkeurt, moet u controleren of:
       </p>
       <ul class="govuk-list govuk-list--bullet">
-        <li>this service is unique</li>
-        <li>the service name is easy to understand</li>
+        <li>deze dienst uniek is</li>
+        <li>de naam van de dienst duidelijk en begrijpelijk is</li>
       </ul>
       <p class="govuk-body govuk-!-margin-bottom-6">
-        You should also make sure that the service meets your organisation’s requirements.
+        U moet er ook voor zorgen dat de dienst voldoet aan de eisen van uw organisatie.
       </p>
 
-    {{ govukButton({"element": "a", "text": "Continue", "href": url_for('.org_member_make_service_live_check_unique', service_id=current_service.id)}) }}
+    {{ govukButton({"element": "a", "text": "Doorgaan", "href": url_for('.org_member_make_service_live_check_unique', service_id=current_service.id)}) }}
 
     </div>
   </div>

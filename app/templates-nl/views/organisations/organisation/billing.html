@@ -2,47 +2,45 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block org_page_title %}
-  Billing
+  Facturatie
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Billing", size="medium") }}
+  {{ page_header("Facturatie", size="medium") }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       <h2 class="heading-small">
-        Data processing and financial agreement
+        Verwerkersovereenkomst en financiële overeenkomst
       </h2>
 
       {% if current_org.agreement_signed_at %}
         <p class="govuk-body">
-          Your organisation accepted version {{ current_org.agreement_signed_version }} of the GOV.UK Notify data processing
-          and financial agreement on {{ current_org.agreement_signed_at | format_date_normal }}.
+          Uw organisatie heeft versie {{ current_org.agreement_signed_version }} van de verwerkersovereenkomst en financiële overeenkomst van GOV.UK Notify geaccepteerd op {{ current_org.agreement_signed_at | format_date_normal }}.
         </p>
         <p class="govuk-body">
-          {{ current_org.agreement_signed_on_behalf_of_name or current_org.agreement_signed_by.name }} signed the agreement
-          on behalf of {{ current_org.name}}.
+          {{ current_org.agreement_signed_on_behalf_of_name or current_org.agreement_signed_by.name }} heeft de overeenkomst ondertekend namens {{ current_org.name }}.
         </p>
         <p class="govuk-body">
           <a class="govuk-link govuk-link--no-visited-state"
-             href="{{ url_for('main.organisation_download_agreement', org_id=current_org.id) }}">Download the current version of the agreement (PDF)
+             href="{{ url_for('main.organisation_download_agreement', org_id=current_org.id) }}">Download de huidige versie van de overeenkomst (PDF)
           </a>
         </p>
       {% elif current_org.agreement_signed %}
         <p class="govuk-body">
-          {{ current_org.name}} has accepted the GOV.UK Notify data processing and financial agreement.
+          {{ current_org.name }} heeft de verwerkersovereenkomst en financiële overeenkomst van GOV.UK Notify geaccepteerd.
         </p>
         <p class="govuk-body">
           <a class="govuk-link govuk-link--no-visited-state"
-             href="{{ url_for('main.organisation_download_agreement', org_id=current_org.id) }}">Download the current version of the agreement (PDF)
+             href="{{ url_for('main.organisation_download_agreement', org_id=current_org.id) }}">Download de huidige versie van de overeenkomst (PDF)
           </a>
         </p>
       {% elif current_org.agreement_signed is false %}
         <p class="govuk-body">
-          {{ current_org.name}} needs to accept the GOV.UK Notify data processing and financial agreement.
+          {{ current_org.name }} moet de verwerkersovereenkomst en financiële overeenkomst van GOV.UK Notify nog accepteren.
         </p>
       {% elif current_org.agreement_signed is none %}
         <p class="govuk-body">
-          {{ current_org.name}} has not accepted the GOV.UK Notify data processing and financial agreement, but we have some service-specific agreements in place.
+          {{ current_org.name }} heeft de verwerkersovereenkomst en financiële overeenkomst van GOV.UK Notify niet geaccepteerd, maar er zijn wel enkele dienstspecifieke overeenkomsten van kracht.
         </p>
       {% endif %}
     </div>

@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Send international text messages
+  Internationale sms-berichten versturen
 {% endblock %}
 
 {% block backLink %}
@@ -16,16 +16,16 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header('Send international text messages') }}
+      {{ page_header('Internationale sms-berichten versturen') }}
       <p class="govuk-body">
-        Messages to international mobile numbers are charged at between 1 and 12 times the cost of messages to UK mobile numbers.</p>
+        Berichten naar internationale mobiele nummers kosten tussen 1 en 12 keer zoveel als berichten naar Britse mobiele nummers.
+      </p>
       <p class="govuk-body">
-        See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages', _anchor='international-numbers') }}">pricing</a> for the list
-        of rates.
+        Bekijk de <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages', _anchor='international-numbers') }}">tarieven</a> voor een overzicht van de kosten.
       </p>
       {% call form_wrapper() %}
         {{ form.enabled }}
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
       {% endcall %}
     </div>
   </div>

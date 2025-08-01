@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Set data retention
+  Stel bewaartermijn in
 {% endblock %}
 
 {% block backLink %}
@@ -14,12 +14,12 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Set data retention') }}
+    {{ page_header('Stel bewaartermijn in') }}
 
     {% call form_wrapper() %}
       {{ form.notification_type }}
       {{ form.days_of_retention }}
-      {{ page_footer('Add') }}
+      {{ page_footer('Toevoegen') }}
     {% endcall %}
 
 {% endblock %}

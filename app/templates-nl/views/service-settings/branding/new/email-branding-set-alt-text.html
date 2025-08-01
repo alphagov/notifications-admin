@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Preview your email branding
+  Voorbeeld van uw e-mailhuisstijl
 {% endblock %}
 
 {% block backLink %}
@@ -14,41 +14,41 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header('Preview your email branding') }}
+  {{ page_header('Voorbeeld van uw e-mailhuisstijl') }}
 
   <p class="govuk-body">
-    This is a preview of what emails from {{ current_service.name }} will look like.
+    Dit is een voorbeeld van hoe e-mails van {{ current_service.name }} eruit zullen zien.
   </p>
 
-  {{ custom_email_branding_preview(email_preview_data, title="Preview of new email branding") }}
+  {{ custom_email_branding_preview(email_preview_data, title="Voorbeeld van nieuwe e-mailhuisstijl") }}
 
-  <h2 class="heading-medium">Add alternative text (alt text)</h2>
+  <h2 class="heading-medium">Alternatieve tekst (alt-tekst) toevoegen</h2>
   {% call form_wrapper() %}
     <p class="govuk-body">
-      Alt text is for people who cannot see your logo. It will be:
+      Alt-tekst is bedoeld voor mensen die uw logo niet kunnen zien. Deze zal:
     </p>
     <ul class="govuk-list govuk-list--bullet">
-      <li>read out by screen readers</li>
-      <li>displayed if your logo does not load</li>
-      <li>shown if your recipient has images switched off</li>
+      <li>worden voorgelezen door schermlezers</li>
+      <li>worden weergegeven als uw logo niet laadt</li>
+      <li>worden getoond als de ontvanger afbeeldingen heeft uitgeschakeld</li>
     </ul>
     <p class="govuk-body">
-      Alt text should tell people what your logo means, not what it looks like.
+      Alt-tekst moet uitleggen wat uw logo betekent, niet hoe het eruitziet.
     </p>
 
     <p class="govuk-body">
-      For example, the alt text for the GOV.UK logo would be ‘GOV.UK’. It would not be ‘Royal crown above the word GOV.UK written in capital letters’.
+      Bijvoorbeeld, de alt-tekst voor het GOV.UK-logo zou ‘GOV.UK’ zijn. Niet ‘Koninklijke kroon boven het woord GOV.UK in hoofdletters geschreven’.
     </p>
 
     <p class="govuk-body">
-      Do not include the word ‘logo’ in your alt text.
+      Vermeld het woord ‘logo’ niet in uw alt-tekst.
     </p>
 
     {{ form.alt_text(param_extensions={
-      'label': {'text': 'Enter alt text for your logo'},
-      'hint': {'text': 'For example, ' + (current_service.organisation_name if current_service.organisation_id else 'Department for Education')}
+      'label': {'text': 'Voer alt-tekst in voor uw logo'},
+      'hint': {'text': 'Bijvoorbeeld, ' + (current_service.organisation_name if current_service.organisation_id else 'Ministerie van Onderwijs')}
     }) }}
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 
 {% endblock %}

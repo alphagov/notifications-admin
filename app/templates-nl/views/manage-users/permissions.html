@@ -17,14 +17,14 @@
   }) }}
 {% elif user.platform_admin %}
   <p class="bottom-gutter">
-    Platform admin users can access all template folders.
+    Platformbeheerders hebben toegang tot alle sjabloonmappen.
   </p>
 {% endif %}
 
 {% if current_service.has_permission('email_auth') %}
   {% if user.webauthn_auth %}
     <p class="bottom-gutter">
-      This user will login with a security key.
+      Deze gebruiker logt in met een beveiligingssleutel.
     </p>
   {% else %}
     {{ form.login_authentication }}

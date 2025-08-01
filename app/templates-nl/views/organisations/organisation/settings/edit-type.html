@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block org_page_title %}
-  Organisation sector
+  Sector van de organisatie
 {% endblock %}
 
 {% block backLink %}
@@ -13,9 +13,9 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Organisation sector") }}
+  {{ page_header("Sector van de organisatie") }}
   {% call form_wrapper() %}
     {{ form.organisation_type }}
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 {% endblock %}

@@ -1,41 +1,41 @@
 {% extends "content_template.html" %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Using Notify' %}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
 
 {% block per_page_title %}
-  Send files by email
+  Bestanden per e-mail versturen
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Send files by email</h1>
+  <h1 class="heading-large">Bestanden per e-mail versturen</h1>
 
-  <p class="govuk-body">Notify offers a safe and reliable way to send files by email.</p>
+  <p class="govuk-body">Notify biedt een veilige en betrouwbare manier om bestanden per e-mail te versturen.</p>
 
-  <p class="govuk-body">Upload a file using our API, then send users an email with a link to download it.</p>
+  <p class="govuk-body">Upload een bestand via onze API en stuur gebruikers een e-mail met een link om het te downloaden.</p>
 
-  <p class="govuk-body">Notify uses encrypted links instead of email attachments because:</p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li>they’re more secure</li>
-    <li>email attachments are often marked as spam</li>
-  </ul>
-
-  <h2 class="heading-medium">Protect personal information about your users</h2>
-  <p class="govuk-body">When the recipient clicks the link in the email, they will need to enter their email address. Only someone who knows the recipient’s email address can download the file. This security feature is optional.</p>
-  <p class="govuk-body">You can also choose the length of time that a file is available to download. When deciding this, you should consider:</p>
+  <p class="govuk-body">Notify gebruikt versleutelde links in plaats van e-mailbijlagen omdat:</p>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>the need to protect the recipient’s personal information</li>
-    <li>whether the recipient will need to download the file again later</li>
+    <li>ze veiliger zijn</li>
+    <li>e-mailbijlagen vaak als spam worden gemarkeerd</li>
   </ul>
 
-  <h2 class="heading-medium">How to send files by email</h2>
-  <p class="govuk-body">This is currently an API-only feature. You’ll need a developer on your team to set it up for you.</p>
+  <h2 class="heading-medium">Bescherm persoonlijke gegevens van uw gebruikers</h2>
+  <p class="govuk-body">Wanneer de ontvanger op de link in de e-mail klikt, moet hij of zij het e-mailadres invoeren. Alleen iemand die het e-mailadres van de ontvanger kent, kan het bestand downloaden. Deze beveiligingsfunctie is optioneel.</p>
+  <p class="govuk-body">U kunt ook kiezen hoe lang een bestand beschikbaar is om te downloaden. Houd hierbij rekening met:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>de noodzaak om de persoonlijke gegevens van de ontvanger te beschermen</li>
+    <li>of de ontvanger het bestand later nogmaals moet kunnen downloaden</li>
+  </ul>
+
+  <h2 class="heading-medium">Hoe bestanden per e-mail te versturen</h2>
+  <p class="govuk-body">Dit is momenteel alleen een API-functie. U heeft een ontwikkelaar in uw team nodig om dit voor u in te stellen.</p>
   <p class="govuk-body">
-    To send a file by email, follow the instructions in our
-    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API documentation</a>.
+    Volg de instructies in onze
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API-documentatie</a> om een bestand per e-mail te versturen.
   </p>
 
 {% endblock %}

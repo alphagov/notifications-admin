@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Sender addresses
+  Afzenderadressen
 {% endblock %}
 
 {% block backLink %}
@@ -15,22 +15,22 @@
 {% block maincolumn_content %}
 
   <div class="bottom-gutter">
-    {{ page_header('Sender addresses') }}
+    {{ page_header('Afzenderadressen') }}
   </div>
   <div class="user-list">
     <div class="user-list-item">
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters">
           <p class="user-list-item-blank govuk-body hint">
-            Blank
+            Leeg
             {% if not current_service.default_letter_contact_block %}
-              (default)
+              (standaard)
             {% endif %}
           </p>
         </div>
         <div class="govuk-grid-column-one-quarter">
           {% if current_service.default_letter_contact_block and current_user.has_permissions('manage_service') %}
-              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.service_make_blank_default_letter_contact', service_id =current_service.id) }}">Make default</a>
+              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.service_make_blank_default_letter_contact', service_id =current_service.id) }}">Maak standaard</a>
           {% endif %}
         </div>
       </div>
@@ -44,14 +44,14 @@
             </p>
             <p class="govuk-body hint">
               {%- if item.is_default -%}
-                (default)
+                (standaard)
               {% endif %}
             </p>
           </div>
           <div class="govuk-grid-column-one-quarter">
             {% if current_user.has_permissions('manage_service') %}
             <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.service_edit_letter_contact', service_id =current_service.id, letter_contact_id = item.id) }}">
-              Change<span class="govuk-visually-hidden"> {{ item.contact_block }}</span>
+              Wijzigen<span class="govuk-visually-hidden"> {{ item.contact_block }}</span>
             </a>
             {% endif %}
           </div>
@@ -69,7 +69,7 @@
         <div class="js-stick-at-bottom-when-scrolling">
           {{ govukButton({
             "element": "a",
-            "text": "Add a new address",
+            "text": "Voeg een nieuw adres toe",
             "href": url_for('main.service_add_letter_contact', service_id=current_service.id)
           }) }}
         </div>

@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block org_page_title %}
-  Add letter branding options
+  Opties voor briefbranding toevoegen
 {% endblock %}
 
 {% block backLink %}
@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Add letter branding options") }}
+  {{ page_header("Opties voor briefbranding toevoegen") }}
   {{ live_search(target_selector='.govuk-checkboxes__item', show=True, form=_search_form, autofocus=True) }}
 
   {% call form_wrapper(module='add-branding-options-form') %}
@@ -22,7 +22,7 @@
         {{ form.branding_field }}
     </div>
   <div class="js-stick-at-bottom-when-scrolling">
-    {{ page_footer('Add selected options') }}
+    {{ page_footer('Geselecteerde opties toevoegen') }}
     <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite"></div>
   </div>
   {% endcall %}

@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block org_page_title %}
-  Edit request to go live notes
+  Notities bewerken bij verzoek om live te gaan
 {% endblock %}
 
 {% block backLink %}
@@ -13,12 +13,12 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Edit request to go live notes") }}
+  {{ page_header("Notities bewerken bij verzoek om live te gaan") }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       <p class="govuk-body">
-        Text entered here will be displayed in the Zendesk ticket when a service
-        belonging to this organisation requests to go live.
+        De tekst die hier wordt ingevoerd, wordt weergegeven in het Zendesk-ticket wanneer een dienst
+        behorend bij deze organisatie een verzoek indient om live te gaan.
       </p>
       {% call form_wrapper() %}
         {{ form.request_to_go_live_notes(param_extensions={
@@ -29,7 +29,7 @@
             "data-highlight-placeholders": "false"
           },
         }) }}
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
       {% endcall %}
     </div>
   </div>

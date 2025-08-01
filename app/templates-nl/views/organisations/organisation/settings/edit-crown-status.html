@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block org_page_title %}
-  Crown organisation
+  Rijksorganisatie
 {% endblock %}
 
 {% block backLink %}
@@ -13,12 +13,12 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Crown organisation") }}
+  {{ page_header("Rijksorganisatie") }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       {% call form_wrapper() %}
         {{ form.crown_status }}
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
       {% endcall %}
     </div>
   </div>

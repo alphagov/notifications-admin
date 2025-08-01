@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block org_page_title %}
-  Edit organisation billing details
+  Organisatiefacturatiegegevens bewerken
 {% endblock %}
 
 {% block backLink %}
@@ -14,7 +14,7 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Edit organisation billing details') }}
+    {{ page_header('Organisatiefacturatiegegevens bewerken') }}
 
     {% call form_wrapper() %}
       {{ form.billing_contact_names(param_extensions={"classes": "govuk-!-width-full"}) }}
@@ -27,7 +27,7 @@
         "classes": "govuk-!-width-full",
         "rows": "4"
       }) }}
-      {{ page_footer('Save') }}
+      {{ page_footer('Opslaan') }}
     {% endcall %}
 
 {% endblock %}

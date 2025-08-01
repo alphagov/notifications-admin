@@ -4,7 +4,7 @@
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% block service_page_title %}
-  Data retention
+  Gegevensbewaring
 {% endblock %}
 
 {% block backLink %}
@@ -16,13 +16,13 @@
   <div class="govuk-grid-row bottom-gutter">
     <div class="govuk-grid-column-two-thirds">
       <h1 class="heading-large">
-        Data retention
+        Gegevensbewaring
       </h1>
     </div>
    <div class="govuk-grid-column-one-third">
     {{ govukButton({
       "element": "a",
-      "text": "Add data retention",
+      "text": "Gegevensbewaring toevoegen",
       "href": url_for('main.add_data_retention', service_id=current_service.id),
       "classes": "align-with-heading"
     }) }}
@@ -30,13 +30,13 @@
   </div>
   <div class="govuk-grid-row bottom-gutter">
       <div class="govuk-grid-column-full">
-          By default data is kept for 7 days
+          Standaard worden gegevens 7 dagen bewaard
       </div>
   </div>
   {% if not current_service.data_retention %}
     <div class="user-list">
       <div class="user-list-item">
-        <p class="govuk-body user-list-item-blank hint">You have not added any data retention</p>
+        <p class="govuk-body user-list-item-blank hint">U heeft nog geen gegevensbewaring toegevoegd</p>
       </div>
     </div>
   {% else %}
@@ -49,14 +49,14 @@
             "text": item.notification_type | format_notification_type
           },
           "value": {
-            "text": item.days_of_retention|string + " days"
+            "text": item.days_of_retention|string + " dagen"
           },
           "actions": {
             "items": [
               {
                 "href": url_for('main.edit_data_retention', service_id=current_service.id, data_retention_id=item.id),
-                "text": "Change",
-                "visuallyHiddenText": item.notification_type | format_notification_type | lower + " data retention setting",
+                "text": "Wijzigen",
+                "visuallyHiddenText": item.notification_type | format_notification_type | lower + " gegevensbewaringsinstelling",
                 "classes": "govuk-link--no-visited-state"
               }
             ]

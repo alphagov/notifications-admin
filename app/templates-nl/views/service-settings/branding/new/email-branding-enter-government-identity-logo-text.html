@@ -4,7 +4,7 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  Enter the text that will appear in your logo
+  Voer de tekst in die in uw logo verschijnt
 {% endblock %}
 
 {% block backLink %}
@@ -14,10 +14,10 @@
 {% block maincolumn_content %}
   {% call form_wrapper() %}
     {% set html %}
-      This is usually the full name of your organisation.
+      Dit is meestal de volledige naam van uw organisatie.
       <br/>
       <br/>
-      For example, {{ current_service.organisation.name }}
+      Bijvoorbeeld, {{ current_service.organisation.name }}
     {% endset %}
     {{
       form.logo_text(
@@ -30,7 +30,7 @@
         },
       )
     }}
-    {{ page_footer('Request new branding') }}
+    {{ page_footer('Vraag nieuwe huisstijl aan') }}
   {% endcall %}
 
 {% endblock %}

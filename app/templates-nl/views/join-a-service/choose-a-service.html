@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
-{% set heading = 'Choose the service you want to join' %}
+{% set heading = 'Kies de dienst waarvoor u lid wilt worden' %}
 
 {% block per_page_title %}
   {{ heading }}
@@ -20,16 +20,16 @@
       {{ heading }}
     </h1>
     <p class="govuk-body govuk-!-margin-bottom-6">
-      {{ current_user.default_organisation.name }} has {{ current_user.default_organisation.live_services | length }} live service{{ '' if current_user.default_organisation.live_services | length == 1 else 's' }}</p>
+      {{ current_user.default_organisation.name }} heeft {{ current_user.default_organisation.live_services | length }} actieve dienst{{ '' if current_user.default_organisation.live_services | length == 1 else 'en' }}</p>
 
     {% set wrongOrganisationCallout %}
-      <p class="govuk-body">GOV.UK Notify uses your email address to decide which services to show you.</p>
-      <p class="govuk-body">If the organisation you work for has changed, <a class="govuk-link govuk-link--no-visited-state"
-          href="{{ url_for('main.support') }}">contact us</a>.</p>
+      <p class="govuk-body">GOV.UK Notify gebruikt uw e-mailadres om te bepalen welke diensten u ziet.</p>
+      <p class="govuk-body">Als uw organisatie is veranderd, <a class="govuk-link govuk-link--no-visited-state"
+          href="{{ url_for('main.support') }}">neem dan contact met ons op</a>.</p>
     {% endset %}
 
     {{ govukDetails({
-      "summaryText": "I do not work for " + current_user.default_organisation.name,
+      "summaryText": "Ik werk niet voor " + current_user.default_organisation.name,
       "html": wrongOrganisationCallout
     }) }}
 
@@ -37,7 +37,7 @@
       target_selector='.browse-list-item',
       show=current_user.default_organisation.live_services | length > 7,
       form=_search_form,
-      label='Search by name',
+      label='Zoeken op naam',
     ) }}
 
     <ul>
@@ -46,7 +46,7 @@
           <a href="{{ url_for('main.join_service_ask', service_to_join_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
           <p class="browse-list-hint">
               {% if current_user.belongs_to_service(service.id) %}
-                You are already a team member of this service
+                U bent al lid van dit team
               {% endif %}
           </p>
         </li>

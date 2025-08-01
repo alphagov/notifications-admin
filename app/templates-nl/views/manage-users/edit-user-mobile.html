@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Change team member’s mobile number
+  Mobiel nummer teamlid wijzigen
 {% endblock %}
 
 {% block backLink %}
@@ -14,14 +14,14 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change team member’s mobile number') }}
+  {{ page_header('Mobiel nummer teamlid wijzigen') }}
 
-  <p class="govuk-body" id="user_name">This will change the mobile number for {{ user.name }}.</p>
+  <p class="govuk-body" id="user_name">Dit verandert het mobiele nummer van {{ user.name }}.</p>
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper(class="extra-tracking") %}
         {{ form.mobile_number }}
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
       {% endcall %}
     </div>
   </div>

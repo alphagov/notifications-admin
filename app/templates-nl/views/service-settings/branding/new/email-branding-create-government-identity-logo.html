@@ -5,7 +5,7 @@
 {% from "components/branding-preview.html" import email_branding_preview %}
 
 {% block service_page_title %}
-  Create a government identity logo
+  Maak een overheidsidentiteitslogo
 {% endblock %}
 
 {% block backLink %}
@@ -14,35 +14,35 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Create a government identity logo') }}
+  {{ page_header('Maak een overheidsidentiteitslogo') }}
 
   {% if example %}
-    {{ email_branding_preview(example.id, title="Example of an email with a government identity logo") }}
+    {{ email_branding_preview(example.id, title="Voorbeeld van een e-mail met een overheidsidentiteitslogo") }}
   {% endif %}
 
   <p class="govuk-body">
-    A government identity logo is made up of:
+    Een overheidsidentiteitslogo bestaat uit:
   </p>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>a coloured line</li>
-    <li>a symbol, for example the Royal Coat of Arms</li>
-    <li>text, usually the organisation name</li>
+    <li>een gekleurde lijn</li>
+    <li>een symbool, bijvoorbeeld de Rijkswapen</li>
+    <li>tekst, meestal de naam van de organisatie</li>
   </ul>
 
   <p class="govuk-body">
-    You will need to enter the text that will appear in the logo.
+    U moet de tekst invoeren die in het logo wordt weergegeven.
   </p>
   <p class="govuk-body">
-    We will select the appropriate symbol and coloured line for you.
+    Wij selecteren voor u het juiste symbool en de gekleurde lijn.
   </p>
   <p class="govuk-body">
-    It can take up to 1 working day for us to create a new logo.
+    Het kan tot 1 werkdag duren voordat wij een nieuw logo hebben gemaakt.
   </p>
 
   {{ govukButton({
     "element": "a",
-    "text": "Continue",
+    "text": "Doorgaan",
     "href": url_for(
       '.email_branding_enter_government_identity_logo_text',
       service_id=service_id,

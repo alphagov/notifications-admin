@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set heading = 'Are you sure you want to switch off the email link sign-in method?' %}
+{% set heading = 'Weet u zeker dat u de aanmeldmethode via e-maillink wilt uitschakelen?' %}
 
 {% block service_page_title %}
   {{ heading }}
@@ -20,14 +20,14 @@
     <div class="govuk-grid-column-five-sixths">
       {{ page_header(heading) }}
       <p class="govuk-body">
-        All team members will sign in to Notify using a text message code.
+        Alle teamleden melden zich dan aan bij Notify met een sms-code.
       </p>
       <p class="govuk-body">
-        This change will affect any other services they belong to.
+        Deze wijziging heeft ook gevolgen voor andere diensten waarbij zij betrokken zijn.
       </p>
 
       {% call form_wrapper() %}
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
       {% endcall %}
     </div>
   </div>

@@ -12,15 +12,15 @@
       </h1>
       {% if user.platform_admin %}
         <p class="govuk-body">
-          <strong class="govuk-tag govuk-tag--red">Platform admin</strong>
+          <strong class="govuk-tag govuk-tag--red">Platformbeheerder</strong>
           &ensp;
-          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.remove_platform_admin', user_id=user.id) }}">Remove</a>
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.remove_platform_admin', user_id=user.id) }}">Verwijderen</a>
         </p>
       {% endif %}
       <p class="govuk-body">{{ user.email_address }}</p>
-      <p class="{{ '' if user.mobile_number else 'hint' }}">{{ user.mobile_number or 'No mobile number'}}</p>
+      <p class="{{ '' if user.mobile_number else 'hint' }}">{{ user.mobile_number or 'Geen mobiel nummer'}}</p>
 
-      <h2 class="heading-medium">Organisations</h2>
+      <h2 class="heading-medium">Organisaties</h2>
       <nav class="browse-list">
         {% if user.organisations %}
           <ul>
@@ -31,12 +31,12 @@
           </ul>
         {% else %}
           <p class="hint">
-            No organisations
+            Geen organisaties
           </p>
         {% endif %}
       </nav>
 
-      <h2 class="heading-medium">Live services</h2>
+      <h2 class="heading-medium">Actieve services</h2>
       <nav class="browse-list">
         {% if user.live_services %}
           <ul>
@@ -48,11 +48,11 @@
           </ul>
         {% else %}
           <p class="hint">
-            No live services
+            Geen actieve services
           </p>
         {% endif %}
       </nav>
-      <h2 class="heading-medium">Trial mode services</h2>
+      <h2 class="heading-medium">Services in proefmodus</h2>
       <nav class="browse-list">
         {% if user.trial_mode_services %}
           <ul>
@@ -64,46 +64,46 @@
           </ul>
         {% else %}
           <p class="hint">
-            No services in trial mode
+            Geen services in proefmodus
           </p>
         {% endif %}
       </nav>
 
-      <h2 class="heading-medium">Authentication</h2>
-      <p class="govuk-body">Signs in with {{ user.auth_type | format_auth_type(with_indefinite_article=True) }}</p>
+      <h2 class="heading-medium">Authenticatie</h2>
+      <p class="govuk-body">Logt in met {{ user.auth_type | format_auth_type(with_indefinite_article=True) }}</p>
       {% if user.auth_type != 'webauthn_auth' %}
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.change_user_auth', user_id=user.id) }}">
-          Change authentication for this user
+          Wijzig authenticatie voor deze gebruiker
         </a>
       {% endif %}
 
       {% if not user.logged_in_at %}
-      <p class="hint">This person has never logged in</p>
+      <p class="hint">Deze persoon heeft nog nooit ingelogd</p>
       {% else %}
-      <p class="govuk-body">Last logged in
+      <p class="govuk-body">Laatst ingelogd
         <time class="timeago" datetime="{{ user.logged_in_at }}">
           {{ user.logged_in_at|format_delta }}
         </time>
       </p>
       {% endif %}
 
-      <h2 class="heading-medium">Preferences</h2>
+      <h2 class="heading-medium">Voorkeuren</h2>
       <p class="govuk-body">
-        {{ "Wants" if user.receives_new_features_email else "Does not want"}} to receive new features email
+        {{ "Wil" if user.receives_new_features_email else "Wil niet"}} e-mails ontvangen over nieuwe functionaliteiten
       </p>
       <p class="govuk-body">
-        {{ "Wants" if user.take_part_in_research else "Does not want"}} to take part in user research
+        {{ "Wil" if user.take_part_in_research else "Wil niet"}} deelnemen aan gebruikersonderzoek
       </p>
 
       {% if user.failed_login_count > 0 %}
       <p style="color:#d4351c;">
-        {{ user.failed_login_count }} failed login attempts
+        {{ user.failed_login_count }} mislukte inlogpogingen
       </p>
       {% endif %}
       {% if user.state == 'active' %}
         <span class="page-footer-link page-footer-delete-link-without-button">
           <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.archive_user', user_id=user.id) }}">
-            Archive user
+            Archiveer gebruiker
           </a>
         </span>
       {% endif %}

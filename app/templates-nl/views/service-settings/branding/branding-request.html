@@ -4,7 +4,7 @@
 {% from "components/page-footer.html" import page_footer %}
 
 {% block service_page_title %}
-  Describe the branding you want
+  Beschrijf de huisstijl die u wilt
 {% endblock %}
 
 {% block backLink %}
@@ -15,8 +15,8 @@
 
   {% call form_wrapper(class="govuk-!-margin-top-3") %}
     {{ form.branding_request }}
-    <p class="form-group">We’ll email you when your branding is ready, or if we need any more information.</p>
-    {{ page_footer('Request new branding') }}
+    <p class="form-group">We sturen u een e-mail zodra uw huisstijl gereed is, of als we aanvullende informatie nodig hebben.</p>
+    {{ page_footer('Nieuwe huisstijl aanvragen') }}
   {% endcall %}
 
 {% endblock %}

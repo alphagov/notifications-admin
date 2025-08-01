@@ -4,7 +4,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block org_page_title %}
-  Can this organisation approve its own go live requests?
+  Kan deze organisatie eigen verzoeken voor livegang goedkeuren?
 {% endblock %}
 
 {% block backLink %}
@@ -18,7 +18,7 @@
         {{ form.enabled(param_extensions={
           "fieldset": {"legend": {"classes": "govuk-fieldset__legend--l", "isPageHeading": True}},
         }) }}
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
       {% endcall %}
     </div>
   </div>

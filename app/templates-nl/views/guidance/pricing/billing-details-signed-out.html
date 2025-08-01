@@ -2,29 +2,29 @@
 
 {% from "components/page-header.html" import page_header %}
 
-{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Pricing information' %}
+{# Wordt gebruikt door de content_template.html-layout, prefix voor de toegankelijke naam van de "navigation" #}
+{% set navigation_label_prefix = 'Prijsinformatie' %}
 
 {% block per_page_title %}
-  Billing details
+  Facturatiegegevens
 {% endblock %}
 
 {% block content_column_content %}
 
-    {{ page_header('Billing details') }}
+    {{ page_header('Facturatiegegevens') }}
 
     <p class="govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in', next=url_for('main.guidance_billing_details')) }}">Sign in</a> to see our:
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in', next=url_for('main.guidance_billing_details')) }}">Meld u aan</a> om onze:
     </p>
 
     <ul class="govuk-list govuk-list--bullet">
-      <li>supplier details</li>
-      <li>bank details</li>
-      <li>invoice address</li>
+      <li>gegevens van de leverancier</li>
+      <li>bankgegevens</li>
+      <li>factuuradres</li>
     </ul>
 
     <p class="govuk-body">
-      You can use this information to add the Department for Science, Innovation and Technology (DSIT) as a supplier. Your organisation may need to do this before you can raise a purchase order.
+      U kunt deze informatie gebruiken om het Department for Science, Innovation and Technology (DSIT) toe te voegen als leverancier. Uw organisatie moet dit mogelijk doen voordat u een inkooporder kunt aanmaken.
     </p>
 
 {% endblock %}

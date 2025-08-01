@@ -20,8 +20,8 @@
       {% call form_wrapper(
           module='set-auth-type-form',
           data_kwargs={
-            'thing-singular': 'team member',
-            'thing-plural': 'team members'
+            'thing-singular': 'teamlid',
+            'thing-plural': 'teamleden'
           }) %}
         {{
           form.users(
@@ -29,17 +29,17 @@
               'fieldset': {
                 'legend': {'isPageHeading': True, 'classes': 'govuk-fieldset__legend--l'},
               },
-              'hint': {'text': 'Team members'},
+              'hint': {'text': 'Teamleden'},
             }
           )
         }}
 
         <p class="govuk-body">
-        If you need to change someone’s sign-in method later, go to the team members page.
+        Als u later de inlogmethode van iemand wilt wijzigen, gaat u naar de pagina teamleden.
         </p>
 
         <div class="js-stick-at-bottom-when-scrolling">
-          {{ page_footer('Save') }}
+          {{ page_footer('Opslaan') }}
           <div class="selection-counter govuk-visually-hidden" role="status" aria-live="polite"></div>
         </div>
       {% endcall %}

@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Add your contact details
+  Voeg uw contactgegevens toe
 {% endblock %}
 
 {% block backLink %}
@@ -14,7 +14,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Add your contact details') }}
+  {{ page_header('Voeg uw contactgegevens toe') }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% call form_wrapper() %}
@@ -26,10 +26,10 @@
             "data-highlight-placeholders": "true"
           },
           "label": {
-            "text": "This will appear as the sender address on your letters"
+            "text": "Dit wordt het afzendadres op uw brieven"
           },
           "hint": {
-            "text": "10 lines maximum"
+            "text": "Maximaal 10 regels"
           },
           "formGroup": {
             "classes": "govuk-textarea-highlight",
@@ -38,7 +38,7 @@
         {% if not first_contact_block %}
           {{ form.is_default }}
         {% endif %}
-        {{ page_footer('Add') }}
+        {{ page_footer('Toevoegen') }}
       {% endcall %}
     </div>
   </div>

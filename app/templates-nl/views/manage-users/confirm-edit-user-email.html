@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
 
 {% block per_page_title %}
-  Confirm change of email address
+  Bevestig wijziging e-mailadres
 {% endblock %}
 
 
@@ -16,17 +16,17 @@
 
 {% block maincolumn_content %}
 
-{{ page_header('Confirm change of email address') }}
+{{ page_header('Bevestig wijziging e-mailadres') }}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
   {% call form_wrapper() %}
-    <p class="govuk-body">New email address:</p>
+    <p class="govuk-body">Nieuw e-mailadres:</p>
 
     {{ govukInsetText({"text": new_email, "classes": "govuk-!-margin-top-0"}) }}
 
-    <p class="govuk-body">We will send {{ user.name }} an email to tell them about the change.</p>
-    {{ page_footer('Confirm') }}
+    <p class="govuk-body">We sturen {{ user.name }} een e-mail om hen te informeren over deze wijziging.</p>
+    {{ page_footer('Bevestigen') }}
   {% endcall %}
   </div>
 </div>

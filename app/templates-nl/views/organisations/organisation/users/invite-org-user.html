@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block org_page_title %}
-  Invite a team member
+  Nodig een teamlid uit
 {% endblock %}
 
 {% block backLink %}
@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Invite a team member") }}
+  {{ page_header("Nodig een teamlid uit") }}
 
   {% call form_wrapper() %}
 
@@ -27,7 +27,7 @@
 
     {% include 'views/organisations/organisation/users/permissions.html' %}
 
-    {{ page_footer('Send invitation email') }}
+    {{ page_footer('Uitnodigingsmail versturen') }}
   {% endcall %}
 
 {% endblock %}

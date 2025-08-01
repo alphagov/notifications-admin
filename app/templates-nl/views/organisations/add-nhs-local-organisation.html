@@ -5,7 +5,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = "Accept our data processing and financial agreement" %}
+{% set page_title = "Accepteer onze verwerkersovereenkomst en financiële voorwaarden" %}
 
 {% block per_page_title %}
   {{ page_title }}
@@ -25,10 +25,10 @@
       target_selector='.govuk-radios__item',
       show=True,
       form=_search_form,
-      label='Search by name',
+      label='Zoek op naam',
       autofocus=True)
     }}
     {{ form.organisations }}
-    {{ sticky_page_footer('Continue') }}
+    {{ sticky_page_footer('Doorgaan') }}
   {% endcall %}
 {% endblock %}
