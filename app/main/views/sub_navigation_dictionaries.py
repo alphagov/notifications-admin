@@ -27,8 +27,8 @@ def features_nav():
             "link": "main.guidance_pricing",
         },
         {
-            "name": "Using Notify",
-            "link": "main.guidance_using_notify",
+            "name": "Guidance",
+            "link": "main.guidance_guidance",
         },
     ]
 
@@ -62,8 +62,8 @@ def pricing_nav():
             ],
         },
         {
-            "name": "Using Notify",
-            "link": "main.guidance_using_notify",
+            "name": "Guidance",
+            "link": "main.guidance_guidance",
         },
     ]
 
@@ -79,8 +79,8 @@ def using_notify_nav():
             "link": "main.guidance_pricing",
         },
         {
-            "name": "Using Notify",
-            "link": "main.guidance_using_notify",
+            "name": "Guidance",
+            "link": "main.guidance_guidance",
             "sub_navigation_items": [
                 {
                     "name": "API documentation",
