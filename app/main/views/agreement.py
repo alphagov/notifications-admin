@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from flask import abort, redirect, render_template, request, send_file, url_for
 from flask_login import current_user
@@ -9,6 +9,7 @@ from app.main.forms import AcceptAgreementForm
 from app.models.organisation import Organisation
 from app.s3_client.s3_mou_client import get_mou
 from app.utils import hide_from_search_engines
+from app.utils.time import str_no_tz
 from app.utils.user import user_has_permissions
 
 
@@ -61,7 +62,7 @@ def service_confirm_agreement(service_id):
     if request.method == "POST":
         current_service.organisation.update(
             agreement_signed=True,
-            agreement_signed_at=str(datetime.utcnow()),
+            agreement_signed_at=str_no_tz(datetime.now(UTC)),
             agreement_signed_by_id=current_user.id,
         )
         return redirect(url_for("main.request_to_go_live", service_id=current_service.id))
