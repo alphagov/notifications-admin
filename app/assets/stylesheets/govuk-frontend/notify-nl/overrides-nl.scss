@@ -1,10 +1,10 @@
 @import '@rijkshuisstijl-community/design-tokens/dist/index.css';
-
+/* stylelint-disable declaration-no-important */
 // NotifyNl overrides
 
 
 @font-face {
-    font-family: "FiraSans";
+    font-family: FiraSans;
     font-weight: 600;
     src:
         local("FiraSans-Bold"),
@@ -13,7 +13,7 @@
 
 /* Add different weights of the same font */
 @font-face {
-    font-family: "FiraSans";
+    font-family: FiraSans;
     font-weight: 400;
     src:
         local("FiraSans-Regular"),
@@ -21,7 +21,7 @@
 }
 
 @font-face {
-    font-family: "FiraSans";
+    font-family: FiraSans;
     font-weight: 400;
     font-style: italic;
     src: ("FiraSans-Italic"),
@@ -29,7 +29,7 @@
 }
 
 @font-face {
-    font-family: "IBMPlexSans";
+    font-family: IBMPlexSans;
     font-weight: 600;
     src:
         local("IBMPlexSans-Bold"),
@@ -38,7 +38,7 @@
 
 /* Add different weights of the same font */
 @font-face {
-    font-family: "IBMPlexSans";
+    font-family: IBMPlexSans;
     font-weight: 400;
     src:
         local("IBMPlexSans-Regular"),
@@ -46,7 +46,7 @@
 }
 
 @font-face {
-    font-family: "IBMPlexSans";
+    font-family: IBMPlexSans;
     font-weight: 400;
     font-style: italic;
     src:
@@ -60,7 +60,11 @@ html.rhc-theme {
 
 .rhc-theme {
     * {
+
+
         font-family: FiraSans, IBMPlexSans, sans-serif !important;
+
+
     }
 
     // hide inconcistent data with NL service
@@ -99,12 +103,6 @@ html.rhc-theme {
             padding-bottom: 10px;
         }
     }
-
-    // .product-page-intro,
-    // .product-page-intro-wrapper {
-    //     background: none !important;
-    //     border: none !important;
-    // }
 
     .product-page-intro {
         background-color: var(--rhc-color-lichtblauw-100);
@@ -403,3 +401,5 @@ html.rhc-theme {
     --utrecht-textbox-font-family: RijksoverheidSansWeb, Fira Sans, Arial, Verdana, sans-serif;
     --utrecht-textbox-border-radius: 2.5px;
 */
+
+/* stylelint-enable declaration-no-important */

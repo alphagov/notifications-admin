@@ -1,6 +1,6 @@
 {% macro previous_next_navigation(previous_page, next_page) %}
   {% if previous_page or next_page %}
-    <nav class="govuk-previous-and-next-navigation" role="navigation" aria-label="{{ 'Pagination' | translate }}">
+    <nav class="govuk-previous-and-next-navigation" role="navigation" aria-label="{{ 'Pagination' }}">
       <ul class="group">
         {% if previous_page %}
           <li class="previous-page">
