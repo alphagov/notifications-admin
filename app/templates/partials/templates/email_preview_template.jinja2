@@ -42,7 +42,8 @@
       "html": "Subject"
     },
     "value": {
-      "html": subject
+      "classes": "" if subject else "govuk-hint",
+      "html": subject or "Subject missing",
     }
 }) %}
 
