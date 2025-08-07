@@ -1070,3 +1070,26 @@ def test_templates_make_quotes_smart_and_dashes_en(
 
     mock_smart_quotes.assert_has_calls(expected_calls)
     mock_en_dash_replacement.assert_has_calls(expected_calls)
+
+
+@pytest.mark.parametrize(
+    "subject, expected_subject, expected_classes",
+    (
+        ("Example", "Example", ["govuk-summary-list__value"]),
+        ("", "Subject missing", ["govuk-summary-list__value", "govuk-hint"]),
+    ),
+)
+def test_email_preview_template_doesnt_error_on_empty_subject(
+    subject,
+    expected_subject,
+    expected_classes,
+):
+    template = BeautifulSoup(
+        str(EmailPreviewTemplate({"content": "content", "subject": subject, "template_type": "email"})),
+        features="html.parser",
+    )
+
+    subject_field = template.select(".email-message-meta .govuk-summary-list__value")[1]
+
+    assert subject_field.text.strip() == expected_subject
+    assert subject_field["class"] == expected_classes
