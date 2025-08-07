@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Thanks for contacting us
+  Bedankt voor uw bericht
 {% endblock %}
 
 {% block backLink %}
@@ -12,12 +12,12 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Thanks for contacting us') }}
+    {{ page_header('Bedankt voor uw bericht') }}
     <p class="govuk-body">
       {% if out_of_hours_emergency %}
-        We’ll reply in the next 30 minutes.
+        U ontvangt binnen 30 minuten een reactie.
       {% else %}
-        We’ll reply by the end of the next working day.
+        U ontvangt uiterlijk aan het einde van de volgende werkdag een reactie.
       {% endif %}
     </p>
 

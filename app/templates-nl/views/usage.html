@@ -6,7 +6,7 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Usage
+  Gebruik
 {% endblock %}
 
 {% set is_high_volume = emails_sent >= 1_000_000_000 or sms_cost >= 1_000_000 or letter_cost >= 1_000_000 %}
@@ -14,7 +14,7 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Usage', size='medium') }}
+    {{ page_header('Gebruik', size='medium') }}
 
     <div class="bottom-gutter">
       {{ pill(years, selected_year, big_number_args={'smallest': True}) }}
@@ -22,25 +22,25 @@
     <div id='pill-selected-item'>
       <div class='govuk-grid-row'>
         <div class='govuk-grid-column-one-third'>
-          <h2 class='heading-small'>Emails</h2>
+          <h2 class='heading-small'>E-mails</h2>
           <div class="keyline-block">
-            {{ big_number(emails_sent, 'sent', **big_number_kwargs) }}
-            {{ big_number("Unlimited", 'free allowance', **big_number_kwargs) }}
+            {{ big_number(emails_sent, 'verzonden', **big_number_kwargs) }}
+            {{ big_number("Onbeperkt", 'gratis tegoed', **big_number_kwargs) }}
           </div>
         </div>
         <div class='govuk-grid-column-one-third'>
-          <h2 class='heading-small'>Text messages</h2>
+          <h2 class='heading-small'>Sms-berichten</h2>
           <div class="keyline-block">
-            {{ big_number(sms_sent, 'sent', **big_number_kwargs) }}
-            {{ big_number(sms_free_allowance, 'free allowance', **big_number_kwargs) }}
+            {{ big_number(sms_sent, 'verzonden', **big_number_kwargs) }}
+            {{ big_number(sms_free_allowance, 'gratis tegoed', **big_number_kwargs) }}
             {% if sms_free_allowance > 0 %}
-              {{ big_number(sms_allowance_remaining, 'free allowance remaining', **big_number_kwargs) }}
+              {{ big_number(sms_allowance_remaining, 'gratis tegoed resterend', **big_number_kwargs) }}
             {% endif %}
             {% for row in sms_breakdown %}
               {% if row.charged_units > 0 %}
                 {{ big_number(
                   row.charged_units,
-                  'at {:.2f} pence per message'.format(row.rate * 100),
+                  'à {:.2f} cent per bericht'.format(row.rate * 100),
                   **big_number_kwargs
                 ) }}
               {% endif %}
@@ -48,9 +48,9 @@
           </div>
         </div>
         <div class='govuk-grid-column-one-third'>
-          <h2 class='heading-small'>Letters</h2>
+          <h2 class='heading-small'>Brieven</h2>
           <div class="keyline-block">
-            {{ big_number(letter_sent, 'sent', **big_number_kwargs) }}
+            {{ big_number(letter_sent, 'verzonden', **big_number_kwargs) }}
           </div>
         </div>
       </div>
@@ -65,7 +65,7 @@
           <div class="keyline-block">
             {{ big_number(
               sms_cost,
-              'spent',
+              'uitgegeven',
               currency="£",
               **big_number_kwargs
             ) }}
@@ -75,7 +75,7 @@
           <div class="keyline-block">
             {{ big_number(
                 letter_cost,
-                'spent',
+                'uitgegeven',
                 currency="£",
                 **big_number_kwargs
               ) }}
@@ -88,12 +88,12 @@
         <div class="dashboard-table usage-table body-copy-table">
           {% call(item, row_index) list_table(
             months,
-            caption="Total spend",
+            caption="Totale uitgaven",
             caption_visible=False,
             empty_message='',
             field_headings=[
-              'By month',
-              hidden_field_heading('Cost'),
+              'Per maand',
+              hidden_field_heading('Kosten'),
             ],
             field_headings_visible=True
           ) %}
@@ -108,15 +108,15 @@
               ) }}
               <ul class="govuk-list">
               {% if item.sms_free_allowance_used %}
-                <li class="tabular-numbers">{{ item.sms_free_allowance_used|format_thousands }} free {{ item.sms_free_count|message_count_label('sms', suffix='') }}</li>
+                <li class="tabular-numbers">{{ item.sms_free_allowance_used|format_thousands }} gratis {{ item.sms_free_count|message_count_label('sms', suffix='') }}</li>
               {% endif %}
               {% for sms in item.sms_breakdown %}
-                  <li class="tabular-numbers">{{ sms.charged_units|message_count('sms') }} at
+                  <li class="tabular-numbers">{{ sms.charged_units|message_count('sms') }} à
                   {{- ' {:.2f}p'.format(sms.rate * 100) }}</li>
               {% endfor %}
               {% for letter in item.letter_breakdown %}
                 {% if letter.sent %}
-                  <li class="tabular-numbers">{{ letter.sent|format_thousands}} {{ letter.postage_description }} {{ letter.sent|message_count_label('letter', suffix='') }} at
+                  <li class="tabular-numbers">{{ letter.sent|format_thousands}} {{ letter.postage_description }} {{ letter.sent|message_count_label('brief', suffix='') }} à
                   {{ letter.rate | format_pounds_as_currency }}</li>
                 {% endif %}
               {% endfor %}
@@ -133,13 +133,13 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-third">
         <p class="align-with-heading-copy">
-          Financial year ends 31&nbsp;March
+          Boekjaar eindigt op 31 maart
         </p>
       </div>
       <div class="govuk-grid-column-two-thirds">
         <p class="align-with-heading-copy">
-          What counts as 1 text message?<br />
-          See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">pricing</a>.
+          Wat telt als 1 sms-bericht?<br />
+          Zie <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">tarieven</a>.
         </p>
       </div>
     </div>

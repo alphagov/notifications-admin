@@ -6,7 +6,7 @@
 {% from "components/file-upload.html" import file_upload %}
 
 {% block errorPrefix %}
-  {% if form.errors or re_upload_form.errors or error_code %}Error: {% endif %}
+  {% if form.errors or re_upload_form.errors or error_code %}Fout: {% endif %}
 {% endblock %}
 
 {% block service_page_title %}
@@ -27,10 +27,10 @@
             re_upload_form.file,
             allowed_file_extensions=['pdf'],
             action=url_for('main.upload_letter', service_id=current_service.id),
-            button_text='Upload your file again'
+            button_text='Upload uw bestand opnieuw'
           ) }}
         </div>
-        <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
+        <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Terug naar boven</a>
       </div>
     </div>
   {% elif current_service.trial_mode %}
@@ -47,20 +47,20 @@
       ) }}
   {% endif %}
 
-    <div class="letter-sent">
-      {{ template|string }}
-    </div>
+  <div class="letter-sent">
+    {{ template|string }}
+  </div>
 
-    {% if status == 'valid' %}
+  {% if status == 'valid' %}
     <div class="js-stick-at-bottom-when-scrolling">
       <p class="top-gutter-0 bottom-gutter-1-2 send-recipient" title="{{ recipient }}">
-        Recipient: {{ postal_address.as_single_line }}
+        Ontvanger: {{ postal_address.as_single_line }}
       </p>
 
       {% if current_service.live %}
         {% if postal_address.international %}
           <p class="govuk-body">
-            Postage: international
+            Verzendkosten: internationaal
           </p>
         {% endif %}
         <form method="post" enctype="multipart/form-data" action="{{url_for(
@@ -81,10 +81,9 @@
                 }
               }) }}
             {% endif %}
-            {{ page_footer("Send 1 letter") }}
+            {{ page_footer("Verzend 1 brief") }}
         </form>
       {% endif %}
-
     </div>
   {% endif %}
 {% endblock %}

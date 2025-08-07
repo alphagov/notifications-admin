@@ -10,11 +10,11 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <h1 class="heading-large">{{ title }}</h1>
-    <p class="govuk-body">We’ve emailed you a link to sign in to Notify.</p>
-    <p class="govuk-body">Emails can take a few minutes to arrive.</p>
+    <p class="govuk-body">We hebben u een e-mail gestuurd met een link om in te loggen bij Notify.</p>
+    <p class="govuk-body">E-mails kunnen enkele minuten duren om aan te komen.</p>
     {{ page_footer(
       secondary_link=url_for('main.email_not_received', next=redirect_url),
-      secondary_link_text='Not received an email?'
+      secondary_link_text='E-mail niet ontvangen?'
     ) }}
   </div>
 </div>

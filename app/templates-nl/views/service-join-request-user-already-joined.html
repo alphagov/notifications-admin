@@ -2,17 +2,17 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
-  This person is already a team member
+  Deze persoon is al lid van het team
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('This person is already a team member') }}
+  {{ page_header('Deze persoon is al lid van het team') }}
 
   <p class="govuk-body">
-    {{ user_to_invite.name }} is already member of ‘{{ current_service.name }}’.
+    {{ user_to_invite.name }} is al lid van ‘{{ current_service.name }}’.
   </p>
 
-  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Back to your services</a>
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Terug naar je diensten</a>
 
 {% endblock %}

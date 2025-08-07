@@ -3,7 +3,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = 'Change your contact details' %}
+{% set page_title = 'Wijzig uw contactgegevens' %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -28,9 +28,9 @@
         'classes': 'govuk-grid-column-three-quarters'
       }) }}
       <div class="govuk-grid-column-three-quarters">
-        {{ page_footer('Continue') }}
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Add new sender</a>
-    </div>
+        {{ page_footer('Doorgaan') }}
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Nieuwe afzender toevoegen</a>
+      </div>
     {% endcall %}
   </div>
 

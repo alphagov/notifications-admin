@@ -4,7 +4,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Returned letters for {{ reported_at|format_date_normal }}
+  Teruggestuurde brieven voor {{ reported_at|format_date_normal }}
 {% endblock %}
 
 
@@ -14,44 +14,44 @@
 
 {% block maincolumn_content %}
 
-{{ page_header('Returned letters for {}'.format(reported_at|format_date_normal)) }}
+{{ page_header('Teruggestuurde brieven voor {}'.format(reported_at|format_date_normal)) }}
 
 <p class="bottom-gutter">
-  <a download href="{{ url_for('main.returned_letters_report', service_id=current_service.id, reported_at=reported_at) }}" class="govuk-link heading-small">Download this report (<abbr title="Comma separated values">CSV</abbr>)</a>
+  <a download href="{{ url_for('main.returned_letters_report', service_id=current_service.id, reported_at=reported_at) }}" class="govuk-link heading-small">Download dit rapport (<abbr title="Comma separated values">CSV</abbr>)</a>
 </p>
 
 <div class="dashboard-table">
   {% call(item, row_number) list_table(
       returned_letters,
-      caption="Returned letters for {}".format(today),
+      caption="Teruggestuurde brieven voor {}".format(today),
       caption_visible=False,
-      empty_message='If you have returned letter reports they will be listed here',
-      field_headings=['Template name', 'Originally sent'],
+      empty_message='Als u rapporten over teruggestuurde brieven heeft, worden deze hier weergegeven',
+      field_headings=['Sjabloonnaam', 'Oorspronkelijk verzonden'],
       field_headings_visible=False
   ) %}
     {% call field() %}
-      <span class="file-list-filename file-list-filename-unlinked">{{ item.template_name or item.uploaded_letter_file_name or 'Provided as PDF' }}</span>
+      <span class="file-list-filename file-list-filename-unlinked">{{ item.template_name or item.uploaded_letter_file_name or 'Als PDF aangeleverd' }}</span>
       <span class="file-list-hint">
         {% if item.client_reference %}
-          Reference {{ item.client_reference }}
+          Referentie {{ item.client_reference }}
         {% elif item.original_file_name %}
-          Sent from {{ item.original_file_name }}
+          Verzonden vanuit {{ item.original_file_name }}
         {% else %}
-          No reference provided
+          Geen referentie opgegeven
         {% endif %}
       </span>
     {% endcall %}
     {% call field(align='right') %}
       <span class="align-with-message-body">
         <span class="status-hint">
-          Sent {{ item.created_at|format_date_normal }}
+          Verzonden {{ item.created_at|format_date_normal }}
         </span>
       </span>
     {% endcall %}
   {% endcall %}
   {% if more_than_one_page %}
     <p class="table-show-more-link">
-      Only showing the first {{ page_size }} of {{ count_of_returned_letters|format_thousands }} rows
+      Er worden alleen de eerste {{ page_size }} van de {{ count_of_returned_letters|format_thousands }} rijen getoond
     </p>
   {% endif %}
 </div>

@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Uploaded letters
+  Geüploade brieven
 {% endblock %}
 
 {% block backLink %}
@@ -12,12 +12,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Uploaded letters') }}
+  {{ page_header('Geüploade brieven') }}
 
   {% if notifications %}
 
     <p class='govuk-body'>
-      {{ total|message_count('letter') }}
+      {{ total|message_count('brief') }}
     </p>
 
     <p class='govuk-body'>
@@ -27,7 +27,7 @@
   {% else %}
 
     <p class='table-empty-message'>
-      No letters printing {{ letter_print_day }}
+      Er worden geen brieven geprint op {{ letter_print_day }}
     </p>
 
   {% endif %}

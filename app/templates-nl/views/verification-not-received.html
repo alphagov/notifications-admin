@@ -3,56 +3,55 @@
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {% block per_page_title %}
-  If you do not receive a security code
+  Als u geen beveiligingscode ontvangt
 {% endblock %}
 
 {% block maincolumn_content %}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="heading-large">If you do not receive a security code</h1>
+    <h1 class="heading-large">Als u geen beveiligingscode ontvangt</h1>
 
     <ol class="govuk-list govuk-list--number">
-      <li>Check that you can receive text messages from other numbers.</li>
-      <li>Switch your phone off and then back on again.</li>
-      <li>If you still do not receive a security code, we can send you a new one.</li>
+      <li>Controleer of u tekstberichten van andere nummers kunt ontvangen.</li>
+      <li>Zet uw telefoon uit en daarna weer aan.</li>
+      <li>Als u nog steeds geen beveiligingscode ontvangt, kunnen wij een nieuwe naar u verzenden.</li>
     </ol>
 
     <p class="govuk-body">
       {{ govukButton({
         "element": "a",
-        "text": "Resend security code",
+        "text": "Beveiligingscode opnieuw verzenden",
         "href": url_for('main.check_and_resend_verification_code', next=redirect_url)
       }) }}
     </p>
 
-    <p class="govuk-body">If this does not work, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.</p>
+    <p class="govuk-body">Als dit niet werkt, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">neem contact met ons op</a>.</p>
 
     {% set change_number %}
-        <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to update your phone number.</p>
+        <p class="govuk-body">Vraag een teamlid met de toestemming ‘Instellingen, team en gebruik beheren’ om uw telefoonnummer bij te werken.</p>
 
-        <p class="govuk-body">To do this, they should:</p>
-
+        <p class="govuk-body">Hiervoor moeten zij het volgende doen:</p>
 
         <ol class="govuk-list govuk-list--number">
-          <li>Sign in to GOV.UK Notify.</li>
-          <li>Go to the <span class="govuk-body govuk-!-font-weight-bold">Team members</span> page.</li>
-          <li>Find your name and select <span class="govuk-body govuk-!-font-weight-bold">Change details</span>.</li>
-          <li>Select <span class="govuk-body govuk-!-font-weight-bold">Change</span> next to your phone number.</li>
+          <li>Log in op GOV.UK Notify.</li>
+          <li>Ga naar de pagina <span class="govuk-body govuk-!-font-weight-bold">Teamleden</span>.</li>
+          <li>Zoek uw naam en selecteer <span class="govuk-body govuk-!-font-weight-bold">Gegevens wijzigen</span>.</li>
+          <li>Selecteer <span class="govuk-body govuk-!-font-weight-bold">Wijzigen</span> naast uw telefoonnummer.</li>
         </ol>
     {% endset %}
 
     {{ govukDetails({
-      "summaryText": "If your phone number has changed",
+      "summaryText": "Als uw telefoonnummer is veranderd",
       "html": change_number
     }) }}
 
     {% set email_link %}
-        <p class="govuk-body">Ask a member of your team with the ‘Manage settings, team and usage’ permission to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">change your sign-in method</a>.</p>
+        <p class="govuk-body">Vraag een teamlid met de toestemming ‘Instellingen, team en gebruik beheren’ om <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">uw inlogmethode te wijzigen</a>.</p>
     {% endset %}
 
     {{ govukDetails({
-      "summaryText": "If you want to sign in with an email link instead",
+      "summaryText": "Als u in plaats daarvan met een e-maillink wilt inloggen",
       "html": email_link
     }) }}
 

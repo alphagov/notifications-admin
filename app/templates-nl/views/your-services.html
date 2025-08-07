@@ -19,7 +19,7 @@
       <a href="{{ url_for('main.organisation_dashboard', org_id=org.id) }}" class="govuk-link govuk-link--no-visited-state">{{ org.name }}</a>
       <p class="browse-list-hint">
         {{ org.count_of_live_services }}
-        live service{% if org.count_of_live_services != 1 %}s{% endif %}
+        actieve service{% if org.count_of_live_services != 1 %}s{% endif %}
       </p>
     </li>
   {% endfor %}
@@ -58,18 +58,18 @@
 {% endmacro %}
 
 {% if current_user.organisations %}
-  {% set thing_to_choose_between = 'organisations and services' %}
+  {% set thing_to_choose_between = 'organisaties en services' %}
 {% else %}
   {% set thing_to_choose_between = 'services' %}
 {% endif %}
 
 {% block per_page_title %}
-  Your {{ thing_to_choose_between }}
+  Uw {{ thing_to_choose_between }}
 {% endblock %}
 
 {% block maincolumn_content %}
   <h1 class="heading-large">
-    Your {{ thing_to_choose_between }}
+    Uw {{ thing_to_choose_between }}
   </h1>
 
   <nav class="browse-list">
@@ -77,14 +77,14 @@
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter">
           <h2>
-            Platform admin
+            Platformbeheerder
           </h2>
         </div>
         <ul class="govuk-grid-column-three-quarters">
           <li class="browse-list-item">
-            <a href="{{ url_for('main.organisations') }}" class="govuk-link govuk-link--no-visited-state">All organisations</a>
+            <a href="{{ url_for('main.organisations') }}" class="govuk-link govuk-link--no-visited-state">Alle organisaties</a>
             <p class="browse-list-hint">
-              {{ org_count|format_thousands }} organisations, {{ live_service_count|format_thousands }} live services
+              {{ org_count|format_thousands }} organisaties, {{ live_service_count|format_thousands }} actieve services
             </p>
           </li>
         </ul>
@@ -94,32 +94,32 @@
 
     {% if current_user.organisations %}
       {{ service_list(
-        heading='Organisations',
+        heading='Organisaties',
         organisations=current_user.organisations,
       ) }}
     {% endif %}
 
     {% if current_user.live_services %}
       {{ service_list(
-        heading='Live services',
+        heading='Actieve services',
         services=current_user.live_services
       ) }}
     {% else %}
       {{ no_service(
-        heading='Live services',
-        no_live_service_text='No live services'
+        heading='Actieve services',
+        no_live_service_text='Geen actieve services'
       ) }}
     {% endif %}
 
     {% if current_user.trial_mode_services %}
       {{ service_list(
-        heading='Trial mode services',
+        heading='Services in proefmodus',
         services=current_user.trial_mode_services
       ) }}
     {% else %}
       {{ no_service(
-        heading='Trial mode services',
-        no_live_service_text='No trial mode services'
+        heading='Services in proefmodus',
+        no_live_service_text='Geen services in proefmodus'
       ) }}
     {% endif %}
 
@@ -134,14 +134,14 @@
         <div class="govuk-grid-column-three-quarters">
         {{ govukButton({
           "element": "a",
-          "text": "Add a new service",
+          "text": "Nieuwe service toevoegen",
           "href": url_for('main.add_service'),
           "classes": "govuk-button--secondary govuk-!-margin-right-3"
         }) }}
         {% if current_user.default_organisation.can_ask_to_join_a_service %}
           {{ govukButton({
             "element": "a",
-            "text": "Join an existing service",
+            "text": "Deelnemen aan bestaande service",
             "href": url_for('main.join_service_choose_service'),
             "classes": "govuk-button--secondary"
           }) }}

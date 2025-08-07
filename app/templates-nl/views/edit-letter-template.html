@@ -7,14 +7,14 @@
 {% set heading %}
   {% if heading_action == 'Edit' %}
     {% if letter_languages == language_options.english.value %}
-      Edit heading and body text
+      Bewerk koptekst en hoofdtekst
     {% elif language is none %}
-      Edit English heading and body text
+      Bewerk Engelse koptekst en hoofdtekst
     {% else %}
-      Edit Welsh heading and body text
+      Bewerk Welshe koptekst en hoofdtekst
     {% endif %}
   {% else %}
-    {{ heading_action }} letter template
+    {{ heading_action }} brievensjabloon
   {% endif %}
 {% endset %}
 
@@ -38,7 +38,7 @@
           {% if show_name_field %}
             {{ form.name(param_extensions={"classes": "govuk-!-width-full"}) }}
           {% else %}
-            {# this needs to be passed through if we're showing this from the copy page #}
+            {# deze moet worden doorgegeven als dit vanaf de kopieerpagina wordt weergegeven #}
             <input type="hidden" name="name" value="{{ form.name.data }}" />
           {% endif %}
 
@@ -64,7 +64,7 @@
             }
           }) }}
           {{ sticky_page_footer(
-            'Save'
+            'Opslaan'
           ) }}
 
         </div>

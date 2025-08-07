@@ -8,7 +8,7 @@
 {% extends "withnav_template.html" %}
 
 {% block service_page_title %}
-  Choose a template
+  Kies een sjabloon
 {% endblock %}
 
 {% block backLink %}
@@ -18,7 +18,7 @@
 {% block maincolumn_content %}
 
 <div class="bottom-gutter-1-2">
-  <h1 class="heading-large">Choose a template</h1>
+  <h1 class="heading-large">Kies een sjabloon</h1>
   {{ folder_path(template_folder_path, current_service, template_type, current_user, root_element='h2') }}
 </div>
 
@@ -26,17 +26,16 @@
 
     {% if current_user.has_permissions('manage_templates') %}
        <p class="bottom-gutter">
-         You need a template before you can send text messages.
+         U heeft een sjabloon nodig voordat u sms-berichten kunt versturen.
        </p>
        {{ govukButton({
         "element": "a",
-        "text": "Add a new template",
+        "text": "Voeg een nieuw sjabloon toe",
         "href": url_for('main.choose_template', service_id=current_service.id, initial_state='add-new-template')
       }) }}
     {% else %}
       <p class="govuk-body">
-        You need to ask your service manager to add templates before you
-        can send text messages.
+        Vraag uw servicemanager om sjablonen toe te voegen voordat u sms-berichten kunt versturen.
       </p>
     {% endif %}
 
@@ -70,7 +69,6 @@
         </div>
       {% endfor %}
     </div>
-
 
   {% endif %}
 

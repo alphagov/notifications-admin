@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-    {{ 'Choose permissions for {}'.format(requester.name) }}
+    {{ 'Kies rechten voor {}'.format(requester.name) }}
 {% endblock %}
 
 {% block backLink %}
@@ -14,7 +14,7 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Choose permissions for {}'.format(requester.name)) }}
+    {{ page_header('Kies rechten voor {}'.format(requester.name)) }}
 
     {% call form_wrapper() %}
         <p class="govuk-body">
@@ -23,7 +23,7 @@
 
         {% include 'views/manage-users/permissions.html' %}
 
-        {{ page_footer('Save') }}
+        {{ page_footer('Opslaan') }}
 
     {% endcall %}
 

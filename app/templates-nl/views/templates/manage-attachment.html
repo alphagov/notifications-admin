@@ -32,18 +32,18 @@
     {% endif %}
 
     {% set attachment_spec %}
-        <p class="govuk-body">Page size and layout: A4 portrait (210 × 297 mm)</p>
-        <p class="govuk-body">Maximum file size: 2 MB</p>
-        <p class="govuk-body">The content of your letter must appear inside the printable area:</p>
+        <p class="govuk-body">Paginagrootte en lay-out: A4 staand (210 × 297 mm)</p>
+        <p class="govuk-body">Maximale bestandsgrootte: 2 MB</p>
+        <p class="govuk-body">De inhoud van uw brief moet binnen het afdrukbare gebied vallen:</p>
 
-        <p class="govuk-body">Left margin 15mm</p>
-        <p class="govuk-body">Right margin 15mm</p>
-        <p class="govuk-body">Top margin 5mm</p>
-        <p class="govuk-body">Bottom margin 5mm</p>
+        <p class="govuk-body">Linkermarge 15 mm</p>
+        <p class="govuk-body">Rechtermarge 15 mm</p>
+        <p class="govuk-body">Bovenmarge 5 mm</p>
+        <p class="govuk-body">Ondermarge 5 mm</p>
     {% endset %}
 
     {{ govukDetails({
-        "summaryText": "Your PDF must meet our attachment specification",
+        "summaryText": "Uw PDF moet voldoen aan onze specificaties voor bijlagen",
         "html": attachment_spec
     }) }}
 
@@ -52,10 +52,10 @@
         form.file,
         allowed_file_extensions=['pdf'],
         action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template.id),
-        button_text='Upload your file again' if error else 'Choose a different file',
+        button_text='Upload uw bestand opnieuw' if error else 'Kies een ander bestand',
         show_errors=use_error_summary,
         alternate_link=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template.id) if error else None,
-        alternate_link_text='cancel'
+        alternate_link_text='annuleren'
     )}}
     </div>
     <div class="template-container">
@@ -72,7 +72,7 @@
       <div class="js-stick-at-bottom-when-scrolling">
         {{ page_footer(
             delete_link=url_for('main.letter_template_edit_pages', template_id=template.id, service_id=service_id),
-            delete_link_text='Remove attachment'
+            delete_link_text='Verwijder bijlage'
         ) }}
       </div>
     </div>

@@ -6,7 +6,7 @@
 
 {% extends "withnav_template.html" %}
 
-{% set page_title = 'Templates' %}
+{% set page_title = 'Sjablonen' %}
 
 {% block service_page_title %}
   {{ page_title_folder_path(template_folder_path) }}
@@ -20,18 +20,17 @@
 
      <p class="govuk-body">
       {% if current_user.has_permissions('manage_templates') %}
-        You need a template before you can
+        U heeft een sjabloon nodig voordat u e-mails, sms-berichten of brieven kunt versturen.
       {% else %}
-        You need to ask your service manager to add templates before you can
+        Vraag uw servicemanager om sjablonen toe te voegen voordat u e-mails, sms-berichten of brieven kunt versturen.
       {% endif %}
-      send emails, text messages or letters.
      </p>
 
   {% else %}
 
     <div class="govuk-grid-row">
       <div class="{% if current_user.has_permissions('manage_templates') %} govuk-grid-column-five-sixths {% else %} govuk-grid-column-full {% endif %}">
-        {# H1 of page #}
+        {# H1 van pagina #}
         {{ folder_path(
           folders=template_folder_path,
           service=current_service,
@@ -41,7 +40,7 @@
       </div>
       {% if current_user.has_permissions('manage_templates') and current_template_folder_id and user_has_template_folder_permission %}
         <div class="govuk-grid-column-one-sixth">
-          <a href="{{ url_for('main.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-manage-link">Manage<span class="govuk-visually-hidden"> this folder</span></a>
+          <a href="{{ url_for('main.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-manage-link">Beheren<span class="govuk-visually-hidden"> deze map</span></a>
         </div>
       {% endif %}
     </div>

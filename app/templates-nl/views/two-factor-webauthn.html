@@ -5,7 +5,7 @@
 {% from "components/webauthn-api-check.html" import webauthn_api_check %}
 {% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
 
-{% set page_title = 'Get your security key' %}
+{% set page_title = 'Haal uw beveiligingssleutel' %}
 
 {% block extra_javascripts_before_body %}
   {{ webauthn_api_check() }}
@@ -24,25 +24,25 @@
 {% set errorSummaries %}
   {{ govukErrorSummary({
     "classes": "webauthn__api-missing",
-    "titleText": "There’s a problem",
-    "descriptionText": "Your browser does not support security keys. Try signing in to Notify using a different browser."
+    "titleText": "Er is een probleem",
+    "descriptionText": "Uw browser ondersteunt beveiligingssleutels niet. Probeer in te loggen bij Notify met een andere browser."
   }) }}
 
   {{ govukErrorSummary({
     "classes": "webauthn__no-js",
-    "titleText": "There’s a problem",
-    "descriptionText": "JavaScript is not available for this page. Security keys need JavaScript to work."
+    "titleText": "Er is een probleem",
+    "descriptionText": "JavaScript is niet beschikbaar op deze pagina. Beveiligingssleutels hebben JavaScript nodig om te functioneren."
   }) }}
 
   {% set keyProblemDescription %}
-    Check you have the right key and try again. If this does not work,
-     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
+    Controleer of u de juiste sleutel heeft en probeer het opnieuw. Werkt dit niet,
+     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">neem contact met ons op</a>.
   {% endset %}
 
   {{ govukErrorSummary({
     "classes": "govuk-!-display-none",
     "attributes": { "aria-live": "polite", "tabindex":"-1" },
-    "titleText": "There’s a problem with your security keys",
+    "titleText": "Er is een probleem met uw beveiligingssleutels",
     "descriptionHtml": keyProblemDescription
   }) }}
 {% endset %}
@@ -53,12 +53,12 @@
       {{ page_header(page_title) }}
 
       <p class="govuk-body">
-        You need to have your security key to sign in.
+        U heeft uw beveiligingssleutel nodig om in te loggen.
       </p>
 
       {{ govukButton({
         "element": "button",
-        "text": "Check security key",
+        "text": "Beveiligingssleutel controleren",
         "classes": "govuk-button--secondary webauthn__api-required",
         "attributes": {
           "data-notify-module": "authenticate-security-key",

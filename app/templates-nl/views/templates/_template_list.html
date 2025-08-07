@@ -5,9 +5,9 @@
 {% if template_list.template_folder_id and not template_list.templates_to_show %}
   <p class="template-list-empty">
     {% if template_list.folder_is_empty %}
-      This folder is empty
+      Deze map is leeg
     {% else %}
-      There are no {{ 1|message_count_label(template_type, suffix='') }} templates in this folder
+      Er zijn geen {{ 1|message_count_label(template_type, suffix='') }} sjablonen in deze map
     {% endif %}
   </p>
 {% else %}

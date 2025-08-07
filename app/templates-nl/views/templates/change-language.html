@@ -3,7 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% set title = 'Change language' %}
+{% set title = 'Taal wijzigen' %}
 {% block service_page_title %}
   {{ title }}
 {% endblock %}
@@ -22,6 +22,6 @@
           },
       }
     }) }}
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 {% endblock %}

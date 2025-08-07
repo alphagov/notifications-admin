@@ -5,10 +5,10 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
-{% set page_title = "Attach pages" %}
+{% set page_title = "Pagina's toevoegen" %}
 
 {% block service_page_title %}
-{% if error and not use_error_summary %}Error: {% endif %}{{ page_title }}
+{% if error and not use_error_summary %}Foutmelding: {% endif %}{{ page_title }}
 {% endblock %}
 
 {% block backLink %}
@@ -29,34 +29,33 @@
         {{ page_header(page_title) }}
     {% endif %}
 
-    <p class="govuk-body">Upload a PDF and we’ll print it as part of your letter.</p>
+    <p class="govuk-body">Upload een PDF en wij printen deze als onderdeel van uw brief.</p>
     <p class="govuk-body">
-        In total, your letter must be 10 pages or less (5 double-sided sheets of paper).
+        Uw brief mag in totaal maximaal 10 pagina’s bevatten (5 dubbelzijdige vellen papier).
     </p>
 
 {% set attachment_spec %}
-    <p class="govuk-body">Page size and layout: A4 portrait (210 × 297 mm)</p>
-    <p class="govuk-body">Maximum file size: 2 MB</p>
-    <p class="govuk-body">The content of your letter must appear inside the printable area:</p>
+    <p class="govuk-body">Paginagrootte en -opmaak: A4 staand (210 × 297 mm)</p>
+    <p class="govuk-body">Maximale bestandsgrootte: 2 MB</p>
+    <p class="govuk-body">De inhoud van uw brief moet binnen het printbare gebied vallen:</p>
 
-    <p class="govuk-body">Left margin 15mm</p>
-    <p class="govuk-body">Right margin 15mm</p>
-    <p class="govuk-body">Top margin 5mm</p>
-    <p class="govuk-body">Bottom margin 5mm</p>
+    <p class="govuk-body">Linkermarge 15 mm</p>
+    <p class="govuk-body">Rechtermarge 15 mm</p>
+    <p class="govuk-body">Bovenzijde 5 mm</p>
+    <p class="govuk-body">Onderzijde 5 mm</p>
   {% endset %}
 
   {{ govukDetails({
-    "summaryText": "Your PDF must meet our attachment specification",
+    "summaryText": "Uw PDF moet voldoen aan onze bijlage-specificaties",
     "html": attachment_spec
   }) }}
-
 
     <div class="govuk-body">
         {{ file_upload(
         form.file,
         allowed_file_extensions=['pdf'],
         action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template.id),
-        button_text='Upload your file again' if error else 'Choose a file',
+        button_text='Upload uw bestand opnieuw' if error else 'Kies een bestand',
         show_errors=use_error_summary
         )}}
     </div>

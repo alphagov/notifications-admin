@@ -4,7 +4,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Change your {{ thing }}
+  Wijzig uw {{ thing }}
 {% endblock %}
 
 {% block backLink %}
@@ -25,16 +25,16 @@
            {%  endif %}
         {% if current_user.auth_type == 'email_auth' and (current_user.mobile_number and thing == "mobile number") %}
           {{ page_footer(
-            'Save',
+            'Opslaan',
             delete_link=url_for(
               'main.your_account_mobile_number_delete',
               user_id=current_user.id
             ),
-            delete_link_text='Delete your number'
+            delete_link_text='Verwijder uw nummer'
             )
           }}
         {% else %}
-          {{ page_footer('Save')}}
+          {{ page_footer('Opslaan')}}
         {% endif %}
       {% endcall %}
     </div>

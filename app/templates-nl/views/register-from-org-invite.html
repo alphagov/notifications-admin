@@ -4,29 +4,29 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-Create an account
+Account aanmaken
 {% endblock %}
 
 {% block maincolumn_content %}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    {{ govuk_page_header("Create an account") }}
-    <p class="govuk-body">Your account will be created with this email: {{invited_org_user.email_address}}</p>
+    {{ govuk_page_header("Account aanmaken") }}
+    <p class="govuk-body">Uw account wordt aangemaakt met dit e-mailadres: {{invited_org_user.email_address}}</p>
     {% call form_wrapper() %}
       {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
       <div class="extra-tracking">
         {{ form.mobile_number(param_extensions={
             "classes": "govuk-!-width-three-quarters",
-            "hint": {"text": "We’ll send you a security code by text message"}
+            "hint": {"text": "We sturen u een beveiligingscode per sms"}
         }) }}
       </div>
       {{ form.password(param_extensions={
           "classes": "govuk-!-width-three-quarters",
-          "hint": {"text": "At least 8 characters"},
+          "hint": {"text": "Minimaal 8 tekens"},
           "autocomplete": "new-password"
         }) }}
-      {{ page_footer("Continue") }}
+      {{ page_footer("Doorgaan") }}
       {{form.organisation}}
       {{form.email_address}}
     {% endcall %}

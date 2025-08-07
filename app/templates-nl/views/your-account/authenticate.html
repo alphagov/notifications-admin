@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Change your {{ thing }}
+  Wijzig uw {{ thing }}
 {% endblock %}
 
 {% block backLink %}
@@ -14,14 +14,14 @@
 
 {% block maincolumn_content %}
 
-  {{ govuk_page_header("Change your " + thing)  }}
+  {{ govuk_page_header("Wijzig uw " + thing)  }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
 
     {% call form_wrapper(autocomplete=True) %}
       {{ form.password(param_extensions={"autocomplete": "current-password"}) }}
-      {{ page_footer('Confirm') }}
+      {{ page_footer('Bevestigen') }}
     {% endcall %}
     </div>
   </div>

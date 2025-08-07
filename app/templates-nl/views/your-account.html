@@ -2,19 +2,19 @@
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% block per_page_title %}
-  Your account
+  Uw account
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Your account</h1>
+  <h1 class="heading-large">Uw account</h1>
 
   {% if can_see_edit %}
     {% set email_address_row =
       {
         "key": {
           "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-          "text": "Email address"
+          "text": "E-mailadres"
         },
         "value": {
           "text": current_user.email_address
@@ -22,8 +22,8 @@
         "actions": {
           "items": [{
             "href": url_for('main.your_account_email'),
-            "text": "Change",
-            "visuallyHiddenText": "email address",
+            "text": "Wijzigen",
+            "visuallyHiddenText": "e-mailadres",
             "classes": "govuk-link--no-visited-state"
           }]
         }
@@ -35,7 +35,7 @@
         "classes": "govuk-summary-list__row--no-actions",
         "key": {
           "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-          "text": "Email address"
+          "text": "E-mailadres"
         },
         "value": {
           "text": current_user.email_address
@@ -48,7 +48,7 @@
     {
       "key": {
         "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-        "text": "Name"
+        "text": "Naam"
       },
       "value": {
         "text": current_user.name
@@ -57,8 +57,8 @@
         "items": [
           {
             "href": url_for('main.your_account_name'),
-            "text": "Change",
-            "visuallyHiddenText": "name",
+            "text": "Wijzigen",
+            "visuallyHiddenText": "naam",
             "classes": "govuk-link--no-visited-state"
           }
         ]
@@ -68,18 +68,18 @@
     {
       "key": {
         "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-        "text": "Mobile number"
+        "text": "Mobiel nummer"
       },
       "value": {
-        "text": current_user.mobile_number or "Not set",
+        "text": current_user.mobile_number or "Niet ingesteld",
         "classes": "" if current_user.mobile_number else "table-field-status-default"
       },
       "actions": {
         "items": [
         {
           "href": url_for('main.your_account_mobile_number'),
-          "text": "Change",
-          "visuallyHiddenText": "mobile number",
+          "text": "Wijzigen",
+          "visuallyHiddenText": "mobiel nummer",
           "classes": "govuk-link--no-visited-state"
         }
 
@@ -89,17 +89,17 @@
     {
       "key": {
         "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-        "text": "Password"
+        "text": "Wachtwoord"
       },
       "value": {
-        "text": ('Last changed ' + current_user.password_changed_at|format_delta)
+        "text": ('Laatst gewijzigd ' + current_user.password_changed_at|format_delta)
       },
       "actions": {
         "items": [
           {
             "href": url_for('main.your_account_password'),
-            "text": "Change",
-            "visuallyHiddenText": "password",
+            "text": "Wijzigen",
+            "visuallyHiddenText": "wachtwoord",
             "classes": "govuk-link--no-visited-state"
           }
         ]
@@ -108,17 +108,17 @@
     {
       "key": {
         "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-        "text": "Take part in user research"
+        "text": "Deelname aan gebruikersonderzoek"
       },
       "value": {
-        "text": "Yes" if current_user.take_part_in_research else "No"
+        "text": "Ja" if current_user.take_part_in_research else "Nee"
       },
       "actions": {
         "items": [
           {
           "href": url_for('main.your_account_take_part_in_user_research'),
-          "text": "Change",
-          "visuallyHiddenText": "consent to take part in user research",
+          "text": "Wijzigen",
+          "visuallyHiddenText": "toestemming om deel te nemen aan gebruikersonderzoek",
           "classes": "govuk-link--no-visited-state"
           }
         ]
@@ -127,17 +127,17 @@
     {
       "key": {
         "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-        "text": "Get emails about new features"
+        "text": "E-mails ontvangen over nieuwe functies"
       },
       "value": {
-        "text": "Yes" if current_user.receives_new_features_email else "No"
+        "text": "Ja" if current_user.receives_new_features_email else "Nee"
       },
       "actions": {
         "items": [
           {
           "href": url_for('main.your_account_get_emails_about_new_features'),
-          "text": "Change",
-          "visuallyHiddenText": "consent to get emails about new features",
+          "text": "Wijzigen",
+          "visuallyHiddenText": "toestemming om e-mails te ontvangen over nieuwe functies",
           "classes": "govuk-link--no-visited-state"
           }
         ]
@@ -150,18 +150,18 @@
     {
       "key": {
         "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-        "text": "Security keys"
+        "text": "Beveiligingssleutels"
       },
       "value": {
-        "text": ('{} registered'.format(current_user.webauthn_credentials|length)) if current_user.webauthn_credentials else "None registered",
+        "text": ('{} geregistreerd'.format(current_user.webauthn_credentials|length)) if current_user.webauthn_credentials else "Geen geregistreerd",
         "classes": "" if current_user.webauthn_credentials else "table-field-status-default"
       },
       "actions": {
         "items": [
           {
             "href": url_for('main.your_account_security_keys'),
-            "text": "Change",
-            "visuallyHiddenText": "security keys",
+            "text": "Wijzigen",
+            "visuallyHiddenText": "beveiligingssleutels",
             "classes": "govuk-link--no-visited-state"
           }
         ]
@@ -175,7 +175,7 @@
     {
       "key": {
         "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-        "text": "Use platform admin view"
+        "text": "Platformbeheerweergave gebruiken"
       },
       "value": {
         "text": (not session.get('disable_platform_admin_view'))|format_yes_no
@@ -184,8 +184,8 @@
         "items": [
           {
             "href": url_for('main.your_account_disable_platform_admin_view'),
-            "text": "Change",
-            "visuallyHiddenText": "whether to use platform admin view",
+            "text": "Wijzigen",
+            "visuallyHiddenText": "of platformbeheerweergave wordt gebruikt",
             "classes": "govuk-link--no-visited-state"
           }
         ]
@@ -200,7 +200,7 @@
 }) }}
 
 <p class="govuk-body">
-  <a href="{{ url_for('main.sign_out') }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">Sign out</a>
+  <a href="{{ url_for('main.sign_out') }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">Uitloggen</a>
 </p>
 
 {% endblock %}

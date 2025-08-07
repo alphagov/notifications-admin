@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Error
+  Fout
 {% endblock %}
 
 {% block backLink %}
@@ -20,32 +20,32 @@
       {% if not recipients|length %}
 
         <h1 class='banner-title'>
-          Your file is missing some rows
+          Uw bestand mist enkele rijen
         </h1>
         <p class="govuk-body">
-          It needs at least one row of data
-          {%- if template_type %}.{% else %}, in a column called ‘email address’ or ‘phone number’.{% endif %}
+          Het moet ten minste één rij met gegevens bevatten
+          {%- if template_type %}.{% else %}, in een kolom genaamd ‘e-mailadres’ of ‘telefoonnummer’.{% endif %}
         </p>
 
       {% elif recipients.column_headers|length == 1 %}
 
         <h1 class='banner-title'>
-          Your file needs a column called ‘email address’ or ‘phone number’.
+          Uw bestand moet een kolom hebben met de naam ‘e-mailadres’ of ‘telefoonnummer’.
         </h1>
         <p class="govuk-body">
-          Right now it has 1 column called ‘{{ recipients._raw_column_headers[0] }}’.
+          Op dit moment heeft het 1 kolom met de naam ‘{{ recipients._raw_column_headers[0] }}’.
         </p>
 
       {% else %}
 
         <h1 class='banner-title'>
-          Your file has too many columns
+          Uw bestand bevat te veel kolommen
         </h1>
         <p class="govuk-body">
-          It needs to have 1 column, called ‘email address’ or ‘phone number’.
+          Het moet precies 1 kolom bevatten, genaamd ‘e-mailadres’ of ‘telefoonnummer’.
         </p>
         <p class="govuk-body">
-          Right now it has {{ recipients._raw_column_headers|length }} columns called {{ recipients._raw_column_headers | formatted_list }}.
+          Op dit moment heeft het {{ recipients._raw_column_headers|length }} kolommen met de namen {{ recipients._raw_column_headers | formatted_list }}.
         </p>
 
       {% endif %}
@@ -59,10 +59,10 @@
         form.file,
         allowed_file_extensions=allowed_file_extensions,
         action=url_for('main.upload_contact_list', service_id=current_service.id),
-        button_text='Upload your file again'
+        button_text='Upload uw bestand opnieuw'
       ) }}
     </div>
-    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
+    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Terug naar boven</a>
   </div>
 
     {% set column_headers = recipients._raw_column_headers if recipients.duplicate_recipient_column_headers else recipients.column_headers %}
@@ -75,7 +75,7 @@
         caption=original_file_name,
         caption_visible=False,
         field_headings=[
-          '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true">1</span>'|safe
+          '<span class="govuk-visually-hidden">Rij in bestand</span> <span aria-hidden="true">1</span>'|safe
         ] + recipients._raw_column_headers
       ) %}
         {% call row_heading() %}
@@ -98,7 +98,7 @@
 
   {% if recipients.displayed_rows|list|length < recipients|length %}
     <p class="table-show-more-link">
-      Only showing the first {{ recipients.displayed_rows|list|length }} rows
+      Er worden alleen de eerste {{ recipients.displayed_rows|list|length }} rijen getoond
     </p>
   {% endif %}
 

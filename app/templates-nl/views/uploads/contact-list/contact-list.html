@@ -17,23 +17,23 @@
   {{ page_header(contact_list.original_file_name) }}
 
   <p class="govuk-body">
-    Uploaded by {{ contact_list.created_by }} {{ contact_list.created_at|format_datetime_human }}.
+    Geüpload door {{ contact_list.created_by }} op {{ contact_list.created_at|format_datetime_human }}.
   </p>
 
   {% if jobs %}
     <p class="govuk-body">
-      Used {{ jobs|length|iteration_count }}
-      in the last {{ current_service.get_days_of_retention(contact_list.template_type) }}
-      days.
+      Gebruikt {{ jobs|length|iteration_count }}
+      in de afgelopen {{ current_service.get_days_of_retention(contact_list.template_type) }}
+      dagen.
     </p>
     <div class='dashboard-table ajax-block-container'>
       {% call(item, row_number) list_table(
         jobs,
-        caption="Messages sent from this contact list",
+        caption="Berichten verstuurd met deze contactlijst",
         caption_visible=False,
         empty_message='',
         field_headings=[
-          'Template',
+          'Sjabloon',
           'Status'
         ],
         field_headings_visible=False,
@@ -44,18 +44,17 @@
             <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.template_name }}</a>
             {% if item.scheduled %}
               <span class="file-list-hint-large">
-                Sending {{
+                Verzending gepland voor {{
                   item.scheduled_for|format_datetime_relative
                 }}
               </span>
             {% else %}
               <span class="file-list-hint-large">
-                Sent {{
+                Verzonden {{
                   (item.scheduled_for or item.created_at)|format_datetime_relative
                 }}
               </span>
             {% endif %}
-
           </div>
         {% endcall %}
         {% call field() %}
@@ -65,7 +64,7 @@
               smallest=True,
               label=item.notification_count|message_count_label(
                 item.template_type,
-                suffix='waiting to send'
+                suffix='in wachtrij om te versturen'
               )
             ) }}
           {% else %}
@@ -74,14 +73,14 @@
                 {{ big_number(
                   item.notifications_sending,
                   smallest=True,
-                  label='sending',
+                  label='bezig met verzenden',
                 ) }}
               </div>
               <div class="govuk-grid-column-one-third">
-                {{ big_number(item.notifications_delivered, smallest=True, label='delivered') }}
+                {{ big_number(item.notifications_delivered, smallest=True, label='bezorgd') }}
               </div>
               <div class="govuk-grid-column-one-third">
-                {{ big_number(item.notifications_failed, smallest=True, label='failed') }}
+                {{ big_number(item.notifications_failed, smallest=True, label='mislukt') }}
               </div>
             </div>
           {% endif %}
@@ -91,15 +90,15 @@
   {% else %}
     <p class="govuk-body">
       {% if contact_list.has_jobs %}
-        Not used in the last {{ current_service.get_days_of_retention(contact_list.template_type) }} days.
+        Niet gebruikt in de afgelopen {{ current_service.get_days_of_retention(contact_list.template_type) }} dagen.
       {% else %}
-        Not used yet.
+        Nog niet gebruikt.
       {% endif %}
     </p>
   {% endif %}
 
   <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
-    {{ contact_list.recipients|length|format_thousands }} saved {{ contact_list.recipients|length|recipient_count_label(contact_list.template_type) }}
+    {{ contact_list.recipients|length|format_thousands }} opgeslagen {{ contact_list.recipients|length|recipient_count_label(contact_list.template_type) }}
   </h2>
 
   {% set recipient_column = contact_list.recipients.column_headers[0] %}
@@ -117,22 +116,20 @@
 
     {% if contact_list.recipients.displayed_rows|list|length < contact_list.recipients|length %}
       <p class="table-show-more-link">
-        Only showing the first {{ contact_list.recipients.displayed_rows|list|length }} rows
+        Er worden alleen de eerste {{ contact_list.recipients.displayed_rows|list|length }} rijen getoond
       </p>
     {% endif %}
   </div>
-
 
   <div class="js-stick-at-bottom-when-scrolling">
     <div class="page-footer">
       {% if not confirm_delete_banner %}
         <span class="page-footer-link page-footer-delete-link-without-button">
-          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.delete_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Delete this contact list</a>
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.delete_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Deze contactlijst verwijderen</a>
         </span>
       {% endif %}
-      <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link-without-button" download href="{{ url_for('main.download_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Download this contact list (<abbr title="Comma separated values">CSV</abbr>)</a>
+      <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link-without-button" download href="{{ url_for('main.download_contact_list', service_id=current_service.id, contact_list_id=contact_list.id) }}">Download deze contactlijst (<abbr title="Comma separated values">CSV</abbr>)</a>
     </div>
   </div>
-
 
 {% endblock %}

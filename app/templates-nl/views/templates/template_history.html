@@ -2,7 +2,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = "Version " + template._template.version|string + " : " + template.name %}
+{% set page_title = "Versie " + template._template.version|string + " : " + template.name %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -23,7 +23,7 @@
 
   {{ page_footer(
     secondary_link=url_for('main.view_template_versions', service_id=current_service.id, template_id=template.id),
-    secondary_link_text='See all versions of this template'
+    secondary_link_text='Bekijk alle versies van deze template'
   ) }}
 
 {% endblock %}

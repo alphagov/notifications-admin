@@ -30,13 +30,13 @@
     {% endif %}
 
     {{ page_footer(
-      'Save',
+      'Opslaan',
       delete_link=url_for(
         '.delete_template_folder',
         service_id=current_service_id,
         template_folder_id=template_folder_id
       ),
-      delete_link_text="Delete this folder") }}
+      delete_link_text="Deze map verwijderen") }}
   {% endcall %}
 
 {% endblock %}

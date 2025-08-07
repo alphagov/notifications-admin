@@ -4,7 +4,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = 'Manage ' + '‘' + security_key.name + '’' %}
+{% set page_title = 'Beheer ' + '‘' + security_key.name + '’' %}
 
 {% block per_page_title %}
   {{ page_title }}
@@ -15,17 +15,17 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{govuk_page_header(''+ page_title)}}
+  {{ govuk_page_header(page_title) }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       {% call form_wrapper(autocomplete=True) %}
         {{ form.security_key_name }}
         {{ page_footer(
-          'Save',
+          'Opslaan',
           delete_link=url_for(
             '.your_account_confirm_delete_security_key', key_id=security_key.id),
-          delete_link_text='Delete'
+          delete_link_text='Verwijderen'
         ) }}
       {% endcall %}
     </div>

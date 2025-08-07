@@ -5,9 +5,9 @@
 
 {% block per_page_title %}
   {% if again %}
-    You need to sign in again
+    U moet opnieuw inloggen
   {% else %}
-    Sign in
+    Inloggen
   {% endif %}
 {% endblock %}
 
@@ -17,28 +17,28 @@
   <div class="govuk-grid-column-two-thirds">
 
     {% if again %}
-      {{ govuk_page_header("You need to sign in again") }}
+      {{ govuk_page_header("U moet opnieuw inloggen") }}
       {% if other_device %}
         <p class="govuk-body">
-          We signed you out because you logged in to Notify on another device.
+          U bent uitgelogd omdat u op een ander apparaat bent ingelogd bij Notify.
         </p>
       {% else %}
         <p class="govuk-body">
-          We signed you out because you have not used Notify for a while.
+          U bent uitgelogd omdat u Notify een tijdje niet heeft gebruikt.
         </p>
       {% endif %}
     {% else %}
-      {{ govuk_page_header("Sign in") }}
+      {{ govuk_page_header("Inloggen") }}
       <p class="govuk-body">
-        If you do not have an account, you can
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">create one now</a>.
+        Heeft u nog geen account? U kunt er
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">nu een aanmaken</a>.
       </p>
     {% endif %}
 
     {% call form_wrapper(autocomplete=True) %}
       {{ form.email_address(param_extensions={"autocomplete": "email"}) }}
       {{ form.password(param_extensions={"autocomplete": "current-password"}) }}
-      {{ page_footer("Continue", secondary_link=password_reset_url, secondary_link_text="Forgotten your password?") }}
+      {{ page_footer("Doorgaan", secondary_link=password_reset_url, secondary_link_text="Wachtwoord vergeten?") }}
     {% endcall %}
   </div>
 </div>

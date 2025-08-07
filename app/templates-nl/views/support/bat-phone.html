@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  How to report a problem outside office hours
+  Een probleem melden buiten kantooruren
 {% endblock %}
 
 {% block backLink %}
@@ -12,48 +12,47 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('How to report a problem outside office hours')}}
+    {{ page_header('Een probleem melden buiten kantooruren')}}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <p class="govuk-body">
-          First, check the
-          <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">GOV.UK Notify status page</a>.
+          Controleer eerst de
+          <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">statuspagina van GOV.UK Notify</a>.
         </p>
         <p class="govuk-body">
-          You do not need to contact us if your problem is already listed on that page.
+          U hoeft geen contact met ons op te nemen als uw probleem al op die pagina staat.
         </p>
         <p class="govuk-body">
-          If your problem is not listed on the status page, contact us using our emergency email address.
+          Staat uw probleem niet op de statuspagina? Neem dan contact met ons op via ons nood-e-mailadres.
         </p>
         <p class="govuk-body">
-          This is the email address we sent to your service manager when we made your service live.
+          Dit is het e-mailadres dat wij naar uw servicemanager hebben gestuurd toen uw dienst is geactiveerd.
         </p>
         <p class="govuk-body">
-          When you contact our emergency email address we’ll reply within 30 minutes.
+          Als u contact opneemt via ons nood-e-mailadres, reageren wij binnen 30 minuten.
         </p>
 
-        <h2 class="heading-medium">Do not use our emergency email address if</h2>
+        <h2 class="heading-medium">Gebruik ons nood-e-mailadres niet als</h2>
 
         <ul class="govuk-list govuk-list--bullet">
         <li>
-          you did not get a ‘technical difficulties’ error when uploading a file
+          u geen foutmelding ‘technische storing’ kreeg bij het uploaden van een bestand
         </li>
         <li>
-          you did not get a 500 response code when using the API
+          u geen 500-responsecode kreeg bij gebruik van de API
         </li>
         <li>
-          your service is still in trial mode
+          uw dienst nog in de testfase is
         </li>
       </ul>
 
         <p class="bottom-gutter-2">
-          Instead you need to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.feedback', ticket_type='report-problem', severe='no') }}">fill in our support form</a>.
+          Vul in dat geval <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.feedback', ticket_type='report-problem', severe='no') }}">ons ondersteuningsformulier</a> in.
         </p>
         <p class="govuk-body">
-          We’ll reply by the end of the next working day.
+          U ontvangt uiterlijk de volgende werkdag een reactie.
         </p>
       </div>
     </div>
-
 
 {% endblock %}

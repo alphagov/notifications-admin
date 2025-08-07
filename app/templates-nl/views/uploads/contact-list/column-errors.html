@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Error
+  Fout
 {% endblock %}
 
 {% block backLink %}
@@ -20,24 +20,25 @@
       {% if recipients.too_many_rows %}
 
         <h1 class='banner-title'>
-          Your file has too many rows
+          Uw bestand bevat te veel rijen
         </h1>
         <p class="govuk-body">
-          Notify can store files up to
-          {{ recipients.max_rows|format_thousands }} rows in size. Your
-          file has {{ recipients|length|format_thousands }} rows.
+          Notify kan bestanden opslaan tot
+          {{ recipients.max_rows|format_thousands }} rijen. Uw
+          bestand bevat {{ recipients|length|format_thousands }} rijen.
         </p>
 
       {% elif not recipients.allowed_to_send_to %}
 
         <h1 class='banner-title'>
-          You cannot save
-          {{ 'this' if recipients|length == 1 else 'these' }}
+          U kunt
+          {{ 'dit' if recipients|length == 1 else 'deze' }}
           {{ recipients|length|recipient_count_label(recipients.template_type) }}
+          niet opslaan
         </h1>
         <p class="govuk-body">
-          In <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a> you can only
-          send to yourself and members of your team
+          In de <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">proefmodus</a> kunt u alleen
+          berichten versturen naar uzelf en leden van uw team
         </p>
 
       {% endif %}
@@ -51,10 +52,10 @@
         form.file,
         allowed_file_extensions=allowed_file_extensions,
         action=url_for('main.upload_contact_list', service_id=current_service.id),
-        button_text='Upload your file again'
+        button_text='Upload uw bestand opnieuw'
       ) }}
     </div>
-    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
+    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Terug naar boven</a>
   </div>
 
     <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
@@ -64,7 +65,7 @@
       caption=original_file_name,
       caption_visible=False,
       field_headings=[
-        '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true">1</span>'|safe
+        '<span class="govuk-visually-hidden">Rij in bestand</span> <span aria-hidden="true">1</span>'|safe
       ] + recipients.column_headers
     ) %}
       {{ index_field(item.index + 2) }}
@@ -75,7 +76,7 @@
 
   {% if recipients.displayed_rows|list|length < recipients|length %}
     <p class="table-show-more-link">
-      Only showing the first {{ recipients.displayed_rows|list|length }} rows
+      Er worden alleen de eerste {{ recipients.displayed_rows|list|length }} rijen getoond
     </p>
   {% endif %}
 

@@ -4,7 +4,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Upload a letter
+  Upload een brief
 {% endblock %}
 
 {% block backLink %}
@@ -14,9 +14,9 @@
 {% block maincolumn_content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header('Upload a letter') }}
-      <p class="govuk-body">Upload a single letter as a PDF and we’ll print, pack and post it for you.</p>
-      <p class="govuk-body">You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>
+      {{ page_header('Upload een brief') }}
+      <p class="govuk-body">Upload een enkele brief als PDF; wij printen, verpakken en versturen deze voor u.</p>
+      <p class="govuk-body">U kunt deze functie gebruiken als u veel eenmalige brieven verstuurt of als onze herbruikbare briefsjablonen niet aan uw wensen voldoen.</p>
       <div class="govuk-!-margin-bottom-4">
         {{ file_upload(
           form.file,
@@ -28,5 +28,5 @@
     </div>
   </div>
 
-  <p class="govuk-body">Your file must meet our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">letter specification</a>.</p>
+  <p class="govuk-body">Uw bestand moet voldoen aan onze <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">briefspecificatie</a>.</p>
 {% endblock %}

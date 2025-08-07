@@ -1,12 +1,12 @@
 {% extends "views/platform-admin/_base_template.html" %}
 
 {% block per_page_title %}
-Inbound SMS
+Inkomende sms
 {% endblock %}
 
 {% set table_headings = {
   'field_headings': [
-    'Number', 'Status', 'Service', 'Created on'
+    'Nummer', 'Status', 'Dienst', 'Aangemaakt op'
   ],
   'field_headings_visible': True,
   'caption_visible': True
@@ -21,7 +21,7 @@ Inbound SMS
 {% block platform_admin_content %}
 
   <h1 class="heading-medium">
-    Inbound SMS
+    Inkomende sms
   </h1>
 
   <table class="inbound">
@@ -44,11 +44,11 @@ Inbound SMS
               <td>
 
               {% if value.active %}
-                Active
+                Actief
               {% elif not value.service.name  %}
-                  Not used
+                  Niet in gebruik
               {% else %}
-                Inactive
+                Inactief
               {% endif %}
               </td>
               <td>

@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Upload an emergency contact list
+  Upload een noodcontactlijst
 {% endblock %}
 
 {% block backLink %}
@@ -15,33 +15,33 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header('Upload an emergency contact list') }}
+  {{ page_header('Upload een noodcontactlijst') }}
   <p class="govuk-body">
-    Save a list of staff email addresses or phone numbers in Notify.
+    Sla een lijst met e-mailadressen of telefoonnummers van medewerkers op in Notify.
   </p>
   <p class="govuk-body">
-    In an emergency, you can send a message to everyone on the list.
+    In een noodgeval kunt u een bericht sturen naar iedereen op de lijst.
   </p>
   <p class="govuk-body">
-    Do not include contact details for members of the public.
+    Voeg geen contactgegevens van leden van het publiek toe.
   </p>
 
 <div class="bottom-gutter">
   {{ file_upload(
     form.file,
     allowed_file_extensions=allowed_file_extensions,
-    button_text='Choose file',
+    button_text='Kies bestand',
   )}}
 </div>
 
-<h2 class="heading-medium">Your file needs to look like one of these examples</h2>
+<h2 class="heading-medium">Uw bestand moet eruitzien als een van deze voorbeelden</h2>
 
 <p class="hint">
-  Save your file as a
+  Sla uw bestand op als een
   <acronym title="Comma Separated Values">CSV</acronym>,
   <acronym title="Tab Separated Values">TSV</acronym>,
   <acronym title="Open Document Spreadsheet">ODS</acronym>,
-  or Microsoft Excel spreadsheet
+  of Microsoft Excel-spreadsheet
 </p>
 
 <div class="govuk-grid-row">
@@ -49,10 +49,10 @@
     <div class="spreadsheet">
       {% call(item, row_number) list_table(
         [
-          ['email address'],
-          ['test@example.gov.uk'],
+          ['e-mailadres'],
+          ['test@example.gov.nl'],
         ],
-        caption="Example",
+        caption="Voorbeeld",
         caption_visible=False,
         field_headings=['', 'A']
       ) %}
@@ -67,10 +67,10 @@
     <div class="spreadsheet">
       {% call(item, row_number) list_table(
         [
-          ['phone number'],
-          ['07700 900123'],
+          ['telefoonnummer'],
+          ['06 12345678'],
         ],
-        caption="Example",
+        caption="Voorbeeld",
         caption_visible=False,
         field_headings=['', 'A']
       ) %}

@@ -1,13 +1,13 @@
 {% extends "withoutnav_template.html" %}
 
 {% block per_page_title %}
-  Check your email
+  Controleer uw e-mail
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Check your email​</h1>
-  <p class="govuk-body">An email has been sent to {{ session['user_details']['email'] }}.</p>
-  <p class="govuk-body">Click the link in the email to continue your registration.</p>
+  <h1 class="heading-large">Controleer uw e-mail</h1>
+  <p class="govuk-body">Er is een e-mail gestuurd naar {{ session['user_details']['email'] }}.</p>
+  <p class="govuk-body">Klik op de link in de e-mail om uw registratie voort te zetten.</p>
 
 {% endblock %}

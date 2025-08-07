@@ -4,7 +4,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Email unsubscribe requests
+  Afmeldverzoeken per e-mail
 {% endblock %}
 
 {% block backLink %}
@@ -13,15 +13,15 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Email unsubscribe requests') }}
+    {{ page_header('Afmeldverzoeken per e-mail') }}
 
 <div class="dashboard-table">
     {% call(item, row_number) list_table(
         current_service.unsubscribe_request_reports_summary,
-        caption="Unsubscribe Request Reports",
+        caption="Afmeldverzoeken rapporten",
         caption_visible=False,
-        empty_message='If you have any email unsubscribe requests they will be listed here',
-        field_headings=['Report', 'Status'],
+        empty_message='Als u afmeldverzoeken per e-mail heeft, worden deze hier weergegeven',
+        field_headings=['Rapport', 'Status'],
         field_headings_visible=False
     ) %}
     {% call row_heading() %}
@@ -32,7 +32,7 @@
         </a>
        <p class="file-list-hint">
 
-         {{ item.count|format_thousands}} {{ item.count | message_count_label('unsubscribe request', suffix='') }}
+         {{ item.count|format_thousands}} {{ item.count | message_count_label('afmeldverzoek', suffix='') }}
          </p>
     {% endcall %}
     {% call field(align='right', status='' if item.is_a_batched_report else 'default') %}

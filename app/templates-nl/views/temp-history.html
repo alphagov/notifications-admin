@@ -3,20 +3,20 @@
 {% from "components/pill.html" import pill %}
 
 {% block service_page_title %}
-  Audit events
+  Auditgebeurtenissen
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header("Audit events") }}
+  {{ page_header("Auditgebeurtenissen") }}
 
   {% if show_navigation %}
     <div class="bottom-gutter">
       {{ pill(
         [
-          ('All', None, url_for('main.history', service_id=current_service.id), None),
-          ('Service settings', 'service', url_for('main.history', service_id=current_service.id, selected='service'), None),
-          ('API keys', 'api', url_for('main.history', service_id=current_service.id, selected='api'), None),
+          ('Alles', None, url_for('main.history', service_id=current_service.id), None),
+          ('Dienstinstellingen', 'service', url_for('main.history', service_id=current_service.id, selected='service'), None),
+          ('API-sleutels', 'api', url_for('main.history', service_id=current_service.id, selected='api'), None),
         ],
         request.args.get('selected'),
         show_count=False

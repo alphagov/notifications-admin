@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Rename template
+  Template hernoemen
 {% endblock %}
 
 {% block backLink %}
@@ -14,14 +14,14 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Rename template') }}
+  {{ page_header('Template hernoemen') }}
 
   {% call form_wrapper() %}
     {{ form.name(param_extensions={
       "classes": "govuk-!-width-full",
-      "hint": {"text": "Your recipients will not see this"}
+      "hint": {"text": "Uw ontvangers zien dit niet"}
     }) }}
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 
 {% endblock %}

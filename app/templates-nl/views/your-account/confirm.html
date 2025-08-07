@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Change your {{ thing }}
+  Wijzig uw {{ thing }}
 {% endblock %}
 
 {% block backLink %}
@@ -14,12 +14,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change your {}'.format(thing)) }}
+  {{ page_header('Wijzig uw {}'.format(thing)) }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
       <p class="govuk-body">
-        We’ve sent a security code to your new {{ thing }}.
+        We hebben een beveiligingscode gestuurd naar uw nieuwe {{ thing }}.
       </p>
       {% call form_wrapper() %}
         {{ form_field(param_extensions={
@@ -27,7 +27,7 @@
             "attributes": {"data-notify-module": "autofocus"}
         }) }}
 
-        {{ page_footer('Confirm') }}
+        {{ page_footer('Bevestigen') }}
       {% endcall %}
     </div>
   </div>

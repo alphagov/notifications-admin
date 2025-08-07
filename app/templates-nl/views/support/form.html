@@ -20,9 +20,9 @@
       <div class="govuk-grid-column-two-thirds">
         {% if show_status_page_banner %}
           {% set insetHtml %}
-          <p class="govuk-body">First, check the <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">
-            GOV.UK Notify status page</a>.</p>
-          <p class="govuk-body">You do not need to contact us if your problem is already listed on that page.</p>
+          <p class="govuk-body">Controleer eerst de <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">
+            statuspagina van GOV.UK Notify</a>.</p>
+          <p class="govuk-body">U hoeft geen contact met ons op te nemen als uw probleem al op die pagina staat.</p>
           {% endset %}
           {{ govukInsetText({"html": insetHtml, classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-3"}) }}
         {% endif %}
@@ -39,9 +39,9 @@
               {{ form.name(param_extensions={"classes": "govuk-!-width-full"}) }}
               {{ form.email_address(param_extensions={"classes": "govuk-!-width-full"}) }}
             {% else %}
-              <p class="govuk-body">We’ll reply to {{ current_user.email_address }}</p>
+              <p class="govuk-body">Wij reageren via {{ current_user.email_address }}</p>
             {% endif %}
-            {{ sticky_page_footer('Send') }}
+            {{ sticky_page_footer('Versturen') }}
         {% endcall %}
       </div>
     </div>

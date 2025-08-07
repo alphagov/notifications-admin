@@ -6,7 +6,7 @@
 {% from "components/webauthn-api-check.html" import webauthn_api_check %}
 {% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
 
-{% set page_title = 'Security keys' %}
+{% set page_title = 'Beveiligingssleutels' %}
 {% set credentials = current_user.webauthn_credentials %}
 
 {% block extra_javascripts_before_body %}
@@ -26,7 +26,7 @@
 {% set webauthn_button %}
   {{ govukButton({
     "element": "button",
-    "text": "Register a key",
+    "text": "Registreer een sleutel",
     "classes": "govuk-button--secondary webauthn__api-required",
     "attributes": {
       "data-notify-module": "register-security-key",
@@ -38,25 +38,25 @@
 {% set errorSummaries %}
   {{ govukErrorSummary({
     "classes": "webauthn__api-missing",
-    "titleText": "There’s a problem",
-    "descriptionText": "Your browser does not support security keys. Try signing in to Notify using a different browser."
+    "titleText": "Er is een probleem",
+    "descriptionText": "Uw browser ondersteunt geen beveiligingssleutels. Probeer in te loggen met Notify via een andere browser."
   }) }}
 
   {{ govukErrorSummary({
     "classes": "webauthn__no-js",
-    "titleText": "There’s a problem",
-    "descriptionText": "JavaScript is not available for this page. Security keys need JavaScript to work."
+    "titleText": "Er is een probleem",
+    "descriptionText": "JavaScript is niet beschikbaar op deze pagina. Beveiligingssleutels hebben JavaScript nodig om te functioneren."
   }) }}
 
   {% set keyProblemDescription %}
-    Check you have the right key and try again. If this does not work,
-     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
+    Controleer of u de juiste sleutel gebruikt en probeer het opnieuw. Werkt dit niet,
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">neem contact met ons op</a>.
   {% endset %}
 
   {{ govukErrorSummary({
     "classes": "govuk-!-display-none",
     "attributes": { "aria-live": "polite", "tabindex":"-1" },
-    "titleText": "There’s a problem with your security keys",
+    "titleText": "Er is een probleem met uw beveiligingssleutels",
     "descriptionHtml": keyProblemDescription
   }) }}
 {% endset %}
@@ -70,7 +70,7 @@
         <div class="body-copy-table">
           {% call mapping_table(
             caption=page_title,
-            field_headings=['Security key details', 'Action'],
+            field_headings=['Details beveiligingssleutel', 'Actie'],
             field_headings_visible=False,
             caption_visible=False,
           ) %}
@@ -80,13 +80,13 @@
                   <div class="govuk-body govuk-!-margin-bottom-2">{{ credential.name }}</div>
                   <div class="govuk-hint govuk-!-margin-bottom-2">
                     {% if credential.logged_in_at %}
-                      Last used {{ credential.logged_in_at|format_delta }}
+                      Laatst gebruikt {{ credential.logged_in_at|format_delta }}
                     {% else %}
-                      Never used (registered {{ credential.created_at|format_delta }})
+                      Nooit gebruikt (geregistreerd {{ credential.created_at|format_delta }})
                     {% endif %}
                   </div>
                 {% endcall %}
-                {{ edit_field('Manage', url_for('main.your_account_manage_security_key', key_id=credential.id)) }}
+                {{ edit_field('Beheren', url_for('main.your_account_manage_security_key', key_id=credential.id)) }}
               {% endcall %}
             {% endfor %}
           {% endcall %}
@@ -97,12 +97,11 @@
       <div class="govuk-grid-column-one-half">
         {{ page_header(page_title) }}
         <p class="govuk-body">
-          Security keys are an alternative way of signing in to Notify,
-          instead of getting a code in a text message
+          Beveiligingssleutels zijn een alternatieve manier om in te loggen bij Notify,
+          in plaats van het ontvangen van een code via sms.
         </p>
         <p class="govuk-body">
-          You can buy any key that’s compatible with the WebAuthn
-          standard.
+          U kunt elke sleutel gebruiken die compatibel is met de WebAuthn-standaard.
         </p>
         {{ webauthn_button }}
       </div>

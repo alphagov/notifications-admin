@@ -2,17 +2,17 @@
 {% from "components/page-header.html" import page_header %}
 
 {% block service_page_title %}
-  {{ 'Tell {} you have refused their request'.format(requester.name) }}
+  {{ 'Laat aan {} weten dat je hun verzoek hebt geweigerd'.format(requester.name) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('Tell {} you have refused their request'.format(requester.name)) }}
+  {{ page_header('Laat aan {} weten dat je hun verzoek hebt geweigerd'.format(requester.name)) }}
 
   <p class="govuk-body">
-    To let {{ requester.name }} know that they cannot join your service, email them directly at {{ requester.email_address }}
+    Om {{ requester.name }} te laten weten dat zij niet kunnen deelnemen aan jouw dienst, kun je hen rechtstreeks e-mailen op {{ requester.email_address }}
   </p>
 
-  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Back to your services</a>
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Terug naar jouw diensten</a>
 
 {% endblock %}

@@ -16,9 +16,9 @@
 {% block maincolumn_content %}
   {% if delete %}
     {{ banner(
-      'Are you sure you want to remove {}?'.format(user.name),
+      'Weet u zeker dat u {} wilt verwijderen?'.format(user.name),
       type='dangerous',
-      delete_button='Yes, remove',
+      delete_button='Ja, verwijderen',
       action=url_for('main.remove_user_from_service', service_id=current_service.id, user_id=user.id)
     ) }}
   {% endif %}
@@ -28,14 +28,14 @@
   <p class="govuk-body">
     {{ user.email_address }}&emsp;
     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_user_email', service_id=current_service.id, user_id=user.id)}}">
-    Change<span class="govuk-visually-hidden"> email address</span>
+    Wijzigen<span class="govuk-visually-hidden"> e-mailadres</span>
     </a>
   </p>
   {% if user.mobile_number %}
     <p class="govuk-body" id="user_mobile_number">
       {{ user.mobile_number|redact_mobile_number(spacing=" ") }}&emsp;
       <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_user_mobile_number', service_id=current_service.id, user_id=user.id)}}">
-      Change<span class="govuk-visually-hidden"> mobile number</span>
+      Wijzigen<span class="govuk-visually-hidden"> mobiel nummer</span>
       </a>
     </p>
   {% endif %}
@@ -44,9 +44,9 @@
     {% include 'views/manage-users/permissions.html' %}
 
     {{ page_footer(
-      'Save',
+      'Opslaan',
       delete_link=url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id, delete='yes'),
-      delete_link_text='Remove this team member'
+      delete_link_text='Verwijder dit teamlid'
     ) }}
 
   {% endcall %}

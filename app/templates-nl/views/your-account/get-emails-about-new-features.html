@@ -3,7 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = 'Get emails about new features' %}
+{% set page_title = 'E-mails ontvangen over nieuwe functies' %}
 
 {% block per_page_title %}
 {{ page_title }}
@@ -27,12 +27,12 @@
                 }
               },
               "hint": {
-                "text": "We send up to 6 emails a year about new features and improvements to GOV.UK Notify."
+                "text": "We sturen maximaal 6 e-mails per jaar over nieuwe functies en verbeteringen van GOV.UK Notify."
               }
             })
           }}
 
-          {{ page_footer("Save") }}
+          {{ page_footer("Opslaan") }}
         {% endcall %}
     </div>
 </div>

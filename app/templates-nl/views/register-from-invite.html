@@ -4,26 +4,25 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block per_page_title %}
-Create an account
+Account aanmaken
 {% endblock %}
 
 {% block maincolumn_content %}
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    {{ govuk_page_header("Create an account") }}
+    {{ govuk_page_header("Account aanmaken") }}
     <p class="govuk-body">
-      Your account will be created with this email address:
+      Uw account wordt aangemaakt met dit e-mailadres:
       <span class="nowrap">{{invited_user.email_address}}</span>
     </p>
     {% call form_wrapper() %}
       {#
-        This field is to enable password managers to capture the username as
-        well as the password, but should not be visible to users, nor should
-        the view process the input.
+        Dit veld is bedoeld zodat wachtwoordmanagers ook de gebruikersnaam kunnen opslaan,
+        maar het moet niet zichtbaar zijn voor gebruikers en ook niet verwerkt worden door de view.
       #}
       <div class="govuk-visually-hidden">
-        <label for="username" aria-hidden="true">Email</label>
+        <label for="username" aria-hidden="true">E-mail</label>
         <input type="email" name="username" id="username" value="{{ invited_user.email_address }}" disabled="disabled" tabindex="-1" aria-hidden="true" autocomplete="username" />
       </div>
       {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
@@ -31,16 +30,16 @@ Create an account
         <div class="extra-tracking">
           {{ form.mobile_number(param_extensions={
               "classes": "govuk-!-width-three-quarters",
-              "hint": {"text": "We’ll send you a security code by text message"}
+              "hint": {"text": "We sturen u een beveiligingscode per sms"}
           }) }}
         </div>
       {% endif %}
       {{ form.password(param_extensions={
           "classes": "govuk-!-width-three-quarters",
-          "hint": {"text": "At least 8 characters"},
+          "hint": {"text": "Minimaal 8 tekens"},
           "autocomplete": "new-password"
         }) }}
-      {{ page_footer("Continue") }}
+      {{ page_footer("Doorgaan") }}
       {{form.service}}
       {{form.email_address}}
       {{form.auth_type}}

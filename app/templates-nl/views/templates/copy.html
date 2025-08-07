@@ -3,7 +3,7 @@
 {% import "components/svgs.html" as svgs %}
 
 {% extends "withnav_template.html" %}
-{% set page_title = "Choose an existing template to copy" %}
+{% set page_title = "Kies een bestaand sjabloon om te kopiëren" %}
 
 {% block service_page_title %}
   {{ page_title }}
@@ -17,7 +17,7 @@
     </div>
     {% if not services_templates_and_folders.templates_to_show %}
       <p class="template-list-empty">
-        This folder is empty
+        Deze map is leeg
       </p>
     {% else %}
       {{ live_search(

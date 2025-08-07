@@ -4,9 +4,9 @@
 
 {% block pageTitle %}
   {% if confirmed %}
-    We have your request to unsubscribe
+    We hebben uw verzoek tot afmelding ontvangen
   {% else %}
-    Are you sure you want to unsubscribe?
+    Weet u zeker dat u zich wilt afmelden?
   {% endif %}
 {% endblock %}
 
@@ -14,25 +14,25 @@
 
   {% if confirmed %}
     <h1>
-      We have your request to unsubscribe
+      We hebben uw verzoek tot afmelding ontvangen
     </h1>
     <p>
-      It can take a few days to unsubscribe you from these emails.
+      Het kan enkele dagen duren voordat u bent afgemeld voor deze e-mails.
     </p>
   {% else %}
     <h1>
-      Are you sure you want to unsubscribe?
+      Weet u zeker dat u zich wilt afmelden?
     </h1>
     <p>
-      If you want to unsubscribe you will no longer receive these emails.
+      Als u zich afmeldt, ontvangt u deze e-mails niet meer.
     </p>
     <form method="post" action="{{ request.url | extract_path_from_url }}" id="confirm-unsubscription">
-      {{ page_footer('Confirm') }}
+      {{ page_footer('Bevestigen') }}
     </form>
     <p>
-      This can take a few days.
+      Dit kan enkele dagen duren.
     </p>
-{% endif %}
+  {% endif %}
 
 {% endblock %}
 
@@ -41,7 +41,7 @@
   {% if example %}
     <footer>
       <p>
-        This is an example page only with no further action needed.
+        Dit is alleen een voorbeeldpagina, er zijn verder geen acties nodig.
       </p>
     </footer>
   {% endif %}

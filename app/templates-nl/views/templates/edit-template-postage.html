@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Change postage
+  Wijzig posttarief
 {% endblock %}
 
 {% block backLink %}
@@ -14,7 +14,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change postage') }}
+  {{ page_header('Wijzig posttarief') }}
   {% call form_wrapper(class="govuk-!-margin-bottom-7") %}
     {{ form.postage(param_extensions={
       "fieldset": {
@@ -23,28 +23,27 @@
           },
       }
     }) }}
-    {{ page_footer('Save') }}
+    {{ page_footer('Opslaan') }}
   {% endcall %}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       <h2 class="govuk-heading-m">
-        Delivery times
+        Bezorgtijden
       </h2>
       <p class="govuk-body">
-        Letters sent before 5:30pm are dispatched the next working day (Monday to Friday).
+        Brieven die vóór 17:30 uur worden verstuurd, worden de volgende werkdag (maandag tot en met vrijdag) verzonden.
       </p>
       <p class="govuk-body">
-        First class letters are delivered one day after they’re dispatched. Second class letters are delivered 2 days after they’re dispatched.
+        Brieven met eersteklas post worden één dag na verzending bezorgd. Brieven met tweedeklas post worden twee dagen na verzending bezorgd.
       </p>
       <p class="govuk-body">
-        Royal Mail delivers from Monday to Saturday, excluding bank holidays.
+        Royal Mail bezorgt van maandag tot en met zaterdag, met uitzondering van officiële feestdagen.
       </p>
       <p class="govuk-body">
-        See a list of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">postage prices</a>.
+        Bekijk een lijst met <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">posttarieven</a>.
       </p>
     </div>
   </div>
-
 
 {% endblock %}

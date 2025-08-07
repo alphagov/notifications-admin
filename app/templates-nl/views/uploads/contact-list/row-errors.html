@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Error
+  Fout
 {% endblock %}
 
 {% block backLink %}
@@ -18,17 +18,17 @@
     {% call banner_wrapper(type='dangerous') %}
       {% if row_errors|length == 1 %}
         <h1 class='banner-title'>
-          There’s a problem with {{ original_file_name }}
+          Er is een probleem met {{ original_file_name }}
         </h1>
         <p class="govuk-body">
-          You need to {{ row_errors[0] }}.
+          U moet {{ row_errors[0] }}.
         </p>
       {% else %}
         <h1 class='banner-title'>
-          There are some problems with {{ original_file_name }}
+          Er zijn enkele problemen met {{ original_file_name }}
         </h1>
         <p class="govuk-body">
-          You need to:
+          U moet het volgende doen:
         </p>
         <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
           {% for error in row_errors %}
@@ -45,10 +45,10 @@
         form.file,
         allowed_file_extensions=allowed_file_extensions,
         action=url_for('main.upload_contact_list', service_id=current_service.id),
-        button_text='Upload your file again'
+        button_text='Upload uw bestand opnieuw'
       ) }}
     </div>
-    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
+    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Terug naar boven</a>
   </div>
 
   {% call(item, row_number) list_table(
@@ -56,7 +56,7 @@
     caption=original_file_name,
     caption_visible=False,
     field_headings=[
-      '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true" class="table-field-invisible-error">1</span>'|safe
+      '<span class="govuk-visually-hidden">Rij in bestand</span> <span aria-hidden="true" class="table-field-invisible-error">1</span>'|safe
     ] + recipients.column_headers
   ) %}
     {% call index_field() %}
@@ -88,14 +88,13 @@
   {% if recipients.displayed_rows|list|length < recipients|length %}
     {% if recipients.displayed_rows|list|length < recipients.rows_with_errors|list|length %}
       <p class="table-show-more-link">
-        Only showing the first {{ recipients.displayed_rows|list|length }} rows with errors
+        Er worden alleen de eerste {{ recipients.displayed_rows|list|length }} rijen met fouten getoond
       </p>
     {% else %}
       <p class="table-show-more-link">
-        Only showing rows with errors
+        Alleen rijen met fouten worden getoond
       </p>
     {% endif %}
   {% endif %}
-
 
 {% endblock %}

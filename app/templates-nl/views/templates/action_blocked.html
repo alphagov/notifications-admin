@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  {{ notification_type.capitalize() }} are disabled
+  {{ notification_type.capitalize() }} zijn uitgeschakeld
 {% endblock %}
 
 {% block backLink %}
@@ -14,13 +14,13 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header('{} are disabled'.format(notification_type.capitalize())) }}
+      {{ page_header('{} zijn uitgeschakeld'.format(notification_type.capitalize())) }}
       <p class="govuk-body">
-        Sending {{ 999|message_count_label(notification_type, suffix='') }} has been disabled for your service.
+        Het verzenden van {{ 999|message_count_label(notification_type, suffix='') }} is uitgeschakeld voor uw dienst.
       </p>
       <p class="govuk-body">
-        If you need to send {{ 999|message_count_label(notification_type, suffix='') }}
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">get in touch with the GOV.UK Notify team</a>.
+        Als u {{ 999|message_count_label(notification_type, suffix='') }} wilt versturen,
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">neem contact op met het GOV.UK Notify-team</a>.
       </p>
 
     </div>

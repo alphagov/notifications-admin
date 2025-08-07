@@ -5,14 +5,14 @@
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {% set title_status = (
-  'Failed '
+  'Mislukt '
   if status == 'failed' and message_type == 'letter'
   else ''
 ) %}
 {% set page_title = (
   (title_status + 99|message_count_label(message_type, suffix='')) | capitalize
   if current_user.has_permissions('view_activity')
-  else 'Sent messages'
+  else 'Verzonden berichten'
 ) %}
 
 {% block service_page_title %}
@@ -23,7 +23,7 @@
 
   {{ page_header(page_title) }}
 
-  {# the blue pills only show for sms and email #}
+  {# de blauwe badges worden alleen getoond voor sms en e-mail #}
   {% if message_type != "letter" %}
 
     {{ ajax_block(
@@ -47,18 +47,18 @@
             "formGroup": {"classes": "notify-simple-search-form__form-group"},
             "label": {
               "text": things_you_can_search_by|formatted_list(
-                conjunction='or',
+                conjunction='of',
                 before_each='',
                 after_each='',
-                prefix='Search by',
-                prefix_plural='Search by'
+                prefix='Zoek op',
+                prefix_plural='Zoek op'
               )
             }
           }
         )
       }}
       {{ govukButton({
-        "text": "Search",
+        "text": "Zoeken",
         "classes": "notify-simple-search-form__button",
       }) }}
   {% endcall %}
@@ -73,16 +73,16 @@
     <p class="bottom-gutter">
         {% if can_download %}
             <a href="{{ download_link }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">
-                Download this report (<abbr title="Comma separated values">CSV</abbr>)
+                Download dit rapport (<abbr title="Comma separated values">CSV</abbr>)
             </a>
 
         {% else %}
             <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold" href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback') }}">
-                Contact support to download this report
+                Neem contact op met de helpdesk om dit rapport te downloaden
             </a>
         {% endif %}
         &emsp;
-        Data available for {{ partials.service_data_retention_days }} days
+        Gegevens zijn {{ partials.service_data_retention_days }} dagen beschikbaar
     </p>
   {% endif %}
 

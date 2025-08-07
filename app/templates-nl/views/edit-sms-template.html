@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  {{ heading_action }} text message template
+  {{ heading_action }} sms-sjabloon
 {% endblock %}
 
 {% block backLink %}
@@ -16,10 +16,10 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('{} text message template'.format(heading_action)) }}
+    {{ page_header('{} sms-sjabloon'.format(heading_action)) }}
 
     {% if current_service.prefix_sms %}
-      {% set content_hint = 'Your message will start with your service name' %}
+      {% set content_hint = 'Uw bericht begint met uw servicenaam' %}
     {% endif %}
 
     {% call form_wrapper() %}
@@ -27,7 +27,7 @@
         <div class="govuk-grid-column-two-thirds">
           {{ form.name(param_extensions={
             "classes": "govuk-!-width-full",
-            "hint": {"text": "Your recipients will not see this"}
+            "hint": {"text": "Ontvangers zien dit niet"}
           }) }}
           {{ form.template_content(param_extensions={
             "classes": "govuk-!-width-full govuk-textarea-highlight__textbox",
@@ -48,7 +48,7 @@
               &nbsp;
             </div>
           </div>
-          {{ page_footer('Save') }}
+          {{ page_footer('Opslaan') }}
         </div>
         <div class="govuk-grid-column-full">
           {% include "partials/templates/guidance-personalisation.html" %}

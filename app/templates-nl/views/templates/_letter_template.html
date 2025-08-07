@@ -9,11 +9,9 @@
 {% endif %}
 
 {#
-  In a slight change from the email/text templates, we render the edit UI elements inside the template's built-in Jinja
-  template. This is because rendering a letter's preview via images is more complex, and there are more complex UI
-  requirements - specifically, we show the 'Edit' body button next to the appropriate body of the letter. We show
-  'edit' buttons for potentially multiple languages (Welsh and English), and those can be on arbitrary pages.
-  So we need to be inside the central rendering logic to get those placed correctly.
+  In een kleine wijziging ten opzichte van e-mail/sms-sjablonen, plaatsen we de bewerkbare UI-elementen
+  in de ingebouwde Jinja-template van de brief. Dit is nodig vanwege de complexere opbouw van de
+  voorbeeldweergave (met afbeeldingen) en ondersteuning voor meertaligheid.
 #}
 {{ template|string }}
 
@@ -21,7 +19,7 @@
   <div class="js-stick-at-bottom-when-scrolling">
     {{ govukButton({
     "element": "a",
-    "text": "Manage attachment" if template.attachment else "Attach pages",
+    "text": "Bijlage beheren" if template.attachment else "Pagina’s bijvoegen",
     "href": url_for(
         '.letter_template_attach_pages',
         service_id=current_service.id,
@@ -32,7 +30,7 @@
 
     {{ govukButton({
     "element": "a",
-    "text": "Change language",
+    "text": "Taal wijzigen",
     "href": url_for(
     '.letter_template_change_language',
     service_id=current_service.id,

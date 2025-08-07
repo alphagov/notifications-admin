@@ -26,22 +26,22 @@
 
 {% if not report.completed %}
     <p class="govuk-body" id="report-unsubscribe-requests-count">
-     {{ report.count|format_thousands}} new unsubscribe {{ report.count | message_count_label('request', suffix='') }}
+     {{ report.count|format_thousands}} nieuwe afmeldverzoeken {{ report.count | message_count_label('request', suffix='') }}
     </p>
 
-    <p class="govuk-body govuk-!-margin-bottom-2">You must: </p>
+    <p class="govuk-body govuk-!-margin-bottom-2">U moet: </p>
       <ol class="govuk-list govuk-list--number govuk-!-margin-bottom-6">
         <li class="bottom-gutter"><a href="{{ url_for('main.download_unsubscribe_request_report', service_id=current_service.id, batch_id=report.batch_id) }}" class="govuk-link govuk-link--no-visited-state heading-small">
-            Download the report</a>
+            Het rapport downloaden</a>
         </li>
-        <li>Remove the email addresses from your mailing list before you send any further emails</li>
+        <li>De e-mailadressen uit uw verzendlijst verwijderen voordat u verdere e-mails verstuurt</li>
       </ol>
 {%  else %}
     <p class="govuk-body" id="report-unsubscribe-requests-count">
-        {{ report.count|format_thousands}} unsubscribe {{ report.count | message_count_label('request', suffix='') }}
+        {{ report.count|format_thousands}} afmeldverzoeken {{ report.count | message_count_label('request', suffix='') }}
     </p>
     <p class="bottom-gutter"><a download href="{{ url_for('main.download_unsubscribe_request_report', service_id=current_service.id, batch_id=report.batch_id) }}" class="govuk-link govuk-link--no-visited-state heading-small" >
-        Download the report</a>
+        Het rapport downloaden</a>
     </p>
 
  {% endif %}
@@ -50,19 +50,19 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     {{ form.report_has_been_processed }}
     {% if report.is_a_batched_report %}
-        {{  govukButton({ "text": "Update", "id":"process_unsubscribe_report" })}}
+        {{  govukButton({ "text": "Bijwerken", "id":"process_unsubscribe_report" })}}
     {% endif %}
 
 {% endcall %}
 <div id="unsubscribe_report_availability">
     {% if report.is_a_batched_report %}
-        This report will be deleted {{ report.will_be_archived_at|format_delta_days(numeric_prefix="in ")}}.
+        Dit rapport wordt verwijderd {{ report.will_be_archived_at|format_delta_days(numeric_prefix="over ")}}.
     {% else %}
         <p class="govuk-body">
-            Once downloaded, reports are available for 7 days.
+            Rapporten zijn na downloaden 7 dagen beschikbaar.
         </p>
         <p class="govuk-body">
-            Requests which have not been downloaded will be deleted after 90 days.
+            Verzoeken die niet zijn gedownload, worden na 90 dagen verwijderd.
         </p>
     {% endif %}
 </div>

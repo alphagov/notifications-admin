@@ -4,22 +4,22 @@
 {% from "components/form.html" import form_wrapper %}
 
 {% block service_page_title %}
-  {{ '{} wants to join your service'.format(requester.name) }}
+  {{ '{} wil deelnemen aan uw dienst'.format(requester.name) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('{} wants to join your service'.format(requester.name)) }}
+  {{ page_header('{} wil deelnemen aan uw dienst'.format(requester.name)) }}
 
   {% call form_wrapper() %}
     {{ form.join_service_approve_request(param_extensions={
       "fieldset": {
         "legend": {
-          "text": "Do you want to let {} join ‘{}’?".format(requester.name, requested_service.name),
+          "text": "Wilt u {} laten deelnemen aan ‘{}’?".format(requester.name, requested_service.name),
         },
       },
     }) }}
-    {{ page_footer('Continue') }}
+    {{ page_footer('Doorgaan') }}
 
   {% endcall %}
 

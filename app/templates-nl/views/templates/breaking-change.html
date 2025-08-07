@@ -6,7 +6,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Confirm changes
+  Wijzigingen bevestigen
 {% endblock %}
 
 {% block backLink %}
@@ -15,19 +15,19 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Confirm changes') }}
+  {{ page_header('Wijzigingen bevestigen') }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       {% if template_change.placeholders_removed %}
         <p class="govuk-body">
-          You removed {{ list_of_placeholders(template_change.placeholders_removed) }}
+          U heeft {{ list_of_placeholders(template_change.placeholders_removed) }} verwijderd
         </p>
       {% endif %}
       <p class="govuk-body">
-        You added {{ list_of_placeholders(template_change.placeholders_added) }}
+        U heeft {{ list_of_placeholders(template_change.placeholders_added) }} toegevoegd
       </p>
       <p class="govuk-body">
-        Before you send any messages, make sure your API calls include {{ list_of_code_snippets(template_change.placeholders_added) }}.
+        Zorg ervoor dat uw API-aanroepen {{ list_of_code_snippets(template_change.placeholders_added) }} bevatten voordat u berichten verstuurt.
       </p>
     </div>
   </div>
@@ -41,7 +41,7 @@
     <input type="hidden" name="template_id" value="{{ new_template.id }}" />
 
     <input type="hidden" name="confirm" value="true" />
-    {{ page_footer('Save changes to template') }}
+    {{ page_footer('Wijzigingen in sjabloon opslaan') }}
   {% endcall %}
 
 {% endblock %}
