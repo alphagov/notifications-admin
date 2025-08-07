@@ -44,7 +44,7 @@ from app.formatters import format_phone_number_human_readable
 # ruff: noqa: E402
 memo_resetters: list[Callable] = []
 
-from app import proxy_fix, webauthn_server
+from app import webauthn_server
 from app.commands import setup_commands
 from app.config import Config, configs
 from app.event_handlers import Events
@@ -193,7 +193,6 @@ def create_app(application):
         metrics,
         csrf,
         login_manager,
-        proxy_fix,
         request_helper,
         # External API clients
         redis_client,
