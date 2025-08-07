@@ -31,12 +31,14 @@ from app import (
 )
 from app.main import main, no_cookie
 from app.main.forms import (
+    AddRecipientForm,
     ChooseTimeForm,
     CsvUploadForm,
     LetterAddressForm,
     SetSenderForm,
     get_placeholder_form_instance,
 )
+from app.main.views.backlink_manager import get_backlink_email_sender, get_previous_backlink
 from app.models.contact_list import ContactList, ContactListsAlphabetical
 from app.models.user import Users
 from app.s3_client.s3_csv_client import (
@@ -162,6 +164,7 @@ def send_messages(service_id, template_id):
         form=form,
         allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
         error_summary_enabled=True,
+        from_sender_flow=session.get("from_sender_flow_check", False),
     )
 
 
@@ -196,13 +199,37 @@ def _should_show_set_sender_page(service_id, template) -> bool:
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/set-sender", methods=["GET", "POST"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
 def set_sender(service_id, template_id):
+    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
+
+    session["from_sender_flow_check"] = True
+
+    if template.template_type == "email":
+        if current_service.email_sender_name is None:
+            session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
+
+            return redirect(
+                url_for(
+                    "main.service_email_sender_change",
+                    service_id=service_id,
+                    from_sender_flow="yes",
+                    template_id=template_id,
+                )
+            )
+
+        if not current_service.email_reply_to_addresses:
+            session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
+            return redirect(url_for("main.service_email_reply_to", service_id=service_id, template_id=template_id))
+
+    backlinks = session.get("email_sender_backlinks", [])
+
+    if len(backlinks) == 0:
+        session["email_sender_backlinks"] = get_backlink_email_sender(current_service, template_id)
+
     from_back_link = request.args.get("from_back_link") == "yes"
     # If we're returning to the page, we want to use the sender_id already in the session instead of resetting it
     session["sender_id"] = session.get("sender_id") if from_back_link else None
 
     redirect_to_one_off = redirect(url_for(".send_one_off", service_id=service_id, template_id=template_id))
-
-    template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if template.template_type == "letter":
         return redirect_to_one_off
@@ -243,20 +270,25 @@ def set_sender(service_id, template_id):
         session["sender_id"] = form.sender.data
         return redirect(url_for(".send_one_off", service_id=service_id, template_id=template_id))
 
+    backlink = _get_set_sender_back_link(service_id, template)
+
+    if template.template_type == "email" and len(backlinks) > 0:
+        backlink = get_previous_backlink(service_id, template_id)
+
     return render_template(
         "views/templates/set-sender.html",
         form=form,
         template_id=template_id,
         sender_context={"title": sender_context["title"], "description": sender_context["description"]},
         option_hints=option_hints,
-        back_link=_get_set_sender_back_link(service_id, template),
+        back_link=backlink,
     )
 
 
 def get_sender_context(sender_details, template_type):
     context = {
         "email": {
-            "title": "Where should replies come back to?",
+            "title": "Choose a reply-to email address",
             "description": "Where should replies come back to?",
             "field_name": "email_address",
         },
@@ -273,6 +305,11 @@ def get_sender_context(sender_details, template_type):
     }[template_type]
 
     sender_format = context["field_name"]
+
+    if not sender_details:
+        context["default_id"] = None
+        context["value_and_label"] = []
+        return context
 
     context["default_id"] = next(sender["id"] for sender in sender_details if sender["is_default"])
     if template_type == "sms":
@@ -513,6 +550,9 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
     back_link = get_back_link(service_id, template, step_index, placeholders)
     template.values[current_placeholder] = None
 
+    if step_index == 0 and template.template_type == "email":
+        return render_email_add_recipients(service_id, template_id, template, placeholders)
+
     return render_template(
         "views/send-test.html",
         page_title=get_send_test_page_title(
@@ -526,6 +566,53 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
         back_link=back_link,
         link_to_upload=(request.endpoint == "main.send_one_off_step" and step_index == 0),
         error_summary_enabled=True,
+        from_sender_flow=session.get("from_sender_flow_check", False),
+    )
+
+
+def render_email_add_recipients(service_id, template_id, template, placeholders):
+    session["placeholders"] = {}
+
+    session["email_sender_backlinks"].append(
+        url_for("main.send_one_off_step", service_id=service_id, template_id=template_id, step_index=0)
+    )
+
+    backlink = get_previous_backlink(service_id, template_id)
+
+    form = AddRecipientForm()
+
+    if form.validate_on_submit():
+        choice = form.add_recipient_method.data
+
+        if choice == AddRecipientForm.CHOICE_UPLOAD_CSV:
+            return redirect(url_for("main.send_messages", service_id=service_id, template_id=template_id))
+
+        email_placeholder = placeholders[0]
+
+        if choice == AddRecipientForm.CHOICE_USE_OWN_EMAIL:
+            session["recipient"] = current_user.email_address
+
+        elif choice == AddRecipientForm.CHOICE_ENTER_SINGLE_EMAIL:
+            session["recipient"] = form.enter_single_address.data
+
+        session["placeholders"][email_placeholder] = session["recipient"]
+        template.values[email_placeholder] = session["recipient"]
+
+        return redirect(
+            url_for(
+                ".send_one_off_step",
+                service_id=service_id,
+                template_id=template_id,
+                step_index=1,
+            )
+        )
+
+    return render_template(
+        "views/add-recipients.html",
+        form=form,
+        template_id=template_id,
+        service_id=service_id,
+        alternative_backlink=backlink,
     )
 
 
@@ -945,6 +1032,7 @@ def check_notification(service_id, template_id):
     return render_template(
         "views/notifications/check.html",
         **_check_notification(service_id, template_id),
+        from_sender_flow=session.get("from_sender_flow_check", False),
     )
 
 
@@ -1042,6 +1130,7 @@ def send_notification(service_id, template_id):
         return render_template(
             "views/notifications/check.html",
             **_check_notification(service_id, template_id, exception),
+            from_sender_flow=session.get("from_sender_flow_check", False),
         )
 
     session.pop("placeholders")
@@ -1064,6 +1153,8 @@ def send_notification(service_id, template_id):
 def get_email_reply_to_address_from_session():
     if session.get("sender_id"):
         return current_service.get_email_reply_to_address(session["sender_id"])["email_address"]
+
+    return current_service.default_email_reply_to_address
 
 
 def get_sms_sender_from_session():
