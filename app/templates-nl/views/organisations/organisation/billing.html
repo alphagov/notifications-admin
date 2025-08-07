@@ -15,7 +15,7 @@
 
       {% if current_org.agreement_signed_at %}
         <p class="govuk-body">
-          Uw organisatie heeft versie {{ current_org.agreement_signed_version }} van de verwerkersovereenkomst en financiële overeenkomst van GOV.UK Notify geaccepteerd op {{ current_org.agreement_signed_at | format_date_normal }}.
+          Uw organisatie heeft versie {{ current_org.agreement_signed_version }} van de verwerkersovereenkomst en financiële overeenkomst van NotifyNL geaccepteerd op {{ current_org.agreement_signed_at | format_date_normal }}.
         </p>
         <p class="govuk-body">
           {{ current_org.agreement_signed_on_behalf_of_name or current_org.agreement_signed_by.name }} heeft de overeenkomst ondertekend namens {{ current_org.name }}.
@@ -27,7 +27,7 @@
         </p>
       {% elif current_org.agreement_signed %}
         <p class="govuk-body">
-          {{ current_org.name }} heeft de verwerkersovereenkomst en financiële overeenkomst van GOV.UK Notify geaccepteerd.
+          {{ current_org.name }} heeft de verwerkersovereenkomst en financiële overeenkomst van NotifyNL geaccepteerd.
         </p>
         <p class="govuk-body">
           <a class="govuk-link govuk-link--no-visited-state"
@@ -36,11 +36,11 @@
         </p>
       {% elif current_org.agreement_signed is false %}
         <p class="govuk-body">
-          {{ current_org.name }} moet de verwerkersovereenkomst en financiële overeenkomst van GOV.UK Notify nog accepteren.
+          {{ current_org.name }} moet de verwerkersovereenkomst en financiële overeenkomst van NotifyNL nog accepteren.
         </p>
       {% elif current_org.agreement_signed is none %}
         <p class="govuk-body">
-          {{ current_org.name }} heeft de verwerkersovereenkomst en financiële overeenkomst van GOV.UK Notify niet geaccepteerd, maar er zijn wel enkele dienstspecifieke overeenkomsten van kracht.
+          {{ current_org.name }} heeft de verwerkersovereenkomst en financiële overeenkomst van NotifyNL niet geaccepteerd, maar er zijn wel enkele dienstspecifieke overeenkomsten van kracht.
         </p>
       {% endif %}
     </div>

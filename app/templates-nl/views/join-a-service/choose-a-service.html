@@ -23,7 +23,7 @@
       {{ current_user.default_organisation.name }} heeft {{ current_user.default_organisation.live_services | length }} actieve dienst{{ '' if current_user.default_organisation.live_services | length == 1 else 'en' }}</p>
 
     {% set wrongOrganisationCallout %}
-      <p class="govuk-body">GOV.UK Notify gebruikt uw e-mailadres om te bepalen welke diensten u ziet.</p>
+      <p class="govuk-body">NotifyNL gebruikt uw e-mailadres om te bepalen welke diensten u ziet.</p>
       <p class="govuk-body">Als uw organisatie is veranderd, <a class="govuk-link govuk-link--no-visited-state"
           href="{{ url_for('main.support') }}">neem dan contact met ons op</a>.</p>
     {% endset %}

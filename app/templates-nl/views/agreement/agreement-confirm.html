@@ -24,11 +24,11 @@
 
       {% if current_service.organisation.agreement_signed_on_behalf_of_name and current_service.organisation.agreement_signed_on_behalf_of_email_address %}
         <p class="govuk-body">
-          Ik bevestig dat ik de wettelijke bevoegdheid heb om namens {{ current_service.organisation.agreement_signed_on_behalf_of_name }} ({{ current_service.organisation.agreement_signed_on_behalf_of_email_address }}) de GOV.UK Notify verwerkersovereenkomst en financiële overeenkomst (versie {{ current_service.organisation.agreement_signed_version }}) te accepteren en dat {{ current_service.organisation.name }} hieraan gebonden zal zijn.
+          Ik bevestig dat ik de wettelijke bevoegdheid heb om namens {{ current_service.organisation.agreement_signed_on_behalf_of_name }} ({{ current_service.organisation.agreement_signed_on_behalf_of_email_address }}) de NotifyNL verwerkersovereenkomst en financiële overeenkomst (versie {{ current_service.organisation.agreement_signed_version }}) te accepteren en dat {{ current_service.organisation.name }} hieraan gebonden zal zijn.
         </p>
       {% else %}
         <p class="govuk-body">
-          Ik bevestig dat ik de wettelijke bevoegdheid heb om de GOV.UK Notify verwerkersovereenkomst en financiële overeenkomst (versie {{ current_service.organisation.agreement_signed_version }}) te accepteren en dat {{ current_service.organisation.name }} hieraan gebonden zal zijn.
+          Ik bevestig dat ik de wettelijke bevoegdheid heb om de NotifyNL verwerkersovereenkomst en financiële overeenkomst (versie {{ current_service.organisation.agreement_signed_version }}) te accepteren en dat {{ current_service.organisation.name }} hieraan gebonden zal zijn.
         </p>
       {% endif %}
 

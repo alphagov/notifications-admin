@@ -12,7 +12,7 @@
 
 <h1 class="heading-large">Functionaliteiten</h1>
 
-<p class="govuk-body">GOV.UK Notify maakt het eenvoudig voor teams van overheidsdiensten om e-mails, sms-berichten en brieven te versturen.</p>
+<p class="govuk-body">NotifyNL maakt het eenvoudig voor teams van overheidsdiensten om e-mails, sms-berichten en brieven te versturen.</p>
 <p class="govuk-body">U heeft geen technische kennis nodig om:</p>
 <ul class="govuk-list govuk-list--bullet">
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_templates') }}">berichten aan te maken en te versturen</a></li>
@@ -23,7 +23,7 @@
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_team_members_and_permissions') }}">samen te werken met uw team</a></li>
 </ul>
 
-<p class="govuk-body">Lees meer over <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">wie GOV.UK Notify kan gebruiken</a>.</p>
+<p class="govuk-body">Lees meer over <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">wie NotifyNL kan gebruiken</a>.</p>
 
 {% if not current_user.is_authenticated %}
   {% set insetHtml %}
@@ -47,7 +47,7 @@
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_text_message_sender') }}">Ontvangers vertellen van wie uw berichten zijn</a></li>
 </ul>
 
-<h2 class="heading-medium">GOV.UK Notify print en verstuurt uw brieven</h2>
+<h2 class="heading-medium">NotifyNL print en verstuurt uw brieven</h2>
 <ul class="govuk-list govuk-list--bullet">
   <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">Posttarief kiezen</a></li>
   <li>Internationale brieven versturen</li>
@@ -56,14 +56,14 @@
 </ul>
 
 <h2 class="heading-medium">Automatisch versturen</h2>
-<p class="govuk-body">Voor automatisch berichten versturen heeft u een ontwikkelaar nodig om te integreren met de GOV.UK Notify API.</p>
+<p class="govuk-body">Voor automatisch berichten versturen heeft u een ontwikkelaar nodig om te integreren met de NotifyNL API.</p>
 <p class="govuk-body">Meer informatie vindt u in onze <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API-documentatie</a>.</p>
 
 <h2 class="heading-medium">Houd uw gegevens veilig</h2>
-<p class="govuk-body">Lees meer over <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">beveiliging bij GOV.UK Notify</a>.</p>
+<p class="govuk-body">Lees meer over <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">beveiliging bij NotifyNL</a>.</p>
 
 <h2 class="heading-medium">Prestaties</h2>
-<p class="govuk-body">GOV.UK Notify streeft ernaar om:</p>
+<p class="govuk-body">NotifyNL streeft ernaar om:</p>
 <ul class="govuk-list govuk-list--bullet">
   <li>95% van de e-mails en sms-berichten binnen 10 seconden te versturen</li>
   <li>brieven vóór 15:00 uur op de volgende werkdag te printen en te versturen</li>
@@ -71,7 +71,7 @@
 <p class="govuk-body">Bekijk de meest recente <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.performance') }}">prestatiegegevens</a>.</p>
 
 <h2 class="heading-medium" id="support">24 uur per dag online ondersteuning</h2>
-<p class="govuk-body">GOV.UK Notify biedt 24/7 ondersteuning bij noodgevallen.</p>
-<p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact op met het GOV.UK Notify-team</a>.</p>
+<p class="govuk-body">NotifyNL biedt 24/7 ondersteuning bij noodgevallen.</p>
+<p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact op met het NotifyNL-team</a>.</p>
 
 {% endblock %}
