@@ -153,12 +153,12 @@ class HeaderNavigation(Navigation):
         from app import current_user
 
         nav_items = [
-            {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
-            {"href": url_for("main.guidance_features"), "text": "Features", "active": self.is_selected("features")},
-            {"href": url_for("main.guidance_pricing"), "text": "Pricing", "active": self.is_selected("pricing")},
+            {"href": url_for("main.support"), "text": "Ondersteuning", "active": self.is_selected("support")},
+            {"href": url_for("main.guidance_features"), "text": "Functies", "active": self.is_selected("features")},
+            {"href": url_for("main.guidance_pricing"), "text": "Prijzen", "active": self.is_selected("pricing")},
             {
                 "href": url_for("main.guidance_using_notify"),
-                "text": "Using Notify",
+                "text": "Gebruik van Notify",
                 "active": self.is_selected("using-notify"),
             },
         ]
@@ -167,7 +167,7 @@ class HeaderNavigation(Navigation):
             nav_items.append(
                 {
                     "href": url_for("main.platform_admin_search"),
-                    "text": "Platform admin",
+                    "text": "Platformbeheer",
                     "active": self.is_selected("platform-admin"),
                 }
             )
@@ -176,13 +176,13 @@ class HeaderNavigation(Navigation):
             nav_items.append(
                 {
                     "href": url_for("main.your_account"),
-                    "text": "Your account",
+                    "text": "Uw account",
                     "active": self.is_selected("your-account"),
                 }
             )
         else:
             nav_items.append(
-                {"href": url_for("main.sign_in"), "text": "Sign in", "active": self.is_selected("sign-in")}
+                {"href": url_for("main.sign_in"), "text": "Inloggen", "active": self.is_selected("sign-in")}
             )
 
         return nav_items
