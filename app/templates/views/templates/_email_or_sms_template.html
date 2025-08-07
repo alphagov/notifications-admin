@@ -1,5 +1,5 @@
 <div class="govuk-grid-row govuk-!-margin-bottom-1">
-  {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) %}
+  {% if current_user.has_permissions('send_messages') %}
     <div class="govuk-grid-column-one-half govuk-!-margin-bottom-3">
       <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-link govuk-link--inverse pill-separate-item">
         Get ready to send<span class="govuk-visually-hidden"> a message using this template</span>
