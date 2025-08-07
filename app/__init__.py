@@ -95,13 +95,6 @@ from app.formatters import (
 from app.models.organisation import Organisation
 from app.models.service import Service
 from app.models.user import AnonymousUser, User
-from app.navigation import (
-    CaseworkNavigation,
-    HeaderNavigation,
-    MainNavigation,
-    OrgNavigation,
-    PlatformAdminNavigation,
-)
 from app.notify_client import InviteTokenError
 from app.notify_client.api_key_api_client import api_key_api_client  # noqa
 from app.notify_client.billing_api_client import billing_api_client  # noqa
@@ -135,6 +128,13 @@ from app.notify_client.unsubscribe_api_client import unsubscribe_api_client  # n
 from app.notify_client.upload_api_client import upload_api_client  # noqa
 from app.notify_client.user_api_client import user_api_client  # noqa
 from app.notify_session import NotifyAdminSessionInterface
+from app.overides_nl.navigation import (
+    CaseworkNavigation,
+    HeaderNavigation,
+    MainNavigation,
+    OrgNavigation,
+    PlatformAdminNavigation,
+)
 from app.s3_client.logo_client import logo_client
 from app.template_previews import template_preview_client  # noqa
 from app.url_converters import (

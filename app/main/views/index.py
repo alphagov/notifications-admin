@@ -16,7 +16,7 @@ from app import status_api_client
 from app.formatters import message_count
 from app.main import main
 from app.main.forms import FieldWithNoneOption
-from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
+from app.main.views_nl.sub_navigation_dictionaries import features_nav, using_notify_nav
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
 from app.models.sms_rate import SMSRate

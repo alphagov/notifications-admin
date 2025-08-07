@@ -7,7 +7,7 @@ from flask import jsonify, render_template, request
 
 from app import performance_dashboard_api_client, status_api_client
 from app.main import main
-from app.main.views.sub_navigation_dictionaries import features_nav
+from app.main.views_nl.sub_navigation_dictionaries import features_nav
 
 ORGS_TO_IGNORE = ["1556fd80-a1b2-4b79-8453-f6fcb6f00d0c"]  # TODO: Move this into the database
 
