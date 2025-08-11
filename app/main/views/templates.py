@@ -55,7 +55,7 @@ from app.main.forms import (
     TemplateFolderForm,
     WelshLetterTemplateForm,
 )
-from app.main.views.send import get_sender_details
+from app.main.views_nl.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, UserTemplateList, UserTemplateLists
 from app.s3_client.s3_letter_upload_client import (
