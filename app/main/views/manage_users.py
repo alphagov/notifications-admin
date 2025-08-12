@@ -270,11 +270,15 @@ def remove_user_from_service(service_id, user_id):
     try:
         service_api_client.remove_user_from_service(service_id, user_id)
     except HTTPError as e:
-        msg = "You cannot remove the only user for a service."
-        if e.message == msg:
-            flash("Je kunt de enige gebruiker van een dienst niet verwijderen", "error")
+        msg = "U kunt de laatste gebruiker van een organisatie niet verwijderen"
+        if e.status_code == 400 and msg in e.message:
+            flash(msg, "info")
+            return redirect(url_for(".manage_users", service_id=service_id))
         else:
-            raise e
+            abort(500, e)
+    else:
+        Events.remove_user_from_service(user_id=user_id, removed_by_id=current_user.id, service_id=service_id)
+
     return redirect(url_for(".manage_users", service_id=service_id))
 
 
