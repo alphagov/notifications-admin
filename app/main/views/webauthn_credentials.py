@@ -38,7 +38,7 @@ def webauthn_begin_register():
 @user_is_logged_in
 def webauthn_complete_register():
     if "webauthn_registration_state" not in session:
-        return cbor.encode("No registration in progress"), 400
+        return cbor.encode("Geen registratie actief"), 400
 
     try:
         credential = WebAuthnCredential.from_registration(
@@ -53,7 +53,7 @@ def webauthn_complete_register():
     current_user.update(auth_type="webauthn_auth")
 
     flash(
-        "Registration complete. Next time you sign in to Notify you’ll be asked to use your security key.",
+        "Registratie voltooid. Bij het volgende aanmelden bij Notify wordt u gevraagd uw beveiligingssleutel te gebruiken.",
         "default_with_tick",
     )
 

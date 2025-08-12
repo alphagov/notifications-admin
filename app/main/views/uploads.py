@@ -92,7 +92,7 @@ def uploads(service_id):
 def uploaded_letters(service_id, letter_print_day):
     page = get_page_from_request()
     if page is None:
-        abort(404, f"Invalid page argument ({request.args.get('page')}).")
+        abort(404, f"Ongeldige paginawaarde ({request.args.get('page')}).")
     uploaded_letters = upload_api_client.get_letters_by_service_and_print_day(
         current_service.id,
         letter_print_day=letter_print_day,
@@ -151,8 +151,8 @@ def upload_letter(service_id):
             # TODO: get page count from the sanitise response once template preview handles malformed files nicely
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
-            current_app.logger.info("Invalid PDF uploaded for service_id: %s", service_id)
-            form.file.errors.append("Notify cannot read this PDF - save a new copy and try again")
+            current_app.logger.info("Ongeldige PDF geüpload voor service_id: %s", service_id)
+            form.file.errors.append("Notify kan deze PDF niet lezen – sla een nieuwe kopie op en probeer het opnieuw")
 
         if not form.errors:
             original_filename = form.file.data.filename
@@ -514,7 +514,7 @@ def delete_contact_list(service_id, contact_list_id):
 
     flash(
         [
-            f"Are you sure you want to delete ‘{contact_list.original_file_name}’?",
+            f"Weet u zeker dat u ‘{contact_list.original_file_name}’ wilt verwijderen?",
         ],
         "delete",
     )
@@ -524,6 +524,7 @@ def delete_contact_list(service_id, contact_list_id):
         contact_list=contact_list,
         confirm_delete_banner=True,
     )
+
 
 
 @main.route("/services/<uuid:service_id>/contact-list/<uuid:contact_list_id>.csv", methods=["GET"])

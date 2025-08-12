@@ -38,7 +38,7 @@ def verify_email(token):
             current_app.config["EMAIL_EXPIRY_SECONDS"],
         )
     except SignatureExpired:
-        flash("The link in the email we sent you has expired. We’ve sent you a new one.")
+        flash("De link in de e-mail die we je hebben gestuurd is verlopen. We hebben je een nieuwe gestuurd.")
         return redirect(url_for("main.resend_email_verification"))
 
     token = Token(token_data)
@@ -47,7 +47,7 @@ def verify_email(token):
         abort(404)
 
     if user.is_active:
-        flash("That verification link has expired.")
+        flash("Die verificatielink is verlopen.")
         return redirect(url_for("main.sign_in"))
 
     if user.email_auth:
@@ -61,7 +61,7 @@ def verify_email(token):
 
 def activate_user(user_id):
     user = User.from_id(user_id)
-    # the user will have a new current_session_id set by the API - store it in the cookie for future requests
+    # de gebruiker krijgt een nieuwe current_session_id toegekend door de API - sla deze op in de cookie voor toekomstige verzoeken
     session["current_session_id"] = user.current_session_id
     organisation_id = session.get("organisation_id")
     activated_user = user.activate()
