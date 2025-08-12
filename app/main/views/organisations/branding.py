@@ -254,41 +254,61 @@ def _handle_change_default_letter_branding_to_none():
             "geen standaard briefbranding gebruiken",
         )
 
-
 def _handle_change_default_letter_branding(form, new_default_branding_id):
     """
     Handle any change of branding to a real brand (all cases except for making the default no branding).
     This includes going from no branding to a custom brand, and going from a custom brand to another custom brand.
+    When moving from no branding to a custom brand, there is a confirmation dialog step. When moving from a custom
+    brand to another custom brand, it happens without any further confirmation.
     """
-    if new_default_branding_id:
-        letter_branding_name = None
+
+    def __get_letter_branding_name(branding_id):
         try:
-            letter_branding_name = current_organisation.letter_branding_pool.get_item_by_id(
-                new_default_branding_id
-            ).name
+            return current_organisation.letter_branding_pool.get_item_by_id(branding_id).name
         except current_organisation.letter_branding_pool.NotFound:
             current_app.logger.info(
-                "Briefbranding-ID %(branding_id)s niet aanwezig in de briefbrandingpool van organisatie %(org_name)s.",
-                {"branding_id": new_default_branding_id, "org_name": current_organisation.name},
+                "Branding id %(id)s is bestaat niet in %(org_name)s's branding lijst.",
+                {"id": branding_id, "org_name": current_organisation.name},
             )
             abort(400)
 
+    # This block handles the case where an organisation is changing from no branding to an explicit brand. We handle
+    # this as a confirmation dialog + POST in order to explain to platform admins making this change that other services
+    # without branding will be affected.
+    if new_default_branding_id:
+        # This also validates that the chosen brand is valid for the organisation.
+        letter_branding_name = __get_letter_branding_name(new_default_branding_id)
+
         if request.method == "POST":
-            current_organisation.update(letter_branding_id=new_default_branding_id)
+            current_organisation.update(delete_services_cache=True, letter_branding_id=new_default_branding_id)
             return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
 
+        confirmation_question = Markup(
+            render_template(
+                "partials/flash_messages/letter_branding_confirm_change_brand_from_none.html",
+                branding_name=letter_branding_name,
+            )
+        )
         flash(
-            Markup(
-                render_template(
-                    "partials/flash_messages/letter_branding_confirm_change_brand.html",
-                    organisation_name=current_organisation.name,
-                    branding_name=letter_branding_name,
-                )
-            ),
-            "maak deze briefbranding de standaard",
+            confirmation_question,
+            "maak deze branding standaard",
         )
 
+    # This form submission handles users pressing `Make default` on a brand. We handle two cases here:
+    # 1) If the org currently has no branding, we redirect them to the confirmation message explaining what happens when
+    #    changing from no branding to an explicit brand. This is handled by the block above.
+    # 2) If the org is currently on an explicit brand and is changing to another, we just handle that change immediately
+    #    and don't require confirmation.
     if form.validate_on_submit():
+        if current_organisation.letter_branding_id is None:
+            return redirect(
+                url_for(
+                    "main.organisation_letter_branding",
+                    org_id=current_organisation.id,
+                    new_default_branding_id=form.letter_branding_id.data,
+                )
+            )
+
         current_organisation.update(letter_branding_id=form.letter_branding_id.data)
         return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
 
