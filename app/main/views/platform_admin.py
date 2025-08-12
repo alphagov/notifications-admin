@@ -206,16 +206,16 @@ def notifications_sent_by_service():
         end_date = form.end_date.data
 
         headers = [
-            "datum aangemaakt",
-            "dienst-ID",
-            "dienstnaam",
-            "berichttype",
-            "aantal verzonden",
-            "aantal afgeleverd",
-            "aantal technische fouten",
-            "aantal tijdelijke fouten",
-            "aantal permanente fouten",
-            "totaal aantal verzonden",
+            "date_created",
+            "service_id",
+            "service_name",
+            "notification_type",
+            "count_sending",
+            "count_delivered",
+            "count_technical_failure",
+            "count_temporary_failure",
+            "count_permanent_failure",
+            "count_sent",
         ]
         result = notification_api_client.get_notification_status_by_service(start_date, end_date)
 
@@ -246,19 +246,19 @@ def get_billing_report():
         start_date = form.start_date.data
         end_date = form.end_date.data
         headers = [
-            "organisatie-ID",
-            "organisatie",
-            "dienst-ID",
-            "dienstnaam",
-            "SMS-kosten",
-            "belastbare SMS-eenheden",
-            "totaal aantal brieven",
-            "briefkosten",
-            "briefspecificatie",
-            "bestelbonnummer",
-            "contactpersonen",
-            "contact e-mailadressen",
-            "factuurreferentie",
+            "organisation_id",
+            "organisation_name",
+            "service_id",
+            "service_name",
+            "sms_cost",
+            "sms_chargeable_units",
+            "total_letters",
+            "letter_cost",
+            "letter_breakdown",
+            "purchase_order_number",
+            "contact_names",
+            "contact_email_addresses",
+            "billing_reference",
         ]
         try:
             result = billing_api_client.get_data_for_billing_report(start_date, end_date)
