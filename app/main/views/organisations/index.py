@@ -198,6 +198,7 @@ def download_organisation_usage_report(org_id):
         },
     )
 
+
 @main.route("/organisations/<uuid:org_id>/trial-services", methods=["GET"])
 @user_is_platform_admin
 def organisation_trial_mode_services(org_id):
@@ -291,6 +292,7 @@ def cancel_invited_org_user(org_id, invited_user_id):
 @user_is_platform_admin
 def organisation_settings(org_id):
     return render_template("views/organisations/organisation/settings/index.html")
+
 
 @main.route("/organisations/<uuid:org_id>/settings/edit-name", methods=["GET", "POST"])
 @user_is_platform_admin
@@ -548,7 +550,7 @@ def archive_organisation(org_id):
         return redirect(url_for(".your_services"))
 
     flash(
-        f"Weet u zeker dat u ‘{current_organisation.name}’ wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+        f"Weet u zeker dat u ‘{current_organisation.name}’ wilt verwijderen? Actie kan niet ongedaan worden gemaakt.",
         "delete",
     )
     return organisation_settings(org_id)

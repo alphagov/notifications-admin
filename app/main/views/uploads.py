@@ -526,7 +526,6 @@ def delete_contact_list(service_id, contact_list_id):
     )
 
 
-
 @main.route("/services/<uuid:service_id>/contact-list/<uuid:contact_list_id>.csv", methods=["GET"])
 @user_has_permissions("send_messages")
 def download_contact_list(service_id, contact_list_id):

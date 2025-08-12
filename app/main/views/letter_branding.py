@@ -96,7 +96,9 @@ def update_letter_branding(branding_id):
                 raise e
 
         except BotoClientError:
-            file_upload_form.file.errors = ["Fout bij opslaan van het geüploade bestand – probeer het opnieuw te uploaden"]
+            file_upload_form.file.errors = [
+                "Fout bij opslaan van het geüploade bestand – probeer het opnieuw te uploaden"
+            ]
 
     return render_template(
         "views/letter-branding/manage-letter-branding.html",

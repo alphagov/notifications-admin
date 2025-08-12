@@ -61,7 +61,8 @@ def verify_email(token):
 
 def activate_user(user_id):
     user = User.from_id(user_id)
-    # de gebruiker krijgt een nieuwe current_session_id toegekend door de API - sla deze op in de cookie voor toekomstige verzoeken
+    # de gebruiker krijgt een nieuwe current_session_id toegekend door de API -
+    # sla deze op in de cookie voor toekomstige verzoeken
     session["current_session_id"] = user.current_session_id
     organisation_id = session.get("organisation_id")
     activated_user = user.activate()

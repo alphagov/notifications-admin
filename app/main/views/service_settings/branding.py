@@ -401,7 +401,7 @@ def email_branding_set_alt_text(service_id):
 
         flash(
             "Je hebt de e-mailhuisstijl gewijzigd. Stuur jezelf een e-mail om te controleren of alles er goed uitziet.",
-            "default_with_tick"
+            "default_with_tick",
         )
 
         return redirect(url_for("main.service_settings", service_id=service_id))

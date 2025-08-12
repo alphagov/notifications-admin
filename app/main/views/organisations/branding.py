@@ -97,7 +97,7 @@ def _handle_change_default_email_branding(form, new_default_branding_id) -> Resp
             return current_organisation.email_branding_pool.get_item_by_id(branding_id).name
         except current_organisation.email_branding_pool.NotFound:
             current_app.logger.info(
-                "E-mailbranding-ID %(branding_id)s is niet aanwezig in de e-mailbrandingpool van organisatie %(org_name)s.",
+                "E-mailbranding-ID %(branding_id)s niet aanwezig in de e-mailbranding van organisatie %(org_name)s.",
                 {"branding_id": branding_id, "org_name": current_organisation.name},
             )
             abort(400)
@@ -263,10 +263,12 @@ def _handle_change_default_letter_branding(form, new_default_branding_id):
     if new_default_branding_id:
         letter_branding_name = None
         try:
-            letter_branding_name = current_organisation.letter_branding_pool.get_item_by_id(new_default_branding_id).name
+            letter_branding_name = current_organisation.letter_branding_pool.get_item_by_id(
+                new_default_branding_id
+            ).name
         except current_organisation.letter_branding_pool.NotFound:
             current_app.logger.info(
-                "Briefbranding-ID %(branding_id)s is niet aanwezig in de briefbrandingpool van organisatie %(org_name)s.",
+                "Briefbranding-ID %(branding_id)s niet aanwezig in de briefbrandingpool van organisatie %(org_name)s.",
                 {"branding_id": new_default_branding_id, "org_name": current_organisation.name},
             )
             abort(400)

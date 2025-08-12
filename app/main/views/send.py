@@ -81,11 +81,10 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
 
 
 def get_example_letter_address(key):
-    return {
-        "address line 1": "A. Naam",
-        "address line 2": "Voorbeeldstraat 123",
-        "address line 3": "1234 AB"
-    }.get(key, "")
+    return {"address line 1": "A. Naam", "address line 2": "Voorbeeldstraat 123", "address line 3": "1234 AB"}.get(
+        key, ""
+    )
+
 
 @main.route("/services/<uuid:service_id>/send/<uuid:template_id>/csv", methods=["GET", "POST"])
 @user_has_permissions("send_messages", restrict_admin_usage=True)
@@ -145,8 +144,12 @@ def send_messages(service_id, template_id):
             current_app.logger.warning("Kon %s niet lezen", form.file.data.filename, exc_info=True)
             form.file.errors = ["Notify kan dit bestand niet lezen - probeer een ander bestandstype te gebruiken"]
         except XLDateError:
-            current_app.logger.warning("Kon nummers/datums in %s niet verwerken", form.file.data.filename, exc_info=True)
-            form.file.errors = ["Notify kan dit bestand niet lezen - probeer het in plaats daarvan op te slaan als een CSV-bestand"]
+            current_app.logger.warning(
+                "Kon nummers/datums in %s niet verwerken", form.file.data.filename, exc_info=True
+            )
+            form.file.errors = [
+                "Notify kan dit bestand niet lezen - probeer het in plaats daarvan op te slaan als een CSV-bestand"
+            ]
 
     elif form.errors:
         # just show the first error, as we don't expect the form to have more

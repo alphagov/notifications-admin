@@ -191,7 +191,7 @@ def live_services_csv():
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())} rapport actieve diensten.csv"',
+            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())} rapport diensten.csv"',
         },
     )
 
@@ -293,7 +293,7 @@ def get_billing_report():
                 200,
                 {
                     "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": f'attachment; filename="Facturatie Rapport van {start_date} tot {end_date}.csv"',
+                    "Content-Disposition": f'attachment; filename="Facturatie Rapport {start_date} tot {end_date}.csv"',
                 },
             )
         else:
@@ -356,6 +356,7 @@ def get_dvla_billing_report():
         else:
             flash("Geen resultaten voor de gekozen data")
     return render_template("views/platform-admin/get-dvla-billing-report.html", form=form)
+
 
 @main.route("/platform-admin/reports/volumes-by-service", methods=["GET", "POST"])
 @user_is_platform_admin
@@ -643,6 +644,7 @@ def clear_cache():
         form=form,
         error_summary_enabled=True,
     )
+
 
 def get_url_for_notify_record(uuid_):
     @dataclasses.dataclass

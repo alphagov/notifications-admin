@@ -33,7 +33,7 @@ def unsubscribe_request_report(service_id, batch_id=None):
         data = {"report_has_been_processed": report_has_been_processed}
         service_api_client.process_unsubscribe_request_report(service_id, batch_id=batch_id, data=data)
         flash(
-            f"Rapport voor {report.title} gemarkeerd als {'voltooid' if report_has_been_processed else 'niet voltooid'}",
+            f"Rapport {report.title} gemarkeerd als {'voltooid' if report_has_been_processed else 'niet voltooid'}",
             "default_with_tick",
         )
         return redirect(url_for("main.unsubscribe_request_reports_summary", service_id=service_id, batch_id=batch_id))

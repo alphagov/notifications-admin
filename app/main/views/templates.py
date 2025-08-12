@@ -915,7 +915,10 @@ def confirm_redact_template(service_id, template_id):
 def redact_template(service_id, template_id):
     service_api_client.redact_service_template(service_id, template_id)
 
-    flash("Gepersonaliseerde inhoud wordt verborgen voor berichten die met deze template worden verstuurd", "default_with_tick")
+    flash(
+        "Gepersonaliseerde inhoud wordt verborgen voor berichten die met deze template worden verstuurd",
+        "default_with_tick",
+    )
 
     return redirect(
         url_for(

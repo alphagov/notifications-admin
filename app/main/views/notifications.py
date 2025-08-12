@@ -87,7 +87,8 @@ def view_notification(service_id, notification_id):
         # Momenteel halen we de brief niet op uit S3 bij het tonen van een preview.
         # In plaats daarvan genereren we een preview op basis van de sjabloon en personalisatie.
         # Bovendien duurt het even voordat de validatiestatus binnenkomt bij een brief die te lang is.
-        # Door hier het aantal pagina's te checken, kunnen we de foutmelding tonen, ook als de brief nog niet volledig verwerkt is.
+        # Door hier het aantal pagina's te checken, kunnen we de foutmelding tonen,
+        # ook als de brief nog niet volledig verwerkt is.
         error_message = get_letter_validation_error("letter-too-long", [1], template.page_count)
 
     if get_help_argument() or request.args.get("help") == "0":

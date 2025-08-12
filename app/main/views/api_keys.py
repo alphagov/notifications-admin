@@ -88,12 +88,14 @@ def create_api_key(service_id):
             "hint": {
                 "html": Markup(
                     "Niet beschikbaar omdat uw dienst zich in "
-                    '<a class="govuk-link govuk-link--no-visited-state" href="/features/trial-mode">proefmodus</a> bevindt'
+                    '<a class="govuk-link govuk-link--no-visited-state" href="/features/trial-mode">trial</a> bevindt'
                 )
             },
         }
     if current_service.has_permission("letter"):
-        form.key_type.param_extensions["items"][1]["hint"] = {"text": "Kan niet worden gebruikt om brieven te versturen"}
+        form.key_type.param_extensions["items"][1]["hint"] = {
+            "text": "Kan niet worden gebruikt om brieven te versturen"
+        }
     if form.validate_on_submit():
         if current_service.trial_mode and form.key_type.data == KEY_TYPE_NORMAL:
             abort(400)

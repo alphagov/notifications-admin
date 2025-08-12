@@ -40,7 +40,8 @@ def _create_example_template(service_id):
     example_sms_template = service_api_client.create_service_template(
         name="Voorbeeld sms-sjabloon",
         type_="sms",
-        content="Hoi ((name)), ik probeer Notify uit. Vandaag is het ((day of week)) en mijn favoriete kleur is ((colour)).",
+        content=("Hoi ((name)), ik probeer Notify uit."
+        "Vandaag is het ((day of week)) en mijn favoriete kleur is ((colour))."),
         service_id=service_id,
     )
     return example_sms_template
@@ -70,7 +71,8 @@ def add_service():
 
         new_service = Service.from_id(service_id)
 
-        # Huisartsen hebben een limiet van nul berichten (om te voorkomen dat ze berichten kunnen sturen tijdens de proefperiode)
+        # Huisartsen hebben een limiet van nul berichten
+        # (om te voorkomen dat ze berichten kunnen sturen tijdens de proefperiode)
         if form.organisation_type.data == Organisation.TYPE_NHS_GP:
             new_service.update(sms_message_limit=0)
 
@@ -87,7 +89,8 @@ def add_service():
                 url_for("main.begin_tour", service_id=service_id, template_id=example_sms_template["data"]["id"])
             )
         else:
-            # als gebruiker e-mail authenticatie heeft, is het logisch dat mensen die ze uitnodigen voor hun nieuwe service dit ook kunnen hebben
+            # als gebruiker e-mail authenticatie heeft, is het logisch dat mensen
+            # die ze uitnodigen voor hun nieuwe service dit ook kunnen hebben
             if current_user.email_auth:
                 new_service.force_permission("email_auth", on=True)
 
