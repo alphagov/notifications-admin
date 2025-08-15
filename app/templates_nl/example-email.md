@@ -10,9 +10,9 @@ Wilt u de huisstijl van uw e-mails aanpassen? Ga dan naar de instellingen van uw
 
 Een overheidslogo bestaat uit:
 
-- een gekleurde lijn  
-- een symbool, bijvoorbeeld het Rijkswapen  
-- tekst, meestal de naam van de organisatie  
+- een gekleurde lijn
+- een symbool, bijvoorbeeld het Rijkswapen
+- tekst, meestal de naam van de organisatie
 
 ---
 
@@ -20,8 +20,8 @@ Een overheidslogo bestaat uit:
 
 Wilt u geen overheidslogo gebruiken? U kunt ook uw eigen huisstijl toevoegen in 3 eenvoudige stappen:
 
-1. Kies een kleur voor de banner.  
-2. Upload een logo.  
+1. Kies een kleur voor de banner.
+2. Upload een logo.
 3. Voeg alternatieve tekst toe voor uw logo.
 
 ^ *Alternatieve tekst (alt-tekst) is een beschrijving van een afbeelding, bedoeld voor gebruikers die de afbeelding niet kunnen zien.*

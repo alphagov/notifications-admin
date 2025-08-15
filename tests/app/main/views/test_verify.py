@@ -8,7 +8,7 @@ from flask import url_for
 from itsdangerous import SignatureExpired
 from notifications_python_client.errors import HTTPError
 
-from app.main.views.verify import activate_user
+from app.main.views_nl.verify import activate_user
 from tests import organisation_json
 from tests.conftest import create_user, normalize_spaces
 

@@ -1,8 +1,8 @@
 {% macro branding_preview(endpoint, branding_style, title, url_kwargs=None, classes='') %}
-  <iframe 
-    src="{{ url_for(endpoint, branding_style=branding_style, title=title, **(url_kwargs or {})) }}" 
-    class="branding-preview {{ classes }}" 
-    scrolling="no" 
+  <iframe
+    src="{{ url_for(endpoint, branding_style=branding_style, title=title, **(url_kwargs or {})) }}"
+    class="branding-preview {{ classes }}"
+    scrolling="no"
     title="{{ title }}">
   </iframe>
 {% endmacro %}
@@ -13,18 +13,18 @@
 
 {% macro custom_letter_branding_preview(filename, title='Voorbeeld van briefhuisstijl') %}
   <div class="branding-preview-image">
-    <img 
-      src="{{ url_for('no_cookie.letter_branding_preview_image', branding_style=None, filename=filename) }}" 
+    <img
+      src="{{ url_for('no_cookie.letter_branding_preview_image', branding_style=None, filename=filename) }}"
       alt="{{ title }}">
   </div>
 {% endmacro %}
 
 {% macro email_branding_preview(branding_style, title='Voorbeeld van e-mailhuisstijl', classes='') %}
   {{ branding_preview(
-      'main.email_template', 
-      branding_style, 
-      title=title, 
-      url_kwargs={"email_branding_preview": True}, 
+      'main.email_template',
+      branding_style,
+      title=title,
+      url_kwargs={"email_branding_preview": True},
       classes=classes
     )
   }}
@@ -32,8 +32,8 @@
 
 {% macro letter_branding_preview(branding_style, title='Voorbeeld van briefhuisstijl', classes='') %}
   <div class="branding-preview-image">
-    <img 
-      src="{{ url_for('no_cookie.letter_branding_preview_image', branding_style=branding_style) }}" 
+    <img
+      src="{{ url_for('no_cookie.letter_branding_preview_image', branding_style=branding_style) }}"
       alt="{{ title }}">
   </div>
 {% endmacro %}

@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.index import REDIRECTS
+from app.main.views_nl.index import REDIRECTS
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
 
 

@@ -2,7 +2,7 @@ import pytest
 from flask import Flask, url_for
 
 from app import create_app
-from app.navigation import (
+from app.overrides_nl.navigation import (
     CaseworkNavigation,
     HeaderNavigation,
     MainNavigation,

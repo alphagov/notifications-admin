@@ -8,8 +8,8 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.dashboard import cache_search_query, get_status_filters, make_cache_key
-from app.main.views.jobs import get_time_left
+from app.main.views_nl.dashboard import cache_search_query, get_status_filters, make_cache_key
+from app.main.views_nl.jobs import get_time_left
 from app.models.service import Service
 from app.utils import SEVEN_DAYS_TTL, get_sha512_hashed
 from tests.conftest import (

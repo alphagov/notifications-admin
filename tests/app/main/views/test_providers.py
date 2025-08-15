@@ -4,7 +4,7 @@ from unittest.mock import call
 import pytest
 from flask import url_for
 
-from app.main.views.providers import add_monthly_traffic
+from app.main.views_nl.providers import add_monthly_traffic
 
 
 def provider_json(overrides):

@@ -128,7 +128,7 @@ from app.notify_client.unsubscribe_api_client import unsubscribe_api_client  # n
 from app.notify_client.upload_api_client import upload_api_client  # noqa
 from app.notify_client.user_api_client import user_api_client  # noqa
 from app.notify_session import NotifyAdminSessionInterface
-from app.overides_nl.navigation import (
+from app.overrides_nl.navigation import (
     CaseworkNavigation,
     HeaderNavigation,
     MainNavigation,
@@ -615,7 +615,7 @@ def add_template_filters(application):
 def init_jinja(application):
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     template_folders = [
-        os.path.join(repo_root, "app/templates-nl"),
+        os.path.join(repo_root, "app/templates_nl"),
     ]
 
     application.jinja_loader = jinja2.ChoiceLoader(

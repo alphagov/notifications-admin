@@ -5,7 +5,7 @@ import pytest
 from flask import g, url_for
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket
 
-from app.main.views.service_settings.branding import (
+from app.main.views_nl.service_settings.branding import (
     _should_set_default_org_letter_branding,
 )
 from app.models.branding import LetterBranding

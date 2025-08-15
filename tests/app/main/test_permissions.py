@@ -251,7 +251,7 @@ ORGANISATION_ID_ARGUMENT = "org_id"
 
 
 def get_routes_and_decorators(argument_name=None):
-    import app.main.views as views
+    import app.main.views_nl as views
 
     for module_name, module in (
         inspect.getmembers(views) + inspect.getmembers(views.organisations) + inspect.getmembers(views.service_settings)

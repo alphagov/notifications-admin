@@ -1,0 +1,1 @@
+Dit is een voorbeeld van een e-mail verzonden via NotifyNL.

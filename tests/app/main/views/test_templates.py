@@ -11,7 +11,7 @@ from notifications_python_client.errors import HTTPError
 from requests import RequestException
 
 from app.main.forms import FieldWithNoneOption
-from app.main.views.templates import _save_letter_attachment
+from app.main.views_nl.templates import _save_letter_attachment
 from app.models.service import Service
 from tests import (
     NotifyBeautifulSoup,

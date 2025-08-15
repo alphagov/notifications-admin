@@ -5,7 +5,7 @@ from unittest.mock import ANY, call
 import pytest
 from flask import url_for
 
-from app.main.views.platform_admin import (
+from app.main.views_nl.platform_admin import (
     build_live_service_permissions_for_users_list,
     create_global_stats,
     format_stats_by_service,

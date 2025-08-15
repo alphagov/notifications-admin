@@ -6,7 +6,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.jobs import get_time_left
+from app.main.views_nl.jobs import get_time_left
 from tests import NotifyBeautifulSoup, job_json, notification_json, user_json
 from tests.conftest import (
     SERVICE_ONE_ID,

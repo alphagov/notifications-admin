@@ -6,7 +6,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views.dashboard import (
+from app.main.views_nl.dashboard import (
     aggregate_notifications_stats,
     aggregate_status_types,
     aggregate_template_usage,

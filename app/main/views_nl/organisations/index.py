@@ -31,7 +31,7 @@ from app.main.forms import (
     SearchUsersForm,
     YesNoSettingForm,
 )
-from app.main.views.dashboard import (
+from app.main.views_nl.dashboard import (
     get_tuples_of_financial_years,
     requested_and_current_financial_year,
 )

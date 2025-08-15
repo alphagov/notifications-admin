@@ -3,7 +3,7 @@ from io import BytesIO
 
 from notifications_python_client.errors import HTTPError
 
-from app.main.views.report_requests import ReportRequest
+from app.main.views_nl.report_requests import ReportRequest
 from tests.conftest import SERVICE_ONE_ID, create_report_request
 
 

@@ -12,7 +12,7 @@ from notifications_utils.clients.zendesk.zendesk_client import (
     ZendeskError,
 )
 
-from app.main.views.feedback import ZENDESK_USER_LOGGED_OUT_NOTE, in_business_hours
+from app.main.views_nl.feedback import ZENDESK_USER_LOGGED_OUT_NOTE, in_business_hours
 from app.models.feedback import (
     GENERAL_TICKET_TYPE,
     PROBLEM_TICKET_TYPE,
