@@ -12,7 +12,7 @@
     we break the permissions block here to to be able to add the get ready to send button,
     so that it appears in a more logical keyboard tab order
   #}
-  {% if current_user.has_permissions('send_messages', restrict_admin_usage=True) and not template.too_many_pages %}
+  {% if current_user.has_permissions('send_messages') and not template.too_many_pages %}
     <a href="{{ url_for(".set_sender", service_id=current_service.id, template_id=template.id) }}" class="govuk-button govuk-button--secondary edit-template-link-get-ready-to-send">
       Get ready to send<span class="govuk-visually-hidden"> a letter using this template</span>
     </a>
