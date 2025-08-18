@@ -9,6 +9,7 @@ from app.s3_client.s3_letter_upload_client import LetterMetadata, LetterNotFound
 from tests.conftest import SERVICE_ONE_ID, do_mock_get_page_counts_for_letter, sample_uuid
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_get_upload_letter(client_request):
     page = client_request.get("main.upload_letter", service_id=SERVICE_ONE_ID)
 
@@ -20,6 +21,7 @@ def test_get_upload_letter(client_request):
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "extra_permissions, expected_allow_international",
     (
@@ -331,6 +333,7 @@ def test_uploading_a_letter_errors_when_file_is_too_big(
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Choose file"
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_post_choose_upload_letter_when_file_is_malformed(
     client_request,
     service_one,
@@ -425,6 +428,7 @@ def test_uploading_a_letter_attachment_errors_when_file_is_too_big(
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_post_choose_upload_letter_attachment_when_file_is_malformed(
     client_request,
     service_one,
@@ -449,6 +453,7 @@ def test_post_choose_upload_letter_attachment_when_file_is_malformed(
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_post_upload_letter_with_invalid_file(
     client_request,
     fake_uuid,

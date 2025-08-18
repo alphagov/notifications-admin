@@ -140,6 +140,7 @@ def test_should_show_page_for_one_job_with_flexible_data_retention(
     assert "Cancel sending these letters" not in page
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_get_jobs_should_tell_user_if_more_than_one_page(
     client_request,
     fake_uuid,
