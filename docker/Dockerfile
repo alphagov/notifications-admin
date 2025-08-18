@@ -22,7 +22,7 @@ WORKDIR /home/vcap/app
 ARG NOTIFY_ENVIRONMENT=development
 
 FROM --platform=linux/amd64 node:22-slim AS node
-FROM base AS frontend_build
+FROM --platform=linux/amd64 python:3.11-slim AS frontend_build
 
 SHELL ["/bin/bash", "-c"]
 
