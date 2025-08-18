@@ -342,6 +342,48 @@ html.rhc-theme {
 
 }
 
+@media (max-width: 48.0624em) {
+    .dashboard {
+
+        .govuk-grid-row {
+            display: flex;
+            flex-direction: column;
+
+            .govuk-grid-column-one-third {
+                width: 100%;
+
+            }
+        }
+
+    }
+}
+
+@media (min-width: 48.0625em) {
+    .govuk-header {
+        .govuk-header__container {
+            display: flex;
+            flex-direction: row;
+
+            .govuk-header__logo {
+                width: auto;
+                flex: 0;
+                padding-right: 0;
+            }
+
+            .govuk-header__content {
+                width: auto;
+                flex: 1;
+            }
+
+            .govuk-header__navigation-list {
+                display: flex;
+                width: 100%;
+                justify-content: end;
+            }
+        }
+    }
+}
+
 
 .rhc-theme {
 
