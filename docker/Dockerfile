@@ -25,24 +25,6 @@ FROM --platform=linux/amd64 node:22-bookworm-slim AS frontend_build
 
 SHELL ["/bin/bash", "-c"]
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        # TODO: this entire block was inlined from unit-tests-image's Dockerfile.
-        # Which of these are actually dependencies of admin,
-        # which are dependencies of document-download-frontend (and can be removed)?
-        make \
-        curl \
-        rlwrap \
-        git \
-        build-essential \
-        libmagic-dev \
-        libcurl4-openssl-dev \
-        libssl-dev \
-        libpng-dev \
-        zip \
-        openssh-client \
-    && rm -rf /var/lib/apt/lists/*
-
 WORKDIR /usr/frontend
 COPY app app
 COPY package-lock.json package.json rollup.config.mjs ./
