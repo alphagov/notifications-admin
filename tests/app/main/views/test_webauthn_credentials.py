@@ -281,7 +281,7 @@ def test_complete_authentication_checks_credentials(
     mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
     mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items", return_value=[webauthn_credential])
     mocker.patch(
-        "app.main.views.webauthn_credentials._complete_webauthn_login_attempt", return_value=Mock(location="/foo")
+        "app.main.views_nl.webauthn_credentials._complete_webauthn_login_attempt", return_value=Mock(location="/foo")
     )
 
     response = client_request.post_response(
@@ -307,7 +307,7 @@ def test_complete_authentication_403s_if_key_isnt_in_users_credentials(
     mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
     # user has no keys in the database
     mocker.patch("app.models.webauthn_credential.WebAuthnCredentials._get_items", return_value=[])
-    mock_verify_webauthn_login = mocker.patch("app.main.views.webauthn_credentials._complete_webauthn_login_attempt")
+    mock_verify_webauthn_login = mocker.patch("app.main.views_nl.webauthn_credentials._complete_webauthn_login_attempt")
     mock_unsuccesful_login_api_call = mocker.patch("app.user_api_client.complete_webauthn_login_attempt")
 
     client_request.post_response(
@@ -340,7 +340,7 @@ def test_complete_authentication_clears_session(
     mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
     mocker.patch("app.user_api_client.get_webauthn_credentials_for_user", return_value=[webauthn_credential])
     mocker.patch(
-        "app.main.views.webauthn_credentials._complete_webauthn_login_attempt", return_value=Mock(location="/foo")
+        "app.main.views_nl.webauthn_credentials._complete_webauthn_login_attempt", return_value=Mock(location="/foo")
     )
 
     client_request.post("main.webauthn_complete_authentication", _data=webauthn_authentication_post_data)
@@ -369,7 +369,7 @@ def test_verify_webauthn_login_signs_user_in(
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": platform_admin_user["id"], "email": platform_admin_user["email_address"]}
     client_request.login(platform_admin_user)
-    mocker.patch("app.main.views.webauthn_credentials._verify_webauthn_authentication")
+    mocker.patch("app.main.views_nl.webauthn_credentials._verify_webauthn_authentication")
     mocker.patch("app.user_api_client.complete_webauthn_login_attempt", return_value=(True, None))
     mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=False)
 
@@ -391,7 +391,7 @@ def test_verify_webauthn_login_signs_user_in_doesnt_sign_user_in_if_api_rejects(
     with client_request.session_transaction() as session:
         session["user_details"] = {"id": platform_admin_user["id"], "email": platform_admin_user["email_address"]}
     client_request.login(platform_admin_user)
-    mocker.patch("app.main.views.webauthn_credentials._verify_webauthn_authentication")
+    mocker.patch("app.main.views_nl.webauthn_credentials._verify_webauthn_authentication")
     mocker.patch("app.user_api_client.complete_webauthn_login_attempt", return_value=(False, None))
 
     client_request.post(
@@ -412,7 +412,7 @@ def test_verify_webauthn_login_signs_user_in_sends_revalidation_email_if_needed(
         session["user_details"] = user_details
 
     mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
-    mocker.patch("app.main.views.webauthn_credentials._verify_webauthn_authentication")
+    mocker.patch("app.main.views_nl.webauthn_credentials._verify_webauthn_authentication")
     mocker.patch("app.user_api_client.complete_webauthn_login_attempt", return_value=(True, None))
     mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=True)
 
@@ -441,7 +441,7 @@ def test_verify_webauthn_login_passes_webauthn_credential_id_to_api(
     client_request.login(platform_admin_user)
 
     mocker.patch(
-        "app.main.views.webauthn_credentials._verify_webauthn_authentication",
+        "app.main.views_nl.webauthn_credentials._verify_webauthn_authentication",
         return_value=Mock(id="12345"),
     )
     mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=False)

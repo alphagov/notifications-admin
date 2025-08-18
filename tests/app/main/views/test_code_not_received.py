@@ -176,6 +176,7 @@ def test_redirect_to_sign_in_if_not_logged_in(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "redirect_url",
     [

@@ -128,7 +128,7 @@ def test_should_redirect_to_forgot_password_with_flash_message_when_token_is_exp
     notify_admin, client_request, mocker
 ):
     client_request.logout()
-    mocker.patch("app.main.views.new_password.check_token", side_effect=SignatureExpired("expired"))
+    mocker.patch("app.main.views_nl.new_password.check_token", side_effect=SignatureExpired("expired"))
     token = generate_token("foo@bar.com", notify_admin.config["SECRET_KEY"], notify_admin.config["DANGEROUS_SALT"])
 
     client_request.get_url(

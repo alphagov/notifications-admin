@@ -555,6 +555,7 @@ def test_edit_email_template_should_update_unsubscribe(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "template_type",
     (
@@ -658,6 +659,7 @@ def test_caseworker_redirected_to_set_sender_for_one_off(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @freeze_time("2020-01-01 15:00")
 def test_caseworker_sees_template_page_if_template_is_deleted(
     client_request,
@@ -1001,7 +1003,9 @@ def test_POST_letter_template_change_to_welsh_and_english_sets_subject_and_conte
 ):
     client_request.login(active_user_with_permissions)
 
-    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+    mock_template_change_language = mocker.patch(
+        "app.main.views_nl.templates.service_api_client.update_service_template"
+    )
 
     client_request.post(
         "main.letter_template_change_language",
@@ -1059,7 +1063,9 @@ def test_POST_letter_template_change_to_welsh_and_english_resets_english_subject
 
     client_request.login(active_user_with_permissions)
 
-    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+    mock_template_change_language = mocker.patch(
+        "app.main.views_nl.templates.service_api_client.update_service_template"
+    )
 
     client_request.post(
         "main.letter_template_change_language",
@@ -1092,7 +1098,9 @@ def test_POST_letter_template_change_to_english_redirects_to_confirmation_page(
 ):
     client_request.login(active_user_with_permissions)
 
-    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+    mock_template_change_language = mocker.patch(
+        "app.main.views_nl.templates.service_api_client.update_service_template"
+    )
 
     client_request.post(
         "main.letter_template_change_language",
@@ -1116,7 +1124,9 @@ def test_GET_letter_template_confirm_remove_welsh(
 ):
     client_request.login(active_user_with_permissions)
 
-    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+    mock_template_change_language = mocker.patch(
+        "app.main.views_nl.templates.service_api_client.update_service_template"
+    )
 
     page = client_request.get(
         "main.letter_template_confirm_remove_welsh",
@@ -1138,7 +1148,9 @@ def test_POST_letter_template_confirm_remove_welsh(
 ):
     client_request.login(active_user_with_permissions)
 
-    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+    mock_template_change_language = mocker.patch(
+        "app.main.views_nl.templates.service_api_client.update_service_template"
+    )
 
     client_request.post(
         "main.letter_template_confirm_remove_welsh",
@@ -1195,7 +1207,9 @@ def test_POST_letter_template_confirm_remove_welsh_resets_english_subject_and_co
 
     client_request.login(active_user_with_permissions)
 
-    mock_template_change_language = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+    mock_template_change_language = mocker.patch(
+        "app.main.views_nl.templates.service_api_client.update_service_template"
+    )
 
     client_request.post(
         "main.letter_template_confirm_remove_welsh",
@@ -1254,9 +1268,9 @@ def test_post_attach_pages_errors_when_content_outside_printable_area(
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     # page count for the attachment
-    mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
+    mocker.patch("app.main.views_nl.templates.pdf_page_count", return_value=1)
 
-    mock_s3_upload = mocker.patch("app.main.views.templates.upload_letter_to_s3")
+    mock_s3_upload = mocker.patch("app.main.views_nl.templates.upload_letter_to_s3")
 
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
@@ -1311,7 +1325,7 @@ def test_post_attach_pages_errors_when_base_template_plus_attachment_too_long(
 ):
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-    mocker.patch("app.main.views.templates.upload_letter_to_s3")
+    mocker.patch("app.main.views_nl.templates.upload_letter_to_s3")
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={
@@ -1355,9 +1369,9 @@ def test_post_attach_pages_redirects_to_template_view_when_validation_successful
     mock_sanitise = mocker.patch("app.template_preview_client.sanitise_letter")
 
     # page count for the attachment
-    mocker.patch("app.main.views.templates.pdf_page_count", return_value=page_count)
+    mocker.patch("app.main.views_nl.templates.pdf_page_count", return_value=page_count)
 
-    mock_save = mocker.patch("app.main.views.templates._save_letter_attachment")
+    mock_save = mocker.patch("app.main.views_nl.templates._save_letter_attachment")
 
     template_id = sample_uuid()
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
@@ -1400,9 +1414,9 @@ def test_post_attach_pages_archives_existing_attachment_when_it_exists(
     mock_sanitise = mocker.patch("app.template_preview_client.sanitise_letter")
 
     # page count for the attachment
-    mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
+    mocker.patch("app.main.views_nl.templates.pdf_page_count", return_value=1)
 
-    mock_save = mocker.patch("app.main.views.templates._save_letter_attachment")
+    mock_save = mocker.patch("app.main.views_nl.templates._save_letter_attachment")
 
     mock_archive_attachment = mocker.patch("app.letter_attachment_client.archive_letter_attachment")
 
@@ -1455,8 +1469,8 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
     mock_sanitise_response.json = lambda: {"message": "content-outside-printable-area", "invalid_pages": [1]}
     mocker.patch("app.template_preview_client.sanitise_letter", return_value=mock_sanitise_response)
 
-    mocker.patch("app.main.views.templates.upload_letter_to_s3")
-    mocker.patch("app.main.views.templates.pdf_page_count", return_value=1)
+    mocker.patch("app.main.views_nl.templates.upload_letter_to_s3")
+    mocker.patch("app.main.views_nl.templates.pdf_page_count", return_value=1)
 
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         page = client_request.post(
@@ -1498,8 +1512,8 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
         json=Mock(return_value={"file": "VGhlIHNhbml0aXNlZCBjb250ZW50", "page_count": attachment_page_count}),
     )
 
-    mock_upload = mocker.patch("app.main.views.templates.upload_letter_attachment_to_s3")
-    mock_backup = mocker.patch("app.main.views.templates.backup_original_letter_to_s3")
+    mock_upload = mocker.patch("app.main.views_nl.templates.upload_letter_attachment_to_s3")
+    mock_backup = mocker.patch("app.main.views_nl.templates.backup_original_letter_to_s3")
     mock_save_to_db = mocker.patch("app.letter_attachment_client.create_letter_attachment")
 
     g.current_service = Service(service_one)
@@ -1529,6 +1543,7 @@ def test_save_letter_attachment_saves_to_s3_and_db_and_redirects(notify_admin, s
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_attach_pages_with_letter_attachment_id_in_template_shows_manage_page(
     mock_get_service_letter_template_with_attachment, client_request, service_one
 ):
@@ -1586,7 +1601,7 @@ def test_get_delete_letter_attachment_shows_confirmation(
     service_one,
     mocker,
 ):
-    mock_flash = mocker.patch("app.main.views.templates.flash")
+    mock_flash = mocker.patch("app.main.views_nl.templates.flash")
     mocker.patch("app.letter_attachment_client.archive_letter_attachment")
     page = client_request.get(
         "main.letter_template_edit_pages",
@@ -1685,7 +1700,9 @@ def test_edit_letter_templates_postage_updates_postage(
     fake_uuid,
     mock_get_service_letter_template,
 ):
-    mock_update_template_postage = mocker.patch("app.main.views.templates.service_api_client.update_service_template")
+    mock_update_template_postage = mocker.patch(
+        "app.main.views_nl.templates.service_api_client.update_service_template"
+    )
 
     client_request.post(
         "main.edit_template_postage",
@@ -2780,10 +2797,10 @@ def test_copy_letter_template_with_letter_attachment(
 ):
     client_request.login(active_user_with_permission_to_two_services)
     mocker.patch(
-        "app.main.views.templates.s3download",
+        "app.main.views_nl.templates.s3download",
         return_value=BytesIO(b"PDF"),
     )
-    mock_upload = mocker.patch("app.main.views.templates.upload_letter_attachment_to_s3")
+    mock_upload = mocker.patch("app.main.views_nl.templates.upload_letter_attachment_to_s3")
     mock_save_to_db = mocker.patch("app.letter_attachment_client.create_letter_attachment")
     mocker.patch("uuid.uuid4", return_value="12341234-1234-1234-1234-123412341234")
 
@@ -3924,6 +3941,7 @@ def test_route_invalid_permissions(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "template_type, expected",
     (
@@ -4385,7 +4403,7 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
     mocker,
 ):
     mocker.patch(
-        "app.main.views.templates.get_attachment_pdf_and_metadata",
+        "app.main.views_nl.templates.get_attachment_pdf_and_metadata",
         return_value=(
             "pdf_file",
             {

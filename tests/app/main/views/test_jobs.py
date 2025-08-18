@@ -443,7 +443,7 @@ def test_should_show_scheduled_job(
     mocker,
 ):
     mocker.patch(
-        "app.main.views.jobs.s3download",
+        "app.main.views_nl.jobs.s3download",
         return_value="""
             phone number,name
             +447700900986,John
@@ -501,7 +501,7 @@ def test_should_download_scheduled_job(
 ):
     original_file_contents = "phone number,name\n+447700900986,John\n+447700900986,Smith\n"
     mocker.patch(
-        "app.main.views.jobs.s3download",
+        "app.main.views_nl.jobs.s3download",
         return_value=original_file_contents,
     )
     response = client_request.get_response(

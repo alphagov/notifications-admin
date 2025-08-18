@@ -3,7 +3,7 @@ import pytest
 
 @pytest.mark.parametrize("query_args", [{}, {"govuk_banner": "false"}])
 def test_renders(client_request, mocker, query_args):
-    mocker.patch("app.main.views.index.HTMLEmailTemplate.__str__", return_value="rendered")
+    mocker.patch("app.main.views_nl.index.HTMLEmailTemplate.__str__", return_value="rendered")
 
     response = client_request.get_response("main.email_template", **query_args)
 

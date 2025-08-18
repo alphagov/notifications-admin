@@ -124,7 +124,7 @@ def test_should_render_performance_page(
         for d in example_performance_data["services_using_notify"]
         if d["organisation_name"] == "Department to be ignored"
     ]
-    mocker.patch("app.main.views.performance.ORGS_TO_IGNORE", orgs_to_ignore)
+    mocker.patch("app.main.views_nl.performance.ORGS_TO_IGNORE", orgs_to_ignore)
     page = client_request.get("main.performance")
     mock_get_performance_data.assert_called_once_with(
         start_date=date(2020, 12, 25),
@@ -190,7 +190,7 @@ def test_should_return_performance_data_as_json(
         for d in example_performance_data["services_using_notify"]
         if d["organisation_name"] == "Department to be ignored"
     ]
-    mocker.patch("app.main.views.performance.ORGS_TO_IGNORE", orgs_to_ignore)
+    mocker.patch("app.main.views_nl.performance.ORGS_TO_IGNORE", orgs_to_ignore)
     response = client_request.get_response("main.performance_json")
     assert response.json.keys() == {
         "average_percentage_under_10_seconds",

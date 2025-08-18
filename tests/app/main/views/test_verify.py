@@ -117,7 +117,7 @@ def test_verify_email_redirects_to_verify_if_token_valid(
     mock_check_verify_code,
 ):
     token_data = {"user_id": api_user_pending["id"], "secret_code": "UNUSED"}
-    mocker.patch("app.main.views.verify.check_token", return_value=json.dumps(token_data))
+    mocker.patch("app.main.views_nl.verify.check_token", return_value=json.dumps(token_data))
 
     client_request.get(
         "main.verify_email",
@@ -145,7 +145,7 @@ def test_verify_email_doesnt_verify_sms_if_user_on_email_auth(
 
     mocker.patch("app.user_api_client.get_user", return_value=pending_user_with_email_auth)
     token_data = {"user_id": pending_user_with_email_auth["id"], "secret_code": "UNUSED"}
-    mocker.patch("app.main.views.verify.check_token", return_value=json.dumps(token_data))
+    mocker.patch("app.main.views_nl.verify.check_token", return_value=json.dumps(token_data))
 
     client_request.get(
         "main.verify_email",
@@ -168,7 +168,7 @@ def test_verify_email_redirects_to_email_sent_if_token_expired(
     mocker,
 ):
     client_request.logout()
-    mocker.patch("app.main.views.verify.check_token", side_effect=SignatureExpired("expired"))
+    mocker.patch("app.main.views_nl.verify.check_token", side_effect=SignatureExpired("expired"))
 
     client_request.get(
         "main.verify_email",
@@ -182,7 +182,7 @@ def test_verify_email_shows_flash_message_if_token_expired(
     mocker,
 ):
     client_request.logout()
-    mocker.patch("app.main.views.verify.check_token", side_effect=SignatureExpired("expired"))
+    mocker.patch("app.main.views_nl.verify.check_token", side_effect=SignatureExpired("expired"))
 
     page = client_request.get(
         "main.verify_email",
@@ -203,7 +203,7 @@ def test_verify_email_redirects_to_sign_in_if_user_active(
 ):
     client_request.logout()
     token_data = {"user_id": api_user_active["id"], "secret_code": 12345}
-    mocker.patch("app.main.views.verify.check_token", return_value=json.dumps(token_data))
+    mocker.patch("app.main.views_nl.verify.check_token", return_value=json.dumps(token_data))
 
     page = client_request.get("main.verify_email", token="notreal", _follow_redirects=True)
 

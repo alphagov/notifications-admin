@@ -23,11 +23,11 @@ VIS_PARENT_FOLDER_ID = "bbbb222b-2b22-2b22-222b-b222b22b2222"
 @pytest.mark.skip(reason="[NOTIFYNL] Dutch phone number implementation breaks this test")
 def test_get_user_phone_number_when_only_inbound_exists(notify_admin, mocker):
     mock_get_inbound_sms = mocker.patch(
-        "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
+        "app.main.views_nl.conversation.service_api_client.get_inbound_sms_by_id",
         return_value={"user_number": "4407900900123", "notify_number": "07900000002"},
     )
     mock_get_notification = mocker.patch(
-        "app.main.views.conversation.notification_api_client.get_notification",
+        "app.main.views_nl.conversation.notification_api_client.get_notification",
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     assert get_user_number("service", "notification") == "07900 900123"
@@ -38,11 +38,11 @@ def test_get_user_phone_number_when_only_inbound_exists(notify_admin, mocker):
 @pytest.mark.skip(reason="[NOTIFYNL] Dutch phone number implementation breaks this test")
 def test_get_user_phone_number_when_only_outbound_exists(notify_admin, mocker):
     mock_get_inbound_sms = mocker.patch(
-        "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
+        "app.main.views_nl.conversation.service_api_client.get_inbound_sms_by_id",
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     mock_get_notification = mocker.patch(
-        "app.main.views.conversation.notification_api_client.get_notification", return_value={"to": "14157711401"}
+        "app.main.views_nl.conversation.notification_api_client.get_notification", return_value={"to": "14157711401"}
     )
     assert get_user_number("service", "notification") == "+1 415-771-1401"
     mock_get_inbound_sms.assert_called_once_with("service", "notification")
@@ -51,11 +51,11 @@ def test_get_user_phone_number_when_only_outbound_exists(notify_admin, mocker):
 
 def test_get_user_phone_number_raises_if_both_api_requests_fail(notify_admin, mocker):
     mock_get_inbound_sms = mocker.patch(
-        "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
+        "app.main.views_nl.conversation.service_api_client.get_inbound_sms_by_id",
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     mock_get_notification = mocker.patch(
-        "app.main.views.conversation.notification_api_client.get_notification",
+        "app.main.views_nl.conversation.notification_api_client.get_notification",
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     with pytest.raises(HTTPError):
@@ -182,11 +182,11 @@ def test_view_conversation_updates(
     mock_get_notification,
 ):
     mocker.patch(
-        "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
+        "app.main.views_nl.conversation.service_api_client.get_inbound_sms_by_id",
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     mock_get_partials = mocker.patch(
-        "app.main.views.conversation.get_conversation_partials", return_value={"messages": "foo"}
+        "app.main.views_nl.conversation.get_conversation_partials", return_value={"messages": "foo"}
     )
 
     response = client_request.get_response(
@@ -462,11 +462,11 @@ def test_conversation_reply_back_link_when_viewing_nested_templates(
 
 def test_get_user_phone_number_when_not_a_standard_phone_number(notify_admin, mocker):
     mocker.patch(
-        "app.main.views.conversation.service_api_client.get_inbound_sms_by_id",
+        "app.main.views_nl.conversation.service_api_client.get_inbound_sms_by_id",
         return_value={"user_number": "ALPHANUM3R1C", "notify_number": "07900000002"},
     )
     mocker.patch(
-        "app.main.views.conversation.notification_api_client.get_notification",
+        "app.main.views_nl.conversation.notification_api_client.get_notification",
         side_effect=HTTPError,
     )
     assert get_user_number("service", "notification") == "ALPHANUM3R1C"
