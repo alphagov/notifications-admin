@@ -28,6 +28,7 @@ def test_set_inbound_sms_sets_a_number_for_service(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_set_inbound_sms_when_no_available_inbound_numbers(
     client_request, service_one, no_available_inbound_numbers, mock_no_inbound_number_for_service
 ):

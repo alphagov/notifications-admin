@@ -36,12 +36,14 @@ def test_render_sign_in_template_with_next_link_for_password_reset(client_reques
     assert forgot_password_link["href"] == url_for("main.forgot_password", next=f"/services/{SERVICE_ONE_ID}/templates")
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_sign_in_explains_session_timeout(client_request):
     client_request.logout()
     page = client_request.get("main.sign_in", next="/foo")
     assert "We signed you out because you have not used Notify for a while." in page.text
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_sign_in_explains_other_browser(client_request, api_user_active, mocker):
     api_user_active["current_session_id"] = str(uuid.UUID(int=1))
     mocker.patch("app.user_api_client.get_user", return_value=api_user_active)

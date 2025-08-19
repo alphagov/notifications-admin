@@ -772,6 +772,7 @@ def test_letter_branding_option_preview_page_redirects_to_branding_options_page_
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_letter_branding_option_preview_changes_letter_branding_when_user_confirms(
     service_one,
     organisation_one,

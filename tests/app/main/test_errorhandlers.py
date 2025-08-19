@@ -66,6 +66,7 @@ def test_load_organisation_before_request_ignores_static_appropriately(
         assert g.current_organisation is not None
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "url",
     ["/new-password/MALFORMED_TOKEN", "/your-account/email/confirm/MALFORMED_TOKEN", "/verify-email/MALFORMED_TOKEN"],

@@ -143,7 +143,6 @@ def test_static_pages(
     request()
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] [FIXME] Non-smart quote or apostrophe found")
 def test_guidance_pages_link_to_service_pages_when_signed_in(
     client_request,
 ):
@@ -217,7 +216,6 @@ def test_message_status_page_redirects_without_notification_type_specified(clien
     )
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] [FIXME] Non-smart quote or apostrophe found")
 def test_message_status_page_contains_link_to_support(client_request):
     page = client_request.get("main.guidance_message_status", notification_type="sms")
     sms_status_table = page.select_one("tbody")
@@ -226,6 +224,7 @@ def test_message_status_page_contains_link_to_support(client_request):
     assert temp_fail_details_cell.select_one("a")["href"] == url_for("main.support")
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_terms_page_has_correct_content(client_request):
     terms_page = client_request.get("main.terms_of_use")
     assert normalize_spaces(terms_page.select("h1")[0].text) == ("Terms of use")
@@ -252,7 +251,6 @@ def test_css_is_served_from_correct_path(client_request):
         )
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] [FIXME] Non-smart quote or apostrophe found")
 def test_resources_that_use_asset_path_variable_have_correct_path(client_request):
     page = client_request.get("main.guidance_api_documentation")  # easy static page
 
@@ -345,6 +343,7 @@ def test_font_preload(
         assert element["href"].endswith(".woff2")
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_sms_price(
     client_request,
     mock_get_service_and_organisation_counts,

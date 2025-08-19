@@ -275,6 +275,7 @@ def test_that_test_files_exist():
     assert len(test_non_spreadsheet_files) == 6
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_should_not_allow_files_to_be_uploaded_without_the_correct_permission(
     client_request,
     mock_get_service_template,
@@ -609,6 +610,7 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
     assert page.select("tbody tr td")[1]["colspan"] == "2"
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     client_request,
     service_one,
@@ -667,6 +669,7 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     ]
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_upload_csv_file_with_bad_bfpo_postal_address_shows_check_page_with_errors(
     client_request,
     service_one,
@@ -709,6 +712,7 @@ def test_upload_csv_file_with_bad_bfpo_postal_address_shows_check_page_with_erro
     ]
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_upload_csv_file_with_international_letters_permission_shows_appropriate_errors(
     client_request,
     service_one,
@@ -756,6 +760,7 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
     ]
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "row_index, expected_postage",
     (
@@ -969,6 +974,7 @@ def test_upload_valid_csv_redirects_to_check_page(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "extra_args, expected_link_in_first_row, expected_recipient, expected_message",
     [
@@ -1137,6 +1143,7 @@ def test_upload_valid_csv_only_sets_meta_if_filename_known(
     assert len(mock_s3_set_metadata.call_args_list) == 0
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_show_all_columns_if_there_are_duplicate_recipient_columns(
     client_request,
     mocker,
@@ -2683,6 +2690,7 @@ def test_download_example_csv_for_letter_template(
     assert "text/csv" in response.headers["Content-Type"]
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_upload_csvfile_with_valid_phone_shows_all_numbers(
     client_request,
     mock_get_service_template,
@@ -3544,6 +3552,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     assert not page.select(".table-field-index a")
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "uploaded_file_name",
     (

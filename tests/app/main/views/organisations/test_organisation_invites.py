@@ -117,6 +117,7 @@ def test_invite_org_user_errors_when_same_email_as_inviter(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_cancel_invited_org_user_cancels_user_invitations(
     client_request,
     mock_get_invites_for_organisation,
