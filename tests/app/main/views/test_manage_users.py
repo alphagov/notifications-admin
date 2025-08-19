@@ -1,6 +1,7 @@
 import copy
 import uuid
 from datetime import datetime
+from unittest.mock import Mock
 
 import pytest
 from flask import url_for
@@ -10,7 +11,7 @@ import app
 from app.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_REJECTED
 from app.formatters import format_date_short
 from app.utils.user import is_gov_user
-from app.utils.user_permissions import translate_permissions_from_ui_to_db
+from app.utils.user_permissions import permission_mappings, translate_permissions_from_ui_to_db
 from tests import organisation_json
 from tests.conftest import (
     ORGANISATION_ID,
@@ -21,6 +22,7 @@ from tests.conftest import (
     create_active_user_manage_template_permissions,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
+    create_service_one_user,
     create_user,
     normalize_spaces,
     sample_uuid,
@@ -2439,7 +2441,6 @@ def test_service_join_request_choose_permissions_on_save(
         status=SERVICE_JOIN_REQUEST_APPROVED,
         status_changed_by_id=current_user.id,
         folder_permissions=["folder-id-1", "folder-id-2"],
-        auth_type="sms_auth",
     )
     assert mock_update_service_join_requests.called
 
@@ -2640,3 +2641,168 @@ def test_service_join_request_approved_flash_message(
 
     flash_banner = normalize_spaces(page.select_one("div.banner-default-with-tick").text)
     assert flash_banner == f"{mock_requester['name']} has joined this service"
+
+
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [
+        (
+            create_service_one_user(
+                id=sample_uuid(), name="Test User With Empty Permissions", auth_type="webauthn_auth"
+            ),
+            create_active_user_with_permissions(True),
+            "pending",
+        )
+    ],
+)
+def test_join_request_does_not_update_auth_type_for_webauthn_users(
+    client_request,
+    mocker,
+    mock_requester,
+    mock_service_user,
+    service_one,
+    mock_get_organisation_by_domain,
+    status,
+    mock_get_service_join_request_status_data,
+    mock_get_template_folders,
+):
+    request_id = sample_uuid()
+
+    selected_permissions = ["send_messages", "view_activity", "manage_service"]
+    mock_user_instance = Mock()
+    mock_user_instance.auth_type = "webauthn_auth"
+    mock_user_instance.mobile_number = "07700 900123"
+    mock_user_instance.permissions_for_service.return_value = set(selected_permissions)
+    mock_user_instance.has_template_folder_permission.return_value = True
+    mock_user_instance.webauthn_auth = True
+    mock_user_instance.platform_admin = False
+
+    mocker.patch("app.models.user.User.from_id", return_value=mock_user_instance)
+
+    mock_get_template_folders.return_value = [
+        {"id": "folder-id-1", "name": "f1", "parent_id": None, "users_with_permission": []},
+        {"id": "folder-id-2", "name": "f2", "parent_id": None, "users_with_permission": []},
+    ]
+
+    mock_update_service_join_requests = mocker.patch(
+        "app.service_api_client.update_service_join_requests",
+        return_value={},
+    )
+
+    service_one["organisation"] = ORGANISATION_ID
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
+    form_page = client_request.get(
+        "main.service_join_request_choose_permissions",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+    )
+
+    assert "Sign-in method" not in form_page.text
+    assert "Text message code" not in form_page.text
+    assert "Email link" not in form_page.text
+
+    client_request.post(
+        "main.service_join_request_choose_permissions",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+        # Include login_authentication in the POST data to simulate form submission,
+        # but since the user uses WebAuthn, the form deletes this field before processing,
+        # and the view should ignore it when updating the join request.
+        _data={
+            "permissions_field": selected_permissions,
+            "folder_permissions": ["folder-id-1", "folder-id-2"],
+        },
+        _expected_status=302,
+        _expected_redirect=url_for("main.manage_users", service_id=SERVICE_ONE_ID),
+    )
+
+    call_args = mock_update_service_join_requests.call_args
+    kwargs = call_args.kwargs
+    assert "auth_type" not in kwargs
+
+
+@pytest.mark.parametrize(
+    "mock_requester, mock_service_user, status",
+    [
+        (
+            create_service_one_user(id=sample_uuid(), name="Test User With Empty Permissions", auth_type="sms_auth"),
+            create_active_user_with_permissions(True),
+            "pending",
+        )
+    ],
+)
+def test_join_request_updates_auth_type_for_non_webauthn_users(
+    client_request,
+    mocker,
+    mock_requester,
+    mock_service_user,
+    service_one,
+    mock_get_organisation_by_domain,
+    status,
+    mock_get_service_join_request_status_data,
+    mock_get_template_folders,
+):
+    request_id = sample_uuid()
+
+    selected_permissions = list(permission_mappings.keys())
+    mock_user_instance = Mock()
+    mock_user_instance.auth_type = "sms_auth"
+    mock_user_instance.mobile_number = "07700 900123"
+    mock_user_instance.has_template_folder_permission.return_value = True
+    mock_user_instance.webauthn_auth = False
+    mock_user_instance.platform_admin = False
+    mock_user_instance.permissions_for_service.return_value = set(selected_permissions)
+
+    mocker.patch("app.models.user.User.from_id", return_value=mock_user_instance)
+
+    mock_get_template_folders.return_value = [
+        {"id": "folder-id-1", "name": "f1", "parent_id": None, "users_with_permission": []},
+        {"id": "folder-id-2", "name": "f2", "parent_id": None, "users_with_permission": []},
+    ]
+
+    mock_update_service_join_requests = mocker.patch(
+        "app.service_api_client.update_service_join_requests",
+        return_value={},
+    )
+
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["permissions"] = ["email_auth"]
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+
+    form_page = client_request.get(
+        "main.service_join_request_choose_permissions",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+    )
+
+    assert "Sign-in method" in form_page.text
+    assert "Text message code" in form_page.text
+    assert "Email link" in form_page.text
+
+    client_request.post(
+        "main.service_join_request_choose_permissions",
+        service_id=SERVICE_ONE_ID,
+        request_id=request_id,
+        _data={
+            "permissions_field": selected_permissions,
+            "folder_permissions": ["folder-id-1", "folder-id-2"],
+            "login_authentication": "sms_auth",
+        },
+        _expected_status=302,
+        _expected_redirect=url_for("main.manage_users", service_id=SERVICE_ONE_ID),
+    )
+
+    call_args = mock_update_service_join_requests.call_args
+    kwargs = call_args.kwargs
+
+    assert kwargs["auth_type"] == "sms_auth"
+    assert kwargs["permissions"] is not None
+    assert kwargs["folder_permissions"] == ["folder-id-1", "folder-id-2"]

@@ -13,7 +13,6 @@ from app.main.forms import (
     ChangeNonGovEmailForm,
     InviteUserForm,
     JoinServiceRequestApproveForm,
-    JoinServiceRequestSetPermissionsForm,
     PermissionsForm,
     SearchUsersForm,
 )
@@ -183,23 +182,22 @@ def service_join_request_choose_permissions(service_id, request_id):
     requested_by = service_join_request.requester
     requested_by_user = User.from_id(requested_by["id"])
 
-    form = JoinServiceRequestSetPermissionsForm(
-        all_template_folders=current_service.all_template_folders,
-        folder_permissions=[f["id"] for f in current_service.all_template_folders],
-        disable_sms_auth=False if requested_by_user.mobile_number else True,
-    )
-
-    if not current_service.has_permission("email_auth"):
-        form.login_authentication.data = "sms_auth"
+    form = PermissionsForm.from_user_and_service(requested_by_user, current_service)
 
     if form.validate_on_submit():
-        service_join_request.update(
-            status=SERVICE_JOIN_REQUEST_APPROVED,
-            status_changed_by_id=current_user.id,
-            permissions=translate_permissions_from_ui_to_db(form.permissions_field.data),
-            folder_permissions=form.folder_permissions.data,
-            auth_type=form.login_authentication.data,
-        )
+        update_kwargs = {
+            "status": SERVICE_JOIN_REQUEST_APPROVED,
+            "status_changed_by_id": current_user.id,
+            "permissions": translate_permissions_from_ui_to_db(form.permissions_field.data),
+            "folder_permissions": form.folder_permissions.data,
+        }
+
+        # Only change the auth type if this is supported for a service. If a user logs in with a
+        # security key, we generally don't want them to be able to use something less secure.
+        if current_service.has_permission("email_auth") and not requested_by_user.webauthn_auth:
+            update_kwargs["auth_type"] = form.login_authentication.data
+
+        service_join_request.update(**update_kwargs)
 
         flash(f"{requested_by_user.name} has joined this service", "default_with_tick")
         return redirect(url_for(".manage_users", service_id=service_id))

@@ -27,6 +27,8 @@
       This user will login with a security key.
     </p>
   {% else %}
-    {{ form.login_authentication }}
+      {% if form.login_authentication %}
+          {{ form.login_authentication }}
+      {% endif %}
   {% endif %}
 {% endif %}
