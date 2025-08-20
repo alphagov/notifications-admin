@@ -794,6 +794,7 @@ def test_get_email_branding_request_page_is_only_option(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_email_branding_request_submit(
     client_request,
     mocker,

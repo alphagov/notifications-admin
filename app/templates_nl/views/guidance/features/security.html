@@ -13,17 +13,24 @@ Beveiligingskenmerken
 <p class="govuk-body">NotifyNL is ontwikkeld voor de beveiligingseisen van overheidsdiensten.</p>
 <p class="govuk-body">Op deze pagina leest u onze aanpak van:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#running-a-secure-service">het runnen van een veilige dienst</a>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#running-a-secure-service">het runnen van een veilige
+      dienst</a>
   </li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#storing-and-processing-your-data">het opslaan en verwerken van uw gegevens</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-data-in-transit">het beschermen van gegevens tijdens verzending</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-data-at-rest">het beschermen van gegevens in rust</a>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#storing-and-processing-your-data">het opslaan en
+      verwerken van uw gegevens</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-data-in-transit">het beschermen van gegevens
+      tijdens verzending</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-data-at-rest">het beschermen van gegevens in
+      rust</a>
   </li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#building-and-managing-notify">het bouwen en beheren van Notify</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#finding-and-fixing-security-issues">het opsporen en oplossen van beveiligingsproblemen</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#building-and-managing-notify">het bouwen en beheren van
+      Notify</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#finding-and-fixing-security-issues">het opsporen en
+      oplossen van beveiligingsproblemen</a></li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="#security-incidents">beveiligingsincidenten</a></li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="#sign-in-and-api-access">inloggen en API-toegang</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-our-website-and-api">het beschermen van onze website en API</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#protecting-our-website-and-api">het beschermen van onze
+      website en API</a></li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="#email-security">e-mailbeveiliging</a></li>
   <li><a class="govuk-link govuk-link--no-visited-state" href="#security-classifications">beveiligingsclassificaties</a>
   </li>
@@ -36,7 +43,8 @@ Beveiligingskenmerken
 <p class="govuk-body">We beoordelen en herzien onze beveiliging regelmatig volgens:</p>
 <ul class="govuk-list govuk-list--bullet">
   <li><a class="govuk-link govuk-link--no-visited-state"
-      href="https://www.ncsc.nl/wat-kun-je-zelf-doen/basisprincipes">de digitale veerkrachtprincipes van het Nationaal Cyber Security Centrum</a></li>
+      href="https://www.ncsc.nl/wat-kun-je-zelf-doen/basisprincipes">de digitale veerkrachtprincipes van het Nationaal
+      Cyber Security Centrum</a></li>
 </ul>
 <p class="govuk-body">We volgen het dreigingslandschap en voeren regelmatig <a
     class="govuk-link govuk-link--no-visited-state"
@@ -60,7 +68,8 @@ Beveiligingskenmerken
   <li>ontvangersemailadressen, mobiele nummers en adressen</li>
 </ul>
 <p class="govuk-body">Standaard bewaren wij deze gegevens 7 dagen.</p>
-<p class="govuk-body">Zodra uw dienst live is, kunt u zelf bepalen hoe lang NotifyNL gegevens over uw verzonden berichten bewaart.</p>
+<p class="govuk-body">Zodra uw dienst live is, kunt u zelf bepalen hoe lang NotifyNL gegevens over uw verzonden
+  berichten bewaart.</p>
 <p class="govuk-body">Voor meer informatie, zie <a class="govuk-link govuk-link--no-visited-state"
     href="{{ url_for('main.guidance_data_retention_period') }}">gegevensbewaartermijn</a>.</p>
 
@@ -73,15 +82,18 @@ Beveiligingskenmerken
 </ul>
 <p class="govuk-body">Teams die NotifyNL gebruiken, kunnen alleen bij hun eigen gegevens.</p>
 <p class="govuk-body">U kunt <a class="govuk-link govuk-link--no-visited-state"
-    href="{{ url_for('main.guidance_team_members_and_permissions') }}">verschillende rechten instellen voor elk lid van uw team</a>.</p>
+    href="{{ url_for('main.guidance_team_members_and_permissions') }}">verschillende rechten instellen voor elk lid van
+    uw team</a>.</p>
 <p class="govuk-body">AWS zorgt voor logische scheiding tussen verschillende AWS-klanten.</p>
 
 <h3 class="heading-small" id="data-centre-security">Beveiliging van datacenters</h3>
 <p class="govuk-body">AWS beschrijft hun:</p>
 <ul class="govuk-list govuk-list--bullet">
   <li><a class="govuk-link govuk-link--no-visited-state"
-      href="https://aws.amazon.com/compliance/data-center/controls/">fysieke beveiligingsmaatregelen, gegevenssanering en afvoer van apparatuur</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="https://aws.amazon.com/compliance/programs/">materialen voor beveiligingsgarantie</a></li>
+      href="https://aws.amazon.com/compliance/data-center/controls/">fysieke beveiligingsmaatregelen, gegevenssanering
+      en afvoer van apparatuur</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="https://aws.amazon.com/compliance/programs/">materialen
+      voor beveiligingsgarantie</a></li>
 </ul>
 
 <h3 class="heading-small" id="how-text-messages-are-stored-and-processed">Hoe sms’jes worden opgeslagen en verwerkt
@@ -94,7 +106,8 @@ Beveiligingskenmerken
 </ul>
 
 <h2 class="heading-medium" id="protecting-data-in-transit">Het beschermen van gegevens tijdens verzending</h2>
-<p class="govuk-body">NotifyNL gebruikt Transport Layer Security (TLS) versie 1.2 om gegevens te versleutelen wanneer:</p>
+<p class="govuk-body">NotifyNL gebruikt Transport Layer Security (TLS) versie 1.2 om gegevens te versleutelen wanneer:
+</p>
 <ul class="govuk-list govuk-list--bullet">
   <li>gebruikers toegang hebben tot de NotifyNL-website of API</li>
   <li>gegevens via NotifyNL worden verstuurd</li>
@@ -102,22 +115,27 @@ Beveiligingskenmerken
 </ul>
 
 <h3 class="heading-small">E-mails</h3>
-<p class="govuk-body">We proberen e-mails altijd te versleutelen met TLS 1.2, 1.1 of 1.0. Als de mailserver van de ontvanger TLS niet ondersteunt, sturen we de e-mail onbeschermd.</p>
+<p class="govuk-body">We proberen e-mails altijd te versleutelen met TLS 1.2, 1.1 of 1.0. Als de mailserver van de
+  ontvanger TLS niet ondersteunt, sturen we de e-mail onbeschermd.</p>
 <p class="govuk-body">E-mail kan geen end-to-end encryptie bieden.</p>
 
 <h3 class="heading-small">Sms’jes</h3>
 <p class="govuk-body">Sms’jes kunnen geen end-to-end encryptie bieden.</p>
 
 <h2 class="heading-medium" id="protecting-data-at-rest">Het beschermen van gegevens in rust</h2>
-<p class="govuk-body">NotifyNL versleutelt de gegevens die in onze databases en back-ups zijn opgeslagen met AES-256-encryptie.</p>
+<p class="govuk-body">NotifyNL versleutelt de gegevens die in onze databases en back-ups zijn opgeslagen met
+  AES-256-encryptie.</p>
 <p class="govuk-body">Dit geldt ook voor bestanden die u uploadt naar NotifyNL wanneer u:</p>
 <ul class="govuk-list govuk-list--bullet">
-  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">een batch berichten verstuurt</a></li>
-  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_attach_pages') }}">pagina’s toevoegt aan brieven</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">een batch
+      berichten verstuurt</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_attach_pages') }}">pagina’s
+      toevoegt aan brieven</a></li>
 </ul>
 
 <h2 class="heading-medium" id="building-and-managing-notify">Het bouwen en beheren van Notify</h2>
-<p class="govuk-body">We ontwerpen NotifyNL met veiligheid als uitgangspunt, volgens het 'security by design'-principe.</p>
+<p class="govuk-body">We ontwerpen NotifyNL met veiligheid als uitgangspunt, volgens het ’security by design’-principe.
+</p>
 <p class="govuk-body">Ons team implementeert beveiliging gedurende de hele ontwikkelingscyclus, inclusief:</p>
 <ul class="govuk-list govuk-list--bullet">
   <li>continue codebeoordeling</li>
@@ -125,34 +143,31 @@ Beveiligingskenmerken
   <li>gebruik van best practices en frameworks die veiligheid verhogen</li>
 </ul>
 
-<h2 class="heading-medium" id="finding-and-fixing-security-issues">Het opsporen en oplossen van beveiligingsproblemen</h2>
+<h2 class="heading-medium" id="finding-and-fixing-security-issues">Het opsporen en oplossen van beveiligingsproblemen
+</h2>
 <p class="govuk-body">We voeren regelmatig penetratietesten en kwetsbaarhedenscans uit.</p>
-<p class="govuk-body">Wij moedigen beveiligingsonderzoekers aan kwetsbaarheden te melden via ons <a
-    class="govuk-link govuk-link--no-visited-state"
-    href="{{ url_for('main.security_hall_of_fame') }}">responsprogramma</a>.</p>
-
-<h2 class="heading-medium" id="security-incidents">Beveiligingsincidenten</h2>
-<p class="govuk-body">Wij behandelen beveiligingsincidenten volgens onze <a
-    class="govuk-link govuk-link--no-visited-state"
-    href="{{ url_for('main.guidance_security_incident_response') }}">incidentresponsprocedure</a>.</p>
 
 <h2 class="heading-medium" id="sign-in-and-api-access">Inloggen en API-toegang</h2>
 <p class="govuk-body">NotifyNL gebruikt Multi-Factor Authenticatie (MFA) voor gebruikersaccounts.</p>
 <p class="govuk-body">API-sleutels zijn uniek en kunnen worden ingetrokken indien nodig.</p>
 
 <h2 class="heading-medium" id="protecting-our-website-and-api">Het beschermen van onze website en API</h2>
-<p class="govuk-body">We gebruiken firewalls, rate limiting en andere beveiligingsmaatregelen om onze diensten te beschermen tegen ongeautoriseerde toegang en misbruik.</p>
+<p class="govuk-body">We gebruiken firewalls, rate limiting en andere beveiligingsmaatregelen om onze diensten te
+  beschermen tegen ongeautoriseerde toegang en misbruik.</p>
 
 <h2 class="heading-medium" id="email-security">E-mailbeveiliging</h2>
-<p class="govuk-body">We ondersteunen beveiligingsstandaarden zoals SPF, DKIM en DMARC om te voorkomen dat onze e-mails worden vervalst of als spam worden gemarkeerd.</p>
+<p class="govuk-body">We ondersteunen beveiligingsstandaarden zoals SPF, DKIM en DMARC om te voorkomen dat onze e-mails
+  worden vervalst of als spam worden gemarkeerd.</p>
 
 <h2 class="heading-medium" id="security-classifications">Beveiligingsclassificaties</h2>
-<p class="govuk-body">NotifyNL behandelt alle gegevens met het oog op vertrouwelijkheid en integriteit, passend bij het beveiligingsniveau dat door onze klanten wordt vereist.</p>
+<p class="govuk-body">NotifyNL behandelt alle gegevens met het oog op vertrouwelijkheid en integriteit, passend bij het
+  beveiligingsniveau dat door onze klanten wordt vereist.</p>
 
 <h2 class="heading-medium" id="staff">NotifyNL-medewerkers</h2>
 <p class="govuk-body">Ons team volgt beveiligingstrainingen en werkt volgens strikte beveiligingsrichtlijnen.</p>
 
 <h2 class="heading-medium" id="suppliers">Leveranciers</h2>
-<p class="govuk-body">We selecteren onze leveranciers zorgvuldig en eisen dat zij voldoen aan onze beveiligingsstandaarden.</p>
+<p class="govuk-body">We selecteren onze leveranciers zorgvuldig en eisen dat zij voldoen aan onze
+  beveiligingsstandaarden.</p>
 
 {% endblock %}

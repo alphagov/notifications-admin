@@ -115,7 +115,7 @@ def using_notify_nav():
                     "link": "main.guidance_letter_branding",
                 },
                 {
-                    "name": "Links en URL's",
+                    "name": "Links en URL’s",
                     "link": "main.guidance_links_and_URLs",
                 },
                 {
