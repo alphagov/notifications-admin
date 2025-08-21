@@ -3,9 +3,17 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/task-list/macro.html" import govukTaskList %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
 
 {% block service_page_title %}
   Make your service live
+{% endblock %}
+
+{% block backLink %}
+    {% if alternative_backlink %}
+        {{ govukBackLink({ "href": alternative_backlink }) }}
+    {% endif %}
 {% endblock %}
 
 {% block maincolumn_content %}
@@ -21,7 +29,7 @@
         <p class="govuk-body">{{ requester }} sent a request to go live for this service.</p>
         <p class="govuk-body">It can take up to one working day to make a service live. This is because we need to check that it meets our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a>.</p>
       {% else %}
-        <p class="govuk-body">To remove the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">trial mode</a> restrictions and make your service live:</p>
+        <p class="govuk-body">To remove the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">test mode</a> restrictions and make your service live:</p>
         <ol class="govuk-list govuk-list--number">
           <li>Complete the tasks on this page.</li>
           <li>Select ‘Send a request to go live’</li>
@@ -43,7 +51,7 @@
               "classes": "govuk-link--no-visited-state",
             },
             "href": url_for('main.estimate_usage', service_id=current_service.id),
-            "status": completed_status if current_service.has_estimated_usage else not_completed_status,
+            "status": completed_status if current_service.go_live_sending_options_complete else not_completed_status,
           },
           {
             "title": {
@@ -65,7 +73,15 @@
 
         {# all the conditional task #}
         {% if current_service.intending_to_send_email %}
-          {% do task_list_items.append(
+          {% do task_list_items.extend(
+            [{
+              "title": {
+                "text": "Choose a ‘from’ name",
+                "classes": "govuk-link--no-visited-state",
+              },
+              "href":  url_for('main.service_email_sender_change', service_id=current_service.id),
+              "status": completed_status if current_service.has_confirmed_email_sender else not_completed_status,
+            },
             {
               "title": {
                 "text": "Add a reply-to email address",
@@ -73,7 +89,7 @@
               },
               "href":  url_for('main.service_email_reply_to', service_id=current_service.id),
               "status": completed_status if current_service.has_email_reply_to_address else not_completed_status,
-            }
+            }]
           )%}
         {% endif %}
         {% if (current_service.intending_to_send_sms and current_service.shouldnt_use_govuk_as_sms_sender) %}

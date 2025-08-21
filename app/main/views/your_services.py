@@ -1,4 +1,4 @@
-from flask import redirect, render_template, session, url_for
+from flask import redirect, render_template, request, session, url_for
 from flask_login import current_user
 
 from app import status_api_client
@@ -21,6 +21,8 @@ def services_or_dashboard():
 @main.route("/your-services")
 @user_is_logged_in
 def your_services():
+    new_user_account = request.args.get("new_user_account")
+
     org_count, live_service_count = None, None
     if current_user.platform_admin:
         org_count, live_service_count = (
@@ -32,6 +34,7 @@ def your_services():
         can_add_service=current_user.is_gov_user,
         org_count=org_count,
         live_service_count=live_service_count,
+        new_user_account=new_user_account,
     )
 
 
