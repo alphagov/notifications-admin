@@ -72,17 +72,31 @@ jobs:
         run: npm run lint:js
 
       - name: Jest tests
-        run: npm run test-report                # run tests (configured to use jest-junit reporter)
+        run: npm run test-report
 
       - uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}
         with:
           name: JEST Tests
           path: reports/jest-*.xml
           reporter: jest-junit
           only-summary: true
           use-actions-summary: false
+          badge-title: JEST
 
       - uses: pavelzw/pytest-action@v2
         with:
+          job-summary: false
           verbose: false
           emoji: false
+          custom-arguments: --junitxml=reports/pytest-unit.xml
+
+      - uses: dorny/test-reporter@v2
+        if: ${{ !cancelled() }}
+        with:
+          name: PyTest Tests
+          path: reports/pytest-*.xml
+          reporter: java-junit
+          only-summary: true
+          use-actions-summary: false
+          badge-title: PYTEST

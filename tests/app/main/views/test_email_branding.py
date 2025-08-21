@@ -178,7 +178,6 @@ def test_view_email_branding_bottom_links(
     assert archive_link["href"] == url_for(".platform_admin_confirm_archive_email_branding", branding_id=fake_uuid)
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] [FIXME] Non-smart quote or apostrophe found")
 def test_edit_email_branding_shows_the_correct_branding_info(
     client_request, platform_admin_user, mock_get_email_branding, fake_uuid
 ):
@@ -195,7 +194,6 @@ def test_edit_email_branding_shows_the_correct_branding_info(
     assert page.select_one("#colour").attrs.get("value") == "f00"
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] [FIXME] Non-smart quote or apostrophe found")
 def test_create_email_branding_does_not_show_any_branding_info(client_request, platform_admin_user):
     client_request.login(platform_admin_user)
     page = client_request.get(
@@ -209,7 +207,6 @@ def test_create_email_branding_does_not_show_any_branding_info(client_request, p
     assert page.select_one("#colour").attrs.get("value") is None
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] [FIXME] Non-smart quote or apostrophe found")
 def test_create_email_branding_can_be_populated_from_querystring(client_request, platform_admin_user):
     client_request.login(platform_admin_user)
     page = client_request.get(

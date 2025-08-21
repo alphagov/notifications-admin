@@ -327,7 +327,7 @@ def test_routes_have_permissions_decorators():
             assert "user_is_logged_in" not in decorators, (
                 f"@user_is_logged_in used with @user_is_platform_admin\n"
                 f"Use @user_is_platform_admin only\n"
-                f"app/main/views/{file}.py::{function}\n"
+                f"app/main/views_nl/{file}.py::{function}\n"
             )
 
 
