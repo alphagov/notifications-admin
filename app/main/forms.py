@@ -1043,14 +1043,6 @@ class JoinServiceRequestApproveForm(StripWhitespaceForm):
     )
 
 
-class JoinServiceRequestSetPermissionsForm(PermissionsForm):
-    custom_field_order: tuple = (
-        "permissions_field",
-        "folder_permissions",
-        "login_authentication",
-    )
-
-
 class OrganisationUserPermissionsForm(StripWhitespaceForm):
     permissions_field = GovukCheckboxesField(
         "Permissions",
