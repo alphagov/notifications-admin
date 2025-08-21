@@ -907,7 +907,6 @@ def test_should_show_page_for_inviting_user_with_email_prefilled(
     assert not page.select("input#email_address") or page.select("input[type=email]")
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] [FIXME] UNEXPECTED")
 def test_should_show_page_if_prefilled_user_is_already_a_team_member(
     client_request,
     mock_get_template_folders,
@@ -939,7 +938,6 @@ def test_should_show_page_if_prefilled_user_is_already_a_team_member(
     assert not page.select("form")
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] [FIXME] UNEXPECTED")
 def test_should_show_page_if_prefilled_user_is_already_invited(
     client_request,
     mock_get_template_folders,
