@@ -23,7 +23,7 @@
         </div>
       {% endif %}
       <p class="govuk-body">
-        Logo's moeten PNG-bestanden zijn, 108 px hoog
+        Logo’s moeten PNG-bestanden zijn, 108 px hoog
       </p>
       {{ file_upload(form.file, allowed_file_extensions=['png'], button_text='{} logo'.format('Bijwerken' if email_branding else 'Uploaden')) }}
       {% call form_wrapper() %}
