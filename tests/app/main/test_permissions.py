@@ -271,7 +271,6 @@ def format_decorators(decorators, indent=8):
     return "\n".join(f"{' ' * indent}@{decorator}" for decorator in decorators)
 
 
-# TODO: FIXME these are broken because of the routing being changed
 def test_code_to_extract_decorators_works_with_known_examples():
     assert (
         "templates.choose_template",
