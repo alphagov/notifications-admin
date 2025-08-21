@@ -1,0 +1,37 @@
+{% extends "withnav_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ form.logo.label.text }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(form.logo.label.text) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <p class="govuk-body">
+      Uw logo moet voldoen aan de volgende eisen:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>een PNG-bestand zijn</li>
+        <li>minimaal 108 pixels hoog zijn</li>
+        <li>een liggende afbeelding met een transparante achtergrond zijn</li>
+      </ul>
+      <p class="govuk-body">
+        Wij raden staande afbeeldingen af, omdat deze erg klein zullen lijken. Dit komt doordat de ruimte voor e-mailhuisstijl een vaste hoogte heeft.
+      </p>
+      {{ file_upload(form.logo, allowed_file_extensions=[form.EXPECTED_LOGO_FORMAT], button_text='Logo uploaden') }}
+      <p class="govuk-body govuk-!-margin-top-4">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ abandon_flow_link }}">Ik heb geen bestand om te uploaden</a>
+      </p>
+    </div>
+  </div>
+
+{% endblock %}

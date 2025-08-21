@@ -1,0 +1,44 @@
+{% from "components/table.html" import list_table, field %}
+{% from "components/previous-next-navigation.html" import previous_next_navigation %}
+
+<div class="ajax-block-container">
+  {% if messages %}
+    <p class="bottom-gutter-2-3 top-gutter-1-2">
+      <a href="{{ url_for('main.inbox_download', service_id=current_service.id) }}" download class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">Download alle berichten</a>
+    </p>
+  {% endif %}
+  {% call(item, row_number) list_table(
+    messages,
+    caption="Inbox",
+    caption_visible=False,
+    empty_message='Wanneer gebruikers een sms sturen naar het telefoonnummer van uw dienst ({}) ziet u hier de berichten'.format(inbound_number),
+    field_headings=[
+      {
+        'text':'Van',
+        'classes': 'govuk-!-width-two-thirds--static'
+      },
+      {
+        'text':'Eerste twee regels van bericht',
+        'classes': 'govuk-!-width-one-third--static'
+      }
+    ],
+    field_headings_visible=False
+  ) %}
+    {% call field() %}
+      <a
+        class="govuk-link govuk-link--no-visited-state file-list-filename"
+        href="{{ url_for('main.conversation', service_id=current_service.id, notification_id=item.id) }}"
+      >
+        {{ item.user_number | format_phone_number_human_readable }}
+      </a>
+      <span class="file-list-hint file-list-hint--flow-text">{{ item.content }}</span>
+    {% endcall %}
+    {% call field(align='right') %}
+      <span class="align-with-message-body">
+        {{ item.created_at | format_delta }}
+      </span>
+    {% endcall %}
+  {% endcall %}
+
+  {{ previous_next_navigation(prev_page, next_page) }}
+</div>

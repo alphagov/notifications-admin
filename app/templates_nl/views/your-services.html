@@ -1,0 +1,154 @@
+{% extends "withoutnav_template.html" %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% macro service_list(
+  heading,
+  organisations=[],
+  services=[]
+) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      <h2>
+        {{ heading }}
+      </h2>
+    </div>
+    <div class="govuk-grid-column-three-quarters">
+      <ul>
+  {% for org in organisations|sort %}
+    <li class="browse-list-item">
+      <a href="{{ url_for('main.organisation_dashboard', org_id=org.id) }}" class="govuk-link govuk-link--no-visited-state">{{ org.name }}</a>
+      <p class="browse-list-hint">
+        {{ org.count_of_live_services }}
+        actieve service{% if org.count_of_live_services != 1 %}s{% endif %}
+      </p>
+    </li>
+  {% endfor %}
+  {% for service in services|sort %}
+    <li class="browse-list-item">
+      <a href="{{ url_for('main.service_dashboard', service_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
+    </li>
+  {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="keyline-block"></div>
+{% endmacro %}
+
+{% macro no_service(
+  heading,
+  no_live_service_text
+) %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      <h2>
+        {{heading}}
+      </h2>
+    </div>
+    <div class="govuk-grid-column-three-quarters">
+        <ul>
+          <li class="browse-list-item">
+            <p class="browse-list-hint">
+              {{no_live_service_text}}
+            </p>
+          </li>
+        </ul>
+    </div>
+  </div>
+  <div class="keyline-block"></div>
+{% endmacro %}
+
+{% if current_user.organisations %}
+  {% set thing_to_choose_between = 'organisaties en services' %}
+{% else %}
+  {% set thing_to_choose_between = 'services' %}
+{% endif %}
+
+{% block per_page_title %}
+  Uw {{ thing_to_choose_between }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <h1 class="heading-large">
+    Uw {{ thing_to_choose_between }}
+  </h1>
+
+  <nav class="browse-list">
+    {% if current_user.platform_admin %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+          <h2>
+            Platformbeheerder
+          </h2>
+        </div>
+        <ul class="govuk-grid-column-three-quarters">
+          <li class="browse-list-item">
+            <a href="{{ url_for('main.organisations') }}" class="govuk-link govuk-link--no-visited-state">Alle organisaties</a>
+            <p class="browse-list-hint">
+              {{ org_count|format_thousands }} organisaties, {{ live_service_count|format_thousands }} actieve services
+            </p>
+          </li>
+        </ul>
+      </div>
+      <div class="keyline-block"></div>
+    {% endif %}
+
+    {% if current_user.organisations %}
+      {{ service_list(
+        heading='Organisaties',
+        organisations=current_user.organisations,
+      ) }}
+    {% endif %}
+
+    {% if current_user.live_services %}
+      {{ service_list(
+        heading='Actieve services',
+        services=current_user.live_services
+      ) }}
+    {% else %}
+      {{ no_service(
+        heading='Actieve services',
+        no_live_service_text='Geen actieve services'
+      ) }}
+    {% endif %}
+
+    {% if current_user.trial_mode_services %}
+      {{ service_list(
+        heading='Services in proefmodus',
+        services=current_user.trial_mode_services
+      ) }}
+    {% else %}
+      {{ no_service(
+        heading='Services in proefmodus',
+        no_live_service_text='Geen services in proefmodus'
+      ) }}
+    {% endif %}
+
+  </nav>
+
+  {% if can_add_service %}
+    <div class="js-stick-at-bottom-when-scrolling">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter">
+          &nbsp;
+        </div>
+        <div class="govuk-grid-column-three-quarters">
+        {{ govukButton({
+          "element": "a",
+          "text": "Nieuwe service toevoegen",
+          "href": url_for('main.add_service'),
+          "classes": "govuk-button--secondary govuk-!-margin-right-3"
+        }) }}
+        {% if current_user.default_organisation.can_ask_to_join_a_service %}
+          {{ govukButton({
+            "element": "a",
+            "text": "Deelnemen aan bestaande service",
+            "href": url_for('main.join_service_choose_service'),
+            "classes": "govuk-button--secondary"
+          }) }}
+        {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+{% endblock %}

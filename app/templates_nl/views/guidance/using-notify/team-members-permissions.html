@@ -1,0 +1,31 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  Teamleden en rechten
+{% endblock %}
+
+{% block content_column_content %}
+  <h1 class="heading-large">Teamleden en rechten</h1>
+
+  <p class="govuk-body">Notify stelt u in staat om verschillende rechten toe te wijzen aan elk lid van uw team.</p>
+
+  <p class="govuk-body">Ga naar de {{ service_link(current_service, 'main.manage_users', 'teamleden') }} pagina om:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>mensen uit te nodigen voor uw dienst</li>
+    <li>te bepalen wie berichten mag zien, toevoegen, bewerken en verzenden</li>
+    <li>andere teamleden toe te staan om uw dienstinstellingen te wijzigen</li>
+    <li>het e-mailadres en telefoonnummer van een teamlid bij te werken</li>
+    <li>de aanmeldmethode van elk teamlid te wijzigen</li>
+    <li>teamleden te verwijderen die niet meer werkzaam zijn</li>
+  </ul>
+  <p class="govuk-body">
+    U moet minimaal één teamlid toevoegen met de rechten ‘instellingen, team en gebruik beheren’.
+    Deze persoon is verantwoordelijk voor uw dienst als u zich niet kunt aanmelden bij Notify.
+  </p>
+  <p class="govuk-body">U kunt teamleden uitnodigen die geen e-mailadres van de overheid hebben.</p>
+{% endblock %}

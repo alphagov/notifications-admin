@@ -1,0 +1,82 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner %}
+{% from "components/ajax-block.html" import ajax_block %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/table.html" import list_table, text_field, row_heading %}
+
+{% block service_page_title %}
+  {{ job.original_file_name }}
+{% endblock %}
+
+{% block backLink %}
+  {% if not just_sent %}
+    {{ govukBackLink({ "href": url_for('main.uploads', service_id=current_service.id) }) }}
+  {% endif %}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ page_header(job.original_file_name) }}
+
+    {% if just_sent and job.template_type == 'letter' %}
+      {{ banner(just_sent_message, type='default', with_tick=True) }}
+    {% else %}
+      {{ ajax_block(partials, updates_url, 'status', finished=job.processing_finished) }}
+    {% endif %}
+    {{ ajax_block(partials, updates_url, 'counts', finished=job.processing_finished) }}
+    {{ ajax_block(partials, updates_url, 'notifications', finished=job.processing_finished) }}
+
+    {% if scheduled_recipients %}
+      <div data-notify-module="remove-in-presence-of" data-target-element-id="job-notifications">
+        <div class="fullscreen-content" data-notify-module="fullscreen-table">
+          {% call(item, row_number) list_table(
+            scheduled_recipients.displayed_rows,
+            caption=job.original_file_name,
+            caption_visible=False,
+            field_headings=[
+              '<span class="govuk-visually-hidden">Rij in bestand</span><span aria-hidden="true">1</span>'|safe
+            ] + scheduled_recipients.column_headers
+          ) %}
+            {% call row_heading() %}
+              <span>
+                {{ item.index + 2 }}
+              </span>
+            {% endcall %}
+            {% for column in scheduled_recipients.column_headers %}
+              {% if item[column].ignore %}
+                {{ text_field(item[column].data or '', status='default') }}
+              {% else %}
+                {{ text_field(item[column].data or '') }}
+              {% endif %}
+            {% endfor %}
+            {% if item[None].data %}
+              {% for column in item[None].data %}
+                {{ text_field(column, status='default') }}
+              {% endfor %}
+            {% endif %}
+          {% endcall %}
+        </div>
+
+        <div class="table-show-more-link">
+          {% if scheduled_recipients|length > scheduled_recipients.displayed_rows|list|length %}
+            <p class="govuk-!-margin-bottom-1">Er worden alleen de eerste {{ scheduled_recipients.displayed_rows|list|length }} rijen getoond</p>
+          {% endif %}
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job_original_file_csv', service_id=current_service.id, job_id=job.id) }}" download>Download dit bestand (CSV)</a>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if job.letter_job_can_be_cancelled %}
+      <div class="js-stick-at-bottom-when-scrolling">
+        <div class="page-footer">
+          <span class="page-footer-link page-footer-delete-link-without-button">
+            <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.cancel_letter_job', service_id=current_service.id, job_id=job.id) }}">Verzending van deze brieven annuleren</a>
+          </span>
+        </div>
+      </div>
+    {% else %}
+      <div>&nbsp;</div>
+    {% endif %}
+
+{% endblock %}

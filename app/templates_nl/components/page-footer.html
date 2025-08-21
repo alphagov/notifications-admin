@@ -1,0 +1,59 @@
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% macro page_footer(
+  button_text=None,
+  button_name=None,
+  button_value=None,
+  button_text_hidden_suffix=None,
+  destructive=False,
+  secondary_link=False,
+  secondary_link_text=None,
+  delete_link=False,
+  delete_link_text="verwijderen",
+  centered_button=False,
+  button_url=None
+) %}
+  <div class="page-footer">
+    {% if button_text %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+      {% set button_data = {"text": button_text, "classes": "page-footer__button"} %}
+      {% if destructive %}{% do button_data.update({"classes": "govuk-button--warning page-footer__button"}) %}{% endif %}
+      {% if centered_button %}{% do button_data.update({"classes": "page-footer__button--centred"}) %}{% endif %}
+      {% if button_url %}
+        {% do button_data.update({
+          "classes": "govuk-button--secondary",
+          "href": button_url }) %}
+      {% endif %}
+      {% if button_name %}{% do button_data.update({"name": button_name}) %}{% endif %}
+      {% if button_value %}{% do button_data.update({"value": button_value}) %}{% endif %}
+      {% if button_text_hidden_suffix %}
+        {% set html %}
+          {{ button_text }}<span class="govuk-visually-hidden"> {{button_text_hidden_suffix}}</span>
+        {% endset %}
+        {% do button_data.update({
+          "text": "",
+          "html": html
+        }) %}
+      {% endif %}
+
+      {{ govukButton(button_data) }}
+
+    {% endif %}
+    {% if delete_link %}
+      <span class="page-footer-link {% if not button_text %}page-footer-delete-link-without-button{% endif %}">
+        <a class="govuk-link govuk-link--destructive" href="{{ delete_link }}">{{ delete_link_text }}</a>
+      </span>
+    {% endif %}
+    {% if secondary_link and secondary_link_text %}
+      <a class="govuk-link govuk-link--no-visited-state page-footer-secondary-link" href="{{ secondary_link }}">{{ secondary_link_text }}</a>
+    {% endif %}
+
+  </div>
+{% endmacro %}
+
+{% macro sticky_page_footer(button_text=None) %}
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ page_footer(button_text) }}
+  </div>
+{% endmacro %}

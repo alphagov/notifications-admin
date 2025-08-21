@@ -1,0 +1,79 @@
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+<div class="ajax-block-container">
+  {% if verification_status == "pending" %}
+    <div role="status"></div>
+    {{ page_header('Controle van het antwoordadres') }}
+    <div role="status">
+      <p class="govuk-body">
+        We moeten controleren of ‘{{ reply_to_email_address }}’ een echt e-mailadres is.
+      </p>
+      <p class="govuk-body">
+        Dit kan tot een minuut duren.
+      </p>
+      <p class="govuk-body">
+        <span class='loading-indicator'>Een ogenblik geduld alstublieft</span>
+      </p>
+    </div>
+
+    <p class="js-hidden govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_verify_reply_to_address', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace) }}">Vernieuwen</a>
+    </p>
+  {% elif verification_status == "success" %}
+    {{ page_header('Controle van het antwoordadres') }}
+    <div role="status">
+      <p class="govuk-body">
+        De controle is voltooid.
+      </p>
+      <p class="govuk-body">
+        We hebben ‘{{ reply_to_email_address }}’ toegevoegd aan uw lijst met antwoordadressen.
+      </p>
+    </div>
+    <div class="js-stick-at-bottom-when-scrolling">
+      {{ govukButton({
+        "element": "a",
+        "text": "Doorgaan",
+        "href": url_for('main.service_email_reply_to', service_id=service_id)
+      }) }}
+    </div>
+  {% elif verification_status == "failure" %}
+    <div class="bottom-gutter">
+      {% call banner_wrapper(type='dangerous') %}
+        <h2 class='banner-title'>
+          Er is een probleem met uw antwoordadres
+        </h2>
+        <p class="govuk-body">
+          We hebben een e-mail gestuurd naar ‘{{ reply_to_email_address }}’, maar deze kon niet worden afgeleverd.
+        </p>
+        <p class="govuk-body">
+          U kunt het opnieuw proberen of een ander adres gebruiken.
+        </p>
+      {% endcall %}
+    </div>
+    {{ page_header('Controle van het antwoordadres') }}
+    {% if replace %}
+      {% set form_url = url_for('main.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
+    {% else %}
+      {% set form_url = url_for('main.service_add_email_reply_to', service_id=service_id) %}
+    {% endif %}
+    {% call form_wrapper(
+      action = form_url
+    ) %}
+      {{ form.email_address(
+          param_extensions={
+            "hint": {"text": "Dit moet een gedeelde inbox zijn die door uw team wordt beheerd, niet uw persoonlijke e-mailadres"},
+            "classes": "govuk-!-width-full"
+          },
+          error_message_with_html=True
+      ) }}
+      {% if not first_email_address and not existing_is_default %}
+        {{ form.is_default }}
+      {% endif %}
+      {{ page_footer('Opnieuw proberen') }}
+    {% endcall %}
+  {% endif %}
+</div>

@@ -1,0 +1,35 @@
+{% extends "content_template.html" %}
+
+{# Wordt gebruikt door de content_template.html-layout, prefix voor de toegankelijke naam van de "navigation" #}
+{% set navigation_label_prefix = 'Prijsinformatie' %}
+
+{% block per_page_title %}
+  Prijzen
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Prijzen</h1>
+
+  <p class="govuk-body">Het is gratis om e-mails te versturen via NotifyNL. Er zijn ook geen maandelijkse kosten, geen aansluitkosten en geen inkoopkosten.</p>
+  <p class="govuk-body">U hoeft alleen te betalen als u:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>uw <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">gratis sms-tekstaanvraag</a> overschrijdt</li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">brieven verzendt</a></li>
+  </ul>
+
+  <p class="govuk-body">Bekijk <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_how_to_pay') }}">hoe u kunt betalen</a>.</p>
+
+  <h2 class="heading-medium">Probeer Notify gratis uit</h2>
+
+  <p class="govuk-body">Wanneer u een nieuwe dienst toevoegt, start deze in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">proefmodus</a>.</p>
+
+  <p class="govuk-body">
+    {% if not current_user.is_authenticated %}
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.register') }}">Maak een account aan</a> en voeg daarna zoveel unieke diensten toe als u nodig heeft.
+    {% else %}
+      U kunt zoveel unieke diensten toevoegen als u nodig heeft.
+    {% endif %}
+  </p>
+
+{% endblock %}

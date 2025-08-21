@@ -1,0 +1,113 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/table.html" import edit_field, mapping_table, row, field %}
+{% from "components/webauthn-api-check.html" import webauthn_api_check %}
+{% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
+
+{% set page_title = 'Beveiligingssleutels' %}
+{% set credentials = current_user.webauthn_credentials %}
+
+{% block extra_javascripts_before_body %}
+  {{ webauthn_api_check() }}
+{% endblock %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.your_account') }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+{% set webauthn_button %}
+  {{ govukButton({
+    "element": "button",
+    "text": "Registreer een sleutel",
+    "classes": "govuk-button--secondary webauthn__api-required",
+    "attributes": {
+      "data-notify-module": "register-security-key",
+      "data-csrf-token": csrf_token(),
+    }
+  }) }}
+{% endset %}
+
+{% set errorSummaries %}
+  {{ govukErrorSummary({
+    "classes": "webauthn__api-missing",
+    "titleText": "Er is een probleem",
+    "descriptionText": "Uw browser ondersteunt geen beveiligingssleutels. Probeer in te loggen met Notify via een andere browser."
+  }) }}
+
+  {{ govukErrorSummary({
+    "classes": "webauthn__no-js",
+    "titleText": "Er is een probleem",
+    "descriptionText": "JavaScript is niet beschikbaar op deze pagina. Beveiligingssleutels hebben JavaScript nodig om te functioneren."
+  }) }}
+
+  {% set keyProblemDescription %}
+    Controleer of u de juiste sleutel gebruikt en probeer het opnieuw. Werkt dit niet,
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">neem contact met ons op</a>.
+  {% endset %}
+
+  {{ govukErrorSummary({
+    "classes": "govuk-!-display-none",
+    "attributes": { "aria-live": "polite", "tabindex":"-1" },
+    "titleText": "Er is een probleem met uw beveiligingssleutels",
+    "descriptionHtml": keyProblemDescription
+  }) }}
+{% endset %}
+
+  <div class="govuk-grid-row">
+
+    {% if credentials %}
+      <div class="govuk-grid-column-five-sixths">
+        {{ errorSummaries }}
+        {{ page_header(page_title) }}
+        <div class="body-copy-table">
+          {% call mapping_table(
+            caption=page_title,
+            field_headings=['Details beveiligingssleutel', 'Actie'],
+            field_headings_visible=False,
+            caption_visible=False,
+          ) %}
+            {% for credential in credentials %}
+              {% call row() %}
+                {% call field() %}
+                  <div class="govuk-body govuk-!-margin-bottom-2">{{ credential.name }}</div>
+                  <div class="govuk-hint govuk-!-margin-bottom-2">
+                    {% if credential.logged_in_at %}
+                      Laatst gebruikt {{ credential.logged_in_at|format_delta }}
+                    {% else %}
+                      Nooit gebruikt (geregistreerd {{ credential.created_at|format_delta }})
+                    {% endif %}
+                  </div>
+                {% endcall %}
+                {{ edit_field('Beheren', url_for('main.your_account_manage_security_key', key_id=credential.id)) }}
+              {% endcall %}
+            {% endfor %}
+          {% endcall %}
+        </div>
+        {{ webauthn_button }}
+      </div>
+    {% else %}
+      <div class="govuk-grid-column-one-half">
+        {{ page_header(page_title) }}
+        <p class="govuk-body">
+          Beveiligingssleutels zijn een alternatieve manier om in te loggen bij Notify,
+          in plaats van het ontvangen van een code via sms.
+        </p>
+        <p class="govuk-body">
+          U kunt elke sleutel gebruiken die compatibel is met de WebAuthn-standaard.
+        </p>
+        {{ webauthn_button }}
+      </div>
+      <div class="govuk-grid-column-one-quarter">
+        <img src="{{ asset_url('images/security-key.svg') }}" alt="" class="webauthn-illustration" width="149" height="150">
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,48 @@
+<div class="ajax-block-container">
+  {% for message in conversation %}
+
+  {% if message.status == 'delivered' %}
+    {% set status_text_in_heading = 'Verzonden' %}
+    {% set visual_status_text %}
+      <time class="sms-message-status sms-message-status-outbound" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
+        {{ message.created_at | format_datetime_relative }}
+      </time>
+    {% endset %}
+  {% elif message.status in ['pending', 'sending', 'created'] %}
+    {% set status_text_in_heading = 'Bezig met verzenden sinds' %}
+    {% set visual_status_text %}
+      <time class="sms-message-status sms-message-status-outbound hint" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
+        bezig met verzenden
+      </time>
+    {% endset %}
+  {% else %}
+    {% set status_text_in_heading = 'Mislukt' %}
+    {% set visual_status_text %}
+      <time class="sms-message-status sms-message-status-outbound table-field-error-label" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
+        Mislukt (verzonden {{ message.created_at | format_datetime_relative }})
+      </time>
+    {% endset %}
+  {% endif %}
+
+    <div class="govuk-grid-row sms-message-row" id="n{{ message.id }}">
+      {% if message.inbound %}
+        <div class="govuk-grid-column-two-thirds sms-message-inbound">
+          <h2 class="govuk-visually-hidden">Ontvangen {{ message.created_at | format_datetime_relative }}</h2>
+          {{ message.content | string }}
+          <time class="sms-message-status" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
+            {{ message.created_at | format_datetime_relative }}
+          </time>
+        </div>
+      {% else %}
+        <div class="govuk-grid-column-one-third">
+          &nbsp;
+        </div>
+        <div class="govuk-grid-column-two-thirds">
+          <h2 class="govuk-visually-hidden">{{ status_text_in_heading }} {{ message.created_at | format_datetime_relative }}</h2>
+          {{ message.content | string }}
+          {{ visual_status_text }}
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

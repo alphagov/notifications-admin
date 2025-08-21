@@ -1,0 +1,42 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = form.branding_options.label.text %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": back_link
+  }) }}
+{% endblock %}
+
+{% set prompt_text -%}
+  {% if branding_choice == "org" %}
+    De huisstijl van {{ current_service.organisation_name }} is nog niet ingesteld.
+  {% elif branding_choice == "govuk_and_org" %}
+    De huisstijl van GOV.UK en {{ current_service.organisation_name }} is nog niet ingesteld.
+  {% endif %}
+{%- endset %}
+
+{% block maincolumn_content %}
+  {% call form_wrapper() %}
+    {% if prompt_text %}
+      {% set param_extensions = {
+        "hint":{
+          "text": prompt_text,
+          "classes": "notify-hint--paragraph",
+        }
+      } %}
+    {% else %}
+      {% set param_extensions = {} %}
+    {% endif %}
+    {{ form.branding_options(param_extensions=param_extensions) }}
+    {{ page_footer('Doorgaan') }}
+  {% endcall %}
+
+{% endblock %}

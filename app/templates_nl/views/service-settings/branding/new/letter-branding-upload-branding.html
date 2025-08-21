@@ -1,0 +1,44 @@
+{% extends "withnav_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ form.branding.label.text }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(form.branding.label.text) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      <p class="govuk-body">
+        {% if branding_choice == 'organisation' %}
+          De huisstijl van {{ current_service.organisation.name }} is nog niet ingesteld.
+        {% endif %}
+      </p>
+      <p class="govuk-body">
+        Het logo voor uw briefehuisstijl moet als een SVG-bestand worden opgeslagen.
+      </p>
+      <p class="govuk-body">
+        Het bestand mag niet bevatten:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>een ingesloten rasterafbeelding</li>
+        <li>tekst die niet is omgezet in paden</li>
+      </ul>
+      <p class="govuk-body">
+        Portretafbeeldingen raden wij af omdat deze erg klein worden weergegeven. Dit komt doordat de ruimte voor briefhuisstijl een vaste hoogte heeft.
+      </p>
+      {{ file_upload(form.branding, allowed_file_extensions=[form.EXPECTED_BRANDING_FORMAT], button_text='Upload huisstijl') }}
+      <p class="govuk-body govuk-!-margin-top-4">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ abandon_flow_link }}">Ik heb geen bestand om te uploaden</a>
+      </p>
+    </div>
+  </div>
+
+{% endblock %}

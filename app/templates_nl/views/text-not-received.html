@@ -1,0 +1,29 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+Als u geen beveiligingscode ontvangt
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-large">Als u geen beveiligingscode ontvangt</h1>
+
+    <ol class="govuk-list govuk-list--number">
+      <li>Controleer of u wel sms-berichten van andere nummers kunt ontvangen.</li>
+      <li>Zet uw telefoon uit en weer aan.</li>
+      <li>Controleer of het mobiele nummer dat u heeft ingevoerd correct is.</li>
+      <li>Vraag een nieuwe beveiligingscode aan.</li>
+    </ol>
+
+      {% call form_wrapper() %}
+        {{ form.mobile_number }}
+        {{ page_footer("Beveiligingscode opnieuw verzenden") }}
+      {% endcall %}
+  </div>
+</div>
+
+{% endblock %}

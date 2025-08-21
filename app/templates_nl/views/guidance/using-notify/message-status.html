@@ -1,0 +1,105 @@
+{% extends "content_template.html" %}
+
+{% from "components/pill.html" import pill %}
+{% from "components/service-link.html" import service_link %}
+{% from "components/table.html" import mapping_table, row, text_field %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+{% set page_title = 'Status van bericht' %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">{{ page_title }}</h1>
+
+  <p class="govuk-body">Gebruik het {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }} om de status van een bericht te controleren.</p>
+  <p class="govuk-body">Op deze pagina vindt u de statussen die u ziet wanneer u bent ingelogd bij NotifyNL.</p>
+  <p class="govuk-body">Als u de Notify API gebruikt, leest u onze <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">documentatie</a> voor een lijst met API-statussen.</p>
+
+  <div class="govuk-!-margin-bottom-3">
+    {{ pill(
+      (
+        ("E-mails", "email", url_for(".guidance_message_status"), 0),
+        ("Sms-berichten", "sms", url_for(".guidance_message_status", notification_type="sms"), 0),
+        ("Brieven", "letter", url_for(".guidance_message_status", notification_type="letter"), 0),
+      ),
+      current_value=notification_type,
+      show_count=False,
+    ) }}
+  </div>
+
+  {% if notification_type == "email" %}
+    {% call mapping_table(
+      caption='Statussen van berichten – e-mails',
+      field_headings=['Status', 'Beschrijving'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_status, description in [
+        ('Verzenden', 'Notify heeft het bericht naar de provider gestuurd. De provider probeert het bericht tot 72 uur bij de ontvanger af te leveren. Notify wacht op bezorginformatie.'),
+        ('Bezorgd', 'Het bericht is succesvol afgeleverd. Notify geeft niet door of een gebruiker het bericht heeft geopend of gelezen.'),
+        ('E-mailadres bestaat niet', 'De provider kon het bericht niet afleveren omdat het e-mailadres onjuist was. U dient deze e-mailadressen uit uw database te verwijderen.'),
+        ('Postvak kan nu geen berichten ontvangen', 'De provider kon het bericht niet afleveren. Dit kan gebeuren als het postvak van de ontvanger vol is of als de spamfilter uw e-mail afwijst. <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages#protect-your-users-from-spam-and-phishing">Controleer of uw inhoud niet op spam lijkt</a> voordat u het bericht opnieuw probeert te verzenden.' | safe),
+        ('Technische storing', 'Uw bericht is niet verzonden door een probleem tussen Notify en de provider. U zult uw berichten opnieuw moeten versturen.'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_status) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+
+  {% endif %}
+  {% if notification_type == "sms" %}
+
+    {% call mapping_table(
+      caption='Statussen van berichten – sms-berichten',
+      field_headings=['Status', 'Beschrijving'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_status, description in [
+        ('Verzenden', 'Notify heeft het bericht naar de provider gestuurd. De provider probeert het bericht tot 72 uur bij de ontvanger af te leveren. Notify wacht op bezorginformatie.'),
+        ('Verzonden naar een internationaal nummer', 'Mobiele netwerken in sommige landen verstrekken geen bezorginformatie meer.'),
+        ('Bezorgd', 'Het bericht is succesvol afgeleverd. Notify geeft niet door of een gebruiker het bericht heeft geopend of gelezen.'),
+        ('Niet bezorgd', ('De provider kon het bericht niet afleveren. Dit kan gebeuren als het telefoonnummer onjuist is of als de netwerkoperator het bericht weigert. Als u zeker weet dat deze telefoonnummers correct zijn, kunt u <a class="govuk-link govuk-link--no-visited-state" href="' + url_for(".support") + '">contact met ons opnemen</a>. Zo niet, dan dient u ze uit uw database te verwijderen. U krijgt nog wel kosten voor sms’jes die niet bezorgd kunnen worden.')|safe),
+        ('Telefoon kan nu geen berichten ontvangen', 'De provider kon het bericht niet afleveren. Dit kan gebeuren als de telefoon van de ontvanger uitstaat, geen bereik heeft of de inbox voor sms-berichten vol is. U kunt het bericht opnieuw proberen te verzenden. U krijgt nog wel kosten voor sms’jes naar telefoons die geen berichten kunnen ontvangen.'),
+        ('Technische storing', 'Uw bericht is niet verzonden door een probleem tussen Notify en de provider. U zult uw berichten opnieuw moeten versturen. Voor sms-berichten die getroffen zijn door een technische storing krijgt u geen kosten in rekening gebracht.'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_status) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+
+  {% endif %}
+  {% if notification_type == "letter" %}
+
+    {% call mapping_table(
+      caption='Statussen van berichten – brieven',
+      field_headings=['Status', 'Beschrijving'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_status, description in [
+        ('Verzonden', 'Notify heeft de brief naar de provider gestuurd om te worden gedrukt.'),
+        ('Gedrukt', 'De provider heeft de brief gedrukt. Brieven worden om 17:30 uur gedrukt en de volgende werkdag verzonden.'),
+        ('Geannuleerd', 'Verzenden geannuleerd. Uw brief wordt niet gedrukt of verzonden.'),
+        ('Technische storing', 'Notify had een onverwachte fout bij het verzenden van de brief naar onze drukker.'),
+        ('Permanente storing', 'De provider kan de brief niet drukken. Uw brief wordt niet verzonden.')
+      ] %}
+        {% call row() %}
+          {{ text_field(message_status) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+
+  {% endif %}
+
+{% endblock %}

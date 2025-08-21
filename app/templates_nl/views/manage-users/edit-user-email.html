@@ -1,0 +1,25 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  E-mailadres teamlid wijzigen
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('E-mailadres teamlid wijzigen') }}
+
+  <p class="govuk-body" id="user_name">Dit verandert het e-mailadres van {{ user.name }}.</p>
+  {% call form_wrapper() %}
+    {{ form.email_address(param_extensions={"classes": "govuk-!-width-full"}, error_message_with_html=True) }}
+    {{ page_footer('Opslaan') }}
+  {% endcall %}
+
+{% endblock %}

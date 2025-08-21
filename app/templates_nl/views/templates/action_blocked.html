@@ -1,0 +1,29 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ notification_type.capitalize() }} zijn uitgeschakeld
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('{} zijn uitgeschakeld'.format(notification_type.capitalize())) }}
+      <p class="govuk-body">
+        Het verzenden van {{ 999|message_count_label(notification_type, suffix='') }} is uitgeschakeld voor uw dienst.
+      </p>
+      <p class="govuk-body">
+        Als u {{ 999|message_count_label(notification_type, suffix='') }} wilt versturen,
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">neem contact op met het NotifyNL-team</a>.
+      </p>
+
+    </div>
+  </div>
+
+{% endblock %}

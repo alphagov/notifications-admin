@@ -1,0 +1,78 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/error-summary.html" import errorSummary %}
+
+{% block service_page_title %}
+  Wanneer u stopt met het ontvangen van sms-berichten
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_receive_text_messages', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ errorSummary(form) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('Wanneer u stopt met het ontvangen van sms-berichten') }}
+
+      <p class="govuk-body">
+        Het Notify-team verwijdert uw unieke telefoonnummer:
+      </p>
+      {% set new_number = current_service.inbound_number %}
+      {{ govukInsetText({
+        "text": new_number,
+        "classes": "govuk-!-margin-top-0"})
+      }}
+      <p class="govuk-body">
+        U kunt geen sms-berichten meer versturen met dit nummer.
+      </p>
+      <p class="govuk-body">
+        Als een van uw gebruikers u een sms stuurt:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>ontvangt u deze niet</li>
+        <li>weet de afzender dit niet en kan nog steeds een reactie verwachten</li>
+      </ul>
+
+      <h2 class="heading heading-medium">Als u het nummer misschien weer nodig heeft</h2>
+      <p class="govuk-body">
+        Wijzig uw sms-afzender-ID zodat u berichten kunt sturen waar niemand op kan reageren.
+      </p>
+      <p class="govuk-body">
+        U kunt {{ current_service.inbound_number }} op elk moment weer als standaard afzender instellen.
+      </p>
+      <p class="govuk-body">
+        Voeg een nieuwe <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">sms-afzender-ID</a> toe.
+      </p>
+
+      <h2 class="heading heading-medium">Als u zeker weet dat u het nummer wilt verwijderen</h2>
+        {% if current_user.platform_admin %}
+            {% if not recent_use_date %}
+            <p class="hint">Dit nummer is nooit gebruikt</p>
+            {% else %}
+            <p class="govuk-body">Dit nummer is voor het laatst gebruikt
+                <time class="timeago" datetime="{{ recent_use_date}}">
+                    {{ recent_use_date|format_delta }}
+                </time>
+            </p>
+            {% endif %}
+            {% call form_wrapper() %}
+                {{ form.removal_options }}
+                {{ page_footer('Opslaan') }}
+            {% endcall %}
+        {% else %}
+          <p class="govuk-body">
+              <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact op met het Notify-team</a>.
+          </p>
+        {% endif %}
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/table.html" import mapping_table, row, text_field %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block per_page_title %}
+  Dagelijks rapport SMS-provider volumes
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-large">
+    Dagelijks rapport SMS-provider volumes
+  </h1>
+
+  {% call form_wrapper() %}
+    {{ form.start_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ page_footer('Download rapport (CSV)') }}
+  {% endcall %}
+
+  <h2 class="heading-medium">
+    Gegevens opgenomen in het rapport
+  </h2>
+<div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Beschrijving van dagelijkse SMS-provider volumes',
+      field_headings=['Naam', 'Beschrijving'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for column_heading, description in [
+        ('day', 'De hele werkdag in BST'),
+        ('provider', 'De SMS-provider'),
+        ('sms totals', 'Het aantal verzonden sms-berichten'),
+        ('sms fragments', 'Het aantal verzonden sms-fragmenten'),
+        ('sms chargeable units', 'Het aantal verzonden sms-fragmenten vermenigvuldigd met de tariefvermenigvuldiger'),
+        ('sms cost', 'De kosten voor Notify-gebruikers van verzonden sms-berichten'),
+      ] %}
+        {% call row() %}
+          {{ text_field(column_heading) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+
+{% endblock %}

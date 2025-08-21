@@ -1,0 +1,46 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Callbacks voor bezorgbevestigingen
+{% endblock %}
+
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for(back_link, service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      {{ page_header('Callbacks voor retouren van brieven') }}
+
+      <p class="govuk-body">
+        Wanneer een door u verstuurde brief wordt geretourneerd, stuurt Notify details van de retour ontvangen brief naar uw callback-url.
+      </p>
+      <p class="govuk-body">
+        Lees de sectie over callbacks in onze <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API-documentatie</a> voor meer informatie.
+      </p>
+
+      {% call form_wrapper() %}
+        {{ form.url(param_extensions={
+          "classes": "govuk-!-width-full",
+          "hint": {"text": "Moet beginnen met https://"}
+        }) }}
+
+        {{ form.bearer_token(param_extensions={
+          "classes": "govuk-!-width-full",
+          "hint": {"text": "Minimaal 10 tekens"},
+          "autocomplete": "new-password"
+        }) }}
+
+        {{ page_footer('Opslaan') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

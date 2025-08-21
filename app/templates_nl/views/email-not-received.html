@@ -1,0 +1,61 @@
+{% extends "withoutnav_template.html" %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% block per_page_title %}
+  Als u geen e-maillink ontvangt
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-large">Als u geen e-maillink ontvangt</h1>
+
+    <ol class="govuk-list govuk-list--number">
+      <li>Controleer uw spammap op e-mails van gov.uk.notify@notifications.service.gov.uk</li>
+      <li>Als de e-mail niet in uw spammap staat, kunnen we u een nieuwe sturen.</li>
+    </ol>
+
+    <p class="govuk-body">
+      {{ govukButton({
+        "element": "a",
+        "text": "E-maillink opnieuw versturen",
+        "href": url_for('main.resend_email_link', next=redirect_url)
+      }) }}
+    </p>
+
+    <p class="govuk-body">Als dit niet werkt, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">neem contact met ons op</a>.</p>
+
+    {% set change_email %}
+        <p class="govuk-body">Vraag een teamlid met de toestemming ‘Instellingen, team en gebruik beheren’ om uw e-mailadres bij te werken.</p>
+
+        <p class="govuk-body">Dat doen zij zo:</p>
+
+        <ol class="govuk-list govuk-list--number">
+          <li>Meld u aan bij NotifyNL.</li>
+          <li>Ga naar de pagina <span class="govuk-body govuk-!-font-weight-bold">Teamleden</span>.</li>
+          <li>Zoek uw naam en selecteer <span class="govuk-body govuk-!-font-weight-bold">Gegevens wijzigen</span>.</li>
+          <li>Selecteer <span class="govuk-body govuk-!-font-weight-bold">Wijzigen</span> naast uw e-mailadres.</li>
+        </ol>
+    {% endset %}
+
+    {{ govukDetails({
+      "summaryText": "Als uw e-mailadres is gewijzigd",
+      "html": change_email
+    }) }}
+
+    {% if not login_via_sms %}
+        {% set text_message_code %}
+            <p class="govuk-body">Vraag een teamlid met de toestemming ‘Instellingen, team en gebruik beheren’ om <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">uw aanmeldmethode te wijzigen</a>.</p>
+        {% endset %}
+
+        {{ govukDetails({
+          "summaryText": "Als u liever met een sms-code wilt inloggen",
+          "html": text_message_code
+        }) }}
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

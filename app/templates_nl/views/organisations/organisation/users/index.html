@@ -1,0 +1,76 @@
+{% extends "org_template.html" %}
+{% from "components/live-search.html" import live_search %}
+{% from "components/tick-cross.html" import tick_cross %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% block org_page_title %}
+  Teamleden
+{% endblock %}
+
+{% block maincolumn_content %}
+  <h1 class="heading-medium">
+    Teamleden
+  </h1>
+
+  {% if show_search_box %}
+    <div data-notify-module="autofocus">
+      {{ live_search(target_selector='.user-list-item', show=True, form=form) }}
+    </div>
+  {% endif %}
+
+  <div class="user-list">
+    {% for user in users|sort %}
+      <div class="user-list-item">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            <h2 class="user-list-item-heading">
+              {%- if user.name -%}
+                <span class="heading-small">{{ user.name }}</span>&ensp;
+              {%- endif -%}
+              <span class="hint">
+                {%- if user.status == 'pending' -%}
+                  {{ user.email_address }} (uitgenodigd)
+                {%- elif user.status == 'cancelled' -%}
+                  {{ user.email_address }} (uitnodiging geannuleerd)
+                {%- elif user.id == current_user.id -%}
+                  (u)
+                {% else %}
+                  {{ user.email_address }}
+                {% endif %}
+              </span>
+            </h2>
+
+            <ul class="tick-cross__list">
+              {% for permission, label in permissions %}
+                {% if current_org.can_use_org_user_permission(permission) %}
+                  {{ tick_cross(
+                    user.has_permission_for_organisation(current_org.id, permission),
+                    label
+                  ) }}
+                {% endif %}
+              {% endfor %}
+            </ul>
+
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {% if user.status == 'pending' %}
+              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.cancel_invited_org_user', org_id=current_org.id, invited_user_id=user.id)}}">Uitnodiging annuleren<span class="govuk-visually-hidden"> voor {{ user.email_address }}</span></a>
+            {% elif user.is_editable_by(current_user) %}
+              <a class="user-list-edit-link govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_organisation_user', org_id=current_org.id, user_id=user.id)}}">Gegevens wijzigen<span class="govuk-visually-hidden"> voor {{ user.name }} {{ user.email_address }}</span></a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ govukButton({
+      "element": "a",
+      "text": "Teamlid uitnodigen",
+      "href": url_for('main.invite_org_user', org_id=current_org.id),
+      "classes": "govuk-button--secondary"
+    }) }}
+  </div>
+
+{% endblock %}

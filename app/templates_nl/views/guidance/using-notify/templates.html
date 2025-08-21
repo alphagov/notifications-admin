@@ -1,0 +1,29 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  Sjablonen
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Sjablonen</h1>
+
+  <p class="govuk-body">Om een e-mail, sms of brief te versturen met Notify, moet u een herbruikbaar berichtsjabloon toevoegen.</p>
+
+  <p class="govuk-body">Met sjablonen kunt u hetzelfde bericht naar veel mensen sturen, zo vaak als nodig is, zonder elke keer een nieuw bericht te schrijven.</p>
+
+  <p class="govuk-body">Ga naar de {{ service_link(current_service, 'main.choose_template', 'sjablonen') }} pagina om:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>een nieuw sjabloon toe te voegen</li>
+    <li>berichten te versturen</li>
+    <li>een bestaand sjabloon te kopiëren</li>
+    <li>mappen toe te voegen en uw sjablonen te organiseren</li>
+  </ul>
+
+{% endblock %}

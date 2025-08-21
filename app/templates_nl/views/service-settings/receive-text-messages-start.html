@@ -1,0 +1,36 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Voordat u begint met het ontvangen van sms-berichten
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_receive_text_messages', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('Voordat u begint met het ontvangen van sms-berichten') }}
+      <p class="govuk-body">
+        De berichten die u ontvangt, zijn alleen {{ current_service.get_days_of_retention('sms') }} dagen beschikbaar om te downloaden.
+      </p>
+      <p class="govuk-body">
+        U bent verantwoordelijk voor het verwerken van afmeldverzoeken.
+      </p>
+      <p class="govuk-body">
+        Ontvangers verwachten mogelijk dat u op hun berichten reageert.
+      </p>
+
+      {% call form_wrapper() %}
+        {{ page_footer('Ik begrijp het – doorgaan') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

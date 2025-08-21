@@ -1,0 +1,212 @@
+{% extends "content_template.html" %}
+{% from "components/content-metadata.html" import content_metadata %}
+{% from "components/table.html" import mapping_table, row, text_field, field %}
+{% from "components/live-search.html" import live_search %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{# Wordt gebruikt door de content_template.html-layout, prefix voor de toegankelijke naam van de "navigation" #}
+{% set navigation_label_prefix = 'Prijsinformatie' %}
+
+{% block per_page_title %}
+  Prijzen voor sms-berichten
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Prijzen voor sms-berichten</h1>
+
+    {{ content_metadata(
+      data={
+        "Laatst bijgewerkt": [
+          last_updated,
+          sms_rate.valid_from
+        ]|max|format_date_normal
+      }
+    ) }}
+
+  <div class="govuk-inset-text">
+    <p class="govuk-body">
+    De tarieven voor internationale sms-berichten zijn gewijzigd.
+    </p>
+    <p class="govuk-body">
+      Bekijk wat het kost om <a class="govuk-link govuk-link--no-visited-state" href="#international-numbers">sms-berichten naar internationale nummers te sturen</a>.
+    </p>
+  </div>
+
+  <h2 class="heading-medium" id="how-text-message-pricing-works">Hoe de prijzen voor sms-berichten werken</h2>
+
+  <p class="govuk-body">U kunt meer berichten gebruiken, of meer betalen per bericht, als u:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#long-text-messages">sms-berichten verstuurt die langer zijn dan 160 tekens</a></li>
+    <li>bepaalde <a class="govuk-link govuk-link--no-visited-state" href="#symbols">tekens en symbolen gebruikt</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#accents">accents en geaccentueerde letters gebruikt</a></li>
+    <li>sms-berichten naar <a class="govuk-link govuk-link--no-visited-state" href="#international-numbers">internationale nummers verstuurt</a></li>
+  </ul>
+
+  <p class="govuk-body">Het ontvangen van <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_receive_text_messages') }}">sms-berichten kost u niets</a>.</p>
+
+  <h3 class="heading-small" id="long-text-messages">Lange sms-berichten</h3>
+  <p class="govuk-body">Als een sms-bericht langer is dan 160 tekens (inclusief spaties), telt dit als meer dan één bericht.</p>
+
+  <div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Prijzen voor sms-berichten',
+      field_headings=['Lengte bericht', 'Kosten'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_length, charge in [
+        ('Tot 160 tekens', '1 sms-bericht'),
+        ('Tot 306 tekens', '2 sms-berichten'),
+        ('Tot 459 tekens', '3 sms-berichten'),
+        ('Tot 612 tekens', '4 sms-berichten'),
+        ('Tot 765 tekens', '5 sms-berichten'),
+        ('Tot 918 tekens', '6 sms-berichten'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_length) }}
+          {{ text_field(charge) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+
+  <h3 class="heading-small" id="symbols">Tekens en symbolen</h3>
+
+  <p class="govuk-body">
+    De volgende tekens en symbolen tellen elk als 2 tekens:<br />
+    <span class="extended-gsm-characters">[]{}^\|~€</span>
+  </p>
+
+  <p class="govuk-body">Het gebruik hiervan kan de kosten voor sms-berichten verhogen.</p>
+
+  <h3 class="heading-small" id="accents">Accenten en geaccentueerde tekens</h3>
+  <p class="govuk-body">Sommige talen, zoals het Welsh, gebruiken geaccentueerde tekens.</p>
+  <p class="govuk-body">De volgende geaccentueerde tekens beïnvloeden de kosten voor sms-berichten niet: Ä, É, Ö, Ü, à, ä, é, è, ì, ò, ö, ù, ü.</p>
+  <p class="govuk-body">Het gebruik van andere geaccentueerde tekens kan de kosten voor sms-berichten verhogen.</p>
+  {% set accentedChars %}
+    <div class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Geaccentueerde tekens die invloed hebben op sms-kosten',
+        field_headings=['Teken', 'Omschrijving'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for letter, description in [
+                ('Â', 'Hoofdletter A met dakje'),
+                ('Á', 'Hoofdletter A met accent aigu'),
+                ('À', 'Hoofdletter A met accent grave'),
+                ('Ê', 'Hoofdletter E met dakje'),
+                ('È', 'Hoofdletter E met accent grave'),
+                ('Ë', 'Hoofdletter E met trema'),
+                ('Î', 'Hoofdletter I met dakje'),
+                ('Í', 'Hoofdletter I met accent aigu'),
+                ('Ì', 'Hoofdletter I met accent grave'),
+                ('Ï', 'Hoofdletter I met trema'),
+                ('Ô', 'Hoofdletter O met dakje'),
+                ('Ó', 'Hoofdletter O met accent aigu'),
+                ('Ò', 'Hoofdletter O met accent grave'),
+                ('Û', 'Hoofdletter U met dakje'),
+                ('Ú', 'Hoofdletter U met accent aigu'),
+                ('Ù', 'Hoofdletter U met accent grave'),
+                ('Ŵ', 'Hoofdletter W met dakje'),
+                ('Ẃ', 'Hoofdletter W met accent aigu'),
+                ('Ẁ', 'Hoofdletter W met accent grave'),
+                ('Ẅ', 'Hoofdletter W met trema'),
+                ('Ŷ', 'Hoofdletter Y met dakje'),
+                ('Ý', 'Hoofdletter Y met accent aigu'),
+                ('Ỳ', 'Hoofdletter Y met accent grave'),
+                ('Ÿ', 'Hoofdletter Y met trema'),
+                ('â', 'Kleine letter a met dakje'),
+                ('á', 'Kleine letter a met accent aigu'),
+                ('ê', 'Kleine letter e met dakje'),
+                ('ë', 'Kleine letter e met trema'),
+                ('î', 'Kleine letter i met dakje'),
+                ('í', 'Kleine letter i met accent aigu'),
+                ('ï', 'Kleine letter i met trema'),
+                ('ô', 'Kleine letter o met dakje'),
+                ('ó', 'Kleine letter o met accent aigu'),
+                ('û', 'Kleine letter u met dakje'),
+                ('ú', 'Kleine letter u met accent aigu'),
+                ('ŵ', 'Kleine letter w met dakje'),
+                ('ẃ', 'Kleine letter w met accent aigu'),
+                ('ẁ', 'Kleine letter w met accent grave'),
+                ('ẅ', 'Kleine letter w met trema'),
+                ('ŷ', 'Kleine letter y met dakje'),
+                ('ý', 'Kleine letter y met accent aigu'),
+                ('ỳ', 'Kleine letter y met accent grave'),
+                ('ÿ', 'Kleine letter y met trema'),
+              ] %}
+          {% call row() %}
+            {{ text_field(letter) }}
+            {{ text_field(description) }}
+          {% endcall %}
+        {% endfor %}
+      {% endcall %}
+    </div>
+  {% endset %}
+  {{ govukDetails({
+    "summaryText": "Geaccentueerde tekens die invloed hebben op sms-kosten",
+    "html": accentedChars
+  }) }}
+
+  <div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Prijzen voor sms-berichten met geaccentueerde tekens die de kosten verhogen',
+      field_headings=['Lengte bericht', 'Kosten'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for message_length, charge in [
+        ('Tot 70 tekens', '1 sms-bericht'),
+        ('Tot 134 tekens', '2 sms-berichten'),
+        ('Tot 201 tekens', '3 sms-berichten'),
+        ('Tot 268 tekens', '4 sms-berichten'),
+        ('Elke volgende 67 tekens', '1 extra sms-bericht'),
+      ] %}
+        {% call row() %}
+          {{ text_field(message_length) }}
+          {{ text_field(charge) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+
+  <h3 class="heading-small" id="international-numbers">Sms-berichten naar internationale nummers sturen</h3>
+  <p class="govuk-body">Het kan meer kosten om sms-berichten naar internationale nummers te sturen dan naar lokale, afhankelijk van het land.</p>
+  {% set smsIntRates %}
+    {{ live_search(target_selector='#international-pricing .table-row', show=True, form=_search_form, label='Zoeken op landnaam of code') }}
+
+    <div id="international-pricing" class="bottom-gutter-3-2">
+      {% call mapping_table(
+        caption='Internationale tarieven voor sms-berichten',
+        field_headings=['Landcode', 'Land', 'Kostenfactor'],
+        field_headings_visible=True,
+        caption_visible=False
+      ) %}
+        {% for cc, names, billable_units in international_sms_rates %}
+          {% call row() %}
+            {{ text_field('+' + cc) }}
+            {% call field() %}
+              {% for name in names %}
+                {{ name }}<br>
+              {% endfor %}
+            {% endcall %}
+            {{ text_field('{}&hairsp;&times;'.format(billable_units)|safe) }}
+          {% endcall %}
+        {% endfor %}
+
+        {% call row() %}
+          {{ text_field('+882') }}
+          {% call field() %}Wereldwijd{% endcall %}
+          {{ text_field('Niet ondersteund') }}
+        {% endcall %}
+      {% endcall %}
+    </div>
+  {% endset %}
+
+  {{ govukDetails({
+    "summaryText": "Internationale tarieven voor sms-berichten",
+    "html": smsIntRates
+  }) }}
+{% endblock %}

@@ -1,0 +1,71 @@
+{% from "components/folder-path.html" import folder_path, page_title_folder_path %}
+{% from "components/pill.html" import pill %}
+{% from "components/live-search.html" import live_search %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
+
+{% extends "withnav_template.html" %}
+
+{% set page_title = 'Sjablonen' %}
+
+{% block service_page_title %}
+  {{ page_title_folder_path(template_folder_path) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {% if (not current_service.all_templates) and (not current_service.all_template_folders) %}
+
+     {{ page_header(page_title, size='medium') }}
+
+     <p class="govuk-body">
+      {% if current_user.has_permissions('manage_templates') %}
+        U heeft een sjabloon nodig voordat u e-mails, sms-berichten of brieven kunt versturen.
+      {% else %}
+        Vraag uw servicemanager om sjablonen toe te voegen voordat u e-mails, sms-berichten of brieven kunt versturen.
+      {% endif %}
+     </p>
+
+  {% else %}
+
+    <div class="govuk-grid-row">
+      <div class="{% if current_user.has_permissions('manage_templates') %} govuk-grid-column-five-sixths {% else %} govuk-grid-column-full {% endif %}">
+        {# H1 van pagina #}
+        {{ folder_path(
+          folders=template_folder_path,
+          service=current_service,
+          template_type=template_type,
+          current_user=current_user
+        ) }}
+      </div>
+      {% if current_user.has_permissions('manage_templates') and current_template_folder_id and user_has_template_folder_permission %}
+        <div class="govuk-grid-column-one-sixth">
+          <a href="{{ url_for('main.manage_template_folder', service_id=current_service.id, template_folder_id=current_template_folder_id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-manage-link">Beheren<span class="govuk-visually-hidden"> deze map</span></a>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+    {% if show_template_nav %}
+      <div class="bottom-gutter-2-3">
+        {{ pill(template_nav_items, current_value=template_type, show_count=False) }}
+      </div>
+    {% endif %}
+
+    {{ live_search(target_selector='#template-list .template-list-item', show=show_search_box, form=_search_form) }}
+
+    {% if current_user.has_permissions('manage_templates') and user_has_template_folder_permission %}
+      {% call form_wrapper(
+          class='sticky-scroll-area',
+          module='template-folder-form',
+          data_kwargs={'prev-state': form.op or None}
+      ) %}
+        {% include 'views/templates/_template_list.html' %}
+        {% include 'views/templates/_move_to.html' %}
+      {% endcall %}
+
+    {% else %}
+      {% include 'views/templates/_template_list.html' %}
+    {% endif %}
+
+
+{% endblock %}

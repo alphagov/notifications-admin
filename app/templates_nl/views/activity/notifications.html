@@ -1,0 +1,43 @@
+{% from "components/previous-next-navigation.html" import previous_next_navigation %}
+{% from "components/table.html" import list_table, row_heading, notification_status_field %}
+
+<div class="ajax-block-container" id='pill-selected-item'>
+
+  {% if notifications %}
+    <div class='dashboard-table'>
+  {% endif %}
+    {% call(item, row_number) list_table(
+      notifications,
+      caption="Recente activiteit",
+      caption_visible=False,
+      empty_message='Geen berichten gevonden &thinsp;(berichten worden {} dagen bewaard)'.format(limit_days)|safe,
+      field_headings=['Ontvanger', 'Status'],
+      field_headings_visible=False
+    ) %}
+      {% call row_heading() %}
+        {% if item.status in ('pending-virus-check', 'virus-scan-failed') %}
+          <span class="file-list-filename loading-indicator">Controleren</span>
+        {% else %}
+          <a class="govuk-link govuk-link--no-visited-state file-list-filename" href="{{ single_notification_url(notification_id=item.id) }}">{{ item.to.splitlines()|join(', ') if item.to else '' }}</a>
+        {% endif %}
+        <p class="file-list-hint">
+          {{ item.preview_of_content }}
+        </p>
+      {% endcall %}
+
+      {{ notification_status_field(item) }}
+
+    {% endcall %}
+  {% if notifications %}
+    </div>
+  {% endif %}
+
+  {% if show_pagination %}
+    {{ previous_next_navigation(prev_page, next_page) }}
+  {% elif next_page %}
+    <p class="table-show-more-link">
+      Alleen de eerste 50 berichten worden getoond
+    </p>
+  {% endif %}
+
+</div>

@@ -1,0 +1,37 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = 'Wijzig uw contactgegevens' %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row govuk-!-margin-top-3">
+    {% call form_wrapper() %}
+      {{ form.sender(param_extensions={
+        'fieldset': {
+          'legend': {
+            'isPageHeading': True,
+            'text': page_title,
+            'classes': 'govuk-fieldset__legend--l govuk-grid-column-full'
+          }
+        },
+        'classes': 'govuk-grid-column-three-quarters'
+      }) }}
+      <div class="govuk-grid-column-three-quarters">
+        {{ page_footer('Doorgaan') }}
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_add_letter_contact', service_id=current_service.id, from_template=template_id) }}">Nieuwe afzender toevoegen</a>
+      </div>
+    {% endcall %}
+  </div>
+
+{% endblock %}

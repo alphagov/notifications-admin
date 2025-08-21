@@ -1,0 +1,42 @@
+{% extends "withnav_template.html" %}
+{% from "components/folder-path.html" import folder_path, page_title_folder_path %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  {{ page_title_folder_path(template_folder_path) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row bottom-gutter-1-2">
+    <div class="govuk-grid-column-full">
+      {{ folder_path(
+        folders=template_folder_path,
+        service=current_service,
+        template_type='all',
+        current_user=current_user,
+        link_current_item=True
+      ) }}
+    </div>
+  </div>
+
+  {% call form_wrapper(action=url_for('main.manage_template_folder', service_id=current_service.id, template_folder_id=template_folder_id)) %}
+    {{ form.name(param_extensions={
+            "classes": "govuk-!-width-full"
+    }) }}
+    {% if current_user.has_permissions("manage_service") and form.users_with_permission.all_service_users %}
+      {{ form.users_with_permission }}
+    {% endif %}
+
+    {{ page_footer(
+      'Opslaan',
+      delete_link=url_for(
+        '.delete_template_folder',
+        service_id=current_service_id,
+        template_folder_id=template_folder_id
+      ),
+      delete_link_text="Deze map verwijderen") }}
+  {% endcall %}
+
+{% endblock %}

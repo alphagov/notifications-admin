@@ -1,0 +1,54 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/branding-preview.html" import custom_email_branding_preview %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Voorbeeld van uw e-mailhuisstijl
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link}) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header('Voorbeeld van uw e-mailhuisstijl') }}
+
+  <p class="govuk-body">
+    Dit is een voorbeeld van hoe e-mails van {{ current_service.name }} eruit zullen zien.
+  </p>
+
+  {{ custom_email_branding_preview(email_preview_data, title="Voorbeeld van nieuwe e-mailhuisstijl") }}
+
+  <h2 class="heading-medium">Alternatieve tekst (alt-tekst) toevoegen</h2>
+  {% call form_wrapper() %}
+    <p class="govuk-body">
+      Alt-tekst is bedoeld voor mensen die uw logo niet kunnen zien. Deze zal:
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>worden voorgelezen door schermlezers</li>
+      <li>worden weergegeven als uw logo niet laadt</li>
+      <li>worden getoond als de ontvanger afbeeldingen heeft uitgeschakeld</li>
+    </ul>
+    <p class="govuk-body">
+      Alt-tekst moet uitleggen wat uw logo betekent, niet hoe het eruitziet.
+    </p>
+
+    <p class="govuk-body">
+      Bijvoorbeeld, de alt-tekst voor het GOV.UK-logo zou ‘GOV.UK’ zijn. Niet ‘Koninklijke kroon boven het woord GOV.UK in hoofdletters geschreven’.
+    </p>
+
+    <p class="govuk-body">
+      Vermeld het woord ‘logo’ niet in uw alt-tekst.
+    </p>
+
+    {{ form.alt_text(param_extensions={
+      'label': {'text': 'Voer alt-tekst in voor uw logo'},
+      'hint': {'text': 'Bijvoorbeeld, ' + (current_service.organisation_name if current_service.organisation_id else 'Ministerie van Onderwijs')}
+    }) }}
+    {{ page_footer('Opslaan') }}
+  {% endcall %}
+
+{% endblock %}

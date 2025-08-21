@@ -1,0 +1,85 @@
+{% extends "withnav_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/table.html" import list_table, text_field, index_field %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Upload een noodcontactlijst
+{% endblock %}
+
+{% block backLink %}
+  {% if not error %}
+    {{ govukBackLink({ "href": url_for('main.uploads', service_id=current_service.id) }) }}
+  {% endif %}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header('Upload een noodcontactlijst') }}
+  <p class="govuk-body">
+    Sla een lijst met e-mailadressen of telefoonnummers van medewerkers op in Notify.
+  </p>
+  <p class="govuk-body">
+    In een noodgeval kunt u een bericht sturen naar iedereen op de lijst.
+  </p>
+  <p class="govuk-body">
+    Voeg geen contactgegevens van leden van het publiek toe.
+  </p>
+
+<div class="bottom-gutter">
+  {{ file_upload(
+    form.file,
+    allowed_file_extensions=allowed_file_extensions,
+    button_text='Kies bestand',
+  )}}
+</div>
+
+<h2 class="heading-medium">Uw bestand moet eruitzien als een van deze voorbeelden</h2>
+
+<p class="hint">
+  Sla uw bestand op als een
+  <acronym title="Comma Separated Values">CSV</acronym>,
+  <acronym title="Tab Separated Values">TSV</acronym>,
+  <acronym title="Open Document Spreadsheet">ODS</acronym>,
+  of Microsoft Excel-spreadsheet
+</p>
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-one-half">
+    <div class="spreadsheet">
+      {% call(item, row_number) list_table(
+        [
+          ['e-mailadres'],
+          ['test@example.gov.nl'],
+        ],
+        caption="Voorbeeld",
+        caption_visible=False,
+        field_headings=['', 'A']
+      ) %}
+        {{ index_field(row_number - 1) }}
+        {% for column in item %}
+          {{ text_field(column) }}
+        {% endfor %}
+      {% endcall %}
+    </div>
+  </div>
+  <div class="govuk-grid-column-one-half">
+    <div class="spreadsheet">
+      {% call(item, row_number) list_table(
+        [
+          ['telefoonnummer'],
+          ['06 12345678'],
+        ],
+        caption="Voorbeeld",
+        caption_visible=False,
+        field_headings=['', 'A']
+      ) %}
+        {{ index_field(row_number - 1) }}
+        {% for column in item %}
+          {{ text_field(column) }}
+        {% endfor %}
+      {% endcall %}
+    </div>
+  </div>
+</div>
+{% endblock %}

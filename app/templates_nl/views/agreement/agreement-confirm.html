@@ -1,0 +1,42 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  Bevestig dat u akkoord gaat met de overeenkomst
+{% endblock %}
+
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_accept_agreement', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-five-sixths">
+
+    {{ page_header('Bevestig dat u akkoord gaat met de overeenkomst') }}
+
+    {% call form_wrapper(class='top-gutter') %}
+
+      {% if current_service.organisation.agreement_signed_on_behalf_of_name and current_service.organisation.agreement_signed_on_behalf_of_email_address %}
+        <p class="govuk-body">
+          Ik bevestig dat ik de wettelijke bevoegdheid heb om namens {{ current_service.organisation.agreement_signed_on_behalf_of_name }} ({{ current_service.organisation.agreement_signed_on_behalf_of_email_address }}) de NotifyNL verwerkersovereenkomst en financiële overeenkomst (versie {{ current_service.organisation.agreement_signed_version }}) te accepteren en dat {{ current_service.organisation.name }} hieraan gebonden zal zijn.
+        </p>
+      {% else %}
+        <p class="govuk-body">
+          Ik bevestig dat ik de wettelijke bevoegdheid heb om de NotifyNL verwerkersovereenkomst en financiële overeenkomst (versie {{ current_service.organisation.agreement_signed_version }}) te accepteren en dat {{ current_service.organisation.name }} hieraan gebonden zal zijn.
+        </p>
+      {% endif %}
+
+      {{ page_footer('Accepteer deze overeenkomst') }}
+
+    {% endcall %}
+
+  </div>
+</div>
+
+{% endblock %}

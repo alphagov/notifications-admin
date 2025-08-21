@@ -1,0 +1,40 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+ Antwoordadres wijzigen
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_email_reply_to', service_id=current_service.id) }) }}
+{% endblock %}
+{% block maincolumn_content %}
+
+  {{ page_header('Antwoordadres wijzigen') }}
+  {% call form_wrapper() %}
+    {{ form.email_address(
+        param_extensions={
+          "hint": {"text": "Dit moet een gedeelde inbox zijn die door uw team wordt beheerd, niet uw persoonlijke e-mailadres"},
+          "classes": "govuk-!-width-full"
+        },
+        error_message_with_html=True
+    ) }}
+    {% if not show_choice_of_default_checkbox %}
+      <p class="form-group">
+        Dit is het standaardantwoordadres voor e-mails van {{ current_service.name }}
+      </p>
+      {{ page_footer('Opslaan') }}
+    {% else %}
+      {{ form.is_default }}
+      {{ page_footer(
+        'Opslaan',
+        delete_link=url_for('main.service_confirm_delete_email_reply_to', service_id=current_service.id, reply_to_email_id=reply_to_email_address_id),
+        delete_link_text='Verwijderen'
+      ) }}
+    {% endif %}
+  {% endcall %}
+
+{% endblock %}

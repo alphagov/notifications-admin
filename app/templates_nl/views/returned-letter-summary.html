@@ -1,0 +1,46 @@
+{% extends "withnav_template.html" %}
+{% from "components/table.html" import list_table, row_heading %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Teruggestuurde brieven
+{% endblock %}
+
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_dashboard', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-five-sixths">
+    {{ page_header('Teruggestuurde brieven') }}
+    <p class="govuk-body">
+      Rapportages worden eenmaal per maand gepubliceerd.
+    </p>
+    <p class="govuk-body">
+      U ontvangt alleen een rapport als één of meer van uw brieven is teruggestuurd.
+    </p>
+  </div>
+</div>
+<div class="dashboard-table">
+    {% call(item, row_number) list_table(
+        data,
+        caption="Rapport teruggestuurde brieven",
+        caption_visible=False,
+        empty_message='Als u rapporten over teruggestuurde brieven heeft, worden deze hier weergegeven',
+        field_headings=['Rapport'],
+        field_headings_visible=False
+    ) %}
+    {% call row_heading() %}
+      <a class="govuk-link govuk-link--no-visited-state file-list-filename"
+         href="{{url_for('main.returned_letters', service_id=current_service.id, reported_at=item.reported_at)}}">{{ item.reported_at | format_date_normal }}</a>
+       <p class="file-list-hint">
+         {{ item.returned_letter_count|format_thousands }} {{ item.returned_letter_count|message_count_label('brief', suffix='')}}
+       </p>
+    {% endcall %}
+  {% endcall %}
+</div>
+
+{% endblock %}

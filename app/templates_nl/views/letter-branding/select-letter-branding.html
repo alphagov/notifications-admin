@@ -1,0 +1,33 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/live-search.html" import live_search %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% set page_title = "Briefhuisstijl" %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-medium">{{ page_title }}</h1>
+  {{ live_search(target_selector='.browse-list-item', show=True, form=_search_form, autofocus=True) }}
+  <nav>
+    {% for brand in letter_brandings %}
+      <div class="browse-list-item">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.platform_admin_view_letter_branding', branding_id=brand.id) }}">
+          {{ brand.name }}
+        </a>
+      </div>
+    {% endfor %}
+  </nav>
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ govukButton({
+      "element": "a",
+      "text": "Nieuwe huisstijl",
+      "href": url_for('main.create_letter_branding'),
+      "classes": "govuk-button--secondary"
+    }) }}
+  </div>
+
+{% endblock %}

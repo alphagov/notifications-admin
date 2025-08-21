@@ -1,0 +1,25 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  Briefbranding
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Briefbranding</h1>
+
+  <p class="govuk-body">U kunt het logo van uw organisatie toevoegen aan de eerste pagina van uw brieftemplates.</p>
+
+  <p class="govuk-body">Zo voegt u branding toe aan uw brieven:</p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Ga naar de sectie <b class="govuk-!-font-weight-bold">Briefinstellingen</b> op de {{ service_link(current_service, 'main.service_settings', 'instellingen') }}-pagina.</li>
+    <li>Kies <b class="govuk-!-font-weight-bold">Wijzigen</b> bij de regel <b class="govuk-!-font-weight-bold">Briefbranding</b>.</li>
+  </ol>
+
+{% endblock %}

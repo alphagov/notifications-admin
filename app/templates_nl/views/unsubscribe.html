@@ -1,0 +1,49 @@
+{% from "components/page-footer.html" import page_footer %}
+
+{% extends "unbranded_template.html" %}
+
+{% block pageTitle %}
+  {% if confirmed %}
+    We hebben uw verzoek tot afmelding ontvangen
+  {% else %}
+    Weet u zeker dat u zich wilt afmelden?
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+  {% if confirmed %}
+    <h1>
+      We hebben uw verzoek tot afmelding ontvangen
+    </h1>
+    <p>
+      Het kan enkele dagen duren voordat u bent afgemeld voor deze e-mails.
+    </p>
+  {% else %}
+    <h1>
+      Weet u zeker dat u zich wilt afmelden?
+    </h1>
+    <p>
+      Als u zich afmeldt, ontvangt u deze e-mails niet meer.
+    </p>
+    <form method="post" action="{{ request.url | extract_path_from_url }}" id="confirm-unsubscription">
+      {{ page_footer('Bevestigen') }}
+    </form>
+    <p>
+      Dit kan enkele dagen duren.
+    </p>
+  {% endif %}
+
+{% endblock %}
+
+{% block footer %}
+
+  {% if example %}
+    <footer>
+      <p>
+        Dit is alleen een voorbeeldpagina, er zijn verder geen acties nodig.
+      </p>
+    </footer>
+  {% endif %}
+
+{% endblock %}

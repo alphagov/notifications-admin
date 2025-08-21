@@ -1,0 +1,28 @@
+{% set service = current_service -%}
+{% set organisation = service.organisation -%}
+{% set user = current_user -%}
+
+Service: {{ service.name }}
+{{ url_for('main.service_dashboard', service_id=service.id, _external=True) }}
+
+---
+Type organisatie: {{ service.organisation_type_label }}
+Overeenkomst getekend: {{ organisation.agreement_signed|format_yes_no(none='Niet te bepalen') }}
+{%- if organisation.agreement_signed %}, voor {{ current_service.organisation.name }}
+{%- elif organisation.name %} (organisatie is {{ organisation.name }}, {{ organisation.crown|format_yes_no(yes='een overheidsorgaan', no='geen overheidsorgaan', none='onbekende overheidsstatus') }})
+{%- else %} (domein is {{ user.email_domain }})
+{%- endif %}.
+{%- if organisation.can_approve_own_go_live_requests %} Deze organisatie kan eigen verzoeken tot livegang goedkeuren. Er is geen actie van onze kant nodig.{% endif %}
+{%- if organisation.request_to_go_live_notes %} {{ organisation.request_to_go_live_notes }}{% endif %}
+{%- if organisation.agreement_signed_by %}
+Overeenkomst getekend door: {{ organisation.agreement_signed_by.email_address }}
+{% endif -%}
+{%- if organisation.agreement_signed_on_behalf_of_email_address -%}
+Overeenkomst namens ondertekend door: {{ organisation.agreement_signed_on_behalf_of_email_address }}
+{%- endif %}
+
+Andere live diensten van deze gebruiker: {{ user.live_services|format_yes_no }}
+
+---
+Verzoek verzonden door {{ user.email_address }}
+Pagina van aanvrager: {{ url_for('main.user_information', user_id=user.id, _external=True) }}

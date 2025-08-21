@@ -1,0 +1,446 @@
+@import '@rijkshuisstijl-community/design-tokens/dist/index.css';
+/* stylelint-disable declaration-no-important */
+// NotifyNl overrides
+
+
+@font-face {
+    font-family: FiraSans;
+    font-weight: 600;
+    src:
+        local("FiraSans-Bold"),
+        url("../../../fonts/FiraSans-Bold.ttf") format("truetype");
+}
+
+/* Add different weights of the same font */
+@font-face {
+    font-family: FiraSans;
+    font-weight: 400;
+    src:
+        local("FiraSans-Regular"),
+        url("../../../fonts/FiraSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: FiraSans;
+    font-weight: 400;
+    font-style: italic;
+    src: ("FiraSans-Italic"),
+        url("../../../fonts/FiraSans-italic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: IBMPlexSans;
+    font-weight: 600;
+    src:
+        local("IBMPlexSans-Bold"),
+        url("../../../fonts/IBMPlexSans-Bold.ttf") format("truetype");
+}
+
+/* Add different weights of the same font */
+@font-face {
+    font-family: IBMPlexSans;
+    font-weight: 400;
+    src:
+        local("IBMPlexSans-Regular"),
+        url("../../../fonts/IBMPlexSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: IBMPlexSans;
+    font-weight: 400;
+    font-style: italic;
+    src:
+        local("IBMPlexSans-Italic"),
+        url("../../../fonts/IBMPlexSans-italic.ttf") format("truetype");
+}
+
+html.rhc-theme {
+    background: var(--rhc-color-lichtblauw-100);
+}
+
+.rhc-theme {
+    * {
+
+
+        font-family: FiraSans, IBMPlexSans, sans-serif !important;
+
+
+    }
+
+    // hide inconcistent data with NL service
+    .nl-hide {
+        display: none;
+    }
+
+    .dutch-logo-above-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .logo-bg {
+            width: 80px;
+            height: 110px;
+            display: inline-flex;
+            align-items: center;
+
+            svg {
+                fill: var(--rhc-color-lintblauw-500);
+                max-width: 100%;
+                height: auto;
+            }
+        }
+    }
+
+    .govuk-footer__licence-logo {
+        display: none;
+    }
+
+    .govuk-header {
+        background-color: var(--rhc-color-lintblauw-500);
+
+        .govuk-header__container {
+            border: none;
+            padding-bottom: 10px;
+        }
+    }
+
+    .product-page-intro {
+        background-color: var(--rhc-color-lichtblauw-100);
+        padding-top: 20px;
+        color: var(--rhc-color-lintblauw-500);
+
+        .breadcrumbs.breadcrumbs--inverse a,
+        .govuk-body,
+        .govuk-link.govuk-link--inverse {
+            color: var(--rhc-color-lintblauw-500);
+        }
+    }
+
+    a.govuk-link {
+        color: var(--utrecht-link-color);
+        text-decoration-color: var(--utrecht-link-text-decoration-color);
+
+        &.govuk-link--no-visited-state:link,
+        &.govuk-link--no-visited-state:visited {
+            color: var(--utrecht-link-color);
+        }
+
+        &:focus {
+            color: var(--utrecht-link-focus-color);
+            background-color: var(--utrecht-link-focus-background-color);
+            text-decoration-thickness: var(--utrecht-link-focus-text-decoration-thickness);
+            text-decoration: var(--utrecht-link-focus-text-decoration);
+        }
+
+        :visited {
+            color: var(--utrecht-link-visited-color);
+        }
+    }
+
+    a.govuk-link.govuk-link--inverse {
+        color: var(--utrecht-focus-inverse-outline-color);
+    }
+
+    button.govuk-button {
+        min-height: var(--utrecht-button-min-block-size);
+    }
+
+    .govuk-button {
+        // color: var(--utrecht-button-primary-action-color);
+        // border-color: var(--utrecht-button-primary-action-border-color);
+        // border-width: 0;
+        // background-color: var(--utrecht-button-primary-action-background-color);
+
+
+        align-items: center;
+        background-color: var(--utrecht-button-background-color);
+        block-size: fit-content;
+        border-block-end-color: var(--utrecht-button-border-bottom-color);
+        border-block-end-width: var(--utrecht-button-border-block-end-width);
+        border-color: var(--utrecht-button-border-color);
+        border-radius: var(--utrecht-button-border-radius);
+        border-style: solid;
+        border-width: var(--utrecht-button-border-width);
+        box-sizing: border-box;
+        color: var(--utrecht-button-color);
+        column-gap: var(--utrecht-button-column-gap);
+        cursor: var(--utrecht-action-activate-cursor, revert);
+        display: inline-flex;
+        font-family: var(--utrecht-button-font-family, var(--utrecht-document-font-family));
+        font-size: var(--utrecht-button-font-size, var(--utrecht-document-font-family, inherit));
+        font-weight: var(--utrecht-button-appearance-font-weight, var(--utrecht-button-font-weight));
+        inline-size: var(--utrecht-button-inline-size, auto);
+        justify-content: center;
+        line-height: var(--utrecht-button-line-height);
+        max-inline-size: var(--utrecht-button-max-inline-size, fit-content);
+        min-block-size: var(--utrecht-button-min-block-size, 44px);
+        min-inline-size: var(--utrecht-button-min-inline-size, 44px);
+        padding-block-end: var(--utrecht-button-padding-block-end);
+        padding-block-start: var(--utrecht-button-padding-block-start);
+        padding-inline-end: var(--utrecht-button-padding-inline-end);
+        padding-inline-start: var(--utrecht-button-padding-inline-start);
+        scale: 1;
+        text-transform: var(--utrecht-button-text-transform);
+        -webkit-user-select: none;
+        user-select: none;
+
+
+        &:hover {
+            color: var(--utrecht-button-primary-action-hover-color);
+            border-color: var(--utrecht-button-primary-action-hover-border-color);
+            background-color: var(--utrecht-button-primary-action-hover-background-color);
+        }
+
+        &.govuk-button--inverse,
+        &:focus:not(:active):not(:hover) {
+            color: var(--utrecht-button-primary-action-focus-color);
+            border-color: var(--utrecht-button-primary-action-focus-border-color);
+            background-color: var(--utrecht-button-primary-action-focus-background-color);
+
+        }
+
+    }
+
+    .govuk-footer {
+        background: var(--rhc-color-lichtblauw-100);
+
+        .govuk-footer__heading+ul {
+            margin-top: 30px;
+
+        }
+
+        .govuk-footer__section,
+        .govuk-footer__section-break,
+        .govuk-footer__heading {
+            border-color: var(--rhc-color-lintblauw-500);
+        }
+    }
+}
+
+
+// headings
+.rhc-theme {
+
+    h3 {
+        margin-block-start: var(--utrecht-heading-5-margin-block-start);
+        margin-block-end: var(--utrecht-heading-5-margin-block-end);
+        font-size: var(--utrecht-heading-5-font-size);
+        line-height: var(--utrecht-heading-5-line-height);
+        font-weight: var(--utrecht-heading-5-font-weight);
+        font-family: var(--utrecht-heading-5-font-family);
+        color: var(--utrecht-heading-5-color)
+    }
+
+    h2,
+    .big-number-smaller .big-number-number {
+        margin-block-start: var(--utrecht-heading-4-margin-block-start);
+        margin-block-end: var(--utrecht-heading-4-margin-block-end);
+        font-size: var(--utrecht-heading-4-font-size);
+        line-height: var(--utrecht-heading-4-line-height);
+        font-weight: var(--utrecht-heading-4-font-weight);
+        font-family: var(--utrecht-heading-4-font-family);
+        color: var(--utrecht-heading-4-color)
+    }
+
+
+
+    h1 {
+        margin-block-start: var(--utrecht-heading-3-margin-block-start);
+        margin-block-end: var(--utrecht-heading-3-margin-block-end);
+        font-size: var(--utrecht-heading-3-font-size);
+        line-height: var(--utrecht-heading-3-line-height);
+        font-weight: var(--utrecht-heading-3-font-weight);
+        font-family: var(--utrecht-heading-3-font-family);
+        color: var(--utrecht-heading-3-color)
+    }
+
+
+    .big-number-with-status {
+
+        .govuk-link.govuk-link--inverse.big-number-link {
+            background: var(--rhc-color-lichtblauw-100);
+            min-height: 110px;
+        }
+
+        .big-number-link {
+            .big-number-label {
+                color: var(--utrecht-heading-5-color);
+                font-size: 0.84em;
+                text-decoration: none;
+            }
+        }
+
+    }
+}
+
+// forms
+.rhc-theme form {
+    label {
+        font-weight: var(--utrecht-form-label-font-weight);
+        font-size: var(--utrecht-form-label-font-size);
+        color: var(--utrecht-form-label-color);
+
+    }
+
+    // textbox
+    .govuk-input {
+        background-color: var(--utrecht-textbox-background-color, var(--utrecht-form-control-background-color));
+        border-width: var(--utrecht-textbox-border-width, var(--utrecht-form-control-border-width));
+        border-block-end-width: var(--utrecht-textbox-border-bottom-width, var(--utrecht-textbox-border-width, var(--utrecht-form-control-border-width)));
+        border-color: var(--utrecht-textbox-border-color, var(--utrecht-form-control-border-color));
+        border-radius: var(--utrecht-textbox-border-radius, var(--utrecht-form-control-border-radius, 0));
+        border-style: solid;
+        box-sizing: border-box;
+        color: var(--utrecht-textbox-color, var(--utrecht-form-control-color));
+        font-family: var(--utrecht-textbox-font-family, var(--utrecht-form-control-font-family));
+        font-size: var(--utrecht-textbox-font-size, var(--utrecht-form-control-font-size, inherit));
+        font-weight: var(--utrecht-textbox-font-weight, var(--utrecht-form-control-font-weight, initial));
+        inline-size: 100%;
+        line-height: var(--utrecht-textbox-line-height, var(--utrecht-form-control-line-height, initial));
+        min-block-size: var(--utrecht-pointer-target-min-size, 44px);
+        min-inline-size: var(--utrecht-pointer-target-min-size, 44px);
+        padding-block-end: var(--utrecht-textbox-padding-block-end, var(--utrecht-form-control-padding-block-end, 0));
+        padding-block-start: var(--utrecht-textbox-padding-block-start, var(--utrecht-form-control-padding-block-start, 0));
+        padding-inline-end: var(--utrecht-textbox-padding-inline-end, var(--utrecht-form-control-padding-inline-end, initial));
+        padding-inline-start: var(--utrecht-textbox-padding-inline-start, var(--utrecht-form-control-padding-inline-start, initial));
+    }
+
+    .notify-simple-search-form__form-group .govuk-input {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+
+// tabs / accordions
+.rhc-theme .pill {
+    border: 1px solid var(--rhc-accordion-section-border-color);
+}
+
+.rhc-theme .pill-item {
+    background: var(--rhc-color-lichtblauw-100);
+    border: 1px solid var(--rhc-color-lichtblauw-100);
+    padding: 12px 2px;
+
+    .pill-item__label {
+        text-decoration: none;
+        color: var(--rhc-accordion-color);
+    }
+
+    &.pill-item--selected {
+        background-color: var(--rhc-accordion-button-expanded-background-color);
+
+        &:focus,
+        &:focus-visible {
+            padding: 12px 2px;
+        }
+
+        .pill-item__label {
+            color: var(--rhc-accordion-button-expanded-color);
+        }
+    }
+
+}
+
+@media (max-width: 48.0624em) {
+    .dashboard {
+
+        .govuk-grid-row {
+            display: flex;
+            flex-direction: column;
+
+            .govuk-grid-column-one-third {
+                width: 100%;
+
+            }
+        }
+
+    }
+}
+
+@media (min-width: 48.0625em) {
+    .govuk-header {
+        .govuk-header__container {
+            display: flex;
+            flex-direction: row;
+
+            .govuk-header__logo {
+                width: auto;
+                flex: 0;
+                padding-right: 0;
+            }
+
+            .govuk-header__content {
+                width: auto;
+                flex: 1;
+            }
+
+            .govuk-header__navigation-list {
+                display: flex;
+                width: 100%;
+                justify-content: end;
+            }
+        }
+    }
+}
+
+
+.rhc-theme {
+
+    a,
+    button,
+    .pill-item {
+
+        &:active,
+        &:focus {
+            box-shadow: inset 0 -2px var(--utrecht-focus-outline-color);
+            border: initial !important;
+            outline-color: var(--utrecht-focus-outline-color, revert);
+            outline-offset: var(--utrecht-focus-outline-offset, revert);
+            outline-style: var(--utrecht-focus-outline-style, revert);
+            outline-width: var(--utrecht-focus-outline-width, revert);
+            z-index: 1;
+            background: initial;
+            color: initial;
+
+        }
+    }
+}
+
+/*
+    --utrecht-textbox-hover-color: #0F172A;
+    --utrecht-textbox-hover-border-color: #738eab;
+    --utrecht-textbox-hover-background-color: #fff;
+    --utrecht-textbox-hover-border-width: 1px;
+    --utrecht-textbox-read-only-color: #0F172A;
+    --utrecht-textbox-read-only-border-color: transparent;
+    --utrecht-textbox-read-only-background-color: #F1F5F9;
+    --utrecht-textbox-disabled-color: #475569;
+    --utrecht-textbox-disabled-border-color: #94A3B8;
+    --utrecht-textbox-disabled-background-color: #CBD5E1;
+    --utrecht-textbox-focus-color: #0F172A;
+    --utrecht-textbox-focus-border-color: #154273;
+    --utrecht-textbox-focus-background-color: #fff;
+    --utrecht-textbox-focus-border-width: 2px;
+    --utrecht-textbox-border-width: 1px;
+    --utrecht-textbox-border-block-end-width: auto;
+    --utrecht-textbox-placeholder-color: #64748B;
+    --utrecht-textbox-invalid-border-width: 1px;
+    --utrecht-textbox-invalid-color: #0F172A;
+    --utrecht-textbox-invalid-border-color: #d52b1e;
+    --utrecht-textbox-invalid-background-color: #f9dfdd;
+    --utrecht-textbox-color: #0F172A;
+    --utrecht-textbox-border-color: #154273;
+    --utrecht-textbox-background-color: #fff;
+    --utrecht-textbox-padding-inline-start: 0.75rem;
+    --utrecht-textbox-padding-inline-end: 0.75rem;
+    --utrecht-textbox-padding-block-start: 0.5rem;
+    --utrecht-textbox-padding-block-end: 0.5rem;
+    --utrecht-textbox-max-inline-size: 400px;
+    --utrecht-textbox-line-height: 150%;
+    --utrecht-textbox-font-weight: 400;
+    --utrecht-textbox-font-size: 1.25rem;
+    --utrecht-textbox-font-family: RijksoverheidSansWeb, Fira Sans, Arial, Verdana, sans-serif;
+    --utrecht-textbox-border-radius: 2.5px;
+*/
+
+/* stylelint-enable declaration-no-important */

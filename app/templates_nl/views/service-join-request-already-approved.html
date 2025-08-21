@@ -1,0 +1,18 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% block service_page_title %}
+  {{ requested_by.name }} is al toegevoegd aan jouw dienst
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('{} is al toegevoegd aan jouw dienst'.format(requested_by.name)) }}
+
+  <p class="govuk-body">
+    {{ approved_by.name }} heeft dit verzoek goedgekeurd op {{ approved_at|format_date_short }}.
+  </p>
+
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Terug naar je diensten</a>
+
+{% endblock %}

@@ -1,0 +1,9 @@
+{{ content }}
+{% if current_service -%}
+Service: "{{ current_service.name }}"
+{{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+{% endif -%}
+{% if out_of_hours_emergency -%}
+Dit ticket is door de gebruiker als spoedgeval gemarkeerd.
+Zie de handleiding voor hulp bij het oplossen: https://github.com/alphagov/notifications-manuals/wiki/Incidents-raised-through-Zendesk-tickets
+{% endif %}

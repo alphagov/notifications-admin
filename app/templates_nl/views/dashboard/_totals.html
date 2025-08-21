@@ -1,0 +1,42 @@
+{% from "components/big-number.html" import big_number_with_status %}
+
+<div class="ajax-block-container">
+  <div class="govuk-grid-row">
+    <div id="total-email" class="govuk-grid-column-one-third">
+      {{ big_number_with_status(
+        statistics['email']['requested'],
+        statistics['email']['requested']|message_count_label('e-mail', suffix='verstuurd'),
+        statistics['email']['failed'],
+        statistics['email']['failed_percentage'],
+        statistics['email']['show_warning'],
+        failure_link=url_for("main.view_notifications", service_id=service_id, message_type='email', status='failed'),
+        link=url_for("main.view_notifications", service_id=service_id, message_type='email', status='sending,delivered,failed'),
+        smaller=True,
+      ) }}
+    </div>
+    <div id="total-sms" class="govuk-grid-column-one-third">
+      {{ big_number_with_status(
+        statistics['sms']['requested'],
+        statistics['sms']['requested']|message_count_label('sms', suffix='verstuurd'),
+        statistics['sms']['failed'],
+        statistics['sms']['failed_percentage'],
+        statistics['sms']['show_warning'],
+        failure_link=url_for("main.view_notifications", service_id=service_id, message_type='sms', status='failed'),
+        link=url_for("main.view_notifications", service_id=service_id, message_type='sms', status='sending,delivered,failed'),
+        smaller=True,
+      ) }}
+    </div>
+    <div id="total-letters" class="govuk-grid-column-one-third">
+      {{ big_number_with_status(
+        statistics['letter']['requested'],
+        statistics['letter']['requested']|message_count_label('brief', suffix='verstuurd'),
+        statistics['letter']['failed'],
+        statistics['letter']['failed_percentage'],
+        statistics['letter']['show_warning'],
+        failure_link=url_for("main.view_notifications", service_id=service_id, message_type='letter', status='failed'),
+        link=url_for("main.view_notifications", service_id=service_id, message_type='letter', status=''),
+        smaller=True,
+      ) }}
+    </div>
+  </div>
+</div>

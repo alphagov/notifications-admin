@@ -1,0 +1,44 @@
+{% from "components/previous-next-navigation.html" import previous_next_navigation %}
+{% extends "withnav_template.html" %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% block service_page_title %}
+  Uploads
+{% endblock %}
+
+{% block maincolumn_content %}
+    <h1 class="heading-medium">Uploads</h1>
+    <div class="dashboard">
+      {% if jobs %}
+        {% include 'views/dashboard/_jobs.html' %}
+      {% else %}
+        <p class="govuk-body">
+          U heeft recent geen bestanden geüpload.
+        </p>
+        {% if current_user.has_permissions('send_messages') and current_service.has_permission('letter')%}
+          <p class="govuk-body">
+            Upload een brief en Notify zal deze voor u afdrukken, verpakken en versturen.
+          </p>
+        {% endif %}
+      {% endif %}
+      {{ previous_next_navigation(prev_page, next_page) }}
+      {% if current_user.has_permissions('send_messages') %}
+        <div class="js-stick-at-bottom-when-scrolling">
+          {% if current_service.has_permission('letter') %}
+            {{ govukButton({
+              "element": "a",
+              "text": "Upload een brief",
+              "href": url_for('main.upload_letter', service_id=current_service.id),
+              "classes": "govuk-button--secondary govuk-!-margin-right-3"
+            }) }}
+          {% endif %}
+          {{ govukButton({
+            "element": "a",
+            "text": "Upload een noodcontactlijst",
+            "href": url_for('main.upload_contact_list', service_id=current_service.id),
+            "classes": "govuk-button--secondary"
+          }) }}
+        </div>
+      {% endif %}
+    </div>
+{% endblock %}

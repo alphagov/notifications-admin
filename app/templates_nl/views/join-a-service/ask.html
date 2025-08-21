@@ -1,0 +1,43 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set heading = 'Vraag om lid te worden van deze dienst' %}
+
+{% block per_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.join_service_choose_service') }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govuk_page_header(heading) }}
+      <p class="govuk-body">
+        U vraagt om lid te worden van ‘{{ service.name }}’.
+      </p>
+
+      {% if service.active_users_with_permission("manage_service") %}
+        {% call form_wrapper() %}
+          {{ form.users }}
+          {{ form.reason }}
+        {{ page_footer('Vraag om lid te worden van deze dienst') }}
+        {% endcall %}
+      {% else %}
+        <p class="govuk-body">
+          Niemand binnen deze dienst heeft toestemming om uw verzoek goed te keuren.
+        </p>
+        <p class="govuk-body">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact op met NotifyNL ondersteuning</a>
+        </p>
+      {% endif %}
+
+    </div>
+  </div>
+
+{% endblock %}

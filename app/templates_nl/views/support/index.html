@@ -1,0 +1,39 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+  Ondersteuning
+{% endblock %}
+
+{% block maincolumn_content %}
+
+   {{ govuk_page_header("Ondersteuning") }}
+  <p class="govuk-body">NotifyNL biedt 24/7 ondersteuning bij noodgevallen.</p>
+  <p class="govuk-body">Bij een noodgeval reageren wij binnen 30 minuten.</p>
+  <p class="govuk-body">Is het geen noodgeval, dan reageren wij uiterlijk aan het eind van de volgende werkdag.</p>
+  <p class="govuk-body">Onze werkdagen zijn maandag tot en met vrijdag, van 9.30 tot 17.30 uur, met uitzondering van feestdagen.</p>
+
+  {% call form_wrapper() %}
+    {% if current_user.is_authenticated %}
+      {{ form.support_type }}
+    {% else %}
+      {{ form.who }}
+    {% endif %}
+    {{ page_footer('Doorgaan') }}
+  {% endcall %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    <h2 class="heading-medium">Wat is een noodgeval?</h2>
+    <p class="govuk-body">Een probleem is alleen een noodgeval als uw dienst live is en:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>u een foutmelding ‘technische storing’ krijgt bij het uploaden van een bestand</li>
+      <li>u een 500-responsecode krijgt bij het versturen van berichten via de API</li>
+    </ul>
+  </div>
+</div>
+
+{% endblock %}

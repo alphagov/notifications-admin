@@ -1,0 +1,22 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Deze persoon heeft al een uitnodiging ontvangen
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.manage_users', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Deze persoon heeft al een uitnodiging ontvangen') }}
+
+  <p class="govuk-body">
+    {{ user_to_invite.name }} heeft de uitnodiging voor
+    ‘{{ current_service.name }}’ nog niet geaccepteerd. U hoeft niets te doen.
+  </p>
+
+{% endblock %}

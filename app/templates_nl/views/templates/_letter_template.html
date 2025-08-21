@@ -1,0 +1,42 @@
+{% from "components/banner.html" import banner_wrapper %}
+
+{% if template.too_many_pages %}
+  <div class="govuk-!-margin-bottom-6">
+    {% call banner_wrapper(type='dangerous') %}
+        {% include "partials/check/letter-too-long.html" %}
+    {% endcall %}
+  </div>
+{% endif %}
+
+{#
+  In een kleine wijziging ten opzichte van e-mail/sms-sjablonen, plaatsen we de bewerkbare UI-elementen
+  in de ingebouwde Jinja-template van de brief. Dit is nodig vanwege de complexere opbouw van de
+  voorbeeldweergave (met afbeeldingen) en ondersteuning voor meertaligheid.
+#}
+{{ template|string }}
+
+<div class="govuk-!-margin-bottom-2">
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ govukButton({
+    "element": "a",
+    "text": "Bijlage beheren" if template.attachment else "Pagina’s bijvoegen",
+    "href": url_for(
+        '.letter_template_attach_pages',
+        service_id=current_service.id,
+        template_id=template.id
+      ),
+    "classes": "govuk-button--secondary edit-template-link-attachment"
+    }) }}
+
+    {{ govukButton({
+    "element": "a",
+    "text": "Taal wijzigen",
+    "href": url_for(
+    '.letter_template_change_language',
+    service_id=current_service.id,
+    template_id=template.id
+    ),
+    "classes": "govuk-button--secondary change-language"
+    }) }}
+  </div>
+</div>

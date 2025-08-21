@@ -1,0 +1,18 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% block service_page_title %}
+  {{ 'Laat aan {} weten dat je hun verzoek hebt geweigerd'.format(requester.name) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Laat aan {} weten dat je hun verzoek hebt geweigerd'.format(requester.name)) }}
+
+  <p class="govuk-body">
+    Om {{ requester.name }} te laten weten dat zij niet kunnen deelnemen aan jouw dienst, kun je hen rechtstreeks e-mailen op {{ requester.email_address }}
+  </p>
+
+  <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Terug naar jouw diensten</a>
+
+{% endblock %}

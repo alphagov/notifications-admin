@@ -1,0 +1,26 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  {{ '{} wil deelnemen aan uw dienst'.format(requester.name) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('{} wil deelnemen aan uw dienst'.format(requester.name)) }}
+
+  {% call form_wrapper() %}
+    {{ form.join_service_approve_request(param_extensions={
+      "fieldset": {
+        "legend": {
+          "text": "Wilt u {} laten deelnemen aan ‘{}’?".format(requester.name, requested_service.name),
+        },
+      },
+    }) }}
+    {{ page_footer('Doorgaan') }}
+
+  {% endcall %}
+
+{% endblock %}

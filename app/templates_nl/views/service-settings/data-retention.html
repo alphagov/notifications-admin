@@ -1,0 +1,73 @@
+{% extends "withnav_template.html" %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+
+{% block service_page_title %}
+  Gegevensbewaring
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row bottom-gutter">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="heading-large">
+        Gegevensbewaring
+      </h1>
+    </div>
+   <div class="govuk-grid-column-one-third">
+    {{ govukButton({
+      "element": "a",
+      "text": "Gegevensbewaring toevoegen",
+      "href": url_for('main.add_data_retention', service_id=current_service.id),
+      "classes": "align-with-heading"
+    }) }}
+  </div>
+  </div>
+  <div class="govuk-grid-row bottom-gutter">
+      <div class="govuk-grid-column-full">
+          Standaard worden gegevens 7 dagen bewaard
+      </div>
+  </div>
+  {% if not current_service.data_retention %}
+    <div class="user-list">
+      <div class="user-list-item">
+        <p class="govuk-body user-list-item-blank hint">U heeft nog geen gegevensbewaring toegevoegd</p>
+      </div>
+    </div>
+  {% else %}
+    {% set data_retention_settings = [] %}
+    {% for item in current_service.data_retention %}
+      {% do data_retention_settings.append(
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": item.notification_type | format_notification_type
+          },
+          "value": {
+            "text": item.days_of_retention|string + " dagen"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_data_retention', service_id=current_service.id, data_retention_id=item.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": item.notification_type | format_notification_type | lower + " gegevensbewaringsinstelling",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        }
+      ) %}
+    {% endfor %}
+    {{ govukSummaryList({
+      "classes": "notify-summary-list",
+      "rows": data_retention_settings
+    }) }}
+  {% endif %}
+
+{% endblock %}

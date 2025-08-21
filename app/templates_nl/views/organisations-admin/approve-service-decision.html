@@ -1,0 +1,55 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set title = "Goedkeuren of afwijzen van het verzoek om live te gaan" %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(title) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {% if organisation %}
+        {% if cannot_approve %}
+          <p class="govuk-body">U moet het verzoek om live te gaan afwijzen omdat deze dienst niet uniek is.</p>
+        {% else %}
+          <p class="govuk-body">U dient te controleren of de dienst voldoet aan de eisen van uw organisatie.</p>
+        {% endif %}
+        {% call form_wrapper() %}
+          {{ form.enabled(param_extensions={
+            "items": [
+              {"disabled": cannot_approve},
+              {
+                "conditional": {
+                  "html": form.rejection_reason(param_extensions={
+                    "hint": {
+                      "text": "Notify deelt dit met de persoon die het verzoek heeft ingediend."
+                    }
+                  })
+                }
+              },
+            ]
+          }) }}
+          {{ page_footer('Bevestigen') }}
+        {% endcall %}
+
+      {% else %}
+        <p class="govuk-body">
+          De dienst moet eerst <a id="link-org" href="{{url_for('main.link_service_to_organisation', service_id=current_service.id)}}" class="govuk-link govuk-link--no-visited-state">aan een organisatie worden gekoppeld</a> voordat deze live kan worden gezet.
+        </p>
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}

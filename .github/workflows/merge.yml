@@ -93,7 +93,7 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          file: docker/Dockerfile
+          file: docker/Dockerfile_nl
           push: true
           tags: ${{ env.IMAGE }}:latest,${{ env.IMAGE }}:${{ needs.build-tag-test.outputs.tag }}
           platforms: linux/amd64,linux/arm64

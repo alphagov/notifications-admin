@@ -1,0 +1,79 @@
+{% extends "org_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper%}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{%  from "components/branding-preview.html" import email_branding_preview %}
+
+{% set page_title = "E-mailhuisstijl" %}
+
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+    {{ govukBackLink({ "href": url_for('main.organisation_settings', org_id=current_org.id) }) }}
+{%  endblock %}
+
+{% block maincolumn_content %}
+    <h1 class="heading-large">{{ page_title }}</h1>
+
+    <!-- display default branding and it's preview -->
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+      {{ current_org.email_branding.name }}<span class="hint govuk-!-font-weight-regular">&ensp;(standaard)</span>
+    </h2>
+
+    {% if show_use_govuk_as_default_link %}
+      {{ email_branding_preview(current_org.email_branding_id, classes='govuk-!-margin-bottom-2') }}
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        <a
+          class="govuk-link govuk-link--no-visited-state"
+          href="{{ url_for('main.organisation_email_branding', org_id=current_org.id) }}?change_default_branding_to_govuk"
+        >
+          Gebruik in plaats daarvan GOV.UK als standaard
+        </a>
+      </p>
+    {% else %}
+      {{ email_branding_preview(current_org.email_branding_id, classes='govuk-!-margin-bottom-8') }}
+    {% endif %}
+
+    <!--display the email-branding-pool options and the preview for each one -->
+
+    {% for option in current_org.email_branding_pool_excluding_default %}
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-2">
+        {{ option.name }}
+      </h2>
+      {{ email_branding_preview(option.id, classes='govuk-!-margin-bottom-0') }}
+      <div class="govuk-grid-row govuk-!-margin-top-2 govuk-!-margin-bottom-6">
+        <div class="govuk-grid-column-one-half">
+          {% call form_wrapper(action=url_for('main.organisation_email_branding', org_id=current_org.id)) %}
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            {{ form.email_branding_id(value=option.id) }}
+            {{ govukButton({
+              "element": "input",
+              "text": "Als standaard instellen",
+              "classes": "govuk-button--secondary"
+            }) }}
+          {% endcall %}
+        </div>
+        <div class="govuk-grid-column-one-half">
+          <p class="govuk-body govuk-!-text-align-right">
+            <a href="{{ url_for('main.organisation_email_branding', org_id=current_org.id) }}?remove_branding_id={{ option.id }}"
+             class="govuk-link govuk-link govuk-link--destructive govuk-link--no-visited-state">
+              Verwijderen <span class="govuk-visually-hidden">van deze huisstijloptie</span>
+            </a>
+          </p>
+        </div>
+      </div>
+    {% endfor %}
+
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-4" />
+
+    <div class="js-stick-at-bottom-when-scrolling">
+      {{ page_footer(
+          button_text='Huisstijlopties toevoegen',
+          button_url=url_for('main.add_organisation_email_branding_options', org_id=current_org.id)
+        )
+      }}
+    </div>
+{% endblock %}

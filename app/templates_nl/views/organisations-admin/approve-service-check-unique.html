@@ -1,0 +1,50 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set title = "Bevestig dat deze dienst uniek is" %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      <p class="govuk-body">
+        U bent verantwoordelijk voor het controleren of deze dienst de enige in zijn soort is binnen uw organisatie.
+      </p>
+
+      <p class="govuk-body">
+        Voordat u doorgaat, dient u de lijst met
+        <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation.id) }}" class="govuk-link govuk-link--no-visited-state">diensten van {{ current_service.organisation.name }}</a> te bekijken.
+      </p>
+
+      <p class="govuk-body">
+        Let op mogelijke overeenkomsten in:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>namen van diensten</li>
+        <li>berichtsjablonen</li>
+        <li>teamleden</li>
+      </ul>
+
+      {% call form_wrapper() %}
+        {{ form.is_unique }}
+        {{ page_footer('Doorgaan') }}
+      {% endcall %}
+
+    </div>
+  </div>
+
+{% endblock %}

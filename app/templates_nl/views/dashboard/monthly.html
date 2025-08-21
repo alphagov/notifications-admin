@@ -1,0 +1,72 @@
+{% from "components/page-header.html" import page_header %}
+{% from "components/big-number.html" import big_number %}
+{% from "components/pill.html" import pill %}
+{% from "components/table.html" import list_table, field, row_heading %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Verzonden berichten,
+  {{ selected_year }} tot {{ selected_year + 1 }} begrotingsjaar
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Verzonden berichten') }}
+  <div class="bottom-gutter">
+    {{ pill(
+      items=years,
+      current_value=selected_year,
+      big_number_args={'smallest': True},
+    ) }}
+  </div>
+  {% if months %}
+    <div class="body-copy-table" id='pill-selected-item'>
+      {% call(month, row_index) list_table(
+        months,
+        caption="Totale uitgaven",
+        caption_visible=False,
+        empty_message='',
+        field_headings=[
+          'Maand',
+          'E-mails',
+          'Sms-berichten',
+          'Brieven',
+        ],
+        field_headings_visible=False,
+        equal_length=True
+      ) %}
+        {% if not month.future %}
+          {% call row_heading() %}
+            {{ month.name }}
+          {% endcall %}
+          {% for counts, template_type in [
+            (month.email_counts, 'email'),
+            (month.sms_counts, 'sms'),
+            (month.letter_counts, 'letter')
+          ] %}
+            {% call field(align='left') %}
+              {{ big_number(
+                counts.requested,
+                counts.requested|message_count_label(template_type, suffix=''),
+                smallest=True,
+              ) }}
+              {% if counts.requested %}
+                <span class="{{ 'failure-highlight' if counts.show_warning else '' }}">
+                  {{ counts.failed|format_thousands }} mislukt
+                </span>
+              {% else %}
+                –
+              {% endif %}
+            {% endcall %}
+          {% endfor %}
+        {% endif %}
+      {% endcall %}
+    </div>
+  {% endif %}
+
+  <p class="align-with-heading-copy">
+    Het begrotingsjaar eindigt op 31 maart.
+  </p>
+
+{% endblock %}

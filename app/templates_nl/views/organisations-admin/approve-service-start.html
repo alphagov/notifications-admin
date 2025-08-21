@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% set title = "Maak deze dienst live" %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      <p class="govuk-body">
+        {{ current_service.go_live_user.name }} heeft een verzoek ingediend om ‘{{ current_service.name }}’ live te zetten.
+      </p>
+
+      <p class="govuk-body">
+        Zij schatten dat deze dienst het volgende aantal berichten zal versturen:
+      </p>
+      <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-6">
+        {% for channel, volumes in current_service.volumes_by_channel.items() %}
+          <li>
+            {% if volumes %}
+              {{ volumes|message_count(channel) }} per jaar
+            {% else %}
+              Geen {{ 0|message_count_noun(channel) }}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <p class="govuk-body">
+        Voordat u dit verzoek goedkeurt, moet u controleren of:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>deze dienst uniek is</li>
+        <li>de naam van de dienst duidelijk en begrijpelijk is</li>
+      </ul>
+      <p class="govuk-body govuk-!-margin-bottom-6">
+        U moet er ook voor zorgen dat de dienst voldoet aan de eisen van uw organisatie.
+      </p>
+
+    {{ govukButton({"element": "a", "text": "Doorgaan", "href": url_for('.org_member_make_service_live_check_unique', service_id=current_service.id)}) }}
+
+    </div>
+  </div>
+
+{% endblock %}

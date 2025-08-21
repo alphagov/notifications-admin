@@ -1,0 +1,56 @@
+{% from "components/page-header.html" import page_header %}
+{% from "components/pill.html" import pill %}
+{% from "components/table.html" import list_table, row_heading, spark_bar_field %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Gebruikte sjablonen
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header("Gebruikte sjablonen") }}
+
+  <div class="bottom-gutter-3-2">
+    {{ pill(
+      items=years,
+      current_value=selected_year,
+      big_number_args={'smallest': True},
+    ) }}
+  </div>
+
+  <div class="dashboard">
+    {% for month in months %}
+      <h2>{{ month.name }}</h2>
+      {% if not month.templates_used %}
+        <p class="table-no-data">
+          Geen berichten verzonden
+        </p>
+      {% else %}
+        <div class='template-statistics-table'>
+          {% call(item, row_number) list_table(
+            month.templates_used,
+            caption=month.name,
+            caption_visible=False,
+            empty_message='',
+            field_headings=[
+              'Sjabloon',
+              'Verzonden berichten'
+            ],
+            field_headings_visible=False
+          ) %}
+            {% call row_heading() %}
+              <a class="govuk-link govuk-link--no-visited-state template-statistics-table-template-name" href="{{ url_for('main.view_template', service_id=current_service.id, template_id=item.id) }}">{{ item.name }}</a>
+              <span class="template-statistics-table-hint">
+                {{ 1|message_count_label(item.type, suffix='sjabloon')|capitalize }}
+              </span>
+            {% endcall %}
+            {{ spark_bar_field(item.requested_count, most_used_template_count) }}
+          {% endcall %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+{% endblock %}

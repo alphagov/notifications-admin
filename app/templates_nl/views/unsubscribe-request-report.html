@@ -1,0 +1,70 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% block meta %}
+    {% if report.is_a_batched_report and request.args.get("force_download") %}
+        <meta http-equiv="refresh" content="0;URL='{{ url_for("main.download_unsubscribe_request_report", service_id=current_service.id, batch_id=report.batch_id)}}'" />
+    {% endif %}
+{% endblock %}
+
+{% block service_page_title %}
+    {{ report.title|sentence_case }}
+{% endblock %}
+
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.unsubscribe_request_reports_summary', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ page_header(report.title|sentence_case) }}
+
+
+{% if not report.completed %}
+    <p class="govuk-body" id="report-unsubscribe-requests-count">
+     {{ report.count|format_thousands}} nieuwe afmeldverzoeken {{ report.count | message_count_label('request', suffix='') }}
+    </p>
+
+    <p class="govuk-body govuk-!-margin-bottom-2">U moet: </p>
+      <ol class="govuk-list govuk-list--number govuk-!-margin-bottom-6">
+        <li class="bottom-gutter"><a href="{{ url_for('main.download_unsubscribe_request_report', service_id=current_service.id, batch_id=report.batch_id) }}" class="govuk-link govuk-link--no-visited-state heading-small">
+            Het rapport downloaden</a>
+        </li>
+        <li>De e-mailadressen uit uw verzendlijst verwijderen voordat u verdere e-mails verstuurt</li>
+      </ol>
+{%  else %}
+    <p class="govuk-body" id="report-unsubscribe-requests-count">
+        {{ report.count|format_thousands}} afmeldverzoeken {{ report.count | message_count_label('request', suffix='') }}
+    </p>
+    <p class="bottom-gutter"><a download href="{{ url_for('main.download_unsubscribe_request_report', service_id=current_service.id, batch_id=report.batch_id) }}" class="govuk-link govuk-link--no-visited-state heading-small" >
+        Het rapport downloaden</a>
+    </p>
+
+ {% endif %}
+
+{% call form_wrapper(class="govuk-!-margin-bottom-6") %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    {{ form.report_has_been_processed }}
+    {% if report.is_a_batched_report %}
+        {{  govukButton({ "text": "Bijwerken", "id":"process_unsubscribe_report" })}}
+    {% endif %}
+
+{% endcall %}
+<div id="unsubscribe_report_availability">
+    {% if report.is_a_batched_report %}
+        Dit rapport wordt verwijderd {{ report.will_be_archived_at|format_delta_days(numeric_prefix="over ")}}.
+    {% else %}
+        <p class="govuk-body">
+            Rapporten zijn na downloaden 7 dagen beschikbaar.
+        </p>
+        <p class="govuk-body">
+            Verzoeken die niet zijn gedownload, worden na 90 dagen verwijderd.
+        </p>
+    {% endif %}
+</div>
+
+{% endblock %}

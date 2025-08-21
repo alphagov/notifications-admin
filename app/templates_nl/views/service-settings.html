@@ -1,0 +1,914 @@
+{% extends "withnav_template.html" %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+{% block service_page_title %}
+  Settings
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {% set service_base_settings %}
+      {% set data_retention_html %}
+        {% if current_service.get_consistent_data_retention_period() %}
+          {{ current_service.get_consistent_data_retention_period()|string + ' dagen' }}
+        {% else %}
+          <ul class="govuk-list">
+            {% for channel in ['email', 'sms', 'letter'] %}
+            <li>{{ channel|format_notification_type }} – {{ current_service.get_days_of_retention(channel) }} dagen</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endset %}
+
+      {{ govukSummaryList({
+        "classes": "notify-summary-list service-base-settings",
+        "rows": [
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Servicenaam"
+            },
+            "value": {
+              "text": current_service.name,
+              "classes": "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_name_change', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "servicenaam",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Aanmeldmethode"
+            },
+            "value": {
+              "text": ("E-maillink of sms-code" if current_service.has_permission("email_auth") else "Sms-code")
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_set_auth_type', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "aanmeldmethode",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Bewaartermijn gegevens"
+            },
+            "value": {
+              "text": data_retention_html
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_data_retention', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "bewaartermijn gegevens",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          }
+        ]
+      }) }}
+    {% endset %}
+
+    {% set service_email_settings %}
+      {% set email_sender_html %}
+        {% with email_sender_name = current_service.custom_email_sender_name or current_service.name %}
+          {% include "partials/preview-email-sender-name.html" %}
+        {% endwith %}
+      {% endset %}
+
+      {% set reply_to_email_addresses_html %}
+        {{ current_service.default_email_reply_to_address or 'Niet ingesteld' }}
+        {% if current_service.count_email_reply_to_addresses > 1 %}
+          <div class="govuk-hint">
+            {{ '…en nog %d' | format(current_service.count_email_reply_to_addresses - 1) }}
+          </div>
+        {% endif %}
+      {% endset %}
+
+      {% set base_email_settings_row = [
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "E-mails verzenden"
+          },
+          "value": {
+            "text": "Aan" if current_service.has_permission("email") else "Uit"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('.service_set_channel', channel='email', service_id=current_service.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "uw instellingen voor het verzenden van e-mails",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        }
+      ]%}
+
+      {% if current_service.has_permission("email") %}
+        {% set restricted_email_settings_rows = [
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Naam afzender e-mail"
+            },
+            "value": {
+              "html": email_sender_html,
+              "classes": "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_email_sender_change', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "naam afzender e-mail",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Antwoord-e-mailadressen"
+            },
+            "value": {
+              "classes": "govuk-summary-list__value--default" if current_service.default_email_reply_to_address is none else "govuk-summary-list__value--truncate",
+              "html": reply_to_email_addresses_html
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_email_reply_to', service_id=current_service.id),
+                  "text": "Beheren",
+                  "visuallyHiddenText": "antwoord-e-mailadressen",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "E-mailhuisstijl"
+            },
+            "value": {
+              "text": current_service.email_branding.name
+            },
+            "actions": {
+              "items": [
+                {
+                  "href":  url_for('main.email_branding_options', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "e-mailhuisstijl",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Bestanden per e-mail verzenden"
+            },
+            "value": {
+              "text": current_service.contact_link or 'Niet ingesteld',
+              "classes": "govuk-summary-list__value--default" if current_service.contact_link is none else "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.send_files_by_email_contact_details', service_id=current_service.id),
+                  "text": "Beheren",
+                  "visuallyHiddenText": "bestanden per e-mail verzenden",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          }
+        ]%}
+      {% endif %}
+
+      {% set email_settings_rows = base_email_settings_row + restricted_email_settings_rows if restricted_email_settings_rows else base_email_settings_row %}
+
+      {{ govukSummaryList({
+        "classes": "notify-summary-list service-email-settings",
+        "rows": email_settings_rows
+      }) }}
+
+    {% endset %}
+
+    {% set service_text_message_settings %}
+      {% set text_message_sender_ids_html %}
+        {{ current_service.default_sms_sender | nl2br if current_service.default_sms_sender else 'Geen' }}
+        {% if current_service.count_sms_senders > 1 %}
+          <div class="govuk-hint">
+            {{ '…en nog %d' | format(current_service.count_sms_senders - 1) }}
+          </div>
+        {% endif %}
+      {% endset %}
+
+      {% set base_text_message_setting_row = [
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Sms-berichten verzenden"
+          },
+          "value": {
+            "text": "Aan" if current_service.has_permission("sms") else "Uit"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for(
+                    '.service_set_channel',
+                    service_id=current_service.id,
+                    channel='sms'
+                  ),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "uw instellingen voor het verzenden van sms-berichten",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        }
+      ]%}
+
+      {% set restricted_text_message_settings_rows = [] %}
+
+      {% if current_service.has_permission("sms") %}
+        {% set restricted_text_message_settings_rows = [
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Sms-afzender-ID's"
+            },
+            "value": {
+              "text": text_message_sender_ids_html,
+              "classes": "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_sms_senders', service_id=current_service.id),
+                  "text": "Beheren",
+                  "visuallyHiddenText": "sms-afzender-ID's",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Sms-berichten starten met servicenaam"
+            },
+            "value": {
+              "text": "Aan" if current_service.prefix_sms else "Uit"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_set_sms_prefix', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "uw instellingen voor het starten van sms-berichten met servicenaam",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Sms-berichten ontvangen"
+            },
+            "value": {
+              "text": "Aan" if current_service.has_permission("inbound_sms") else "Uit"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_receive_text_messages', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "uw instellingen voor het ontvangen van sms-berichten",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Internationale sms-berichten verzenden"
+            },
+            "value": {
+              "text": "Aan" if current_service.has_permission("international_sms") else "Uit"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_set_international_sms', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "uw instellingen voor het verzenden van internationale sms-berichten",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+        ]%}
+      {% endif %}
+
+      {% set restricted_international_text_message_settings_rows = [] %}
+
+      {% if current_service.has_permission("international_sms") and current_service.has_permission("sms") %}
+        {% set restricted_international_text_message_settings_rows = [
+          {
+            "key": {
+                "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+                "text": "Limiet internationale sms-berichten",
+              },
+            "value": {
+              "text": "{} per dag".format(current_service.get_message_limit('international_sms')|format_thousands)
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.set_per_day_international_sms_message_limit', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "dagelijkse limiet internationale sms",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+        ]%}
+      {% endif %}
+
+      {% set text_message_settings_rows = base_text_message_setting_row + restricted_text_message_settings_rows + restricted_international_text_message_settings_rows %}
+
+      {{ govukSummaryList({
+        "classes": "notify-summary-list service-sms-settings",
+        "rows": text_message_settings_rows
+      }) }}
+    {% endset %}
+
+{% set service_letter_settings %}
+      {% set base_letter_settings_row = [
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Brieven versturen"
+          },
+          "value": {
+            "text": "Aan" if current_service.has_permission("letter") else "Uit"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for(
+                  '.service_set_channel',
+                  channel='letter',
+                  service_id=current_service.id
+                ),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "uw instellingen voor het versturen van brieven",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        }
+      ]%}
+
+      {% if current_service.has_permission("letter") %}
+
+        {% set sender_addresses_html %}
+          {% if current_service.default_letter_contact_block %}
+            {{ current_service.default_letter_contact_block.contact_block | nl2br }}
+          {% elif current_service.count_letter_contact_details %}
+            Leeg
+          {% else %}
+            Niet ingesteld
+          {% endif %}
+          {% if current_service.count_letter_contact_details > 1 %}
+            <div class="govuk-hint">
+              {{ '…en %d meer' | format(current_service.count_letter_contact_details - 1) }}
+            </div>
+          {% endif %}
+        {% endset %}
+        {% set restricted_letter_settings_rows = [
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Internationale brieven versturen"
+            },
+            "value": {
+              "text": "Aan" if current_service.has_permission('international_letters') else "Uit"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_set_international_letters', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "uw instellingen voor het versturen van internationale brieven",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Afzenderadressen"
+            },
+            "value": {
+              "html": sender_addresses_html,
+              "classes": "govuk-summary-list__value--default" if current_service.count_letter_contact_details == 0 else "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_letter_contact_details', service_id=current_service.id),
+                  "text": "Beheren",
+                  "visuallyHiddenText": "afzenderadressen",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Briefopmaak"
+            },
+            "value": {
+              "text": current_service.letter_branding.name or "Niet ingesteld",
+              "classes": "govuk-summary-list__value--default" if not current_service.letter_branding.name
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.letter_branding_options', service_id=current_service.id),
+                  "text": "Wijzigen",
+                  "visuallyHiddenText": "briefopmaak",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          }
+        ] %}
+      {% endif %}
+
+      {% set letter_settings_rows = base_letter_settings_row + restricted_letter_settings_rows  if restricted_letter_settings_rows else base_letter_settings_row %}
+
+      {{ govukSummaryList({
+        "classes": "notify-summary-list service-letter-settings",
+        "rows": letter_settings_rows
+      }) }}
+
+    {% endset %}
+
+<h1 class="heading-medium">Instellingen</h1>
+    <div class="bottom-gutter-3-2">
+      <h2 class="heading-medium govuk-visually-hidden">Algemeen</h2>
+      {{ service_base_settings }}
+      <h2 class="heading-medium">E-mailinstellingen</h2>
+      {{ service_email_settings }}
+      <h2 class="heading-medium">Sms-instellingen</h2>
+      {{ service_text_message_settings }}
+      <h2 class="heading-medium">Briefinstellingen</h2>
+      {{ service_letter_settings }}
+
+    </div>
+
+    {% if current_service.trial_mode %}
+      <h2 class="heading-medium top-gutter-0">Uw dienst is in proefmodus</h2>
+
+        <p class="govuk-body">U kunt alleen:</p>
+
+        <ul class="govuk-list govuk-list--bullet">
+          <li>berichten sturen naar uzelf en andere teamleden</li>
+          <li>{{ current_service.email_message_limit | message_count('email') }} e-mails per dag versturen</li>
+          <li>{{ current_service.sms_message_limit | message_count('sms') }} sms-berichten per dag versturen</li>
+          <li>briefsjablonen aanmaken, maar niet versturen</li>
+        </ul>
+
+      <p class="govuk-body">
+        {% if current_user.has_permissions('manage_service') %}
+          Om deze beperkingen op te heffen, kunt u een
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">verzoek indienen om live te gaan</a>.
+        {% else %}
+          De beheerder van uw dienst kan een verzoek indienen om deze beperkingen op te heffen.
+        {% endif %}
+      </p>
+
+    {% else %}
+      <h2 class="heading-medium top-gutter-0">Uw dienst is live</h2>
+      <p class="govuk-body">
+        U kunt maximaal het volgende versturen:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>{{ current_service.email_message_limit | message_count('email') }} e-mails per dag</li>
+        <li>{{ current_service.sms_message_limit | message_count('sms') }} sms-berichten per dag</li>
+        <li>{{ current_service.letter_message_limit | message_count('letter') }} brieven per dag</li>
+      </ul>
+      <p class="govuk-body">
+        Als u deze limieten wilt bespreken,
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">neem contact met ons op</a>.
+      </p>
+
+    {% endif %}
+
+
+    {% if current_user.platform_admin %}
+
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-4 govuk-!-margin-top-8">Instellingen voor platformbeheer</h2>
+
+      {% set has_change_action = {} %}
+      {% set admin_org_live_status_html %}
+        {% if current_service.trial_mode and not current_service.organisation_id %}
+            Nee
+            <div class="govuk-hint">Eerst een organisatie koppelen</div>
+        {% elif current_service.trial_mode and current_service.organisation.agreement_signed is false %}
+            Nee
+            <div class="govuk-hint">De organisatie moet eerst de verwerkers- en financiële overeenkomst accepteren</div>
+        {% else %}
+          {{ "Aan" if not current_service.trial_mode else "Uit" }}
+
+          {% do has_change_action.update({
+            "items": [
+              {
+                "href": url_for('main.service_switch_live', service_id=current_service.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "status van de dienst",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }) %}
+        {% endif %}
+      {% endset %}
+
+      {% set admin_service_billing_details_html %}
+        {% if current_service.billing_details %}
+          <ul class="govuk-list">
+            {% for item in current_service.billing_details %}
+              {% if item %}
+                <li>{{ item }}</li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% else %}
+          Geen
+        {% endif %}
+      {% endset %}
+
+      {% set admin_service_parent_org_html %}
+        {% if current_service.organisation_id %}
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.organisation_dashboard', org_id=current_service.organisation_id) }}">
+            {{ current_service.organisation_name }}
+          </a>
+        {% else %}
+          <span class="govuk-hint">Niet ingesteld</span>
+        {% endif %}
+        {% if current_service.organisation_type %}
+          <div class="govuk-hint">
+            {{ current_service.organisation_type_label }}
+          </div>
+        {% endif %}
+      {% endset %}
+
+      {% set admin_service_data_retention_html %}
+        {% for channel in current_service.data_retention %}
+          {% if loop.first %}
+            <ul class="govuk-list">
+          {% endif %}
+            <li>{{ channel.notification_type|format_notification_type }} – {{ channel.days_of_retention }} dagen</li>
+          {% if loop.last %}
+            </ul>
+          {% endif %}
+        {% else %}
+          Niet ingesteld
+        {% endfor %}
+      {% endset %}
+
+      {% set admin_settings_rows = [
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Actief"
+          },
+          "value": {
+            "html": admin_org_live_status_html,
+          },
+          "actions": has_change_action
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Tellen in overzicht actieve diensten"
+          },
+          "value": {
+            "text": current_service.count_as_live|format_yes_no
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.service_switch_count_as_live', service_id=current_service.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "of deze dienst meetelt in het overzicht van actieve diensten",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Facturatiegegevens"
+          },
+          "value": {
+            "text": admin_service_billing_details_html,
+            "classes": "govuk-summary-list__value--default" if not current_service.billing_details
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_service_billing_details', service_id=current_service.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "facturatiegegevens voor deze dienst",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Notities"
+          },
+          "value": {
+            "text": current_service.notes or "Geen",
+            "classes": "govuk-summary-list__value--default" if not current_service.notes
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_service_notes', service_id=current_service.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "de notities van de dienst",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Organisatie"
+          },
+          "value": {
+            "html": admin_service_parent_org_html
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.link_service_to_organisation', service_id=current_service.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "organisatie van deze dienst",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Snelheidslimiet"
+          },
+          "value": {
+            "text": "{} per minuut".format(current_service.rate_limit|format_thousands)
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.set_per_minute_rate_limit', service_id=current_service.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "snelheidslimiet",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "{} limiet".format('email'|format_notification_type)
+          },
+          "value": {
+            "text": "{} per dag".format(current_service.get_message_limit('email')|format_thousands)
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.set_per_day_message_limit', service_id=current_service.id, notification_type='email'),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "dagelijkse {} limiet".format('email'|format_notification_type|lower),
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "{} limiet".format('sms'|format_notification_type)
+          },
+          "value": {
+            "text": "{} per dag".format(current_service.get_message_limit('sms')|format_thousands)
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.set_per_day_message_limit', service_id=current_service.id, notification_type='sms'),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "dagelijkse {} limiet".format('sms'|format_notification_type|lower),
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "{} limiet".format('letter'|format_notification_type)
+          },
+          "value": {
+            "text": "{} per dag".format(current_service.get_message_limit('letter')|format_thousands)
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.set_per_day_message_limit', service_id=current_service.id, notification_type='letter'),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "dagelijkse {} limiet".format('letter'|format_notification_type|lower),
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Vrije sms-bundel"
+          },
+          "value": {
+            "text": "{} per jaar".format(current_service.free_sms_fragment_limit|format_thousands)
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.set_free_sms_allowance', service_id=current_service.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "vrije sms-bundel",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "E-mailopmaak"
+          },
+          "value": {
+            "text": current_service.email_branding.name
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.service_set_branding', service_id=current_service.id, branding_type='email'),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "e-mailopmaak (beheerder)",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Briefopmaak"
+          },
+          "value": {
+            "text": current_service.letter_branding.name or "Niet ingesteld",
+            "classes": "govuk-summary-list__value--default" if not current_service.letter_branding.name
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.service_set_branding', service_id=current_service.id, branding_type='letter'),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "briefopmaak (beheerder)",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Aangepaste bewaartermijnen"
+          },
+          "value": {
+            "text": admin_service_data_retention_html,
+            "classes": "govuk-summary-list__value--default" if not current_service.data_retention
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.data_retention', service_id=current_service.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "bewaartermijnen",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+      ] %}
+
+{% for permission in service_permissions %}
+  {% if not service_permissions[permission].requires or current_service.has_permission(service_permissions[permission].requires) %}
+    {% do admin_settings_rows.append(
+      {
+        "key": {
+          "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+          "text": service_permissions[permission].title
+        },
+        "value": {
+          "text": "Aan" if current_service.has_permission(permission) else "Uit"
+        },
+        "actions": {
+          "items": [
+            {
+              "href": url_for(
+                service_permissions[permission].endpoint or '.service_set_permission',
+                service_id=current_service.id,
+                permission=permission if not service_permissions[permission].endpoint else None
+              ),
+              "text": "Wijzigen",
+              "visuallyHiddenText": "uw instellingen voor " + service_permissions[permission].title,
+              "classes": "govuk-link--no-visited-state"
+            }
+          ]
+        }
+      }
+    ) %}
+  {% endif %}
+{% endfor %}
+
+{{ govukSummaryList({
+  "classes": "notify-summary-list platform-admin-settings",
+  "rows": admin_settings_rows
+}) }}
+
+{% endif %}
+
+<p class="top-gutter-1-2">
+  {% if current_service.active and (current_service.trial_mode or current_user.platform_admin) %}
+  <span class="page-footer-link page-footer-delete-link-without-button">
+    <a
+      class="govuk-link govuk-link--destructive"
+      href="{{ url_for('main.archive_service', service_id=current_service.id) }}"
+    >
+      Verwijder deze dienst
+    </a>
+  </span>
+  {% endif %}
+  {% if current_user.platform_admin %}
+    <span class="page-footer-link">
+      <a
+        class="govuk-link govuk-link--no-visited-state"
+        href="{{ url_for('main.history', service_id=current_service.id) }}"
+      >
+        Geschiedenis van de dienst
+      </a>
+    </span>
+  {% endif %}
+</p>
+{% endblock %}

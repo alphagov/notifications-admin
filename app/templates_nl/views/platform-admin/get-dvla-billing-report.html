@@ -1,0 +1,49 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import mapping_table, row, text_field %}
+
+{% block per_page_title %}
+  DVLA Facturatie Rapport
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-large">
+    DVLA Facturatie Rapport
+  </h1>
+
+  {% call form_wrapper() %}
+    {{ form.start_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ form.end_date(param_extensions={"hint": {"text": "Gebruik het formaat JJJJ-MM-DD"}}) }}
+    {{ page_footer('Download rapport (CSV)') }}
+  {% endcall %}
+
+  <h2 class="heading-medium">
+    Gegevens opgenomen in het rapport
+  </h2>
+<div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Beschrijving van facturatierapportgegevens',
+      field_headings=['Naam', 'Beschrijving'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for column_heading, description in [
+        ('despatch date', 'De datum waarop deze brieven door DVLA zijn verzonden'),
+        ('postage', 'De postzegelsoort van de brieven (bijv. eerste, tweede, Europa, rest van de wereld)'),
+        ('DVLA cost threshold', 'Een intern DVLA prijsdrempel (gesorteerd, ongesorteerd).'),
+        ('sheets', 'Het aantal pagina’s per brief (1-5 pagina’s)'),
+        ('rate (€)', 'De eenheidsprijs per brief in € (Eur)'),
+        ('letters', 'Het aantal verzonden brieven'),
+        ('cost (€)', 'De kosten voor het verzenden van deze brieven in € (Eur)'),
+      ] %}
+        {% call row() %}
+          {{ text_field(column_heading) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "withnav_template.html" %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "components/branding-preview.html" import email_branding_preview %}
+
+{% block service_page_title %}
+  Maak een overheidsidentiteitslogo
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Maak een overheidsidentiteitslogo') }}
+
+  {% if example %}
+    {{ email_branding_preview(example.id, title="Voorbeeld van een e-mail met een overheidsidentiteitslogo") }}
+  {% endif %}
+
+  <p class="govuk-body">
+    Een overheidsidentiteitslogo bestaat uit:
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>een gekleurde lijn</li>
+    <li>een symbool, bijvoorbeeld de Rijkswapen</li>
+    <li>tekst, meestal de naam van de organisatie</li>
+  </ul>
+
+  <p class="govuk-body">
+    U moet de tekst invoeren die in het logo wordt weergegeven.
+  </p>
+  <p class="govuk-body">
+    Wij selecteren voor u het juiste symbool en de gekleurde lijn.
+  </p>
+  <p class="govuk-body">
+    Het kan tot 1 werkdag duren voordat wij een nieuw logo hebben gemaakt.
+  </p>
+
+  {{ govukButton({
+    "element": "a",
+    "text": "Doorgaan",
+    "href": url_for(
+      '.email_branding_enter_government_identity_logo_text',
+      service_id=service_id,
+      branding_choice=branding_choice,
+      logo_type=logo_type
+    )
+  }) }}
+
+{% endblock %}

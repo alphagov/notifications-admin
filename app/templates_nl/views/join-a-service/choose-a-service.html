@@ -1,0 +1,58 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/live-search.html" import live_search %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% set heading = 'Kies de dienst waarvoor u lid wilt worden' %}
+
+{% block per_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block backLink %}
+    {{ govukBackLink({ "href": url_for('main.your_services') }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-large">
+      {{ heading }}
+    </h1>
+    <p class="govuk-body govuk-!-margin-bottom-6">
+      {{ current_user.default_organisation.name }} heeft {{ current_user.default_organisation.live_services | length }} actieve dienst{{ '' if current_user.default_organisation.live_services | length == 1 else 'en' }}</p>
+
+    {% set wrongOrganisationCallout %}
+      <p class="govuk-body">NotifyNL gebruikt uw e-mailadres om te bepalen welke diensten u ziet.</p>
+      <p class="govuk-body">Als uw organisatie is veranderd, <a class="govuk-link govuk-link--no-visited-state"
+          href="{{ url_for('main.support') }}">neem dan contact met ons op</a>.</p>
+    {% endset %}
+
+    {{ govukDetails({
+      "summaryText": "Ik werk niet voor " + current_user.default_organisation.name,
+      "html": wrongOrganisationCallout
+    }) }}
+
+    {{ live_search(
+      target_selector='.browse-list-item',
+      show=current_user.default_organisation.live_services | length > 7,
+      form=_search_form,
+      label='Zoeken op naam',
+    ) }}
+
+    <ul>
+      {% for service in current_user.default_organisation.live_services | sort %}
+        <li class="browse-list-item">
+          <a href="{{ url_for('main.join_service_ask', service_to_join_id=service.id) }}" class="govuk-link govuk-link--no-visited-state">{{ service.name }}</a>
+          <p class="browse-list-hint">
+              {% if current_user.belongs_to_service(service.id) %}
+                U bent al lid van dit team
+              {% endif %}
+          </p>
+        </li>
+
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

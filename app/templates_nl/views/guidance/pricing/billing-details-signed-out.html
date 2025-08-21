@@ -1,0 +1,30 @@
+{% extends "content_template.html" %}
+
+{% from "components/page-header.html" import page_header %}
+
+{# Wordt gebruikt door de content_template.html-layout, prefix voor de toegankelijke naam van de "navigation" #}
+{% set navigation_label_prefix = 'Prijsinformatie' %}
+
+{% block per_page_title %}
+  Facturatiegegevens
+{% endblock %}
+
+{% block content_column_content %}
+
+    {{ page_header('Facturatiegegevens') }}
+
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in', next=url_for('main.guidance_billing_details')) }}">Meld u aan</a> om onze:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+      <li>gegevens van de leverancier</li>
+      <li>bankgegevens</li>
+      <li>factuuradres</li>
+    </ul>
+
+    <p class="govuk-body">
+      U kunt deze informatie gebruiken om het Department for Science, Innovation and Technology (DSIT) toe te voegen als leverancier. Uw organisatie moet dit mogelijk doen voordat u een inkooporder kunt aanmaken.
+    </p>
+
+{% endblock %}

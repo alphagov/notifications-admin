@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/list-entry.html" import list_entry %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Gastenlijst
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.api_integration', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Gastenlijst') }}
+
+  <p class="govuk-body">
+    U kunt een team- en gastenlijst-sleutel gebruiken om echte berichten te versturen naar uw team en maximaal 5 andere e-mailadressen of telefoonnummers.
+  </p>
+
+  <p class="govuk-body">
+    U hoeft uzelf of uw <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.manage_users', service_id=current_service.id) }}">teamleden</a> niet toe te voegen aan de gastenlijst.
+  </p>
+
+  {% call form_wrapper() %}
+
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+
+        {{ list_entry(
+          form.email_addresses,
+          item_name='e-mailadres',
+          autocomplete=False
+        ) }}
+
+        {{ list_entry(
+          form.phone_numbers,
+          item_name='telefoonnummer',
+          autocomplete=False
+        ) }}
+
+      </div>
+    </div>
+
+    {{ page_footer('Opslaan') }}
+
+  {% endcall %}
+
+{% endblock %}

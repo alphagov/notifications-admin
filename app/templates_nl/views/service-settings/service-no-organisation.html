@@ -1,0 +1,20 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% set title = "Deze dienst behoort niet tot een organisatie" %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(title) }}
+
+  <p class="govuk-body">
+    U dient deze dienst eerst
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.link_service_to_organisation', service_id=current_service.id) }}">te koppelen aan een organisatie</a>
+    voordat u deze live kunt zetten.
+  </p>
+
+{% endblock %}

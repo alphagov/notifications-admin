@@ -1,0 +1,50 @@
+Hallo {{ current_user.name }}
+
+# Neem contact op met het teamlid dat dit verzoek heeft ingediend om live te gaan
+
+Servicenaam: {{ current_service.name }}
+
+{% if check_if_unique and unclear_service_name %}
+U heeft ons verteld dat:
+
+* deze service mogelijk niet uniek is
+* de servicenaam niet makkelijk te begrijpen is
+{% elif check_if_unique %}
+U heeft ons verteld dat deze service mogelijk niet uniek is.
+{% else %}
+U heeft ons verteld dat de servicenaam niet makkelijk te begrijpen is.
+{% endif %}
+
+Voordat u het verzoek om live te gaan kunt accepteren of afwijzen, moet u contact opnemen met {{ current_service.go_live_user.name }}.
+
+Hun e-mailadres is {{ current_service.go_live_user.email_address }}
+
+{% if check_if_unique %}
+# Controleer of de service uniek is
+
+{{ current_service.organisation.name }} mag niet meer dan één actieve service voor hetzelfde doel hebben.
+
+Als deze service niet uniek is, moet u het verzoek om live te gaan afwijzen.
+{% endif %}
+
+{% if unclear_service_name %}
+# Werk de servicenaam bij
+
+{% if check_if_unique %}
+Als de service uniek is, moet u {{ current_service.go_live_user.name }} vragen om:
+{% else %}
+Vraag {{ current_service.go_live_user.name }} om:
+{% endif %}
+
+1. Ga naar de pagina ‘Instellingen’ voor hun service.
+2. Selecteer ‘Wijzigen’ bij ‘Servicenaam’.
+3. Volg de richtlijnen voor het benoemen van hun service.
+4. Geef u door wanneer dit is gedaan.
+{% endif %}
+
+^ [Goedkeuren of afwijzen van het verzoek om live te gaan]( {{ url_for('.org_member_make_service_live_start', service_id=current_service.id, _external=True) }} )
+
+Bedankt
+
+Het NotifyNL team
+https://admin.notifynl.nl

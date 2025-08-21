@@ -1,0 +1,48 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/branding-preview.html" import email_branding_preview %}
+
+{% set page_title = 'E-mailhuisstijl wijzigen' %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": url_for('main.service_settings', service_id=current_service.id)
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(page_title) }}
+
+  <p class="govuk-body">
+    Uw e-mails hebben momenteel de huisstijl {{ current_service.email_branding.name }}.
+  </p>
+
+  {{ email_branding_preview(
+    current_service.email_branding_id if current_service.email_branding else '__NONE__',
+    title='Voorbeeld van de huidige e-mailhuisstijl'
+  ) }}
+
+  {% if current_service.needs_to_change_email_branding %}
+    <p class="govuk-body">
+      U dient in plaats daarvan uw eigen huisstijl te gebruiken.
+    </p>
+  {% endif %}
+
+  {% call form_wrapper() %}
+    {% if form.something_else_is_only_option %}
+      <input type="hidden" name="options" value="something_else"/>
+    {% else %}
+      {{ form.options }}
+    {% endif %}
+    {{ page_footer('Doorgaan') }}
+  {% endcall %}
+
+{% endblock %}

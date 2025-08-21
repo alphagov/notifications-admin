@@ -1,0 +1,39 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Sms-berichten verzenden
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('Sms-berichten verzenden') }}
+      <p class="govuk-body">
+        U heeft een gratis tegoed van
+        {{ current_service.free_sms_fragment_limit|format_thousands }} sms-berichten per
+        begrotingsjaar.
+      </p>
+      <p class="govuk-body">
+        Het kost {{ sms_rate }} cent (excl. btw) voor elk sms-bericht dat u verstuurt
+        nadat uw gratis tegoed is opgebruikt.
+      </p>
+      <p class="govuk-body">
+        Zie <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">tarieven</a> voor meer informatie.
+      </p>
+      {% call form_wrapper() %}
+        {{ form.enabled }}
+        {{ page_footer('Opslaan') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

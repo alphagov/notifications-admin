@@ -1,0 +1,44 @@
+{% extends "withoutnav_template.html" %}
+
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  De NotifyNL-dienst is voor mensen die bij de overheid werken
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.support') }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {{ page_header('NotifyNL is voor mensen die bij de overheid werken') }}
+
+    <p class="govuk-body">
+      Wij kunnen geen advies geven aan het publiek. Wij hebben geen toegang tot informatie die overheidsorganisaties over u hebben.
+    </p>
+
+    <p class="govuk-body">
+      Op andere pagina’s van GOV.UK vindt u hulp:
+    </p>
+
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-1">
+      <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/contact">Neem contact op met de overheid</a>
+    </h2>
+    <p class="govuk-body">
+      Stel vragen over uitkeringen, verkeer, vervoer, belastingen en meer.
+    </p>
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-1">
+      <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/report-suspicious-emails-websites-phishing">Meld internetoplichting en phishing</a>
+    </h2>
+    <p class="govuk-body">
+      Advies over verdachte e-mails en sms-berichten.
+    </p>
+  </div>
+</div>
+
+{% endblock %}

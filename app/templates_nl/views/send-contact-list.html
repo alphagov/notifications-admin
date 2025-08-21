@@ -1,0 +1,77 @@
+{% extends "withnav_template.html" %}
+{% from "components/big-number.html" import big_number -%}
+{% from "components/list.html" import list_of_placeholders %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/table.html" import list_table, field, row_heading %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Kies een noodcontactlijst
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.send_one_off', service_id=current_service.id, template_id=template.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Kies een noodcontactlijst') }}
+
+  {% if template.placeholders %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-five-sixths">
+        <p class="govuk-body">
+          U kunt deze sjabloon niet gebruiken met een noodcontactlijst omdat deze
+          is gepersonaliseerd met {{ list_of_placeholders(template.placeholders) }}.
+        </p>
+        <p class="govuk-body">
+          Noodcontactlijsten mogen alleen e-mailadressen of telefoonnummers bevatten.
+        </p>
+      </div>
+    </div>
+  {% elif contact_lists %}
+    <div class='dashboard-table ajax-block-container'>
+      {% call(item, row_number) list_table(
+        contact_lists,
+        caption="Noodcontactlijsten",
+        caption_visible=False,
+        empty_message=(
+          'U heeft nog geen contactlijsten opgeslagen.'
+        ),
+        field_headings=[
+          'Bestand',
+          'Status'
+        ],
+        field_headings_visible=False
+      ) %}
+        {% call row_heading() %}
+          <div class="file-list">
+            <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.send_from_contact_list', service_id=current_service.id, template_id=template.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
+            <span class="file-list-hint-large">
+              Geüpload op {{ item.created_at|format_datetime_relative }}
+            </span>
+          </div>
+        {% endcall %}
+        {% call field() %}
+          {{ big_number(
+            item.row_count,
+            smallest=True,
+            label=item.row_count|recipient_count_label(item.template_type),
+          ) }}
+        {% endcall %}
+      {% endcall %}
+    </div>
+  {% else %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-five-sixths">
+        <p class="govuk-body">
+          U heeft nog geen lijsten met {{ 99|recipient_count_label(template.template_type) }} opgeslagen.
+        </p>
+        <p class="govuk-body">
+          Ga naar de pagina <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploads', service_id=current_service.id) }}">uploads</a> om een noodcontactlijst te uploaden en op te slaan.
+        </p>
+      </div>
+    </div>
+  {% endif %}
+
+{% endblock %}

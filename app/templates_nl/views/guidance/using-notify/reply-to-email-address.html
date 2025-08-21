@@ -1,0 +1,28 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  Reply-to e-mailadres
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Reply-to e-mailadres</h1>
+
+  <p class="govuk-body">U kunt het e-mailadres kiezen waar uw gebruikers op reageren.</p>
+
+  <p class="govuk-body">E-mails met een reply-to adres lijken betrouwbaarder en worden minder snel als spam gemarkeerd.</p>
+
+  <p class="govuk-body">Om een reply-to e-mailadres toe te voegen:</p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Ga naar de sectie <b class="govuk-!-font-weight-bold">E-mailinstellingen</b> op de {{ service_link(current_service, 'main.service_settings', 'instellingen') }} pagina.</li>
+    <li>Kies <b class="govuk-!-font-weight-bold">Beheren</b> bij de regel <b class="govuk-!-font-weight-bold">Reply-to e-mailadressen</b>.</li>
+    <li>Kies <b class="govuk-!-font-weight-bold">Reply-to adres toevoegen</b>.</li>
+  </ol>
+
+{% endblock %}

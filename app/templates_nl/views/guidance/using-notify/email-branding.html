@@ -1,0 +1,27 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  E-mailhuisstijl
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">E-mailhuisstijl</h1>
+
+  <p class="govuk-body">U kunt het logo en de huisstijlkleuren van uw organisatie toevoegen aan e-mailsjablonen.</p>
+
+  <p class="govuk-body">De standaardhuisstijl voor e-mailsjablonen is het GOV.UK-logo.</p>
+
+  <p class="govuk-body">Zo wijzigt u uw e-mailhuisstijl:</p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Ga naar de sectie <b class="govuk-!-font-weight-bold">E-mailinstellingen</b> op de {{ service_link(current_service, 'main.service_settings', 'instellingen') }}-pagina.</li>
+    <li>Selecteer <b class="govuk-!-font-weight-bold">Wijzigen</b> bij de regel <b class="govuk-!-font-weight-bold">E-mailhuisstijl</b>.</li>
+  </ol>
+
+{% endblock %}

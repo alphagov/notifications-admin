@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% set title = "Neem contact op met het teamlid dat het verzoek heeft ingediend om live te gaan" %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      <p class="govuk-body">
+        U heeft een e-mail ontvangen met instructies.
+      </p>
+
+      {% set reasons = [] %}
+      {% if unique != 'yes' %}
+        {% do reasons.append('te controleren of ‘' + current_service.name + '’ uniek is') %}
+      {% endif %}
+      {% if name == 'bad' %}
+        {% do reasons.append('de naam van de dienst aan te passen zodat deze duidelijk is') %}
+      {% endif %}
+
+      {% if reasons|length == 0 %}
+        {# Dit zal een DivideByZero-fout veroorzaken zodat we kunnen onderzoeken wat er is gebeurd #}
+        {{ ('geen reden om contact op te nemen met gebruiker') / 0 }}
+      {% elif reasons|length == 1 %}
+        <p class="govuk-body">Voordat u dit verzoek kunt goedkeuren of afwijzen, neemt u contact op met {{ current_service.go_live_user.name }} om {{ reasons[0] }}.</p>
+      {% else %}
+        <p class="govuk-body">Voordat u dit verzoek kunt goedkeuren of afwijzen, neemt u contact op met {{ current_service.go_live_user.name }} om het volgende te doen:</p>
+        <ul class="govuk-list govuk-list--bullet">
+          {% for reason in reasons %}
+          <li>{{ reason }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <p class="govuk-body">
+        Het e-mailadres is {{ current_service.go_live_user.email_address }}
+      </p>
+
+      <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation_id) }}">Ga terug naar het dashboard van {{ current_service.organisation.name }}</a>
+      </p>
+
+    </div>
+  </div>
+{% endblock %}

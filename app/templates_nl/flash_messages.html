@@ -1,0 +1,35 @@
+{% from "components/banner.html" import banner %}
+{% set category_translations = {
+  'cancel': 'annuleren',
+  'delete': 'verwijderen',
+  'suspend': 'onderbreken',
+  'resume': 'hervatten',
+  'remove': 'verwijderen',
+  'remove default letter branding': 'standaard huisstijl voor brieven verwijderen',
+  'revoke this API key': 'deze API-sleutel intrekken',
+  'make this email branding the default': 'deze e-mailhuisstijl als standaard instellen',
+  'make this letter branding the default': 'deze brievenhuisstijl als standaard instellen',
+  'try again': 'Opnieuw proberen'
+} %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      {% if category in category_translations %}
+        {% set delete_button_text = "Ja, {}".format(category_translations[category]) %}
+      {% else %}
+        {% set delete_button_text = None %}
+      {% endif %}
+      <div class="bottom-gutter">
+        {{ banner(
+          message if message is string else message[0],
+          'default' if ((category == 'default') or (category == 'default_with_tick')) else 'dangerous',
+          delete_button=delete_button_text,
+          with_tick=True if category == 'default_with_tick' else False,
+          context=message[1] if message is not string,
+          thing=message[2] if message is not string and message[2]
+        )}}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}

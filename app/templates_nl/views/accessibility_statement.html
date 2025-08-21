@@ -1,0 +1,162 @@
+{% extends "content_template.html" %}
+{% from "components/content-metadata.html" import content_metadata %}
+
+{% block per_page_title %}
+  Toegankelijkheidsverklaring
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Toegankelijkheidsverklaring</h1>
+
+  {{ content_metadata(
+    data={
+      "Gepubliceerd": "23 september 2020",
+      "Laatst bijgewerkt": "13 mei 2025",
+      "Volgende beoordeling": "30 juni 2025"
+    }
+    ) }}
+    {# Laatste niet-functionele wijziging: 13 december 2024 #}
+
+  <p class="govuk-body">
+    Deze toegankelijkheidsverklaring is van toepassing op de domeinnaam www.notifications.service.gov.uk.
+    Deze geldt niet voor de <a class="govuk-link govuk-link--no-visited-state" href="https://docs.notifications.service.gov.uk">NotifyNL API-documentatie subdomein</a>.
+  </p>
+
+  <p class="govuk-body">
+    Deze website wordt beheerd door het NotifyNL-team van de Government Digital Service (GDS).
+    De site is ontworpen om door zoveel mogelijk mensen gebruikt te kunnen worden. U moet in staat zijn om:
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>kleuren, contrastniveaus en lettertypen aan te passen via de instellingen van uw browser of apparaat</li>
+    <li>in te zoomen tot 400% zonder dat de tekst buiten het scherm valt</li>
+    <li>de meeste delen van de website te bedienen met een toetsenbord of spraakherkenningssoftware</li>
+    <li>de meeste delen van de website te beluisteren met een schermlezer (waaronder de nieuwste versies van JAWS, NVDA en VoiceOver)</li>
+  </ul>
+
+  <p class="govuk-body">
+    We hebben de teksten op de website ook zo eenvoudig mogelijk gehouden om te begrijpen.
+  </p>
+
+  <p class="govuk-body">
+    <a class="govuk-link govuk-link--no-visited-state" href="https://mcmw.abilitynet.org.uk">AbilityNet</a> geeft advies over het gebruiksvriendelijker maken van uw apparaat als u een beperking heeft.
+  </p>
+
+  <h2 class="heading-medium" id="how-accessible-this-website-is">Hoe toegankelijk deze website is</h2>
+
+  <p class="govuk-body">
+    We weten dat sommige onderdelen van deze website niet volledig toegankelijk zijn:
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>pagina’s voor template-mappen kunnen door schermlezers verwarrend worden aangekondigd</li>
+    <li>de statuspagina van Notify kent meerdere toegankelijkheidsproblemen</li>
+  </ul>
+
+  <p class="govuk-body">
+    We weten ook dat de e-mails die Notify verstuurt niet volledig toegankelijk zijn. De NVDA-schermlezer leest extra spaties voor in e-mails wanneer deze bekeken worden in Microsoft Outlook.
+  </p>
+
+  <h2 class="heading-medium" id="feedback-and-contact-information">Feedback en contactgegevens</h2>
+
+  <p class="govuk-body">
+    Als u een deel van deze dienst in een ander formaat nodig heeft, zoals grote letters, audio-opname of braille, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">neem dan contact op met het NotifyNL-team</a>.
+  </p>
+
+  <p class="govuk-body">
+    We zullen uw verzoek in overweging nemen en binnen de volgende werkdag contact met u opnemen.
+  </p>
+
+  <h2 class="heading-medium" id="reporting-accessibility-problems">Toegankelijkheidsproblemen melden</h2>
+
+  <p class="govuk-body">
+    We streven er voortdurend naar de toegankelijkheid van deze website te verbeteren. Als u problemen vindt die niet op deze pagina staan of denkt dat we niet voldoen aan toegankelijkheidseisen, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">neem dan contact op met het NotifyNL-team</a>.
+  </p>
+
+  <h2 class="heading-medium" id="enforcement-procedure">Handhavingsprocedure</h2>
+
+  <p class="govuk-body">
+    De Equality and Human Rights Commission (EHRC) is verantwoordelijk voor de handhaving van de Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (‘toegankelijkheidsregels’).
+    Bent u niet tevreden over onze reactie op uw klacht, <a class="govuk-link govuk-link--no-visited-state" href="https://www.equalityadvisoryservice.com/">neem dan contact op met de Equality Advisory and Support Service (EASS)</a>.
+  </p>
+
+  <h2 class="heading-medium" id="technical-information">Technische informatie over de toegankelijkheid van deze website</h2>
+
+  <p class="govuk-body">
+    GDS zet zich in om haar websites toegankelijk te maken, in overeenstemming met de Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018.
+  </p>
+
+  <h2 class="heading-medium" id="compliance-status">Voldoen aan richtlijnen</h2>
+
+  <p class="govuk-body">
+    We hebben de Notify-website getest aan de hand van de Web Content Accessibility Guidelines (WCAG) 2.2 AA-standaard.
+  </p>
+
+  <p class="govuk-body">
+    Deze website voldoet gedeeltelijk aan de WCAG 2.2 AA-standaard, vanwege onderstaande punten van niet-naleving.
+  </p>
+
+  <h2 class="heading-medium" id="non-accessible-content">Niet-toegankelijke inhoud</h2>
+
+  <h3 class="heading-small" id="non-compliance">Niet-naleving van de toegankelijkheidsregels</h3>
+
+  <p class="govuk-body">
+    De volgende inhoud op de Notify-website voldoet niet aan de WCAG 2.2 AA-standaard:
+  </p>
+
+  <h3 class="heading-small" id="problems-with-using-the-interface">Problemen bij gebruik van de interface</h3>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>
+      Pagina-koppen op pagina’s voor mappen kunnen verwarrend zijn voor schermlezergebruikers. We hebben ze opnieuw ontworpen en zullen dit binnenkort testen.
+    </li>
+  </ol>
+
+  <h3 class="heading-small" id="pdfs-documents">
+    PDF’s en andere documenten
+  </h3>
+
+  <h3 class="heading-small" id="emails">
+    E-mails
+  </h3>
+
+  <p class="govuk-body">
+    De NVDA-schermlezer leest extra spaties voor in e-mails wanneer deze bekeken worden in Microsoft Outlook.
+  </p>
+
+  <h3 class="heading-small" id="status-page">
+    Statuspagina
+  </h3>
+
+  <p class="govuk-body">
+    De volgende inhoud op de <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk/">Notify-statuspagina</a> voldoet niet aan de WCAG 2.2 AA-standaard:
+  </p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>een onjuiste hiërarchie van koppen, waardoor <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#info-and-relationships">succescriterium 1.3.1: informatie en relaties</a> faalt</li>
+    <li>ontbrekende koppen van niveau 1 (gebruikers kunnen de structuur van de pagina mogelijk niet goed bepalen)</li>
+    <li>onvoldoende hoofdkoppen op de incidentenpagina en een onjuiste koppenhiërarchie op de statusstartpagina – dit faalt <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#info-and-relationships">succescriterium 1.3.1: informatie en relaties</a></li>
+    <li>de formulieren voor het abonneren op statusupdates geven bij een foutmelding geen melding aan schermlezergebruikers – dit faalt <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#status-messages">succescriterium 4.1.3: statusberichten</a></li>
+    <li>sommige invoervelden voor automatische invulling zijn niet correct ingesteld – dit faalt <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#identify-input-purpose">succescriterium 1.3.5: invoerdoel identificeren</a></li>
+    <li>titels van incidenten zijn alleen kleurgecodeerd, zonder andere visuele of tekstuele aanwijzing – dit faalt <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#use-of-color">succescriterium 1.4.1: kleurgebruik</a></li>
+    <li>links worden alleen door kleur onderscheiden zonder andere visuele aanwijzing – dit faalt <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#use-of-color">succescriterium 1.4.1: kleurgebruik</a></li>
+    <li>de pop-up voor het abonneren op statusupdates wordt deels afgesneden bij 200% inzoomen – dit faalt <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#resize-text">succescriterium 1.4.4: tekstgrootte aanpassen</a></li>
+    <li>dezelfde pop-up wordt bijna volledig afgesneden bij 400% inzoomen – dit faalt <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#resize-text">succescriterium 1.4.4: tekstgrootte aanpassen</a></li>
+  </ul>
+
+  <h2 class="heading-medium" id="preparing-this-accessibility-statement">Opstellen van deze toegankelijkheidsverklaring</h2>
+
+  <p class="govuk-body">
+    Deze toegankelijkheidsverklaring is opgesteld op 13 mei 2025. Hij is voor het laatst beoordeeld op 30 juni 2025.
+  </p>
+
+  <h2 class="heading-medium" id="contact">Contactgegevens</h2>
+
+  <p class="govuk-body">
+    Voor vragen of opmerkingen over deze toegankelijkheidsverklaring kunt u contact opnemen met het NotifyNL-team:
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>Telefoon: 020 7946 0000</li>
+    <li>E-mail: <a href="mailto:notify@digital.cabinet-office.gov.uk" class="govuk-link govuk-link--no-visited-state">notify@digital.cabinet-office.gov.uk</a></li>
+  </ul>
+
+{% endblock %}

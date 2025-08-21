@@ -1,0 +1,153 @@
+{% extends "content_template.html" %}
+{% from "components/big-number.html" import big_number %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/table.html" import field, list_table %}
+
+{% set navigation_label_prefix = 'Functionaliteiten' %}
+{% set content_column_width = 'three-quarters' %}
+{% set bodyClasses = 'performance' %}
+
+{% block per_page_title %}
+  Prestatiegegevens
+{% endblock %}
+
+{% block content_column_content %}
+
+  <div class="govuk-grid-row govuk-!-margin-bottom-8">
+    <div class="govuk-grid-column-two-thirds">
+      {{ page_header('Prestatiegegevens') }}
+    </div>
+  </div>
+
+  <h2 class="govuk-heading-m" id='messages-sent-since-may-2016'>
+    Berichten verstuurd sinds mei 2016
+  </h2>
+
+  <div class="totals totals--4-column">
+    <p class="totals__all">
+      <span class="product-page-big-number">{{ total_notifications|format_billions }}</span>
+      in totaal
+    </p>
+    <p class="totals__set-type">
+      {{ big_number(
+        email_notifications|format_billions,
+        label=email_notifications|message_count_noun('email'),
+        smallest=True,
+      ) }}
+    </p>
+    <p class="totals__set-type">
+      {{ big_number(
+        sms_notifications|format_billions,
+        label=sms_notifications|message_count_noun('sms'),
+        smallest=True,
+      ) }}
+    </p>
+    <p class="totals__set-type">
+      {{ big_number(
+        letter_notifications|format_billions,
+        label=letter_notifications|message_count_noun('letter'),
+        smallest=True,
+      ) }}
+    </p>
+  </div>
+
+  <div class="dashboard-table dashboard-table--4-column">
+    {% call(item, row_number) list_table(
+      notifications_by_type|reverse,
+      caption='Berichten verstuurd sinds mei 2016',
+      caption_visible=False,
+      field_headings=[
+        'Datum',
+        99|message_count_noun('email')|capitalize,
+        99|message_count_noun('sms')|capitalize,
+        99|message_count_noun('letter')|capitalize,
+      ],
+      empty_message='Geen gegevens om weer te geven'
+    ) %}
+      {% call field() %}
+        {{ item.date | format_date_normal }}
+      {% endcall %}
+      {% call field() %}
+        {{ item.emails|format_thousands }}
+      {% endcall %}
+      {% call field() %}
+        {{ item.sms|format_thousands }}
+      {% endcall %}
+      {% call field() %}
+        {{ item.letters|format_thousands }}
+      {% endcall %}
+    {% endcall %}
+    <p class="table-show-more-link">
+      Er worden alleen de laatste {{ notifications_by_type|length }} dagen weergegeven
+    </p>
+  </div>
+
+  <h2 class="govuk-heading-m" id='messages-sent-within-10-seconds'>
+    Berichten verstuurd binnen 10 seconden
+  </h2>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-half">
+      {{ big_number(
+        '{:.2f}%'.format(average_percentage_under_10_seconds),
+        label='gemiddeld',
+      ) }}
+    </div>
+  </div>
+  <div class="dashboard-table dashboard-table--2-column">
+    {% call(item, row_number) list_table(
+      processing_time | reverse,
+      caption='Berichten verstuurd binnen 10 seconden',
+      caption_visible=False,
+      field_headings=[
+        'Datum', 'Percentage'
+      ],
+      empty_message='Geen gegevens om weer te geven'
+    ) %}
+      {% call field() %}
+        {{ item.date | format_date_normal }}
+      {% endcall %}
+      {% call field() %}
+        {{ '{:.2f}%'.format(item.percentage_under_10_seconds) }}
+      {% endcall %}
+    {% endcall %}
+    <p class="table-show-more-link">
+      Er worden alleen de laatste {{ processing_time|length }} dagen weergegeven
+    </p>
+  </div>
+
+  <h2 class="govuk-heading-m" id='organisations-using-notify'>
+    Organisaties die Notify gebruiken
+  </h2>
+  <p class="totals totals--2-column bottom-gutter">
+    <span class="totals__all">
+      <span class="govuk-visually-hidden">Er zijn</span>
+      <span class="product-page-big-number">{{ count_of_live_services_and_organisations.organisations|format_thousands }}</span>
+      organisaties
+    </span>
+    <span class="totals__set-type">
+      <span class="govuk-visually-hidden">en</span>
+      <span class="product-page-big-number">{{ count_of_live_services_and_organisations.services|format_thousands }}</span>
+      diensten
+      <span class="govuk-visually-hidden">die Notify gebruiken.</span>
+    </span>
+  </p>
+  <div class="dashboard-table dashboard-table--2-column">
+    {% call(item, row_number) list_table(
+      organisations_using_notify,
+      caption='Organisaties die Notify gebruiken',
+      caption_visible=False,
+      field_headings=[
+        'Organisatie', 'Aantal actieve diensten'
+      ],
+      empty_message='Geen gegevens om weer te geven'
+    ) %}
+      {% call field() %}
+        {{ item.organisation_name }}
+      {% endcall %}
+      {% call field() %}
+        {{ item.count_of_live_services }}
+      {% endcall %}
+    {% endcall %}
+  </div>
+
+{% endblock %}

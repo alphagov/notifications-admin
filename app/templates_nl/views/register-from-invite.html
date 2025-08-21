@@ -1,0 +1,50 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block per_page_title %}
+Account aanmaken
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ govuk_page_header("Account aanmaken") }}
+    <p class="govuk-body">
+      Uw account wordt aangemaakt met dit e-mailadres:
+      <span class="nowrap">{{invited_user.email_address}}</span>
+    </p>
+    {% call form_wrapper() %}
+      {#
+        Dit veld is bedoeld zodat wachtwoordmanagers ook de gebruikersnaam kunnen opslaan,
+        maar het moet niet zichtbaar zijn voor gebruikers en ook niet verwerkt worden door de view.
+      #}
+      <div class="govuk-visually-hidden">
+        <label for="username" aria-hidden="true">E-mail</label>
+        <input type="email" name="username" id="username" value="{{ invited_user.email_address }}" disabled="disabled" tabindex="-1" aria-hidden="true" autocomplete="username" />
+      </div>
+      {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
+      {% if invited_user.auth_type == 'sms_auth' %}
+        <div class="extra-tracking">
+          {{ form.mobile_number(param_extensions={
+              "classes": "govuk-!-width-three-quarters",
+              "hint": {"text": "We sturen u een beveiligingscode per sms"}
+          }) }}
+        </div>
+      {% endif %}
+      {{ form.password(param_extensions={
+          "classes": "govuk-!-width-three-quarters",
+          "hint": {"text": "Minimaal 8 tekens"},
+          "autocomplete": "new-password"
+        }) }}
+      {{ page_footer("Doorgaan") }}
+      {{form.service}}
+      {{form.email_address}}
+      {{form.auth_type}}
+    {% endcall %}
+  </div>
+</div>
+
+{% endblock %}

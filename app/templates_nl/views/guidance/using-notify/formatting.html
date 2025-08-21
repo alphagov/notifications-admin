@@ -1,0 +1,118 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  E-mails en brieven opmaken
+{% endblock %}
+
+{% block content_column_content %}
+  <h1 class="heading-large">E-mails en brieven opmaken</h1>
+
+<p class="govuk-body">NotifyNL gebruikt Markdown om inhoud op te maken.</p>
+<p class="govuk-body">U ziet de opmaakinstructies terwijl u een sjabloon bewerkt:</p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Ga naar de {{ service_link(current_service, 'main.choose_template', 'sjablonen') }}-pagina.</li>
+    <li>Voeg een nieuw sjabloon toe of kies een bestaand sjabloon en selecteer <b class="govuk-!-font-weight-bold">Bewerken</b>.</li>
+    <li>Scroll naar beneden om een handleiding van de beschikbare Markdown te zien.</li>
+  </ol>
+
+<h2 class="heading-medium">Opmaakopties</h2>
+ <p class="govuk-body">E-mailsjablonen kunnen bevatten:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#bullets">opsommingstekens</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#headings-and-subheadings">koppen</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#horizontal-lines">horizontale lijnen</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#inset-text">ingesprongen tekst</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#numbered-steps">genummerde stappen</a></li>
+  </ul>
+
+ <p class="govuk-body">Brieven kunnen bevatten:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#bullets">opsommingstekens</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#headings-and-subheadings">koppen</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#numbered-steps">genummerde stappen</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#page-breaks">paginabreuken</a></li>
+  </ul>
+
+<p class="govuk-body">U kunt geen vet, cursief, onderstreept tekst, verschillende lettertypen of lettertypes gebruiken. Dit maakt het voor mensen moeilijker om te lezen wat u geschreven heeft.</p>
+
+<h2 class="heading-medium">Handleiding</h2>
+
+{% include "partials/templates/guidance-bullet-points.html" %}
+
+<h3 class="heading-small" id="headings-and-subheadings">Koppen</h3>
+<p class="govuk-body">Gebruik een kop om ontvangers te vertellen waar uw e-mail of brief over gaat.</p>
+<p class="govuk-body">Gebruik in e-mails subkoppen om de rest van uw inhoud op te delen. Uw eerste subkop moet na een kop komen.</p>
+<p class="govuk-body">Gebruik in brieven koppen om de rest van uw inhoud op te delen.</p>
+<p class="govuk-body">Schrijf alle koppen en subkoppen met een hoofdletter aan het begin van de zin.</p>
+<p class="govuk-body">Gebruik één hekje gevolgd door een spatie voor een kop in e-mails en brieven, bijvoorbeeld:</p>
+
+<pre class="formatting-example"><code class="lang-md"># Dit is een kop
+</code></pre>
+
+<p class="govuk-body">Gebruik 2 hekjes gevolgd door een spatie voor een subkop in e-mails, bijvoorbeeld:</p>
+
+<pre class="formatting-example"><code class="lang-md">## Dit is een subkop
+</code></pre>
+
+<p class="govuk-body">Er is meer <a class="govuk-link govuk-link--no-visited-state"
+    href="https://www.gov.uk/guidance/content-design/writing-for-gov-uk#headings">informatie over koppen op GOV.UK</a>.</p>
+
+<h3 class="heading-small" id="horizontal-lines">Horizontale lijnen</h3>
+<p class="govuk-body">Gebruik een horizontale lijn om verschillende secties in een e-mailsjabloon te maken.</p>
+<p class="govuk-body">Om een horizontale lijn tussen 2 alinea’s toe te voegen, gebruik 3 streepjes. Laat één lege regelruimte na de eerste alinea. Bijvoorbeeld:</p>
+
+<pre class="formatting-example"><code class="lang-md">Eerste alinea
+
+---
+Tweede alinea
+</code></pre>
+
+<h3 class="heading-small" id="inset-text">Ingesprongen tekst</h3>
+<p class="govuk-body">Gebruik ingesprongen tekst om een tekstblok te onderscheiden van de omliggende inhoud, bijvoorbeeld voor:</p>
+
+<ul class="govuk-list govuk-list--bullet">
+    <li>citaten</li>
+    <li>voorbeelden</li>
+    <li>extra informatie</li>
+  </ul>
+<p class="govuk-body">Gebruik een dakje (caret) om ingesprongen tekst toe te voegen. Bijvoorbeeld:</p>
+
+<pre class="formatting-example"><code class="lang-md">^ U moet ons informeren als uw situatie verandert.
+</code></pre>
+
+<p class="govuk-body">Gebruik ingesprongen tekst spaarzaam – het is minder effectief als het te vaak wordt gebruikt.</p>
+<p class="govuk-body">Er is meer <a class="govuk-link govuk-link--no-visited-state"
+    href="https://design-system.service.gov.uk/components/inset-text/">informatie over ingesprongen tekst in het GOV.UK Design System</a>.</p>
+
+<h3 class="heading-small" id="numbered-steps">Genummerde stappen</h3>
+<p class="govuk-body">Gebruik genummerde stappen in plaats van opsommingstekens om een gebruiker door een proces te leiden, of wanneer de volgorde van de lijst belangrijk is.</p>
+<p class="govuk-body">U heeft geen inleidende regel nodig voor een genummerde lijst.</p>
+<p class="govuk-body">Kopieer dit voorbeeld om genummerde stappen toe te voegen:</p>
+
+<pre class="formatting-example"><code class="lang-md">1. Laat één lege regelruimte voor u de lijst begint.
+2. Typ een nummer gevolgd door een punt en een spatie om een item toe te voegen.
+3. Begin elk item met een hoofdletter en eindig met een punt.
+4. Laat één lege regelruimte na het laatste item.
+</code></pre>
+
+<p class="govuk-body">Voor subitems voegt u een inspringing toe van 2 spaties vóór het nummer.</p>
+<p class="govuk-body">Er is meer <a class="govuk-link govuk-link--no-visited-state"
+    href="https://design-system.service.gov.uk/styles/lists/#numbered-lists">informatie over genummerde lijsten in het GOV.UK Design System</a>.</p>
+
+<h3 class="heading-small" id="page-breaks">Paginabreuken</h3>
+<p class="govuk-body">Gebruik 3 sterren om een paginabreak in een brievensjabloon in te voegen. Bijvoorbeeld:</p>
+
+<pre class="formatting-example"><code class="lang-md">Inhoud op pagina 1
+
+***
+
+Inhoud op pagina 2
+</code></pre>
+
+{% endblock %}

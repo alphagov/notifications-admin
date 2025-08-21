@@ -1,0 +1,106 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/table.html" import mapping_table, row, text_field %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% block per_page_title %}
+    Gebruikerslijst
+{% endblock %}
+
+{% block platform_admin_content %}
+
+<h1 class="govuk-heading-l">
+    Exporteren gebruikerslijst
+</h1>
+
+<p class="govuk-body">
+    Filter en download de lijst met gebruikers.
+</p>
+
+{% call form_wrapper() %}
+<fieldset class="govuk-fieldset">
+
+    {% set creation_date_content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+            {{ form.created_from_date(param_extensions={"hint": {"text": "YYYY-MM-DD"}}) }}
+        </div>
+        <div class="govuk-grid-column-one-half">
+            {{ form.created_to_date(param_extensions={"hint": {"text": "YYYY-MM-DD"}}) }}
+        </div>
+    </div>
+    {% endset %}
+    {{ govukDetails({
+                "summaryText": "Filter op aanmaakdatum",
+                "html": creation_date_content,
+                "open": (form.created_from_date.value or form.created_to_date.value) or ('created_from_date' in form.errors) or ('created_to_date' in form.errors)
+            }) }}
+
+    {% set login_date_content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half">
+            {{ form.logged_from_date(param_extensions={"hint": {"text": "YYYY-MM-DD"}}) }}
+        </div>
+        <div class="govuk-grid-column-one-half">
+            {{ form.logged_to_date(param_extensions={"hint": {"text": "YYYY-MM-DD"}}) }}
+        </div>
+    </div>
+    {% endset %}
+    {{ govukDetails({
+                "summaryText": "Filter op datum van laatste aanmelding",
+                "html": login_date_content,
+                "open": (form.logged_from_date.value or form.logged_to_date.value) or ('logged_from_date' in form.errors) or ('logged_to_date' in form.errors)
+            }) }}
+
+    {% set permissions_content %}
+    <fieldset class="govuk-fieldset">
+        <div class="govuk-checkboxes">
+            {{ form.permissions_field }}
+        </div>
+    </fieldset>
+    {% endset %}
+    {{ govukDetails({
+                "summaryText": "Filter op machtigingen",
+                "html": permissions_content,
+                "open": (form.permissions_field.value) or ('permissions_field' in form.errors)
+            }) }}
+
+    {% set research_content %}
+    {{ form.take_part_in_research }}
+    {% endset %}
+    {{ govukDetails({
+                "summaryText": "Filter op deelname aan onderzoek",
+                "html": research_content,
+                "open": (form.take_part_in_research.value) or ('take_part_in_research' in form.errors)
+            }) }}
+
+    {{ page_footer('Download rapport (CSV)') }}
+</fieldset>
+{% endcall %}
+
+<div class="bottom-gutter-3-2">
+    {% call mapping_table(
+          caption="Gegevens opgenomen in het rapport",
+          field_headings=['Veld', 'Beschrijving'],
+          field_headings_visible=True,
+          caption_visible=True
+        ) %}
+        {% for column_heading, description in [
+            ('Naam', 'De volledige naam van de gebruiker'),
+            ('E-mailadres', 'Het e-mailadres dat aan de gebruiker is gekoppeld'),
+            ('Aangemaakt op', 'De datum waarop het gebruikersaccount is aangemaakt'),
+            ('Deelname aan onderzoek', 'Of de gebruiker heeft ingestemd met deelname aan onderzoek'),
+            ('Is lid van organisatie', 'Geeft aan of de gebruiker lid is van een organisatie'),
+            ('Aantal actieve diensten', 'Het aantal actieve diensten waartoe de gebruiker toegang heeft'),
+            ('Rechten binnen actieve diensten', 'De diensten en bijbehorende rechten die aan de gebruiker zijn toegekend'),
+          ] %}
+            {% call row() %}
+                {{ text_field(column_heading) }}
+                {{ text_field(description) }}
+            {% endcall %}
+        {% endfor %}
+    {% endcall %}
+</div>
+
+{% endblock %}

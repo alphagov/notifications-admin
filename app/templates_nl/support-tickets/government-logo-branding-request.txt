@@ -1,0 +1,22 @@
+Organisation: {% if current_service.organisation -%}
+  {{ current_service.organisation.name }}
+{%- else -%}
+  Niet te bepalen (domein is {{ current_user.email_domain }})
+{%- endif %}
+Service: {{ current_service.name }}
+{{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+
+---
+Gevraagd overheidslogo tekst: {{ logo_text }}
+{% set create_logo_url = url_for(
+  'main.create_email_branding_government_identity_logo', text=logo_text, _external=True
+) %}
+{% if branding_choice == "govuk_and_org" %}Deze service heeft gevraagd dat zowel het GOV.UK-logo als het organisatielogo zichtbaar zijn.
+{% set create_logo_url = url_for(
+  'main.create_email_branding_government_identity_logo', text=logo_text, brand_type="both", _external=True
+) %}
+{% elif branding_choice == "organisation" %}Deze service heeft organisatiebranding gevraagd.
+
+{% endif %}Maak dit logo aan: {{ create_logo_url }}
+
+Pas branding toe op deze service: {{ url_for('main.service_set_branding', service_id=current_service.id, branding_type='email', _external=True) }}

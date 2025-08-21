@@ -6,7 +6,7 @@ main = Blueprint("main", __name__)
 json_updates = Blueprint(JSON_UPDATES_BLUEPRINT_NAME, __name__)
 no_cookie = Blueprint("no_cookie", __name__)
 
-from app.main.views import (  # noqa
+from app.main.views_nl import (  # noqa
     add_service,
     agreement,
     api_keys,
@@ -42,15 +42,15 @@ from app.main.views import (  # noqa
     templates,
     tour,
     two_factor,
-    uploads,
     unsubscribe_requests,
+    uploads,
     verify,
     webauthn_credentials,
     your_account,
     your_services,
 )
-from app.main.views.organisations import branding, index  # noqa
-from app.main.views.service_settings import branding, index  # noqa
+from app.main.views_nl.organisations import branding, index  # noqa
+from app.main.views_nl.service_settings import branding, index  # noqa
 
 
 def make_session_permanent():

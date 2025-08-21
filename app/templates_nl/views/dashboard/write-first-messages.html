@@ -1,0 +1,11 @@
+<h2 class="heading-medium">Aan de slag</h2>
+
+<nav>
+  <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('main.choose_template', service_id=current_service.id) }}">
+    {% if current_service.has_permission('letter') %}
+      Schrijf een e-mail, sms of brief
+    {% else %}
+      Schrijf een e-mail of sms
+    {% endif %}
+  </a>
+</nav>

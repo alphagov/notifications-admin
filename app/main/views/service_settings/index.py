@@ -78,14 +78,14 @@ from app.utils.user import (
 )
 
 PLATFORM_ADMIN_SERVICE_PERMISSIONS = {
-    "inbound_sms": {"title": "Receive inbound SMS", "requires": "sms", "endpoint": ".service_set_inbound_number"},
-    "email_auth": {"title": "Email authentication"},
-    "sms_to_uk_landlines": {"title": "Sending SMS to UK landlines"},
-    "economy_letter_sending": {"title": "Sending economy letters", "requires": "letter"},
+    "inbound_sms": {"title": "Inkomende sms ontvangen", "requires": "sms", "endpoint": ".service_set_inbound_number"},
+    "email_auth": {"title": "E-mailauthenticatie"},
+    "sms_to_uk_landlines": {"title": "Sms-berichten naar Britse vaste nummers versturen"},
+    "economy_letter_sending": {"title": "Economy-brieven versturen", "requires": "letter"},
 }
 
 THANKS_FOR_BRANDING_REQUEST_MESSAGE = (
-    "Thanks for your branding request. We’ll get back to you by the end of the next working day."
+    "Bedankt voor uw aanvraag voor branding. We nemen uiterlijk aan het einde van de volgende werkdag contact met u op."
 )
 
 
@@ -173,7 +173,7 @@ def service_data_retention(service_id):
         service_api_client.set_service_data_retention(
             service_id=service_id, days_of_retention=form.days_of_retention.data
         )
-        flash(f"You’ve changed the data retention period to {form.days_of_retention.data} days", "default")
+        flash(f"De bewaartermijn van gegevens is gewijzigd naar {form.days_of_retention.data} dagen", "default")
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
@@ -258,7 +258,7 @@ def submit_request_to_go_live(service_id):
 
     current_service.notify_organisation_users_of_request_to_go_live()
 
-    flash("Thanks for your request to go live. We’ll get back to you within one working day.", "default")
+    flash("Bedankt voor uw verzoek om live te gaan. We nemen binnen één werkdag contact met u op.", "default")
     return redirect(url_for(".service_settings", service_id=service_id))
 
 
@@ -340,7 +340,7 @@ def archive_service(service_id):
         Events.archive_service(service_id=service_id, archived_by_id=current_user.id)
 
         flash(
-            f"‘{current_service.name}’ was deleted",
+            f"‘{current_service.name}’ is verwijderd",
             "default_with_tick",
         )
         return redirect(url_for(".your_services"))
@@ -569,7 +569,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
             )
 
     if request.endpoint == "main.service_confirm_delete_email_reply_to":
-        flash("Are you sure you want to delete this reply-to email address?", "delete")
+        flash("Weet u zeker dat u dit reply-to e-mailadres wilt verwijderen?", "delete")
     return render_template(
         "views/service-settings/email-reply-to/edit.html",
         form=form,
@@ -710,7 +710,7 @@ def service_receive_text_messages_start(service_id):
             inbound_number_id=sms_sender["inbound_number_id"],
         )
 
-        flash("You added a phone number to your service.", "default_with_tick")
+        flash("U heeft een telefoonnummer aan uw dienst toegevoegd.", "default_with_tick")
         return redirect(url_for(".service_receive_text_messages", service_id=service_id))
 
     return render_template("views/service-settings/receive-text-messages-start.html")
@@ -958,7 +958,7 @@ def service_edit_letter_contact(service_id, letter_contact_id):
         return redirect(url_for(".service_letter_contact_details", service_id=service_id))
 
     if request.endpoint == "main.service_confirm_delete_letter_contact":
-        flash("Are you sure you want to delete this contact block?", "delete")
+        flash("Weet u zeker dat u dit contactblok wilt verwijderen?", "delete")
     return render_template(
         "views/service-settings/letter-contact/edit.html",
         form=form,
@@ -1045,7 +1045,7 @@ def service_edit_sms_sender(service_id, sms_sender_id):
 
     form.is_default.data = sms_sender["is_default"]
     if request.endpoint == "main.service_confirm_delete_sms_sender":
-        flash("Are you sure you want to delete this text message sender ID?", "delete")
+        flash("Weet u zeker dat u deze sms-afzender-ID wilt verwijderen?", "delete")
     return render_template(
         "views/service-settings/sms-sender/edit.html",
         form=form,
@@ -1175,17 +1175,17 @@ def service_set_branding_add_to_branding_pool_step(service_id, branding_type):
     form = AdminSetBrandingAddToBrandingPoolStepForm()
 
     if form.validate_on_submit():
-        # The service’s branding gets updated either way
+        # De branding van de dienst wordt in elk geval bijgewerkt
         current_service.update(**{f"{branding_type}_branding": branding_id})
-        message = f"The {branding_type} branding has been set to {branding_name}"
+        message = f"De {branding_type}-branding is ingesteld op {branding_name}"
 
-        # If the platform admin chose "yes" the branding is added to the organisation's branding pool
+        # Als de platformbeheerder 'ja' kiest, wordt de branding toegevoegd aan de brandingpool van de organisatie
         if form.add_to_pool.data == "yes":
             branding_ids = [branding_id]
             add_brandings_to_pool(org_id, branding_ids)
             message = (
-                f"The {branding_type} branding has been set to {branding_name} and it has been "
-                f"added to {current_service.organisation.name}'s {branding_type} branding pool"
+                f"De {branding_type}-branding is ingesteld op {branding_name} en toegevoegd aan "
+                f"de {branding_type}-brandingpool van {current_service.organisation.name}"
             )
 
         flash(message, "default_with_tick")

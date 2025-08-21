@@ -1,0 +1,96 @@
+{% extends "withnav_template.html" %}
+{% from "components/ajax-block.html" import ajax_block %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% set title_status = (
+  'Mislukt '
+  if status == 'failed' and message_type == 'letter'
+  else ''
+) %}
+{% set page_title = (
+  (title_status + 99|message_count_label(message_type, suffix='')) | capitalize
+  if current_user.has_permissions('view_activity')
+  else 'Verzonden berichten'
+) %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(page_title) }}
+
+  {# de blauwe badges worden alleen getoond voor sms en e-mail #}
+  {% if message_type != "letter" %}
+
+    {{ ajax_block(
+      partials,
+      url_for('json_updates.get_notifications_page_partials_as_json', service_id=current_service.id, message_type=message_type, status=status, page=page, search_query=search_query),
+      'counts',
+      form='search-form'
+    ) }}
+
+  {% endif %}
+
+  <div class="govuk-grid-column-full {% if message_type == 'sms' %}extra-tracking{% endif %}">
+  {% call form_wrapper(
+    action=url_for('main.view_notifications', service_id=current_service.id, message_type=message_type, search_query=search_query),
+    class="govuk-grid-row notify-simple-search-form"
+  ) %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{
+        _search_form.to(
+          param_extensions={
+            "formGroup": {"classes": "notify-simple-search-form__form-group"},
+            "label": {
+              "text": things_you_can_search_by|formatted_list(
+                conjunction='of',
+                before_each='',
+                after_each='',
+                prefix='Zoek op',
+                prefix_plural='Zoek op'
+              )
+            }
+          }
+        )
+      }}
+      {{ govukButton({
+        "text": "Zoeken",
+        "classes": "notify-simple-search-form__button",
+      }) }}
+  {% endcall %}
+    </div>
+
+  {% call form_wrapper(id="search-form") %}
+    <input type="hidden" name="to" {% if _search_form.to.data %}value="{{ _search_form.to.data }}"{%  endif %}>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% endcall %}
+
+  {% if current_user.has_permissions('view_activity') %}
+    <p class="bottom-gutter">
+        {% if can_download %}
+            <a href="{{ download_link }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">
+                Download dit rapport (<abbr title="Comma separated values">CSV</abbr>)
+            </a>
+
+        {% else %}
+            <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold" href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback') }}">
+                Neem contact op met de helpdesk om dit rapport te downloaden
+            </a>
+        {% endif %}
+        &emsp;
+        Gegevens zijn {{ partials.service_data_retention_days }} dagen beschikbaar
+    </p>
+  {% endif %}
+
+  {{ ajax_block(
+    partials,
+    url_for('json_updates.get_notifications_page_partials_as_json', service_id=current_service.id, message_type=message_type, status=status, page=page, search_query=search_query),
+    'notifications',
+    form='search-form'
+  ) }}
+
+{% endblock %}

@@ -1,0 +1,63 @@
+{% from "govuk_frontend_jinja/components/fieldset/macro.html" import govukFieldset %}
+
+{% macro list_entry(
+  field,
+  item_name,
+  hint='',
+  autocomplete=True
+) %}
+
+  <div class="govuk-form-group">
+    {% if hint %}
+      {% set attributes = {"aria-describedby": field.name + '-hint'} %}
+    {% else %}
+      {% set attributes = {} %}
+    {% endif %}
+    {% call govukFieldset({
+        "legend": {
+          "text": field.label.text,
+          "isPageHeading": False
+        },
+        "attributes": attributes
+      })
+    %}
+    {% if hint %}
+      <div id="{{ field.name }}-hint" class="govuk-hint">
+        {{ hint }}
+      </div>
+    {% endif %}
+    <div class="input-list" data-notify-module="list-entry" data-list-item-name="{{ item_name }}" id="list-entry-{{ field.name }}">
+      {% for entry in field.entries %}
+        <div class="list-entry">
+          {% if not autocomplete %}
+            {% set autocomplete = "off" %}
+          {% else %}
+            {% set autocomplete = "" %}
+          {% endif %}
+          {% if entry.errors %}
+            {% set label_classes = "govuk-input--numbered__label govuk-input--numbered__label--error" %}
+          {% else %}
+            {% set label_classes = "govuk-input--numbered__label" %}
+          {% endif %}
+          {% set field_name = field.name + "-" + loop.index|string %}
+          {% set html -%}
+            <span class="govuk-visually-hidden">{{ item_name }} nummer </span> {{ loop.index }}.
+          {%- endset%}
+          {{ entry(param_extensions={
+            "id": field_name,
+            "name": field_name,
+            "label": {
+              "html": html,
+              "classes": label_classes
+            },
+            "classes": "govuk-input--numbered govuk-!-width-full",
+            "value": field.data[loop.index0] if field.data[loop.index0] != '' else None,
+            "autocomplete": autocomplete
+          }) }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endcall %}
+  </div>
+
+{% endmacro %}

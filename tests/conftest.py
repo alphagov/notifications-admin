@@ -1859,7 +1859,7 @@ def mock_get_uploaded_letters(notify_admin, mocker):
         }
 
     return mocker.patch(
-        "app.main.views.uploads.upload_api_client.get_letters_by_service_and_print_day",
+        "app.main.views_nl.uploads.upload_api_client.get_letters_by_service_and_print_day",
         side_effect=_get_uploaded_letters,
     )
 
@@ -1867,7 +1867,7 @@ def mock_get_uploaded_letters(notify_admin, mocker):
 @pytest.fixture(scope="function")
 def mock_get_no_uploaded_letters(notify_admin, mocker):
     return mocker.patch(
-        "app.main.views.uploads.upload_api_client.get_letters_by_service_and_print_day",
+        "app.main.views_nl.uploads.upload_api_client.get_letters_by_service_and_print_day",
         return_value={"notifications": [], "total": 0, "links": {}},
     )
 
@@ -2195,7 +2195,7 @@ def mock_s3_upload(mocker):
     def _upload(service_id, filedata, region):
         return sample_uuid()
 
-    return mocker.patch("app.main.views.send.s3upload", side_effect=_upload)
+    return mocker.patch("app.main.views_nl.send.s3upload", side_effect=_upload)
 
 
 @pytest.fixture(scope="function")
@@ -2207,7 +2207,7 @@ def mock_s3_download(mocker):
             +447700900986,Smith
         """
 
-    return mocker.patch("app.main.views.send.s3download", side_effect=_download)
+    return mocker.patch("app.main.views_nl.send.s3download", side_effect=_download)
 
 
 @pytest.fixture(scope="function")
@@ -2215,12 +2215,12 @@ def mock_s3_get_metadata(mocker):
     def _get_metadata(service_id, upload_id):
         return {"original_file_name": "example.csv"}
 
-    return mocker.patch("app.main.views.send.get_csv_metadata", side_effect=_get_metadata)
+    return mocker.patch("app.main.views_nl.send.get_csv_metadata", side_effect=_get_metadata)
 
 
 @pytest.fixture(scope="function")
 def mock_s3_set_metadata(mocker):
-    return mocker.patch("app.main.views.send.set_metadata_on_csv_upload")
+    return mocker.patch("app.main.views_nl.send.set_metadata_on_csv_upload")
 
 
 @pytest.fixture(scope="function")

@@ -1,0 +1,66 @@
+{% extends "withnav_template.html" %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+
+{% block service_page_title %}
+  Bewaartermijn van gegevens
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <h1 class="heading-large">Bewaartermijn van gegevens</h1>
+
+  {% if single_retention_period %}
+    <p class="govuk-body">Uw huidige bewaartermijn is {{ single_retention_period }} dagen.</p>
+  {% else %}
+    <p class="govuk-body">Uw huidige bewaartermijn is:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ current_service.get_days_of_retention('email') }} dagen voor {{ 2|message_count_noun("email") }}</li>
+      <li>{{ current_service.get_days_of_retention('sms') }} dagen voor {{ 2|message_count_noun("sms") }}</li>
+      <li>{{ current_service.get_days_of_retention('letter') }} dagen voor {{ 2|message_count_noun("letter") }}</li>
+    </ul>
+  {% endif %}
+
+  {% if current_service.trial_mode %}
+    <p class="govuk-body">
+      U kunt de bewaartermijn niet wijzigen zolang uw dienst in <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">proefmodus</a> is.
+    </p>
+    <p class="govuk-body">Zodra uw dienst actief is, kunt u het aantal dagen kiezen dat Notify bewaart:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>de inhoud van de e-mails, sms-berichten en brieven die u verstuurt</li>
+      <li>e-mailadressen, mobiele nummers en adressen van ontvangers</li>
+    </ul>
+
+    <p class="govuk-body">Het aantal dagen moet tussen 3 en 90 liggen.</p>
+
+  {% elif high_volume_service %}
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact op met het team</a>
+      om het aantal dagen te wijzigen dat Notify bewaart:
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>de inhoud van de e-mails, sms-berichten en brieven die u verstuurt</li>
+      <li>e-mailadressen, mobiele nummers en adressen van ontvangers</li>
+    </ul>
+    <p class="govuk-body">U kunt de bewaartermijn niet zelf wijzigen. Dit komt omdat uw dienst waarschijnlijk meer dan 1 miljoen berichten per jaar verstuurt.</p>
+    <p class="govuk-body">
+      Uit veiligheidsoverwegingen bewaart Notify geen grote hoeveelheden persoonsgegevens voor langere tijd.
+    </p>
+
+  {% else %}
+    <p class="govuk-body">Kies het aantal dagen dat Notify bewaart:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>de inhoud van de e-mails, sms-berichten en brieven die u verstuurt</li>
+      <li>e-mailadressen, mobiele nummers en adressen van ontvangers</li>
+    </ul>
+
+    {% call form_wrapper(class='top-gutter') %}
+      {{ form.days_of_retention }}
+      {{ page_footer('Doorgaan') }}
+    {% endcall %}
+  {% endif %}
+{% endblock %}

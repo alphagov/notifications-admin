@@ -1,0 +1,68 @@
+{% extends "withnav_template.html" %}
+{% from "components/table.html" import list_table, field %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  API-sleutels
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.api_integration', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('API-sleutels') }}
+
+  <div class="body-copy-table">
+    {% call(item, row_number) list_table(
+      current_service.api_keys,
+      empty_message="U heeft nog geen API-sleutels aangemaakt",
+      caption="API-sleutels",
+      caption_visible=false,
+      field_headings=[
+        'API-sleutels',
+        'Actie'
+      ],
+      field_headings_visible=False
+    ) %}
+      {% call field() %}
+        <div class="file-list">
+          {{ item.name }}
+          <div class="hint">
+            {% if item.key_type == 'normal' %}
+              Live – verzendt naar iedereen
+            {% elif item.key_type == 'team' %}
+              Team en gastenlijst – beperkt wie u kunt benaderen
+            {% elif item.key_type == 'test' %}
+              Test – simuleert het verzenden van berichten
+            {% endif %}
+          </div>
+        </div>
+      {% endcall %}
+      {% if item.expiry_date %}
+        {% call field(align='right') %}
+          <span class='hint'>Ingetrokken op {{ item.expiry_date|format_datetime_short }}</span>
+        {% endcall %}
+      {% else %}
+        {% call field(align='right', status='error') %}
+          <a class="govuk-link govuk-link--destructive" href='{{ url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>
+            Intrekken<span class="govuk-visually-hidden"> {{ item.name }}</span>
+          </a>
+        {% endcall %}
+      {% endif %}
+    {% endcall %}
+  </div>
+
+  <div class="js-stick-at-bottom-when-scrolling">
+    {{ govukButton({
+      "element": "a",
+      "text": "Maak een API-sleutel aan",
+      "href": url_for('main.create_api_key', service_id=current_service.id),
+      "classes": "govuk-button--secondary"
+    }) }}
+  </div>
+
+{% endblock %}

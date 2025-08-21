@@ -1,0 +1,58 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/table.html" import list_table, text_field %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  {{ provider_versions[0].display_name }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_providers') }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+
+    {{ page_header(provider_versions[0].display_name) }}
+
+    <p class="govuk-body">
+      Er worden slechts de laatste 100 versies getoond.
+    </p>
+
+    {% call(item, row_number) list_table(
+        provider_versions,
+        caption='',
+        caption_visible=False,
+        empty_message='Geen geschiedenis beschikbaar voor deze provider',
+        field_headings=['Versie', 'Laatst bijgewerkt', 'Bijgewerkt door', 'Prioriteit', 'Actief'],
+        field_headings_visible=True,
+        give_rows_ids=False,
+      ) %}
+
+        {{ text_field(item.version) }}
+
+        {% if item.updated_at %}
+            {{ text_field(item.updated_at|format_datetime_short) }}
+        {% else %}
+            {{ text_field('Geen') }}
+        {% endif %}
+
+        {% if item.created_by %}
+            {{ text_field(item.created_by.name) }}
+        {% else %}
+            {{ text_field('Geen') }}
+        {% endif %}
+
+        {{ text_field(item.priority) }}
+
+        {{ text_field(item.active) }}
+
+      {% endcall %}
+
+    </div>
+</div>
+
+{% endblock %}

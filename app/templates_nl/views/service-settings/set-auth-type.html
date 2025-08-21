@@ -1,0 +1,44 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set heading = 'Inlogmethode' %}
+
+{% block service_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header(heading) }}
+
+      <p class="govuk-body">
+        De veiligste manier om in te loggen bij Notify is met een code via sms.
+      </p>
+      <p class="govuk-body">
+        Teamleden kunnen ook inloggen met een link die per e-mail wordt verzonden.
+        Uit veiligheidsoverwegingen doet u dit alleen als zij hun e-mailaccount openen via:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>een door het werk verstrekt apparaat</li>
+        <li>een kantoornetwerk of VPN</li>
+        <li>een andere vorm van tweefactorauthenticatie</li>
+      </ul>
+
+      {% call form_wrapper() %}
+        {{ form.sign_in_method }}
+        {{ page_footer('Doorgaan') }}
+      {% endcall %}
+
+    </div>
+  </div>
+
+{% endblock %}

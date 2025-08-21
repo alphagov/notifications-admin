@@ -1,0 +1,46 @@
+{% extends "withnav_template.html" %}
+{% from "components/table.html" import field, list_table, row_heading%}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Afmeldverzoeken per e-mail
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_dashboard', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ page_header('Afmeldverzoeken per e-mail') }}
+
+<div class="dashboard-table">
+    {% call(item, row_number) list_table(
+        current_service.unsubscribe_request_reports_summary,
+        caption="Afmeldverzoeken rapporten",
+        caption_visible=False,
+        empty_message='Als u afmeldverzoeken per e-mail heeft, worden deze hier weergegeven',
+        field_headings=['Rapport', 'Status'],
+        field_headings_visible=False
+    ) %}
+    {% call row_heading() %}
+
+      <a class="govuk-link govuk-link--no-visited-state file-list-filename"
+         href="{{url_for('main.unsubscribe_request_report', service_id=current_service.id, batch_id=item.batch_id)}}" >
+          {{ item.title|sentence_case }}
+        </a>
+       <p class="file-list-hint">
+
+         {{ item.count|format_thousands}} {{ item.count | message_count_label('afmeldverzoek', suffix='') }}
+         </p>
+    {% endcall %}
+    {% call field(align='right', status='' if item.is_a_batched_report else 'default') %}
+      <span class="align-with-message-body">
+        {{ item.status}}
+      </span>
+    {% endcall %}
+  {% endcall %}
+</div>
+
+{% endblock %}

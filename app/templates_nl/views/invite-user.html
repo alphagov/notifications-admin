@@ -1,0 +1,40 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ 'Laat iemand deelnemen aan uw dienst' if user_to_invite else 'Nodig een teamlid uit' }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.manage_users', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Laat {} deelnemen aan uw dienst'.format(user_to_invite.name) if user_to_invite else 'Nodig een teamlid uit') }}
+
+  {% call form_wrapper() %}
+
+    {% if user_to_invite %}
+      <p class="govuk-body">
+        {{ user_to_invite.email_address }}
+      </p>
+    {% else %}
+      {{ form.email_address(
+        param_extensions={
+          "classes": "govuk-!-width-full"
+        },
+        error_message_with_html=True
+      ) }}
+    {% endif %}
+
+    {% include 'views/manage-users/permissions.html' %}
+
+    {{ page_footer('Bevestigingsmail versturen' if user_to_invite else 'Uitnodigingsmail versturen') }}
+
+  {% endcall %}
+
+{% endblock %}

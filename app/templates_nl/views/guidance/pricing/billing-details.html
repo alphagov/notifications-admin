@@ -1,0 +1,145 @@
+{% extends "content_template.html" %}
+
+{% from "components/page-header.html" import page_header %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
+
+{# Wordt gebruikt door de content_template.html-layout, prefix voor de toegankelijke naam van de "navigation" #}
+{% set navigation_label_prefix = 'Prijsinformatie' %}
+
+{% block per_page_title %}
+  Facturatiegegevens
+{% endblock %}
+
+{% block content_column_content %}
+
+    {{ page_header('Facturatiegegevens') }}
+
+    <p class="govuk-body">
+      U kunt de informatie op deze pagina gebruiken om het Department for Science, Innovation and Technology (DSIT) toe te voegen als leverancier. Uw organisatie moet dit mogelijk doen voordat u een inkooporder (PO) kunt aanmaken.
+    </p>
+
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact op</a> als u andere gegevens nodig heeft.
+    </p>
+
+    <h2 class="heading-medium govuk-!-margin-top-7" id="supplier-details">
+      Gegevens van de leverancier
+    </h2>
+
+    <p class="govuk-body">
+      Department for Science, Innovation and Technology
+    </p>
+
+    <p class="govuk-body">
+      100 Parliament Street <br>
+      London <br>
+      SW1A 2BQ
+    </p>
+
+    <h3 class="heading-small" id="email-addresses">
+      E-mailadres
+    </h3>
+
+    <p class="govuk-body">
+      {{ billing_details['notify_billing_email_address'] }}
+    </p>
+
+    <h3 class="heading-small" id="vat-number">
+      <abbr title="Value Added Tax">Btw</abbr>-nummer
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        'GB 888 8255 50',
+        thing='<abbr title="Value Added Tax">Btw</abbr>-nummer',
+    ) }}
+    </div>
+
+    <h2 class="heading-medium govuk-!-margin-top-7" id="bank-details">
+      Bankgegevens
+    </h2>
+
+    <p class="govuk-body">
+      National Westminster Bank PLC <br>
+      NatWest Customer Service Centre <br>
+      Brampton Road <br>
+      Newcastle-under-Lyme <br>
+      Staffordshire <br>
+      ST5 0QX
+    </p>
+
+    <h3 class="heading-small" id="account-name">
+      Rekeninghouder
+    </h3>
+
+    <p class="govuk-body">
+      Department for Science, Innovation and Technology
+    </p>
+
+    <h3 class="heading-small" id="account-number">
+      Rekeningnummer
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['account_number'],
+        thing='rekeningnummer',
+      ) }}
+    </div>
+
+    <h3 class="heading-small" id="sort-code">
+      Sortcode
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['sort_code'],
+        thing='sortcode',
+      ) }}
+    </div>
+
+
+    <h3 class="heading-small" id="iban">
+      <abbr title="International Bank Account Number">IBAN</abbr>
+    </h3>
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['IBAN'],
+        thing='IBAN',
+      ) }}
+    </div>
+
+    <h3 class="heading-small" id="swift-code">
+      Swiftcode
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        billing_details['swift'],
+        thing='Swiftcode',
+      ) }}
+    </div>
+
+    <h3 class="heading-small" id="duns-number">
+      D-U-N-S-nummer
+    </h3>
+
+    <div class="govuk-!-margin-bottom-4">
+    {{ copy_to_clipboard(
+        '227331642',
+        thing='<abbr title="Data Universal Numbering System">D-U-N-S</abbr>-nummer',
+    ) }}
+    </div>
+
+    <h2 class="heading-medium govuk-!-margin-top-7" id="invoice-address">
+      Factuuradres
+    </h2>
+
+    <p class="govuk-body">
+      Department for Science, Innovation and Technology <br>
+      100 Parliament Street <br>
+      London <br>
+      SW1A 2BQ
+    </p>
+
+{% endblock %}

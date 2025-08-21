@@ -1,0 +1,26 @@
+{% macro form_wrapper(
+  method="post",
+  action=None,
+  autocomplete=False,
+  class=None,
+  id=None,
+  module=None,
+  data_kwargs={}
+) %}
+  <form
+    method="{{ method }}"
+    {% if action %}action="{{ action }}"{% else %}action="{{ request.url | extract_path_from_url }}"{% endif %}
+    {% if not autocomplete %}autocomplete="off"{% endif %}
+    {% if class %}class="{{ class }}"{% endif %}
+    {% if id %}id="{{ id }}"{% endif %}
+    {% if module %}data-notify-module="{{ module }}"{% endif %}
+    {% for key, val in data_kwargs.items() %}
+      {% if val %}
+        data-{{ key }}="{{ val }}"
+      {% endif %}
+    {% endfor %}
+    novalidate
+  >
+    {{ caller() }}
+  </form>
+{% endmacro %}

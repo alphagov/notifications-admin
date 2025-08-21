@@ -1,0 +1,29 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  Mobiel nummer teamlid wijzigen
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Mobiel nummer teamlid wijzigen') }}
+
+  <p class="govuk-body" id="user_name">Dit verandert het mobiele nummer van {{ user.name }}.</p>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {% call form_wrapper(class="extra-tracking") %}
+        {{ form.mobile_number }}
+        {{ page_footer('Opslaan') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

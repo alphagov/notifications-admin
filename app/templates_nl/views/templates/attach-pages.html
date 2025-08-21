@@ -1,0 +1,74 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+
+{% set page_title = "Pagina’s toevoegen" %}
+
+{% block service_page_title %}
+{% if error and not use_error_summary %}Foutmelding: {% endif %}{{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+{{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+{% if error and not use_error_summary %}
+<div class="govuk-!-margin-bottom-4">
+    {% call banner_wrapper(type='dangerous') %}
+    <h1 class="banner-title">{{ error.title }}</h1>
+    {% if error.detail %}
+    <p class="govuk-body">{{ error.detail | safe }}</p>
+    {% endif %}
+    {% endcall %}
+</div>
+{% else %}
+{{ page_header(page_title) }}
+{% endif %}
+
+<p class="govuk-body">Upload een PDF en wij printen deze als onderdeel van uw brief.</p>
+<p class="govuk-body">
+    Uw brief mag in totaal maximaal 10 pagina’s bevatten (5 dubbelzijdige vellen papier).
+</p>
+
+{% set attachment_spec %}
+<p class="govuk-body">Paginagrootte en -opmaak: A4 staand (210 × 297 mm)</p>
+<p class="govuk-body">Maximale bestandsgrootte: 2 MB</p>
+<p class="govuk-body">De inhoud van uw brief moet binnen het printbare gebied vallen:</p>
+
+<p class="govuk-body">Linkermarge 15 mm</p>
+<p class="govuk-body">Rechtermarge 15 mm</p>
+<p class="govuk-body">Bovenzijde 5 mm</p>
+<p class="govuk-body">Onderzijde 5 mm</p>
+{% endset %}
+
+{{ govukDetails({
+"summaryText": "Uw PDF moet voldoen aan onze bijlage-specificaties",
+"html": attachment_spec
+}) }}
+
+<div class="govuk-body">
+    {{ file_upload(
+    form.file,
+    allowed_file_extensions=['pdf'],
+    action=url_for('main.letter_template_attach_pages', service_id=current_service.id, template_id=template.id),
+    button_text='Upload uw bestand opnieuw' if error else 'Kies een bestand',
+    show_errors=use_error_summary
+    )}}
+</div>
+
+<div class="template-container">
+
+    {% for page_number in page_numbers %}
+    <div
+        class="letter page--{{ loop.cycle('odd', 'even') }}{% if loop.first %} page--first{% endif %}{% if loop.last %} page--last{% endif %}">
+        <img src="{{ letter_attachment_image_url }}?page={{ page_number }}" alt=""
+            loading="{{ 'eager' if (page_number==1) else 'lazy' }}">
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

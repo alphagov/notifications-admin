@@ -1,0 +1,23 @@
+<div class="ajax-block-container">
+  {% if current_service.scheduled_job_stats.count %}
+    <h2 class="heading-medium heading-upcoming-jobs">
+      Binnen enkele dagen
+    </h2>
+    <a class="govuk-link govuk-link--no-visited-state banner-dashboard" href="{{ url_for('main.uploads', service_id=current_service.id) }}">
+      <span class="banner-dashboard-count">
+        {{ current_service.scheduled_job_stats.count }}
+      </span>
+      <span class="banner-dashboard-count-label">
+        {% if current_service.scheduled_job_stats.count == 1 %}
+          bestand wacht om verzonden te worden
+        {% else %}
+          bestanden wachten om verzonden te worden
+        {% endif %}
+      </span>
+      <span class="banner-dashboard-meta">
+        verzending start
+        {{ current_service.scheduled_job_stats.soonest_scheduled_for|format_datetime_relative }}
+      </span>
+    </a>
+  {% endif %}
+</div>

@@ -1,0 +1,105 @@
+{% from "components/content-metadata.html" import content_metadata %}
+{% extends "content_template.html" %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Over Notify' %}
+
+{% block per_page_title %}
+  Gebruiksvoorwaarden
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Gebruiksvoorwaarden</h1>
+
+  {{ content_metadata(
+    data={
+      "Geplaatst": "23 maart 2016",
+      "Laatst bijgewerkt": "3 juni 2024"
+    }
+    ) }}
+
+  <p class="govuk-body">
+    Deze voorwaarden gelden voor het gebruik van NotifyNL.
+  </p>
+
+  <p class="govuk-body">
+    U accepteert onze gebruiksvoorwaarden wanneer u een account aanmaakt.
+  </p>
+
+  <p class="govuk-body">
+    U moet zich aan deze voorwaarden houden. Als u dat niet doet, stoppen wij met het verzenden van uw berichten.
+  </p>
+
+  <h2 class="heading-medium" id="before-using-notify">Voordat u Notify gebruikt</h2>
+
+  <p class="govuk-body">Zorg dat NotifyNL aan de normen van uw organisatie voldoet voor:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>het gebruik, de verwerking, opslag en verzending van informatie</li>
+    <li>cyberbeveiliging</li>
+    <li>gegevensbescherming</li>
+  </ul>
+
+  <p class="govuk-body">U moet dit proces doorlopen:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>voordat u een verzoek indient om live te gaan</li>
+    <li>met regelmatige tussenpozen zodra uw dienst live is</li>
+  </ul>
+
+  <p class="govuk-body">
+    Om u hierbij te helpen, hebben wij details gepubliceerd over <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">Notify’s benadering van beveiliging</a>.
+  </p>
+
+  <h2 class="heading-medium" id="when-using-notify">Bij het gebruik van Notify</h2>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Meld beveiligingsincidenten onmiddellijk bij <a class="govuk-link govuk-link--no-visited-state" href="mailto:report@digital.cabinet-office.gov.uk">report@digital.cabinet-office.gov.uk</a>. Dit omvat vermoedelijke compromittering van inloggegevens van teamleden of authenticatiefactoren, vermoede compromittering van API-sleutels en certificaatwaarschuwingen.</li>
+    <li>Zorg dat elke live dienst die u toevoegt uniek is. Als u vergelijkbare of dubbele diensten toevoegt, stoppen wij uw <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">toelage voor gratis sms-berichten</a>.</li>
+    <li>Controleer dat u de juiste toestemming heeft van ontvangers voordat u hun persoonsgegevens gebruikt.</li>
+    <li>Zorg dat de gegevens die u aan Notify toevoegt correct zijn en voldoen aan de wetgeving gegevensbescherming.</li>
+    <li>Verzend alleen berichten die voldoen aan de GOV.UK Service Manual-standaarden voor <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">het schrijven van sms-berichten en e-mails</a> of <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/writing-effective-letters">het schrijven van effectieve brieven</a>.</li>
+    <li>Verzend geen ongevraagde berichten. Verzend alleen berichten die verband houden met een transactie of waar de ontvanger zich op heeft geabonneerd voor updates.</li>
+    <li>Verzend geen berichten met beledigende of aanstootgevende inhoud.</li>
+  </ol>
+
+  <h3 class="heading-small" id="signing-in-to-notify">Inloggen bij Notify</h3>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>U moet inloggen op de Notify-website met een werkapparaat dat door de organisatie wordt beheerd. Wij adviseren dat uw apparaat minimaal voldoet aan de eisen van het National Cyber Security Centre (NCSC) <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/files/Cyber-Essentials-Requirements-for-Infrastructure-v3-1-April-2023.pdf">Cyber Essentials Scheme</a>. Indien mogelijk maakt uw apparaat gebruik van een beschermende Domain Name System (DNS)-dienst, bijvoorbeeld de <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/information/pdns">PDNS van het NCSC</a>.</li>
+    <li>U moet inloggen met een werkmailadres. Uw mailbox moet beveiligd zijn met <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/guidance/multi-factor-authentication-online-services">multi-factor authenticatie</a> (MFA). Open e-mails van Notify alleen op een werkapparaat dat door uw organisatie wordt beheerd.</li>
+    <li>Wees zorgvuldig met uw inloggegevens. Kies <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/blog-post/three-random-words-or-thinkrandom-0">een sterk en uniek wachtwoord</a>. Deel uw wachtwoord nooit met anderen, ook niet met teamleden.</li>
+    <li>Verwijder teamleden direct als zij geen toegang meer mogen hebben tot Notify.</li>
+  </ol>
+
+  <h3 class="heading-small" id="api-keys">API-sleutels</h3>
+
+  <p class="govuk-body">Als u <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">de Notify API gebruikt</a> voor het verzenden van berichten, moet u uw API-sleutels beschermen tegen onbevoegde toegang of openbaarmaking. Dit betekent dat u de sleutels versleuteld moet opslaan en verzenden. U dient uw sleutels ook regelmatig te vernieuwen:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>minstens eenmaal per jaar</li>
+    <li>wanneer iemand met toegang tot een sleutel de organisatie verlaat</li>
+    <li>wanneer u vermoedt dat een sleutel is gecompromitteerd</li>
+  </ul>
+
+  <p class="govuk-body">Gebruik geen hard-coded API-sleutels.</p>
+
+  <p class="govuk-body">Wij raden aan om een sleutelbeheer-service van een cloudprovider te gebruiken om uw API-sleutels veilig te bewaren. Meer informatie vindt u in de <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/collection/developers-collection/principles">NCSC-richtlijnen</a>.</p>
+
+  <h2 class="heading-medium" id="what-notify-will-do">Wat NotifyNL zal doen</h2>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Onze actuele status en details van incidenten tonen op onze <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk/">statuspagina</a>.</li>
+    <li>Actuele <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.performance') }}">prestatiegegevens</a> verstrekken.</li>
+    <li>Uw gegevens <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">beveiligd</a> houden.</li>
+    <li>U 30 dagen van tevoren per e-mail informeren bij wijzigingen in onze gebruiksvoorwaarden of bezorgdiensten.</li>
+  </ol>
+
+  <h2 class="heading-medium" id="leaving-notify">Notify verlaten</h2>
+
+  <p class="govuk-body">U kunt <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">contact met ons opnemen</a> om uw account te sluiten.</p>
+
+  <p class="govuk-body">Bekijk onze privacyverklaring voor informatie over <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.privacy')}}#how-long-we-keep-your-data">hoe lang wij uw persoonsgegevens bewaren</a>.</p>
+
+{% endblock %}

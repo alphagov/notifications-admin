@@ -1,0 +1,62 @@
+{% extends "content_template.html" %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  Een QR-code toevoegen aan een lettertemplate
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Een QR-code toevoegen aan een lettertemplate</h1>
+
+  <p class="govuk-body">Met een QR-code kan de ontvanger van een brief uw website bezoeken zonder de URL te hoeven typen.</p>
+
+  <p class="govuk-body">Als u een QR-code aan uw brief toevoegt, moet u een alternatief bieden voor mensen die geen QR-codes kunnen scannen. Bijvoorbeeld een korte URL die makkelijk te lezen is, of schriftelijke instructies om uw website te vinden.</p>
+
+  <h2 class="heading-medium">Hoe voegt u QR-codes toe</h2>
+
+  <p class="govuk-body">U kunt:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>dezelfde QR-code aan elke brief toevoegen die u verstuurt</li>
+    <li>de QR-code personaliseren elke keer dat u een brief verstuurt</li>
+  </ul>
+
+  <p class="govuk-body">Voeg niet meer dan één QR-code per pagina toe.</p>
+
+  <h3 class="heading-small">Dezelfde QR-code aan elke brief toevoegen</h3>
+
+  <p class="govuk-body">Kopieer dit voorbeeld om een QR-code aan uw lettertemplate toe te voegen:</p>
+
+  <pre class="formatting-example"><code class="lang-md">QR: https://www.gov.uk/example</code></pre>
+
+  <p class="govuk-body">Laat één lege regelruimte vóór en na de QR-code.</p>
+
+  <h3 class="heading-small">De QR-code personaliseren elke keer dat u een brief verstuurt</h3>
+
+  <p class="govuk-body">Gebruik <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_personalisation') }}">plaatsaanduidingen</a> om de hele of een deel van de link in een QR-code te personaliseren.</p>
+
+  <p class="govuk-body">Elke keer dat u de lettertemplate verstuurt, kunt u:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>de plaatsaanduiding zelf invullen met een link</li>
+    <li>een lijst met persoonsgegevens uploaden, inclusief links, en Notify dit voor u laten doen</li>
+  </ul>
+
+  <p class="govuk-body">Kopieer dit voorbeeld als de hele link elke keer verandert:</p>
+
+  <pre class="formatting-example"><code class="lang-md">QR: ((link))</code></pre>
+
+  <p class="govuk-body">Kopieer dit voorbeeld als alleen een deel van de link elke keer verandert:</p>
+
+  <pre class="formatting-example"><code class="lang-md">QR: https://www.example.com?reference=((link reference))</code></pre>
+
+  <p class="govuk-body">Laat één lege regelruimte vóór en na de QR-code.</p>
+
+  <p class="govuk-body">Kies een unieke naam voor de plaatsaanduiding tussen de dubbele haakjes. Wanneer u de brief verstuurt, vervangt Notify dit door de QR-code link.</p>
+
+  <p class="govuk-body">Als u een lijst met persoonsgegevens uploadt, moeten de kolomnamen in uw spreadsheet overeenkomen met de plaatsaanduidingen in de template.</p>
+
+{% endblock %}

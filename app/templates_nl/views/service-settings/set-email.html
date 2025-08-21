@@ -1,0 +1,30 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  E-mails versturen
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('E-mails versturen') }}
+      <p class="govuk-body">
+        Het is gratis om e-mails te versturen via NotifyNL.
+      </p>
+      {% call form_wrapper() %}
+        {{ form.enabled }}
+        {{ page_footer('Opslaan') }}
+      {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}

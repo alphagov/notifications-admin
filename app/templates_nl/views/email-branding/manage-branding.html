@@ -1,0 +1,47 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  {{ '{} e-mailbranding'.format('Bijwerken' if email_branding else 'Toevoegen')}}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block platform_admin_content %}
+  {{ page_header('{} e-mailbranding'.format('Bijwerken' if email_branding else 'Toevoegen')) }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {% if logo %}
+        <div id="logo-img">
+          <img src="https://{{ cdn_url }}/{{ logo }}"/>
+        </div>
+      {% endif %}
+      <p class="govuk-body">
+        Logo’s moeten PNG-bestanden zijn, 108 px hoog
+      </p>
+      {{ file_upload(form.file, allowed_file_extensions=['png'], button_text='{} logo'.format('Bijwerken' if email_branding else 'Uploaden')) }}
+      {% call form_wrapper() %}
+        <div class="form-group govuk-!-margin-top-3">
+          {{ form.name }}
+          {{ form.text }}
+          {{ form.alt_text }}
+          {{ form.colour }}
+          {{ form.brand_type }}
+          {{ page_footer(
+            'Opslaan',
+            button_name='operation',
+            button_value='email-branding-details'
+          ) }}
+        </div>
+      {% endcall %}
+
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+
+
+{% block service_page_title %}
+  Sms-berichten ontvangen
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('Sms-berichten ontvangen') }}
+
+      {% if current_service.has_permission("inbound_sms") %}
+        <p class="govuk-body">
+          Uw dienst ontvangt sms-berichten die worden gestuurd naar:
+        </p>
+          {% set new_number = current_service.inbound_number %}
+          {{ govukInsetText({
+            "text": new_number,
+            "classes": "govuk-!-margin-top-0"})
+          }}
+        <p class="govuk-body">
+          U kunt het aantal ontvangen berichten zien op uw <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_dashboard', service_id=current_service.id) }}">dashboard</a>.
+        </p>
+        <p class="govuk-body">
+          U kunt ook de ontvangen sms-berichten van de afgelopen {{ current_service.get_days_of_retention('sms') }} dagen downloaden via <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.inbox', service_id=current_service.id) }}">de inbox</a>.
+        </p>
+        {% if current_service.api_keys %}
+          <p class="govuk-body">
+            Als u de API gebruikt, kunt u ontvangen berichten ophalen of een callback instellen om berichten naar uw dienst te sturen.
+          </p>
+        {% endif %}
+        <p class="govuk-body">
+          U kunt nog steeds sms-berichten versturen vanaf een <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_sms_senders', service_id=current_service.id) }}">afzender-ID</a> indien nodig, maar mensen kunnen niet op die berichten reageren.
+        </p>
+        <p class="govuk-body">
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.service_receive_text_messages_stop', service_id=current_service.id) }}">Stop met het ontvangen van sms-berichten</a>
+        </p>
+
+      {% else %}
+
+        <p class="govuk-body">
+          Als u sms-berichten wilt ontvangen, krijgt u van Notify een uniek telefoonnummer van 11 cijfers.
+        </p>
+        <p class="govuk-body">
+          U kunt vanaf dit nummer sms-berichten versturen in plaats van uw huidige afzender-ID.
+        </p>
+        <p class="govuk-body">
+          Wanneer iemand op dit nummer reageert, ziet u dat op uw dashboard.
+        </p>
+        <p class="govuk-body">
+          Het ontvangen van sms-berichten kost u niets. Uw gebruikers betalen hun standaard sms-tarief.
+        </p>
+        {{ govukButton({
+          "element": "a",
+          "text": "Begin met het ontvangen van sms-berichten",
+          "href": url_for('main.service_receive_text_messages_start', service_id=current_service.id),
+        }) }}
+
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}

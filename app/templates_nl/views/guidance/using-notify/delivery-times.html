@@ -1,0 +1,61 @@
+{% from "components/service-link.html" import service_link %}
+
+{% extends "content_template.html" %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  Bezorgtijden
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Bezorgtijden</h1>
+
+  <p class="govuk-body">Het {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }} geeft de status van een bericht weer, zodat u kunt zien wanneer het is bezorgd.</p>
+  <p class="govuk-body">Om <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_security") }}">gegevens van ontvangers veilig te houden</a>, is deze informatie slechts 7 dagen beschikbaar nadat een bericht is verzonden. U kunt een rapport downloaden, inclusief een lijst met verzonden berichten, voor uw eigen administratie.</p>
+  <p class="govuk-body">Lees <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_message_status') }}">wat elke berichtstatus betekent</a>.</p>
+
+  <h2 id="emails" class="heading-medium">E-mails</h2>
+  <p class="govuk-body">Notify streeft ernaar 95% van de e-mails binnen 10 seconden te versturen.</p>
+  <p class="govuk-body">Nadat een e-mail is verstuurd, probeert onze e-mailprovider deze tot 72 uur lang bij de ontvanger af te leveren.</p>
+
+  <h3 id="open-rates" class="heading-small">Open- en doorklikpercentages</h3>
+  <p class="govuk-body">Notify kan niet aangeven of uw gebruikers een e-mail openen of op links klikken. Wij registreren geen open- of doorklikpercentages vanwege privacyregels. Het volgen van e-mails zonder toestemming van gebruikers kan in strijd zijn met de Algemene Verordening Gegevensbescherming (AVG).</p>
+
+  <h2 id="text-messages"  class="heading-medium">Sms-berichten</h2>
+  <p class="govuk-body">Notify streeft ernaar 95% van de sms-berichten binnen 10 seconden te versturen.</p>
+  <p class="govuk-body">Nadat een sms is verzonden, probeert onze sms-provider deze tot 72 uur bij de ontvanger af te leveren.</p>
+  <p class="govuk-body">We sturen sms-berichten via verschillende providers. Als één provider faalt, schakelt Notify over naar een andere, zodat uw sms-berichten niet worden beïnvloed.</p>
+
+  <h2 id="letters" class="heading-medium">Brieven</h2>
+  <p class="govuk-body">Brieven worden om 17:30 uur gedrukt en de volgende werkdag (maandag tot en met vrijdag) verzonden.</p>
+
+  <p class="govuk-body">Brieven in eersteklas post worden één dag na verzending bezorgd. Tweedeklas post wordt twee dagen na verzending bezorgd. Royal Mail bezorgt van maandag tot en met zaterdag, met uitzondering van feestdagen.</p>
+  <p class="govuk-body">Brieven naar Europa worden binnen 3 tot 5 dagen bezorgd. Brieven naar andere landen wereldwijd hebben 5 tot 7 dagen nodig voor bezorging.</p>
+
+  <h2 id="returned-mail" class="heading-medium">Retour gezonden brieven</h2>
+  <p class="govuk-body">Elke brief die wij versturen bevat het adres van onze drukkerij op de achterkant van de envelop. U kunt het retouradres niet aanpassen.</p>
+  <p class="govuk-body">Niet bezorgde brieven worden teruggestuurd naar onze drukkerij en vernietigd.</p>
+  <p class="govuk-body">U kunt een rapport van retour gezonden brieven zien op het dashboard.</p>
+
+  <h3 id="identify-returned-letters" class="heading-small">Retour gezonden brieven herkennen</h3>
+  <p class="govuk-body">Om u te helpen bij het herkennen van retour gezonden brieven, toont het rapport onder andere:
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>template-ID</li>
+    <li>datum waarop de brief is verzonden</li>
+    <li>een referentie voor elke brief als u een van de volgende gebruikt:
+      <ul class="govuk-list govuk-list--bullet">
+        <li>een kolom genaamd ‘reference’ in de lijst met adressen die u uploadt</li>
+        <li>het <code class="lang-py">reference</code>-argument bij het aanroepen van de Notify API</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3 id="automate-identifying-returned-letters" class="heading-small">Automatisch herkennen van retour gezonden brieven</h3>
+  <p class="govuk-body">Gebruik de Notify API om het rapport van retour gezonden brieven op te halen en de brieven te identificeren. Volg de instructies in onze <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/using-notify/api-documentation">API-documentatie</a>.</p>
+  <p class="govuk-body">U heeft een ontwikkelaar nodig in uw team om dit voor u in te stellen.</p>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/pill.html" import pill %}
+
+{% block service_page_title %}
+  Auditgebeurtenissen
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header("Auditgebeurtenissen") }}
+
+  {% if show_navigation %}
+    <div class="bottom-gutter">
+      {{ pill(
+        [
+          ('Alles', None, url_for('main.history', service_id=current_service.id), None),
+          ('Dienstinstellingen', 'service', url_for('main.history', service_id=current_service.id, selected='service'), None),
+          ('API-sleutels', 'api', url_for('main.history', service_id=current_service.id, selected='api'), None),
+        ],
+        request.args.get('selected'),
+        show_count=False
+      ) }}
+    </div>
+  {% endif %}
+
+  {% for day, events in days %}
+    <h2 class="heading-small top-gutter">
+      {{ events[0].time|format_date_human|title }}
+    </h2>
+    <ul class="bottom-gutter govuk-list">
+      {% for event in events %}
+        <li class="history-list-item">
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-third">
+              <div class="history-list-user">
+                {{ user_getter(event.user_id) }}
+              </div>
+              <div class="history-list-time">
+                {{ event.time|format_time }}
+              </div>
+            </div>
+            <div class="govuk-grid-column-two-thirds">
+              {{ event }}
+            </div>
+          </div>
+        </li>
+      {% endfor%}
+    </ul>
+  {% endfor %}
+
+{% endblock %}

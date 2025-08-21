@@ -1,0 +1,27 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  E-mails en sms-berichten plannen
+{% endblock %}
+
+{% block content_column_content %}
+  <h1 class="heading-large">E-mails en sms-berichten plannen</h1>
+
+  <p class="govuk-body">U kunt berichten tot een week van tevoren inplannen.</p>
+
+  <p class="govuk-body">Om een batch e-mails of sms-berichten te plannen:</p>
+  <ol class="govuk-list govuk-list--number">
+    <li>Ga naar de {{ service_link(current_service, 'main.choose_template', 'sjablonen') }} pagina.</li>
+    <li>Voeg een nieuw sjabloon toe of kies een bestaand sjabloon.</li>
+    <li>Selecteer <b class="govuk-!-font-weight-bold">Klaar om te verzenden</b>.</li>
+    <li>Upload een lijst met ontvangers.</li>
+    <li>Stel de datum en tijd in waarop u uw berichten wilt verzenden.</li>
+  </ol>
+
+  <p class="govuk-body">Uw ingeplande berichten verschijnen op de {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }} en {{ service_link(current_service, 'main.uploads', 'uploads') }} pagina’s.</p>
+{% endblock %}

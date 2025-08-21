@@ -1,0 +1,47 @@
+{% from "service_navigation.html" import service_navigation %}
+{% from "components/error-summary.html" import errorSummary %}
+
+{% extends "admin_template.html" %}
+
+{% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
+
+{% block per_page_title %}
+  {% block service_page_title %}{% endblock %} – {{ current_service.name }}
+{% endblock %}
+
+{% block main %}
+  <div class="govuk-width-container">
+    {{ service_navigation(current_user, current_service) }}
+    <div class="govuk-grid-row govuk-!-padding-bottom-12">
+      {% if help %}
+        <div class="govuk-grid-column-one-third">
+      {% else %}
+        <div class="govuk-grid-column-one-quarter">
+      {% endif %}
+          {% include "main_nav.html" %}
+        </div>
+      {% if help %}
+        <div class="govuk-grid-column-two-thirds">
+      {% else %}
+        <div class="govuk-grid-column-three-quarters">
+      {% endif %}
+        {% block beforeContent %}
+          {% block backLink %}{% endblock %}
+        {% endblock %}
+        <main class="govuk-main-wrapper column-main {{ mainClasses }}" id="main-content" role="main">
+        {% block content %}
+          {% include 'flash_messages.html' %}
+          {% block errorSummary %}
+            {% if error_summary_enabled %}
+              {% if form and form.errors %}
+                {{ errorSummary(form, error_summary_extra_params) }}
+              {% endif %}
+            {% endif %}
+          {% endblock %}
+          {% block maincolumn_content %}{% endblock %}
+        {% endblock %}
+        </main>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% from "components/live-search.html" import live_search %}
+{% from "components/folder-path.html" import folder_path, format_template_name %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% import "components/svgs.html" as svgs %}
+
+{% extends "withnav_template.html" %}
+
+{% block service_page_title %}
+  Kies een sjabloon
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="bottom-gutter-1-2">
+  <h1 class="heading-large">Kies een sjabloon</h1>
+  {{ folder_path(template_folder_path, current_service, template_type, current_user, root_element='h2') }}
+</div>
+
+  {% if not templates_and_folders.templates_to_show %}
+
+    {% if current_user.has_permissions('manage_templates') %}
+       <p class="bottom-gutter">
+         U heeft een sjabloon nodig voordat u sms-berichten kunt versturen.
+       </p>
+       {{ govukButton({
+        "element": "a",
+        "text": "Voeg een nieuw sjabloon toe",
+        "href": url_for('main.choose_template', service_id=current_service.id, initial_state='add-new-template')
+      }) }}
+    {% else %}
+      <p class="govuk-body">
+        Vraag uw servicemanager om sjablonen toe te voegen voordat u sms-berichten kunt versturen.
+      </p>
+    {% endif %}
+
+  {% else %}
+
+    {{ live_search(target_selector='#template-list .template-list-item', show=True, form=_search_form) }}
+
+    <div id="template-list">
+      {% for item in templates_and_folders %}
+        {% set item_num = loop.index %}
+        <div class="template-list-item {% if item.ancestors %}template-list-item-hidden-by-default{% endif %} {% if not item.ancestors %}template-list-item-without-ancestors{% endif %}">
+          {% for ancestor in item.ancestors %}
+              <a href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
+              {{ svgs.folder(classes="template-list-folder__icon") }}
+              {{ ancestor.name }}
+            </a> <span class="message-name-separator"></span>
+          {% endfor %}
+          {% if item.is_folder %}
+            <a href="{{ url_for('main.conversation_reply', service_id=current_service.id, notification_id=notification_id, from_folder=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
+              {{ svgs.folder(classes="template-list-folder__icon") }}
+              <span class="live-search-relevant">{{ format_template_name(item.name) }}</span>
+            </a>
+          {% else %}
+            <a class="govuk-link govuk-link--no-visited-state template-list-template" href="{{ url_for('main.conversation_reply_with_template', service_id=current_service.id, template_id=item.id, notification_id=notification_id, from_folder=from_folder)  }}">
+              <span class="live-search-relevant">{{ item.name }}</span>
+            </a>
+          {% endif %}
+          <p class="template-list-item-hint govuk-hint">
+            {{ item.hint }}
+          </p>
+        </div>
+      {% endfor %}
+    </div>
+
+  {% endif %}
+
+{% endblock %}

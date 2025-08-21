@@ -1,0 +1,41 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Accepteer de verwerkersovereenkomst en financiële overeenkomst
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-five-sixths">
+
+    {{ page_header('Accepteer de verwerkersovereenkomst en financiële overeenkomst')}}
+
+    <p class="govuk-body">
+      Voordat u NotifyNL kunt gebruiken, moet u onze verwerkersovereenkomst en financiële overeenkomst accepteren.
+    </p>
+    <p class="govuk-body">
+      Dit moet worden gedaan door, of namens, iemand die bevoegd is om contracten te ondertekenen voor uw organisatie.
+    </p>
+    <p class="govuk-body">
+      Zodra deze is geaccepteerd, geldt de overeenkomst voor alle Notify-diensten van uw organisatie.
+    </p>
+    <p class="govuk-body">
+      Er zijn verschillende overeenkomsten voor crown- en niet-crownorganisaties.
+    </p>
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact met ons op</a> om ons te laten weten
+      of u werkt voor een crownorganisatie. Als u het niet zeker weet,
+      helpen wij u dit uit te zoeken.
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

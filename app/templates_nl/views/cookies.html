@@ -1,0 +1,47 @@
+{% extends "withoutnav_template.html" %}
+
+{% block per_page_title %}
+  Cookies
+{% endblock %}
+
+{% block cookie_message %}{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-large">Cookies</h1>
+    <p class="summary">
+      Cookies zijn kleine bestandjes die op uw telefoon, tablet of computer worden opgeslagen wanneer u een website bezoekt.
+    </p>
+    <p class="govuk-body">We gebruiken een essentiële cookie om uw gegevens veilig te houden terwijl u NotifyNL gebruikt.</p>
+    <p class="govuk-body">
+      Voor het gebruik van essentiële cookies is geen toestemming nodig.
+    </p>
+    <table>
+        <caption class="govuk-visually-hidden">Essentiële cookies</caption>
+        <thead>
+            <tr>
+                <th>Naam</th>
+                <th>Doel</th>
+                <th>Verloopt</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                  notify_admin_session
+                </td>
+                <td width="50%">
+                  Wordt gebruikt om u ingelogd te houden
+                </td>
+                <td>
+                  20 uur
+                </td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

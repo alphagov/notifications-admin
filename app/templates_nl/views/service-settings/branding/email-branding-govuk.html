@@ -1,0 +1,45 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/branding-preview.html" import email_branding_preview %}
+
+{% set page_title = 'Bevestig e-mailhuisstijl' %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": back_link
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(page_title) }}
+
+  <p class="govuk-body">
+    E-mails van {{ current_service.name }} zien er als volgt uit.
+  </p>
+
+  {{ email_branding_preview('__NONE__', title="Voorbeeld van nieuwe e-mailhuisstijl") }}
+
+  <h2 class="heading-medium">Voordat u doorgaat</h2>
+
+  <p class="govuk-body">U mag alleen GOV.UK-huisstijl gebruiken als mensen via GOV.UK toegang hebben tot uw dienst.</p>
+
+  <p class="govuk-body">
+    U mag geen GOV.UK-huisstijl gebruiken als uw organisatie
+    <a class="govuk-link govuk-link--no-visited-state"
+      href="https://www.gov.uk/government/publications/govuk-proposition/govuk-proposition#organisations-independent-from-government">onafhankelijk
+      is van de overheid</a>.
+  </p>
+
+  {% call form_wrapper() %}
+    {{ page_footer(page_title) }}
+  {% endcall %}
+
+{% endblock %}

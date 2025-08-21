@@ -1,0 +1,33 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Uw organisatie heeft de overeenkomst al geaccepteerd
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.request_to_go_live', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-five-sixths">
+
+    {{ page_header('Uw organisatie heeft de overeenkomst al geaccepteerd')}}
+
+    <p class="govuk-body">
+      {{ current_service.organisation.name }} heeft de GOV.UK
+      Notify verwerkersovereenkomst en financiële overeenkomst al geaccepteerd.
+    </p>
+    <p class="govuk-body">Voor meer informatie kunt u <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_download_agreement', service_id=current_service.id) }}">een kopie van de overeenkomst downloaden (PDF)</a>.
+    </p>
+    <p class="govuk-body">
+      De overeenkomst is vertrouwelijk en mag niet buiten uw organisatie worden gedeeld.
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

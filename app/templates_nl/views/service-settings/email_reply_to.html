@@ -1,0 +1,81 @@
+{% extends "withnav_template.html" %}
+{% from "components/copy-to-clipboard.html" import copy_to_clipboard %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Antwoord-naar e-mailadressen
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Antwoord-naar e-mailadressen') }}
+
+  <div class="user-list">
+    {% if not current_service.email_reply_to_addresses %}
+      <div class="user-list-item">
+        <p class="govuk-body user-list-item-blank hint">U heeft nog geen antwoord-naar e-mailadressen toegevoegd</p>
+      </div>
+    {% endif %}
+    {% for item in current_service.email_reply_to_addresses %}
+      <div class="user-list-item">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-three-quarters">
+            <h2 class="user-list-item-heading">
+              <span class="heading-small">{{ item.email_address }}</span>&ensp;<span class="hint">
+                {%- if item.is_default -%}
+                  (standaard)
+                {% endif %}
+              </span>
+            </h2>
+          </div>
+          <div class="govuk-grid-column-one-quarter">
+            {% if current_user.has_permissions('manage_service') %}
+              <a class="govuk-link govuk-link--no-visited-state user-list-edit-link" href="{{ url_for('main.service_edit_email_reply_to', service_id=current_service.id, reply_to_email_id=item.id) }}">
+                Wijzigen<span class="govuk-visually-hidden"> {{ item.email_address }}</span>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-full">
+            {% if current_service.count_email_reply_to_addresses > 1 %}
+              {{ copy_to_clipboard(item.id, name=item.email_address, thing="ID") }}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {% if current_user.has_permissions('manage_service') %}
+        <div class="js-stick-at-bottom-when-scrolling">
+          {{ govukButton({
+            "element": "a",
+            "text": "Antwoord-naar e-mailadres toevoegen",
+            "href": url_for('main.service_add_email_reply_to', service_id=current_service.id),
+          }) }}
+        </div>
+      {% endif %}
+    </div>
+    <div class="govuk-grid-column-five-sixths">
+      <p class="govuk-body">
+        U moet minimaal één antwoord-naar adres toevoegen zodat ontvangers op uw berichten kunnen reageren.
+      </p>
+      <p class="govuk-body">
+        E-mails met een antwoord-naar adres:
+      </p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>worden minder snel als spam gemarkeerd</li>
+        <li>komen betrouwbaarder over</li>
+      </ul>
+    </div>
+  </div>
+
+{% endblock %}

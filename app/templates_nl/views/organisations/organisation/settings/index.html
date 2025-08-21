@@ -1,0 +1,323 @@
+{% extends "org_template.html" %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+
+{% block org_page_title %}
+  Instellingen
+{% endblock %}
+
+{% block maincolumn_content %}
+  <h1 class="heading-medium">Instellingen</h1>
+  <div class="bottom-gutter-3-2">
+
+    {% set billing_details_html %}
+      {% if current_org.billing_details is iterable and text is not string %}
+        <ul class="govuk-list">
+          {% for item in current_org.billing_details %}
+            {% if item %}
+              <li>{{ item }}</li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% else %}
+        Geen
+      {% endif %}
+    {% endset %}
+
+    {% set email_branding_html %}
+      <div {% if current_org.email_branding_pool_excluding_default %}class="govuk-!-margin-bottom-3"{% endif %}>
+        {{ current_org.email_branding.name }}
+        <br>
+        <span class="govuk-hint">
+          Standaard
+        </span>
+      </div>
+
+      {% for item in current_org.email_branding_pool_excluding_default %}
+        {% if loop.first %}<ul class="govuk-list">{% endif %}
+          <li>
+            {{ item.name }}
+          </li>
+        {% if loop.last %}</ul>{% endif %}
+      {% endfor %}
+    {% endset %}
+
+    {% set letter_branding_html %}
+      <div {% if current_org.letter_branding_pool_excluding_default %}class="govuk-!-margin-bottom-3"{% endif %}>
+        {{ current_org.letter_branding.name or "Geen huisstijl" }}
+        <br>
+        <span class="govuk-hint">
+          Standaard
+        </span>
+      </div>
+      {% for item in current_org.letter_branding_pool_excluding_default %}
+        {% if loop.first %}<ul class="govuk-list">{% endif %}
+          <li>
+            {{ item.name }}
+          </li>
+        {% if loop.last %}</ul>{% endif %}
+      {% endfor %}
+    {% endset %}
+
+    {% set known_domains_html %}
+      {% if current_org.domains %}
+        <ul class="govuk-list">
+          {% for item in current_org.domains %}
+            {% if item %}
+              <li>{{ item }}</li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% else %}
+        Geen
+      {% endif %}
+    {% endset %}
+
+    {{ govukSummaryList({
+      "classes": "notify-summary-list organisation-settings",
+      "rows": [
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Naam"
+          },
+          "value": {
+            "text": current_org.name
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_name', org_id=current_org.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "naam van de organisatie",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Sector"
+          },
+          "value": {
+            "text": current_org.organisation_type_label or "Niet ingesteld"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_type', org_id=current_org.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "sector van de organisatie",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Rijksorganisatie"
+          },
+          "value": {
+            "text": "Onbekend" if current_org.crown is none else "Ja" if current_org.crown else "Nee",
+            "classes": "govuk-summary-list__value--default" if current_org.crown is none
+          },
+          "actions": {
+            "items": [
+              {
+                "href":  url_for('main.edit_organisation_crown_status', org_id=current_org.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "status Rijksorganisatie",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Verwerking- en financiële overeenkomst"
+          },
+          "value": {
+            "text": "Niet ondertekend (maar er zijn enkele diensten-specifieke overeenkomsten)" if current_org.agreement_signed is none else "Ondertekend" if current_org.agreement_signed else "Niet ondertekend",
+            "classes": "govuk-summary-list__value--truncate" if current_org.agreement_signed is none
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_agreement', org_id=current_org.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "verwerking- en financiële overeenkomst van de organisatie",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Opmerkingen bij livegang-verzoek"
+          },
+          "value": {
+            "text": current_org.request_to_go_live_notes or "Geen",
+            "classes": "govuk-summary-list__value--default" if current_org.request_to_go_live_notes is none else "govuk-summary-list__value--truncate"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_go_live_notes', org_id=current_org.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "opmerkingen bij livegang-verzoek",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Kan eigen livegang-verzoeken goedkeuren"
+          },
+          "value": {
+            "text": current_org.can_approve_own_go_live_requests|format_yes_no
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_can_approve_own_go_live_requests', org_id=current_org.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "of deze organisatie eigen livegang-verzoeken kan goedkeuren",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Gebruikers kunnen verzoeken om diensten te joinen"
+          },
+          "value": {
+            "text": current_org.can_ask_to_join_a_service|format_yes_no
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_can_ask_to_join_a_service', org_id=current_org.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "of gebruikers kunnen vragen om diensten te joinen binnen deze organisatie",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Facturatiegegevens"
+          },
+          "value": {
+            "text": billing_details_html
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_billing_details', org_id=current_org.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "facturatiegegevens van de organisatie",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Notities"
+          },
+          "value": {
+            "text": current_org.notes or "Geen",
+            "classes": "govuk-summary-list__value--default" if current_org.notes is none
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_notes', org_id=current_org.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "de notities voor de organisatie",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "E-mail huisstijl opties"
+          },
+          "value": {
+            "text": email_branding_html
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.organisation_email_branding', org_id=current_org.id),
+                "text": "Beheren",
+                "visuallyHiddenText": "e-mail huisstijl opties voor de organisatie",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Brief huisstijl opties"
+          },
+          "value": {
+            "text": letter_branding_html
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.organisation_letter_branding', org_id=current_org.id),
+                "text": "Beheren",
+                "visuallyHiddenText": "brief huisstijl opties voor de organisatie",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Bekende e-maildomeinen"
+          },
+          "value": {
+            "text": known_domains_html,
+            "classes": "govuk-summary-list__value--default" if not current_org.domains
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for('main.edit_organisation_domains', org_id=current_org.id),
+                "text": "Wijzigen",
+                "visuallyHiddenText": "bekende e-maildomeinen voor de organisatie",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        }
+      ]
+    }) }}
+    {% if current_org.active %}
+      <p class="top-gutter-1-2">
+        <span class="page-footer-link page-footer-delete-link-without-button">
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.archive_organisation', org_id=current_org.id) }}">
+            Deze organisatie verwijderen
+          </a>
+        </span>
+      </p>
+    {% endif %}
+  </div>
+{% endblock %}

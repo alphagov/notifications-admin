@@ -1,0 +1,42 @@
+{% extends "content_template.html" %}
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  Aanmeldmethode
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Aanmeldmethode</h1>
+
+  <p class="govuk-body">Als u zich aanmeldt bij Notify, moet u het volgende invoeren:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>uw e-mailadres</li>
+    <li>uw wachtwoord</li>
+    <li>een code per sms die Notify naar uw telefoon stuurt</li>
+  </ul>
+
+  <p class="govuk-body">Als aanmelden met een sms-code lastig is voor uw team, kunt u zich ook aanmelden met een link die per e-mail wordt gestuurd.</p>
+
+  <p class="govuk-body">Om veiligheidsredenen mag u dit alleen doen als u gebruikmaakt van:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>een apparaat dat door het werk wordt beheerd</li>
+    <li>een werk-e-mailadres dat beschermd wordt door multi-factor authenticatie (MFA)</li>
+  </ul>
+
+
+  <h2 class="heading-medium">Hoe u de aanmeldmethode voor uw team wijzigt</h2>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Ga naar de {{ service_link(current_service, 'main.service_settings', 'Instellingen') }} pagina.</li>
+    <li>Selecteer <b class="govuk-!-font-weight-bold">Wijzigen</b> bij de rij <b class="govuk-!-font-weight-bold">Aanmeldmethode</b>.</li>
+  </ol>
+
+  <p class="govuk-body">Ga vervolgens naar de pagina <b class="govuk-!-font-weight-bold">Teamleden</b> om de aanmeldmethode voor elke persoon in uw team te kiezen.</p>
+
+{% endblock %}

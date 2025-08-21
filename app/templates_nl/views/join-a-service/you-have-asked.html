@@ -1,0 +1,29 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% set heading = 'U heeft gevraagd om lid te worden van een bestaande dienst' %}
+{% set number_of_users_emailed = request.args.get('number_of_users_emailed') %}
+
+{% block per_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {{ page_header(heading) }}
+      <p class="govuk-body">
+        We hebben uw verzoek gestuurd naar {{ number_of_users_emailed }} lid{{ '' if number_of_users_emailed == '1' else 'men' }} van ‘{{ service.name }}’.
+      </p>
+      <p class="govuk-body">
+        We hebben ook een bevestigingsmail naar u gestuurd.
+      </p>
+      <p class="govuk-body">
+        U ontvangt een nieuwe e-mail zodra uw verzoek is goedgekeurd.
+      </p>
+      <p class="govuk-body">
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.your_services') }}">Terug naar uw diensten</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

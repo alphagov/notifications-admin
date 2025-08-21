@@ -1,0 +1,36 @@
+{% extends "views/platform-admin/_base_template.html" %}
+{% from "components/previous-next-navigation.html" import previous_next_navigation %}
+{% from "components/table.html" import list_table, text_field, link_field %}
+
+{% block per_page_title %}
+  E-mailklachten
+{% endblock %}
+
+{% block platform_admin_content %}
+
+  <h1 class="heading-medium">
+    E-mailklachten
+  </h1>
+
+  {% call(item, row_number) list_table(
+      complaints,
+      caption="Klachten",
+      caption_visible=False,
+      empty_message='Geen klachten',
+      field_headings=['Melding-ID', 'Dienst', 'Type klacht', 'Datum klacht'],
+      field_headings_visible=True
+  ) %}
+
+      {{ link_field(item.notification_id, url_for('main.view_notification', service_id=item.service_id, notification_id=item.notification_id)) }}
+
+      {{ link_field(item.service_name, url_for('main.service_dashboard', service_id=item.service_id)) }}
+
+      {{ text_field(item.complaint_type) }}
+
+      {{ text_field(item.complaint_date|format_datetime_short if item.complaint_date else None) }}
+
+  {% endcall %}
+
+  {{ previous_next_navigation(prev_page, next_page) }}
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = "‘{}’ branding toepassen".format(branding_name) %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+    {{ page_header(page_title) }}
+
+    {% call form_wrapper() %}
+      {% set hint_1 %}
+        <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
+          <li>Deze branding toepassen op ‘{{current_service.name}}’</li>
+          <li class="govuk-!-margin-bottom-0">Andere teams binnen {{current_service.organisation.name}} deze branding zelf laten toepassen</li>
+        </ul>
+      {% endset %}
+      {% set hint_2 %}
+        <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
+          <li class="govuk-!-margin-bottom-0">Deze branding alleen toepassen op ‘{{current_service.name}}’</li>
+        </ul>
+      {% endset %}
+      {% set label_text %}
+        Moeten andere teams binnen {{current_service.organisation.name}} de mogelijkheid hebben om deze branding te gebruiken?
+      {% endset %}
+
+      {{
+        form.add_to_pool(
+          param_extensions={
+            "fieldset": {
+              "legend": {"text": label_text}
+            },
+            "items": [
+              {"hint": {"html": hint_1} },
+              {"hint": {"html": hint_2} },
+            ]
+          }
+        )
+      }}
+      {{ page_footer('Doorgaan') }}
+    {% endcall %}
+
+{% endblock %}

@@ -1,0 +1,14 @@
+Service: {{ current_service.name }}
+{{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
+
+---
+De gebruiker - {{current_user.email_address}} vroeg om een afzender-ID die mogelijk wordt gebruikt voor phishing - {{ senderID }}. Deze is geblokkeerd.
+
+Controleer of dit alleen een test is; zo niet, meld dan een beveiligingsincident:
+
+Handleiding voor beveiligingsincidenten: https://github.com/alphagov/notifications-manuals/wiki/What-to-do-during-an-incident#security-incidents-and-data-breaches
+
+Om de omvang van het probleem te bepalen:
+ - bekijk afzender-ID’s, zowel huidige als gearchiveerde: https://github.com/alphagov/notifications-manuals/wiki/Support-Runbook#look-at-senderid-history
+ - bekijk e-mails: {{url_for("main.view_notifications", service_id=current_service.id, message_type='email', status='delivered', _external=True)}}
+ - bekijk sms-berichten: {{url_for("main.view_notifications", service_id=current_service.id, message_type='sms', status='delivered', _external=True)}}

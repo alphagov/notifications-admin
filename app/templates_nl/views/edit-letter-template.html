@@ -1,0 +1,80 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set heading %}
+  {% if heading_action == 'Edit' %}
+    {% if letter_languages == language_options.english.value %}
+      Bewerk koptekst en hoofdtekst
+    {% elif language is none %}
+      Bewerk Engelse koptekst en hoofdtekst
+    {% else %}
+      Bewerk Welshe koptekst en hoofdtekst
+    {% endif %}
+  {% else %}
+    {{ heading_action }} brievensjabloon
+  {% endif %}
+{% endset %}
+
+{% block service_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({
+    "href": back_link
+  }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+    {{ page_header(heading) }}
+
+    {% call form_wrapper() %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-five-sixths">
+          {% if show_name_field %}
+            {{ form.name(param_extensions={"classes": "govuk-!-width-full"}) }}
+          {% else %}
+            {# deze moet worden doorgegeven als dit vanaf de kopieerpagina wordt weergegeven #}
+            <input type="hidden" name="name" value="{{ form.name.data }}" />
+          {% endif %}
+
+          {{ form.subject(param_extensions={
+            "classes": "govuk-!-width-full govuk-textarea-highlight__textbox",
+            "rows": "2",
+            "attributes": {
+              "data-notify-module": "enhanced-textbox",
+              "data-highlight-placeholders": "true"
+            },
+            "formGroup": {
+              "classes": "govuk-textarea-highlight",
+            }
+          }) }}
+          {{ form.template_content(param_extensions={
+            "classes": "govuk-!-width-full govuk-textarea-highlight__textbox",
+            "attributes": {
+              "data-notify-module": "enhanced-textbox",
+              "data-highlight-placeholders": "true"
+            },
+            "formGroup": {
+              "classes": "govuk-textarea-highlight",
+            }
+          }) }}
+          {{ sticky_page_footer(
+            'Opslaan'
+          ) }}
+
+        </div>
+        <div class="govuk-grid-column-full">
+          {% include "partials/templates/guidance-formatting-letters.html" %}
+          {% include "partials/templates/guidance-personalisation.html" %}
+          {% include "partials/templates/guidance-optional-content.html" %}
+          {% include "partials/templates/guidance-qr-codes.html" %}
+        </div>
+      </div>
+    {% endcall %}
+
+{% endblock %}

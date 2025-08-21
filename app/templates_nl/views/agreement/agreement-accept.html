@@ -1,0 +1,51 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/fieldset/macro.html" import govukFieldset %}
+
+
+{% block per_page_title %}
+  Accepteer onze overeenkomst voor gegevensverwerking en financiële afspraken
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_agreement', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-five-sixths">
+
+    {{ page_header('Accepteer onze overeenkomst voor gegevensverwerking en financiële afspraken') }}
+
+    {%  set contentHtml%}
+            {% call govukFieldset({
+              "legend": {}
+            }) %}
+                {{ form.on_behalf_of_name }}
+                {{ form.on_behalf_of_email }}
+       {% endcall %}
+    {% endset -%}
+
+    {% call form_wrapper(class='top-gutter') %}
+        {{ form.who(param_extensions={
+          "items": [{}, {"conditional": {"html": contentHtml}
+          }]})
+        }}
+        {{ form.version(
+        param_extensions={
+          "hint": {"text": "Het versienummer staat op de voorkant, bijvoorbeeld ‘3.6’"},
+          "classes": "govuk-!-width-one-third"})
+       }}
+
+      {{ page_footer('Doorgaan') }}
+
+    {% endcall %}
+
+  </div>
+</div>
+
+{% endblock %}

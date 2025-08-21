@@ -1,0 +1,46 @@
+{% extends "withnav_template.html" %}
+
+{% from "components/show-more.html" import show_more %}
+{% from "components/ajax-block.html" import ajax_block %}
+
+{% block service_page_title %}
+  Dashboard
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="dashboard">
+
+    <h1 class="govuk-visually-hidden">Dashboard</h1>
+    {% if current_user.has_permissions('manage_templates') and not current_service.all_templates %}
+      {% include 'views/dashboard/write-first-messages.html' %}
+    {% endif %}
+
+    {{ ajax_block(partials, updates_url, 'upcoming') }}
+
+    <h2 class="heading-medium">
+      Afgelopen 7 dagen
+    </h2>
+
+    {{ ajax_block(partials, updates_url, 'inbox') }}
+
+    {{ ajax_block(partials, updates_url, 'totals') }}
+    {{ show_more(
+      url_for('main.monthly', service_id=current_service.id),
+      'Bekijk berichten per maand'
+    ) }}
+
+    {{ ajax_block(partials, updates_url, 'template-statistics') }}
+
+    {% if current_user.has_permissions('manage_service') %}
+      <h2 class='heading-medium'>Dit jaar</h2>
+      {{ ajax_block(partials, updates_url, 'usage') }}
+      {{ show_more(
+        url_for(".usage", service_id=current_service['id']),
+        'Bekijk gebruik'
+      ) }}
+    {% endif %}
+
+  </div>
+
+{% endblock %}

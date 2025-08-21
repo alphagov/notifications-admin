@@ -1,0 +1,57 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set title = "Controleer de naam van de dienst" %}
+
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ page_header(title) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+
+      <p class="govuk-body">
+        De naam van de dienst mag geen:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        <li>afkortingen of initialen bevatten, tenzij deze algemeen bekend zijn</li>
+        <li>uw eigen naam of de naam van iemand uit uw team bevatten</li>
+        <li>de naam van een webapplicatie of backofficesysteem bevatten</li>
+      </ul>
+
+      <p class="govuk-body">
+        Een dienstnaam moet aan de ontvanger duidelijk maken waar de boodschap over gaat en van wie deze afkomstig is. Bijvoorbeeld:
+      </p>
+
+      <ul class="govuk-list govuk-list--bullet">
+        {% if organisation.organisation_type == 'local' %}
+          <li>Toelating tot school – {{ organisation.name }}</li>
+          <li>Verkiezingsdiensten – {{ organisation.name }}</li>
+          <li>Blauwe parkeerkaart – {{ organisation.name }}</li>
+        {% else %}
+          <li>Inschrijven om te stemmen</li>
+          <li>Verleng uw paspoort</li>
+          <li>Controleer uw AOW-uitkering</li>
+        {% endif %}
+      </ul>
+
+    {% call form_wrapper() %}
+      {{ form.enabled }}
+      {{ page_footer('Doorgaan') }}
+    {% endcall %}
+
+    </div>
+  </div>
+
+{% endblock %}

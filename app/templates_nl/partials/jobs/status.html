@@ -1,0 +1,35 @@
+<div class="ajax-block-container">
+    {% if job.scheduled_for %}
+      {% if job.processing_started %}
+        <p class='bottom-gutter'>
+          Verzonden door {{ job.created_by.name }} op {{ job.processing_started|format_datetime_short }}
+        </p>
+        {% if job.template.template_type == "letter" %}
+          <p class="govuk-body" id="printing-info">
+            {{ letter_print_day }}
+          </p>
+        {% endif %}
+      {% else %}
+        <p class='bottom-gutter'>
+          Geüpload door {{ job.created_by.name }} op {{ job.created_at|format_datetime_short }}
+        </p>
+      {% endif %}
+    {% else %}
+      <p class='bottom-gutter'>
+        Verzonden door {{ job.created_by.name }} op {{ job.created_at|format_datetime_short }}
+      </p>
+      {% if job.template.template_type == "letter" %}
+        <p class="govuk-body" id="printing-info">
+          {{ letter_print_day }}
+        </p>
+      {% endif %}
+    {% endif %}
+  {% if job.status == 'sending limits exceeded'%}
+    <p class="govuk-error-message">
+        Notify kan deze berichten niet verzenden omdat je je dagelijkse limiet hebt bereikt. Je kunt maximaal {{ current_service.get_message_limit(job.template.template_type) | message_count(job.template.template_type) }} per dag verzenden.
+    </p>
+    <p class="govuk-error-message govuk-!-margin-bottom-6">
+        Upload deze spreadsheet morgen opnieuw of <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.support") }}>neem contact op met het NotifyNL-team</a> om de limiet te verhogen.
+    </p>
+  {% endif %}
+</div>

@@ -1,0 +1,22 @@
+{% extends "withnav_template.html" %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% block service_page_title %}
+  {{ template.name }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <h1 class="heading-large">{{ template.name }}</h1>
+
+  {{ template|string }}
+
+  <div class="page-footer">
+    {{ govukButton({
+      "element": "a",
+      "text": "Doorgaan",
+      "href": continue_link,
+    }) }}
+  </div>
+
+{% endblock %}

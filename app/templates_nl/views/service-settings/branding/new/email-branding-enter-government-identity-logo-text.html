@@ -1,0 +1,36 @@
+{% extends "withnav_template.html" %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block service_page_title %}
+  Voer de tekst in die in uw logo verschijnt
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({"href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% call form_wrapper() %}
+    {% set html %}
+      Dit is meestal de volledige naam van uw organisatie.
+      <br/>
+      <br/>
+      Bijvoorbeeld, {{ current_service.organisation.name }}
+    {% endset %}
+    {{
+      form.logo_text(
+        param_extensions={
+          "label": {
+            "isPageHeading": True,
+            "classes": "govuk-label--l",
+          },
+          "hint": {"html": html},
+        },
+      )
+    }}
+    {{ page_footer('Vraag nieuwe huisstijl aan') }}
+  {% endcall %}
+
+{% endblock %}

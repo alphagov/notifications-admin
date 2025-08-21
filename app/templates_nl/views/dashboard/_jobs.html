@@ -1,0 +1,118 @@
+{% from "components/table.html" import list_table, field, row_heading %}
+{% from "components/big-number.html" import big_number -%}
+
+<div class='dashboard-table ajax-block-container'>
+  {% call(item, row_number) list_table(
+    jobs,
+    caption="Recent geüploade bestanden",
+    caption_visible=False,
+    empty_message=(
+      'Upload een brief en Notify print, verpakt en verstuurt deze voor u.' if current_service.has_permission('letter') else 'U heeft nog geen bestanden geüpload.'
+    ),
+    field_headings=[
+      'Bestand',
+      'Status'
+    ],
+    field_headings_visible=False,
+    give_rows_ids=False,
+  ) %}
+    {% call row_heading() %}
+      <div class="file-list">
+        {% if item.upload_type == 'letter_day' %}
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploaded_letters', service_id=current_service.id, letter_print_day=item.created_at|format_date_numeric) }}">{{ item.original_file_name }}</a>
+        {% elif item.upload_type == 'letter' %}
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.original_file_name }}</a>
+        {% elif item.upload_type == 'contact_list' %}
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.contact_list', service_id=current_service.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
+        {% else %}
+          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+        {% endif %}
+        {% if item.scheduled %}
+          <span class="file-list-hint-large">
+            Verzending gepland voor {{
+              item.scheduled_for|format_datetime_relative
+            }}
+          </span>
+        {% elif item.upload_type == 'contact_list' %}
+          <span class="file-list-hint-large">
+            {% if item.recent_job_count %}
+              Gebruikt {{ item.recent_job_count|iteration_count }}
+              in de afgelopen
+              {{ current_service.get_days_of_retention(item.template_type) }}
+              dagen
+            {% elif item.has_jobs %}
+              Niet gebruikt in de afgelopen
+              {{ current_service.get_days_of_retention(item.template_type) }}
+              dagen
+            {% else %}
+              Nog niet gebruikt
+            {% endif %}
+          </span>
+        {% elif item.upload_type == 'letter_day' %}
+          <span class="file-list-hint-large">
+            {{ item.letter_printing_statement }}
+          </span>
+        {% else %}
+          <span class="file-list-hint-large">
+            Verzonden {{
+              (item.scheduled_for or item.created_at)|format_datetime_relative
+            }}
+          </span>
+        {% endif %}
+
+      </div>
+    {% endcall %}
+    {% call field() %}
+      {% if item.scheduled %}
+        {{ big_number(
+          item.notification_count,
+          smallest=True,
+          label=item.notification_count|message_count_label(
+            item.template_type,
+            suffix='in wachtrij om te versturen'
+          )
+        ) }}
+      {% elif item.template_type == 'letter' %}
+        {{ big_number(
+          item.notification_count,
+          smallest=True,
+          label=item.notification_count|message_count_label(
+            item.template_type,
+            suffix=''
+          )
+        ) }}
+      {% elif item.upload_type == 'contact_list' %}
+        {{ big_number(
+          item.row_count,
+          smallest=True,
+          label="opgeslagen {}".format(item.row_count|recipient_count_label(item.template_type))
+        ) }}
+      {% elif item.pdf_letter %}
+        <p class="govuk-body letter-recipient-summary">
+          {% for line in item.recipient.splitlines() %}
+            {% if loop.index < 3 %}
+              {{ line }}<br>
+            {% endif %}
+          {% endfor %}
+        </p>
+      {% else %}
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-one-third">
+            {{ big_number(
+              item.notifications_sending,
+              smallest=True,
+              label='bezig met versturen',
+            ) }}
+          </div>
+          <div class="govuk-grid-column-one-third">
+            {{ big_number(item.notifications_delivered, smallest=True, label='verzonden') }}
+          </div>
+          <div class="govuk-grid-column-one-third">
+            {{ big_number(item.notifications_failed, smallest=True, label='mislukt') }}
+          </div>
+        </div>
+
+      {% endif %}
+    {% endcall %}
+  {% endcall %}
+</div>

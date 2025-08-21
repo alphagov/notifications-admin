@@ -1,0 +1,112 @@
+{% extends "views/platform-admin/_base_template.html" %}
+
+{% block per_page_title %}
+  {{ user.name }}
+{% endblock %}
+
+{% block platform_admin_content %}
+  <div class="govuk-grid-row bottom-gutter">
+    <div class="govuk-grid-column-full">
+      <h1 class="heading-large">
+        {{ user.name }}
+      </h1>
+      {% if user.platform_admin %}
+        <p class="govuk-body">
+          <strong class="govuk-tag govuk-tag--red">Platformbeheerder</strong>
+          &ensp;
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.remove_platform_admin', user_id=user.id) }}">Verwijderen</a>
+        </p>
+      {% endif %}
+      <p class="govuk-body">{{ user.email_address }}</p>
+      <p class="{{ '' if user.mobile_number else 'hint' }}">{{ user.mobile_number or 'Geen mobiel nummer'}}</p>
+
+      <h2 class="heading-medium">Organisaties</h2>
+      <nav class="browse-list">
+        {% if user.organisations %}
+          <ul>
+          {% for org in user.organisations|sort %}
+            <li class="browse-list-item">
+              <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href={{url_for('main.organisation_dashboard', org_id=org.id)}}>{{ org.name }}</a>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p class="hint">
+            Geen organisaties
+          </p>
+        {% endif %}
+      </nav>
+
+      <h2 class="heading-medium">Actieve services</h2>
+      <nav class="browse-list">
+        {% if user.live_services %}
+          <ul>
+          {% for service in user.live_services|sort %}
+            <li class="browse-list-item">
+              <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href={{url_for('main.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
+            </li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p class="hint">
+            Geen actieve services
+          </p>
+        {% endif %}
+      </nav>
+      <h2 class="heading-medium">Services in proefmodus</h2>
+      <nav class="browse-list">
+        {% if user.trial_mode_services %}
+          <ul>
+          {% for service in user.trial_mode_services|sort %}
+            <li class="browse-list-item">
+              <a class="govuk-link govuk-link--no-visited-state browse-list-hint" href={{url_for('main.service_dashboard', service_id=service.id)}}>{{ service.name }}</a>
+            </li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p class="hint">
+            Geen services in proefmodus
+          </p>
+        {% endif %}
+      </nav>
+
+      <h2 class="heading-medium">Authenticatie</h2>
+      <p class="govuk-body">Logt in met {{ user.auth_type | format_auth_type(with_indefinite_article=True) }}</p>
+      {% if user.auth_type != 'webauthn_auth' %}
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.change_user_auth', user_id=user.id) }}">
+          Wijzig authenticatie voor deze gebruiker
+        </a>
+      {% endif %}
+
+      {% if not user.logged_in_at %}
+      <p class="hint">Deze persoon heeft nog nooit ingelogd</p>
+      {% else %}
+      <p class="govuk-body">Laatst ingelogd
+        <time class="timeago" datetime="{{ user.logged_in_at }}">
+          {{ user.logged_in_at|format_delta }}
+        </time>
+      </p>
+      {% endif %}
+
+      <h2 class="heading-medium">Voorkeuren</h2>
+      <p class="govuk-body">
+        {{ "Wil" if user.receives_new_features_email else "Wil niet"}} e-mails ontvangen over nieuwe functionaliteiten
+      </p>
+      <p class="govuk-body">
+        {{ "Wil" if user.take_part_in_research else "Wil niet"}} deelnemen aan gebruikersonderzoek
+      </p>
+
+      {% if user.failed_login_count > 0 %}
+      <p style="color:#d4351c;">
+        {{ user.failed_login_count }} mislukte inlogpogingen
+      </p>
+      {% endif %}
+      {% if user.state == 'active' %}
+        <span class="page-footer-link page-footer-delete-link-without-button">
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.archive_user', user_id=user.id) }}">
+            Archiveer gebruiker
+          </a>
+        </span>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

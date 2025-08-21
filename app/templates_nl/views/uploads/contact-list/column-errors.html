@@ -1,0 +1,83 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+{% from "components/table.html" import list_table, text_field, index_field %}
+{% from "components/file-upload.html" import file_upload %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Fout
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.upload_contact_list', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  <div class="bottom-gutter-1-2">
+    {% call banner_wrapper(type='dangerous') %}
+
+      {% if recipients.too_many_rows %}
+
+        <h1 class='banner-title'>
+          Uw bestand bevat te veel rijen
+        </h1>
+        <p class="govuk-body">
+          Notify kan bestanden opslaan tot
+          {{ recipients.max_rows|format_thousands }} rijen. Uw
+          bestand bevat {{ recipients|length|format_thousands }} rijen.
+        </p>
+
+      {% elif not recipients.allowed_to_send_to %}
+
+        <h1 class='banner-title'>
+          U kunt
+          {{ 'dit' if recipients|length == 1 else 'deze' }}
+          {{ recipients|length|recipient_count_label(recipients.template_type) }}
+          niet opslaan
+        </h1>
+        <p class="govuk-body">
+          In de <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">proefmodus</a> kunt u alleen
+          berichten versturen naar uzelf en leden van uw team
+        </p>
+
+      {% endif %}
+    {% endcall %}
+  </div>
+
+
+  <div class="js-stick-at-top-when-scrolling">
+    <div class="form-group">
+      {{ file_upload(
+        form.file,
+        allowed_file_extensions=allowed_file_extensions,
+        action=url_for('main.upload_contact_list', service_id=current_service.id),
+        button_text='Upload uw bestand opnieuw'
+      ) }}
+    </div>
+    <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Terug naar boven</a>
+  </div>
+
+    <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
+
+    {% call(item, row_number) list_table(
+      recipients.displayed_rows,
+      caption=original_file_name,
+      caption_visible=False,
+      field_headings=[
+        '<span class="govuk-visually-hidden">Rij in bestand</span> <span aria-hidden="true">1</span>'|safe
+      ] + recipients.column_headers
+    ) %}
+      {{ index_field(item.index + 2) }}
+      {% for column in recipients.column_headers %}
+        {{ text_field(item[column].data or '') }}
+      {% endfor %}
+    {% endcall %}
+
+  {% if recipients.displayed_rows|list|length < recipients|length %}
+    <p class="table-show-more-link">
+      Er worden alleen de eerste {{ recipients.displayed_rows|list|length }} rijen getoond
+    </p>
+  {% endif %}
+
+{% endblock %}

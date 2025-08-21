@@ -1,0 +1,54 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/banner.html" import banner %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ user.name or user.email_localpart }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.manage_users', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {% if delete %}
+    {{ banner(
+      'Weet u zeker dat u {} wilt verwijderen?'.format(user.name),
+      type='dangerous',
+      delete_button='Ja, verwijderen',
+      action=url_for('main.remove_user_from_service', service_id=current_service.id, user_id=user.id)
+    ) }}
+  {% endif %}
+
+  {{ page_header(user.name or user.email_localpart) }}
+
+  <p class="govuk-body">
+    {{ user.email_address }}&emsp;
+    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_user_email', service_id=current_service.id, user_id=user.id)}}">
+    Wijzigen<span class="govuk-visually-hidden"> e-mailadres</span>
+    </a>
+  </p>
+  {% if user.mobile_number %}
+    <p class="govuk-body" id="user_mobile_number">
+      {{ user.mobile_number|redact_mobile_number(spacing=" ") }}&emsp;
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_user_mobile_number', service_id=current_service.id, user_id=user.id)}}">
+      Wijzigen<span class="govuk-visually-hidden"> mobiel nummer</span>
+      </a>
+    </p>
+  {% endif %}
+  {% call form_wrapper() %}
+
+    {% include 'views/manage-users/permissions.html' %}
+
+    {{ page_footer(
+      'Opslaan',
+      delete_link=url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id, delete='yes'),
+      delete_link_text='Verwijder dit teamlid'
+    ) }}
+
+  {% endcall %}
+
+{% endblock %}

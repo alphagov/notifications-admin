@@ -1,0 +1,77 @@
+{% extends "content_template.html" %}
+
+{% from "components/page-header.html" import page_header %}
+
+{# Wordt gebruikt door de content_template.html-layout, prefix voor de toegankelijke naam van de "navigation" #}
+{% set navigation_label_prefix = 'Over Notify' %}
+
+{% block per_page_title %}
+Wie kan Notify gebruiken
+{% endblock %}
+
+{% block content_column_content %}
+
+{{ page_header(
+'Wie kan Notify gebruiken'
+) }}
+
+<p class="govuk-body">
+  NotifyNL is beschikbaar voor teams van:
+</p>
+<ul class="govuk-list govuk-list--bullet">
+  <li>centrale overheidsdepartementen</li>
+  <li>gemeentelijke overheden</li>
+  <li>de krijgsmacht</li>
+  <li>gezondheidszorginstellingen</li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#gp">huisartsenpraktijken</a></li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#gp">apotheken</a></li>
+  <li>de hulpdiensten</li>
+  <li>door de staat gefinancierde scholen</li>
+</ul>
+<p class="govuk-body">
+  Werkt u voor een van deze organisaties maar krijgt u een foutmelding bij het aanmaken van een account, <a
+    class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">neem dan contact op met de ondersteuning</a>.
+</p>
+
+<p class="govuk-body">NotifyNL is niet bedoeld voor persoonlijk gebruik.</p>
+
+<p class="govuk-body">
+  NotifyNL is niet beschikbaar voor:
+</p>
+<ul class="govuk-list govuk-list--bullet">
+  <li>goededoelenorganisaties</li>
+  <li>hospices</li>
+  <li>wooncorporaties</li>
+  <li><a class="govuk-link govuk-link--no-visited-state" href="#public">particulieren</a></li>
+  <li>universiteiten</li>
+</ul>
+
+<h2 class="govuk-heading-m" id="suppliers">Leveranciers</h2>
+<p class="govuk-body">
+  Werkt u voor een organisatie in de publieke sector? Dan kunt u NotifyNL gebruiken.
+</p>
+<p class="govuk-body">
+  Iemand van de publieke organisatie waarvoor u werkt, moet eerst een account aanmaken en de dienst toevoegen.
+  Daarna kunnen zij u uitnodigen om als teamlid mee te werken.
+</p>
+<div class="nl-hide">
+  <h2 class="govuk-heading-m" id="gp">Huisartsenpraktijken en apotheken</h2>
+  <p class="govuk-body">
+    Door de NHS gefinancierde huisartsenpraktijken en apotheken kunnen NotifyNL gebruiken, maar:
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>krijgen zij geen <a class="govuk-link govuk-link--no-visited-state"
+        href="{{ url_for('main.guidance_pricing_text_messages') }}">jaarlijkse gratis sms-tegoed</a></li>
+    <li>kunnen zij geen sms-berichten verzenden in <a class="govuk-link govuk-link--no-visited-state"
+        href="{{ url_for('main.guidance_trial_mode') }}">proefmodus</a></li>
+  </ul>
+</div>
+<h2 class="govuk-heading-m" id="public">Particulieren</h2>
+<p class="govuk-body">
+  NotifyNL is alleen bedoeld voor mensen die werken bij de overheid of andere publieke organisaties.
+</p>
+<p class="govuk-body">
+  <a class="govuk-link govuk-link--no-visited-state" href="https://overheid.nl/">Vind overheidsdiensten en informatie op NotifyNL</a>.
+</p>
+
+{% endblock %}

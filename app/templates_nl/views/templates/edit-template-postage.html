@@ -1,0 +1,49 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  Wijzig posttarief
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_template', service_id=service_id, template_id=template_id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header('Wijzig posttarief') }}
+  {% call form_wrapper(class="govuk-!-margin-bottom-7") %}
+    {{ form.postage(param_extensions={
+      "fieldset": {
+          "legend": {
+              "classes": "",
+          },
+      }
+    }) }}
+    {{ page_footer('Opslaan') }}
+  {% endcall %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      <h2 class="govuk-heading-m">
+        Bezorgtijden
+      </h2>
+      <p class="govuk-body">
+        Brieven die vóór 17:30 uur worden verstuurd, worden de volgende werkdag (maandag tot en met vrijdag) verzonden.
+      </p>
+      <p class="govuk-body">
+        Brieven met eersteklas post worden één dag na verzending bezorgd. Brieven met tweedeklas post worden twee dagen na verzending bezorgd.
+      </p>
+      <p class="govuk-body">
+        Royal Mail bezorgt van maandag tot en met zaterdag, met uitzondering van officiële feestdagen.
+      </p>
+      <p class="govuk-body">
+        Bekijk een lijst met <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">posttarieven</a>.
+      </p>
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "content_template.html" %}
+
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  Sms-berichten ontvangen
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Sms-berichten ontvangen</h1>
+
+  <p class="govuk-body">U kunt mensen berichten laten sturen naar uw service of laten reageren op uw sms’jes.</p>
+
+  <p class="govuk-body">De berichten die u verstuurt, komen van een uniek 11-cijferig telefoonnummer.</p>
+
+  <p class="govuk-body">Als iemand terugstuurt naar dat nummer, ziet u dat op uw dashboard. Als u onze API gebruikt, kunt u eigen geautomatiseerde processen instellen om reacties te verwerken.</p>
+
+  <p class="govuk-body">Het kost u niets om sms-berichten te ontvangen. Uw gebruikers betalen hun standaard sms-tarief.</p>
+
+  <p class="govuk-body">Om sms-berichten te ontvangen:</p>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Ga naar de sectie <b class="govuk-!-font-weight-bold">Sms-instellingen</b> op de {{ service_link(current_service, 'main.service_settings', 'instellingen') }} pagina.</li>
+    <li>Kies <b class="govuk-!-font-weight-bold">Wijzigen</b> bij de regel <b class="govuk-!-font-weight-bold">Sms-berichten ontvangen</b>.</li>
+  </ol>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(page_title) }}
+
+  {% call form_wrapper(
+    class='js-stick-at-top-when-scrolling send-one-off-form' if template.template_type != 'sms' else 'send-one-off-form',
+    module="autofocus" if not form.errors and form.placeholder_value.label.text not in ['email address', 'phone number'] else None,
+    data_kwargs={'force-focus': True}
+  ) %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full {% if form.placeholder_value.label.text == 'phone number' %}extra-tracking{% endif %}">
+        {{ form.placeholder_value(param_extensions={"classes": "govuk-!-width-full"}) }}
+      </div>
+      {% if skip_link or link_to_upload %}
+        <div class="govuk-grid-column-full">
+          {% if link_to_upload %}
+            <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3" href="{{ url_for('main.send_messages', service_id=current_service.id, template_id=template.id) }}">Upload een lijst met {{ 999|recipient_count_label(template.template_type) }}</a>
+            {% if current_service.contact_lists %}
+              <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3" href="{{ url_for('main.choose_from_contact_list', service_id=current_service.id, template_id=template.id) }}">Gebruik een noodlijst</a>
+            {% endif %}
+          {% endif %}
+          {% if skip_link %}
+            <a href="{{ skip_link[1] }}" class="govuk-link govuk-link--no-visited-state govuk-!-margin-right-3">{{ skip_link[0] }}</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+    {% if link_to_upload %}
+      <p class="govuk-body">
+
+      </p>
+    {% endif %}
+    {{ page_footer('Doorgaan') }}
+  {% endcall %}
+
+  {{ template|string }}
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% block per_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    <h1 class="heading-large">{{ title }}</h1>
+    <p class="govuk-body">Voor uw veiligheid moeten wij controleren of u nog toegang heeft tot uw e-mailadres.</p>
+    <p class="govuk-body">We hebben u een link gestuurd om in te loggen bij Notify. De link opent in een nieuw browservenster, zodat u dit venster kunt sluiten.</p>
+
+    {{ page_footer(
+      secondary_link=url_for('main.email_not_received', next=redirect_url),
+      secondary_link_text='Geen e-mail ontvangen?'
+    ) }}
+  </div>
+</div>
+
+{% endblock %}

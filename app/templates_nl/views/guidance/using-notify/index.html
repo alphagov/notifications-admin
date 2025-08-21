@@ -1,0 +1,76 @@
+{% extends "content_template.html" %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = 'Notify gebruiken' %}
+
+{% block per_page_title %}
+  Notify gebruiken
+{% endblock %}
+
+{% block content_column_content %}
+
+  <h1 class="heading-large">Notify gebruiken</h1>
+
+  <p class="govuk-body">Deze informatie is bedoeld voor teams die NotifyNL gebruiken voor het versturen van e-mails, sms’jes en brieven.</p>
+  <p class="govuk-body">Als u moet integreren met de NotifyNL API, lees dan onze <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_api_documentation') }}">API-documentatie</a>.</p>
+
+  <h2 class="heading-medium">Berichten verzenden en ontvangen</h2>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_templates') }}">Templates</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_bulk_sending') }}">Bulkverzending</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_delivery_times') }}">Bezorgtijden</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_message_status') }}">Berichtstatus</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_receive_text_messages') }}">Sms-berichten ontvangen</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_reply_to_email_address') }}">Antwoord-naar e-mailadres</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_schedule_messages') }}">E-mails en sms’jes inplannen</a></li>
+  </ul>
+
+  <h2 class="heading-medium">Opmaak</h2>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_formatting') }}">E-mails en brieven opmaken</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_links_and_URLs') }}">Links en URL’s</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_optional_content') }}">Optionele inhoud</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_personalisation') }}">Personalisatie</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_qr_codes') }}">QR-code toevoegen aan een brief</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_unsubscribe_links') }}">Afmeldlinks</a></li>
+  </ul>
+
+  <h2 class="heading-medium">Branding</h2>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_email_branding') }}">E-mailbranding</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_text_message_sender') }}">Afzender-ID voor sms</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_letter_branding') }}">Briefbranding</a></li>
+  </ul>
+
+  <h2 class="heading-medium">Uploads en bijlagen</h2>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_send_files_by_email') }}">Bestanden per e-mail versturen</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_attach_pages') }}">Pagina’s aan een brief toevoegen</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_upload_a_letter') }}">Een brief uploaden</a></li>
+  </ul>
+
+  <h2 class="heading-medium">Instellingen en rechten</h2>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_trial_mode') }}">Proefmodus</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_sign_in_method') }}">Inlogmethode</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_team_members_and_permissions') }}">Teamleden en rechten</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_data_retention_period') }}">Bewaartermijn van gegevens</a></li>
+  </ul>
+
+  <h2 class="heading-medium">Meer informatie</h2>
+
+  <p class="govuk-body">De GOV.UK Service Manual geeft advies over:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li><a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/sending-emails-and-text-messages">het plannen en schrijven van sms’jes en e-mails</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/design/writing-effective-letters">het schrijven van effectieve brieven</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/technology/how-to-email-your-users">het versturen van e-mails vanuit uw dienstendomein</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/technology/sending-text-messages-securely">het veilig versturen van sms’jes</a></li>
+  </ul>
+
+{% endblock %}

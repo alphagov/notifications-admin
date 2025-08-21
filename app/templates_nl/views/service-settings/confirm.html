@@ -1,0 +1,32 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block service_page_title %}
+  {{ heading }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(heading) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+
+    {% call form_wrapper() %}
+      {{ form.password(param_extensions={"autocomplete": "current-password"}) }}
+      {{ page_footer(
+        'Bevestigen',
+        destructive=destructive
+      ) }}
+    {% endcall %}
+    </div>
+  </div>
+
+{% endblock %}
