@@ -85,6 +85,32 @@ FAKE_TEMPLATE_ID = uuid4()
             ],
         ),
         (
+            create_active_user_no_settings_permission(),
+            ["sms", "email", "letter"],
+            [
+                "Service name Test Service",
+                "Sign-in method Text message code",
+                "Data retention period 7 days",
+                "Send emails On",
+                "Email sender name Test Service test.service@notifications.service.gov.uk",
+                "Reply-to email addresses Not set Manage reply-to email addresses",  # user will see manage button
+                "Email branding GOV.UK",
+                "Send files by email contact_us@gov.uk",
+                "Email limit 1,000 per day 1,234 sent today",
+                "Send text messages On",
+                "Text message sender IDs GOVUK Manage text message sender IDs",  # user will see manage button
+                "Start text messages with service name On",
+                "Receive text messages Off",
+                "Text message limit 1,000 per day 1,234 sent today",
+                "Send international text messages Off",
+                "Send letters On",
+                "Send international letters Off",
+                "Sender addresses Not set Manage sender addresses",  # user will see manage button
+                "Letter branding Not set",
+                "Letter limit 1,000 per day 1,234 sent today",
+            ],
+        ),
+        (
             create_platform_admin_user(),
             ["sms", "email"],
             [
@@ -155,7 +181,7 @@ FAKE_TEMPLATE_ID = uuid4()
         ),
     ],
 )
-def test_should_show_overview(
+def test_service_settings_page_visible_settings_depend_on_user_and_service_permissions(
     client_request,
     mocker,
     api_user_active,
