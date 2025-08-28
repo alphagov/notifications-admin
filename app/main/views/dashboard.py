@@ -47,6 +47,8 @@ def old_service_dashboard(service_id):
 @main.route("/services/<uuid:service_id>")
 @user_has_permissions()
 def service_dashboard(service_id):
+    session["from_sender_flow_check"] = False
+
     if session.get("invited_user_id"):
         session.pop("invited_user_id", None)
         session["service_id"] = service_id

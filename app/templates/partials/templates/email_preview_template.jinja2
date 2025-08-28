@@ -3,28 +3,24 @@
 {% set email_meta = [] %}
 
 {% if show_recipient %}
-  {% if from_name %}
     {% do email_meta.append({
       "key": {
         "html": "From"
       },
       "value": {
-        "html": from_name
+        "html": from_name if from_name else "Not set"
       }
     }) %}
-  {% endif %}
 
-  {% if reply_to %}
     {% do email_meta.append({
       "key": {
         "html": "Reply&nbsp;to" | safe
       },
       "value": {
         "classes": "email-message-meta__reply-to",
-        "html": reply_to
+        "html": reply_to if reply_to else "Not set"
       }
     }) %}
-  {% endif %}
 {% endif %}
 
 {% do email_meta.append({

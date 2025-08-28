@@ -5,75 +5,89 @@
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 <div class="ajax-block-container">
-  {% if verification_status == "pending" %}
-    <div role="status"></div>
-    {{ page_header('Reply-to email address check') }}
-    <div role="status">
-      <p class="govuk-body">
-        We need to check that ‘{{ reply_to_email_address }}’ is a real email address.
-      </p>
-      <p class="govuk-body">
-        This can take up to a minute.
-      </p>
-      <p class="govuk-body">
-        <span class='loading-indicator'>Please wait</span>
-      </p>
-    </div>
+    {% if verification_status == "pending" %}
+        <div role="status"></div>
+        {{ page_header('Reply-to email address check') }}
+        <div role="status">
+            <p class="govuk-body">
+                We need to check that ‘{{ reply_to_email_address }}’ is a real email address.
+            </p>
+            <p class="govuk-body">
+                This can take up to a minute.
+            </p>
+            <p class="govuk-body">
+                <span class='loading-indicator'>Please wait</span>
+            </p>
+        </div>
 
-    <p class="js-hidden govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_verify_reply_to_address', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace) }}">Refresh</a>
-    </p>
-  {% elif verification_status == "success" %}
-    {{ page_header('Reply-to email address check') }}
-    <div role="status">
-      <p class="govuk-body">
-        The check is complete.
-      </p>
-      <p class="govuk-body">
-        We’ve added ‘{{ reply_to_email_address }}’ to your reply-to email addresses.
-      </p>
-    </div>
-    <div class="js-stick-at-bottom-when-scrolling">
-      {{ govukButton({
-        "element": "a",
-        "text": "Continue",
-        "href": url_for('main.service_email_reply_to', service_id=service_id)
-      }) }}
-    </div>
-  {% elif verification_status == "failure" %}
-    <div class="bottom-gutter">
-      {% call banner_wrapper(type='dangerous') %}
-        <h2 class='banner-title'>
-          There’s a problem with your reply-to address
-        </h2>
-        <p class="govuk-body">
-          We sent an email to ‘{{ reply_to_email_address }}’ but it could not be delivered.
+        <p class="js-hidden govuk-body">
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_verify_reply_to_address', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace) }}">Refresh</a>
         </p>
-        <p class="govuk-body">
-          You can try again, or use a different address.
-        </p>
-      {% endcall %}
-    </div>
-    {{ page_header('Reply-to email address check') }}
-    {% if replace %}
-      {% set form_url = url_for('main.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
-    {% else %}
-      {% set form_url = url_for('main.service_add_email_reply_to', service_id=service_id) %}
-    {% endif %}
-    {% call form_wrapper(
+    {% elif verification_status == "success" %}
+        {{ page_header('Reply-to email address check') }}
+        <div role="status">
+            <p class="govuk-body">
+                The check is complete.
+            </p>
+            <p class="govuk-body">
+                We’ve added ‘{{ reply_to_email_address }}’ to your reply-to email addresses.
+            </p>
+        </div>
+        {#if alternative link is provided AND Continue is clicked too fast AND
+      if "href" was defined inline (Eg. href: alternative_redirect_link or url_for('main.service_email_reply_to', ...)
+      we seem to automatically redirect to service_email_reply_to.
+        By separating these statements it prevents weird behaviour#}
+        {% if alternative_redirect_link %}
+            <div class="js-stick-at-bottom-when-scrolling">
+                {{ govukButton({
+      "element": "a",
+      "text": "Continue",
+      "href": alternative_redirect_link
+    }) }}
+            </div>
+        {% else %}
+            <div class="js-stick-at-bottom-when-scrolling">
+                {{ govukButton({
+      "element": "a",
+      "text": "Continue",
+      "href": url_for('main.service_email_reply_to', service_id=service_id)
+    }) }}
+            </div>
+        {% endif %}
+    {% elif verification_status == "failure" %}
+        <div class="bottom-gutter">
+            {% call banner_wrapper(type='dangerous') %}
+                <h2 class='banner-title'>
+                    There’s a problem with your reply-to address
+                </h2>
+                <p class="govuk-body">
+                    We sent an email to ‘{{ reply_to_email_address }}’ but it could not be delivered.
+                </p>
+                <p class="govuk-body">
+                    You can try again, or use a different address.
+                </p>
+            {% endcall %}
+        </div>
+        {{ page_header('Reply-to email address check') }}
+        {% if replace %}
+            {% set form_url = url_for('main.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
+        {% else %}
+            {% set form_url = url_for('main.service_add_email_reply_to', service_id=service_id) %}
+        {% endif %}
+        {% call form_wrapper(
       action = form_url
     ) %}
-      {{ form.email_address(
+            {{ form.email_address(
           param_extensions={
             "hint": {"text": "This should be a shared inbox managed by your team, not your own email address"},
             "classes": "govuk-!-width-full"
           },
           error_message_with_html=True
       ) }}
-      {% if not first_email_address and not existing_is_default %}
-        {{ form.is_default }}
-      {% endif %}
-      {{ page_footer('Try again') }}
-    {% endcall %}
-  {% endif %}
+            {% if not first_email_address and not existing_is_default %}
+                {{ form.is_default }}
+            {% endif %}
+            {{ page_footer('Try again') }}
+        {% endcall %}
+    {% endif %}
 </div>

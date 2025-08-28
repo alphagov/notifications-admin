@@ -351,6 +351,7 @@ class MainNavigation(Navigation):
             "add_organisation_from_gp_service",
             "add_organisation_from_nhs_local_service",
             "confirm_service_is_unique",
+            "email_usage",
             "estimate_usage",
             "request_to_go_live",
             "service_agreement",

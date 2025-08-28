@@ -55,7 +55,7 @@ class ServiceEvent(Event):
         if self.value_to is False:
             return "Made this service live"
         if self.value_to is True:
-            return "Put this service back into trial mode"
+            return "Put this service back into test mode"
 
     def format_active(self):
         if self.value_to is False:

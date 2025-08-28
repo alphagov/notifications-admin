@@ -1290,7 +1290,7 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
 
 class CreateServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
-        "Service name",
+        "",
         validators=[
             DataRequired(message="Enter a service name"),
             MustContainAlphanumericCharacters(),
@@ -1298,6 +1298,24 @@ class CreateServiceForm(StripWhitespaceForm):
         ],
     )
     organisation_type = OrganisationTypeField("Who runs this service?")
+
+
+class ChooseOrganisationForm(StripWhitespaceForm):
+    choices = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.organisation.choices = [
+            ("default", kwargs["default_organisation"]),
+            ("other", "Other public sector body"),
+        ]
+
+    organisation = GovukRadiosField(
+        "",
+        validators=[DataRequired()],
+        choices=choices,
+        thing="an organisation",
+    )
 
 
 class CreateNhsServiceForm(CreateServiceForm):
@@ -1736,6 +1754,29 @@ class EstimateUsageForm(StripWhitespaceForm):
         return super().validate(*args, **kwargs)
 
 
+class ExpectToSendForm(StripWhitespaceForm):
+    message_types = GovukCheckboxesField(
+        "",
+        validators=[DataRequired(message="Select at least 1 option")],
+        choices=[
+            ("emails", "Emails"),
+            ("texts", "Text messages"),
+            ("letters", "Letters"),
+        ],
+    )
+
+
+class EmailUsageForm(StripWhitespaceForm):
+    high_volume_emails = GovukRadiosField(
+        "",
+        choices=[
+            ("yes", "Yes"),
+            ("no", "No"),
+            ("maybe", "Maybe"),
+        ],
+    )
+
+
 class AdminProviderRatioForm(OrderableFieldsForm):
     def __init__(self, providers):
         self._providers = providers
@@ -1927,19 +1968,23 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
         "alert",
     }
 
-    use_custom_email_sender_name = OnOffField(
-        "Choose a sender name",
-        choices_for_error_message="same or custom",
+    CHOICE_CUSTOM = "custom"
+    CHOICE_ORGANISATION = "organisation"
+    CHOICE_SERVICE = "service"
+
+    use_custom_email_sender_name = GovukRadiosField(
+        "",
         choices=[
-            (False, "Use the name of your service"),
-            (True, "Enter a custom sender name"),
+            (CHOICE_CUSTOM, "Enter a ‘from’ name"),
+            (CHOICE_ORGANISATION, "Use the name of your organisation"),
+            (CHOICE_SERVICE, "Use the name of your service"),
         ],
     )
 
     custom_email_sender_name = GovukTextInputField("Sender name", validators=[])
 
     def validate(self, *args, **kwargs):
-        if self.use_custom_email_sender_name.data is True:
+        if self.use_custom_email_sender_name.data == self.CHOICE_CUSTOM:
             self.custom_email_sender_name.validators = [
                 NotifyDataRequired(thing="a sender name"),
                 MustContainAlphanumericCharacters(thing="sender name"),
@@ -1953,7 +1998,7 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
         Validate that the email from name ("Sender Name" <sender.name@notifications.service.gov.uk)
         is under 320 characters (if it's over, SES will reject the email and we'll end up with technical errors)
         """
-        if self.use_custom_email_sender_name.data is not True:
+        if self.use_custom_email_sender_name.data != self.CHOICE_CUSTOM:
             return
 
         normalised_sender_name = make_string_safe_for_email_local_part(field.data)
@@ -2349,6 +2394,43 @@ def get_placeholder_form_instance(
     PlaceholderForm.placeholder_value = field
 
     return PlaceholderForm(placeholder_value=dict_to_populate_from.get(placeholder_name, ""))
+
+
+class AddRecipientForm(StripWhitespaceForm):
+    CHOICE_UPLOAD_CSV = "upload_csv"
+    CHOICE_ENTER_SINGLE_EMAIL = "enter_single"
+    CHOICE_USE_OWN_EMAIL = "use_my_email"
+
+    ADD_RECIPIENT_CHOICES = [
+        (CHOICE_UPLOAD_CSV, "Upload a list of email addresses"),
+        (CHOICE_ENTER_SINGLE_EMAIL, "Enter a single email address"),
+        (CHOICE_USE_OWN_EMAIL, "Use my email address"),
+    ]
+
+    add_recipient_method = GovukRadiosField(
+        "",
+        choices=ADD_RECIPIENT_CHOICES,
+        thing="how to add recipients",
+        validators=[DataRequired()],
+    )
+
+    enter_single_address = make_email_address_field(
+        gov_user=False,
+        thing="an email address",
+        label="Email address",
+    )
+
+    def validate(self, *args, **kwargs):
+        self.enter_single_address.validators = []
+
+        if self.add_recipient_method.data == self.CHOICE_ENTER_SINGLE_EMAIL:
+            self.enter_single_address.validators = [
+                NotifyDataRequired(thing="an email address"),
+                ValidEmail(),
+                ValidGovEmail(),
+            ]
+
+        return super().validate(*args, **kwargs)
 
 
 class SetSenderForm(StripWhitespaceForm):
