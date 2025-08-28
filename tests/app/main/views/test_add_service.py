@@ -48,6 +48,7 @@ def test_get_should_render_add_service_template(
         "GP surgery",
         "Emergency service",
         "School or college",
+        "Pharmacy local",
         "Other",
     ]
     assert [radio["value"] for radio in page.select(".govuk-radios__item input")] == [
@@ -58,6 +59,7 @@ def test_get_should_render_add_service_template(
         "nhs_gp",
         "emergency_service",
         "school_or_college",
+        "pharmacy_local",
         "other",
     ]
 
@@ -224,12 +226,7 @@ def test_add_service_has_to_choose_org_type(
 
 @pytest.mark.parametrize(
     "email_address",
-    (
-        "test@nhs.net",
-        "test@nhs.uk",
-        "test@example.NhS.uK",
-        "test@EXAMPLE.NHS.NET",
-    ),
+    ("test@nhs.net", "test@nhs.uk", "test@example.NhS.uK", "test@EXAMPLE.NHS.NET"),
 )
 def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
     client_request,
@@ -250,11 +247,13 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
         "NHS – central government agency or public body",
         "NHS Trust or Integrated Care Board",
         "GP surgery",
+        "Pharmacy local",
     ]
     assert [radio["value"] for radio in page.select(".govuk-radios__item input")] == [
         "nhs_central",
         "nhs_local",
         "nhs_gp",
+        "pharmacy_local",
     ]
 
 
@@ -268,6 +267,7 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
         "nhs_gp",
         "school_or_college",
         "emergency_service",
+        "pharmacy_local",
         "other",
     ],
 )
