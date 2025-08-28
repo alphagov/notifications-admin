@@ -2312,7 +2312,15 @@ class CallbackForm(StripWhitespaceForm):
         "URL",
         validators=[
             DataRequired(message="Cannot be empty"),
-            Regexp(regex="^https.*", message="Must be a valid https URL"),
+            Regexp(
+                regex=r"^https:\/\/(?:[a-zA-Z0-9\-._~%!$&'()*+,;=]+@)?"
+                r"(?:[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})"
+                r"(?::\d+)?"
+                r"(?:\/[\w\-._~%!$&'()*+,;=:@/]*)?"
+                r"(?:\?[\w\-._~%!$&'()*+,;=:@/?]*)?"
+                r"(?:#[\w\-._~%!$&'()*+,;=:@/?]*)?$",
+                message="Must be a valid https URL",
+            ),
         ],
     )
     bearer_token = GovukPasswordField(
