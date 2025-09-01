@@ -74,6 +74,7 @@ class Service(JSONModel):
         "international_letters",
         "international_sms",
         "sms_to_uk_landlines",
+        "token_bucket",
     )
 
     @classmethod
