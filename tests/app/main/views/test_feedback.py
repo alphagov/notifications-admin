@@ -333,13 +333,6 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
 
 
 @pytest.mark.parametrize(
-    "data",
-    [
-        {"feedback": "blah", "name": "Fred"},
-        {"feedback": "blah"},
-    ],
-)
-@pytest.mark.parametrize(
     "ticket_type",
     [
         PROBLEM_TICKET_TYPE,
@@ -348,15 +341,43 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
 )
 def test_email_address_required_for_problems_and_questions(
     client_request,
-    mocker,
-    data,
     ticket_type,
+    mocker,
 ):
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
     mocker.patch("app.main.views.feedback.zendesk_client")
     client_request.logout()
-    page = client_request.post("main.feedback", ticket_type=ticket_type, _data=data, _expected_status=200)
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Enter your email address"
+    page = client_request.post(
+        "main.feedback",
+        ticket_type=ticket_type,
+        _data={"feedback": "blah", "name": "Fred"},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one("#email_address-error").text) == "Error: Enter your email address"
+
+
+@pytest.mark.parametrize(
+    "ticket_type",
+    [
+        PROBLEM_TICKET_TYPE,
+        QUESTION_TICKET_TYPE,
+    ],
+)
+def test_name_required_for_problems_and_questions(
+    client_request,
+    ticket_type,
+    mocker,
+):
+    mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
+    mocker.patch("app.main.views.feedback.zendesk_client")
+    client_request.logout()
+    page = client_request.post(
+        "main.feedback",
+        ticket_type=ticket_type,
+        _data={"feedback": "blah", "email_address": "me@gov.uk"},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one("#name-error").text) == "Error: Enter your name"
 
 
 @pytest.mark.parametrize("ticket_type", (PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE))
@@ -378,7 +399,7 @@ def test_email_address_must_be_valid_if_provided_to_support_form(
     )
 
     assert (
-        normalize_spaces(page.select_one(".govuk-error-message").text)
+        normalize_spaces(page.select_one("#email_address-error").text)
         == "Error: Enter your email address in the correct format, like name@example.gov.uk"
     )
 
