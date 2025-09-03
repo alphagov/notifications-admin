@@ -103,12 +103,12 @@ ENV HOME=/home/vcap
 # Copying to overwrite is faster than RUN chown notify:notify ...
 COPY --from=python_build --chown=notify:notify /opt/venv /opt/venv
 
-# Make sure the app/ directory is there so that "make bootstrap" can create app/version.py
+# Make sure the app/ directory is there so that "make bootstrap-nl" can create app/version.py
 RUN mkdir -p app
 
 # Install dev/test requirements
 COPY --chown=notify:notify Makefile requirements_nl_test.txt package-lock.json package.json rollup.config.mjs ./
-RUN make bootstrap
+RUN make bootstrap-nl
 
 COPY --chown=notify:notify . .
 

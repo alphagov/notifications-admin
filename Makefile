@@ -108,3 +108,9 @@ production: ## Set environment to production
 .PHONY: upload-static ## Upload the static files to be served from S3
 upload-static: check-env-vars
 	aws s3 cp --region eu-west-1 --recursive --cache-control max-age=315360000,immutable ./app/static s3://${DNS_NAME}-static
+
+.PHONY: bootstrap-nl
+bootstrap-nl: generate-version-file ## Set up everything to run the app
+	uv pip install -r requirements_nl_test.txt
+	npm ci --no-audit
+	. environment.sh; npm run build
