@@ -1,0 +1,14 @@
+-r requirements_nl.txt
+-r requirements_for_test_common.in
+
+pytest-freezegun==0.4.2
+moto==5.1.0
+html5lib==1.1
+
+pytest-cov
+pytest-dotenv
+pytest-md
+pytest-emoji
+python-dotenv
+
+# -e ../notifynl-utils
