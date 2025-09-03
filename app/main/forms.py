@@ -1695,7 +1695,7 @@ class SupportRedirect(StripWhitespaceForm):
 
 class FeedbackOrProblem(StripWhitespaceForm):
     feedback = GovukTextareaField("Your message", validators=[NotifyDataRequired(thing="your message")])
-    name = GovukTextInputField("Name (optional)")
+    name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
     email_address = make_email_address_field(
         label="Email address", gov_user=False, required=True, thing="your email address"
     )
