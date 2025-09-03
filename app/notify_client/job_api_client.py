@@ -6,7 +6,7 @@ from werkzeug.local import LocalProxy
 
 from app import memo_resetters
 from app.extensions import redis_client
-from app.notify_client import NotifyAdminAPIClient, _attach_current_user, cache
+from app.notify_client import NotifyAdminAPIClient, _attach_current_user, api_client_request_session, cache
 
 
 class JobApiClient(NotifyAdminAPIClient):
@@ -125,7 +125,7 @@ class JobApiClient(NotifyAdminAPIClient):
 _job_api_client_context_var: ContextVar[JobApiClient] = ContextVar("job_api_client")
 get_job_api_client: LazyLocalGetter[JobApiClient] = LazyLocalGetter(
     _job_api_client_context_var,
-    lambda: JobApiClient(current_app),
+    lambda: JobApiClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_job_api_client.clear())
 job_api_client = LocalProxy(get_job_api_client)
