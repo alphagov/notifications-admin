@@ -114,7 +114,7 @@ def feedback(ticket_type):
 
     if form.validate_on_submit():
         user_email = form.email_address.data
-        user_name = form.name.data or None
+        user_name = form.name.data
 
         feedback_msg = render_template(
             "support-tickets/support-ticket.txt",
