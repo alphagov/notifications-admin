@@ -312,7 +312,7 @@ def get_template(
             show_recipient=show_recipient,
             redact_missing_personalisation=redact_missing_personalisation,
             reply_to=email_reply_to,
-            unsubscribe_link=url_for(".unsubscribe_example") if template.get("has_unsubscribe_link") else None,
+            unsubscribe_link=url_for(".unsubscribe_example", _external=True) if template.get("has_unsubscribe_link") else None,
         )
     if "sms" == template["template_type"]:
         return SMSPreviewTemplate(
