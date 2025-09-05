@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  How to report a problem outside office hours
+  Send us an email
 {% endblock %}
 
 {% block backLink %}
@@ -12,46 +12,36 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('How to report a problem outside office hours')}}
+    {{ page_header('Send us an email')}}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <p class="govuk-body">
-          First, check the
-          <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">GOV.UK Notify status page</a>.
-        </p>
-        <p class="govuk-body">
-          You do not need to contact us if your problem is already listed on that page.
-        </p>
-        <p class="govuk-body">
-          If your problem is not listed on the status page, contact us using our emergency email address.
-        </p>
-        <p class="govuk-body">
-          This is the email address we sent to your service manager when we made your service live.
+          You can find our emergency email address in the email we sent you (or one of your team) when we made your service live.
         </p>
         <p class="govuk-body">
           When you contact our emergency email address we’ll reply within 30 minutes.
         </p>
 
-        <h2 class="heading-medium">Do not use our emergency email address if</h2>
+        <h2 class="heading-medium">Do not use our emergency email address</h2>
 
         <ul class="govuk-list govuk-list--bullet">
         <li>
-          you did not get a ‘technical difficulties’ error when uploading a file
+          if you did not get a ‘technical difficulties’ error when uploading a file
         </li>
         <li>
-          you did not get a 500 response code when using the API
+          if you did not get a 500 response code when using the API
         </li>
         <li>
-          your service is still in trial mode
+          if your service is still in trial mode
+        </li>
+        <li>
+          if your problem is already listed on the <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk">status page</a>.
         </li>
       </ul>
 
-        <p class="bottom-gutter-2">
-          Instead you need to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.feedback', ticket_type='report-problem', severe='no') }}">fill in our support form</a>.
-        </p>
-        <p class="govuk-body">
-          We’ll reply by the end of the next working day.
-        </p>
+      <p class="bottom-gutter-2">
+        Instead you’ll need to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.feedback', ticket_type='report-problem', category='problem-sending', severe='no') }}">fill in our support form</a>.
+      </p>
       </div>
     </div>
 
