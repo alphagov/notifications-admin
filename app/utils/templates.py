@@ -236,9 +236,8 @@ class EmailPreviewTemplate(BaseEmailTemplate):
         reply_to=None,
         show_recipient=True,
         redact_missing_personalisation=False,
-        **kwargs,
     ):
-        super().__init__(template, values, redact_missing_personalisation=redact_missing_personalisation, **kwargs)
+        super().__init__(template, values, redact_missing_personalisation=redact_missing_personalisation)
         self.from_name = from_name
         self.reply_to = reply_to
         self.show_recipient = show_recipient
