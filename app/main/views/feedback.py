@@ -9,7 +9,15 @@ from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTick
 from app import convert_to_boolean, current_service
 from app.extensions import zendesk_client
 from app.main import main
-from app.main.forms import FeedbackOrProblem, SupportRedirect, SupportType, Triage
+from app.main.forms import (
+    FeedbackOrProblem,
+    SupportProblemTypeForm,
+    SupportRedirect,
+    SupportTrialModeForm,
+    SupportType,
+    SupportWhatHappenedForm,
+    Triage,
+)
 from app.models.feedback import (
     GENERAL_TICKET_TYPE,
     PROBLEM_TICKET_TYPE,
@@ -27,50 +35,175 @@ ZENDESK_USER_LOGGED_OUT_NOTE = (
 )
 
 
+# PAGE 1
 @main.route("/support", methods=["GET", "POST"])
 @hide_from_search_engines
 def support():
     if current_user.is_authenticated:
         form = SupportType()
         if form.validate_on_submit():
-            return redirect(
-                url_for(
-                    ".feedback",
-                    ticket_type=form.support_type.data,
+            if form.support_type.data == "report-problem":
+                return redirect(url_for("main.support_problem"))
+            else:
+                return redirect(
+                    url_for(
+                        "main.feedback",
+                        ticket_type=form.support_type.data,
+                    )
                 )
-            )
     else:
         form = SupportRedirect()
         if form.validate_on_submit():
             if form.who.data == "public":
                 return redirect(url_for(".support_public"))
             else:
-                return redirect(
-                    url_for(
-                        ".feedback",
-                        ticket_type=GENERAL_TICKET_TYPE,
-                    )
-                )
+                return redirect(url_for("main.support_what_do_you_want_to_do"))
 
     return render_template("views/support/index.html", form=form, error_summary_enabled=True)
 
 
+# PAGE 2
+@main.route("/support/what-do-you-want-to-do", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_what_do_you_want_to_do():
+    form = SupportType()
+    if form.validate_on_submit():
+        if form.support_type.data == "report-problem":
+            return redirect(url_for("main.support_problem"))
+        else:
+            # ticket type is ask-question-give-feedback
+            return redirect(
+                url_for(
+                    "main.feedback",
+                    ticket_type=form.support_type.data,
+                )
+            )
+
+    return render_template("views/support/what-do-you-want-to-do.html", form=form, error_summary_enabled=True)
+
+
+# PAGE 3
 @main.route("/support/public")
 @hide_from_search_engines
 def support_public():
     return render_template("views/support/public.html")
 
 
+# PAGE 4
+@main.route("/support/problem", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_problem():
+    form = SupportProblemTypeForm()
+
+    back_link = url_for(".support") if current_user.is_authenticated else url_for(".support_what_do_you_want_to_do")
+
+    if form.validate_on_submit():
+        if form.problem_type.data == "sending-messages":
+            return redirect(url_for("main.support_what_happened"))
+        elif form.problem_type.data == "something-else":
+            return redirect(url_for(".feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no", issue="something-else"))
+    return render_template("views/support/problem.html", back_link=back_link, form=form, error_summary_enabled=True)
+
+
+# PAGE 6
+@main.route("/support/what-happened", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_what_happened():
+    form = SupportWhatHappenedForm()
+
+    if form.validate_on_submit():
+        if form.what_happened.data == "something-else":
+            return redirect(url_for(".feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no", issue="problem-sending"))
+        else:
+            if current_user.is_authenticated:
+                # No live services
+                if not current_user.live_services:
+                    return redirect(
+                        url_for(
+                            "main.feedback",
+                            ticket_type=PROBLEM_TICKET_TYPE,
+                            severe="no",
+                            issue="technical-error-trial-mode",
+                        )
+                    )
+                # Only live services
+                elif current_user.live_services and not current_user.trial_mode_services:
+                    return redirect(
+                        url_for(
+                            "main.feedback",
+                            ticket_type=PROBLEM_TICKET_TYPE,
+                            severe="yes",
+                            issue="technical-error-live-signed-in",
+                        )
+                    )
+            # Either no services, both trial and live services or the user is not logged in
+            return redirect(url_for(".is_your_service_in_trial_mode"))
+
+    return render_template("views/support/what-happened.html", form=form, error_summary_enabled=True)
+
+
+# PAGE 6 (the old version)
 @main.route("/support/triage", methods=["GET", "POST"])
 @main.route("/support/triage/<ticket_type:ticket_type>", methods=["GET", "POST"])
 @hide_from_search_engines
 def triage(ticket_type=PROBLEM_TICKET_TYPE):
     form = Triage()
     if form.validate_on_submit():
+        # this is the old route so we don't bother giving it an issue slug - it can use the old ones
         return redirect(url_for(".feedback", ticket_type=ticket_type, severe=form.severe.data))
     return render_template("views/support/triage.html", form=form, error_summary_enabled=True)
 
 
+# PAGE 7
+@main.route("/support/is-your-service-in-trial-mode", methods=["GET", "POST"])
+@hide_from_search_engines
+def is_your_service_in_trial_mode():
+    form = SupportTrialModeForm()
+
+    if form.validate_on_submit():
+        is_service_trial = form.is_service_in_trial_mode.data
+
+        if is_service_trial == "no" and current_user.is_authenticated:
+            severe = "yes"
+            issue = "technical-error-live-signed-in"
+        elif is_service_trial == "no" and not current_user.is_authenticated:
+            severe = "yes"
+            issue = "technical-error-live-signed-out"
+        else:
+            severe = "no"
+            issue = "technical-error-trial-mode"
+
+        return redirect(
+            url_for(
+                "main.feedback",
+                ticket_type=PROBLEM_TICKET_TYPE,
+                severe=severe,
+                issue=issue,
+            )
+        )
+
+    return render_template("views/support/is-your-service-in-trial-mode.html", form=form, error_summary_enabled=True)
+
+
+zendesk_subject_mapping = {
+    "problem-sending": "Problem sending messages",
+    "technical-error-live-signed-in": "Urgent - Technical error (live service)",
+    "technical-error-live-signed-out": "Technical error (live service - user not signed in)",
+    "technical-error-trial-mode": "Technical error (trial mode service)",
+    "something-else": "Problem",
+}
+
+
+def get_zendesk_ticket_subject(ticket_type, issue_type):
+    if ticket_type == GENERAL_TICKET_TYPE:
+        return "General Notify Support"
+    elif ticket_type == QUESTION_TICKET_TYPE:
+        return "Question or feedback"
+    else:
+        return zendesk_subject_mapping.get(issue_type, "Reported Problem")
+
+
+# PAGE 15 (or 5)
 @main.route("/support/<ticket_type:ticket_type>", methods=["GET", "POST"])
 @hide_from_search_engines
 def feedback(ticket_type):
@@ -82,7 +215,10 @@ def feedback(ticket_type):
             "ticket_subject": "General Notify Support",
         },
         PROBLEM_TICKET_TYPE: {"page_title": "Report a problem", "ticket_subject": "Reported Problem"},
-        QUESTION_TICKET_TYPE: {"page_title": "Ask a question or give feedback", "ticket_subject": "Question/Feedback"},
+        QUESTION_TICKET_TYPE: {
+            "page_title": "Ask a question or give feedback",
+            "ticket_subject": "Question or feedback",
+        },
     }
 
     if not form.feedback.data:
@@ -114,7 +250,7 @@ def feedback(ticket_type):
 
     if form.validate_on_submit():
         user_email = form.email_address.data
-        user_name = form.name.data or None
+        user_name = form.name.data
 
         feedback_msg = render_template(
             "support-tickets/support-ticket.txt",
@@ -128,7 +264,7 @@ def feedback(ticket_type):
             else f"[env: {current_app.config['NOTIFY_ENVIRONMENT']}] "
         )
 
-        subject = prefix + ticket_type_names[ticket_type]["ticket_subject"]
+        subject = prefix + get_zendesk_ticket_subject(ticket_type, request.args.get("issue"))
 
         ticket = NotifySupportTicket(
             subject=subject,
@@ -158,30 +294,29 @@ def feedback(ticket_type):
             )
         )
 
-    if severe:
-        page_title = "Tell us about the emergency"
-    else:
-        page_title = ticket_type_names[ticket_type]["page_title"]
+    page_title = ticket_type_names[ticket_type]["page_title"]
 
     return render_template(
         "views/support/form.html",
         form=form,
         back_link=(url_for(".support") if severe is None else url_for(".triage", ticket_type=ticket_type)),
-        show_status_page_banner=(ticket_type == PROBLEM_TICKET_TYPE),
         page_title=page_title,
         error_summary_enabled=True,
     )
 
 
+# PAGE 8
 @main.route("/support/escalate", methods=["GET", "POST"])
 @hide_from_search_engines
 def bat_phone():
     if current_user.is_authenticated:
+        # TODO: redirect to page 4
         return redirect(url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE))
 
     return render_template("views/support/bat-phone.html")
 
 
+# PAGE 16
 @main.route("/support/thanks", methods=["GET", "POST"])
 @hide_from_search_engines
 def thanks():
