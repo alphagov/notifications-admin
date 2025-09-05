@@ -382,6 +382,33 @@ def test_should_show_page_for_email_template(
         ("Subject", "Your ((thing)) is due soon"),
     ]
     assert normalize_spaces(page.select_one(".email-message-body").text) == "Your vehicle tax expires on ((date))"
+    assert not page.select_one(".email-message-body a")  # No unsubscribe link
+
+
+def test_should_show_page_for_email_template_with_unsubscribe_link(
+    client_request,
+    fake_uuid,
+    mocker,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                has_unsubscribe_link=True,
+            )
+        },
+    )
+    page = client_request.get(
+        ".view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+    unsubscribe_link = page.select_one(".email-message-body a")
+    assert unsubscribe_link["href"] == "http://localhost/unsubscribe/example"
+    assert normalize_spaces(unsubscribe_link.text) == "Unsubscribe from these emails"
 
 
 @pytest.mark.parametrize(
