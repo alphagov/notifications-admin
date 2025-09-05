@@ -45,14 +45,34 @@ def support():
             if form.who.data == "public":
                 return redirect(url_for(".support_public"))
             else:
-                return redirect(
-                    url_for(
-                        ".feedback",
-                        ticket_type=GENERAL_TICKET_TYPE,
-                    )
-                )
+                return redirect(url_for("main.support_what_do_you_want_to_do"))
 
     return render_template("views/support/index.html", form=form, error_summary_enabled=True)
+
+
+@main.route("/support/what-do-you-want-to-do", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_what_do_you_want_to_do():
+    form = SupportType()
+    if form.validate_on_submit():
+        if form.support_type.data == "report-problem":
+            return redirect(url_for("main.support_problem"))
+        else:
+            # ticket type is ask-question-give-feedback
+            return redirect(
+                url_for(
+                    "main.feedback",
+                    ticket_type=form.support_type.data,
+                )
+            )
+
+    return render_template("views/support/what-do-you-want-to-do.html", form=form, error_summary_enabled=True)
+
+
+@main.route("/support/problem")
+@hide_from_search_engines
+def support_problem():
+    pass
 
 
 @main.route("/support/public")

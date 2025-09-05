@@ -90,11 +90,12 @@ def test_get_support_as_someone_in_the_public_sector(
         _data={"who": "public-sector"},
         _follow_redirects=True,
     )
-    assert normalize_spaces(page.select("h1")) == "Contact GOV.UK Notify support"
-    assert page.select_one("form textarea[name=feedback]")
-    assert page.select_one("form input[name=name]")
-    assert page.select_one("form input[name=email_address]")
-    assert page.select_one("form button")
+    assert normalize_spaces(page.select("h1")) == "What do you want to do?"
+    assert normalize_spaces(page.select_one("form label[for=support_type-0]").text) == "Report a problem"
+    assert page.select_one("form input#support_type-0")["value"] == "report-problem"
+    assert normalize_spaces(page.select_one("form label[for=support_type-1]").text) == "Ask a question or give feedback"
+    assert page.select_one("form input#support_type-1")["value"] == "ask-question-give-feedback"
+    assert normalize_spaces(page.select_one("form button").text) == "Continue"
 
 
 def test_get_support_as_member_of_public(
@@ -111,6 +112,33 @@ def test_get_support_as_member_of_public(
     assert not page.select("form")
     assert not page.select("input")
     assert not page.select("form button")
+
+
+def test_get_support_what_do_you_want_to_do_page(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_what_do_you_want_to_do")
+    assert normalize_spaces(page.select("h1")) == "What do you want to do?"
+    assert normalize_spaces(page.select_one("form label[for=support_type-0]").text) == "Report a problem"
+    assert page.select_one("form input#support_type-0")["value"] == "report-problem"
+    assert normalize_spaces(page.select_one("form label[for=support_type-1]").text) == "Ask a question or give feedback"
+    assert page.select_one("form input#support_type-1")["value"] == "ask-question-give-feedback"
+    assert normalize_spaces(page.select_one("form button").text) == "Continue"
+
+
+@pytest.mark.parametrize(
+    "form_option, redirect_endpoint, redirect_kwargs",
+    [
+        ("report-problem", "main.support_problem", {}),
+        ("ask-question-give-feedback", "main.feedback", {"ticket_type": "ask-question-give-feedback"}),
+    ],
+)
+def test_support_what_do_you_want_to_do_page_redirects(client_request, form_option, redirect_endpoint, redirect_kwargs):
+    client_request.logout()
+    client_request.post(
+        "main.support_what_do_you_want_to_do",
+        _data={"support_type": form_option},
+        _expected_redirect=url_for(redirect_endpoint, **redirect_kwargs),
+    )
 
 
 @pytest.mark.parametrize(
