@@ -60,7 +60,7 @@ def test_get_support_index_page_when_signed_out(
 @pytest.mark.parametrize(
     "support_type, expected_h1",
     [
-        (PROBLEM_TICKET_TYPE, "Report a problem"),
+        (PROBLEM_TICKET_TYPE, "Describe the problem"),
         (QUESTION_TICKET_TYPE, "Ask a question or give feedback"),
     ],
 )
@@ -619,16 +619,15 @@ def test_triage_redirects_to_correct_url(
 
 
 @pytest.mark.parametrize(
-    "extra_args, expected_back_link, expected_page_title",
+    "extra_args, expected_back_link",
     [
         (
             {"severe": "yes"},
             partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
-            "Tell us about the emergency",
         ),
-        ({"severe": "no"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE), "Report a problem"),
-        ({"severe": "foo"}, partial(url_for, "main.support"), "Report a problem"),  # hacking the URL
-        ({}, partial(url_for, "main.support"), "Report a problem"),
+        ({"severe": "no"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE)),
+        ({"severe": "foo"}, partial(url_for, "main.support")),  # hacking the URL
+        ({}, partial(url_for, "main.support")),
     ],
 )
 def test_back_link_from_form(
@@ -637,12 +636,11 @@ def test_back_link_from_form(
     mocker,
     extra_args,
     expected_back_link,
-    expected_page_title,
 ):
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
     page = client_request.get("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, **extra_args)
     assert page.select_one(".govuk-back-link")["href"] == expected_back_link()
-    assert normalize_spaces(page.select_one("h1").text) == expected_page_title
+    assert normalize_spaces(page.select_one("h1").text) == "Describe the problem"
 
 
 @pytest.mark.parametrize(

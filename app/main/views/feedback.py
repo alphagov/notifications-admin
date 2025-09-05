@@ -81,7 +81,7 @@ def feedback(ticket_type):
             "page_title": "Contact GOV.UK Notify support",
             "ticket_subject": "General Notify Support",
         },
-        PROBLEM_TICKET_TYPE: {"page_title": "Report a problem", "ticket_subject": "Reported Problem"},
+        PROBLEM_TICKET_TYPE: {"page_title": "Describe the problem", "ticket_subject": "Reported Problem"},
         QUESTION_TICKET_TYPE: {"page_title": "Ask a question or give feedback", "ticket_subject": "Question/Feedback"},
     }
 
@@ -158,10 +158,7 @@ def feedback(ticket_type):
             )
         )
 
-    if severe:
-        page_title = "Tell us about the emergency"
-    else:
-        page_title = ticket_type_names[ticket_type]["page_title"]
+    page_title = ticket_type_names[ticket_type]["page_title"]
 
     return render_template(
         "views/support/form.html",
