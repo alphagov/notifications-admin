@@ -16,6 +16,12 @@
 
 {{ page_header('Returned letters for {}'.format(reported_at|format_date_normal)) }}
 
+{% if orphaned_count %}
+<p class="govuk-body">
+  Your report is missing {{ orphaned_count|format_thousands }} letter{% if orphaned_count > 1 %}s{% endif %} because {% if orphaned_count > 1 %}they were{% else %}it was{% endif %} sent too long ago.
+</p>
+{% endif %}
+
 <p class="bottom-gutter">
   <a download href="{{ url_for('main.returned_letters_report', service_id=current_service.id, reported_at=reported_at) }}" class="govuk-link heading-small">Download this report (<abbr title="Comma separated values">CSV</abbr>)</a>
 </p>
