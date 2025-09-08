@@ -22,7 +22,7 @@ def test_report_request_download_gets_file_from_s3(client_request, fake_uuid, mo
 
     assert response.get_data() == b"my notifications file"
     assert response.headers["Content-Type"] == "text/csv; charset=utf-8"
-    assert response.headers["Content-Disposition"] == (f"attachment; filename={report_request['id']}.csv")
+    assert response.headers["Content-Disposition"] == f"attachment; filename={report_request['id']}.csv"
 
 
 def test_report_request_download_when_report_does_not_exist(client_request, fake_uuid, mocker):

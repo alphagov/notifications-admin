@@ -441,7 +441,7 @@ def test_view_contact_list(
     )
     assert normalize_spaces(page.select_one("h1").text) == "EmergencyContactList.xls"
     assert normalize_spaces(page.select("main p")[0].text) == "Uploaded by Test User on 3 March at 12:12pm."
-    assert normalize_spaces(page.select("main p")[1].text) == (expected_empty_message)
+    assert normalize_spaces(page.select("main p")[1].text) == expected_empty_message
     assert normalize_spaces(page.select_one("main h2").text) == "51 saved email addresses"
     assert page.select_one(".js-stick-at-bottom-when-scrolling a[download]")["href"] == url_for(
         "main.download_contact_list",

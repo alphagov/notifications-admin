@@ -365,7 +365,7 @@ def test_unsubscribe_request_report_with_forced_download(
         service_id=SERVICE_ONE_ID,
         batch_id=fake_uuid,
     )
-    assert page.select_one("head meta[http-equiv=refresh]")["content"] == (f"0;URL='{download_url}'")
+    assert page.select_one("head meta[http-equiv=refresh]")["content"] == f"0;URL='{download_url}'"
 
 
 def test_cannot_force_download_for_unbatched_unsubscribe_request_report(

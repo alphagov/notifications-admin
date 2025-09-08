@@ -218,7 +218,7 @@ def template_usage(service_id):
     year, current_financial_year = requested_and_current_financial_year(request)
     stats = template_statistics_client.get_monthly_template_usage_for_service(service_id, year)
 
-    stats = sorted(stats, key=lambda x: (x["count"]), reverse=True)
+    stats = sorted(stats, key=lambda x: x["count"], reverse=True)
 
     def get_monthly_template_stats(month_name, stats):
         return {
