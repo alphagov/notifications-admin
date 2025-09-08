@@ -345,6 +345,7 @@ EXCLUDED_ENDPOINTS = set(
             "support_problem",
             "support_public",
             "support_what_do_you_want_to_do",
+            "support_what_happened",
             "template_history",
             "template_usage",
             "terms_of_use",

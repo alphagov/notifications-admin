@@ -9,7 +9,7 @@ from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTick
 from app import convert_to_boolean, current_service
 from app.extensions import zendesk_client
 from app.main import main
-from app.main.forms import FeedbackOrProblem, SupportRedirect, SupportType, Triage
+from app.main.forms import FeedbackOrProblem, SupportProblemTypeForm, SupportRedirect, SupportType, Triage
 from app.models.feedback import (
     GENERAL_TICKET_TYPE,
     PROBLEM_TICKET_TYPE,
@@ -33,12 +33,15 @@ def support():
     if current_user.is_authenticated:
         form = SupportType()
         if form.validate_on_submit():
-            return redirect(
-                url_for(
-                    ".feedback",
-                    ticket_type=form.support_type.data,
+            if form.support_type.data == "report-problem":
+                return redirect(url_for("main.support_problem"))
+            else:
+                return redirect(
+                    url_for(
+                        "main.feedback",
+                        ticket_type=form.support_type.data,
+                    )
                 )
-            )
     else:
         form = SupportRedirect()
         if form.validate_on_submit():
@@ -69,9 +72,24 @@ def support_what_do_you_want_to_do():
     return render_template("views/support/what-do-you-want-to-do.html", form=form, error_summary_enabled=True)
 
 
-@main.route("/support/problem")
+@main.route("/support/problem", methods=["GET", "POST"])
 @hide_from_search_engines
 def support_problem():
+    form = SupportProblemTypeForm()
+
+    back_link = url_for(".support") if current_user.is_authenticated else url_for(".support_what_do_you_want_to_do")
+
+    if form.validate_on_submit():
+        if form.problem_type.data == "sending-messages":
+            return redirect(url_for("main.support_what_happened"))
+        elif form.problem_type.data == "something-else":
+            return redirect(url_for(".feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no", issue="something-else"))
+    return render_template("views/support/problem.html", back_link=back_link, form=form, error_summary_enabled=True)
+
+
+@main.route("/support/what-happened", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_what_happened():
     pass
 
 

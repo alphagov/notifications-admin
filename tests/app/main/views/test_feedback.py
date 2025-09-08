@@ -57,26 +57,34 @@ def test_get_support_index_page_when_signed_out(
     assert normalize_spaces(page.select_one("form button").text) == "Continue"
 
 
-@pytest.mark.parametrize(
-    "support_type, expected_h1",
-    [
-        (PROBLEM_TICKET_TYPE, "Describe the problem"),
-        (QUESTION_TICKET_TYPE, "Ask a question or give feedback"),
-    ],
-)
-def test_choose_support_type(
-    client_request, mock_get_non_empty_organisations_and_services_for_user, mocker, support_type, expected_h1
+def test_choose_question_support_type_shows_feedback_form(
+    client_request, mock_get_non_empty_organisations_and_services_for_user, mocker
 ):
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
     page = client_request.post(
         "main.support",
-        _data={"support_type": support_type},
+        _data={"support_type": QUESTION_TICKET_TYPE},
         _follow_redirects=True,
     )
-    assert page.select_one("h1").string.strip() == expected_h1
+    assert page.select_one("h1").string.strip() == "Ask a question or give feedback"
     assert not page.select_one("input[name=name]")
     assert not page.select_one("input[name=email_address]")
     assert page.select_one("form").find("p").text.strip() == "We’ll reply to test@user.gov.uk"
+
+
+def test_choose_problem_support_type_shows_problem_type_form(
+    client_request, mock_get_non_empty_organisations_and_services_for_user, mocker
+):
+    mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
+    page = client_request.post(
+        "main.support",
+        _data={"support_type": PROBLEM_TICKET_TYPE},
+        _follow_redirects=True,
+    )
+    assert page.select_one("h1").string.strip() == "Report a problem"
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.support")
+    assert page.select("form input[type=radio]")[0]["value"] == "sending-messages"
+    assert page.select("form input[type=radio]")[1]["value"] == "something-else"
 
 
 def test_get_support_as_someone_in_the_public_sector(
@@ -137,6 +145,34 @@ def test_support_what_do_you_want_to_do_page_redirects(client_request, form_opti
     client_request.post(
         "main.support_what_do_you_want_to_do",
         _data={"support_type": form_option},
+        _expected_redirect=url_for(redirect_endpoint, **redirect_kwargs),
+    )
+
+
+def test_support_problem(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_problem")
+    assert page.select_one("h1").string.strip() == "Report a problem"
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_what_do_you_want_to_do")
+    assert page.select("form input[type=radio]")[0]["value"] == "sending-messages"
+    assert page.select("form input[type=radio]")[1]["value"] == "something-else"
+
+
+@pytest.mark.parametrize(
+    "form_option, redirect_endpoint, redirect_kwargs",
+    [
+        ("sending-messages", "main.support_what_happened", {}),
+        (
+            "something-else",
+            "main.feedback",
+            {"ticket_type": "report-problem", "severe": "no", "issue": "something-else"},
+        ),
+    ],
+)
+def test_post_support_problem_redirects(client_request, form_option, redirect_endpoint, redirect_kwargs):
+    client_request.post(
+        "main.support_problem",
+        _data={"problem_type": form_option},
         _expected_redirect=url_for(redirect_endpoint, **redirect_kwargs),
     )
 
