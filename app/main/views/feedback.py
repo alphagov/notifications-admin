@@ -9,7 +9,14 @@ from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTick
 from app import convert_to_boolean, current_service
 from app.extensions import zendesk_client
 from app.main import main
-from app.main.forms import FeedbackOrProblem, SupportProblemTypeForm, SupportRedirect, SupportType, Triage
+from app.main.forms import (
+    FeedbackOrProblem,
+    SupportProblemTypeForm,
+    SupportRedirect,
+    SupportType,
+    SupportWhatHappenedForm,
+    Triage,
+)
 from app.models.feedback import (
     GENERAL_TICKET_TYPE,
     PROBLEM_TICKET_TYPE,
@@ -90,7 +97,37 @@ def support_problem():
 @main.route("/support/what-happened", methods=["GET", "POST"])
 @hide_from_search_engines
 def support_what_happened():
-    pass
+    form = SupportWhatHappenedForm()
+
+    if form.validate_on_submit():
+        if form.what_happened.data == "something-else":
+            return redirect(url_for(".feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no", issue="problem-sending"))
+        else:
+            if current_user.is_authenticated:
+                # No live services
+                if not current_user.live_services:
+                    return redirect(
+                        url_for(
+                            "main.feedback",
+                            ticket_type=PROBLEM_TICKET_TYPE,
+                            severe="no",
+                            issue="technical-error-trial-mode",
+                        )
+                    )
+                # Only live services
+                elif current_user.live_services and not current_user.trial_mode_services:
+                    return redirect(
+                        url_for(
+                            "main.feedback",
+                            ticket_type=PROBLEM_TICKET_TYPE,
+                            severe="yes",
+                            issue="technical-error-only-live-services-signed-in",
+                        )
+                    )
+            # Either both trial and live services or the user is not logged in
+            return redirect(url_for(".support_is_your_service_in_trial_mode"))
+
+    return render_template("views/support/what-happened.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/support/public")
@@ -107,6 +144,12 @@ def triage(ticket_type=PROBLEM_TICKET_TYPE):
     if form.validate_on_submit():
         return redirect(url_for(".feedback", ticket_type=ticket_type, severe=form.severe.data))
     return render_template("views/support/triage.html", form=form, error_summary_enabled=True)
+
+
+@main.route("/support/is-your-service-in-trial-mode", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_is_your_service_in_trial_mode():
+    pass
 
 
 @main.route("/support/<ticket_type:ticket_type>", methods=["GET", "POST"])

@@ -342,6 +342,7 @@ EXCLUDED_ENDPOINTS = set(
             "submit_request_to_go_live",
             "submit_request_to_go_live_old_path",
             "support",
+            "support_is_your_service_in_trial_mode",
             "support_problem",
             "support_public",
             "support_what_do_you_want_to_do",

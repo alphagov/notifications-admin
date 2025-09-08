@@ -177,6 +177,124 @@ def test_post_support_problem_redirects(client_request, form_option, redirect_en
     )
 
 
+@pytest.mark.parametrize("user_logged_in", [True, False])
+def test_get_support_what_happened_page(client_request, user_logged_in):
+    if not user_logged_in:
+        client_request.logout()
+
+    page = client_request.get("main.support_what_happened")
+    assert page.select_one("h1").string.strip() == "What happened?"
+    assert page.select("form input[type=radio]")[0]["value"] == "technical-difficulties"
+    assert page.select("form input[type=radio]")[1]["value"] == "api-500-response"
+    assert page.select("form input[type=radio]")[2]["value"] == "something-else"
+
+
+@pytest.mark.parametrize("user_logged_in", [True, False])
+def test_support_what_happened_when_something_else_selected(client_request, user_logged_in):
+    if not user_logged_in:
+        client_request.logout()
+
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": "something-else"},
+        _expected_redirect=url_for("main.feedback", ticket_type="report-problem", severe="no", issue="problem-sending"),
+    )
+
+
+@pytest.mark.parametrize("option_selected", ["technical-difficulties", "api-500-response"])
+def test_support_what_happened_when_logged_out_and_selecting_an_error(client_request, option_selected):
+    client_request.logout()
+
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": option_selected},
+        _expected_redirect=url_for("main.support_is_your_service_in_trial_mode"),
+    )
+
+
+@pytest.mark.parametrize("option_selected", ["technical-difficulties", "api-500-response"])
+def test_support_what_happened_when_logged_in_and_selecting_an_error_with_trial_service(
+    client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
+    service_one,
+    option_selected,
+    mocker,
+):
+    mocker.patch("app.main.views.feedback.current_user", live_services=[], trial_mode_services=[service_one])
+
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": option_selected},
+        _expected_redirect=url_for(
+            "main.feedback",
+            ticket_type="report-problem",
+            severe="no",
+            issue="technical-error-trial-mode",
+        ),
+    )
+
+
+@pytest.mark.parametrize("option_selected", ["technical-difficulties", "api-500-response"])
+def test_support_what_happened_when_logged_in_and_selecting_an_error_with_no_services(
+    client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
+    option_selected,
+    mocker,
+):
+    mocker.patch("app.main.views.feedback.current_user", live_services=[], trial_mode_services=[])
+
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": option_selected},
+        _expected_redirect=url_for(
+            "main.feedback",
+            ticket_type="report-problem",
+            severe="no",
+            issue="technical-error-trial-mode",
+        ),
+    )
+
+
+@pytest.mark.parametrize("option_selected", ["technical-difficulties", "api-500-response"])
+def test_support_what_happened_when_logged_in_and_selecting_an_error_with_live_service(
+    client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
+    service_one,
+    option_selected,
+    mocker,
+):
+    mocker.patch("app.main.views.feedback.current_user", live_services=[service_one], trial_mode_services=[])
+
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": option_selected},
+        _expected_redirect=url_for(
+            "main.feedback",
+            ticket_type="report-problem",
+            severe="yes",
+            issue="technical-error-only-live-services-signed-in",
+        ),
+    )
+
+
+@pytest.mark.parametrize("option_selected", ["technical-difficulties", "api-500-response"])
+def test_support_what_happened_when_logged_in_and_selecting_an_error_with_live_and_trial_services(
+    client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
+    service_one,
+    service_two,
+    option_selected,
+    mocker,
+):
+    mocker.patch("app.main.views.feedback.current_user", live_services=[service_one], trial_mode_services=[service_two])
+
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": option_selected},
+        _expected_redirect=url_for("main.support_is_your_service_in_trial_mode"),
+    )
+
+
 @pytest.mark.parametrize(
     "ticket_type, expected_status_code", [(PROBLEM_TICKET_TYPE, 200), (QUESTION_TICKET_TYPE, 200), ("gripe", 404)]
 )

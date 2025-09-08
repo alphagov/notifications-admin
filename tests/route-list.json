@@ -353,6 +353,7 @@
     "/support",
     "/support/<ticket_type:ticket_type>",
     "/support/escalate",
+    "/support/is-your-service-in-trial-mode",
     "/support/problem",
     "/support/public",
     "/support/thanks",
