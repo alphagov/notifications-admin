@@ -1025,7 +1025,7 @@ def test_unsubscribe_link_is_rendered():
     expected_content = (
         '<hr style="border: 0; height: 1px; background: #B1B4B6; Margin: 30px 0 30px 0;">'
         '<p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">'
-        '<a style="word-wrap: break-word; color: #1D70B8;" href="https://www.example.com">'
+        '<a style="word-wrap: break-word; color: #1D70B8;" href="http://localhost/unsubscribe/example">'
         "Unsubscribe from these emails"
         "</a>"
         "</p>\n"
@@ -1034,9 +1034,13 @@ def test_unsubscribe_link_is_rendered():
     assert expected_content in (
         str(
             EmailPreviewTemplate(
-                {"content": "Hello world", "subject": "subject", "template_type": "email"},
+                {
+                    "content": "Hello world",
+                    "subject": "subject",
+                    "template_type": "email",
+                    "has_unsubscribe_link": True,
+                },
                 {},
-                unsubscribe_link="https://www.example.com",
             )
         )
     )

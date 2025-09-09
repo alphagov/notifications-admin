@@ -4324,6 +4324,7 @@ def create_template(
     redact_personalisation=False,
     postage=None,
     folder=None,
+    has_unsubscribe_link=False,
 ):
     return template_json(
         service_id=service_id,
@@ -4335,6 +4336,7 @@ def create_template(
         redact_personalisation=redact_personalisation,
         postage=postage,
         folder=folder,
+        has_unsubscribe_link=has_unsubscribe_link,
     )
 
 
