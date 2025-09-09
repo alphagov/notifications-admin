@@ -295,6 +295,47 @@ def test_support_what_happened_when_logged_in_and_selecting_an_error_with_live_a
     )
 
 
+def test_support_is_your_service_in_trial_mode_shows_trial_mode_form(client_request):
+    page = client_request.get("main.support_is_your_service_in_trial_mode")
+    assert normalize_spaces(page.select_one("h1").text) == "Is your service in trial mode?"
+    assert page.select("form input[type=radio]")[0]["value"] == "yes"
+    assert page.select("form input[type=radio]")[1]["value"] == "no"
+    assert page.select("form input[type=radio]")[2]["value"] == "unknown"
+
+
+@pytest.mark.parametrize(
+    "service_trial_mode, user_logged_in, severe, issue",
+    [
+        ("yes", True, "no", "technical-error-trial-mode"),
+        ("yes", False, "no", "technical-error-trial-mode"),
+        ("no", True, "yes", "technical-error-live-service-signed-in"),
+        ("no", False, "yes", "technical-error-live-signed-out"),
+        ("unknown", True, "no", "technical-error-trial-mode"),
+        ("unknown", False, "no", "technical-error-trial-mode"),
+    ],
+)
+def test_support_is_your_service_in_trial_mode_redirects_to_feedback_form(
+    client_request,
+    service_trial_mode,
+    user_logged_in,
+    severe,
+    issue,
+):
+    if not user_logged_in:
+        client_request.logout()
+
+    client_request.post(
+        "main.support_is_your_service_in_trial_mode",
+        _data={"is_service_in_trial_mode": service_trial_mode},
+        _expected_redirect=url_for(
+            "main.feedback",
+            ticket_type="report-problem",
+            severe=severe,
+            issue=issue,
+        ),
+    )
+
+
 @pytest.mark.parametrize(
     "ticket_type, expected_status_code", [(PROBLEM_TICKET_TYPE, 200), (QUESTION_TICKET_TYPE, 200), ("gripe", 404)]
 )

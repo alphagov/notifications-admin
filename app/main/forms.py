@@ -1719,6 +1719,17 @@ class SupportWhatHappenedForm(StripWhitespaceForm):
     )
 
 
+class SupportTrialModeForm(StripWhitespaceForm):
+    is_service_in_trial_mode = GovukRadiosField(
+        "Is your service in trial mode?",
+        choices=[
+            ("yes", "Yes"),
+            ("no", "No"),
+            ("unknown", "I do not know"),
+        ],
+    )
+
+
 class Triage(StripWhitespaceForm):
     severe = GovukRadiosField(
         "Did you get one of the following errors?",

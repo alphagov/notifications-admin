@@ -13,6 +13,7 @@ from app.main.forms import (
     FeedbackOrProblem,
     SupportProblemTypeForm,
     SupportRedirect,
+    SupportTrialModeForm,
     SupportType,
     SupportWhatHappenedForm,
     Triage,
@@ -149,7 +150,31 @@ def triage(ticket_type=PROBLEM_TICKET_TYPE):
 @main.route("/support/is-your-service-in-trial-mode", methods=["GET", "POST"])
 @hide_from_search_engines
 def support_is_your_service_in_trial_mode():
-    pass
+    form = SupportTrialModeForm()
+
+    if form.validate_on_submit():
+        is_service_trial = form.is_service_in_trial_mode.data
+
+        if is_service_trial == "no" and current_user.is_authenticated:
+            severe = "yes"
+            issue = "technical-error-live-service-signed-in"
+        elif is_service_trial == "no" and not current_user.is_authenticated:
+            severe = "yes"
+            issue = "technical-error-live-signed-out"
+        else:
+            severe = "no"
+            issue = "technical-error-trial-mode"
+
+        return redirect(
+            url_for(
+                "main.feedback",
+                ticket_type=PROBLEM_TICKET_TYPE,
+                severe=severe,
+                issue=issue,
+            )
+        )
+
+    return render_template("views/support/is-your-service-in-trial-mode.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/support/<ticket_type:ticket_type>", methods=["GET", "POST"])
