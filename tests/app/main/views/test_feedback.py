@@ -445,8 +445,8 @@ def test_does_not_add_internal_note_to_ticket_if_error_creating_ticket(client_re
 @pytest.mark.parametrize(
     "ticket_type, zendesk_ticket_type, expected_subject",
     [
-        (PROBLEM_TICKET_TYPE, "incident", "[env: test] Reported Problem"),
-        (QUESTION_TICKET_TYPE, "question", "[env: test] Question/Feedback"),
+        (PROBLEM_TICKET_TYPE, "incident", "[env: test] Problem"),
+        (QUESTION_TICKET_TYPE, "question", "[env: test] Question or feedback"),
     ],
 )
 def test_passes_user_details_through_flow(
@@ -544,6 +544,67 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
         subject="General Notify Support",
         message=ANY,
         ticket_type="question",
+        p1=False,
+        user_name="Test User",
+        user_email="test@user.gov.uk",
+        notify_ticket_type=None,
+        org_id=None,
+        org_type="central",
+        service_id=SERVICE_ONE_ID,
+        user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
+    )
+
+
+@pytest.mark.parametrize(
+    "ticket_type, issue, expected_subject",
+    [
+        (GENERAL_TICKET_TYPE, None, "General Notify Support"),
+        (QUESTION_TICKET_TYPE, None, "Question or feedback"),
+        (PROBLEM_TICKET_TYPE, "problem-sending", "Problem sending messages"),
+        (PROBLEM_TICKET_TYPE, "technical-error-live-service-signed-in", "Urgent - Technical error (live service)"),
+        (
+            PROBLEM_TICKET_TYPE,
+            "technical-error-only-live-services-signed-in",
+            "Urgent - Technical error (live service)",
+        ),
+        (PROBLEM_TICKET_TYPE, "technical-error-live-signed-out", "Technical error (live service - user not signed in)"),
+        (PROBLEM_TICKET_TYPE, "technical-error-trial-mode", "Technical error (trial mode service)"),
+        (PROBLEM_TICKET_TYPE, "something-else", "Problem"),
+    ],
+)
+def test_zendesk_subject_reflects_journey_taken_to_support_form(
+    notify_admin,
+    client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
+    ticket_type,
+    issue,
+    expected_subject,
+    mocker,
+):
+    mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
+    mocker.patch(
+        "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
+        autospec=True,
+    )
+
+    client_request.post(
+        "main.feedback",
+        ticket_type=ticket_type,
+        issue=issue,
+        _data={"feedback": "blah"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.thanks",
+            out_of_hours_emergency=False,
+        ),
+    )
+
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        subject=f"[env: test] {expected_subject}",
+        message=ANY,
+        ticket_type=ANY,
         p1=False,
         user_name="Test User",
         user_email="test@user.gov.uk",
@@ -844,13 +905,17 @@ def test_triage_redirects_to_correct_url(
 @pytest.mark.parametrize(
     "extra_args, expected_back_link",
     [
-        (
-            {"severe": "yes"},
-            partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
-        ),
-        ({"severe": "no"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE)),
         ({"severe": "foo"}, partial(url_for, "main.support")),  # hacking the URL
         ({}, partial(url_for, "main.support")),
+        ({"issue": "problem-sending"}, partial(url_for, "main.support_what_happened")),
+        (
+            {"issue": "technical-error-live-service-signed-in"},
+            partial(url_for, "main.support_is_your_service_in_trial_mode"),
+        ),
+        ({"issue": "technical-error-only-live-services-signed-in"}, partial(url_for, "main.support_what_happened")),
+        ({"issue": "technical-error-live-signed-out"}, partial(url_for, "main.support_is_your_service_in_trial_mode")),
+        ({"issue": "technical-error-trial-mode"}, partial(url_for, "main.support_is_your_service_in_trial_mode")),
+        ({"issue": "something-else"}, partial(url_for, "main.support_problem")),
     ],
 )
 def test_back_link_from_form(
