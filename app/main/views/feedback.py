@@ -4,7 +4,11 @@ import pytz
 from flask import current_app, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_utils.bank_holidays import BankHolidays
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifySupportTicketComment
+from notifications_utils.clients.zendesk.zendesk_client import (
+    NotifySupportTicket,
+    NotifySupportTicketComment,
+    NotifyTicketType,
+)
 
 from app import convert_to_boolean, current_service
 from app.extensions import zendesk_client
@@ -178,44 +182,50 @@ def support_is_your_service_in_trial_mode():
 
 
 feedback_page_details = {
-    GENERAL_TICKET_TYPE: {"default": {"zendesk_subject": "General Notify Support", "back_link": "main.support"}},
-    QUESTION_TICKET_TYPE: {"default": {"zendesk_subject": "Question or feedback", "back_link": "main.support"}},
+    GENERAL_TICKET_TYPE: {
+        "default": {
+            "zendesk_subject": "General Notify Support",
+            "back_link": "main.support",
+            "notify_ticket_type": None,
+        }
+    },
+    QUESTION_TICKET_TYPE: {
+        "default": {"zendesk_subject": "Question or feedback", "back_link": "main.support", "notify_ticket_type": None}
+    },
     PROBLEM_TICKET_TYPE: {
-        "default": {"zendesk_subject": "Problem", "back_link": "main.support"},
-        "problem-sending": {"zendesk_subject": "Problem sending messages", "back_link": "main.support_what_happened"},
+        "default": {"zendesk_subject": "Problem", "back_link": "main.support", "notify_ticket_type": None},
+        "problem-sending": {
+            "zendesk_subject": "Problem sending messages",
+            "back_link": "main.support_what_happened",
+            "notify_ticket_type": NotifyTicketType.TECHNICAL,
+        },
         "technical-error-live-service-signed-in": {
             "zendesk_subject": "Urgent - Technical error (live service)",
             "back_link": "main.support_is_your_service_in_trial_mode",
+            "notify_ticket_type": NotifyTicketType.TECHNICAL,
         },
         "technical-error-only-live-services-signed-in": {
             "zendesk_subject": "Urgent - Technical error (live service)",
             "back_link": "main.support_what_happened",
+            "notify_ticket_type": NotifyTicketType.TECHNICAL,
         },
         "technical-error-live-signed-out": {
             "zendesk_subject": "Technical error (live service - user not signed in)",
             "back_link": "main.support_is_your_service_in_trial_mode",
+            "notify_ticket_type": NotifyTicketType.TECHNICAL,
         },
         "technical-error-trial-mode": {
             "zendesk_subject": "Technical error (trial mode service)",
             "back_link": "main.support_is_your_service_in_trial_mode",
+            "notify_ticket_type": NotifyTicketType.TECHNICAL,
         },
-        "something-else": {"zendesk_subject": "Problem", "back_link": "main.support_problem"},
+        "something-else": {
+            "zendesk_subject": "Problem",
+            "back_link": "main.support_problem",
+            "notify_ticket_type": None,
+        },
     },
 }
-
-
-def get_zendesk_ticket_subject(ticket_type, category=None):
-    if category is None:
-        category = "default"
-
-    return feedback_page_details[ticket_type][category]["zendesk_subject"]
-
-
-def get_feedback_back_link_endpoint(ticket_type, category=None):
-    if category is None:
-        category = "default"
-
-    return feedback_page_details[ticket_type][category]["back_link"]
 
 
 @main.route("/support/<ticket_type:ticket_type>", methods=["GET", "POST"])
@@ -234,6 +244,8 @@ def feedback(ticket_type):
 
     if not form.feedback.data:
         form.feedback.data = session.pop("feedback_message", "")
+
+    category = request.args.get("issue", "default")
 
     if request.args.get("severe") in ["yes", "no"]:
         severe = convert_to_boolean(request.args.get("severe"))
@@ -275,13 +287,13 @@ def feedback(ticket_type):
             else f"[env: {current_app.config['NOTIFY_ENVIRONMENT']}] "
         )
 
-        subject = prefix + get_zendesk_ticket_subject(ticket_type, request.args.get("issue"))
+        subject = prefix + feedback_page_details[ticket_type][category]["zendesk_subject"]
 
         ticket = NotifySupportTicket(
             subject=subject,
             message=feedback_msg,
             ticket_type=get_zendesk_ticket_type(ticket_type),
-            notify_ticket_type=None,  # don't set technical/non-technical, we'll do this as part of triage on support
+            notify_ticket_type=feedback_page_details[ticket_type][category]["notify_ticket_type"],
             p1=out_of_hours_emergency,
             user_name=user_name,
             user_email=user_email,
@@ -306,11 +318,12 @@ def feedback(ticket_type):
         )
 
     page_title = ticket_type_names[ticket_type]["page_title"]
+    back_link = url_for(feedback_page_details[ticket_type][category]["back_link"])
 
     return render_template(
         "views/support/form.html",
         form=form,
-        back_link=url_for(get_feedback_back_link_endpoint(ticket_type, request.args.get("issue"))),
+        back_link=back_link,
         page_title=page_title,
         error_summary_enabled=True,
     )

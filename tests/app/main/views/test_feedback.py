@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from notifications_utils.clients.zendesk.zendesk_client import (
     NotifySupportTicket,
     NotifySupportTicketComment,
+    NotifyTicketType,
     ZendeskError,
 )
 
@@ -556,29 +557,46 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
 
 
 @pytest.mark.parametrize(
-    "ticket_type, issue, expected_subject",
+    "ticket_type, issue, expected_subject, notify_ticket_type",
     [
-        (GENERAL_TICKET_TYPE, None, "General Notify Support"),
-        (QUESTION_TICKET_TYPE, None, "Question or feedback"),
-        (PROBLEM_TICKET_TYPE, "problem-sending", "Problem sending messages"),
-        (PROBLEM_TICKET_TYPE, "technical-error-live-service-signed-in", "Urgent - Technical error (live service)"),
+        (GENERAL_TICKET_TYPE, None, "General Notify Support", None),
+        (QUESTION_TICKET_TYPE, None, "Question or feedback", None),
+        (PROBLEM_TICKET_TYPE, "problem-sending", "Problem sending messages", NotifyTicketType.TECHNICAL),
+        (
+            PROBLEM_TICKET_TYPE,
+            "technical-error-live-service-signed-in",
+            "Urgent - Technical error (live service)",
+            NotifyTicketType.TECHNICAL,
+        ),
         (
             PROBLEM_TICKET_TYPE,
             "technical-error-only-live-services-signed-in",
             "Urgent - Technical error (live service)",
+            NotifyTicketType.TECHNICAL,
         ),
-        (PROBLEM_TICKET_TYPE, "technical-error-live-signed-out", "Technical error (live service - user not signed in)"),
-        (PROBLEM_TICKET_TYPE, "technical-error-trial-mode", "Technical error (trial mode service)"),
-        (PROBLEM_TICKET_TYPE, "something-else", "Problem"),
+        (
+            PROBLEM_TICKET_TYPE,
+            "technical-error-live-signed-out",
+            "Technical error (live service - user not signed in)",
+            NotifyTicketType.TECHNICAL,
+        ),
+        (
+            PROBLEM_TICKET_TYPE,
+            "technical-error-trial-mode",
+            "Technical error (trial mode service)",
+            NotifyTicketType.TECHNICAL,
+        ),
+        (PROBLEM_TICKET_TYPE, "something-else", "Problem", None),
     ],
 )
-def test_zendesk_subject_reflects_journey_taken_to_support_form(
+def test_zendesk_subject_and_ticket_type_reflect_journey_taken_to_support_form(
     notify_admin,
     client_request,
     mock_get_non_empty_organisations_and_services_for_user,
     ticket_type,
     issue,
     expected_subject,
+    notify_ticket_type,
     mocker,
 ):
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
@@ -608,7 +626,7 @@ def test_zendesk_subject_reflects_journey_taken_to_support_form(
         p1=False,
         user_name="Test User",
         user_email="test@user.gov.uk",
-        notify_ticket_type=None,
+        notify_ticket_type=notify_ticket_type,
         org_id=None,
         org_type="central",
         service_id=SERVICE_ONE_ID,
