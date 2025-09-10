@@ -35,7 +35,8 @@ def test_returned_letter_summary_with_one_letter(client_request, mocker):
     assert normalize_spaces(page.select_one(".table-field").text) == "24 December 2019 1 letter"
 
 
-def test_returned_letters_page(client_request, mocker):
+@pytest.mark.parametrize("orphaned_count", (None, 1))
+def test_returned_letters_page(client_request, orphaned_count, mocker):
     data = [
         {
             "notification_id": uuid.uuid4(),
@@ -58,6 +59,13 @@ def test_returned_letters_page(client_request, mocker):
             ("XYZ999", None, None, None),
         )
     ]
+    if orphaned_count is not None:
+        # new-style response
+        data = {
+            "returned_letters": data,
+            "orphaned_count": orphaned_count,
+        }
+
     mocker.patch("app.service_api_client.get_returned_letters", return_value=data)
 
     page = client_request.get(
@@ -78,17 +86,29 @@ def test_returned_letters_page(client_request, mocker):
 
 
 @pytest.mark.parametrize(
-    "number_of_letters, expected_message",
+    "orphaned_count, orphaned_expected_message",
     (
+        pytest.param(None, None),
+        pytest.param(0, None),
+        pytest.param(1, "Your report is missing 1 letter because it was sent too long ago."),
+        pytest.param(4321, "Your report is missing 4,321 letters because they were sent too long ago."),
+    ),
+)
+@pytest.mark.parametrize(
+    "number_of_letters, more_expected_message",
+    (
+        pytest.param(50, None),
         pytest.param(51, "Only showing the first 50 of 51 rows"),
         pytest.param(1234, "Only showing the first 50 of 1,234 rows"),
     ),
 )
 def test_returned_letters_page_with_many_letters(
     client_request,
-    mocker,
+    orphaned_count,
+    orphaned_expected_message,
     number_of_letters,
-    expected_message,
+    more_expected_message,
+    mocker,
 ):
     data = [
         {
@@ -104,6 +124,13 @@ def test_returned_letters_page_with_many_letters(
             "uploaded_letter_file_name": None,
         }
     ] * number_of_letters
+    if orphaned_count is not None:
+        # new-style response
+        data = {
+            "returned_letters": data,
+            "orphaned_count": orphaned_count,
+        }
+
     mocker.patch("app.service_api_client.get_returned_letters", return_value=data)
 
     page = client_request.get(
@@ -112,15 +139,25 @@ def test_returned_letters_page_with_many_letters(
         reported_at="2019-12-24",
     )
 
-    assert len(data) == number_of_letters
     assert len(page.select("tbody tr")) == 50
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == (expected_message)
     assert page.select_one("a[download]").text == "Download this report (CSV)"
     assert page.select_one("a[download]")["href"] == url_for(
         ".returned_letters_report",
         service_id=SERVICE_ONE_ID,
         reported_at="2019-12-24",
     )
+
+    orphaned_paras = [e for e in page.select("p.govuk-body") if "missing" in e.text]
+    if orphaned_expected_message is None:
+        assert orphaned_paras == []
+    else:
+        assert [normalize_spaces(e.text) for e in orphaned_paras] == [orphaned_expected_message]
+
+    show_more_links = [e for e in page.select(".table-show-more-link") if "Only showing" in e.text]
+    if more_expected_message is None:
+        assert show_more_links == []
+    else:
+        assert [normalize_spaces(e.text) for e in show_more_links] == [more_expected_message]
 
 
 def test_returned_letters_reports(client_request, mocker):

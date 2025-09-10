@@ -19,7 +19,16 @@ def returned_letter_summary(service_id):
 @user_has_permissions("view_activity")
 def returned_letters(service_id, reported_at):
     page_size = 50
-    returned_letters = service_api_client.get_returned_letters(service_id, reported_at)
+    response = service_api_client.get_returned_letters(service_id, reported_at)
+    try:
+        # new-style (dict-wrapped) response
+        returned_letters = response["returned_letters"]
+        orphaned_count = response["orphaned_count"]
+    except TypeError:
+        # old-style (raw list) response
+        returned_letters = response
+        orphaned_count = None
+
     count_of_returned_letters = len(returned_letters)
 
     return render_template(
@@ -29,6 +38,7 @@ def returned_letters(service_id, reported_at):
         more_than_one_page=(count_of_returned_letters > page_size),
         page_size=page_size,
         count_of_returned_letters=count_of_returned_letters,
+        orphaned_count=orphaned_count,
     )
 
 
@@ -36,6 +46,13 @@ def returned_letters(service_id, reported_at):
 @user_has_permissions("view_activity")
 def returned_letters_report(service_id, reported_at):
     returned_letters = service_api_client.get_returned_letters(service_id, reported_at)
+    try:
+        # new-style (dict-wrapped) response
+        returned_letters = returned_letters["returned_letters"]
+    except TypeError:
+        # old-style (raw list) response
+        pass
+
     column_names = {
         "notification_id": "Notification ID",
         "client_reference": "Reference",
