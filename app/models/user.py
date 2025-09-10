@@ -15,7 +15,7 @@ from app.notify_client import InviteTokenError
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.user_api_client import user_api_client
-from app.utils.time import is_less_than_days_ago
+from app.utils.time import is_less_than_days_ago, isoformat_no_tz
 from app.utils.user import is_gov_user
 from app.utils.user_permissions import (
     all_ui_permissions,
@@ -141,7 +141,7 @@ class User(BaseUser, UserMixin):
         self.__init__(response)
 
     def update_email_access_validated_at(self):
-        self.update(email_access_validated_at=datetime.utcnow().isoformat())
+        self.update(email_access_validated_at=isoformat_no_tz(datetime.now(UTC)))
 
     def password_changed_more_recently_than(self, aware_datetime):
         if not self.password_changed_at:
