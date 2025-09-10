@@ -109,8 +109,40 @@ production: ## Set environment to production
 upload-static: check-env-vars
 	aws s3 cp --region eu-west-1 --recursive --cache-control max-age=315360000,immutable ./app/static s3://${DNS_NAME}-static
 
+## NOTIFYNL
 .PHONY: bootstrap-nl
 bootstrap-nl: generate-version-file ## Set up everything to run the app
 	uv pip install -r requirements_nl_test.txt
 	npm ci --no-audit
 	. environment.sh; npm run build
+
+.PHONY: test-nl
+test-nl: ## Set environment to test
+	$(eval export DEPLOY_ENV=development)
+	$(eval export CDN_BUCKET=admin.test.notifynl.nl-static)
+	@true
+
+.PHONY: acc-nl
+acc-nl: ## Set environment to acc
+	$(eval export DEPLOY_ENV=acceptance)
+	$(eval export CDN_BUCKET=admin.acc.notifynl.nl-static)
+	@true
+
+.PHONY: prod-nl
+prod-nl: ## Set environment to prod
+	$(eval export DEPLOY_ENV=production)
+	$(eval export CDN_BUCKET=admin.notifynl.nl-static)
+	@true
+
+.PHONY: upload-static-nl
+upload-static-nl: ## Base command
+	aws s3 cp --region eu-west-1 --recursive --cache-control max-age=315360000,immutable ./app/static s3://${CDN_BUCKET}
+
+.PHONY: upload-static-nl-test
+upload-static-nl-test: test-nl upload-static-nl
+
+.PHONY: upload-static-nl-acc
+upload-static-nl-acc: acc-nl upload-static-nl
+
+.PHONY: upload-static-nl-prod
+upload-static-nl-prod: prod-nl upload-static-nl
