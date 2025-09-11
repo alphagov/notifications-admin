@@ -119,7 +119,7 @@ def test_get_upload_hub_page(
     assert normalize_spaces(uploads[1].text.strip()) == (
         "some.csv Sent 1 January 2016 at 11:09am 0 delivering 8 delivered 2 failed"
     )
-    assert uploads[1].select_one("a.file-list-filename-large")["href"] == (f"/services/{SERVICE_ONE_ID}/jobs/job_id_1")
+    assert uploads[1].select_one("a.file-list-filename-large")["href"] == f"/services/{SERVICE_ONE_ID}/jobs/job_id_1"
 
     assert normalize_spaces(uploads[2].text.strip()) == (
         "some.pdf Sent 1 January 2016 at 11:09am Firstname Lastname 123 Example Street"

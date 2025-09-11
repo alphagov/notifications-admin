@@ -120,7 +120,7 @@ def naturaltime_without_indefinite_article(date):
 
 
 def format_delta(date):
-    delta = (datetime.now(UTC)) - (utc_string_to_aware_gmt_datetime(date))
+    delta = datetime.now(UTC) - utc_string_to_aware_gmt_datetime(date)
     if delta < timedelta(seconds=30):
         return "just now"
     if delta < timedelta(seconds=60):
@@ -311,7 +311,7 @@ def get_time_left(created_at, service_data_retention_days=7):
     if not isinstance(created_at, datetime):
         created_at = dateutil.parser.parse(created_at)
     return ago.human(
-        (datetime.now(UTC))
+        datetime.now(UTC)
         - (created_at.replace(hour=0, minute=0, second=0) + timedelta(days=service_data_retention_days + 1)),
         future_tense="Data available for {}",
         past_tense="Data no longer available",  # No-one should ever see this

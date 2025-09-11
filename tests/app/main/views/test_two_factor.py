@@ -338,7 +338,7 @@ def test_valid_two_factor_email_link_shows_interstitial(
     assert "action" not in form
     assert form["method"] == "post"
     assert form["id"] == expected_form_id
-    assert page.select_one("main script").string.strip() == (f'document.getElementById("{expected_form_id}").submit();')
+    assert page.select_one("main script").string.strip() == f'document.getElementById("{expected_form_id}").submit();'
 
     assert mock_check_code.called is False
 

@@ -241,7 +241,7 @@ def test_notification_page_doesnt_link_to_template_in_tour(
             help=3,
         )
 
-    assert normalize_spaces(page.select("main p:nth-of-type(1)")[0].text) == (expected_message)
+    assert normalize_spaces(page.select("main p:nth-of-type(1)")[0].text) == expected_message
     assert len(page.select("main p:nth-of-type(1) a")) == 0
 
 
@@ -370,8 +370,8 @@ def test_notification_page_shows_page_for_letter_sent_with_test_key(
         notification_id=fake_uuid,
     )
 
-    assert normalize_spaces(page.select("main p:nth-of-type(1)")[0].text) == (expected_p1)
-    assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == (expected_p2)
+    assert normalize_spaces(page.select("main p:nth-of-type(1)")[0].text) == expected_p1
+    assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == expected_p2
     assert normalize_spaces(page.select_one(".letter-postage").text) == expected_postage
     assert page.select("p.notification-status") == []
 
@@ -450,7 +450,7 @@ def test_notification_page_shows_cancelled_or_failed_letter(
     assert normalize_spaces(page.select("main p")[0].text) == (
         "‘sample template’ was sent by Test User today at 1:01am"
     )
-    assert normalize_spaces(page.select("main p")[1].text) == (expected_message)
+    assert normalize_spaces(page.select("main p")[1].text) == expected_message
     assert not page.select("p.notification-status")
 
     assert page.select_one("main img")["src"].endswith(".png?page=1")
@@ -562,8 +562,8 @@ def test_notification_page_shows_page_for_other_postage_classes(
     )
 
     assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == "Printing starts tomorrow at 5:30pm"
-    assert normalize_spaces(page.select("main p:nth-of-type(3)")[0].text) == (expected_delivery)
-    assert normalize_spaces(page.select_one(".letter-postage").text) == (expected_postage_text)
+    assert normalize_spaces(page.select("main p:nth-of-type(3)")[0].text) == expected_delivery
+    assert normalize_spaces(page.select_one(".letter-postage").text) == expected_postage_text
     assert page.select_one(".letter-postage")["class"] == ["letter-postage", expected_class_value]
 
 

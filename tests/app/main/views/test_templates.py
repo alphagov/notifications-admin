@@ -67,7 +67,7 @@ def test_should_show_empty_page_when_no_templates(
     )
 
     assert normalize_spaces(page.select_one("h1").text) == "Templates"
-    assert normalize_spaces(page.select_one("main p").text) == (expected_message)
+    assert normalize_spaces(page.select_one("main p").text) == expected_message
     assert page.select_one("#add_new_folder_form")
     assert page.select_one("#add_new_template_form")
 
@@ -497,7 +497,7 @@ def test_should_show_page_for_one_template(
 
     assert (
         (page.select_one("[data-notify-module=update-status]")["data-target"])
-        == (page.select_one("textarea")["id"])
+        == page.select_one("textarea")["id"]
         == "template_content"
     )
 
@@ -507,7 +507,7 @@ def test_should_show_page_for_one_template(
         template_type="sms",
     )
 
-    assert (page.select_one("[data-notify-module=update-status]")["aria-live"]) == "polite"
+    assert page.select_one("[data-notify-module=update-status]")["aria-live"] == "polite"
 
     mock_get_service_template.assert_called_with(SERVICE_ONE_ID, template_id, None)
 

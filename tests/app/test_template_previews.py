@@ -262,7 +262,7 @@ def test_page_count_returns_none_for_non_letter_templates(notify_admin, template
     [
         (None, ({"template_type": "letter"}, "json", None)),
         (
-            ({"foo": "bar"}),
+            {"foo": "bar"},
             ({"template_type": "letter"}, "json", {"foo": "bar"}),
         ),
     ],

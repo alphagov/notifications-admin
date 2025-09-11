@@ -137,9 +137,9 @@ def test_create_new_organisation_validates(
         _expected_status=200,
     )
     assert [(normalize_spaces(error.text)) for error in page.select(".govuk-error-message")] == [
-        ("Error: Enter an organisation name"),
-        ("Error: Select a type of organisation"),
-        ("Error: Select yes if the organisation is a Crown body"),
+        "Error: Enter an organisation name",
+        "Error: Select a type of organisation",
+        "Error: Select yes if the organisation is a Crown body",
     ]
     assert mock_create_organisation.called is False
 
@@ -1724,7 +1724,7 @@ def test_update_organisation_domains_with_more_than_just_domain(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.select_one(".govuk-error-summary__title").text) == ("There is a problem")
+    assert normalize_spaces(page.select_one(".govuk-error-summary__title").text) == "There is a problem"
 
     error_summary_links = page.select(".govuk-error-summary__list a")
 
@@ -1773,7 +1773,7 @@ def test_update_organisation_domains_nhs_domains(
         _expected_status=200,
     )
 
-    assert normalize_spaces(page.select_one(".govuk-error-summary__title").text) == ("There is a problem")
+    assert normalize_spaces(page.select_one(".govuk-error-summary__title").text) == "There is a problem"
 
     if domain == "NHS.NET":  # NHS.NET fails by being nhs.net (lowercased) so is announced as such
         failed_domain = domain.lower()
@@ -2436,7 +2436,7 @@ def test_download_organisation_agreement(
     if expected_file_served:
         assert response.get_data() == b"foo"
         assert response.headers["Content-Type"] == "application/pdf"
-        assert response.headers["Content-Disposition"] == (f'attachment; filename="{expected_file_served}"')
+        assert response.headers["Content-Disposition"] == f'attachment; filename="{expected_file_served}"'
         mock_get_s3_object.assert_called_once_with("test-mou", expected_file_fetched)
     else:
         assert not expected_file_fetched
