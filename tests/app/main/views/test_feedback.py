@@ -177,6 +177,75 @@ def test_post_support_problem_redirects(client_request, form_option, redirect_en
     )
 
 
+@pytest.mark.parametrize("user_logged_in", [True, False])
+def test_get_support_what_happened_page(client_request, user_logged_in):
+    if not user_logged_in:
+        client_request.logout()
+
+    page = client_request.get("main.support_what_happened")
+    assert page.select_one("h1").string.strip() == "What happened?"
+    assert page.select("form input[type=radio]")[0]["value"] == "technical-difficulties"
+    assert page.select("form input[type=radio]")[1]["value"] == "api-500-response"
+    assert page.select("form input[type=radio]")[2]["value"] == "something-else"
+
+
+@pytest.mark.parametrize("user_logged_in", [True, False])
+def test_support_what_happened_when_something_else_selected(client_request, user_logged_in):
+    if not user_logged_in:
+        client_request.logout()
+
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": "something-else"},
+        _expected_redirect=url_for(
+            "main.feedback", ticket_type="report-problem", severe="no", category="problem-sending"
+        ),
+    )
+
+
+@pytest.mark.parametrize("error_selected", ["technical-difficulties", "api-500-response"])
+@pytest.mark.parametrize(
+    "has_live_services, severe, category",
+    [
+        (True, "yes", "tech-error-live-services"),
+        (False, "no", "tech-error-no-live-services"),
+    ],
+)
+def test_support_what_happened_when_an_error_is_selected_and_user_logged_in(
+    client_request,
+    error_selected,
+    has_live_services,
+    severe,
+    category,
+    mocker,
+):
+    mocker.patch(
+        "app.models.user.User.live_services",
+        new_callable=PropertyMock,
+        return_value=[{}, {}] if has_live_services else [],
+    )
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": error_selected},
+        _expected_redirect=url_for("main.feedback", ticket_type="report-problem", severe=severe, category=category),
+    )
+
+
+@pytest.mark.parametrize("error_selected", ["technical-difficulties", "api-500-response"])
+def test_support_what_happened_when_an_error_is_selected_and_user_logged_out(
+    client_request,
+    error_selected,
+):
+    client_request.logout()
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": error_selected},
+        _expected_redirect=url_for(
+            "main.feedback", ticket_type="report-problem", severe="yes", category="tech-error-signed-out"
+        ),
+    )
+
+
 @pytest.mark.parametrize(
     "ticket_type, expected_status_code", [(PROBLEM_TICKET_TYPE, 200), (QUESTION_TICKET_TYPE, 200), ("gripe", 404)]
 )

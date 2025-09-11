@@ -9,7 +9,14 @@ from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTick
 from app import convert_to_boolean, current_service
 from app.extensions import zendesk_client
 from app.main import main
-from app.main.forms import FeedbackOrProblem, SupportProblemTypeForm, SupportRedirect, SupportType, Triage
+from app.main.forms import (
+    FeedbackOrProblem,
+    SupportProblemTypeForm,
+    SupportRedirect,
+    SupportType,
+    SupportWhatHappenedForm,
+    Triage,
+)
 from app.models.feedback import (
     GENERAL_TICKET_TYPE,
     PROBLEM_TICKET_TYPE,
@@ -92,7 +99,34 @@ def support_problem():
 @main.route("/support/what-happened", methods=["GET", "POST"])
 @hide_from_search_engines
 def support_what_happened():
-    pass
+    form = SupportWhatHappenedForm()
+
+    if form.validate_on_submit():
+        if form.what_happened.data == "something-else":
+            return redirect(
+                url_for(".feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no", category="problem-sending")
+            )
+        else:
+            if current_user.is_authenticated and current_user.live_services:
+                severe = "yes"
+                category = "tech-error-live-services"
+            elif current_user.is_authenticated and not current_user.live_services:
+                severe = "no"
+                category = "tech-error-no-live-services"
+            else:
+                severe = "yes"
+                category = "tech-error-signed-out"
+
+            return redirect(
+                url_for(
+                    "main.feedback",
+                    ticket_type=PROBLEM_TICKET_TYPE,
+                    severe=severe,
+                    category=category,
+                )
+            )
+
+    return render_template("views/support/what-happened.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/support/public")

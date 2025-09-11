@@ -1712,6 +1712,17 @@ class FeedbackOrProblem(StripWhitespaceForm):
     )
 
 
+class SupportWhatHappenedForm(StripWhitespaceForm):
+    what_happened = GovukRadiosField(
+        "What happened?",
+        choices=[
+            ("technical-difficulties", "I got a ‘technical difficulties’ error when I tried to upload a file"),
+            ("api-500-response", "I got a 500 response code from the API"),
+            ("something-else", "Something else"),
+        ],
+    )
+
+
 class Triage(StripWhitespaceForm):
     severe = GovukRadiosField(
         "Did you get one of the following errors?",
