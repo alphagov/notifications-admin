@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient, cache
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session, cache
 
 
 class LetterJobsClient(NotifyAdminAPIClient):
@@ -18,7 +18,7 @@ class LetterJobsClient(NotifyAdminAPIClient):
 _letter_jobs_client_context_var: ContextVar[LetterJobsClient] = ContextVar("letter_jobs_client")
 get_letter_jobs_client: LazyLocalGetter[LetterJobsClient] = LazyLocalGetter(
     _letter_jobs_client_context_var,
-    lambda: LetterJobsClient(current_app),
+    lambda: LetterJobsClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_letter_jobs_client.clear())
 letter_jobs_client = LocalProxy(get_letter_jobs_client)
