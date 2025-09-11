@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from notifications_utils.clients.zendesk.zendesk_client import (
     NotifySupportTicket,
     NotifySupportTicketComment,
+    NotifyTicketType,
     ZendeskError,
 )
 
@@ -355,8 +356,8 @@ def test_does_not_add_internal_note_to_ticket_if_error_creating_ticket(client_re
 @pytest.mark.parametrize(
     "ticket_type, zendesk_ticket_type, expected_subject",
     [
-        (PROBLEM_TICKET_TYPE, "incident", "[env: test] Reported Problem"),
-        (QUESTION_TICKET_TYPE, "question", "[env: test] Question/Feedback"),
+        (PROBLEM_TICKET_TYPE, "incident", "[env: test] Problem"),
+        (QUESTION_TICKET_TYPE, "question", "[env: test] Question or feedback"),
     ],
 )
 def test_passes_user_details_through_flow(
@@ -458,6 +459,76 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
         user_name="Test User",
         user_email="test@user.gov.uk",
         notify_ticket_type=None,
+        org_id=None,
+        org_type="central",
+        service_id=SERVICE_ONE_ID,
+        user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
+    )
+
+
+@pytest.mark.parametrize(
+    "ticket_type, category, expected_subject, notify_ticket_type",
+    [
+        (GENERAL_TICKET_TYPE, None, "General Notify Support", None),
+        (QUESTION_TICKET_TYPE, None, "Question or feedback", None),
+        (PROBLEM_TICKET_TYPE, "something-else", "Problem", None),
+        (PROBLEM_TICKET_TYPE, "problem-sending", "Problem sending messages", None),
+        (
+            PROBLEM_TICKET_TYPE,
+            "tech-error-live-services",
+            "Urgent - Technical error (live service)",
+            NotifyTicketType.TECHNICAL,
+        ),
+        (
+            PROBLEM_TICKET_TYPE,
+            "tech-error-no-live-services",
+            "Technical error (no live services)",
+            NotifyTicketType.TECHNICAL,
+        ),
+        (
+            PROBLEM_TICKET_TYPE,
+            "tech-error-signed-out",
+            "Technical error (user not signed in)",
+            NotifyTicketType.TECHNICAL,
+        ),
+    ],
+)
+def test_zendesk_subject_and_ticket_type_reflect_journey_taken_to_support_form(
+    notify_admin,
+    client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
+    ticket_type,
+    category,
+    expected_subject,
+    notify_ticket_type,
+    mocker,
+):
+    mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
+    mocker.patch(
+        "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
+        autospec=True,
+    )
+    client_request.post(
+        "main.feedback",
+        ticket_type=ticket_type,
+        category=category,
+        _data={"feedback": "blah"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.thanks",
+            out_of_hours_emergency=False,
+        ),
+    )
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        subject=f"[env: test] {expected_subject}",
+        message=ANY,
+        ticket_type=ANY,
+        p1=False,
+        user_name="Test User",
+        user_email="test@user.gov.uk",
+        notify_ticket_type=notify_ticket_type,
         org_id=None,
         org_type="central",
         service_id=SERVICE_ONE_ID,
@@ -756,11 +827,16 @@ def test_triage_redirects_to_correct_url(
     [
         (
             {"severe": "yes"},
-            partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
+            partial(url_for, "main.support"),
         ),
-        ({"severe": "no"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE)),
+        ({"severe": "no"}, partial(url_for, "main.support")),
         ({"severe": "foo"}, partial(url_for, "main.support")),  # hacking the URL
         ({}, partial(url_for, "main.support")),
+        ({"category": "something-else"}, partial(url_for, "main.support_problem")),
+        ({"category": "problem-sending"}, partial(url_for, "main.support_what_happened")),
+        ({"category": "tech-error-live-services"}, partial(url_for, "main.support_what_happened")),
+        ({"category": "tech-error-no-live-services"}, partial(url_for, "main.support_what_happened")),
+        ({"category": "tech-error-signed-out"}, partial(url_for, "main.support_what_happened")),
     ],
 )
 def test_back_link_from_form(

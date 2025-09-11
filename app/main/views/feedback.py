@@ -4,7 +4,11 @@ import pytz
 from flask import current_app, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_utils.bank_holidays import BankHolidays
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifySupportTicketComment
+from notifications_utils.clients.zendesk.zendesk_client import (
+    NotifySupportTicket,
+    NotifySupportTicketComment,
+    NotifyTicketType,
+)
 
 from app import convert_to_boolean, current_service
 from app.extensions import zendesk_client
@@ -145,6 +149,48 @@ def triage(ticket_type=PROBLEM_TICKET_TYPE):
     return render_template("views/support/triage.html", form=form, error_summary_enabled=True)
 
 
+feedback_page_details = {
+    GENERAL_TICKET_TYPE: {
+        "default": {
+            "zendesk_subject": "General Notify Support",
+            "back_link": "main.support",
+            "notify_ticket_type": None,
+        }
+    },
+    QUESTION_TICKET_TYPE: {
+        "default": {"zendesk_subject": "Question or feedback", "back_link": "main.support", "notify_ticket_type": None}
+    },
+    PROBLEM_TICKET_TYPE: {
+        "default": {"zendesk_subject": "Problem", "back_link": "main.support", "notify_ticket_type": None},
+        "something-else": {
+            "zendesk_subject": "Problem",
+            "back_link": "main.support_problem",
+            "notify_ticket_type": None,
+        },
+        "problem-sending": {
+            "zendesk_subject": "Problem sending messages",
+            "back_link": "main.support_what_happened",
+            "notify_ticket_type": None,
+        },
+        "tech-error-live-services": {
+            "zendesk_subject": "Urgent - Technical error (live service)",
+            "back_link": "main.support_what_happened",
+            "notify_ticket_type": NotifyTicketType.TECHNICAL,
+        },
+        "tech-error-no-live-services": {
+            "zendesk_subject": "Technical error (no live services)",
+            "back_link": "main.support_what_happened",
+            "notify_ticket_type": NotifyTicketType.TECHNICAL,
+        },
+        "tech-error-signed-out": {
+            "zendesk_subject": "Technical error (user not signed in)",
+            "back_link": "main.support_what_happened",
+            "notify_ticket_type": NotifyTicketType.TECHNICAL,
+        },
+    },
+}
+
+
 @main.route("/support/<ticket_type:ticket_type>", methods=["GET", "POST"])
 @hide_from_search_engines
 def feedback(ticket_type):
@@ -161,6 +207,8 @@ def feedback(ticket_type):
 
     if not form.feedback.data:
         form.feedback.data = session.pop("feedback_message", "")
+
+    category = request.args.get("category", "default")
 
     if request.args.get("severe") in ["yes", "no"]:
         severe = convert_to_boolean(request.args.get("severe"))
@@ -202,13 +250,13 @@ def feedback(ticket_type):
             else f"[env: {current_app.config['NOTIFY_ENVIRONMENT']}] "
         )
 
-        subject = prefix + ticket_type_names[ticket_type]["ticket_subject"]
+        subject = prefix + feedback_page_details[ticket_type][category]["zendesk_subject"]
 
         ticket = NotifySupportTicket(
             subject=subject,
             message=feedback_msg,
             ticket_type=get_zendesk_ticket_type(ticket_type),
-            notify_ticket_type=None,  # don't set technical/non-technical, we'll do this as part of triage on support
+            notify_ticket_type=feedback_page_details[ticket_type][category]["notify_ticket_type"],
             p1=out_of_hours_emergency,
             user_name=user_name,
             user_email=user_email,
@@ -233,11 +281,12 @@ def feedback(ticket_type):
         )
 
     page_title = ticket_type_names[ticket_type]["page_title"]
+    back_link = url_for(feedback_page_details[ticket_type][category]["back_link"])
 
     return render_template(
         "views/support/form.html",
         form=form,
-        back_link=(url_for(".support") if severe is None else url_for(".triage", ticket_type=ticket_type)),
+        back_link=back_link,
         page_title=page_title,
         error_summary_enabled=True,
     )
