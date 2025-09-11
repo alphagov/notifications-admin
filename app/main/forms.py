@@ -1682,6 +1682,15 @@ class SupportType(StripWhitespaceForm):
     )
 
 
+class SupportProblemTypeForm(StripWhitespaceForm):
+    problem_type = GovukRadiosField(
+        choices=[
+            ("sending-messages", "I’m having problems sending messages"),
+            ("something-else", "Something else"),
+        ]
+    )
+
+
 class SupportRedirect(StripWhitespaceForm):
     who = GovukRadiosField(
         choices=[
