@@ -2,6 +2,7 @@
 {% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {% block per_page_title %}
   Support
@@ -17,24 +18,25 @@
 
   {% call form_wrapper() %}
     {% if current_user.is_authenticated %}
+      <h2 class="govuk-heading-m">What do you want to do?</h2>
       {{ form.support_type }}
     {% else %}
+      <h2 class="govuk-heading-m">What do you need help with?</h2>
       {{ form.who }}
     {% endif %}
     {{ page_footer('Continue') }}
   {% endcall %}
 
-  <p class="govuk-body">If you have a .gov.uk, .gov.scot, .gov.wales, .police.uk or .mod.uk email address, you can also <a class="govuk-link govuk-link--no-visited-state" href="https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC">contact us on Slack</a>.</p>
-
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-
-    <h2 class="heading-medium">What counts as an emergency?</h2>
-    <p class="govuk-body">A problem is only classed as an emergency if you have a live service and:</p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>a ‘technical difficulties’ error appears when you try to upload a file</li>
-      <li>a 500 response code appears when you try to send messages using the API</li>
-    </ul>
+      {% set emergency_criteria %}
+      <p class="govuk-body">A problem is only classed as an emergency if you have a live service and:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>a ‘technical difficulties’ error appears when you try to upload a file</li>
+        <li>a 500 response code appears when you try to send messages using the API</li>
+      </ul>
+      {% endset %}
+      {{ govukDetails({"summaryText": "What counts as an emergency?", "html": emergency_criteria}) }}
   </div>
 </div>
 
