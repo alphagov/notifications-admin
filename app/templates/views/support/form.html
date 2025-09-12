@@ -24,11 +24,12 @@
               "attributes": {
                 "data-notify-module": "enhanced-textbox",
                 "data-highlight-placeholders": "false"
-              }
+              },
+              "label": {"classes": "govuk-visually-hidden"}
             }) }}
             {% if not current_user.is_authenticated %}
-              {{ form.name(param_extensions={"classes": "govuk-!-width-full"}) }}
-              {{ form.email_address(param_extensions={"classes": "govuk-!-width-full"}) }}
+              {{ form.name(param_extensions={"classes": "govuk-!-width-full", "autocomplete": "name"}) }}
+              {{ form.email_address(param_extensions={"classes": "govuk-!-width-full", "autocomplete": "email"}) }}
             {% else %}
               <p class="govuk-body">We’ll reply to {{ current_user.email_address }}</p>
             {% endif %}
