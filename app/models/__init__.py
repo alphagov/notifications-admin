@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from functools import total_ordering
 
 from flask import abort
@@ -9,7 +9,7 @@ from notifications_utils.serialised_model import (
 
 
 @total_ordering
-class SortingAndEqualityMixin(ABC):
+class SortingAndEqualityMixin:
     @property
     @abstractmethod
     def __sort_attribute__(self):

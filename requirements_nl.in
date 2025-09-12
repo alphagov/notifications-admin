@@ -11,7 +11,7 @@ pyexcel-ods3==0.6.1
 notifications-python-client==10.0.0
 fido2==1.1.3
 notifications-utils @ git+https://github.com/Worth-NL/notifynl-utils.git@99.3.3
-govuk-frontend-jinja @ git+https://github.com/Worth-NL/LandRegistry-frontend-jinja@20250821.1
+govuk-frontend-jinja @ git+https://github.com/Worth-NL/LandRegistry-frontend-jinja@20250911.2
 prometheus-client==0.15.0
 git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
 sentry-sdk[flask]==1.45.1

@@ -57,7 +57,7 @@ gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6
     # via -r requirements_nl.in
 govuk-bank-holidays==0.17
     # via notifications-utils
-govuk-frontend-jinja @ git+https://github.com/Worth-NL/LandRegistry-frontend-jinja@1b6aac36e67ddf3a64c9a467fbb6b0fede43669e
+govuk-frontend-jinja @ git+https://github.com/Worth-NL/LandRegistry-frontend-jinja@0d6796c785db6db67ed3cf375df2dc3bc318c267
     # via -r requirements_nl.in
 greenlet==3.2.4
     # via eventlet

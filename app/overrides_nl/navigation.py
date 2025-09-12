@@ -155,7 +155,7 @@ class HeaderNavigation(Navigation):
         nav_items = [
             {"href": url_for("main.support"), "text": "Ondersteuning", "active": self.is_selected("support")},
             {"href": url_for("main.guidance_features"), "text": "Functies", "active": self.is_selected("features")},
-            {"href": url_for("main.guidance_pricing"), "text": "Prijzen", "active": self.is_selected("pricing")},
+            # {"href": url_for("main.guidance_pricing"), "text": "Prijzen", "active": self.is_selected("pricing")},
             {
                 "href": url_for("main.guidance_using_notify"),
                 "text": "Gebruik van Notify",

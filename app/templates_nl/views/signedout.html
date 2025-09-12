@@ -3,7 +3,7 @@
 
 {% block meta %}
 <meta name="description"
-  content="NotifyNL stelt u in staat om e-mails, sms-berichten en brieven naar uw gebruikers te sturen. Probeer het nu als u werkt bij de rijksoverheid, een gemeente of de NHS.">
+  content="NotifyNL stelt u in staat om e-mails, sms-berichten en brieven naar uw gebruikers te sturen. Probeer NotifyNL nu als u werkt bij de rijksoverheid of een gemeente.">
 {% endblock %}
 
 {% block pageTitle %}
@@ -20,7 +20,7 @@ NotifyNL
           Verstuur e-mails, sms-berichten en brieven naar uw gebruikers
         </h1>
         <p class="govuk-body">
-          Probeer NotifyNL nu als u werkt bij de rijksoverheid, een&nbsp;gemeente of de NHS.
+          Probeer NotifyNL nu als u werkt bij de rijksoverheid of een gemeente.
         </p>
         <div class="button-container">
           {{ govukButton({
@@ -48,7 +48,7 @@ NotifyNL
       </p>
     </div>
     <div class="govuk-grid-column-one-half">
-      <img src="{{ asset_url('images/product/01-templates.svg') }}" alt="">
+      <img src="{{ asset_url('images/product_nl/01-templates.svg') }}" alt="">
     </div>
   </div>
 </div>
@@ -64,7 +64,7 @@ NotifyNL
       </p>
     </div>
     <div class="govuk-grid-column-one-half">
-      <img src="{{ asset_url('images/product/02-reporting.svg') }}"
+      <img src="{{ asset_url('images/product_nl/02-reporting.svg') }}"
         alt="Een schermafbeelding van NotifyNL met het aantal verzonden e-mails en sms-berichten">
     </div>
   </div>
@@ -79,7 +79,7 @@ NotifyNL
         Upload een spreadsheet met e-mailadressen of
         telefoonnummers en Notify verstuurt de berichten.
       </p>
-      <img src="{{ asset_url('images/product/03-spreadsheet.svg') }}"
+      <img src="{{ asset_url('images/product_nl/03-spreadsheet.svg') }}"
         alt="Een schermafbeelding van een spreadsheet met kolommen voor e-mailadres, naam en kleur">
     </div>
     <div class="govuk-grid-column-one-half">
@@ -87,12 +87,12 @@ NotifyNL
         Koppel de NotifyNL API aan uw webapplicatie of
         backofficesysteem.
       </p>
-      <img src="{{ asset_url('images/product/04-api.svg') }}"
+      <img src="{{ asset_url('images/product_nl/04-api.svg') }}"
         alt="Een schermafbeelding van computercode met een notify.send_email functie">
     </div>
   </div>
 </div>
-<div class="product-page-section">
+<div class="product-page-section nl-hide-demo" >
   <div class="with-keyline bottom-gutter-2" id="whos-using-notify">
     <h2>Wie gebruikt NotifyNL</h2>
     <div class="govuk-grid-row bottom-gutter">
@@ -115,7 +115,7 @@ NotifyNL
     </p>
   </div>
 </div>
-<div class="product-page-section">
+<div class="product-page-section nl-hide-demo">
   <div class="with-keyline bottom-gutter-2">
     <h2>Prijzen</h2>
     <div class="govuk-grid-row bottom-gutter">
@@ -153,16 +153,15 @@ NotifyNL
         Het team
       </h2>
       <p class="govuk-body">
-        NotifyNL is ontwikkeld door de Government Digital Service
-        en wordt 24 uur per dag, 7 dagen per week ondersteund.
+        NotifyNL wordt ontwikkeld en ondersteund door <a href="https://worth.systems" class="govuk-link govuk-link--no-visited-state" target="_blank">Worth Systems</a>.
       </p>
       <p class="govuk-body">
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact met ons op</a> als u
+        <a class="govuk-link govuk-link--no-visited-state" href="mailto:info@worth.nl">Neem contact met ons op</a> als u
         een vraag heeft of feedback wilt geven.
       </p>
     </div>
     <div class="govuk-grid-column-one-half">
-      <img src="{{ asset_url('images/product/team.jpg') }}"
+      <img src="{{ asset_url('images/product_nl/team.png') }}"
         alt="Een foto van het NotifyNL-team rond een groot scherm. Een teamlid wijst naar een grafiek op het scherm.">
     </div>
   </div>
