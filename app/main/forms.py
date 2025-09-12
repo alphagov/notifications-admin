@@ -1703,7 +1703,6 @@ class SupportRedirect(StripWhitespaceForm):
 class FeedbackOrProblem(StripWhitespaceForm):
     feedback = GovukTextareaField(
         "Your message",
-        param_extensions={"label": {"classes": "govuk-visually-hidden"}},
         validators=[NotifyDataRequired(thing="your message")],
     )
     name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
