@@ -196,15 +196,6 @@ feedback_page_details = {
 def feedback(ticket_type):
     form = FeedbackOrProblem()
 
-    ticket_type_names = {
-        GENERAL_TICKET_TYPE: {
-            "page_title": "Contact GOV.UK Notify support",
-            "ticket_subject": "General Notify Support",
-        },
-        PROBLEM_TICKET_TYPE: {"page_title": "Describe the problem", "ticket_subject": "Reported Problem"},
-        QUESTION_TICKET_TYPE: {"page_title": "Ask a question or give feedback", "ticket_subject": "Question/Feedback"},
-    }
-
     if not form.feedback.data:
         form.feedback.data = session.pop("feedback_message", "")
 
@@ -280,7 +271,7 @@ def feedback(ticket_type):
             )
         )
 
-    page_title = ticket_type_names[ticket_type]["page_title"]
+    page_title = "Describe the problem" if ticket_type == PROBLEM_TICKET_TYPE else "Ask a question or give feedback"
     back_link = url_for(feedback_page_details[ticket_type][category]["back_link"])
 
     return render_template(
