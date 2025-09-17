@@ -19,7 +19,7 @@ $button-shadow-size: $govuk-border-width-form-element;
       padding: govuk-spacing(6) 0 govuk-spacing(9) 0;
 
       @include govuk-media-query($from: desktop) {
-        background-image: file-url('product/proposition-illustration.png');
+        background-image: file-url('product/proposition-illustration.svg');
         background-size: 320px;
         background-repeat: no-repeat;
         background-position: right -6px top 55px;
