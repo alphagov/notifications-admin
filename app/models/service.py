@@ -13,6 +13,7 @@ from app.constants import (
     SIGN_IN_METHOD_TEXT,
     SIGN_IN_METHOD_TEXT_OR_EMAIL,
 )
+from app.extensions import redis_client
 from app.models import JSONModel
 from app.models.api_key import APIKeys
 from app.models.branding import EmailBranding, LetterBranding
@@ -294,6 +295,16 @@ class Service(JSONModel):
             return self.has_sms_templates
         return self.volume_sms > 0
 
+    @property
+    def has_confirmed_email_sender(self):
+        if redis_client.get(f"{self.id}_has_confirmed_email_sender"):
+            return True
+        return False
+
+    @property
+    def needs_to_confirm_email_sender(self):
+        return self.intending_to_send_email and not self.has_confirmed_email_sender
+
     @cached_property
     def email_reply_to_addresses(self):
         return service_api_client.get_reply_to_email_addresses(self.id)
@@ -407,12 +418,29 @@ class Service(JSONModel):
         return {channel: getattr(self, f"volume_{channel}") for channel in ("email", "sms", "letter")}
 
     @property
+    def will_send_emails(self):
+        return redis_client.get(f"{self.id}_will_send_emails")
+
+    @property
+    def will_send_texts(self):
+        return redis_client.get(f"{self.id}_will_send_texts")
+
+    @property
+    def will_send_letters(self):
+        return redis_client.get(f"{self.id}_will_send_letters")
+
+    @property
+    def go_live_sending_options_complete(self):
+        return any([self.will_send_emails, self.will_send_texts, self.will_send_letters])
+
+    @property
     def go_live_checklist_completed(self):
         return all(
             (
-                any(self.volumes_by_channel.values()),
+                self.go_live_sending_options_complete,
                 self.has_team_members_with_manage_service_permission,
                 self.has_templates,
+                not self.needs_to_confirm_email_sender,
                 not self.needs_to_add_email_reply_to_address,
                 not self.needs_to_change_sms_sender,
                 self.confirmed_unique,
@@ -625,8 +653,8 @@ class Service(JSONModel):
         return SIGN_IN_METHOD_TEXT
 
     @property
-    def email_sender_name(self) -> str:
-        return self.custom_email_sender_name or self.name
+    def email_sender_name(self) -> str | None:
+        return self.custom_email_sender_name
 
     @property
     def unsubscribe_request_reports_summary(self):

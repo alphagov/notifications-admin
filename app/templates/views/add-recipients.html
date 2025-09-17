@@ -1,0 +1,74 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set heading = 'Add recipients' %}
+
+{% block service_page_title %}
+    {{ heading }}
+{% endblock %}
+
+{% block backLink %}
+    {{ govukBackLink({ "href": alternative_backlink or url_for('main.view_template', service_id=service_id, template_id=template_id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+        {{ page_header(heading) }}
+
+        <p class="govuk-body">Choose how you want to add recipients:</p>
+
+        {% set enter_single_field_html %}
+        {{ form.enter_single_address(
+                    param_extensions={
+                        "classes": "",
+                        "label": {"classes": "govuk-visually-hidden"}, "hint": None,
+                        "formGroup": {"classes": "govuk-!-margin-bottom-3"},
+                    }
+                ) }}
+        {% endset %}
+
+        {% call form_wrapper() %}
+            {{ form.add_recipient_method(param_extensions={
+          "fieldset": {
+            "legend": {
+              "classes": "",
+            }
+          },
+          "items": [
+            {"value": "upload_csv"},
+            {
+                "value": "enter_single",
+                "conditional": {
+                    "html": enter_single_field_html
+                }
+            },
+            {"value": "use_my_email"}
+          ]
+        }) }}
+
+            {% if current_service.trial_mode %}
+                <div class="govuk-inset-text">
+                    <p>Your service is in test mode. You can only:</p>
+
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>send 50 emails per day</li>
+                        <li>send test emails to yourself and your team members</li>
+                    </ul>
+                    <p>
+                        To lift these restrictions,
+                        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=service_id) }}">
+                            make your service live
+                        </a>
+                    </p>
+                </div>
+            {% endif %}
+
+            {{ page_footer('Continue') }}
+        {% endcall %}
+    </div>
+</div>
+{% endblock %}

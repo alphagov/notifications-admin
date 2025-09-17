@@ -14,6 +14,7 @@ from flask import (
     redirect,
     render_template,
     request,
+    session,
     url_for,
 )
 from flask_login import current_user
@@ -102,6 +103,9 @@ class LetterAttachmentFormError(Exception):
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>")
 @user_has_permissions(allow_org_user=True)
 def view_template(service_id, template_id):
+    session["email_sender_backlinks"] = []
+    session["from_sender_flow_check"] = False
+
     template = current_service.get_template(
         template_id,
         letter_preview_url=url_for(
@@ -112,6 +116,7 @@ def view_template(service_id, template_id):
         ),
         show_recipient=True,
         include_letter_edit_ui_overlay=True,
+        email_reply_to=current_service.default_email_reply_to_address,
     )
 
     if template._template["archived"]:
