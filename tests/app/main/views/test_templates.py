@@ -637,6 +637,47 @@ def test_add_email_template_should_add_unsubscribe(
     )
 
 
+@pytest.mark.parametrize(
+    "template_type",
+    (
+        "email",
+        "sms",
+        "letter",
+    ),
+)
+def test_add_service_template_should_include_save_and_preview_button(
+    client_request,
+    service_one,
+    template_type,
+):
+    if template_type == "letter":
+        service_one["permissions"].append("letter")
+
+    page = client_request.get(
+        ".add_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_type=template_type,
+    )
+    assert "Save and preview" in page.text
+
+
+@pytest.mark.parametrize(
+    "template_type",
+    (
+        "email",
+        "sms",
+        "letter",
+    ),
+)
+def test_edit_service_template_should_include_save_and_preview_button(
+    client_request, template_type, mock_get_service_letter_template, fake_uuid, service_one
+):
+    service_one["permissions"].append("letter")
+    page = client_request.get(".edit_service_template", service_id=SERVICE_ONE_ID, template_id=fake_uuid)
+
+    assert "Save and preview" in page.text
+
+
 def test_editing_letter_template_should_have_hidden_name_field(
     client_request, mock_get_service_letter_template, fake_uuid, service_one
 ):
