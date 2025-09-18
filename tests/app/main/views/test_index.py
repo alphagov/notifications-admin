@@ -59,6 +59,9 @@ def test_robots(client_request):
     (
         ("sign_in", {}),
         ("support", {}),
+        ("support_what_do_you_want_to_do", {}),
+        ("support_problem", {}),
+        ("support_what_happened", {}),
         ("support_public", {}),
         ("triage", {}),
         ("feedback", {"ticket_type": QUESTION_TICKET_TYPE}),
