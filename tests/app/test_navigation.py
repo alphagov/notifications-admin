@@ -153,6 +153,7 @@ EXCLUDED_ENDPOINTS = set(
             "guidance_qr_codes",
             "guidance_receive_text_messages",
             "guidance_reply_to_email_address",
+            "guidance_returned_letters",
             "guidance_roadmap",
             "guidance_schedule_messages",
             "guidance_security",

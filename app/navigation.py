@@ -74,6 +74,7 @@ class HeaderNavigation(Navigation):
             "guidance_qr_codes",
             "guidance_receive_text_messages",
             "guidance_reply_to_email_address",
+            "guidance_returned_letters",
             "guidance_schedule_messages",
             "guidance_send_files_by_email",
             "guidance_sign_in_method",

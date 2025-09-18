@@ -147,6 +147,10 @@ def using_notify_nav():
                     "link": "main.guidance_reply_to_email_address",
                 },
                 {
+                    "name": "Returned letters",
+                    "link": "main.guidance_returned_letters",
+                },
+                {
                     "name": "Schedule messages",
                     "link": "main.guidance_schedule_messages",
                 },
