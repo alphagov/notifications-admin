@@ -44,7 +44,7 @@ def support():
     if current_user.is_authenticated:
         form = SupportType()
         if form.validate_on_submit():
-            if form.support_type.data == "report-problem":
+            if form.support_type.data == PROBLEM_TICKET_TYPE:
                 return redirect(url_for("main.support_problem"))
             else:
                 return redirect(
@@ -69,7 +69,7 @@ def support():
 def support_what_do_you_want_to_do():
     form = SupportType()
     if form.validate_on_submit():
-        if form.support_type.data == "report-problem":
+        if form.support_type.data == PROBLEM_TICKET_TYPE:
             return redirect(url_for("main.support_problem"))
         else:
             # ticket type is ask-question-give-feedback

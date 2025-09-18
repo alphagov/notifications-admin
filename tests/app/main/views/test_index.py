@@ -6,6 +6,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.index import REDIRECTS
+from app.models.feedback import GENERAL_TICKET_TYPE, PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
 
 
@@ -60,9 +61,9 @@ def test_robots(client_request):
         ("support", {}),
         ("support_public", {}),
         ("triage", {}),
-        ("feedback", {"ticket_type": "ask-question-give-feedback"}),
-        ("feedback", {"ticket_type": "general"}),
-        ("feedback", {"ticket_type": "report-problem"}),
+        ("feedback", {"ticket_type": QUESTION_TICKET_TYPE}),
+        ("feedback", {"ticket_type": GENERAL_TICKET_TYPE}),
+        ("feedback", {"ticket_type": PROBLEM_TICKET_TYPE}),
         ("bat_phone", {}),
         ("thanks", {}),
         ("register", {}),

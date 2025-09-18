@@ -34,9 +34,9 @@ def test_get_support_index_page(
     assert "action" not in page.select_one("form")
     assert normalize_spaces(page.select_one("h1").text) == "Support"
     assert normalize_spaces(page.select_one("form label[for=support_type-0]").text) == "Report a problem"
-    assert page.select_one("form input#support_type-0")["value"] == "report-problem"
+    assert page.select_one("form input#support_type-0")["value"] == PROBLEM_TICKET_TYPE
     assert normalize_spaces(page.select_one("form label[for=support_type-1]").text) == "Ask a question or give feedback"
-    assert page.select_one("form input#support_type-1")["value"] == "ask-question-give-feedback"
+    assert page.select_one("form input#support_type-1")["value"] == QUESTION_TICKET_TYPE
     assert normalize_spaces(page.select_one("form button").text) == "Continue"
 
 
@@ -101,9 +101,9 @@ def test_get_support_as_someone_in_the_public_sector(
     )
     assert normalize_spaces(page.select("h1")) == "What do you want to do?"
     assert normalize_spaces(page.select_one("form label[for=support_type-0]").text) == "Report a problem"
-    assert page.select_one("form input#support_type-0")["value"] == "report-problem"
+    assert page.select_one("form input#support_type-0")["value"] == PROBLEM_TICKET_TYPE
     assert normalize_spaces(page.select_one("form label[for=support_type-1]").text) == "Ask a question or give feedback"
-    assert page.select_one("form input#support_type-1")["value"] == "ask-question-give-feedback"
+    assert page.select_one("form input#support_type-1")["value"] == QUESTION_TICKET_TYPE
     assert normalize_spaces(page.select_one("form button").text) == "Continue"
 
 
@@ -128,17 +128,17 @@ def test_get_support_what_do_you_want_to_do_page(client_request):
     page = client_request.get("main.support_what_do_you_want_to_do")
     assert normalize_spaces(page.select("h1")) == "What do you want to do?"
     assert normalize_spaces(page.select_one("form label[for=support_type-0]").text) == "Report a problem"
-    assert page.select_one("form input#support_type-0")["value"] == "report-problem"
+    assert page.select_one("form input#support_type-0")["value"] == PROBLEM_TICKET_TYPE
     assert normalize_spaces(page.select_one("form label[for=support_type-1]").text) == "Ask a question or give feedback"
-    assert page.select_one("form input#support_type-1")["value"] == "ask-question-give-feedback"
+    assert page.select_one("form input#support_type-1")["value"] == QUESTION_TICKET_TYPE
     assert normalize_spaces(page.select_one("form button").text) == "Continue"
 
 
 @pytest.mark.parametrize(
     "form_option, redirect_endpoint, redirect_kwargs",
     [
-        ("report-problem", "main.support_problem", {}),
-        ("ask-question-give-feedback", "main.feedback", {"ticket_type": "ask-question-give-feedback"}),
+        (PROBLEM_TICKET_TYPE, "main.support_problem", {}),
+        (QUESTION_TICKET_TYPE, "main.feedback", {"ticket_type": QUESTION_TICKET_TYPE}),
     ],
 )
 def test_support_what_do_you_want_to_do_page_redirects(client_request, form_option, redirect_endpoint, redirect_kwargs):
@@ -166,7 +166,7 @@ def test_support_problem(client_request):
         (
             "something-else",
             "main.feedback",
-            {"ticket_type": "report-problem", "severe": "no", "category": "something-else"},
+            {"ticket_type": PROBLEM_TICKET_TYPE, "severe": "no", "category": "something-else"},
         ),
     ],
 )
@@ -199,7 +199,7 @@ def test_support_what_happened_when_something_else_selected(client_request, user
         "main.support_what_happened",
         _data={"what_happened": "something-else"},
         _expected_redirect=url_for(
-            "main.feedback", ticket_type="report-problem", severe="no", category="problem-sending"
+            "main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no", category="problem-sending"
         ),
     )
 
@@ -228,7 +228,7 @@ def test_support_what_happened_when_an_error_is_selected_and_user_logged_in(
     client_request.post(
         "main.support_what_happened",
         _data={"what_happened": error_selected},
-        _expected_redirect=url_for("main.feedback", ticket_type="report-problem", severe=severe, category=category),
+        _expected_redirect=url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe=severe, category=category),
     )
 
 
@@ -242,7 +242,7 @@ def test_support_what_happened_when_an_error_is_selected_and_user_logged_out(
         "main.support_what_happened",
         _data={"what_happened": error_selected},
         _expected_redirect=url_for(
-            "main.feedback", ticket_type="report-problem", severe="yes", category="tech-error-signed-out"
+            "main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="yes", category="tech-error-signed-out"
         ),
     )
 
