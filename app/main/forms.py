@@ -1675,7 +1675,6 @@ class CreateKeyForm(StripWhitespaceForm):
 
 class SupportType(StripWhitespaceForm):
     support_type = GovukRadiosField(
-        "How can we help you?",
         choices=[
             (PROBLEM_TICKET_TYPE, "Report a problem"),
             (QUESTION_TICKET_TYPE, "Ask a question or give feedback"),
@@ -1683,9 +1682,17 @@ class SupportType(StripWhitespaceForm):
     )
 
 
+class SupportProblemTypeForm(StripWhitespaceForm):
+    problem_type = GovukRadiosField(
+        choices=[
+            ("sending-messages", "I’m having problems sending messages"),
+            ("something-else", "Something else"),
+        ]
+    )
+
+
 class SupportRedirect(StripWhitespaceForm):
     who = GovukRadiosField(
-        "What do you need help with?",
         choices=[
             ("public-sector", "I work in the public sector and need to send emails, text messages or letters"),
             ("public", "I’m a member of the public with a question for the government"),
@@ -1698,6 +1705,17 @@ class FeedbackOrProblem(StripWhitespaceForm):
     name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
     email_address = make_email_address_field(
         label="Email address", gov_user=False, required=True, thing="your email address"
+    )
+
+
+class SupportWhatHappenedForm(StripWhitespaceForm):
+    what_happened = GovukRadiosField(
+        "What happened?",
+        choices=[
+            ("technical-difficulties", "I got a ‘technical difficulties’ error when I tried to upload a file"),
+            ("api-500-response", "I got a 500 response code from the API"),
+            ("something-else", "Something else"),
+        ],
     )
 
 

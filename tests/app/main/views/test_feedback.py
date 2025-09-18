@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from notifications_utils.clients.zendesk.zendesk_client import (
     NotifySupportTicket,
     NotifySupportTicketComment,
+    NotifyTicketType,
     ZendeskError,
 )
 
@@ -57,26 +58,34 @@ def test_get_support_index_page_when_signed_out(
     assert normalize_spaces(page.select_one("form button").text) == "Continue"
 
 
-@pytest.mark.parametrize(
-    "support_type, expected_h1",
-    [
-        (PROBLEM_TICKET_TYPE, "Report a problem"),
-        (QUESTION_TICKET_TYPE, "Ask a question or give feedback"),
-    ],
-)
-def test_choose_support_type(
-    client_request, mock_get_non_empty_organisations_and_services_for_user, mocker, support_type, expected_h1
+def test_choose_question_support_type_shows_feedback_form(
+    client_request, mock_get_non_empty_organisations_and_services_for_user, mocker
 ):
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
     page = client_request.post(
         "main.support",
-        _data={"support_type": support_type},
+        _data={"support_type": QUESTION_TICKET_TYPE},
         _follow_redirects=True,
     )
-    assert page.select_one("h1").string.strip() == expected_h1
+    assert page.select_one("h1").string.strip() == "Ask a question or give feedback"
     assert not page.select_one("input[name=name]")
     assert not page.select_one("input[name=email_address]")
     assert page.select_one("form").find("p").text.strip() == "We’ll reply to test@user.gov.uk"
+
+
+def test_choose_problem_support_type_shows_problem_type_form(
+    client_request, mock_get_non_empty_organisations_and_services_for_user, mocker
+):
+    mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
+    page = client_request.post(
+        "main.support",
+        _data={"support_type": PROBLEM_TICKET_TYPE},
+        _follow_redirects=True,
+    )
+    assert page.select_one("h1").string.strip() == "Report a problem"
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.support")
+    assert page.select("form input[type=radio]")[0]["value"] == "sending-messages"
+    assert page.select("form input[type=radio]")[1]["value"] == "something-else"
 
 
 def test_get_support_as_someone_in_the_public_sector(
@@ -90,11 +99,12 @@ def test_get_support_as_someone_in_the_public_sector(
         _data={"who": "public-sector"},
         _follow_redirects=True,
     )
-    assert normalize_spaces(page.select("h1")) == "Contact GOV.UK Notify support"
-    assert page.select_one("form textarea[name=feedback]")
-    assert page.select_one("form input[name=name]")
-    assert page.select_one("form input[name=email_address]")
-    assert page.select_one("form button")
+    assert normalize_spaces(page.select("h1")) == "What do you want to do?"
+    assert normalize_spaces(page.select_one("form label[for=support_type-0]").text) == "Report a problem"
+    assert page.select_one("form input#support_type-0")["value"] == "report-problem"
+    assert normalize_spaces(page.select_one("form label[for=support_type-1]").text) == "Ask a question or give feedback"
+    assert page.select_one("form input#support_type-1")["value"] == "ask-question-give-feedback"
+    assert normalize_spaces(page.select_one("form button").text) == "Continue"
 
 
 def test_get_support_as_member_of_public(
@@ -111,6 +121,130 @@ def test_get_support_as_member_of_public(
     assert not page.select("form")
     assert not page.select("input")
     assert not page.select("form button")
+
+
+def test_get_support_what_do_you_want_to_do_page(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_what_do_you_want_to_do")
+    assert normalize_spaces(page.select("h1")) == "What do you want to do?"
+    assert normalize_spaces(page.select_one("form label[for=support_type-0]").text) == "Report a problem"
+    assert page.select_one("form input#support_type-0")["value"] == "report-problem"
+    assert normalize_spaces(page.select_one("form label[for=support_type-1]").text) == "Ask a question or give feedback"
+    assert page.select_one("form input#support_type-1")["value"] == "ask-question-give-feedback"
+    assert normalize_spaces(page.select_one("form button").text) == "Continue"
+
+
+@pytest.mark.parametrize(
+    "form_option, redirect_endpoint, redirect_kwargs",
+    [
+        ("report-problem", "main.support_problem", {}),
+        ("ask-question-give-feedback", "main.feedback", {"ticket_type": "ask-question-give-feedback"}),
+    ],
+)
+def test_support_what_do_you_want_to_do_page_redirects(client_request, form_option, redirect_endpoint, redirect_kwargs):
+    client_request.logout()
+    client_request.post(
+        "main.support_what_do_you_want_to_do",
+        _data={"support_type": form_option},
+        _expected_redirect=url_for(redirect_endpoint, **redirect_kwargs),
+    )
+
+
+def test_support_problem(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_problem")
+    assert page.select_one("h1").string.strip() == "Report a problem"
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_what_do_you_want_to_do")
+    assert page.select("form input[type=radio]")[0]["value"] == "sending-messages"
+    assert page.select("form input[type=radio]")[1]["value"] == "something-else"
+
+
+@pytest.mark.parametrize(
+    "form_option, redirect_endpoint, redirect_kwargs",
+    [
+        ("sending-messages", "main.support_what_happened", {}),
+        (
+            "something-else",
+            "main.feedback",
+            {"ticket_type": "report-problem", "severe": "no", "category": "something-else"},
+        ),
+    ],
+)
+def test_post_support_problem_redirects(client_request, form_option, redirect_endpoint, redirect_kwargs):
+    client_request.post(
+        "main.support_problem",
+        _data={"problem_type": form_option},
+        _expected_redirect=url_for(redirect_endpoint, **redirect_kwargs),
+    )
+
+
+@pytest.mark.parametrize("user_logged_in", [True, False])
+def test_get_support_what_happened_page(client_request, user_logged_in):
+    if not user_logged_in:
+        client_request.logout()
+
+    page = client_request.get("main.support_what_happened")
+    assert page.select_one("h1").string.strip() == "What happened?"
+    assert page.select("form input[type=radio]")[0]["value"] == "technical-difficulties"
+    assert page.select("form input[type=radio]")[1]["value"] == "api-500-response"
+    assert page.select("form input[type=radio]")[2]["value"] == "something-else"
+
+
+@pytest.mark.parametrize("user_logged_in", [True, False])
+def test_support_what_happened_when_something_else_selected(client_request, user_logged_in):
+    if not user_logged_in:
+        client_request.logout()
+
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": "something-else"},
+        _expected_redirect=url_for(
+            "main.feedback", ticket_type="report-problem", severe="no", category="problem-sending"
+        ),
+    )
+
+
+@pytest.mark.parametrize("error_selected", ["technical-difficulties", "api-500-response"])
+@pytest.mark.parametrize(
+    "has_live_services, severe, category",
+    [
+        (True, "yes", "tech-error-live-services"),
+        (False, "no", "tech-error-no-live-services"),
+    ],
+)
+def test_support_what_happened_when_an_error_is_selected_and_user_logged_in(
+    client_request,
+    error_selected,
+    has_live_services,
+    severe,
+    category,
+    mocker,
+):
+    mocker.patch(
+        "app.models.user.User.live_services",
+        new_callable=PropertyMock,
+        return_value=[{}, {}] if has_live_services else [],
+    )
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": error_selected},
+        _expected_redirect=url_for("main.feedback", ticket_type="report-problem", severe=severe, category=category),
+    )
+
+
+@pytest.mark.parametrize("error_selected", ["technical-difficulties", "api-500-response"])
+def test_support_what_happened_when_an_error_is_selected_and_user_logged_out(
+    client_request,
+    error_selected,
+):
+    client_request.logout()
+    client_request.post(
+        "main.support_what_happened",
+        _data={"what_happened": error_selected},
+        _expected_redirect=url_for(
+            "main.feedback", ticket_type="report-problem", severe="yes", category="tech-error-signed-out"
+        ),
+    )
 
 
 @pytest.mark.parametrize(
@@ -222,8 +356,8 @@ def test_does_not_add_internal_note_to_ticket_if_error_creating_ticket(client_re
 @pytest.mark.parametrize(
     "ticket_type, zendesk_ticket_type, expected_subject",
     [
-        (PROBLEM_TICKET_TYPE, "incident", "[env: test] Reported Problem"),
-        (QUESTION_TICKET_TYPE, "question", "[env: test] Question/Feedback"),
+        (PROBLEM_TICKET_TYPE, "incident", "[env: test] Problem"),
+        (QUESTION_TICKET_TYPE, "question", "[env: test] Question or feedback"),
     ],
 )
 def test_passes_user_details_through_flow(
@@ -325,6 +459,76 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
         user_name="Test User",
         user_email="test@user.gov.uk",
         notify_ticket_type=None,
+        org_id=None,
+        org_type="central",
+        service_id=SERVICE_ONE_ID,
+        user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
+    )
+
+
+@pytest.mark.parametrize(
+    "ticket_type, category, expected_subject, notify_ticket_type",
+    [
+        (GENERAL_TICKET_TYPE, None, "General Notify Support", None),
+        (QUESTION_TICKET_TYPE, None, "Question or feedback", None),
+        (PROBLEM_TICKET_TYPE, "something-else", "Problem", None),
+        (PROBLEM_TICKET_TYPE, "problem-sending", "Problem sending messages", None),
+        (
+            PROBLEM_TICKET_TYPE,
+            "tech-error-live-services",
+            "Urgent - Technical error (live service)",
+            NotifyTicketType.TECHNICAL,
+        ),
+        (
+            PROBLEM_TICKET_TYPE,
+            "tech-error-no-live-services",
+            "Technical error (no live services)",
+            NotifyTicketType.TECHNICAL,
+        ),
+        (
+            PROBLEM_TICKET_TYPE,
+            "tech-error-signed-out",
+            "Technical error (user not signed in)",
+            NotifyTicketType.TECHNICAL,
+        ),
+    ],
+)
+def test_zendesk_subject_and_ticket_type_reflect_journey_taken_to_support_form(
+    notify_admin,
+    client_request,
+    mock_get_non_empty_organisations_and_services_for_user,
+    ticket_type,
+    category,
+    expected_subject,
+    notify_ticket_type,
+    mocker,
+):
+    mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
+    mocker.patch(
+        "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
+        autospec=True,
+    )
+    client_request.post(
+        "main.feedback",
+        ticket_type=ticket_type,
+        category=category,
+        _data={"feedback": "blah"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.thanks",
+            out_of_hours_emergency=False,
+        ),
+    )
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        subject=f"[env: test] {expected_subject}",
+        message=ANY,
+        ticket_type=ANY,
+        p1=False,
+        user_name="Test User",
+        user_email="test@user.gov.uk",
+        notify_ticket_type=notify_ticket_type,
         org_id=None,
         org_type="central",
         service_id=SERVICE_ONE_ID,
@@ -619,16 +823,20 @@ def test_triage_redirects_to_correct_url(
 
 
 @pytest.mark.parametrize(
-    "extra_args, expected_back_link, expected_page_title",
+    "extra_args, expected_back_link",
     [
         (
             {"severe": "yes"},
-            partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
-            "Tell us about the emergency",
+            partial(url_for, "main.support"),
         ),
-        ({"severe": "no"}, partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE), "Report a problem"),
-        ({"severe": "foo"}, partial(url_for, "main.support"), "Report a problem"),  # hacking the URL
-        ({}, partial(url_for, "main.support"), "Report a problem"),
+        ({"severe": "no"}, partial(url_for, "main.support")),
+        ({"severe": "foo"}, partial(url_for, "main.support")),  # hacking the URL
+        ({}, partial(url_for, "main.support")),
+        ({"category": "something-else"}, partial(url_for, "main.support_problem")),
+        ({"category": "problem-sending"}, partial(url_for, "main.support_what_happened")),
+        ({"category": "tech-error-live-services"}, partial(url_for, "main.support_what_happened")),
+        ({"category": "tech-error-no-live-services"}, partial(url_for, "main.support_what_happened")),
+        ({"category": "tech-error-signed-out"}, partial(url_for, "main.support_what_happened")),
     ],
 )
 def test_back_link_from_form(
@@ -637,12 +845,11 @@ def test_back_link_from_form(
     mocker,
     extra_args,
     expected_back_link,
-    expected_page_title,
 ):
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
     page = client_request.get("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, **extra_args)
     assert page.select_one(".govuk-back-link")["href"] == expected_back_link()
-    assert normalize_spaces(page.select_one("h1").text) == expected_page_title
+    assert normalize_spaces(page.select_one("h1").text) == "Describe the problem"
 
 
 @pytest.mark.parametrize(
@@ -794,7 +1001,8 @@ def test_bat_email_page(
     page_links = page.select("main a")
     form_link = next(
         filter(
-            lambda link: link["href"] == url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no"),
+            lambda link: link["href"]
+            == url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, category="problem-sending", severe="no"),
             page_links,
         ),
         None,

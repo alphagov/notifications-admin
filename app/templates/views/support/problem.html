@@ -1,0 +1,31 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/inset-text/macro.html" import govukInsetText %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+
+{% block per_page_title %}
+  Report a problem
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  {{ govuk_page_header("Report a problem") }}
+
+  {% call form_wrapper() %}
+      {{ form.problem_type }}
+        {% set insetHtml %}
+        <p class="govuk-body">Before you continue, <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk" target="_blank">
+        check the GOV.UK Notify status page (opens in a new tab)</a>.</p>
+        <p class="govuk-body">You do not need to contact us if your problem is already listed on that page.</p>
+        {% endset %}
+        {{ govukInsetText({"html": insetHtml, "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"}) }}
+
+    {{ page_footer('Continue') }}
+  {% endcall %}
+{% endblock %}
