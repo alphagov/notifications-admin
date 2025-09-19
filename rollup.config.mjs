@@ -104,7 +104,7 @@ export default [
       paths.src + 'javascripts/radioSelect.js',
       paths.src + 'javascripts/updateContent.js',
       paths.src + 'javascripts/preventDuplicateFormSubmissions.js',
-      paths.src + 'javascripts/fullscreenTable.js',
+      // paths.src + 'javascripts/fullscreenTable.js',
       paths.src + 'javascripts/templateFolderForm.js',
       paths.src + 'javascripts/registerSecurityKey.js',
       paths.src + 'javascripts/authenticateSecurityKey.js',
