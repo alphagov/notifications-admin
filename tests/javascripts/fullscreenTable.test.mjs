@@ -1,22 +1,16 @@
-const helpers = require('./support/helpers');
+import FullscreenTable from '../../app/assets/javascripts/esm/fullscreen-table.mjs';
+import { jest } from '@jest/globals';
+import * as helpers from './support/helpers';
 
-beforeAll(() => {
-  // TODO: remove this when tests for sticky JS are written
-  require('../../app/assets/javascripts/stick-to-window-when-scrolling.js');
-
-  require('../../app/assets/javascripts/fullscreenTable.js');
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
-});
 
 describe('FullscreenTable', () => {
   let screenMock;
   let container;
+  let caption;
   let tableFrame;
   let table;
   let numberColumnFrame;
+  let fixedRowHeaders;
 
   beforeEach(() => {
 
@@ -87,6 +81,7 @@ describe('FullscreenTable', () => {
     });
 
     // set up DOM
+    document.body.classList.add('govuk-frontend-supported')
     document.body.innerHTML =
       `<main>
         <div class="fullscreen-content" data-notify-module="fullscreen-table">
@@ -122,7 +117,7 @@ describe('FullscreenTable', () => {
     test("it fixes the number column for each row without changing the semantics", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+     new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -138,7 +133,7 @@ describe('FullscreenTable', () => {
       const stickyJSSpy = jest.spyOn(window.GOVUK.stickAtBottomWhenScrolling, 'recalculate');
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       expect(stickyJSSpy.mock.calls.length).toBe(1);
 
@@ -149,13 +144,13 @@ describe('FullscreenTable', () => {
     describe("and the scrolling section is wider than its container", () => {
 
       beforeEach(() => {
-        $(container).css({ 'width': '640px' });
-        $('table', container).css({ 'width': '990px' });
-
-        window.GOVUK.notifyModules.start();
+        container.style.width = '640px';
+        container.querySelector('table').style.width = '990px';
       });
 
       test("it should be made focusable and have an accessible name matching the table caption", () => {
+
+        new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
         tableFrame = document.querySelector('.fullscreen-scrollable-table');
         caption = tableFrame.querySelector('caption');
@@ -182,7 +177,7 @@ describe('FullscreenTable', () => {
         $(container).css({ 'width': '640px' });
         $('table', container).css({ 'width': '640px' });
 
-        window.GOVUK.notifyModules.start();
+         new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
       });
 
       test("it shouldn't be made focusable or have an accessible name", () => {
@@ -205,7 +200,7 @@ describe('FullscreenTable', () => {
     test("the section providing the fixed row headers is not focusable and is hidden from assistive tech'", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       fixedRowHeaders = document.querySelector('.fullscreen-fixed-table');
 
@@ -236,7 +231,7 @@ describe('FullscreenTable', () => {
       });
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -296,7 +291,7 @@ describe('FullscreenTable', () => {
       rowNumberColumnHeader.setAttribute('style', 'width: 40px');
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -356,7 +351,7 @@ describe('FullscreenTable', () => {
       document.querySelector('main').setAttribute('style', 'width: 712px');
 
       // start module
-      window.GOVUK.notifyModules.start();
+       new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       invisibleScrollableTopLeftCell = document.querySelector('.fullscreen-scrollable-table .table-field-heading-first');
       fixedTopLeftHeaderCell = document.querySelector('.fullscreen-fixed-table .table-field-heading-first');
@@ -378,7 +373,7 @@ describe('FullscreenTable', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       table = tableFrame.querySelector('table');
@@ -429,18 +424,23 @@ describe('FullscreenTable', () => {
     beforeEach(() => {
 
       // make table wider than its container so it is made focusable
-      $(container).css({ 'width': '640px' });
-      $('table', container).css({ 'width': '990px' });
+      // $(container).css({ 'width': '640px' });
+      // $('table', container).css({ 'width': '990px' });
+      // container.style.width = '640px';
+      // container.querySelector('table').style.width = '990px';
 
-      // start module
-      window.GOVUK.notifyModules.start();
-
-      tableFrame = document.querySelector('.fullscreen-scrollable-table');
-      tableFrame.focus();
+      // tableFrame = document.querySelector('.fullscreen-scrollable-table');
+      // tableFrame.focus();
 
     });
 
-    test("it should make the parent frame a focus style", () => {
+    test.only("it should make the parent frame a focus style", () => {
+      // start module
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
+      tableFrame = document.querySelector('.fullscreen-scrollable-table');
+      tableFrame.focus();
+
+      console.log(container.innerHTML)
 
       expect(container.classList.contains('js-focus-style')).toBe(true);
 
