@@ -1719,17 +1719,6 @@ class SupportWhatHappenedForm(StripWhitespaceForm):
     )
 
 
-class Triage(StripWhitespaceForm):
-    severe = GovukRadiosField(
-        "Did you get one of the following errors?",
-        choices=[
-            ("yes", "Yes"),
-            ("no", "No"),
-        ],
-        thing="‘yes’ if it is an emergency",
-    )
-
-
 class EstimateUsageForm(StripWhitespaceForm):
     volume_email = GovukIntegerField(
         "How many emails do you expect to send in the next year?",
