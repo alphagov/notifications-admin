@@ -17,6 +17,7 @@ import EnhancedTextbox from './enhanced-textbox.mjs';
 import CheckReportStatus from './check-report-status.mjs';
 import LiveCheckboxControls from './live-checkbox-controls.mjs';
 import AddBrandingOptionsControls from './add-branding-options-controls.mjs';
+import FullscreenTable from './fullscreen-table.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -100,6 +101,11 @@ if ($authTypeForm) {
 const $addBrandingOptionsForm = document.querySelector('[data-notify-module="add-branding-options-form"]');
 if ($addBrandingOptionsForm) {
   new AddBrandingOptionsControls($addBrandingOptionsForm);
+}
+
+const $fullScreenTableArray = document.querySelectorAll('[data-notify-module="fullscreen-table"]');
+if ($fullScreenTableArray.length > 0) {
+  $fullScreenTableArray.forEach(tableComponent => new FullscreenTable(tableComponent));
 }
 
 const focusBanner = new FocusBanner();
