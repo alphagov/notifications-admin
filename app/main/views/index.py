@@ -411,6 +411,13 @@ def feedback_guidance_ticket_type():
     return redirect(url_for("main.support"), 301)
 
 
+@main.route("/support/triage")
+@main.route("/support/triage/<ticket_type:ticket_type>")
+@hide_from_search_engines
+def triage(ticket_type="problem"):
+    return redirect(url_for("main.support_problem"), 301)
+
+
 def historical_redirects(new_endpoint, **kwargs):
     return redirect(url_for(new_endpoint, **kwargs), 301)
 

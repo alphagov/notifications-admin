@@ -63,7 +63,6 @@ def test_robots(client_request):
         ("support_problem", {}),
         ("support_what_happened", {}),
         ("support_public", {}),
-        ("triage", {}),
         ("feedback", {"ticket_type": QUESTION_TICKET_TYPE}),
         ("feedback", {"ticket_type": PROBLEM_TICKET_TYPE}),
         ("bat_phone", {}),
@@ -91,15 +90,17 @@ def test_hiding_pages_from_search_engines(
 
 
 @pytest.mark.parametrize(
-    "endpoint",
+    "endpoint, kwargs",
     (
-        ("feedback_guidance_ticket_type"),
-        pytest.param("index", marks=pytest.mark.xfail(raises=AssertionError)),
+        ("feedback_guidance_ticket_type", {}),
+        ("triage", {}),
+        ("triage", {"ticket_type": PROBLEM_TICKET_TYPE}),
+        pytest.param("index", {}, marks=pytest.mark.xfail(raises=AssertionError)),
     ),
 )
-def test_hiding_pages_that_redirect_from_search_engines(client_request, endpoint):
+def test_hiding_pages_that_redirect_from_search_engines(client_request, endpoint, kwargs):
     client_request.logout()
-    response = client_request.get_response(f"main.{endpoint}", _expected_status=301)
+    response = client_request.get_response(f"main.{endpoint}", _expected_status=301, **kwargs)
     assert "X-Robots-Tag" in response.headers
     assert response.headers["X-Robots-Tag"] == "noindex"
 

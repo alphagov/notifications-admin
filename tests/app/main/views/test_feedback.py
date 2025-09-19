@@ -665,7 +665,7 @@ ids, params = zip(
                 False,
                 True,
                 302,
-                partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
+                partial(url_for, "main.support_problem"),
             ),
         ),
         ("trial services are never high priority", (PROBLEM_TICKET_TYPE, False, True, False, 200, no_redirect())),
@@ -679,7 +679,7 @@ ids, params = zip(
                 True,
                 True,
                 302,
-                partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
+                partial(url_for, "main.support_problem"),
             ),
         ),
     ],
@@ -692,7 +692,7 @@ ids, params = zip(
     params,
     ids=ids,
 )
-def test_redirects_to_triage(
+def test_redirects_to_report_a_problem_page(
     client_request,
     mocker,
     ticket_type,
@@ -719,13 +719,6 @@ def test_redirects_to_triage(
     )
 
 
-def test_options_on_triage_page(client_request):
-    page = client_request.get("main.triage", ticket_type=PROBLEM_TICKET_TYPE)
-    assert normalize_spaces(page.select_one("h1").text) == "Did you get one of the following errors?"
-    assert page.select("form input[type=radio]")[0]["value"] == "yes"
-    assert page.select("form input[type=radio]")[1]["value"] == "no"
-
-
 def test_doesnt_lose_message_if_post_across_closing(
     client_request,
     mocker,
@@ -738,7 +731,7 @@ def test_doesnt_lose_message_if_post_across_closing(
         ticket_type=PROBLEM_TICKET_TYPE,
         _data={"feedback": "foo"},
         _expected_status=302,
-        _expected_redirect=url_for(".triage", ticket_type=PROBLEM_TICKET_TYPE),
+        _expected_redirect=url_for(".support_problem"),
     )
     with client_request.session_transaction() as session:
         assert session["feedback_message"] == "foo"
@@ -772,31 +765,6 @@ def test_doesnt_lose_message_if_post_across_closing(
 def test_in_business_hours(when, is_in_business_hours):
     with freeze_time(when):
         assert in_business_hours() == is_in_business_hours
-
-
-@pytest.mark.parametrize(
-    "choice, expected_redirect_param",
-    [
-        ("yes", "yes"),
-        ("no", "no"),
-    ],
-)
-def test_triage_redirects_to_correct_url(
-    client_request,
-    choice,
-    expected_redirect_param,
-):
-    client_request.post(
-        "main.triage",
-        ticket_type=PROBLEM_TICKET_TYPE,
-        _data={"severe": choice},
-        _expected_status=302,
-        _expected_redirect=url_for(
-            "main.feedback",
-            ticket_type=PROBLEM_TICKET_TYPE,
-            severe=expected_redirect_param,
-        ),
-    )
 
 
 @pytest.mark.parametrize(
@@ -851,18 +819,18 @@ def test_back_link_from_form(
             False,
             "",
             302,
-            partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
+            partial(url_for, "main.support_problem"),
             302,
-            partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
+            partial(url_for, "main.support_problem"),
         ),
         # User hasn’t answered the triage question
         (
             False,
             None,
             302,
-            partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
+            partial(url_for, "main.support_problem"),
             302,
-            partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
+            partial(url_for, "main.support_problem"),
         ),
         # Escalation is needed for non-logged-in users
         (
@@ -931,7 +899,10 @@ def test_bat_email_page(
     assert form_link is not None
 
     client_request.login(active_user_with_permissions)
-    client_request.get(bat_phone_page, _expected_redirect=url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE))
+    client_request.get(
+        bat_phone_page,
+        _expected_redirect=url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE),
+    )
 
 
 @pytest.mark.parametrize(

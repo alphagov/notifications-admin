@@ -19,7 +19,6 @@ from app.main.forms import (
     SupportRedirect,
     SupportType,
     SupportWhatHappenedForm,
-    Triage,
 )
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.utils import hide_from_search_engines
@@ -135,16 +134,6 @@ def support_public():
     return render_template("views/support/public.html")
 
 
-@main.route("/support/triage", methods=["GET", "POST"])
-@main.route("/support/triage/<ticket_type:ticket_type>", methods=["GET", "POST"])
-@hide_from_search_engines
-def triage(ticket_type=PROBLEM_TICKET_TYPE):
-    form = Triage()
-    if form.validate_on_submit():
-        return redirect(url_for(".feedback", ticket_type=ticket_type, severe=form.severe.data))
-    return render_template("views/support/triage.html", form=form, error_summary_enabled=True)
-
-
 feedback_page_details = {
     QUESTION_TICKET_TYPE: {
         "default": {"zendesk_subject": "Question or feedback", "back_link": "main.support", "notify_ticket_type": None}
@@ -205,7 +194,7 @@ def feedback(ticket_type):
 
     if needs_triage(ticket_type, severe):
         session["feedback_message"] = form.feedback.data
-        return redirect(url_for(".triage", ticket_type=ticket_type))
+        return redirect(url_for(".support_problem"))
 
     if needs_escalation(ticket_type, severe):
         return redirect(url_for(".bat_phone"))
