@@ -14,11 +14,7 @@ from notifications_utils.clients.zendesk.zendesk_client import (
 )
 
 from app.main.views.feedback import ZENDESK_USER_LOGGED_OUT_NOTE, in_business_hours
-from app.models.feedback import (
-    GENERAL_TICKET_TYPE,
-    PROBLEM_TICKET_TYPE,
-    QUESTION_TICKET_TYPE,
-)
+from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config_values
 
 
@@ -278,7 +274,7 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
 
     client_request.post(
         "main.feedback",
-        ticket_type=GENERAL_TICKET_TYPE,
+        ticket_type=QUESTION_TICKET_TYPE,
         _data=data,
         _expected_redirect=url_for(
             "main.thanks",
@@ -288,7 +284,7 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
 
     mock_create_ticket.assert_called_once_with(
         ANY,
-        subject="[env: test] General Notify Support",
+        subject="[env: test] Question or feedback",
         message="blah\n",
         ticket_type="question",
         p1=False,
@@ -318,7 +314,7 @@ def test_does_not_add_internal_note_to_tickets_created_by_suspended_users(client
 
     client_request.post(
         "main.feedback",
-        ticket_type=GENERAL_TICKET_TYPE,
+        ticket_type=QUESTION_TICKET_TYPE,
         _data={"feedback": "blah", "name": "Anne Example", "email_address": "anne@example.com"},
         _expected_redirect=url_for(
             "main.thanks",
@@ -340,7 +336,7 @@ def test_does_not_add_internal_note_to_ticket_if_error_creating_ticket(client_re
     with pytest.raises(ZendeskError):
         client_request.post(
             "main.feedback",
-            ticket_type=GENERAL_TICKET_TYPE,
+            ticket_type=QUESTION_TICKET_TYPE,
             _data={"feedback": "blah", "name": "Anne Example", "email_address": "anne@example.com"},
             _expected_redirect=url_for(
                 "main.thanks",
@@ -441,7 +437,7 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
     ):
         client_request.post(
             "main.feedback",
-            ticket_type=GENERAL_TICKET_TYPE,
+            ticket_type=QUESTION_TICKET_TYPE,
             _data={"feedback": "blah"},
             _expected_status=302,
             _expected_redirect=url_for(
@@ -452,7 +448,7 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
 
     mock_create_ticket.assert_called_once_with(
         ANY,
-        subject="General Notify Support",
+        subject="Question or feedback",
         message=ANY,
         ticket_type="question",
         p1=False,
@@ -469,7 +465,6 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
 @pytest.mark.parametrize(
     "ticket_type, category, expected_subject, notify_ticket_type",
     [
-        (GENERAL_TICKET_TYPE, None, "General Notify Support", None),
         (QUESTION_TICKET_TYPE, None, "Question or feedback", None),
         (PROBLEM_TICKET_TYPE, "something-else", "Problem", None),
         (PROBLEM_TICKET_TYPE, "problem-sending", "Problem sending messages", None),
@@ -665,12 +660,12 @@ ids, params = zip(
         (
             "non-logged in users always have to triage",
             (
-                GENERAL_TICKET_TYPE,
+                PROBLEM_TICKET_TYPE,
                 False,
                 False,
                 True,
                 302,
-                partial(url_for, "main.triage", ticket_type=GENERAL_TICKET_TYPE),
+                partial(url_for, "main.triage", ticket_type=PROBLEM_TICKET_TYPE),
             ),
         ),
         ("trial services are never high priority", (PROBLEM_TICKET_TYPE, False, True, False, 200, no_redirect())),
@@ -724,18 +719,8 @@ def test_redirects_to_triage(
     )
 
 
-@pytest.mark.parametrize(
-    "ticket_type",
-    [
-        PROBLEM_TICKET_TYPE,
-        GENERAL_TICKET_TYPE,
-    ],
-)
-def test_options_on_triage_page(
-    client_request,
-    ticket_type,
-):
-    page = client_request.get("main.triage", ticket_type=ticket_type)
+def test_options_on_triage_page(client_request):
+    page = client_request.get("main.triage", ticket_type=PROBLEM_TICKET_TYPE)
     assert normalize_spaces(page.select_one("h1").text) == "Did you get one of the following errors?"
     assert page.select("form input[type=radio]")[0]["value"] == "yes"
     assert page.select("form input[type=radio]")[1]["value"] == "no"
@@ -790,13 +775,6 @@ def test_in_business_hours(when, is_in_business_hours):
 
 
 @pytest.mark.parametrize(
-    "ticket_type",
-    (
-        GENERAL_TICKET_TYPE,
-        PROBLEM_TICKET_TYPE,
-    ),
-)
-@pytest.mark.parametrize(
     "choice, expected_redirect_param",
     [
         ("yes", "yes"),
@@ -805,18 +783,17 @@ def test_in_business_hours(when, is_in_business_hours):
 )
 def test_triage_redirects_to_correct_url(
     client_request,
-    ticket_type,
     choice,
     expected_redirect_param,
 ):
     client_request.post(
         "main.triage",
-        ticket_type=ticket_type,
+        ticket_type=PROBLEM_TICKET_TYPE,
         _data={"severe": choice},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.feedback",
-            ticket_type=ticket_type,
+            ticket_type=PROBLEM_TICKET_TYPE,
             severe=expected_redirect_param,
         ),
     )
@@ -913,62 +890,6 @@ def test_should_be_shown_the_bat_email(
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=is_in_business_hours)
 
     feedback_page = url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe=severe)
-
-    client_request.logout()
-    client_request.get_url(
-        feedback_page,
-        _expected_status=expected_status_code,
-        _expected_redirect=expected_redirect(),
-    )
-
-    # logged in users should never be redirected to the bat email page
-    client_request.login(active_user_with_permissions)
-    client_request.get_url(
-        feedback_page,
-        _expected_status=expected_status_code_when_logged_in,
-        _expected_redirect=expected_redirect_when_logged_in(),
-    )
-
-
-@pytest.mark.parametrize(
-    (
-        "severe,"
-        "expected_status_code, expected_redirect,"
-        "expected_status_code_when_logged_in, expected_redirect_when_logged_in"
-    ),
-    [
-        # User hasn’t answered the triage question
-        (
-            None,
-            302,
-            partial(url_for, "main.triage", ticket_type=GENERAL_TICKET_TYPE),
-            302,
-            partial(url_for, "main.triage", ticket_type=GENERAL_TICKET_TYPE),
-        ),
-        # Escalation is needed for non-logged-in users
-        (
-            "yes",
-            302,
-            partial(url_for, "main.bat_phone"),
-            200,
-            no_redirect(),
-        ),
-    ],
-)
-def test_should_be_shown_the_bat_email_for_general_questions(
-    client_request,
-    active_user_with_permissions,
-    mocker,
-    mock_get_non_empty_organisations_and_services_for_user,
-    severe,
-    expected_status_code,
-    expected_redirect,
-    expected_status_code_when_logged_in,
-    expected_redirect_when_logged_in,
-):
-    mocker.patch("app.main.views.feedback.in_business_hours", return_value=False)
-
-    feedback_page = url_for("main.feedback", ticket_type=GENERAL_TICKET_TYPE, severe=severe)
 
     client_request.logout()
     client_request.get_url(

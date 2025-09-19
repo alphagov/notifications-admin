@@ -21,11 +21,7 @@ from app.main.forms import (
     SupportWhatHappenedForm,
     Triage,
 )
-from app.models.feedback import (
-    GENERAL_TICKET_TYPE,
-    PROBLEM_TICKET_TYPE,
-    QUESTION_TICKET_TYPE,
-)
+from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.utils import hide_from_search_engines
 
 bank_holidays = BankHolidays(use_cached_holidays=True)
@@ -150,13 +146,6 @@ def triage(ticket_type=PROBLEM_TICKET_TYPE):
 
 
 feedback_page_details = {
-    GENERAL_TICKET_TYPE: {
-        "default": {
-            "zendesk_subject": "General Notify Support",
-            "back_link": "main.support",
-            "notify_ticket_type": None,
-        }
-    },
     QUESTION_TICKET_TYPE: {
         "default": {"zendesk_subject": "Question or feedback", "back_link": "main.support", "notify_ticket_type": None}
     },

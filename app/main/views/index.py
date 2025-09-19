@@ -20,6 +20,7 @@ from app.main.views.sub_navigation_dictionaries import features_nav, using_notif
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
 from app.models.sms_rate import SMSRate
+from app.utils import hide_from_search_engines
 from app.utils.user import user_has_permissions
 
 redirects = Blueprint("redirects", __name__)
@@ -402,6 +403,12 @@ def request_to_go_live_old_path(service_id):
 @user_has_permissions("manage_service")
 def submit_request_to_go_live_old_path(service_id):
     return redirect(url_for("main.submit_request_to_go_live", service_id=service_id), 301)
+
+
+@main.route("/support/general")
+@hide_from_search_engines
+def feedback_guidance_ticket_type():
+    return redirect(url_for("main.support"), 301)
 
 
 def historical_redirects(new_endpoint, **kwargs):

@@ -6,7 +6,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from app.main.views.index import REDIRECTS
-from app.models.feedback import GENERAL_TICKET_TYPE, PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
+from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, sample_uuid
 
 
@@ -65,7 +65,6 @@ def test_robots(client_request):
         ("support_public", {}),
         ("triage", {}),
         ("feedback", {"ticket_type": QUESTION_TICKET_TYPE}),
-        ("feedback", {"ticket_type": GENERAL_TICKET_TYPE}),
         ("feedback", {"ticket_type": PROBLEM_TICKET_TYPE}),
         ("bat_phone", {}),
         ("thanks", {}),
@@ -89,6 +88,20 @@ def test_hiding_pages_from_search_engines(
 
     page = BeautifulSoup(response.data.decode("utf-8"), "html.parser")
     assert page.select_one("meta[name=robots]")["content"] == "noindex"
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    (
+        ("feedback_guidance_ticket_type"),
+        pytest.param("index", marks=pytest.mark.xfail(raises=AssertionError)),
+    ),
+)
+def test_hiding_pages_that_redirect_from_search_engines(client_request, endpoint):
+    client_request.logout()
+    response = client_request.get_response(f"main.{endpoint}", _expected_status=301)
+    assert "X-Robots-Tag" in response.headers
+    assert response.headers["X-Robots-Tag"] == "noindex"
 
 
 @pytest.mark.parametrize(
@@ -189,6 +202,7 @@ def test_guidance_pages_link_to_service_pages_when_signed_in(
         ("/integration_testing", "main.guidance_api_documentation", {}),
         ("/integration-testing", "main.guidance_api_documentation", {}),
         ("/roadmap", "main.guidance_roadmap", {}),
+        ("/support/general", "main.support", {}),
         ("/terms", "main.terms_of_use", {}),
         ("/using-notify/guidance/message-status", "main.guidance_message_status", {}),
         ("/using-notify/guidance/message-status/sms", "main.guidance_message_status", {"notification_type": "sms"}),
