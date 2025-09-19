@@ -20,15 +20,9 @@ def returned_letter_summary(service_id):
 def returned_letters(service_id, reported_at):
     page_size = 50
     response = service_api_client.get_returned_letters(service_id, reported_at)
-    try:
-        # new-style (dict-wrapped) response
-        returned_letters = response["returned_letters"]
-        orphaned_count = response["orphaned_count"]
-    except TypeError:
-        # old-style (raw list) response
-        returned_letters = response
-        orphaned_count = None
 
+    returned_letters = response["returned_letters"]
+    orphaned_count = response["orphaned_count"]
     count_of_returned_letters = len(returned_letters)
 
     return render_template(
@@ -45,13 +39,7 @@ def returned_letters(service_id, reported_at):
 @main.route("/services/<uuid:service_id>/returned-letters/<simple_date:reported_at>.csv")
 @user_has_permissions("view_activity")
 def returned_letters_report(service_id, reported_at):
-    returned_letters = service_api_client.get_returned_letters(service_id, reported_at)
-    try:
-        # new-style (dict-wrapped) response
-        returned_letters = returned_letters["returned_letters"]
-    except TypeError:
-        # old-style (raw list) response
-        pass
+    returned_letters = service_api_client.get_returned_letters(service_id, reported_at)["returned_letters"]
 
     column_names = {
         "notification_id": "Notification ID",
