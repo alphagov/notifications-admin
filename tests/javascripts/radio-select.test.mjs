@@ -1,11 +1,11 @@
-const helpers = require('./support/helpers');
+
+import RadioSelect from '../../app/assets/javascripts/esm/radio-select.mjs';
+import * as helpers from './support/helpers.js';
+import { jest } from '@jest/globals';
 
 let consoleErrorSpy;
 
 beforeAll(() => {
-
-  require('../../app/assets/javascripts/radioSelect.js');
-
   // The sticky JS should be called whenever the times are shown so stub it out as a mock
   window.GOVUK.stickAtBottomWhenScrolling = {
     recalculate: jest.fn(() => {})
@@ -17,11 +17,8 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-
   consoleErrorSpy.mockRestore();
-
-  require('./support/teardown.js');
-
+  jest.restoreAllMocks();
 });
 
 describe('RadioSelect', () => {
@@ -41,13 +38,13 @@ describe('RadioSelect', () => {
 
   const getDataFromOption = (option) => {
     return {
-              value: option.querySelector('input').getAttribute('value'),
-              label: option.querySelector('label').textContent.trim()
-           };
+      value: option.querySelector('input').getAttribute('value'),
+      label: option.querySelector('label').textContent.trim()
+    };
   };
 
   function getEnterKeyEvent (eventType) {
-    return new $.Event(eventType, {
+    return new KeyboardEvent(eventType, {
       which: 13,
       charCode: 13,
       keyCode: 13,
@@ -62,10 +59,6 @@ describe('RadioSelect', () => {
     screenMock.setWindow({
       scrollTop: scrollPosition
     });
-
-    // reset all tracking of calls to console.error
-    consoleErrorSpy.mockClear();
-
 
     const options = () => {
       let result = '';
@@ -132,6 +125,7 @@ describe('RadioSelect', () => {
       return result;
     };
 
+    document.body.classList.add('govuk-frontend-supported');
     document.body.innerHTML = `
       <form method="post" enctype="multipart/form-data" action="/services/6658542f-0cad-491f-bec8-ab8457700ead/start-job/ab3080c8-f2d1-4524-b199-9718ecf6eabc">
         <fieldset>
@@ -153,8 +147,6 @@ describe('RadioSelect', () => {
 
       originalOptionsForAllDays = Array.from(document.querySelectorAll('.govuk-radios__item:not(:first-of-type)'))
                                           .map(option => getDataFromOption(option));
-
-      window.GOVUK.notifyModules.start();
   });
 
   afterEach(() => {
@@ -166,6 +158,8 @@ describe('RadioSelect', () => {
 
     test("it should show the right time and set the right name:value pairing in the form data", () => {
 
+      new RadioSelect(document.querySelector('[data-notify-module="radio-select"]'));
+
       const visibleField = document.querySelector('.radio-select__selected-day-and-time');
       const formData = new FormData(visibleField.form);
 
@@ -176,6 +170,8 @@ describe('RadioSelect', () => {
     });
 
     test("all times originally in the page should be present and split by day", () => {
+
+      new RadioSelect(document.querySelector('[data-notify-module="radio-select"]'));
 
       originalOptionsForAllDays.forEach(option => {
 
@@ -206,6 +202,8 @@ describe('RadioSelect', () => {
 
     test("it should have a button that shows or hides a section for choosing a time", () => {
 
+      new RadioSelect(document.querySelector('[data-notify-module="radio-select"]'));
+
       const expanderButton = document.querySelector('.radio-select__expander');
       let expandingSection;
 
@@ -220,6 +218,8 @@ describe('RadioSelect', () => {
 
     test("the section for choosing a time should be collapsed", () => {
 
+      new RadioSelect(document.querySelector('[data-notify-module="radio-select"]'));
+
       const expandingSection = document.getElementById(
         document.querySelector('.radio-select__expander').getAttribute('aria-controls')
       );
@@ -230,11 +230,11 @@ describe('RadioSelect', () => {
 
     test("You should be able to submit the form again", () => {
 
+      new RadioSelect(document.querySelector('[data-notify-module="radio-select"]'));
+
       const form = document.querySelector('.radio-select__selected-day-and-time').form;
-
-      const submitEvent = new $.Event('submit');
-
-      $(form).trigger(submitEvent);
+      
+      form.submit();
 
       // JSDOM doesn't implement form submissions
       // see https://github.com/jsdom/jsdom/issues/1937#issuecomment-321575590
@@ -243,6 +243,7 @@ describe('RadioSelect', () => {
       //
       // That means we can assume any errors of that type would be the same as a form submission in
       // browsers.
+    
       expect(consoleErrorSpy.mock.calls.length).toEqual(1);
       expect(consoleErrorSpy.mock.calls[0][0].message).toEqual('Not implemented: HTMLFormElement.prototype.submit');
 
@@ -258,6 +259,8 @@ describe('RadioSelect', () => {
     let timesView;
 
     beforeEach(() => {
+
+      new RadioSelect(document.querySelector('[data-notify-module="radio-select"]'));
 
       expanderButton = document.querySelector('.radio-select__expander');
       expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
@@ -298,10 +301,11 @@ describe('RadioSelect', () => {
 
       expect(expanderButton.form.querySelector('button:not([type=button])').hasAttribute('hidden')).toBe(true);
 
-      const submitEvent = new $.Event('submit');
+      const submitEvent = new Event('submit');
 
       jest.spyOn(submitEvent, 'preventDefault');
-      $(expanderButton.form).trigger(submitEvent);
+
+      expanderButton.form.dispatchEvent(submitEvent);
 
       expect(submitEvent.preventDefault).toHaveBeenCalled();
 
@@ -315,6 +319,8 @@ describe('RadioSelect', () => {
     let expandingSection;
 
     beforeEach(() => {
+      jest.restoreAllMocks();
+      new RadioSelect(document.querySelector('[data-notify-module="radio-select"]'));
 
       expanderButton = document.querySelector('.radio-select__expander');
       expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
@@ -334,10 +340,8 @@ describe('RadioSelect', () => {
     test("it should show the submit button again and allow the form to be submitted again", () => {
 
       expect(expanderButton.form.querySelector('button:not([type=button])').hasAttribute('hidden')).toBe(false);
-
-      const submitEvent = new $.Event('submit');
-
-      $(expanderButton.form).trigger(submitEvent);
+  
+      expanderButton.form.dispatchEvent(new Event('submit'))
 
       // JSDOM doesn't implement form submissions
       // see https://github.com/jsdom/jsdom/issues/1937#issuecomment-321575590
@@ -363,6 +367,8 @@ describe('RadioSelect', () => {
     let stickyJsRecalculateMock;
 
     beforeEach(() => {
+
+      new RadioSelect(document.querySelector('[data-notify-module="radio-select"]'));
 
       expanderButton = document.querySelector('.radio-select__expander');
       expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
@@ -481,6 +487,8 @@ describe('RadioSelect', () => {
 
     beforeEach(() => {
 
+      new RadioSelect(document.querySelector('[data-notify-module="radio-select"]'));
+
       expanderButton = document.querySelector('.radio-select__expander');
       expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
       buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
@@ -533,6 +541,8 @@ describe('RadioSelect', () => {
 
     beforeEach(() => {
 
+      new RadioSelect(document.querySelector('[data-notify-module="radio-select"]'));
+
       expanderButton = document.querySelector('.radio-select__expander');
       expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
 
@@ -554,8 +564,8 @@ describe('RadioSelect', () => {
 
         radioFor3amTomorrow.focus();
         radioFor3amTomorrow.setAttribute('checked', 'checked');
-        $(radioFor3amTomorrow).trigger(enterKeydownEvent);
-        $(radioFor3amTomorrow).trigger(enterKeyupEvent);
+        radioFor3amTomorrow.dispatchEvent(enterKeydownEvent);
+        radioFor3amTomorrow.dispatchEvent(enterKeyupEvent);
 
       });
 

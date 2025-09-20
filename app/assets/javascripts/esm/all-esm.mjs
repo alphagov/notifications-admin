@@ -18,6 +18,8 @@ import CheckReportStatus from './check-report-status.mjs';
 import LiveCheckboxControls from './live-checkbox-controls.mjs';
 import AddBrandingOptionsControls from './add-branding-options-controls.mjs';
 
+import RadioSelect from './radio-select.mjs';
+
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
 
@@ -100,6 +102,14 @@ if ($authTypeForm) {
 const $addBrandingOptionsForm = document.querySelector('[data-notify-module="add-branding-options-form"]');
 if ($addBrandingOptionsForm) {
   new AddBrandingOptionsControls($addBrandingOptionsForm);
+}
+
+const $radioSelectElementsArray = document.querySelectorAll('[data-notify-module="radio-select"]');
+
+if ($radioSelectElementsArray.length > 0) {
+  $radioSelectElementsArray.forEach(el => {
+    new RadioSelect(el);
+  });
 }
 
 const focusBanner = new FocusBanner();
