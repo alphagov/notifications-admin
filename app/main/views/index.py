@@ -291,6 +291,14 @@ def guidance_reply_to_email_address():
     )
 
 
+@main.route("/using-notify/returned-letters")
+def guidance_returned_letters():
+    return render_template(
+        "views/guidance/using-notify/returned-letters.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route("/using-notify/schedule-messages")
 def guidance_schedule_messages():
     return render_template(

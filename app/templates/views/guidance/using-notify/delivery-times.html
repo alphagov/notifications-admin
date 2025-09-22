@@ -67,25 +67,6 @@
 
   <p class="govuk-body">See a list of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">postage prices</a>.</p>
 
-  <h2 id="returned-mail" class="heading-medium">Returned letters</h2>
-  <p class="govuk-body">Every letter we send includes our print provider’s address on the back of the envelope. You cannot customise the return address.</p>
-  <p class="govuk-body">Undelivered letters are returned to our print provider and destroyed.</p>
-  <p class="govuk-body">You can see a report of returned letters on the dashboard.</p>
-  <h3 id="identify-returned-letters" class="heading-small">Identify the returned letters</h3>
- <p class="govuk-body">To help you identify what letters are returned, the report will show details such as the:
- </p>
- <ul class="govuk-list govuk-list--bullet">
-   <li>template ID</li>
-   <li>date the letter was sent</li>
-   <li>a reference for each letter if you include either:
-       <ul class="govuk-list govuk-list--bullet">
-           <li>a column called ‘reference’ in the list of addresses you upload</li>
-           <li>the <code class="lang-py">reference</code> argument when making an API call if you use the Notify API</li>
-       </ul>
-   </li>
- </ul>
-  <h3 id="automate-identifying-returned-letters" class="heading-small">Automate identifying the returned letters</h3>
-  <p class="govuk-body">Use the Notify API to get the returned letters report and identify the letters. Follow the instructions in our <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/using-notify/api-documentation">API documentation</a>.</p>
-  <p class="govuk-body">You’ll need a developer on your team to set this up for you.</p>
+<p class="govuk-body">Find out what happens to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_returned_letters') }}">letters that are returned</a>.</p>
 
 {% endblock %}
