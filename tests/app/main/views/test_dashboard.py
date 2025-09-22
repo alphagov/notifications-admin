@@ -1229,7 +1229,7 @@ def test_usage_page_letter_breakdown_ordered_by_postage_and_rate(
 ):
     page = client_request.get("main.usage", service_id=SERVICE_ONE_ID)
     row_for_feb = page.select_one("table").select("tr.table-row")[10]
-    postage_details = row_for_feb.select("li.tabular-numbers")
+    postage_details = row_for_feb.select(r"li.govuk-\!-font-tabular-numbers")
 
     assert normalize_spaces(postage_details[3].text) == "5 first class letters at 33p"
     assert normalize_spaces(postage_details[4].text) == "10 second class letters at 31p"

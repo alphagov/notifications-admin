@@ -20,7 +20,7 @@
     <div class="govuk-grid-column-five-sixths">
         {{ page_header(page_title) }}
         <p class="govuk-body">
-            You can send up to <span class="tabular-numbers">{{ current_service.get_message_limit(daily_limit_type)|message_count(daily_limit_type) }}</span> per day.
+            You can send up to <span class="govuk-!-font-tabular-numbers">{{ current_service.get_message_limit(daily_limit_type)|message_count(daily_limit_type) }}</span> per day.
         </p>
 
         {{ ajax_block(partials, updates_url, 'remaining_limit') }}
