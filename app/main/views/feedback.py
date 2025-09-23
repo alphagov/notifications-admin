@@ -81,18 +81,26 @@ def support_what_do_you_want_to_do():
 @main.route("/support/problem", methods=["GET", "POST"])
 @hide_from_search_engines
 def support_problem():
-    form = SupportProblemTypeForm()
+    form = SupportProblemTypeForm(user_logged_in=current_user.is_authenticated)
 
     back_link = url_for(".support") if current_user.is_authenticated else url_for(".support_what_do_you_want_to_do")
 
     if form.validate_on_submit():
-        if form.problem_type.data == "sending-messages":
+        if form.problem_type.data == "signing-in":
+            return redirect(url_for("main.support_cannot_sign_in"))
+        elif form.problem_type.data == "sending-messages":
             return redirect(url_for("main.support_what_happened"))
         elif form.problem_type.data == "something-else":
             return redirect(
                 url_for(".feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no", category="something-else")
             )
     return render_template("views/support/problem.html", back_link=back_link, form=form, error_summary_enabled=True)
+
+
+@main.route("/support/cannot-sign-in", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_cannot_sign_in():
+    pass
 
 
 @main.route("/support/what-happened", methods=["GET", "POST"])

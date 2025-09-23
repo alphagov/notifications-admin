@@ -1683,12 +1683,22 @@ class SupportType(StripWhitespaceForm):
 
 
 class SupportProblemTypeForm(StripWhitespaceForm):
-    problem_type = GovukRadiosField(
-        choices=[
-            ("sending-messages", "I’m having problems sending messages"),
-            ("something-else", "Something else"),
-        ]
-    )
+    def __init__(self, *args, user_logged_in, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if user_logged_in:
+            self.problem_type.choices = [
+                ("sending-messages", "I’m having problems sending messages"),
+                ("something-else", "Something else"),
+            ]
+        else:
+            self.problem_type.choices = [
+                ("signing-in", "I cannot sign in to my account"),
+                ("sending-messages", "I’m having problems sending messages"),
+                ("something-else", "Something else"),
+            ]
+
+    problem_type = GovukRadiosField("")
 
 
 class SupportRedirect(StripWhitespaceForm):
