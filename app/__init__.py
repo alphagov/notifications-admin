@@ -76,6 +76,7 @@ from app.formatters import (
     format_notification_type,
     format_pennies_as_currency,
     format_pounds_as_currency,
+    format_provider,
     format_thousands,
     format_time,
     format_yes_no,
@@ -146,7 +147,6 @@ from app.url_converters import (
     TemplateTypeConverter,
     TicketTypeConverter,
 )
-from app.utils import format_provider
 from app.utils.user_id import get_user_id_from_flask_login_session
 
 login_manager = LoginManager()
