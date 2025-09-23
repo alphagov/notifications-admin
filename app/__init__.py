@@ -588,6 +588,7 @@ def add_template_filters(application):
         format_notification_status_as_field_status,
         format_notification_status_as_url,
         format_pounds_as_currency,
+        format_provider,
         formatted_list,
         get_lines_with_normalised_whitespace,
         nl2br,
@@ -625,8 +626,6 @@ def init_jinja(application):
             jinja2.PrefixLoader({"govuk_frontend_jinja": jinja2.PackageLoader("govuk_frontend_jinja")}),
         ]
     )
-
-    application.jinja_env.filters["format_provider"] = format_provider
     application.jinja_env.add_extension("jinja2.ext.do")
     application.jinja_env.undefined = NotifyJinjaUndefined
 
