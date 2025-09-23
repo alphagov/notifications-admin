@@ -19,13 +19,8 @@ from app.main.forms import (
     SupportRedirect,
     SupportType,
     SupportWhatHappenedForm,
-    Triage,
 )
-from app.models.feedback import (
-    GENERAL_TICKET_TYPE,
-    PROBLEM_TICKET_TYPE,
-    QUESTION_TICKET_TYPE,
-)
+from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.utils import hide_from_search_engines
 
 bank_holidays = BankHolidays(use_cached_holidays=True)
@@ -44,7 +39,7 @@ def support():
     if current_user.is_authenticated:
         form = SupportType()
         if form.validate_on_submit():
-            if form.support_type.data == "report-problem":
+            if form.support_type.data == PROBLEM_TICKET_TYPE:
                 return redirect(url_for("main.support_problem"))
             else:
                 return redirect(
@@ -69,7 +64,7 @@ def support():
 def support_what_do_you_want_to_do():
     form = SupportType()
     if form.validate_on_submit():
-        if form.support_type.data == "report-problem":
+        if form.support_type.data == PROBLEM_TICKET_TYPE:
             return redirect(url_for("main.support_problem"))
         else:
             # ticket type is ask-question-give-feedback
@@ -139,24 +134,7 @@ def support_public():
     return render_template("views/support/public.html")
 
 
-@main.route("/support/triage", methods=["GET", "POST"])
-@main.route("/support/triage/<ticket_type:ticket_type>", methods=["GET", "POST"])
-@hide_from_search_engines
-def triage(ticket_type=PROBLEM_TICKET_TYPE):
-    form = Triage()
-    if form.validate_on_submit():
-        return redirect(url_for(".feedback", ticket_type=ticket_type, severe=form.severe.data))
-    return render_template("views/support/triage.html", form=form, error_summary_enabled=True)
-
-
 feedback_page_details = {
-    GENERAL_TICKET_TYPE: {
-        "default": {
-            "zendesk_subject": "General Notify Support",
-            "back_link": "main.support",
-            "notify_ticket_type": None,
-        }
-    },
     QUESTION_TICKET_TYPE: {
         "default": {"zendesk_subject": "Question or feedback", "back_link": "main.support", "notify_ticket_type": None}
     },
@@ -196,15 +174,6 @@ feedback_page_details = {
 def feedback(ticket_type):
     form = FeedbackOrProblem()
 
-    ticket_type_names = {
-        GENERAL_TICKET_TYPE: {
-            "page_title": "Contact GOV.UK Notify support",
-            "ticket_subject": "General Notify Support",
-        },
-        PROBLEM_TICKET_TYPE: {"page_title": "Describe the problem", "ticket_subject": "Reported Problem"},
-        QUESTION_TICKET_TYPE: {"page_title": "Ask a question or give feedback", "ticket_subject": "Question/Feedback"},
-    }
-
     if not form.feedback.data:
         form.feedback.data = session.pop("feedback_message", "")
 
@@ -225,7 +194,7 @@ def feedback(ticket_type):
 
     if needs_triage(ticket_type, severe):
         session["feedback_message"] = form.feedback.data
-        return redirect(url_for(".triage", ticket_type=ticket_type))
+        return redirect(url_for(".support_problem"))
 
     if needs_escalation(ticket_type, severe):
         return redirect(url_for(".bat_phone"))
@@ -280,7 +249,7 @@ def feedback(ticket_type):
             )
         )
 
-    page_title = ticket_type_names[ticket_type]["page_title"]
+    page_title = "Describe the problem" if ticket_type == PROBLEM_TICKET_TYPE else "Ask a question or give feedback"
     back_link = url_for(feedback_page_details[ticket_type][category]["back_link"])
 
     return render_template(
