@@ -137,7 +137,7 @@ def cancel_letter_job(service_id, job_id):
 
         # reduce to just == FINISHED_ALL_NOTIFICATIONS_CREATED_JOB_STATUS once api support rolled out
         if job.status not in JobApiClient.FINISHED_JOB_STATUSES or job.notifications_created < job.notification_count:
-            flash("We are still processing these letters, please try again in a minute.", "try again")
+            flash("We are still processing these letters, please try again in 5 minutes.", "try again")
             return view_job(service_id, job_id)
         try:
             number_of_letters = job.cancel()
