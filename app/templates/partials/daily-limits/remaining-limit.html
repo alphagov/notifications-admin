@@ -5,7 +5,7 @@
 
 <div class="ajax-block-container">
     {{ govukInsetText({
-        "text": "You have sent {} today ({} remaining).".format(
+        "html": "You have sent <span class='govuk-!-font-tabular-numbers'>{}</span> today (<span class='govuk-!-font-tabular-numbers'>{}</span> remaining).".format(
             sent_today|message_count(daily_limit_type),
             remaining_limit|format_thousands
         ),

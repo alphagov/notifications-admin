@@ -180,10 +180,6 @@ td {
 
 }
 
-.tabular-numbers {
-  @include govuk-font(19, $tabular: true);
-}
-
 summary::-moz-details-marker {
   display: none;
 }
