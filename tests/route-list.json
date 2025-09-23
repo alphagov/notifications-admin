@@ -352,6 +352,7 @@
     "/static/<path:filename>",
     "/support",
     "/support/<ticket_type:ticket_type>",
+    "/support/cannot-sign-in",
     "/support/escalate",
     "/support/general",
     "/support/problem",

@@ -146,27 +146,54 @@ def test_support_what_do_you_want_to_do_page_redirects(client_request, form_opti
     )
 
 
-def test_support_problem(client_request):
+def test_support_problem_when_user_is_logged_in(client_request):
+    page = client_request.get("main.support_problem")
+    assert page.select_one("h1").string.strip() == "Report a problem"
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.support")
+
+    radios = page.select("form input[type=radio]")
+    assert len(radios) == 2
+    assert radios[0]["value"] == "sending-messages"
+    assert radios[1]["value"] == "something-else"
+
+
+def test_support_problem_when_user_is_logged_out(client_request):
     client_request.logout()
     page = client_request.get("main.support_problem")
     assert page.select_one("h1").string.strip() == "Report a problem"
     assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_what_do_you_want_to_do")
-    assert page.select("form input[type=radio]")[0]["value"] == "sending-messages"
-    assert page.select("form input[type=radio]")[1]["value"] == "something-else"
+
+    radios = page.select("form input[type=radio]")
+    assert len(radios) == 3
+    assert radios[0]["value"] == "signing-in"
+    assert radios[1]["value"] == "sending-messages"
+    assert radios[2]["value"] == "something-else"
 
 
 @pytest.mark.parametrize(
-    "form_option, redirect_endpoint, redirect_kwargs",
+    "form_option, logged_in, redirect_endpoint, redirect_kwargs",
     [
-        ("sending-messages", "main.support_what_happened", {}),
+        ("signing-in", False, "main.support_cannot_sign_in", {}),
+        ("sending-messages", True, "main.support_what_happened", {}),
+        ("sending-messages", False, "main.support_what_happened", {}),
         (
             "something-else",
+            True,
+            "main.feedback",
+            {"ticket_type": PROBLEM_TICKET_TYPE, "severe": "no", "category": "something-else"},
+        ),
+        (
+            "something-else",
+            False,
             "main.feedback",
             {"ticket_type": PROBLEM_TICKET_TYPE, "severe": "no", "category": "something-else"},
         ),
     ],
 )
-def test_post_support_problem_redirects(client_request, form_option, redirect_endpoint, redirect_kwargs):
+def test_post_support_problem_redirects(client_request, form_option, logged_in, redirect_endpoint, redirect_kwargs):
+    if not logged_in:
+        client_request.logout()
+
     client_request.post(
         "main.support_problem",
         _data={"problem_type": form_option},
