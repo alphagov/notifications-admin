@@ -17,6 +17,7 @@ from app.main.forms import (
     FeedbackOrProblem,
     SupportProblemTypeForm,
     SupportRedirect,
+    SupportSignInIssuesForm,
     SupportType,
     SupportWhatHappenedForm,
 )
@@ -100,7 +101,23 @@ def support_problem():
 @main.route("/support/cannot-sign-in", methods=["GET", "POST"])
 @hide_from_search_engines
 def support_cannot_sign_in():
-    pass
+    form = SupportSignInIssuesForm()
+
+    if form.validate_on_submit():
+        if form.sign_in_issue.data == "no-code":
+            pass
+        elif form.sign_in_issue.data == "mobile-number-changed":
+            pass
+        elif form.sign_in_issue.data == "no-email-link":
+            pass
+        elif form.sign_in_issue.data == "email-address-changed":
+            pass
+        elif form.sign_in_issue.data == "something-else":
+            return redirect(
+                url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no", category="cannot-sign-in")
+            )
+
+    return render_template("views/support/cannot-sign-in.html", form=form, error_summary_enabled=True)
 
 
 @main.route("/support/what-happened", methods=["GET", "POST"])
@@ -172,6 +189,11 @@ feedback_page_details = {
             "zendesk_subject": "Technical error (user not signed in)",
             "back_link": "main.support_what_happened",
             "notify_ticket_type": NotifyTicketType.TECHNICAL,
+        },
+        "cannot-sign-in": {
+            "zendesk_subject": "Cannot sign in",
+            "back_link": "main.support_problem",
+            "notify_ticket_type": None,
         },
     },
 }
