@@ -201,6 +201,41 @@ def test_post_support_problem_redirects(client_request, form_option, logged_in, 
     )
 
 
+def test_support_cannot_sign_in(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_cannot_sign_in")
+    assert page.select_one("h1").string.strip() == "Tell us why you cannot sign in"
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_problem")
+
+    radios = page.select("form input[type=radio]")
+    assert len(radios) == 5
+    assert radios[0]["value"] == "no-code"
+    assert radios[1]["value"] == "mobile-number-changed"
+    assert radios[2]["value"] == "no-email-link"
+    assert radios[3]["value"] == "email-address-changed"
+    assert radios[4]["value"] == "something-else"
+
+
+@pytest.mark.parametrize(
+    "form_option, redirect_endpoint, redirect_kwargs",
+    [
+        (
+            "something-else",
+            "main.feedback",
+            {"ticket_type": PROBLEM_TICKET_TYPE, "severe": "no", "category": "cannot-sign-in"},
+        ),
+    ],
+)
+def test_support_cannot_sign_in_redirects(client_request, form_option, redirect_endpoint, redirect_kwargs):
+    client_request.logout()
+
+    client_request.post(
+        "main.support_cannot_sign_in",
+        _data={"sign_in_issue": form_option},
+        _expected_redirect=url_for(redirect_endpoint, **redirect_kwargs),
+    )
+
+
 @pytest.mark.parametrize("user_logged_in", [True, False])
 def test_get_support_what_happened_page(client_request, user_logged_in):
     if not user_logged_in:
@@ -513,6 +548,7 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
             "Technical error (user not signed in)",
             NotifyTicketType.TECHNICAL,
         ),
+        (PROBLEM_TICKET_TYPE, "cannot-sign-in", "Cannot sign in", None),
     ],
 )
 def test_zendesk_subject_and_ticket_type_reflect_journey_taken_to_support_form(

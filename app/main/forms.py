@@ -1701,6 +1701,19 @@ class SupportProblemTypeForm(StripWhitespaceForm):
     problem_type = GovukRadiosField("")
 
 
+class SupportSignInIssuesForm(StripWhitespaceForm):
+    sign_in_issue = GovukRadiosField(
+        "Tell us why you cannot sign in",
+        choices=[
+            ("no-code", "I did not receive a text message with a security code"),
+            ("mobile-number-changed", "My mobile number has changed"),
+            ("no-email-link", "I did not receive an email with a link to sign in"),
+            ("email-address-changed", "My email address has changed"),
+            ("something-else", "Something else"),
+        ],
+    )
+
+
 class SupportRedirect(StripWhitespaceForm):
     who = GovukRadiosField(
         choices=[
