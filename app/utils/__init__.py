@@ -164,12 +164,5 @@ def merge_jsonlike(source, destination):  # noqa: C901
     merge_items(source, destination)
 
 
-def format_provider(provider):
-    if provider == "firetext":
-        return provider.title()
-
-    return provider.upper()
-
-
 def get_sha512_hashed(str):
     return hashlib.sha512(str.encode()).hexdigest()

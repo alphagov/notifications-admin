@@ -76,6 +76,7 @@ from app.formatters import (
     format_notification_type,
     format_pennies_as_currency,
     format_pounds_as_currency,
+    format_provider,
     format_thousands,
     format_time,
     format_yes_no,
@@ -146,7 +147,6 @@ from app.url_converters import (
     TemplateTypeConverter,
     TicketTypeConverter,
 )
-from app.utils import format_provider
 from app.utils.user_id import get_user_id_from_flask_login_session
 
 login_manager = LoginManager()
@@ -588,6 +588,7 @@ def add_template_filters(application):
         format_notification_status_as_field_status,
         format_notification_status_as_url,
         format_pounds_as_currency,
+        format_provider,
         formatted_list,
         get_lines_with_normalised_whitespace,
         nl2br,
@@ -625,8 +626,6 @@ def init_jinja(application):
             jinja2.PrefixLoader({"govuk_frontend_jinja": jinja2.PackageLoader("govuk_frontend_jinja")}),
         ]
     )
-
-    application.jinja_env.filters["format_provider"] = format_provider
     application.jinja_env.add_extension("jinja2.ext.do")
     application.jinja_env.undefined = NotifyJinjaUndefined
 

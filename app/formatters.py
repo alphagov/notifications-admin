@@ -471,3 +471,10 @@ def format_phone_number_human_readable(number):
         # if there was a validation error, we want to shortcut out here, but still display the number on the front end
         return number
     return phone_number.get_human_readable_format()
+
+
+def format_provider(provider):
+    if provider == "firetext":
+        return provider.title()
+
+    return provider.upper()
