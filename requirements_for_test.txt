@@ -17,12 +17,12 @@ blinker==1.9.0
     #   -r requirements.txt
     #   flask
     #   gds-metrics
-boto3==1.34.129
+boto3[crt]==1.34.129
     # via
     #   -r requirements.txt
     #   moto
     #   notifications-utils
-botocore==1.34.129
+botocore[crt]==1.34.129
     # via
     #   -r requirements.txt
     #   boto3
@@ -72,6 +72,8 @@ eventlet==0.39.1
     # via
     #   -r requirements.txt
     #   gunicorn
+exceptiongroup==1.3.0
+    # via pytest
 execnet==2.1.1
     # via pytest-xdist
 fido2==1.1.3
@@ -106,7 +108,7 @@ greenlet==3.2.2
     # via
     #   -r requirements.txt
     #   eventlet
-gunicorn==23.0.0
+gunicorn[eventlet]==23.0.0
     # via
     #   -r requirements.txt
     #   notifications-utils
@@ -118,6 +120,10 @@ idna==3.7
     # via
     #   -r requirements.txt
     #   requests
+importlib-metadata==8.7.0
+    # via
+    #   flask
+    #   segno
 iniconfig==2.0.0
     # via pytest
 itsdangerous==2.2.0
@@ -230,7 +236,7 @@ pytest==8.3.4
     #   pytest-xdist
 pytest-env==1.1.5
     # via -r requirements_for_test_common.in
-pytest-mock==3.14.0
+pytest-mock==3.15.1
     # via -r requirements_for_test_common.in
 pytest-testmon==2.1.1
     # via -r requirements_for_test_common.in
@@ -304,6 +310,15 @@ texttable==1.6.4
     # via
     #   -r requirements.txt
     #   pyexcel
+tomli==2.2.1
+    # via
+    #   pytest
+    #   pytest-env
+typing-extensions==4.15.0
+    # via
+    #   exceptiongroup
+    #   pypdf
+    #   python-json-logger
 urllib3==1.26.19
     # via
     #   -r requirements.txt
@@ -333,3 +348,5 @@ xlwt==1.3.0
     #   pyexcel-xls
 xmltodict==0.14.2
     # via moto
+zipp==3.23.0
+    # via importlib-metadata
