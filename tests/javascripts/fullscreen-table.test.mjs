@@ -114,6 +114,7 @@ describe('FullscreenTable', () => {
     // window.removeEventListener('resize');
     document.body.innerHTML = '';
     window.GOVUK.stickAtBottomWhenScrolling.recalculate.mockClear();
+    jest.restoreAllMocks();
 
   });
 
@@ -149,6 +150,7 @@ describe('FullscreenTable', () => {
     describe("and the scrolling section is wider than its container", () => {
 
       beforeEach(() => {
+        jest.restoreAllMocks();
         container.style.width = '640px';
         container.querySelector('table').style.width = '990px';
 
@@ -179,6 +181,7 @@ describe('FullscreenTable', () => {
     describe("and the scrolling section is the same width as its container", () => {
 
       beforeEach(() => {
+        jest.restoreAllMocks();
         container.style.width = '640px';
         container.querySelector('table').style.width = '990px';
 
@@ -377,6 +380,9 @@ describe('FullscreenTable', () => {
 
     beforeEach(() => {
 
+      // start module
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
+
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       table = tableFrame.querySelector('table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -385,8 +391,7 @@ describe('FullscreenTable', () => {
       tableFrame.setAttribute('style', 'width: 742px');
       table.setAttribute('style', 'width: 1000px');
 
-      // start module
-      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
+      
 
     });
 
@@ -426,7 +431,13 @@ describe('FullscreenTable', () => {
 
   describe("when the table is focused", () => {
 
-    beforeEach(() => {
+    // beforeEach(() => {
+
+      
+
+    // });
+
+    test.only("it should make the parent frame a focus style", () => {
 
       container.style.width = '640px';
       container.querySelector('table').style.width = '990px';
@@ -434,13 +445,8 @@ describe('FullscreenTable', () => {
       // start module
       new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
-      tableFrame = document.querySelector('.fullscreen-scrollable-table');
+      console.log(document.body.innerHTML)
 
-    });
-
-    test("it should make the parent frame a focus style", () => {
-
-      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       tableFrame.focus();
