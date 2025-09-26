@@ -699,7 +699,7 @@ def test_dont_cancel_letter_job_when_too_early_to_cancel(
     assert mock_cancel.called is False
     flash_message = normalize_spaces(page.select_one("div.banner-dangerous").text)
 
-    assert "We are still processing these letters, please try again in a minute." in flash_message
+    assert "We are still processing these letters, please try again in 5 minutes." in flash_message
 
 
 @freeze_time("2016-01-01 00:00:00.000001")
