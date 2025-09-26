@@ -35,36 +35,32 @@ def test_returned_letter_summary_with_one_letter(client_request, mocker):
     assert normalize_spaces(page.select_one(".table-field").text) == "24 December 2019 1 letter"
 
 
-@pytest.mark.parametrize("orphaned_count", (None, 1))
-def test_returned_letters_page(client_request, orphaned_count, mocker):
-    data = [
-        {
-            "notification_id": uuid.uuid4(),
-            "client_reference": client_reference,
-            "created_at": "2019-12-24 13:30",
-            "email_address": "test@gov.uk",
-            "template_name": template_name,
-            "template_id": uuid.uuid4(),
-            "template_version": None,
-            "original_file_name": original_file_name,
-            "job_row_number": None,
-            "uploaded_letter_file_name": uploaded_letter_file_name,
-        }
-        for client_reference, template_name, original_file_name, uploaded_letter_file_name in (
-            ("ABC123", "Example template", None, None),
-            (None, "Example template", "Example spreadsheet.xlsx", None),
-            (None, "Example template", None, None),
-            ("DEF456", None, None, "Example precompiled.pdf"),
-            (None, None, None, "Example one-off.pdf"),
-            ("XYZ999", None, None, None),
-        )
-    ]
-    if orphaned_count is not None:
-        # new-style response
-        data = {
-            "returned_letters": data,
-            "orphaned_count": orphaned_count,
-        }
+def test_returned_letters_page(client_request, mocker):
+    data = {
+        "returned_letters": [
+            {
+                "notification_id": uuid.uuid4(),
+                "client_reference": client_reference,
+                "created_at": "2019-12-24 13:30",
+                "email_address": "test@gov.uk",
+                "template_name": template_name,
+                "template_id": uuid.uuid4(),
+                "template_version": None,
+                "original_file_name": original_file_name,
+                "job_row_number": None,
+                "uploaded_letter_file_name": uploaded_letter_file_name,
+            }
+            for client_reference, template_name, original_file_name, uploaded_letter_file_name in (
+                ("ABC123", "Example template", None, None),
+                (None, "Example template", "Example spreadsheet.xlsx", None),
+                (None, "Example template", None, None),
+                ("DEF456", None, None, "Example precompiled.pdf"),
+                (None, None, None, "Example one-off.pdf"),
+                ("XYZ999", None, None, None),
+            )
+        ],
+        "orphaned_count": 123,
+    }
 
     mocker.patch("app.service_api_client.get_returned_letters", return_value=data)
 
@@ -88,7 +84,6 @@ def test_returned_letters_page(client_request, orphaned_count, mocker):
 @pytest.mark.parametrize(
     "orphaned_count, orphaned_expected_message",
     (
-        pytest.param(None, None),
         pytest.param(0, None),
         pytest.param(1, "Your report is missing 1 letter because it was sent too long ago."),
         pytest.param(4321, "Your report is missing 4,321 letters because they were sent too long ago."),
@@ -110,26 +105,24 @@ def test_returned_letters_page_with_many_letters(
     more_expected_message,
     mocker,
 ):
-    data = [
-        {
-            "notification_id": uuid.uuid4(),
-            "client_reference": None,
-            "created_at": "2019-12-24 13:30",
-            "email_address": "test@gov.uk",
-            "template_name": "Example template",
-            "template_id": uuid.uuid4(),
-            "template_version": None,
-            "original_file_name": None,
-            "job_row_number": None,
-            "uploaded_letter_file_name": None,
-        }
-    ] * number_of_letters
-    if orphaned_count is not None:
-        # new-style response
-        data = {
-            "returned_letters": data,
-            "orphaned_count": orphaned_count,
-        }
+    data = {
+        "returned_letters": [
+            {
+                "notification_id": uuid.uuid4(),
+                "client_reference": None,
+                "created_at": "2019-12-24 13:30",
+                "email_address": "test@gov.uk",
+                "template_name": "Example template",
+                "template_id": uuid.uuid4(),
+                "template_version": None,
+                "original_file_name": None,
+                "job_row_number": None,
+                "uploaded_letter_file_name": None,
+            }
+        ]
+        * number_of_letters,
+        "orphaned_count": orphaned_count,
+    }
 
     mocker.patch("app.service_api_client.get_returned_letters", return_value=data)
 
@@ -161,20 +154,23 @@ def test_returned_letters_page_with_many_letters(
 
 
 def test_returned_letters_reports(client_request, mocker):
-    data = [
-        {
-            "notification_id": "12345678",
-            "client_reference": "2344567",
-            "created_at": "2019-12-24 13:30",
-            "email_address": "test@gov.uk",
-            "template_name": "First letter template",
-            "template_id": "3445667",
-            "template_version": 2,
-            "original_file_name": None,
-            "job_row_number": None,
-            "uploaded_letter_file_name": "test_letter.pdf",
-        }
-    ]
+    data = {
+        "returned_letters": [
+            {
+                "notification_id": "12345678",
+                "client_reference": "2344567",
+                "created_at": "2019-12-24 13:30",
+                "email_address": "test@gov.uk",
+                "template_name": "First letter template",
+                "template_id": "3445667",
+                "template_version": 2,
+                "original_file_name": None,
+                "job_row_number": None,
+                "uploaded_letter_file_name": "test_letter.pdf",
+            }
+        ],
+        "orphaned_count": 123,
+    }
     mock = mocker.patch("app.service_api_client.get_returned_letters", return_value=data)
 
     response = client_request.get_response(
