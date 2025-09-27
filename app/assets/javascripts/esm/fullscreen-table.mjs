@@ -24,7 +24,7 @@ class FullscreenTable {
     this.nativeHeight = this.$module.offsetHeight + 20; // 20px for scrollbar room
     this.topOffset = this.$module.offsetTop;
 
-    this.isFocusable = this.$table.offsetWidth > this.$module.offsetWidth;
+    this.isFocusable = this.$table.getBoundingClientRect().width > this.$module.getBoundingClientRect().width;
     this.maintainHeight = this.maintainHeight.bind(this);
     this.maintainWidth = this.maintainWidth.bind(this);
     this.toggleShadows = this.toggleShadows.bind(this);
@@ -116,7 +116,7 @@ class FullscreenTable {
 
     if ($scrollableIndexColumnHeader === null || $fixedIndexColumnHeader === null) return;
 
-    this.$scrollableTable.style.width = `${this.$module.parentElement.clientWidth}px`;
+    this.$scrollableTable.style.width = `${this.$module.parentElement.getBoundingClientRect().width}px`;
 
     // Ensure column widths in both tables match to prevent misalignment
     if ($fixedIndexColumnHeader.offsetWidth !== $scrollableIndexColumnHeader.offsetWidth) {

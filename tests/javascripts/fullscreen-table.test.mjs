@@ -12,6 +12,32 @@ describe('FullscreenTable', () => {
   let numberColumnFrame;
   let fixedRowHeaders;
 
+  // JSDOM does not return true values of elements (always 0,0)
+  // so we need to get the values from the style property we set
+  // and fill-in for missing implementation in JSDOM
+  // https://github.com/jsdom/jsdom/issues/3729
+  window.HTMLElement.prototype.getBoundingClientRect = function () {
+    return {
+      width: parseFloat(this.style.width) || 0,
+      height: parseFloat(this.style.height) || 0
+    }
+  }
+  
+  Object.defineProperties(window.HTMLElement.prototype, {
+    offsetWidth: {
+      get () { return parseFloat(this.style.width) || 0 }
+    },
+    offsetHeight: {
+      get () { return parseFloat(this.style.height) || 0 }
+    },
+    offsetTop: {
+      get () { return parseFloat(this.style.marginTop) || 0 }
+    },
+    offsetLeft: {
+      get () { return parseFloat(this.style.marginLeft) || 0 }
+    }
+  })
+
   beforeEach(() => {
 
     const tableHeadings = () => {
@@ -150,7 +176,7 @@ describe('FullscreenTable', () => {
     describe("and the scrolling section is wider than its container", () => {
 
       beforeEach(() => {
-        jest.restoreAllMocks();
+
         container.style.width = '640px';
         container.querySelector('table').style.width = '990px';
 
@@ -181,9 +207,9 @@ describe('FullscreenTable', () => {
     describe("and the scrolling section is the same width as its container", () => {
 
       beforeEach(() => {
-        jest.restoreAllMocks();
+
         container.style.width = '640px';
-        container.querySelector('table').style.width = '990px';
+        container.querySelector('table').style.width = '640px';
 
        new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
       });
@@ -294,6 +320,7 @@ describe('FullscreenTable', () => {
       // set main content column width (used by module as gauge for table width)
       screenMock.window.setWidthTo(1024);
       document.querySelector('main').setAttribute('style', 'width: 712px');
+      
 
       // set total width of column for row numbers in table to 40px
       rowNumberColumnHeader.setAttribute('style', 'width: 40px');
@@ -315,7 +342,7 @@ describe('FullscreenTable', () => {
     test("when the page has loaded", () => {
 
       // table should set its width to be that of `<main>`
-      expect(window.getComputedStyle(tableFrame)['width']).toEqual('712px');
+      expect(window.getComputedStyle(tableFrame).width).toEqual('712px');
 
       // table for number column has 4px extra to allow space for drop shadow
       expect(window.getComputedStyle(numberColumnFrame)['width']).toEqual('44px');
@@ -431,13 +458,7 @@ describe('FullscreenTable', () => {
 
   describe("when the table is focused", () => {
 
-    // beforeEach(() => {
-
-      
-
-    // });
-
-    test.only("it should make the parent frame a focus style", () => {
+    beforeEach(() => {
 
       container.style.width = '640px';
       container.querySelector('table').style.width = '990px';
@@ -445,11 +466,11 @@ describe('FullscreenTable', () => {
       // start module
       new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
-      console.log(document.body.innerHTML)
-
-
-      tableFrame = document.querySelector('.fullscreen-scrollable-table');
+      tableFrame = container.querySelector('.fullscreen-scrollable-table');
       tableFrame.focus();
+    });
+
+    test("it should make the parent frame a focus style", () => {
 
       expect(container.classList.contains('js-focus-style')).toBe(true);
 
