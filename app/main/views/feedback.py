@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytz
 from flask import current_app, redirect, render_template, request, session, url_for
@@ -281,7 +281,7 @@ def thanks():
 
 
 def in_business_hours():
-    now = datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.now(UTC)
 
     if is_weekend(now) or is_bank_holiday(now):
         return False

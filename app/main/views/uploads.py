@@ -2,7 +2,6 @@ import base64
 import itertools
 import json
 import uuid
-from datetime import datetime
 from functools import partial
 from io import BytesIO
 from zipfile import BadZipFile
@@ -83,7 +82,6 @@ def uploads(service_id):
         jobs=listed_uploads,
         prev_page=prev_page,
         next_page=next_page,
-        now=datetime.utcnow().isoformat(),
     )
 
 
