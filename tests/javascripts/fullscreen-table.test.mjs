@@ -1,22 +1,42 @@
-const helpers = require('./support/helpers');
+import FullscreenTable from '../../app/assets/javascripts/esm/fullscreen-table.mjs';
+import { jest } from '@jest/globals';
+import * as helpers from './support/helpers';
 
-beforeAll(() => {
-  // TODO: remove this when tests for sticky JS are written
-  require('../../app/assets/javascripts/stick-to-window-when-scrolling.js');
-
-  require('../../app/assets/javascripts/fullscreenTable.js');
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
-});
 
 describe('FullscreenTable', () => {
   let screenMock;
   let container;
+  let caption;
   let tableFrame;
   let table;
   let numberColumnFrame;
+  let fixedRowHeaders;
+
+  // JSDOM does not return true values of elements (always 0,0)
+  // so we need to get the values from the style property we set
+  // and fill-in for missing implementation in JSDOM
+  // https://github.com/jsdom/jsdom/issues/3729
+  window.HTMLElement.prototype.getBoundingClientRect = function () {
+    return {
+      width: parseFloat(this.style.width) || 0,
+      height: parseFloat(this.style.height) || 0
+    }
+  }
+  
+  Object.defineProperties(window.HTMLElement.prototype, {
+    offsetWidth: {
+      get () { return parseFloat(this.style.width) || 0 }
+    },
+    offsetHeight: {
+      get () { return parseFloat(this.style.height) || 0 }
+    },
+    offsetTop: {
+      get () { return parseFloat(this.style.marginTop) || 0 }
+    },
+    offsetLeft: {
+      get () { return parseFloat(this.style.marginLeft) || 0 }
+    }
+  })
 
   beforeEach(() => {
 
@@ -86,7 +106,12 @@ describe('FullscreenTable', () => {
       scrollTop: 0
     });
 
+    window.GOVUK.stickAtBottomWhenScrolling = {
+      recalculate: jest.fn(() => {})
+    };
+
     // set up DOM
+    document.body.classList.add('govuk-frontend-supported')
     document.body.innerHTML =
       `<main>
         <div class="fullscreen-content" data-notify-module="fullscreen-table">
@@ -111,9 +136,9 @@ describe('FullscreenTable', () => {
   });
 
   afterEach(() => {
-
-    $(window).off('scroll resize');
     document.body.innerHTML = '';
+    window.GOVUK.stickAtBottomWhenScrolling.recalculate.mockClear();
+    jest.restoreAllMocks();
 
   });
 
@@ -122,7 +147,7 @@ describe('FullscreenTable', () => {
     test("it fixes the number column for each row without changing the semantics", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -138,7 +163,7 @@ describe('FullscreenTable', () => {
       const stickyJSSpy = jest.spyOn(window.GOVUK.stickAtBottomWhenScrolling, 'recalculate');
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       expect(stickyJSSpy.mock.calls.length).toBe(1);
 
@@ -149,10 +174,11 @@ describe('FullscreenTable', () => {
     describe("and the scrolling section is wider than its container", () => {
 
       beforeEach(() => {
-        $(container).css({ 'width': '640px' });
-        $('table', container).css({ 'width': '990px' });
 
-        window.GOVUK.notifyModules.start();
+        container.style.width = '640px';
+        container.querySelector('table').style.width = '990px';
+
+        new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
       });
 
       test("it should be made focusable and have an accessible name matching the table caption", () => {
@@ -179,10 +205,11 @@ describe('FullscreenTable', () => {
     describe("and the scrolling section is the same width as its container", () => {
 
       beforeEach(() => {
-        $(container).css({ 'width': '640px' });
-        $('table', container).css({ 'width': '640px' });
 
-        window.GOVUK.notifyModules.start();
+        container.style.width = '640px';
+        container.querySelector('table').style.width = '640px';
+
+       new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
       });
 
       test("it shouldn't be made focusable or have an accessible name", () => {
@@ -205,7 +232,7 @@ describe('FullscreenTable', () => {
     test("the section providing the fixed row headers is not focusable and is hidden from assistive tech'", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       fixedRowHeaders = document.querySelector('.fullscreen-fixed-table');
 
@@ -236,7 +263,7 @@ describe('FullscreenTable', () => {
       });
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -291,12 +318,13 @@ describe('FullscreenTable', () => {
       // set main content column width (used by module as gauge for table width)
       screenMock.window.setWidthTo(1024);
       document.querySelector('main').setAttribute('style', 'width: 712px');
+      
 
       // set total width of column for row numbers in table to 40px
       rowNumberColumnHeader.setAttribute('style', 'width: 40px');
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -312,7 +340,7 @@ describe('FullscreenTable', () => {
     test("when the page has loaded", () => {
 
       // table should set its width to be that of `<main>`
-      expect(window.getComputedStyle(tableFrame)['width']).toEqual('712px');
+      expect(window.getComputedStyle(tableFrame).width).toEqual('712px');
 
       // table for number column has 4px extra to allow space for drop shadow
       expect(window.getComputedStyle(numberColumnFrame)['width']).toEqual('44px');
@@ -356,7 +384,7 @@ describe('FullscreenTable', () => {
       document.querySelector('main').setAttribute('style', 'width: 712px');
 
       // start module
-      window.GOVUK.notifyModules.start();
+       new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       invisibleScrollableTopLeftCell = document.querySelector('.fullscreen-scrollable-table .table-field-heading-first');
       fixedTopLeftHeaderCell = document.querySelector('.fullscreen-fixed-table .table-field-heading-first');
@@ -378,7 +406,7 @@ describe('FullscreenTable', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       table = tableFrame.querySelector('table');
@@ -387,6 +415,8 @@ describe('FullscreenTable', () => {
 
       tableFrame.setAttribute('style', 'width: 742px');
       table.setAttribute('style', 'width: 1000px');
+
+      
 
     });
 
@@ -428,16 +458,14 @@ describe('FullscreenTable', () => {
 
     beforeEach(() => {
 
-      // make table wider than its container so it is made focusable
-      $(container).css({ 'width': '640px' });
-      $('table', container).css({ 'width': '990px' });
+      container.style.width = '640px';
+      container.querySelector('table').style.width = '990px';
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
-      tableFrame = document.querySelector('.fullscreen-scrollable-table');
+      tableFrame = container.querySelector('.fullscreen-scrollable-table');
       tableFrame.focus();
-
     });
 
     test("it should make the parent frame a focus style", () => {
