@@ -1,0 +1,5 @@
+User’s email address has changed
+
+Old email address: {{ old_email_address }}
+
+New email address: {{ new_email_address }}

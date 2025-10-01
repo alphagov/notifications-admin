@@ -1,0 +1,3 @@
+User did not receive a security code
+
+Mobile number: {{ user_mobile }}
