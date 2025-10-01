@@ -1714,6 +1714,49 @@ class SupportSignInIssuesForm(StripWhitespaceForm):
     )
 
 
+class SupportNoSecurityCodeForm(StripWhitespaceForm):
+    name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
+    email_address = make_email_address_field(
+        label="Email address", gov_user=False, required=True, thing="your email address"
+    )
+    mobile_number = PhoneNumber(
+        "Mobile number",
+        validators=[NotifyDataRequired(thing="your mobile number"), ValidPhoneNumber(allow_international_sms=True)],
+    )
+
+
+class SupportMobileNumberChangedForm(StripWhitespaceForm):
+    name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
+    email_address = make_email_address_field(
+        label="Email address", gov_user=False, required=True, thing="your email address"
+    )
+    old_mobile_number = PhoneNumber(
+        "Old mobile number",
+        validators=[NotifyDataRequired(thing="your old mobile number"), ValidPhoneNumber(allow_international_sms=True)],
+    )
+    new_mobile_number = PhoneNumber(
+        "New mobile number",
+        validators=[NotifyDataRequired(thing="your new mobile number"), ValidPhoneNumber(allow_international_sms=True)],
+    )
+
+
+class SupportNoEmailLinkForm(StripWhitespaceForm):
+    name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
+    email_address = make_email_address_field(
+        label="Email address", gov_user=False, required=True, thing="your email address"
+    )
+
+
+class SupportEmailAddressChangedForm(StripWhitespaceForm):
+    name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
+    old_email_address = make_email_address_field(
+        label="Old email address", gov_user=False, required=True, thing="your old email address"
+    )
+    new_email_address = make_email_address_field(
+        label="New email address", gov_user=False, required=True, thing="your new email address"
+    )
+
+
 class SupportRedirect(StripWhitespaceForm):
     who = GovukRadiosField(
         choices=[

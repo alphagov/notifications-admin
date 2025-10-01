@@ -15,6 +15,10 @@ from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
     FeedbackOrProblem,
+    SupportEmailAddressChangedForm,
+    SupportMobileNumberChangedForm,
+    SupportNoEmailLinkForm,
+    SupportNoSecurityCodeForm,
     SupportProblemTypeForm,
     SupportRedirect,
     SupportSignInIssuesForm,
@@ -142,6 +146,125 @@ def support_no_email_link():
 @hide_from_search_engines
 def support_email_address_changed():
     return render_template("views/support/email-address-changed.html")
+
+
+def create_sign_in_issues_zendesk_ticket(subject, message, name, email, notifiy_ticket_type=None):
+    prefix = (
+        ""
+        if not current_app.config["FEEDBACK_ZENDESK_SUBJECT_PREFIX_ENABLED"]
+        else f"[env: {current_app.config['NOTIFY_ENVIRONMENT']}] "
+    )
+
+    ticket = NotifySupportTicket(
+        subject=f"{prefix}{subject}",
+        message=message,
+        ticket_type=get_zendesk_ticket_type(PROBLEM_TICKET_TYPE),
+        notify_ticket_type=notifiy_ticket_type,
+        user_name=name,
+        user_email=email,
+        requester_sees_message_content=False,
+    )
+    zendesk_client.send_ticket_to_zendesk(ticket)
+
+
+@main.route("/support/security-code/account-details", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_no_security_code_account_details():
+    form = SupportNoSecurityCodeForm()
+
+    if form.validate_on_submit():
+        feedback_msg = render_template(
+            "support-tickets/sign-in-issue-no-security-code.txt",
+            user_mobile=form.mobile_number.data,
+        )
+        create_sign_in_issues_zendesk_ticket(
+            subject="Security code not received",
+            message=feedback_msg,
+            name=form.name.data,
+            email=form.email_address.data,
+        )
+
+        return redirect(url_for("main.thanks"))
+
+    return render_template("views/support/no-security-code-account-details.html", form=form, error_summary_enabled=True)
+
+
+@main.route("/support/mobile-number-changed/account-details", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_mobile_number_changed_account_details():
+    form = SupportMobileNumberChangedForm()
+
+    if form.validate_on_submit():
+        feedback_msg = render_template(
+            "support-tickets/sign-in-issue-mobile-number-changed.txt",
+            old_mobile_number=form.old_mobile_number.data,
+            new_mobile_number=form.new_mobile_number.data,
+        )
+        create_sign_in_issues_zendesk_ticket(
+            subject="Change mobile number",
+            message=feedback_msg,
+            name=form.name.data,
+            email=form.email_address.data,
+            notifiy_ticket_type=NotifyTicketType.NON_TECHNICAL,
+        )
+
+        return redirect(url_for("main.thanks"))
+
+    return render_template(
+        "views/support/mobile-number-changed-account-details.html",
+        form=form,
+        error_summary_enabled=True,
+    )
+
+
+@main.route("/support/email-link/account-details", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_no_email_link_account_details():
+    form = SupportNoEmailLinkForm()
+
+    if form.validate_on_submit():
+        feedback_msg = render_template(
+            "support-tickets/sign-in-issue-no-email-link.txt",
+            user_email_address=form.email_address.data,
+        )
+        create_sign_in_issues_zendesk_ticket(
+            subject="Email link not received",
+            message=feedback_msg,
+            name=form.name.data,
+            email=form.email_address.data,
+        )
+
+        return redirect(url_for("main.thanks"))
+
+    return render_template("views/support/no-email-link-account-details.html", form=form, error_summary_enabled=True)
+
+
+@main.route("/support/email-address-changed/account-details", methods=["GET", "POST"])
+@hide_from_search_engines
+def support_email_address_changed_account_details():
+    form = SupportEmailAddressChangedForm()
+
+    if form.validate_on_submit():
+        feedback_msg = render_template(
+            "support-tickets/sign-in-issue-email-address-changed.txt",
+            old_email_address=form.old_email_address.data,
+            new_email_address=form.new_email_address.data,
+        )
+        create_sign_in_issues_zendesk_ticket(
+            subject="Change email address",
+            message=feedback_msg,
+            name=form.name.data,
+            email=form.new_email_address.data,
+            notifiy_ticket_type=NotifyTicketType.NON_TECHNICAL,
+        )
+
+        return redirect(url_for("main.thanks"))
+
+    return render_template(
+        "views/support/email-address-changed-account-details.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/support/what-happened", methods=["GET", "POST"])

@@ -245,6 +245,7 @@ def test_support_no_security_code(client_request):
     page = client_request.get("main.support_no_security_code")
     assert normalize_spaces(page.select_one("h1").text) == "If you did not receive a security code"
     assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_cannot_sign_in")
+    assert page.select_one(f'a[href="{url_for("main.support_no_security_code_account_details")}"]')
 
 
 def test_support_mobile_number_changed(client_request):
@@ -252,6 +253,7 @@ def test_support_mobile_number_changed(client_request):
     page = client_request.get("main.support_mobile_number_changed")
     assert normalize_spaces(page.select_one("h1").text) == "If your mobile number has changed"
     assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_cannot_sign_in")
+    assert page.select_one(f'a[href="{url_for("main.support_mobile_number_changed_account_details")}"]')
 
 
 def test_support_no_email_link(client_request):
@@ -259,6 +261,7 @@ def test_support_no_email_link(client_request):
     page = client_request.get("main.support_no_email_link")
     assert normalize_spaces(page.select_one("h1").text) == "If you did not receive an email link"
     assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_cannot_sign_in")
+    assert page.select_one(f'a[href="{url_for("main.support_no_email_link_account_details")}"]')
 
 
 def test_support_email_address_changed(client_request):
@@ -266,6 +269,223 @@ def test_support_email_address_changed(client_request):
     page = client_request.get("main.support_email_address_changed")
     assert normalize_spaces(page.select_one("h1").text) == "If your email address has changed"
     assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_cannot_sign_in")
+    assert page.select_one(f'a[href="{url_for("main.support_email_address_changed_account_details")}"]')
+
+
+def test_support_no_security_code_account_details_shows_form(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_no_security_code_account_details")
+    assert normalize_spaces(page.select_one("h1").text) == "Enter your account details"
+
+    form_labels = page.select("form label")
+    assert len(form_labels) == 3
+    assert normalize_spaces(form_labels[0].text) == "Name"
+    assert normalize_spaces(form_labels[1].text) == "Email address"
+    assert normalize_spaces(form_labels[2].text) == "Mobile number"
+    assert normalize_spaces(page.select_one("form button").text) == "Send"
+
+
+def test_support_no_security_code_account_details_form_requires_all_fields(client_request):
+    client_request.logout()
+    page = client_request.post(
+        "main.support_no_security_code_account_details",
+        _data={"name": "", "email_address": "", "mobile_number": ""},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one("#name-error").text) == "Error: Enter your name"
+    assert normalize_spaces(page.select_one("#email_address-error").text) == "Error: Enter your email address"
+    assert normalize_spaces(page.select_one("#mobile_number-error").text) == "Error: Enter your mobile number"
+
+
+def test_support_no_security_code_account_details_submits_zendesk_ticket(client_request, mocker):
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
+    mocker.patch(
+        "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
+        autospec=True,
+    )
+
+    client_request.logout()
+    page = client_request.post(
+        "main.support_no_security_code_account_details",
+        _data={"name": "User", "email_address": "test@gov.uk", "mobile_number": "07000000000"},
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Thanks for contacting us"
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        subject="[env: test] Security code not received",
+        message="User did not receive a security code\n\nMobile number: 07000000000",
+        ticket_type="incident",
+        user_name="User",
+        user_email="test@gov.uk",
+        notify_ticket_type=None,
+        requester_sees_message_content=False,
+    )
+
+
+def test_support_mobile_number_changed_account_details_shows_form(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_mobile_number_changed_account_details")
+    assert normalize_spaces(page.select_one("h1").text) == "Enter your account details"
+
+    form_labels = page.select("form label")
+    assert len(form_labels) == 4
+    assert normalize_spaces(form_labels[0].text) == "Name"
+    assert normalize_spaces(form_labels[1].text) == "Email address"
+    assert normalize_spaces(form_labels[2].text) == "Old mobile number"
+    assert normalize_spaces(form_labels[3].text) == "New mobile number"
+    assert normalize_spaces(page.select_one("form button").text) == "Send"
+
+
+def test_support_mobile_number_changed_account_details_form_requires_all_fields(client_request):
+    client_request.logout()
+    page = client_request.post(
+        "main.support_mobile_number_changed_account_details",
+        _data={"name": "", "email_address": "", "old_mobile_number": "", "new_mobile_number": ""},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one("#name-error").text) == "Error: Enter your name"
+    assert normalize_spaces(page.select_one("#email_address-error").text) == "Error: Enter your email address"
+    assert normalize_spaces(page.select_one("#old_mobile_number-error").text) == "Error: Enter your old mobile number"
+    assert normalize_spaces(page.select_one("#new_mobile_number-error").text) == "Error: Enter your new mobile number"
+
+
+def test_support_mobile_number_changed_account_details_submits_zendesk_ticket(client_request, mocker):
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
+    mocker.patch(
+        "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
+        autospec=True,
+    )
+
+    client_request.logout()
+    page = client_request.post(
+        "main.support_mobile_number_changed_account_details",
+        _data={
+            "name": "User",
+            "email_address": "test@gov.uk",
+            "old_mobile_number": "07000000000",
+            "new_mobile_number": "07000000001",
+        },
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Thanks for contacting us"
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        subject="[env: test] Change mobile number",
+        message="User’s mobile number has changed\n\nOld mobile number: 07000000000\n\nNew mobile number: 07000000001",
+        ticket_type="incident",
+        user_name="User",
+        user_email="test@gov.uk",
+        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
+        requester_sees_message_content=False,
+    )
+
+
+def test_support_no_email_link_account_details_shows_form(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_no_email_link_account_details")
+    assert normalize_spaces(page.select_one("h1").text) == "Enter your account details"
+
+    form_labels = page.select("form label")
+    assert len(form_labels) == 2
+    assert normalize_spaces(form_labels[0].text) == "Name"
+    assert normalize_spaces(form_labels[1].text) == "Email address"
+    assert normalize_spaces(page.select_one("form button").text) == "Send"
+
+
+def test_support_no_email_link_account_details_form_requires_all_fields(client_request):
+    client_request.logout()
+    page = client_request.post(
+        "main.support_no_email_link_account_details",
+        _data={"name": "", "email_address": ""},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one("#name-error").text) == "Error: Enter your name"
+    assert normalize_spaces(page.select_one("#email_address-error").text) == "Error: Enter your email address"
+
+
+def test_support_no_email_link_account_details_submits_zendesk_ticket(client_request, mocker):
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
+    mocker.patch(
+        "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
+        autospec=True,
+    )
+
+    client_request.logout()
+    page = client_request.post(
+        "main.support_no_email_link_account_details",
+        _data={"name": "User", "email_address": "test@gov.uk"},
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Thanks for contacting us"
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        subject="[env: test] Email link not received",
+        message="User did not receive an email link\n\nEmail address: test@gov.uk",
+        ticket_type="incident",
+        user_name="User",
+        user_email="test@gov.uk",
+        notify_ticket_type=None,
+        requester_sees_message_content=False,
+    )
+
+
+def test_support_email_address_changed_account_details_shows_form(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_email_address_changed_account_details")
+    assert normalize_spaces(page.select_one("h1").text) == "Enter your account details"
+
+    form_labels = page.select("form label")
+    assert len(form_labels) == 3
+    assert normalize_spaces(form_labels[0].text) == "Name"
+    assert normalize_spaces(form_labels[1].text) == "Old email address"
+    assert normalize_spaces(form_labels[2].text) == "New email address"
+    assert normalize_spaces(page.select_one("form button").text) == "Send"
+
+
+def test_support_email_address_changed_account_details_form_requires_all_fields(client_request):
+    client_request.logout()
+    page = client_request.post(
+        "main.support_email_address_changed_account_details",
+        _data={"name": "", "old_email_address": "", "new_email_address": ""},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one("#name-error").text) == "Error: Enter your name"
+    assert normalize_spaces(page.select_one("#old_email_address-error").text) == "Error: Enter your old email address"
+    assert normalize_spaces(page.select_one("#new_email_address-error").text) == "Error: Enter your new email address"
+
+
+def test_support_email_address_account_details_submits_zendesk_ticket(client_request, mocker):
+    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
+    mocker.patch(
+        "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
+        autospec=True,
+    )
+
+    client_request.logout()
+    page = client_request.post(
+        "main.support_email_address_changed_account_details",
+        _data={
+            "name": "User",
+            "old_email_address": "old_address@gov.uk",
+            "new_email_address": "new_address@gov.uk",
+        },
+        _follow_redirects=True,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Thanks for contacting us"
+    mock_create_ticket.assert_called_once_with(
+        ANY,
+        subject="[env: test] Change email address",
+        message=(
+            "User’s email address has changed\n\n"
+            "Old email address: old_address@gov.uk\n\nNew email address: new_address@gov.uk"
+        ),
+        ticket_type="incident",
+        user_name="User",
+        user_email="new_address@gov.uk",
+        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
+        requester_sees_message_content=False,
+    )
 
 
 @pytest.mark.parametrize("user_logged_in", [True, False])
