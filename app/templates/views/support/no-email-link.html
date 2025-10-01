@@ -1,0 +1,36 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  If you did not receive an email link
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for("main.support_cannot_sign_in") }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ page_header("If you did not receive an email link") }}
+
+    <p class="govuk-body">
+      Make sure you can receive emails from gov.uk.notify@notifications.service.gov.uk
+    </p>
+    <ol class="govuk-list govuk-list--number">
+      <li>
+      Check your spam folder.
+      </li>
+      <li>
+      Contact your IT department.
+      </li>
+    </ol>
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.support_no_email_link_account_details") }}>I still cannot find an email from GOV.UK Notify</a>
+    </p>
+  </div>
+</div>
+
+{% endblock %}

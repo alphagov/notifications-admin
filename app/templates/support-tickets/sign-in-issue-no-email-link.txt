@@ -1,0 +1,3 @@
+User did not receive an email link
+
+Email address: {{ user_email_address }}
