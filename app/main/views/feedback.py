@@ -105,19 +105,43 @@ def support_cannot_sign_in():
 
     if form.validate_on_submit():
         if form.sign_in_issue.data == "no-code":
-            pass
+            return redirect(url_for("main.support_no_security_code"))
         elif form.sign_in_issue.data == "mobile-number-changed":
-            pass
+            return redirect(url_for("main.support_mobile_number_changed"))
         elif form.sign_in_issue.data == "no-email-link":
-            pass
+            return redirect(url_for("main.support_no_email_link"))
         elif form.sign_in_issue.data == "email-address-changed":
-            pass
+            return redirect(url_for("main.support_email_address_changed"))
         elif form.sign_in_issue.data == "something-else":
             return redirect(
                 url_for("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, severe="no", category="cannot-sign-in")
             )
 
     return render_template("views/support/cannot-sign-in.html", form=form, error_summary_enabled=True)
+
+
+@main.route("/support/security-code")
+@hide_from_search_engines
+def support_no_security_code():
+    return render_template("views/support/no-security-code.html")
+
+
+@main.route("/support/mobile-number-changed")
+@hide_from_search_engines
+def support_mobile_number_changed():
+    return render_template("views/support/mobile-number-changed.html")
+
+
+@main.route("/support/email-link")
+@hide_from_search_engines
+def support_no_email_link():
+    return render_template("views/support/no-email-link.html")
+
+
+@main.route("/support/email-address-changed")
+@hide_from_search_engines
+def support_email_address_changed():
+    return render_template("views/support/email-address-changed.html")
 
 
 @main.route("/support/what-happened", methods=["GET", "POST"])
