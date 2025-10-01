@@ -219,6 +219,10 @@ def test_support_cannot_sign_in(client_request):
 @pytest.mark.parametrize(
     "form_option, redirect_endpoint, redirect_kwargs",
     [
+        ("no-code", "main.support_no_security_code", {}),
+        ("mobile-number-changed", "main.support_mobile_number_changed", {}),
+        ("no-email-link", "main.support_no_email_link", {}),
+        ("email-address-changed", "main.support_email_address_changed", {}),
         (
             "something-else",
             "main.feedback",
@@ -234,6 +238,34 @@ def test_support_cannot_sign_in_redirects(client_request, form_option, redirect_
         _data={"sign_in_issue": form_option},
         _expected_redirect=url_for(redirect_endpoint, **redirect_kwargs),
     )
+
+
+def test_support_no_security_code(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_no_security_code")
+    assert normalize_spaces(page.select_one("h1").text) == "If you did not receive a security code"
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_cannot_sign_in")
+
+
+def test_support_mobile_number_changed(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_mobile_number_changed")
+    assert normalize_spaces(page.select_one("h1").text) == "If your mobile number has changed"
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_cannot_sign_in")
+
+
+def test_support_no_email_link(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_no_email_link")
+    assert normalize_spaces(page.select_one("h1").text) == "If you did not receive an email link"
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_cannot_sign_in")
+
+
+def test_support_email_address_changed(client_request):
+    client_request.logout()
+    page = client_request.get("main.support_email_address_changed")
+    assert normalize_spaces(page.select_one("h1").text) == "If your email address has changed"
+    assert page.select_one(".govuk-back-link")["href"] == url_for("main.support_cannot_sign_in")
 
 
 @pytest.mark.parametrize("user_logged_in", [True, False])
