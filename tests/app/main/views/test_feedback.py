@@ -488,6 +488,23 @@ def test_support_email_address_account_details_submits_zendesk_ticket(client_req
     )
 
 
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "support_no_security_code",
+        "support_mobile_number_changed",
+        "support_no_email_link",
+        "support_email_address_changed",
+        "support_no_security_code_account_details",
+        "support_mobile_number_changed_account_details",
+        "support_no_email_link_account_details",
+        "support_email_address_changed_account_details",
+    ],
+)
+def test_support_sign_in_problem_pages_redirect_if_user_is_logged_in(client_request, endpoint):
+    client_request.get(f"main.{endpoint}", _expected_redirect=url_for("main.support_problem"))
+
+
 @pytest.mark.parametrize("user_logged_in", [True, False])
 def test_get_support_what_happened_page(client_request, user_logged_in):
     if not user_logged_in:
