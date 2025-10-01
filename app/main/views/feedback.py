@@ -127,24 +127,36 @@ def support_cannot_sign_in():
 @main.route("/support/security-code")
 @hide_from_search_engines
 def support_no_security_code():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.support_problem"))
+
     return render_template("views/support/no-security-code.html")
 
 
 @main.route("/support/mobile-number-changed")
 @hide_from_search_engines
 def support_mobile_number_changed():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.support_problem"))
+
     return render_template("views/support/mobile-number-changed.html")
 
 
 @main.route("/support/email-link")
 @hide_from_search_engines
 def support_no_email_link():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.support_problem"))
+
     return render_template("views/support/no-email-link.html")
 
 
 @main.route("/support/email-address-changed")
 @hide_from_search_engines
 def support_email_address_changed():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.support_problem"))
+
     return render_template("views/support/email-address-changed.html")
 
 
@@ -170,6 +182,9 @@ def create_sign_in_issues_zendesk_ticket(subject, message, name, email, notifiy_
 @main.route("/support/security-code/account-details", methods=["GET", "POST"])
 @hide_from_search_engines
 def support_no_security_code_account_details():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.support_problem"))
+
     form = SupportNoSecurityCodeForm()
 
     if form.validate_on_submit():
@@ -192,6 +207,9 @@ def support_no_security_code_account_details():
 @main.route("/support/mobile-number-changed/account-details", methods=["GET", "POST"])
 @hide_from_search_engines
 def support_mobile_number_changed_account_details():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.support_problem"))
+
     form = SupportMobileNumberChangedForm()
 
     if form.validate_on_submit():
@@ -220,6 +238,9 @@ def support_mobile_number_changed_account_details():
 @main.route("/support/email-link/account-details", methods=["GET", "POST"])
 @hide_from_search_engines
 def support_no_email_link_account_details():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.support_problem"))
+
     form = SupportNoEmailLinkForm()
 
     if form.validate_on_submit():
@@ -242,6 +263,9 @@ def support_no_email_link_account_details():
 @main.route("/support/email-address-changed/account-details", methods=["GET", "POST"])
 @hide_from_search_engines
 def support_email_address_changed_account_details():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.support_problem"))
+
     form = SupportEmailAddressChangedForm()
 
     if form.validate_on_submit():
