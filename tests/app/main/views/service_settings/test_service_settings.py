@@ -54,7 +54,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
                 "Send emails On Change your settings for sending emails",
-                "Email sender name Test Service test.service@notifications.service.gov.uk Change email sender name",
+                "Email ‘from’ name Test Service test.service@notifications.service.gov.uk Change email ‘from’ name",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
@@ -92,7 +92,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Sign-in method Text message code",
                 "Data retention period 7 days",
                 "Send emails On",
-                "Email sender name Test Service test.service@notifications.service.gov.uk",
+                "Email ‘from’ name Test Service test.service@notifications.service.gov.uk",
                 "Reply-to email addresses Not set Manage reply-to email addresses",  # user will see manage button
                 "Email branding GOV.UK",
                 "Send files by email contact_us@gov.uk",
@@ -118,7 +118,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
                 "Send emails On Change your settings for sending emails",
-                "Email sender name Test Service test.service@notifications.service.gov.uk Change email sender name",
+                "Email ‘from’ name Test Service test.service@notifications.service.gov.uk Change email ‘from’ name",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
@@ -380,7 +380,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
                 "Send emails On Change your settings for sending emails",
-                "Email sender name service one service.one@notifications.service.gov.uk Change email sender name",
+                "Email ‘from’ name service one service.one@notifications.service.gov.uk Change email ‘from’ name",
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Email branding Organisation name Change email branding",
                 "Send files by email Not set up Manage sending files by email",
@@ -402,7 +402,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Sign-in method Email link or text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
                 "Send emails On Change your settings for sending emails",
-                "Email sender name service one service.one@notifications.service.gov.uk Change email sender name",
+                "Email ‘from’ name service one service.one@notifications.service.gov.uk Change email ‘from’ name",
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Email branding Organisation name Change email branding",
                 "Send files by email Not set up Manage sending files by email",
@@ -5631,12 +5631,12 @@ class TestServiceEmailSenderChange:
             (
                 "custom sender name",
                 "True",
-                "Sender name custom sender name custom.sender.name@notifications.service.gov.uk",
+                "‘From’ name custom sender name custom.sender.name@notifications.service.gov.uk",
             ),
             (
                 None,
                 "False",
-                "Sender name Example example@notifications.service.gov.uk",
+                "‘From’ name Example example@notifications.service.gov.uk",
             ),
         ],
     )
@@ -5651,10 +5651,10 @@ class TestServiceEmailSenderChange:
         service_one["custom_email_sender_name"] = custom_email_sender_name
         service_one["email_sender_local_part"] = "local.part"
         page = client_request.get("main.service_email_sender_change", service_id=SERVICE_ONE_ID, _expected_status=200)
-        assert page.select_one("h1").text == "Email sender name"
+        assert page.select_one("h1").text == "Email ‘from’ name"
         assert [normalize_spaces(radio.text) for radio in page.select(".govuk-radios__item")] == [
             "Use the name of your service service one service.one@notifications.service.gov.uk",
-            "Enter a custom sender name",
+            "Enter a custom ‘from’ name",
         ]
         assert page.select_one("input[name=use_custom_email_sender_name][checked]")["value"] == expected_value
         assert normalize_spaces(page.select_one(".govuk-radios__conditional").text) == expected_conditional_content
@@ -5670,18 +5670,18 @@ class TestServiceEmailSenderChange:
     @pytest.mark.parametrize(
         "custom_email_sender_name, error_message",
         [
-            ("", "Error: Enter a sender name"),
-            (".", "Sender name must include at least 2 letters or numbers"),
-            ("GOV.UK Ειδοποίηση", "Sender name cannot include characters from a non-Latin alphabet"),
-            ("no reply", "Sender name needs to be more specific"),
-            ("NO-REPLY", "Sender name needs to be more specific"),
-            ("info", "Sender name needs to be more specific"),
-            ("Support", "Sender name needs to be more specific"),
-            ("ALERT", "Sender name needs to be more specific"),
-            ("test@example.com", "Sender name cannot be an email address"),
-            ("Foo.BAR@example.gov.uk", "Sender name cannot be an email address"),
+            ("", "Error: Enter a ‘from’ name"),
+            (".", "‘From’ name must include at least 2 letters or numbers"),
+            ("GOV.UK Ειδοποίηση", "‘From’ name cannot include characters from a non-Latin alphabet"),
+            ("no reply", "‘From’ name needs to be more specific"),
+            ("NO-REPLY", "‘From’ name needs to be more specific"),
+            ("info", "‘From’ name needs to be more specific"),
+            ("Support", "‘From’ name needs to be more specific"),
+            ("ALERT", "‘From’ name needs to be more specific"),
+            ("test@example.com", "‘From’ name cannot be an email address"),
+            ("Foo.BAR@example.gov.uk", "‘From’ name cannot be an email address"),
             # under the 255 db col length, but too long when combined with email_sender_local_part to make an email
-            ("a" * 150 + " " * 100 + "a", "Sender name cannot be longer than 143 characters"),
+            ("a" * 150 + " " * 100 + "a", "‘From’ name cannot be longer than 143 characters"),
         ],
     )
     def test_service_email_sender_change_fails_if_new_name_fails_validation(
