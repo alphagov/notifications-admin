@@ -539,7 +539,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def parse_custom_email_sender_name_http_error(cls, http_error):
         """Inspect the HTTPError from a update_service call and return a human-friendly error message"""
         if http_error.message.get("email_sender_local_part"):
-            return "Sender name cannot include characters from a non-Latin alphabet"
+            return "‘From’ name cannot include characters from a non-Latin alphabet"
 
         return None
 

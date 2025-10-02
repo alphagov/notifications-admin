@@ -1935,29 +1935,29 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
     }
 
     use_custom_email_sender_name = OnOffField(
-        "Choose a sender name",
+        "Choose a ‘from’ name",
         choices_for_error_message="same or custom",
         choices=[
             (False, "Use the name of your service"),
-            (True, "Enter a custom sender name"),
+            (True, "Enter a custom ‘from’ name"),
         ],
     )
 
-    custom_email_sender_name = GovukTextInputField("Sender name", validators=[])
+    custom_email_sender_name = GovukTextInputField("‘From’ name", validators=[])
 
     def validate(self, *args, **kwargs):
         if self.use_custom_email_sender_name.data is True:
             self.custom_email_sender_name.validators = [
-                NotifyDataRequired(thing="a sender name"),
-                MustContainAlphanumericCharacters(thing="sender name"),
-                Length(max=255, thing="sender name"),
+                NotifyDataRequired(thing="a ‘from’ name"),
+                MustContainAlphanumericCharacters(thing="‘from’ name"),
+                Length(max=255, thing="‘from’ name"),
             ]
 
         return super().validate(*args, **kwargs)
 
     def validate_custom_email_sender_name(self, field):
         """
-        Validate that the email from name ("Sender Name" <sender.name@notifications.service.gov.uk)
+        Validate that the email from name ("‘From’ Name" <from.name@notifications.service.gov.uk)
         is under 320 characters (if it's over, SES will reject the email and we'll end up with technical errors)
         """
         if self.use_custom_email_sender_name.data is not True:
@@ -1968,20 +1968,20 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
             # TODO: should probs store this value in config["NOTIFY_EMAIL_DOMAIN"] or similar
             email = validate_email_address(f"{normalised_sender_name}@notifications.service.gov.uk")
         except InvalidEmailError as e:
-            raise ValidationError("Sender name cannot include characters from a non-Latin alphabet") from e
+            raise ValidationError("‘From’ name cannot include characters from a non-Latin alphabet") from e
 
         if len(f'"{field.data}" <{email}>') > 320:
-            # This is a little white lie - the sender name _can_ be longer, provided the normalised name is short so
+            # This is a little white lie - the ‘from’ name _can_ be longer, provided the normalised name is short so
             # that the whole email is under 320 characters. 143 is chosen because a 143 char name + 143 char normalised
             # name + 34 characters of email domain, quotes, angle brackets etc = 320 characters total.
-            raise ValidationError("Sender name cannot be longer than 143 characters")
+            raise ValidationError("‘From’ name cannot be longer than 143 characters")
 
         if normalised_sender_name in self.BAD_EMAIL_LOCAL_PARTS:
-            raise ValidationError("Sender name needs to be more specific")
+            raise ValidationError("‘From’ name needs to be more specific")
 
         with suppress(InvalidEmailError):
             validate_email_address(field.data)
-            raise ValidationError("Sender name cannot be an email address")
+            raise ValidationError("‘From’ name cannot be an email address")
 
 
 class AdminSetEmailBrandingForm(StripWhitespaceForm):
