@@ -134,7 +134,7 @@
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
-              "text": "Email sender name"
+              "text": "Email ‘from’ name"
             },
             "value": {
               "html": email_sender_html,
@@ -145,7 +145,7 @@
                 {
                   "href": url_for('main.service_email_sender_change', service_id=current_service.id),
                   "text": "Change",
-                  "visuallyHiddenText": "email sender name",
+                  "visuallyHiddenText": "email ‘from’ name",
                   "classes": "govuk-link--no-visited-state"
                 }
               ] if current_user.has_permissions('manage_service') else []

@@ -920,7 +920,7 @@ def get_skip_link(step_index, template):
 @main.route("/services/<uuid:service_id>/template/<uuid:template_id>/one-off/send-to-myself", methods=["GET"])
 @user_has_permissions("send_messages")
 def send_one_off_to_myself(service_id, template_id):
-    # We aren't concerned with creating the exact template (for example adding recipient and sender names)
+    # We aren't concerned with creating the exact template (for example adding recipient and ‘from’ names)
     # we just want to create enough to use `fields_to_fill_in`
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
