@@ -113,7 +113,7 @@ def test_route_for_platform_admin(
 @pytest.mark.parametrize(
     "confirmed_unique, expected_status_text",
     [
-        (False, "Confirm that your service is unique Not completed"),
+        (False, "Confirm that your service is unique Incomplete"),
         (True, "Confirm that your service is unique Completed"),
     ],
 )
@@ -139,7 +139,7 @@ def test_should_check_confirm_service_is_unique_task(
 @pytest.mark.parametrize(
     "volumes, expected_estimated_volumes_item",
     [
-        ((0, 0, 0), "Tell us how many messages you expect to send Not completed"),
+        ((0, 0, 0), "Tell us how many messages you expect to send Incomplete"),
         ((1, 0, 0), "Tell us how many messages you expect to send Completed"),
         ((9, 99, 999), "Tell us how many messages you expect to send Completed"),
     ],
@@ -178,11 +178,11 @@ def test_should_check_if_estimated_volumes_provided(
     [
         pytest.param(None, 0, [], "", marks=pytest.mark.xfail(raises=IndexError)),
         pytest.param(0, 0, [], "", marks=pytest.mark.xfail(raises=IndexError)),
-        (None, 1, [], "Add a reply-to email address Not completed"),
+        (None, 1, [], "Add a reply-to email address Incomplete"),
         (None, 1, [{}], "Add a reply-to email address Completed"),
-        (1, 1, [], "Add a reply-to email address Not completed"),
+        (1, 1, [], "Add a reply-to email address Incomplete"),
         (1, 1, [{}], "Add a reply-to email address Completed"),
-        (1, 0, [], "Add a reply-to email address Not completed"),
+        (1, 0, [], "Add a reply-to email address Incomplete"),
         (1, 0, [{}], "Add a reply-to email address Completed"),
     ],
 )
@@ -229,7 +229,7 @@ def test_should_check_for_reply_to_on_go_live(
 @pytest.mark.parametrize(
     "count_of_users_with_manage_service,count_of_invites_with_manage_service,expected_user_checklist_item",
     [
-        (1, 0, "Give another team member the ‘manage settings’ permission Not completed"),
+        (1, 0, "Give another team member the ‘manage settings’ permission Incomplete"),
         (2, 0, "Give another team member the ‘manage settings’ permission Completed"),
         (1, 1, "Give another team member the ‘manage settings’ permission Completed"),
     ],
@@ -237,7 +237,7 @@ def test_should_check_for_reply_to_on_go_live(
 @pytest.mark.parametrize(
     "count_of_templates, expected_templates_checklist_item",
     [
-        (0, "Add templates with examples of your content Not completed"),
+        (0, "Add templates with examples of your content Incomplete"),
         (1, "Add templates with examples of your content Completed"),
         (2, "Add templates with examples of your content Completed"),
     ],
@@ -480,21 +480,21 @@ def test_request_to_go_live_redirects_if_service_already_live(
             "local",
             1,
             [],
-            "Change your Text message sender ID Not completed",
+            "Change your Text message sender ID Incomplete",
         ),
         (
             1,
             "nhs_local",
             0,
             [],
-            "Change your Text message sender ID Not completed",
+            "Change your Text message sender ID Incomplete",
         ),
         (
             None,
             "school_or_college",
             1,
             [{"is_default": True, "sms_sender": "GOVUK"}],
-            "Change your Text message sender ID Not completed",
+            "Change your Text message sender ID Incomplete",
         ),
         (
             None,
@@ -569,7 +569,7 @@ def test_should_check_for_sms_sender_on_go_live(
         ),
         (
             False,
-            "Accept our data processing and financial agreement Not completed",
+            "Accept our data processing and financial agreement Incomplete",
         ),
     ),
 )
@@ -660,7 +660,7 @@ def test_gp_without_organisation_is_shown_agreement_step(
     assert page.select_one("h1").text == "Make your service live"
     assert normalize_spaces(
         page.select_one(".govuk-task-list:nth-of-type(2) .govuk-task-list__item:last-of-type").text
-    ) == ("Accept our data processing and financial agreement Not completed")
+    ) == ("Accept our data processing and financial agreement Incomplete")
 
 
 def test_service_without_organisation_is_shown_agreement_text(
