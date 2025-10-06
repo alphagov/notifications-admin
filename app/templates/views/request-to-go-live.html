@@ -9,10 +9,10 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {# as options objects are different for completed vs not completed #}
+  {# as options objects are different for completed vs incomplete #}
   {# we set them here to reuse them later #}
   {% set completed_status = {"text": "Completed"} %}
-  {% set not_completed_status = {"tag": {"text": "Not completed"}} %}
+  {% set incomplete_status = {"tag": {"text": "Incomplete"}} %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {{ page_header('Make your service live') }}
@@ -35,7 +35,7 @@
               "classes": "govuk-link--no-visited-state",
             },
             "href": url_for('main.confirm_service_is_unique', service_id=current_service.id),
-            "status": completed_status if current_service.confirmed_unique else not_completed_status,
+            "status": completed_status if current_service.confirmed_unique else incomplete_status,
           },
           {
             "title": {
@@ -43,7 +43,7 @@
               "classes": "govuk-link--no-visited-state",
             },
             "href": url_for('main.estimate_usage', service_id=current_service.id),
-            "status": completed_status if current_service.has_estimated_usage else not_completed_status,
+            "status": completed_status if current_service.has_estimated_usage else incomplete_status,
           },
           {
             "title": {
@@ -51,7 +51,7 @@
               "classes": "govuk-link--no-visited-state",
             },
             "href": url_for('main.manage_users', service_id=current_service.id),
-            "status": completed_status if current_service.has_team_members_with_manage_service_permission else not_completed_status,
+            "status": completed_status if current_service.has_team_members_with_manage_service_permission else incomplete_status,
           },
           {
             "title": {
@@ -59,7 +59,7 @@
               "classes": "govuk-link--no-visited-state",
             },
             "href": url_for('main.choose_template', service_id=current_service.id),
-            "status": completed_status if current_service.has_templates else not_completed_status,
+            "status": completed_status if current_service.has_templates else incomplete_status,
           }]
         %}
 
@@ -72,7 +72,7 @@
                 "classes": "govuk-link--no-visited-state",
               },
               "href":  url_for('main.service_email_reply_to', service_id=current_service.id),
-              "status": completed_status if current_service.has_email_reply_to_address else not_completed_status,
+              "status": completed_status if current_service.has_email_reply_to_address else incomplete_status,
             }
           )%}
         {% endif %}
@@ -84,7 +84,7 @@
                 "classes": "govuk-link--no-visited-state",
               },
               "href": url_for('main.service_sms_senders', service_id=current_service.id),
-              "status": completed_status if not current_service.sms_sender_is_govuk else not_completed_status,
+              "status": completed_status if not current_service.sms_sender_is_govuk else incomplete_status,
             }
           )%}
         {% endif %}
@@ -108,7 +108,7 @@
                   "classes": "govuk-link--no-visited-state",
                 },
                 "href": url_for('main.service_agreement', service_id=current_service.id),
-                "status": completed_status if current_service.organisation.agreement_signed else not_completed_status,
+                "status": completed_status if current_service.organisation.agreement_signed else incomplete_status,
               }
             ]
           }) }}
