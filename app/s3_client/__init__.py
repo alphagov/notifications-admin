@@ -17,5 +17,10 @@ def check_s3_object_exists(bucket_name, filename):
         if e.response["Error"]["Code"] == "404":
             return False
         else:
-            current_app.logger.error("Error when checking file %s in bucket %s", filename, bucket_name)
+            current_app.logger.error(
+                "Error when checking file %s in bucket %s",
+                filename,
+                bucket_name,
+                extra={"s3_bucket": bucket_name, "s3_key": filename},
+            )
             raise e
