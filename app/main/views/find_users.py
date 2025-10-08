@@ -27,7 +27,7 @@ def remove_platform_admin(user_id):
         Events.remove_platform_admin(user_id=str(user_id), removed_by_id=current_user.id)
         return redirect(url_for(".user_information", user_id=user_id))
 
-    flash("Weet u zeker dat u deze gebruiker de platformbeheerder wilt ontnemen?", "remove")
+    flash("Are you sure you want to remove platform admin from this user?", "remove")
     return user_information(user_id)
 
 
@@ -43,8 +43,8 @@ def archive_user(user_id):
         except HTTPError as e:
             if e.status_code == 400 and "manage_settings" in e.message:
                 flash(
-                    "De gebruiker kan niet uit een dienst verwijderd worden – "
-                    "controleer of elke dienst een ander teamlid met beheerdersrechten heeft"
+                    "User can’t be removed from a service - "
+                    "check all services have another team member with manage_settings"
                 )
                 return redirect(url_for("main.user_information", user_id=user_id))
 
@@ -54,7 +54,7 @@ def archive_user(user_id):
 
         return redirect(url_for(".user_information", user_id=user_id))
     else:
-        flash("Dit kan niet ongedaan worden gemaakt! Weet u zeker dat u deze gebruiker wilt archiveren?", "delete")
+        flash("There’s no way to reverse this! Are you sure you want to archive this user?", "delete")
         return user_information(user_id)
 
 

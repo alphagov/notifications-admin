@@ -12,10 +12,10 @@ from tests.conftest import normalize_spaces
             False,
             False,
             (
-                ("Support", ".support"),
                 ("Features", ".guidance_features"),
                 ("Pricing", ".guidance_pricing"),
                 ("Using Notify", ".guidance_using_notify"),
+                ("Support", ".support"),
                 ("Sign in", ".sign_in"),
             ),
         ),
@@ -23,10 +23,11 @@ from tests.conftest import normalize_spaces
             True,
             False,
             (
-                ("Support", ".support"),
+                ("Your services", ".your_services"),
                 ("Features", ".guidance_features"),
                 ("Pricing", ".guidance_pricing"),
                 ("Using Notify", ".guidance_using_notify"),
+                ("Support", ".support"),
                 ("Your account", ".your_account"),
             ),
         ),
@@ -34,10 +35,11 @@ from tests.conftest import normalize_spaces
             True,
             True,
             (
-                ("Support", ".support"),
+                ("Your services", ".your_services"),
                 ("Features", ".guidance_features"),
                 ("Pricing", ".guidance_pricing"),
                 ("Using Notify", ".guidance_using_notify"),
+                ("Support", ".support"),
                 ("Platform admin", ".platform_admin_search"),
                 ("Your account", ".your_account"),
             ),
@@ -58,5 +60,5 @@ def test_header_navigation(
     page = client_request.get("main.guidance_features")
     assert [
         (normalize_spaces(link.text), link["href"])
-        for link in page.select(".govuk-header__navigation-list .govuk-header__navigation-item a")
+        for link in page.select(".govuk-service-navigation__list .govuk-service-navigation__item a")
     ] == [(label, url_for(endpoint)) for label, endpoint in expected_navigation_items]

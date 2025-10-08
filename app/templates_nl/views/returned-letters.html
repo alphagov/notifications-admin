@@ -23,7 +23,7 @@
 <div class="dashboard-table">
   {% call(item, row_number) list_table(
       returned_letters,
-      caption="Teruggestuurde brieven voor {}".format(today),
+      caption="Teruggestuurde brieven voor {}".format(reported_at|format_date_normal),
       caption_visible=False,
       empty_message='Als u rapporten over teruggestuurde brieven heeft, worden deze hier weergegeven',
       field_headings=['Sjabloonnaam', 'Oorspronkelijk verzonden'],

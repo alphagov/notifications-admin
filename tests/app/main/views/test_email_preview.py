@@ -42,7 +42,7 @@ def test_displays_both_branding(client_request, mock_get_email_branding_with_bot
     )
     assert page.select("img")[1]["src"] == "https://static-logos.test.com/example.png"
     assert (
-        page.select("body > table:nth-of-type(3) table > tr:nth-of-type(1) > td:nth-of-type(2)")[0].get_text().strip()
+        page.select("body > table:nth-of-type(2) table:nth-of-type(1) table td:nth-of-type(2)")[0].get_text().strip()
         == "Organisation text"
     )  # brand text is set
 

@@ -81,19 +81,21 @@ def view_notification(service_id, notification_id):
     template.postage = notification.displayed_postage
 
     if template.template_type == "letter" and template.too_many_pages:
-        # We controleren hier het aantal pagina's om de juiste foutmelding te tonen bij een te lange brief.
-        # Een alternatieve aanpak zou zijn om de status en foutmelding uit de briefmetadata te halen.
-        # Dit is echter veel werk en valt buiten de scope van deze bugfix.
-        # Momenteel halen we de brief niet op uit S3 bij het tonen van een preview.
-        # In plaats daarvan genereren we een preview op basis van de sjabloon en personalisatie.
-        # Bovendien duurt het even voordat de validatiestatus binnenkomt bij een brief die te lang is.
-        # Door hier het aantal pagina's te checken, kunnen we de foutmelding tonen,
-        # ook als de brief nog niet volledig verwerkt is.
+        # We check page count here to show the right error message for a letter that is too long.
+        # Another way to do this would be to get the status and error message from letter metadata.
+        # This would be a significant amount of work though, out of scope for this bug fix.
+        # This is because currently we do not pull the letter from S3 when showing preview.
+        # Instead, we generate letter preview based on the letter template and personalisation.
+        # Additionally, when a templated letter is sent via the api and the personalisation pushes the
+        # page count over 10 pages, it takes a while for validation status to come through.
+        # Checking page count here will enable us to show the error message even if the letter is not
+        # fully processed yet.
         error_message = get_letter_validation_error("letter-too-long", [1], template.page_count)
 
     if get_help_argument() or request.args.get("help") == "0":
-        # help=0 wordt gezet wanneer u net een notificatie heeft verzonden.
-        # We willen alleen de terugknop tonen als u een notificatie bekijkt, niet direct na verzending.
+        # help=0 is set when you’ve just sent a notification. We
+        # only want to show the back link when you’ve navigated to a
+        # notification, not when you’ve just sent it.
         back_link = None
     elif request.args.get("from_job"):
         back_link = url_for(
@@ -148,7 +150,7 @@ def cancel_letter(service_id, notification_id):
                 raise e
         return redirect(url_for("main.view_notification", service_id=service_id, notification_id=notification_id))
 
-    flash("Weet u zeker dat u het versturen van deze brief wilt annuleren?", "cancel")
+    flash("Are you sure you want to cancel sending this letter?", "cancel")
     return view_notification(service_id, notification_id)
 
 
@@ -239,7 +241,7 @@ def download_notifications_csv(service_id):
         list(data),
         mimetype="text/csv",
         headers={
-            "Content-Disposition": 'inline; filename="{} - {} - {} rapport.csv"'.format(
+            "Content-Disposition": 'inline; filename="{} - {} - {} report.csv"'.format(
                 format_date_numeric(datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")),
                 message_type,
                 current_service.name,

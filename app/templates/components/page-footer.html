@@ -6,6 +6,7 @@
   button_value=None,
   button_text_hidden_suffix=None,
   destructive=False,
+  disabled=False,
   secondary_link=False,
   secondary_link_text=None,
   delete_link=False,
@@ -19,6 +20,7 @@
 
       {% set button_data = {"text": button_text, "classes": "page-footer__button"} %}
       {% if destructive %}{% do button_data.update({"classes": "govuk-button--warning page-footer__button"}) %}{% endif %}
+      {% if disabled %}{% do button_data.update({"disabled": disabled}) %}{% endif %}
       {% if centered_button %}{% do button_data.update({"classes": "page-footer__button--centred"}) %}{% endif %}
       {% if button_url %}
         {% do button_data.update({

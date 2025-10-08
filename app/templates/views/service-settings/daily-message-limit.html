@@ -1,0 +1,52 @@
+{% extends "withnav_template.html" %}
+{% from "components/ajax-block.html" import ajax_block %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = "Daily {} limit".format(1|message_count_noun(daily_limit_type)) %}
+
+
+{% block service_page_title %}
+{{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+{{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+        {{ page_header(page_title) }}
+        <p class="govuk-body">
+            You can send up to {{ current_service.get_message_limit(daily_limit_type)|message_count(daily_limit_type) }} per day.
+        </p>
+
+        {{ ajax_block(partials, updates_url, 'remaining_limit') }}
+
+        <h2 class="heading-medium">If you need to change the daily {{ 1|message_count_noun(daily_limit_type) }} limit</h2>
+
+        <p class="govuk-body">
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Contact us</a> and let us know:
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>what you need to change your limit to</li>
+
+            {% if daily_limit_type == "letter" %}
+                <li>the start and end dates of your letter campaign</li>
+                <li>the total volume of letters your service will send during this time</li>
+                <li>the number of pages per letter</li>
+                <li>the postage class you will be using</li>
+
+            {% else %}
+                <li>how long you need to increase your limit for</li>
+                <li>the total volume of {{ 3|message_count_noun(daily_limit_type) }} your service will send during this time</li>
+            {% endif %}
+
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

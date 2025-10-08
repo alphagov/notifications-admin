@@ -32,6 +32,7 @@
 
 <p class="govuk-body">Brieven mogen maximaal 10 pagina’s bevatten (5 vellen papier, dubbelzijdig bedrukt).</p>
 
+<p class="govuk-body">Prijzen zijn exclusief BTW.</p>
   <div>
     {% call mapping_table(
       caption='Prijzen voor brieven',
@@ -43,11 +44,13 @@
         {% call row() %}
           {% call row_heading() %} {{ sheets }} vel{{ 'len' if sheets > 1 else '' }} {% endcall %}
           {% for post_class in letter_rates.post_classes.keys() %}
-            {{ text_field(letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False) + ' + BTW') }}
+            {{ text_field(letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False)) }}
           {% endfor %}
         {% endcall %}
       {% endfor %}
     {% endcall %}
   </div>
+
+<p class="govuk-body">Zie <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_delivery_times', _anchor='letters') }}">levertijden</a>.</p>
 
 {% endblock %}

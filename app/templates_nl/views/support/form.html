@@ -24,7 +24,7 @@
             statuspagina van NotifyNL</a>.</p>
           <p class="govuk-body">U hoeft geen contact met ons op te nemen als uw probleem al op die pagina staat.</p>
           {% endset %}
-          {{ govukInsetText({"html": insetHtml, classes: "govuk-!-margin-top-0 govuk-!-margin-bottom-3"}) }}
+          {{ govukInsetText({"html": insetHtml, "classes": "govuk-!-margin-top-0 govuk-!-margin-bottom-3"}) }}
         {% endif %}
         {% call form_wrapper() %}
             {{ form.feedback(param_extensions={

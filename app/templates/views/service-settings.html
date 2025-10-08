@@ -39,7 +39,7 @@
                   "visuallyHiddenText": "service name",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
           },
           {
@@ -58,7 +58,7 @@
                   "visuallyHiddenText": "sign-in method",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
           },
           {
@@ -77,7 +77,7 @@
                   "visuallyHiddenText": "data retention",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
           }
         ]
@@ -100,6 +100,13 @@
         {% endif %}
       {% endset %}
 
+      {% set email_limit_html %}
+        {{ "{} per day".format(current_service.get_message_limit("email")|format_thousands) }}
+        <div class="govuk-hint">
+          {{ current_service.sent_today("email")|format_thousands + " sent today" }}
+        </div>
+      {% endset %}
+
       {% set base_email_settings_row = [
         {
           "key": {
@@ -117,7 +124,7 @@
                 "visuallyHiddenText": "your settings for sending emails",
                 "classes": "govuk-link--no-visited-state"
               }
-            ]
+            ] if current_user.has_permissions('manage_service') else []
           }
         }
       ]%}
@@ -141,7 +148,7 @@
                   "visuallyHiddenText": "email sender name",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
           },
           {
@@ -180,7 +187,7 @@
                   "visuallyHiddenText": "email branding",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
           },
           {
@@ -200,10 +207,36 @@
                   "visuallyHiddenText": "sending files by email",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
-          }
+          },
         ]%}
+      {% endif %}
+
+      <!-- only show limit page for live services -->
+      {% if current_service.has_permission("email") and current_service.live %}
+        {% set _ = restricted_email_settings_rows.append(
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Email limit",
+            },
+            "value": {
+              "text": email_limit_html,
+              "classes": "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for("main.set_daily_message_limit", service_id=current_service.id, daily_limit_type="email"),
+                  "text": "Change",
+                  "visuallyHiddenText": "daily {} limit".format("email"|format_notification_type|lower),
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ] if current_user.has_permissions('manage_service') else []
+            }
+          },
+        )%}
       {% endif %}
 
       {% set email_settings_rows = base_email_settings_row + restricted_email_settings_rows if restricted_email_settings_rows else base_email_settings_row %}
@@ -216,6 +249,7 @@
     {% endset %}
 
     {% set service_text_message_settings %}
+
       {% set text_message_sender_ids_html %}
         {{ current_service.default_sms_sender | nl2br if current_service.default_sms_sender else 'None'}}
         {% if current_service.count_sms_senders > 1 %}
@@ -224,6 +258,21 @@
           </div>
         {% endif %}
       {% endset %}
+
+      {% set text_message_limit_html %}
+        {{ "{} per day".format(current_service.get_message_limit("sms")|format_thousands) }}
+        <div class="govuk-hint">
+          {{ current_service.sent_today("sms")|format_thousands + " sent today" }}
+        </div>
+      {% endset %}
+
+      {% set international_text_message_limit_html %}
+        {{ "{} per day".format(current_service.get_message_limit("international_sms")|format_thousands) }}
+        <div class="govuk-hint">
+          {{ current_service.sent_today("international_sms")|format_thousands + " sent today" }}
+        </div>
+      {% endset %}
+
 
       {% set base_text_message_setting_row = [
         {
@@ -246,7 +295,7 @@
                 "visuallyHiddenText": "your settings for sending text messages",
                 "classes": "govuk-link--no-visited-state"
               }
-            ]
+            ] if current_user.has_permissions('manage_service') else []
           }
         }
       ]%}
@@ -291,7 +340,7 @@
                   "visuallyHiddenText": "your settings for starting text messages with service name",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
           },
           {
@@ -310,9 +359,40 @@
                   "visuallyHiddenText": "your settings for receiving text messages",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
           },
+        ]%}
+      {% endif %}
+
+    <!-- only show limit page for live services -->
+      {% if current_service.has_permission("sms") and current_service.live %}
+        {% set _ = restricted_text_message_settings_rows.append(
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "{} limit".format('sms'|format_notification_type),
+            },
+            "value": {
+              "text": text_message_limit_html,
+              "classes": "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for("main.set_daily_message_limit", service_id=current_service.id, daily_limit_type="sms"),
+                  "text": "Change",
+                  "visuallyHiddenText": "daily {} limit".format("sms"|format_notification_type|lower),
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ] if current_user.has_permissions('manage_service') else []
+            }
+          },
+        )%}
+      {% endif %}
+      <!-- we want international sms row to be after the daily limit row -->
+      {% if current_service.has_permission("sms") %}
+        {% set _ = restricted_text_message_settings_rows.append(
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
@@ -329,10 +409,10 @@
                   "visuallyHiddenText": "your settings for sending international text messages",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
           },
-        ]%}
+        )%}
       {% endif %}
 
       {% set restricted_international_text_message_settings_rows = [] %}
@@ -345,17 +425,18 @@
                 "text": "International text message limit",
               },
             "value": {
-              "text": "{} per day".format(current_service.get_message_limit('international_sms')|format_thousands)
+              "text": international_text_message_limit_html,
+              "classes": "govuk-summary-list__value--truncate"
             },
             "actions": {
               "items": [
                 {
-                  "href": url_for('main.set_per_day_international_sms_message_limit', service_id=current_service.id),
+                  "href": url_for("main.set_per_day_international_sms_message_limit", service_id=current_service.id),
                   "text": "Change",
-                  "visuallyHiddenText": "daily international {} limit".format('sms'|format_notification_type|lower),
+                  "visuallyHiddenText": "daily international {} limit".format("sms"|format_notification_type|lower),
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
           },
         ]%}
@@ -370,6 +451,14 @@
     {% endset %}
 
     {% set service_letter_settings %}
+
+    {% set letter_limit_html %}
+      {{ "{} per day".format(current_service.get_message_limit("letter")|format_thousands) }}
+      <div class="govuk-hint">
+        {{ current_service.sent_today("letter")|format_thousands + " sent today" }}
+      </div>
+    {% endset %}
+
       {% set base_letter_settings_row = [
         {
           "key": {
@@ -391,7 +480,7 @@
                 "visuallyHiddenText": "your settings for sending letters",
                 "classes": "govuk-link--no-visited-state"
               }
-            ]
+            ] if current_user.has_permissions('manage_service') else []
           }
         }
       ]%}
@@ -429,7 +518,7 @@
                   "visuallyHiddenText": "your settings for sending international letters",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
           },
           {
@@ -469,10 +558,35 @@
                   "visuallyHiddenText": "letter branding",
                   "classes": "govuk-link--no-visited-state"
                 }
-              ]
+              ] if current_user.has_permissions('manage_service') else []
             }
-          }
+          },
         ] %}
+      {% endif %}
+      <!-- only show limit page for live services -->
+      {% if current_service.has_permission("letter") and current_service.live %}
+        {% set _ = restricted_letter_settings_rows.append(
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "{} limit".format('letter'|format_notification_type),
+            },
+            "value": {
+              "text": letter_limit_html,
+              "classes": "govuk-summary-list__value--truncate"
+            },
+            "actions": {
+              "items": [
+                {
+                "href": url_for("main.set_daily_message_limit", service_id=current_service.id, daily_limit_type="letter"),
+                "text": "Change",
+                "visuallyHiddenText": "daily {} limit".format("letter"|format_notification_type|lower),
+                "classes": "govuk-link--no-visited-state"
+                }
+              ] if current_user.has_permissions('manage_service') else []
+            }
+          },
+        ) %}
       {% endif %}
 
       {% set letter_settings_rows = base_letter_settings_row + restricted_letter_settings_rows  if restricted_letter_settings_rows else base_letter_settings_row %}
@@ -497,40 +611,10 @@
 
     </div>
 
-    {% if current_service.trial_mode %}
-      <h2 class="heading-medium top-gutter-0">Your service is in trial mode</h2>
-
-        <p class="govuk-body">You can only:</p>
-
-        <ul class="govuk-list govuk-list--bullet">
-          <li>send messages to yourself and other people in your team</li>
-          <li>send {{ current_service.email_message_limit | message_count('email') }} per day</li>
-          <li>send {{ current_service.sms_message_limit | message_count('sms') }} per day</li>
-          <li>create letter templates, but not send them</li>
-        </ul>
-
-      <p class="govuk-body">
-        {% if current_user.has_permissions('manage_service') %}
-          To remove these restrictions, you can send us a
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.
-        {% else %}
-          Your service manager can ask to have these restrictions removed.
-        {% endif %}
-      </p>
-
-    {% else %}
+    {% if current_service.live %}
       <h2 class="heading-medium top-gutter-0">Your service is live</h2>
       <p class="govuk-body">
-        You can send up to:
-      </p>
-      <ul class="govuk-list govuk-list--bullet">
-        <li>{{ current_service.email_message_limit | message_count('email') }} per day</li>
-        <li>{{ current_service.sms_message_limit | message_count('sms') }} per day</li>
-        <li>{{ current_service.letter_message_limit | message_count('letter') }} per day</li>
-      </ul>
-      <p class="govuk-body">
-        If you need to discuss these limits,
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
+        To delete this service, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
       </p>
 
     {% endif %}

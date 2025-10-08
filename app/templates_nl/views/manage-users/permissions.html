@@ -27,6 +27,8 @@
       Deze gebruiker logt in met een beveiligingssleutel.
     </p>
   {% else %}
-    {{ form.login_authentication }}
+    {% if form.login_authentication %}
+      {{ form.login_authentication }}
+    {% endif %}
   {% endif %}
 {% endif %}

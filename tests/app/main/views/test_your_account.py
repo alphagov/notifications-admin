@@ -1,5 +1,6 @@
 import json
 import uuid
+from unittest.mock import call
 
 import pytest
 from flask import url_for
@@ -95,17 +96,48 @@ def test_should_show_name_page(client_request):
     assert page.select_one("h1").text.strip() == "Change your name"
 
 
+@pytest.mark.parametrize(
+    "name",
+    (
+        "https://example.com",
+        "firstname http://example.com lastname",
+        "click [here](http://example.com)",
+        "click [here](example.com)",
+        "example.com/index.html?foo=bar#baz",
+    ),
+)
+def test_should_not_allow_urls_in_name(client_request, name):
+    page = client_request.post(
+        "main.your_account_name",
+        _data={"new_name": name},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == ("Error: Your name cannot contain a URL")
+
+
+@pytest.mark.parametrize(
+    "name",
+    (
+        "New Name",
+        "Mr. Firstname Lastname",  # dots are fine
+        "test@example.com",  # email addresses are fine (lots of users do this for some reason)
+    ),
+)
 def test_should_redirect_after_name_change(
     client_request,
     mock_update_user_attribute,
+    fake_uuid,
+    name,
 ):
     client_request.post(
         "main.your_account_name",
-        _data={"new_name": "New Name"},
+        _data={"new_name": name},
         _expected_status=302,
         _expected_redirect=url_for("main.your_account"),
     )
-    assert mock_update_user_attribute.called is True
+    assert mock_update_user_attribute.call_args_list == [
+        call(fake_uuid, name=name),
+    ]
 
 
 @pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")

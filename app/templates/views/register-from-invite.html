@@ -28,12 +28,10 @@ Create an account
       </div>
       {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
       {% if invited_user.auth_type == 'sms_auth' %}
-        <div class="extra-tracking">
-          {{ form.mobile_number(param_extensions={
-              "classes": "govuk-!-width-three-quarters",
-              "hint": {"text": "We’ll send you a security code by text message"}
-          }) }}
-        </div>
+        {{ form.mobile_number(param_extensions={
+            "classes": "govuk-!-width-three-quarters govuk-input--extra-letter-spacing",
+            "hint": {"text": "We’ll send you a security code by text message"}
+        }) }}
       {% endif %}
       {{ form.password(param_extensions={
           "classes": "govuk-!-width-three-quarters",

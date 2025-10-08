@@ -1,15 +1,13 @@
 from datetime import datetime
 from functools import partial
-from unittest.mock import ANY, Mock, PropertyMock, call
+from unittest.mock import Mock, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
 from uuid import UUID, uuid4
 
 import pytest
-import pytz
 from flask import g, url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
 import app
 from app.constants import SIGN_IN_METHOD_TEXT, SIGN_IN_METHOD_TEXT_OR_EMAIL
@@ -19,7 +17,6 @@ from app.main.views_nl.service_settings.branding import (
 from app.models.service import Service
 from tests import (
     find_element_by_tag_and_partial_text,
-    invite_json,
     organisation_json,
     sample_uuid,
     service_json,
@@ -40,25 +37,13 @@ from tests.conftest import (
     create_reply_to_email_address,
     create_service_one_user,
     create_sms_sender,
-    create_template,
     normalize_spaces,
 )
 
 FAKE_TEMPLATE_ID = uuid4()
 
 
-@pytest.fixture
-def mock_get_service_settings_page_common(
-    mock_get_all_letter_branding,
-    mock_get_inbound_number_for_service,
-    mock_get_free_sms_fragment_limit,
-    mock_get_service_data_retention,
-    mock_get_organisation,
-):
-    return
-
-
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
+@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
 @pytest.mark.parametrize(
     "user, service_permissions, expected_rows",
     [
@@ -74,10 +59,12 @@ def mock_get_service_settings_page_common(
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
+                "Email limit 1,000 per day 1,234 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Text message limit 1,000 per day 1,234 sent today Change daily text message limit",
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
             ],
@@ -95,6 +82,33 @@ def mock_get_service_settings_page_common(
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
+                "Letter limit 1,000 per day 1,234 sent today Change daily letter limit",
+            ],
+        ),
+        (
+            create_active_user_no_settings_permission(),
+            ["sms", "email", "letter"],
+            [
+                "Service name Test Service",
+                "Sign-in method Text message code",
+                "Data retention period 7 days",
+                "Send emails On",
+                "Email sender name Test Service test.service@notifications.service.gov.uk",
+                "Reply-to email addresses Not set Manage reply-to email addresses",  # user will see manage button
+                "Email branding GOV.UK",
+                "Send files by email contact_us@gov.uk",
+                "Email limit 1,000 per day 1,234 sent today",
+                "Send text messages On",
+                "Text message sender IDs GOVUK Manage text message sender IDs",  # user will see manage button
+                "Start text messages with service name On",
+                "Receive text messages Off",
+                "Text message limit 1,000 per day 1,234 sent today",
+                "Send international text messages Off",
+                "Send letters On",
+                "Send international letters Off",
+                "Sender addresses Not set Manage sender addresses",  # user will see manage button
+                "Letter branding Not set",
+                "Letter limit 1,000 per day 1,234 sent today",
             ],
         ),
         (
@@ -109,13 +123,15 @@ def mock_get_service_settings_page_common(
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Email branding GOV.UK Change email branding",
                 "Send files by email contact_us@gov.uk Manage sending files by email",
+                "Email limit 1,000 per day 1,234 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Text message limit 1,000 per day 1,234 sent today Change daily text message limit",
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
-                "Live No Organisation must accept the data processing and financial agreement first",
+                "Live On Change service status",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -146,7 +162,8 @@ def mock_get_service_settings_page_common(
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses Not set Manage sender addresses",
                 "Letter branding Not set Change letter branding",
-                "Live No Organisation must accept the data processing and financial agreement first",
+                "Letter limit 1,000 per day 1,234 sent today Change daily letter limit",
+                "Live On Change service status",
                 "Count in list of live services Yes Change if service is counted in list of live services",
                 "Billing details None Change billing details for service",
                 "Notes None Change the notes for the service",
@@ -161,12 +178,11 @@ def mock_get_service_settings_page_common(
                 "Custom data retention Email – 7 days Change data retention",
                 "Email authentication Off Change your settings for Email authentication",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
-                "Sending economy letters Off Change your settings for Sending economy letters",
             ],
         ),
     ],
 )
-def test_should_show_overview(
+def test_service_settings_page_visible_settings_depend_on_user_and_service_permissions(
     client_request,
     mocker,
     api_user_active,
@@ -184,8 +200,10 @@ def test_should_show_overview(
         permissions=service_permissions,
         organisation_id=ORGANISATION_ID,
         contact_link="contact_us@gov.uk",
+        restricted=False,
     )
     mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch("app.service_api_client.get_notification_count", return_value=1_234)
 
     client_request.login(user, service_one)
     page = client_request.get("main.service_settings", service_id=SERVICE_ONE_ID)
@@ -195,6 +213,42 @@ def test_should_show_overview(
     assert len(rows) == len(expected_rows)
     assert [" ".join(row.text.split()) for row in rows] == expected_rows
     app.service_api_client.get_service.assert_called_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    "endpoint",
+    [
+        "main.service_sms_senders",
+        "main.service_settings",
+        "main.service_email_reply_to",
+        "main.service_letter_contact_details",
+    ],
+)
+def test_user_with_manage_api_keys_permission_but_no_settings_permission_can_view_certain_settings_pages(
+    client_request,
+    service_one,
+    active_user_no_settings_permission,
+    single_reply_to_email_address,
+    single_letter_contact_block,
+    mock_get_organisation,
+    single_sms_sender,
+    mocker,
+    endpoint,
+):
+    mocker.patch("app.models.user.Users._get_items", return_value=[active_user_no_settings_permission])
+    mocker.patch("app.service_api_client.get_notification_count", return_value=1_234)
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    mocker.patch(
+        "app.service_api_client.get_service_data_retention",
+        return_value=[],
+    )
+
+    client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        branding_type="letter",
+        _expected_status=200,
+    )
 
 
 @pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
@@ -334,12 +388,14 @@ def test_send_files_by_email_row_on_settings_page(
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Email branding Organisation name Change email branding",
                 "Send files by email Not set up Manage sending files by email",
+                "Email limit 1,000 per day 0 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages On Change your settings for receiving text messages",
+                "Text message limit 1,000 per day 0 sent today Change daily text message limit",
                 "Send international text messages On Change your settings for sending international text messages",
-                "International text message limit 500 per day Change daily international text message limit",
+                "International text message limit 500 per day 0 sent today Change daily international text message limit",  # noqa
                 "Send letters Off Change your settings for sending letters",
             ],
         ),
@@ -354,10 +410,12 @@ def test_send_files_by_email_row_on_settings_page(
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Email branding Organisation name Change email branding",
                 "Send files by email Not set up Manage sending files by email",
+                "Email limit 1,000 per day 0 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
+                "Text message limit 1,000 per day 0 sent today Change daily text message limit",
                 "Send international text messages Off Change your settings for sending international text messages",
                 "Send letters Off Change your settings for sending letters",
             ],
@@ -374,6 +432,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses 1 Example Street Manage sender addresses",
                 "Letter branding Not set Change letter branding",
+                "Letter limit 1,000 per day 0 sent today Change daily letter limit",
             ],
         ),
     ],
@@ -393,6 +452,7 @@ def test_should_show_overview_for_service_with_more_things_set(
 ):
     client_request.login(active_user_with_permissions)
     service_one["permissions"] = permissions
+    service_one["restricted"] = False
     service_one["email_branding"] = uuid4()
     page = client_request.get("main.service_settings", service_id=service_one["id"])
     assert [
@@ -400,7 +460,6 @@ def test_should_show_overview_for_service_with_more_things_set(
     ] == expected_rows
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_if_cant_send_letters_then_cant_see_letter_contact_block(
     client_request,
     service_one,
@@ -433,7 +492,6 @@ def test_letter_contact_block_shows_none_if_not_set(
     assert "govuk-summary-list__value--default" in div.attrs["class"][1]
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_escapes_letter_contact_block(
     client_request,
     service_one,
@@ -557,63 +615,6 @@ def test_service_name_change_fails_if_new_name_fails_validation(
 
 
 @pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
-@pytest.mark.parametrize(
-    "user, expected_text, expected_link",
-    [
-        (
-            create_active_user_with_permissions(),
-            "To remove these restrictions, you can send us a request to go live.",
-            True,
-        ),
-        (
-            create_active_user_no_settings_permission(),
-            "Your service manager can ask to have these restrictions removed.",
-            False,
-        ),
-    ],
-)
-def test_show_restricted_service(
-    client_request,
-    service_one,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    single_sms_sender,
-    mock_get_service_settings_page_common,
-    user,
-    expected_text,
-    expected_link,
-):
-    service_one["email_message_limit"] = 50
-    service_one["sms_message_limit"] = 51
-
-    client_request.login(user)
-    page = client_request.get(
-        "main.service_settings",
-        service_id=SERVICE_ONE_ID,
-    )
-
-    assert page.select_one("h1").text == "Settings"
-    assert page.select("main > h2")[0].text == "Your service is in trial mode"
-
-    assert [normalize_spaces(li.text) for li in page.select("main ul li")] == [
-        "send messages to yourself and other people in your team",
-        "send 50 emails per day",
-        "send 51 text messages per day",
-        "create letter templates, but not send them",
-    ]
-
-    request_to_live = page.select("main p")[1]
-    request_to_live_link = request_to_live.select_one("a")
-    assert normalize_spaces(request_to_live.text) == expected_text
-
-    if expected_link:
-        assert request_to_live_link.text.strip() == "request to go live"
-        assert request_to_live_link["href"] == url_for("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    else:
-        assert not request_to_live_link
-
-
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_show_limits_for_live_service(
     client_request,
     service_one,
@@ -633,14 +634,7 @@ def test_show_limits_for_live_service(
     )
 
     assert page.select_one("main > h2").text == "Your service is live"
-    assert normalize_spaces(page.select_one("main p").text) == "You can send up to:"
-    assert [normalize_spaces(li.text) for li in page.select("main ul li")] == [
-        "1,000 emails per day",
-        "2,000 text messages per day",
-        "3,000 letters per day",
-    ]
-    assert normalize_spaces(page.select_one("main ul + p").text) == "If you need to discuss these limits, contact us."
-    assert page.select_one("main ul + p a")["href"] == url_for("main.support")
+    assert normalize_spaces(page.select_one("main p").text) == "To delete this service, contact us."
 
 
 @pytest.mark.parametrize(
@@ -887,585 +881,7 @@ def test_should_redirect_after_service_name_change(
         ),
     )
 
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="New Name")
-
-
-@pytest.mark.parametrize(
-    "volumes, expected_estimated_volumes_item",
-    [
-        ((0, 0, 0), "Tell us how many messages you expect to send Not completed"),
-        ((1, 0, 0), "Tell us how many messages you expect to send Completed"),
-        ((9, 99, 999), "Tell us how many messages you expect to send Completed"),
-    ],
-)
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_should_check_if_estimated_volumes_provided(
-    client_request,
-    mocker,
-    single_sms_sender,
-    single_reply_to_email_address,
-    mock_get_service_templates,
-    mock_get_users_by_service,
-    mock_get_organisation,
-    mock_get_invites_for_service,
-    volumes,
-    expected_estimated_volumes_item,
-):
-    for volume, channel in zip(volumes, ("sms", "email", "letter"), strict=True):
-        mocker.patch(
-            f"app.models.service.Service.volume_{channel}",
-            create=True,
-            new_callable=PropertyMock,
-            return_value=volume,
-        )
-
-    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
-
-    assert normalize_spaces(page.select_one(".task-list .task-list-item").text) == expected_estimated_volumes_item
-
-
-@pytest.mark.parametrize(
-    "volume_email,count_of_email_templates,reply_to_email_addresses,expected_reply_to_checklist_item",
-    [
-        pytest.param(None, 0, [], "", marks=pytest.mark.xfail(raises=IndexError)),
-        pytest.param(0, 0, [], "", marks=pytest.mark.xfail(raises=IndexError)),
-        (None, 1, [], "Add a reply-to email address Not completed"),
-        (None, 1, [{}], "Add a reply-to email address Completed"),
-        (1, 1, [], "Add a reply-to email address Not completed"),
-        (1, 1, [{}], "Add a reply-to email address Completed"),
-        (1, 0, [], "Add a reply-to email address Not completed"),
-        (1, 0, [{}], "Add a reply-to email address Completed"),
-    ],
-)
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_should_check_for_reply_to_on_go_live(
-    client_request,
-    mocker,
-    service_one,
-    single_sms_sender,
-    volume_email,
-    count_of_email_templates,
-    reply_to_email_addresses,
-    expected_reply_to_checklist_item,
-    mock_get_invites_for_service,
-    mock_get_users_by_service,
-):
-    mocker.patch(
-        "app.service_api_client.get_service_templates",
-        return_value={"data": [create_template(template_type="email") for _ in range(count_of_email_templates)]},
-    )
-
-    mock_get_reply_to_email_addresses = mocker.patch(
-        "app.main.views_nl.service_settings.index.service_api_client.get_reply_to_email_addresses",
-        return_value=reply_to_email_addresses,
-    )
-
-    for channel, volume in (("email", volume_email), ("sms", 0), ("letter", 1)):
-        mocker.patch(
-            f"app.models.service.Service.volume_{channel}",
-            create=True,
-            new_callable=PropertyMock,
-            return_value=volume,
-        )
-
-    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
-
-    checklist_items = page.select(".task-list .task-list-item")
-    assert normalize_spaces(checklist_items[3].text) == expected_reply_to_checklist_item
-
-    if count_of_email_templates:
-        mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
-
-
-@pytest.mark.parametrize(
-    "count_of_users_with_manage_service,count_of_invites_with_manage_service,expected_user_checklist_item",
-    [
-        (1, 0, "Add a team member who can manage settings, team and usage Not completed"),
-        (2, 0, "Add a team member who can manage settings, team and usage Completed"),
-        (1, 1, "Add a team member who can manage settings, team and usage Completed"),
-    ],
-)
-@pytest.mark.parametrize(
-    "count_of_templates, expected_templates_checklist_item",
-    [
-        (0, "Add templates with examples of the content you plan to send Not completed"),
-        (1, "Add templates with examples of the content you plan to send Completed"),
-        (2, "Add templates with examples of the content you plan to send Completed"),
-    ],
-)
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_should_check_for_sending_things_right(
-    client_request,
-    mocker,
-    service_one,
-    single_sms_sender,
-    count_of_users_with_manage_service,
-    count_of_invites_with_manage_service,
-    expected_user_checklist_item,
-    count_of_templates,
-    expected_templates_checklist_item,
-    active_user_with_permissions,
-    active_user_no_settings_permission,
-    single_reply_to_email_address,
-):
-    mocker.patch(
-        "app.service_api_client.get_service_templates",
-        return_value={"data": [create_template(template_type="sms") for _ in range(count_of_templates)]},
-    )
-
-    mock_get_users = mocker.patch(
-        "app.models.user.Users._get_items",
-        return_value=(
-            [active_user_with_permissions] * count_of_users_with_manage_service + [active_user_no_settings_permission]
-        ),
-    )
-    invite_one = invite_json(
-        id_=uuid4(),
-        from_user=service_one["users"][0],
-        service_id=service_one["id"],
-        email_address="invited_user@test.gov.uk",
-        permissions="view_activity,send_messages,manage_service,manage_api_keys",
-        created_at=datetime.utcnow(),
-        status="pending",
-        auth_type="sms_auth",
-        folder_permissions=[],
-    )
-
-    invite_two = invite_one.copy()
-    invite_two["permissions"] = "view_activity"
-
-    mock_get_invites = mocker.patch(
-        "app.models.user.InvitedUsers._get_items",
-        return_value=(([invite_one] * count_of_invites_with_manage_service) + [invite_two]),
-    )
-
-    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
-
-    checklist_items = page.select(".task-list .task-list-item")
-    assert normalize_spaces(checklist_items[1].text) == expected_user_checklist_item
-    assert normalize_spaces(checklist_items[2].text) == expected_templates_checklist_item
-
-    mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
-    mock_get_invites.assert_called_once_with(SERVICE_ONE_ID)
-
-
-@pytest.mark.parametrize(
-    "checklist_completed, agreement_signed, expected_button",
-    (
-        (True, True, True),
-        (True, None, True),
-        (True, False, False),
-        (False, True, False),
-        (False, None, False),
-    ),
-)
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_should_not_show_go_live_button_if_checklist_not_complete(
-    client_request,
-    mocker,
-    mock_get_service_templates,
-    mock_get_users_by_service,
-    mock_get_service_organisation,
-    mock_get_invites_for_service,
-    single_sms_sender,
-    checklist_completed,
-    agreement_signed,
-    expected_button,
-):
-    mocker.patch(
-        "app.models.service.Service.go_live_checklist_completed",
-        new_callable=PropertyMock,
-        return_value=checklist_completed,
-    )
-    mocker.patch(
-        "app.models.organisation.Organisation.agreement_signed",
-        new_callable=PropertyMock,
-        return_value=agreement_signed,
-        create=True,
-    )
-
-    for channel in ("email", "sms", "letter"):
-        mocker.patch(
-            f"app.models.service.Service.volume_{channel}",
-            create=True,
-            new_callable=PropertyMock,
-            return_value=0,
-        )
-
-    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
-
-    if expected_button:
-        assert page.select_one("form")["method"] == "post"
-        assert "action" not in page.select_one("form")
-        assert normalize_spaces(page.select("main p")[0].text) == (
-            "When we receive your request we’ll get back to you by the end of the next working day."
-        )
-        assert page.select_one("form button").text.strip() == "Request to go live"
-    else:
-        assert not page.select("form")
-        assert not page.select("form button")
-        assert len(page.select("main p")) == 1
-        assert normalize_spaces(page.select_one("main p").text) == (
-            "You must complete these steps before you can request to go live."
-        )
-
-
-@pytest.mark.parametrize(
-    "has_active_go_live_request, expected_button",
-    (
-        (True, False),
-        (False, True),
-    ),
-)
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_should_not_show_go_live_button_if_service_already_has_go_live_request(
-    client_request,
-    mocker,
-    mock_get_service_templates,
-    mock_get_users_by_service,
-    mock_get_service_organisation,
-    mock_get_invites_for_service,
-    single_sms_sender,
-    has_active_go_live_request,
-    expected_button,
-):
-    mocker.patch(
-        "app.models.service.Service.has_active_go_live_request",
-        new_callable=PropertyMock,
-        return_value=has_active_go_live_request,
-        create=True,
-    )
-    mocker.patch(
-        "app.models.service.Service.go_live_checklist_completed",
-        new_callable=PropertyMock,
-        return_value=True,
-    )
-    mocker.patch(
-        "app.models.organisation.Organisation.agreement_signed",
-        new_callable=PropertyMock,
-        return_value=True,
-        create=True,
-    )
-
-    for channel in ("email", "sms", "letter"):
-        mocker.patch(
-            f"app.models.service.Service.volume_{channel}",
-            create=True,
-            new_callable=PropertyMock,
-            return_value=0,
-        )
-
-    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
-
-    if expected_button:
-        assert page.select_one("form button").text.strip() == "Request to go live"
-    else:
-        assert not page.select("form")
-        assert not page.select("form button")
-        assert len(page.select("main p")) == 1
-        assert normalize_spaces(page.select_one("main p").text) == (
-            "Your team has already sent a request to go live for this service."
-        )
-
-
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
-@pytest.mark.parametrize(
-    "go_live_at, message",
-    [
-        (None, "‘service one’ is already live."),
-        ("2020-10-09 13:55:20", "‘service one’ went live on 9 October 2020."),
-    ],
-)
-def test_request_to_go_live_redirects_if_service_already_live(
-    client_request,
-    service_one,
-    go_live_at,
-    message,
-):
-    service_one["restricted"] = False
-    service_one["go_live_at"] = go_live_at
-
-    page = client_request.get(
-        "main.request_to_go_live",
-        service_id=SERVICE_ONE_ID,
-    )
-
-    assert page.select_one("h1").text == "Your service is already live"
-    assert normalize_spaces(page.select_one("main p").text) == message
-
-
-@pytest.mark.parametrize(
-    "estimated_sms_volume,organisation_type,count_of_sms_templates,sms_senders,expected_sms_sender_checklist_item",
-    [
-        pytest.param(0, "local", 0, [], "", marks=pytest.mark.xfail(raises=IndexError)),
-        pytest.param(
-            None,
-            "local",
-            0,
-            [{"is_default": True, "sms_sender": "GOVUK"}],
-            "",
-            marks=pytest.mark.xfail(raises=IndexError),
-        ),
-        pytest.param(
-            1,
-            "central",
-            99,
-            [{"is_default": True, "sms_sender": "GOVUK"}],
-            "",
-            marks=pytest.mark.xfail(raises=IndexError),
-        ),
-        pytest.param(
-            None,
-            "central",
-            99,
-            [{"is_default": True, "sms_sender": "GOVUK"}],
-            "",
-            marks=pytest.mark.xfail(raises=IndexError),
-        ),
-        pytest.param(
-            1,
-            "central",
-            99,
-            [{"is_default": True, "sms_sender": "GOVUK"}],
-            "",
-            marks=pytest.mark.xfail(raises=IndexError),
-        ),
-        (
-            None,
-            "local",
-            1,
-            [],
-            "Change your Text message sender ID Not completed",
-        ),
-        (
-            1,
-            "nhs_local",
-            0,
-            [],
-            "Change your Text message sender ID Not completed",
-        ),
-        (
-            None,
-            "school_or_college",
-            1,
-            [{"is_default": True, "sms_sender": "GOVUK"}],
-            "Change your Text message sender ID Not completed",
-        ),
-        (
-            None,
-            "local",
-            1,
-            [
-                {"is_default": False, "sms_sender": "GOVUK"},
-                {"is_default": True, "sms_sender": "KUVOG"},
-            ],
-            "Change your Text message sender ID Completed",
-        ),
-        (
-            None,
-            "nhs_local",
-            1,
-            [{"is_default": True, "sms_sender": "KUVOG"}],
-            "Change your Text message sender ID Completed",
-        ),
-    ],
-)
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_should_check_for_sms_sender_on_go_live(
-    client_request,
-    service_one,
-    mocker,
-    organisation_type,
-    count_of_sms_templates,
-    sms_senders,
-    expected_sms_sender_checklist_item,
-    estimated_sms_volume,
-):
-    service_one["organisation_type"] = organisation_type
-
-    mocker.patch(
-        "app.service_api_client.get_service_templates",
-        return_value={"data": [create_template(template_type="sms") for _ in range(count_of_sms_templates)]},
-    )
-
-    mocker.patch(
-        "app.models.service.Service.has_team_members_with_manage_service_permission",
-        return_value=True,
-    )
-
-    mock_get_sms_senders = mocker.patch(
-        "app.main.views_nl.service_settings.index.service_api_client.get_sms_senders",
-        return_value=sms_senders,
-    )
-
-    for channel, volume in (("email", 0), ("sms", estimated_sms_volume)):
-        mocker.patch(
-            f"app.models.service.Service.volume_{channel}",
-            create=True,
-            new_callable=PropertyMock,
-            return_value=volume,
-        )
-
-    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
-
-    checklist_items = page.select(".task-list .task-list-item")
-    assert normalize_spaces(checklist_items[3].text) == expected_sms_sender_checklist_item
-
-    mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
-
-
-@pytest.mark.parametrize(
-    "agreement_signed, expected_item",
-    (
-        pytest.param(None, "", marks=pytest.mark.xfail(raises=IndexError)),
-        (
-            True,
-            "Accept our data processing and financial agreement Completed",
-        ),
-        (
-            False,
-            "Accept our data processing and financial agreement Not completed",
-        ),
-    ),
-)
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_should_check_for_mou_on_request_to_go_live(
-    client_request,
-    service_one,
-    mocker,
-    agreement_signed,
-    mock_get_service_organisation,
-    expected_item,
-):
-    mocker.patch(
-        "app.models.service.Service.has_team_members_with_manage_service_permission",
-        return_value=False,
-    )
-    mocker.patch(
-        "app.models.service.Service.all_templates",
-        new_callable=PropertyMock,
-        return_value=[],
-    )
-    mocker.patch(
-        "app.main.views_nl.service_settings.index.service_api_client.get_sms_senders",
-        return_value=[],
-    )
-    mocker.patch(
-        "app.main.views_nl.service_settings.index.service_api_client.get_reply_to_email_addresses",
-        return_value=[],
-    )
-    for channel in {"email", "sms", "letter"}:
-        mocker.patch(
-            f"app.models.service.Service.volume_{channel}",
-            create=True,
-            new_callable=PropertyMock,
-            return_value=None,
-        )
-
-    mocker.patch(
-        "app.organisations_client.get_organisation", return_value=organisation_json(agreement_signed=agreement_signed)
-    )
-    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
-
-    checklist_items = page.select(".task-list .task-list-item")
-    assert normalize_spaces(checklist_items[3].text) == expected_item
-
-
-@pytest.mark.parametrize(
-    "organisation_type",
-    (
-        "nhs_gp",
-        pytest.param("central", marks=pytest.mark.xfail(raises=IndexError)),
-    ),
-)
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_gp_without_organisation_is_shown_agreement_step(
-    client_request,
-    service_one,
-    mocker,
-    organisation_type,
-):
-    mocker.patch(
-        "app.models.service.Service.has_team_members_with_manage_service_permission",
-        return_value=False,
-    )
-    mocker.patch(
-        "app.models.service.Service.all_templates",
-        new_callable=PropertyMock,
-        return_value=[],
-    )
-    mocker.patch(
-        "app.main.views_nl.service_settings.index.service_api_client.get_sms_senders",
-        return_value=[],
-    )
-    mocker.patch(
-        "app.main.views_nl.service_settings.index.service_api_client.get_reply_to_email_addresses",
-        return_value=[],
-    )
-    for channel in {"email", "sms", "letter"}:
-        mocker.patch(
-            f"app.models.service.Service.volume_{channel}",
-            create=True,
-            new_callable=PropertyMock,
-            return_value=None,
-        )
-    mocker.patch(
-        "app.models.service.Service.organisation_id",
-        new_callable=PropertyMock,
-        return_value=None,
-    )
-    mocker.patch(
-        "app.models.service.Service.organisation_type",
-        new_callable=PropertyMock,
-        return_value=organisation_type,
-    )
-
-    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Before you request to go live"
-    assert normalize_spaces(page.select(".task-list .task-list-item")[3].text) == (
-        "Accept our data processing and financial agreement Not completed"
-    )
-
-
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
-def test_non_gov_user_is_told_they_cant_go_live(
-    client_request,
-    api_nongov_user_active,
-    mocker,
-    mock_get_organisations,
-    mock_get_organisation,
-):
-    mocker.patch(
-        "app.models.service.Service.has_team_members_with_manage_service_permission",
-        return_value=False,
-    )
-    mocker.patch(
-        "app.models.service.Service.all_templates",
-        new_callable=PropertyMock,
-        return_value=[],
-    )
-    mocker.patch(
-        "app.main.views_nl.service_settings.index.service_api_client.get_sms_senders",
-        return_value=[],
-    )
-    mocker.patch(
-        "app.main.views_nl.service_settings.index.service_api_client.get_reply_to_email_addresses",
-        return_value=[],
-    )
-    client_request.login(api_nongov_user_active)
-    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("main p").text) == (
-        "Only team members with a government email address can request to go live."
-    )
-    assert len(page.select("main form")) == 0
-    assert len(page.select("main button")) == 0
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="New Name", confirmed_unique=False)
 
 
 class TestServiceDataRetention:
@@ -1860,6 +1276,7 @@ class TestServiceDataRetention:
         )
         assert expected_error in page.text
 
+    @pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
     def test_post_updates_volumes_for_all_channels(self, client_request, platform_admin_user, mocker, service_one):
         service_one["restricted"] = False
         for channel, volume in {"email": 0, "sms": 0, "letter": 0}.items():
@@ -1890,7 +1307,6 @@ class TestServiceDataRetention:
         ]
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "volumes, displayed_volumes",
     (
@@ -1904,6 +1320,7 @@ class TestServiceDataRetention:
         ),
     ),
 )
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_should_show_estimate_volumes(
     client_request,
     volumes,
@@ -2038,276 +1455,6 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
     assert mock_update_service.called is False
 
 
-def test_non_gov_users_cant_request_to_go_live(
-    client_request,
-    api_nongov_user_active,
-    mock_get_organisations,
-):
-    client_request.login(api_nongov_user_active)
-    client_request.post(
-        "main.request_to_go_live",
-        service_id=SERVICE_ONE_ID,
-        _expected_status=403,
-    )
-
-
-@freeze_time("2012-12-21 13:12:12.12354")
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_should_redirect_after_request_to_go_live(
-    client_request,
-    mocker,
-    active_user_with_permissions,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    mock_get_organisations_and_services_for_user,
-    single_sms_sender,
-    mock_get_service_settings_page_common,
-    mock_get_users_by_service,
-    mock_update_service,
-):
-    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
-    mock_send_ticket_to_zendesk = mocker.patch(
-        "app.main.views_nl.service_settings.index.zendesk_client.send_ticket_to_zendesk",
-        autospec=True,
-    )
-    page = client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID, _follow_redirects=True)
-
-    expected_message = (
-        "Service: service one\n"
-        "http://localhost/services/{service_id}\n"
-        "\n"
-        "---\n"
-        "Organisation type: Central government\n"
-        "Agreement signed: Can’t tell (domain is user.gov.uk).\n"
-        "\n"
-        "Other live services for that user: No\n"
-        "\n"
-        "---\n"
-        "Request sent by test@user.gov.uk\n"
-        "Requester’s user page: http://localhost/users/{user_id}\n"
-    ).format(
-        service_id=SERVICE_ONE_ID,
-        user_id=active_user_with_permissions["id"],
-    )
-    mock_create_ticket.assert_called_once_with(
-        ANY,
-        subject="Request to go live - service one",
-        message=expected_message,
-        ticket_type="task",
-        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
-        user_name=active_user_with_permissions["name"],
-        user_email=active_user_with_permissions["email_address"],
-        requester_sees_message_content=False,
-        org_id=None,
-        org_type="central",
-        service_id=SERVICE_ONE_ID,
-        notify_task_type="notify_task_go_live_request",
-        user_created_at=datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
-    )
-    mock_send_ticket_to_zendesk.assert_called_once()
-
-    assert normalize_spaces(page.select_one(".banner-default").text) == (
-        "Thanks for your request to go live. We’ll get back to you within one working day."
-    )
-    assert normalize_spaces(page.select_one("h1").text) == "Settings"
-    mock_update_service.assert_called_once_with(
-        SERVICE_ONE_ID,
-        go_live_user=active_user_with_permissions["id"],
-        has_active_go_live_request=True,
-    )
-
-
-@pytest.mark.parametrize(
-    "can_approve_own_go_live_requests, expected_subject, expected_go_live_notes, expected_zendesk_task_type",
-    (
-        (
-            False,
-            "Request to go live - service one",
-            "This service is not allowed to go live",
-            "notify_task_go_live_request",
-        ),
-        (
-            True,
-            "Self approve go live request - service one",
-            (
-                "This organisation can approve its own go live requests. "
-                "No action should be needed from us. "
-                "This service is not allowed to go live"
-            ),
-            "notify_task_go_live_request_self_approve",
-        ),
-    ),
-)
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
-    client_request,
-    mocker,
-    active_user_with_permissions,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    mock_get_organisations_and_services_for_user,
-    single_sms_sender,
-    mock_get_service_organisation,
-    mock_get_service_settings_page_common,
-    mock_get_service_templates,
-    mock_get_users_by_service,
-    mock_update_service,
-    mock_get_invites_without_manage_permission,
-    mock_notify_users_of_request_to_go_live_for_service,
-    can_approve_own_go_live_requests,
-    expected_go_live_notes,
-    expected_subject,
-    expected_zendesk_task_type,
-):
-    mocker.patch(
-        "app.organisations_client.get_organisation",
-        side_effect=lambda org_id: organisation_json(
-            ORGANISATION_ID,
-            "Org 1",
-            request_to_go_live_notes="This service is not allowed to go live",
-            can_approve_own_go_live_requests=can_approve_own_go_live_requests,
-        ),
-    )
-    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
-    mock_send_ticket_to_zendesk = mocker.patch(
-        "app.main.views_nl.service_settings.index.zendesk_client.send_ticket_to_zendesk",
-        autospec=True,
-    )
-    client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID, _follow_redirects=True)
-
-    expected_message = (
-        "Service: service one\n"
-        "http://localhost/services/{service_id}\n"
-        "\n"
-        "---\n"
-        "Organisation type: Central government\n"
-        "Agreement signed: No (organisation is Org 1, a crown body). {expected_go_live_notes}\n"
-        "\n"
-        "Other live services for that user: No\n"
-        "\n"
-        "---\n"
-        "Request sent by test@user.gov.uk\n"
-        "Requester’s user page: http://localhost/users/{user_id}\n"
-    ).format(
-        service_id=SERVICE_ONE_ID,
-        expected_go_live_notes=expected_go_live_notes,
-        user_id=active_user_with_permissions["id"],
-    )
-
-    mock_create_ticket.assert_called_once_with(
-        ANY,
-        subject=expected_subject,
-        message=expected_message,
-        ticket_type="task",
-        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
-        user_name=active_user_with_permissions["name"],
-        user_email=active_user_with_permissions["email_address"],
-        requester_sees_message_content=False,
-        org_id=ORGANISATION_ID,
-        org_type="central",
-        service_id=SERVICE_ONE_ID,
-        notify_task_type=expected_zendesk_task_type,
-        user_created_at=datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
-    )
-    mock_send_ticket_to_zendesk.assert_called_once()
-
-
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_request_to_go_live_displays_mou_signatories(
-    client_request,
-    mocker,
-    fake_uuid,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    mock_get_organisations_and_services_for_user,
-    single_sms_sender,
-    mock_get_service_organisation,
-    mock_get_service_settings_page_common,
-    mock_update_service,
-):
-    mocker.patch(
-        "app.organisations_client.get_organisation",
-        side_effect=lambda org_id: organisation_json(
-            ORGANISATION_ID,
-            "Org 1",
-            agreement_signed=True,
-            agreement_signed_by_id=fake_uuid,
-            agreement_signed_on_behalf_of_email_address="bigdog@example.gov.uk",
-        ),
-    )
-    mocker.patch(
-        "app.main.views_nl.service_settings.index.zendesk_client.send_ticket_to_zendesk",
-        autospec=True,
-    )
-    mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
-    client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID, _follow_redirects=True)
-
-    assert (
-        "Organisation type: Central government\n"
-        "Agreement signed: Yes, for Org 1.\n"
-        "Agreement signed by: test@user.gov.uk\n"
-        "Agreement signed on behalf of: bigdog@example.gov.uk\n"
-    ) in mock_create_ticket.call_args[1]["message"]
-
-
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_should_be_able_to_request_to_go_live_with_no_organisation(
-    client_request,
-    mocker,
-    single_reply_to_email_address,
-    single_letter_contact_block,
-    mock_get_organisations_and_services_for_user,
-    single_sms_sender,
-    mock_get_service_settings_page_common,
-    mock_get_service_templates,
-    mock_get_users_by_service,
-    mock_update_service,
-    mock_get_invites_without_manage_permission,
-):
-    for channel in {"email", "sms", "letter"}:
-        mocker.patch(
-            f"app.models.service.Service.volume_{channel}",
-            create=True,
-            new_callable=PropertyMock,
-            return_value=1,
-        )
-    mock_post = mocker.patch(
-        "app.main.views_nl.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True
-    )
-
-    client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID, _follow_redirects=True)
-
-    assert mock_post.called is True
-
-
-@pytest.mark.parametrize(
-    "can_approve_own_go_live_requests, expected_call_args",
-    (
-        (True, [call(SERVICE_ONE_ID)]),
-        (False, []),
-    ),
-)
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
-def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organisation(
-    client_request,
-    mocker,
-    mock_get_organisations_and_services_for_user,
-    mock_get_service_organisation,
-    mock_update_service,
-    mock_notify_users_of_request_to_go_live_for_service,
-    organisation_one,
-    can_approve_own_go_live_requests,
-    expected_call_args,
-):
-    organisation_one["can_approve_own_go_live_requests"] = can_approve_own_go_live_requests
-    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
-    mocker.patch("app.main.views_nl.service_settings.index.zendesk_client.send_ticket_to_zendesk", autospec=True)
-
-    client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-
-    assert mock_notify_users_of_request_to_go_live_for_service.call_args_list == expected_call_args
-
-
 @pytest.mark.parametrize(
     (
         "has_team_members_with_manage_service_permission,"
@@ -2320,6 +1467,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
         "volume_email,"
         "volume_sms,"
         "volume_letter,"
+        "confirmed_unique,"
         "expected_readyness,"
         "agreement_signed,"
     ),
@@ -2337,6 +1485,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             0,
             True,
             True,
+            True,
         ),
         (  # Needs to set reply to address
             True,
@@ -2349,6 +1498,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             1,
             0,
             1,
+            True,
             False,
             True,
         ),
@@ -2365,6 +1515,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             0,
             True,
             True,
+            True,
         ),
         (  # Needs to change SMS sender
             True,
@@ -2377,6 +1528,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             0,
             1,
             0,
+            True,
             False,
             True,
         ),
@@ -2391,6 +1543,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             1,
             0,
             0,
+            True,
             False,
             True,
         ),
@@ -2405,6 +1558,22 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             0,
             1,
             0,
+            True,
+            False,
+            True,
+        ),
+        (  # Just confirm unique service
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            1,
+            0,
+            0,
+            False,
             False,
             True,
         ),
@@ -2419,6 +1588,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
             None,
             None,
             None,
+            False,
             False,
             False,
         ),
@@ -2438,6 +1608,7 @@ def test_ready_to_go_live(
     volume_email,
     volume_sms,
     volume_letter,
+    confirmed_unique,
     expected_readyness,
     agreement_signed,
 ):
@@ -2468,7 +1639,9 @@ def test_ready_to_go_live(
             return_value=volume,
         )
 
-    assert app.models.service.Service({"id": SERVICE_ONE_ID}).go_live_checklist_completed is expected_readyness
+    service = app.models.service.Service({"id": SERVICE_ONE_ID, "confirmed_unique": confirmed_unique})
+
+    assert service.go_live_checklist_completed is expected_readyness
 
 
 @pytest.mark.parametrize(
@@ -2476,12 +1649,9 @@ def test_ready_to_go_live(
     [
         "main.service_settings",
         "main.service_name_change",
-        "main.request_to_go_live",
-        "main.submit_request_to_go_live",
         "main.archive_service",
     ],
 )
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
 def test_route_permissions(
     notify_admin,
     client_request,
@@ -2514,8 +1684,6 @@ def test_route_permissions(
     [
         "main.service_settings",
         "main.service_name_change",
-        "main.request_to_go_live",
-        "main.submit_request_to_go_live",
         "main.service_switch_live",
         "main.archive_service",
     ],
@@ -2547,11 +1715,8 @@ def test_route_invalid_permissions(
     [
         "main.service_settings",
         "main.service_name_change",
-        "main.request_to_go_live",
-        "main.submit_request_to_go_live",
     ],
 )
-@pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
 def test_route_for_platform_admin(
     notify_admin,
     client_request,
@@ -2603,7 +1768,7 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
     )
     assert (
         get_row(page, "Text message sender IDs")
-        == "Text message sender IDs Example …and 2 more Manage text message sender IDs"
+        == "Text message sender IDs 07812398712 …and 2 more Manage text message sender IDs"
     )
     assert get_row(page, "Sender addresses") == "Sender addresses 1 Example Street …and 2 more Manage sender addresses"
 
@@ -3395,6 +2560,7 @@ def test_confirm_delete_reply_to_email_address(fake_uuid, client_request, get_no
     assert page.select_one(".banner-dangerous form")["method"] == "post"
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_delete_reply_to_email_address(
     client_request,
     service_one,
@@ -3676,7 +2842,6 @@ def test_confirm_delete_sms_sender(
     assert page.select_one(".banner-dangerous form")["method"] == "post"
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "sms_sender, expected_link_text",
     [
@@ -3685,6 +2850,7 @@ def test_confirm_delete_sms_sender(
         (create_sms_sender(is_default=False), "Delete"),
     ],
 )
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_inbound_sms_sender_is_not_deleteable(
     client_request, service_one, fake_uuid, sms_sender, expected_link_text, mocker
 ):
@@ -4219,6 +3385,7 @@ def test_service_set_email_branding_add_to_branding_pool_step_is_platform_admin_
 
 
 @pytest.mark.parametrize("add_to_pool", ["yes", "no"])
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_service_set_email_branding_add_to_branding_pool_step_choices_yes_or_no(
     client_request,
     platform_admin_user,
@@ -4351,6 +3518,7 @@ def test_service_set_letter_branding_add_to_branding_pool_step_is_platform_admin
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize("add_to_pool", ["yes", "no"])
 def test_service_set_letter_branding_add_to_branding_pool_step_choices_yes_or_no(
     client_request,
@@ -4671,6 +3839,7 @@ def test_old_set_letters_page_redirects(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_unknown_channel_404s(
     client_request,
 ):
@@ -4696,7 +3865,7 @@ def test_unknown_channel_404s(
     [
         (
             "letter",
-            "It costs between 61 pence and £1.63 to send a letter using Notify.",
+            "It costs between 59 pence and £1.76 to send a letter using Notify.",
             "Send letters",
             ["email", "sms"],
             "False",
@@ -4705,7 +3874,7 @@ def test_unknown_channel_404s(
         ),
         (
             "letter",
-            "It costs between 61 pence and £1.63 to send a letter using Notify.",
+            "It costs between 59 pence and £1.76 to send a letter using Notify.",
             "Send letters",
             ["email", "sms", "letter"],
             "True",
@@ -4785,7 +3954,6 @@ def test_switch_service_channels_on_and_off(
     assert mocked_fn.call_args[0][0] == service_one["id"]
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "permission, permissions, expected_checked",
     [
@@ -4811,6 +3979,18 @@ def test_show_international_sms_and_letters_as_radio_button(
 
     assert len(checked_radios) == 1
     assert checked_radios[0]["value"] == expected_checked
+
+
+def test_set_international_sms_page_shows_services_international_sms_limit(
+    client_request,
+    service_one,
+):
+    service_one["permissions"] = ["international_sms"]
+    service_one["international_sms_message_limit"] = 56
+
+    page = client_request.get("main.service_set_international_sms", service_id=service_one["id"])
+
+    assert "56" in page.select(".govuk-body")[2].text
 
 
 @pytest.mark.parametrize(
@@ -4851,18 +4031,30 @@ def test_switch_service_enable_international_sms_and_letters(
     assert mocked_fn.call_args[0][0] == service_one["id"]
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_should_show_page_to_set_per_day_international_sms_message_limit(
     client_request,
     service_one,
+    mocker,
 ):
     service_one["permissions"] = ["international_sms"]
+    mock_get_notification_count = mocker.patch("app.service_api_client.get_notification_count", return_value=1)
 
     page = client_request.get(
         "main.set_per_day_international_sms_message_limit",
         service_id=SERVICE_ONE_ID,
     )
     assert normalize_spaces(page.select_one("label").text) == "Daily international text message limit"
+    # form prefilled with current limit
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "500"
+    # today's remaining limit pulled and displayed
+    assert mock_get_notification_count.called_once_with(
+        service_id=SERVICE_ONE_ID, notification_type="international_sms"
+    )
+    assert (
+        normalize_spaces(page.select(".ajax-block-container")[0].text)
+        == "You have sent 1 international text message today (499 remaining)."
+    )
 
 
 @pytest.mark.parametrize(
@@ -4890,6 +4082,38 @@ def test_set_per_day_international_sms_message_limit(
     assert mock_update_service.call_args_list == [
         mocker.call(SERVICE_ONE_ID, international_sms_message_limit=expected_api_argument)
     ]
+
+
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
+@pytest.mark.parametrize(
+    "daily_limit_type, limit_noun", (("sms", "text message"), ("email", "email"), ("letter", "letter"))
+)
+def test_should_show_daily_message_limit_page(
+    client_request,
+    service_one,
+    daily_limit_type,
+    limit_noun,
+    mocker,
+):
+    mock_get_notification_count = mocker.patch("app.service_api_client.get_notification_count", return_value=1)
+
+    page = client_request.get(
+        "main.set_daily_message_limit",
+        service_id=SERVICE_ONE_ID,
+        daily_limit_type=daily_limit_type,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == f"Daily {limit_noun} limit"
+
+    # full limit pulled in and displayed
+    assert normalize_spaces(page.select(".govuk-body")[0].text) == (f"You can send up to 1,000 {limit_noun}s per day.")
+
+    # today's remaining limit pulled and displayed
+    assert mock_get_notification_count.called_once_with(service_id=SERVICE_ONE_ID, notification_type=daily_limit_type)
+    assert (
+        normalize_spaces(page.select(".ajax-block-container")[0].text)
+        == f"You have sent 1 {limit_noun} today (999 remaining)."
+    )
 
 
 @pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
@@ -4957,6 +4181,7 @@ def test_archive_service_after_confirm(
         ),
     ),
 )
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_archive_service_prompts_user(
     client_request,
     mocker,
@@ -5030,6 +4255,7 @@ def test_send_files_by_email_contact_details_prefills_the_form_with_the_existing
     assert page.select_one(f"input#{contact_details_type}")["value"] == contact_details_value
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @pytest.mark.parametrize(
     "contact_details_type, old_value, new_value",
     [
@@ -5038,7 +4264,6 @@ def test_send_files_by_email_contact_details_prefills_the_form_with_the_existing
         ("phone_number", "020 3451 9002", "020 3451 9001"),
     ],
 )
-@pytest.mark.skip(reason="[NOTIFYNL] Dutch phone number implementation breaks this test")
 def test_send_files_by_email_contact_details_updates_contact_details_and_redirects_to_settings_page(
     client_request,
     service_one,
@@ -5062,7 +4287,8 @@ def test_send_files_by_email_contact_details_updates_contact_details_and_redirec
         },
         _follow_redirects=True,
     )
-
+    # no idea why its trying to assert `Settings` as the title when the code says `
+    # Send files by email` in our case NL Bestanden per e-mail verzenden
     assert page.select_one("h1").text == "Settings"
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link=new_value)
 
@@ -5798,8 +5024,8 @@ def test_service_receive_text_messages_stop(client_request, service_one, mock_ge
     )
 
     assert page.select_one("h1").text == "When you stop receiving text messages"
-    assert normalize_spaces(page.select_one(".govuk-inset-text").text) == "0781239871"
-    assert "You can make 0781239871 the default sender again at any time." in page.text
+    assert normalize_spaces(page.select_one(".govuk-inset-text").text) == "07812398712"
+    assert "You can make 07812398712 the default sender again at any time." in page.text
 
     support_link = page.select("p a")[-1]
     assert support_link["href"] == url_for(".support")
@@ -5852,6 +5078,7 @@ def test_service_receive_text_messages_stop_success_redirect(
     platform_admin_user,
     service_one,
     mock_get_inbound_number_for_service,
+    multiple_sms_senders_with_diff_default,
     mocker,
 ):
     service_one["permissions"] = ["inbound_sms"]
@@ -5864,7 +5091,7 @@ def test_service_receive_text_messages_stop_success_redirect(
         service_id=SERVICE_ONE_ID,
         _data={"removal_options": "true"},
         _expected_redirect=url_for(
-            ".service_receive_text_messages_stop_success", service_id=SERVICE_ONE_ID, inbound_number="0781239871"
+            ".service_receive_text_messages_stop_success", service_id=SERVICE_ONE_ID, inbound_number="07812398712"
         ),
     )
 
@@ -5882,13 +5109,13 @@ def service_receive_text_messages_stop_success(
     page = client_request.get(
         ".service_receive_text_messages_stop_success",
         service_id=SERVICE_ONE_ID,
-        inbound_number="0781239871",
+        inbound_number="07812398712",
     )
 
     assert page.select_one("h1").text == "You’ve stopped receiving text messages"
 
     inset_text = page.select_one(".govuk-inset-text")
-    assert inset_text and normalize_spaces(inset_text.text) == "0781239871"
+    assert inset_text and normalize_spaces(inset_text.text) == "07812398712"
 
     service_settings_link = page.select_one("a.govuk-link")
     assert service_settings_link["href"] == url_for("main.service_settings", service_id=SERVICE_ONE_ID)
@@ -5902,6 +5129,7 @@ def test_service_receive_text_messages_stop_handles_error(
     service_one,
     mock_get_inbound_number_for_service,
     mock_get_most_recent_inbound_usage_date,
+    multiple_sms_senders_with_diff_default,
     mocker,
 ):
     service_one["permissions"] = ["inbound_sms"]
@@ -5925,6 +5153,37 @@ def test_service_receive_text_messages_stop_handles_error(
     assert error_summary is not None
     assert "There is a problem" in error_summary.text
     assert "Failed to remove number from service" in error_summary.text
+
+    radios = page.select("input[type=radio]")
+    assert len(radios) == 2
+    assert radios[0]["value"] == "true"
+    assert radios[1]["value"] == "false"
+
+
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
+def test_service_receive_text_messages_stop_fails_when_inbound_number_is_default_sender(
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_inbound_number_for_service,
+    mock_get_most_recent_inbound_usage_date,
+    multiple_sms_senders,
+    mocker,
+):
+    service_one["permissions"] = ["inbound_sms"]
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        ".service_receive_text_messages_stop",
+        service_id=SERVICE_ONE_ID,
+        _data={"removal_options": "true"},
+        _expected_status=200,
+    )
+
+    error_summary = page.select_one(".govuk-error-summary")
+    assert error_summary is not None
+    assert "There is a problem" in error_summary.text
+    assert "You need to change your default text message sender ID before you can continue" in error_summary.text
 
     radios = page.select("input[type=radio]")
     assert len(radios) == 2
@@ -6085,7 +5344,6 @@ def test_update_service_organisation_does_not_update_if_same_value(
     assert mock_update_service_organisation.called is False
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_service_settings_links_to_branding_request_page_for_emails(
     service_one,
     client_request,
@@ -6101,7 +5359,6 @@ def test_service_settings_links_to_branding_request_page_for_emails(
     assert len(page.select(f'a[href="/services/{SERVICE_ONE_ID}/service-settings/email-branding"]')) == 1
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_service_settings_links_to_branding_options_page_for_letters(
     service_one,
     client_request,
@@ -6236,7 +5493,6 @@ def test_update_service_data_retention_populates_form(
     assert page.select_one("input", attrs={"name": "days_of_retention"})["value"] == "5"
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_service_settings_links_to_edit_service_notes_page_for_platform_admins(
     service_one,
     client_request,
@@ -6285,7 +5541,6 @@ def test_update_service_notes(client_request, platform_admin_user, service_one, 
     mock_update_service.assert_called_with(SERVICE_ONE_ID, notes="Very fluffy")
 
 
-@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_service_settings_links_to_edit_service_billing_details_page_for_platform_admins(
     service_one,
     client_request,

@@ -35,7 +35,7 @@
 
   {% endif %}
 
-  <div class="govuk-grid-column-full {% if message_type == 'sms' %}extra-tracking{% endif %}">
+  <div class="govuk-grid-column-full">
   {% call form_wrapper(
     action=url_for('main.view_notifications', service_id=current_service.id, message_type=message_type, search_query=search_query),
     class="govuk-grid-row notify-simple-search-form"
@@ -53,7 +53,8 @@
                 prefix='Search by',
                 prefix_plural='Search by'
               )
-            }
+            },
+            "classes": "govuk-input--extra-letter-spacing" if message_type == "sms" else ""
           }
         )
       }}
@@ -70,20 +71,43 @@
   {% endcall %}
 
   {% if current_user.has_permissions('view_activity') %}
-    <p class="bottom-gutter">
-        {% if can_download %}
-            <a href="{{ download_link }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">
-                Download this report (<abbr title="Comma separated values">CSV</abbr>)
-            </a>
-
-        {% else %}
-            <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold" href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback') }}">
-                Contact support to download this report
-            </a>
-        {% endif %}
-        &emsp;
-        Data available for {{ partials.service_data_retention_days }} days
-    </p>
+    {% set retention_text %}
+      Data available for {{ partials.service_data_retention_days }} days
+    {% endset %}
+    {% if report_request_feature_flag or current_user.platform_admin %}
+      <div class="govuk-button-group govuk-button-group--flex-start">
+        {% call form_wrapper(class='csv-request-form form--inline') %}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="report_type" value="notifications_report">
+          {{ govukButton({
+            "html": 'Download this report (CSV)',
+            "classes": "govuk-button--as-link",
+            "attributes": {
+              "role": "link"
+            }
+          }) }}
+        {% endcall %}
+        <p class="govuk-body">
+          {{ retention_text }}
+        </p>
+      </div>
+    {% else %}
+      {% if can_download %}
+        <p class="bottom-gutter">
+          <a href="{{ download_link }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">
+              Download this report (<abbr title="Comma separated values">CSV</abbr>)
+          </a>
+          &emsp;
+          {{ retention_text }}
+        </p>
+      {% else %}
+      <p class="bottom-gutter">
+        <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold" href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback') }}">
+          Contact support to download this report
+        </a>
+      </p>
+      {% endif %}
+    {% endif %}
   {% endif %}
 
   {{ ajax_block(

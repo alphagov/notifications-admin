@@ -198,33 +198,6 @@ def test_letter_image_renderer_pagination(mocker, page_image_url):
     )
 
 
-# FIXME: current_service required
-# @pytest.mark.parametrize(
-#     "kwargs, expected_exception, expected_exception_value",
-#     (
-#         (
-#             {"image_url": "foo"},
-#             TypeError,
-#             "page_count is required to render TemplatedLetterImageTemplate",
-#         ),
-#         (
-#             {"image_url": "foo", "page_count": "foo"},
-#             TypeError,
-#             "'<' not supported between instances of 'int' and 'str'",
-#         ),
-#     ),
-# )
-# def test_letter_image_renderer_requires_page_count_to_render(
-#     mocker, kwargs, service_one, expected_exception, expected_exception_value
-# ):
-#     template = TemplatedLetterImageTemplate(
-#         {"service": SERVICE_ONE_ID, "content": "", "subject": "", "template_type": "letter"}, **kwargs
-#     )
-#     with pytest.raises(expected_exception) as exception:
-#         str(template)
-#     assert str(exception.value) == expected_exception_value
-
-
 def test_letter_image_renderer_requires_valid_postage():
     with pytest.raises(TypeError) as exception:
         TemplatedLetterImageTemplate(
@@ -335,7 +308,6 @@ def test_letter_image_renderer_passes_postage_to_html_attribute(
 
 
 @freeze_time("2012-12-12 12:12:12")
-# @mock.patch("app.utils.templates.TemplatedLetterImageTemplate.jinja_template.render")
 @pytest.mark.parametrize(
     "page_count, expected_oversized, expected_page_numbers",
     [
@@ -802,7 +774,7 @@ def test_email_preview_template_makes_links_out_of_URLs(url, url_with_entities_r
         f'<a style="word-wrap: break-word; color: #1D70B8;" href="{url_with_entities_replaced}">'
         f"{url_with_entities_replaced}"
         "</a>"
-    ) in str(EmailPreviewTemplate({"content": url, "subject": "", "template_type": "email"}))
+    ) in str(EmailPreviewTemplate({"content": url, "subject": "Required", "template_type": "email"}))
 
 
 @pytest.mark.parametrize(
@@ -1101,3 +1073,27 @@ def test_templates_make_quotes_smart_and_dashes_en(
 
     mock_smart_quotes.assert_has_calls(expected_calls)
     mock_en_dash_replacement.assert_has_calls(expected_calls)
+
+
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
+@pytest.mark.parametrize(
+    "subject, expected_subject, expected_classes",
+    (
+        ("Example", "Example", ["govuk-summary-list__value"]),
+        ("", "Subject missing", ["govuk-summary-list__value", "govuk-hint"]),
+    ),
+)
+def test_email_preview_template_doesnt_error_on_empty_subject(
+    subject,
+    expected_subject,
+    expected_classes,
+):
+    template = BeautifulSoup(
+        str(EmailPreviewTemplate({"content": "content", "subject": subject, "template_type": "email"})),
+        features="html.parser",
+    )
+
+    subject_field = template.select(".email-message-meta .govuk-summary-list__value")[1]
+
+    assert subject_field.text.strip() == expected_subject
+    assert subject_field["class"] == expected_classes

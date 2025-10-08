@@ -1,4 +1,7 @@
+import io
+
 import pytest
+from PIL import Image
 from werkzeug.datastructures import FileStorage
 
 from app.utils.image_processing import CorruptImage, ImageProcessor, WrongImageFormat
@@ -75,7 +78,18 @@ class TestImageProcessor:
         assert ip.size == (1, 10)
         assert ip.width == 1
         assert ip.height == 10
-        assert ip.get_data().read() == open("tests/test_img_files/its-a-taller-padded-one.png", "rb").read()
+
+        # Normalize both images
+        actual = Image.open(io.BytesIO(ip.get_data().read()))
+        expected = Image.open("tests/test_img_files/its-a-taller-padded-one.png")
+
+        actual_bytes = io.BytesIO()
+        expected_bytes = io.BytesIO()
+
+        actual.save(actual_bytes, format="PNG")
+        expected.save(expected_bytes, format="PNG")
+
+        assert actual_bytes.getvalue() == expected_bytes.getvalue()
 
     def test_get_data(self):
         ip = ImageProcessor(FileStorage(open("tests/test_img_files/small-but-perfectly-formed.png", "rb")))

@@ -53,7 +53,7 @@
 
   {% if status == 'valid' %}
     <div class="js-stick-at-bottom-when-scrolling">
-      <p class="top-gutter-0 bottom-gutter-1-2 send-recipient" title="{{ recipient }}">
+      <p class="top-gutter-0 bottom-gutter-1-2 send-recipient" title="{{ postal_address.as_single_line }}">
         Ontvanger: {{ postal_address.as_single_line }}
       </p>
 
@@ -84,6 +84,7 @@
             {{ page_footer("Verzend 1 brief") }}
         </form>
       {% endif %}
+
     </div>
   {% endif %}
 {% endblock %}

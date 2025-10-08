@@ -22,16 +22,21 @@ from tests.conftest import (
 @pytest.mark.parametrize(
     "key_type, notification_status, platform_admin, expected_status",
     [
-        (None, "created", False, "Sending"),
-        (None, "created", True, "Sending via MMG"),
-        (None, "sending", False, "Sending"),
-        (None, "sending", True, "Sending via MMG"),
+        (None, "created", False, "Delivering"),
+        (None, "created", True, "Delivering via MMG"),
+        (None, "sending", False, "Delivering"),
+        (None, "sending", True, "Delivering via MMG"),
         (None, "delivered", False, "Delivered"),
         (None, "delivered", True, "Delivered via MMG"),
         (None, "failed", False, "Failed"),
         (None, "failed", True, "Failed via MMG"),
         (None, "temporary-failure", False, "Phone not accepting messages right now"),
-        (None, "temporary-failure", True, "Phone not accepting messages right now via MMG"),
+        (
+            None,
+            "temporary-failure",
+            True,
+            "Phone not accepting messages right now via MMG",
+        ),
         (None, "permanent-failure", False, "Not delivered"),
         (None, "permanent-failure", True, "Not delivered via MMG"),
         (None, "technical-failure", False, "Technical failure"),
@@ -40,8 +45,8 @@ from tests.conftest import (
         ("team", "delivered", True, "Delivered via MMG"),
         ("live", "delivered", False, "Delivered"),
         ("live", "delivered", True, "Delivered via MMG"),
-        ("test", "sending", False, "Sending (test)"),
-        ("test", "sending", True, "Sending via MMG (test)"),
+        ("test", "sending", False, "Delivering (test)"),
+        ("test", "sending", True, "Delivering via MMG (test)"),
         ("test", "delivered", False, "Delivered (test)"),
         ("test", "delivered", True, "Delivered via MMG (test)"),
         ("test", "permanent-failure", False, "Not delivered (test)"),
@@ -264,9 +269,7 @@ def test_notification_page_shows_page_for_letter_notification(
         "‘sample template’ was sent by Test User today at 1:01am"
     )
     assert normalize_spaces(page.select("main p:nth-of-type(2)")[0].text) == "Printing starts today at 5:30pm"
-    assert normalize_spaces(page.select("main p:nth-of-type(3)")[0].text) == (
-        "Estimated delivery date: Wednesday 6 January"
-    )
+    assert normalize_spaces(page.select("main p:nth-of-type(3)")[0].text) == "Estimated delivery by Monday 11 January"
     assert len(page.select(".letter-postage")) == 1
     assert normalize_spaces(page.select_one(".letter-postage").text) == "Postage: second class"
     assert page.select_one(".letter-postage")["class"] == ["letter-postage", "letter-postage-second"]
@@ -519,25 +522,25 @@ def test_notification_page_does_not_show_cancel_link_for_letter_which_cannot_be_
             "first",
             "Postage: first class",
             "letter-postage-first",
-            "Estimated delivery date: Tuesday 5 January",
+            "Estimated delivery by Tuesday 5 January",
         ),
         (
             "economy",
             "Postage: economy",
             "letter-postage-economy",
-            "Estimated delivery date: Thursday 7 January",
+            "Estimated delivery by Wednesday 13 January",
         ),
         (
             "europe",
             "Postage: international",
             "letter-postage-international",
-            "Estimated delivery date: Friday 8 January",
+            "Estimated delivery by Tuesday 12 January",
         ),
         (
             "rest-of-world",
             "Postage: international",
             "letter-postage-international",
-            "Estimated delivery date: Monday 11 January",
+            "Estimated delivery by Thursday 14 January",
         ),
     ),
 )
@@ -947,3 +950,26 @@ def test_should_show_reply_to_from_notification(
     )
 
     assert "reply to info" in page.text
+
+
+# before going live with this feature, update test to check
+# users with 'view activity' permissions
+def test_show_csv_request_form_to_users_with_correct_permissions(
+    client_request,
+    service_one,
+    mock_get_notifications,
+    mock_get_service_data_retention,
+    mock_get_service_statistics,
+    mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
+    platform_admin_user,
+):
+    client_request.login(platform_admin_user)
+    page = client_request.get(
+        "main.view_notifications",
+        service_id=service_one["id"],
+        message_type="email",
+        status="delivered",
+    )
+
+    assert len(page.select("form.csv-request-form")) == 1

@@ -92,7 +92,7 @@ def uploads(service_id):
 def uploaded_letters(service_id, letter_print_day):
     page = get_page_from_request()
     if page is None:
-        abort(404, f"Ongeldige paginawaarde ({request.args.get('page')}).")
+        abort(404, f"Invalid page argument ({request.args.get('page')}).")
     uploaded_letters = upload_api_client.get_letters_by_service_and_print_day(
         current_service.id,
         letter_print_day=letter_print_day,
@@ -127,6 +127,7 @@ def uploaded_letters(service_id, letter_print_day):
             service_id=current_service.id,
             from_uploaded_letters=letter_print_day,
         ),
+        limit_days=None,
     )
 
 
@@ -151,8 +152,8 @@ def upload_letter(service_id):
             # TODO: get page count from the sanitise response once template preview handles malformed files nicely
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
-            current_app.logger.info("Ongeldige PDF geüpload voor service_id: %s", service_id)
-            form.file.errors.append("Notify kan deze PDF niet lezen – sla een nieuwe kopie op en probeer het opnieuw")
+            current_app.logger.info("Invalid PDF uploaded for service_id: %s", service_id)
+            form.file.errors.append("Notify cannot read this PDF - save a new copy and try again")
 
         if not form.errors:
             original_filename = form.file.data.filename
@@ -250,9 +251,7 @@ def uploaded_letter_preview(service_id, file_id):
 
     error_message = get_letter_validation_error(error_shortcode, invalid_pages, page_count)
 
-    form = LetterUploadPostageForm(
-        postage_zone=postal_address.postage, show_economy_class=current_service.has_permission("economy_letter_sending")
-    )
+    form = LetterUploadPostageForm(postage_zone=postal_address.postage)
 
     template = current_service.get_precompiled_letter_template(
         letter_preview_url=url_for(".view_letter_upload_as_preview", service_id=service_id, file_id=file_id),
@@ -319,9 +318,7 @@ def send_uploaded_letter(service_id, file_id):
 
     postal_address = PostalAddress(metadata.get("recipient"))
 
-    form = LetterUploadPostageForm(
-        postage_zone=postal_address.postage, show_economy_class=current_service.has_permission("economy_letter_sending")
-    )
+    form = LetterUploadPostageForm(postage_zone=postal_address.postage)
 
     if not form.validate_on_submit():
         return uploaded_letter_preview(service_id, file_id)
@@ -514,7 +511,7 @@ def delete_contact_list(service_id, contact_list_id):
 
     flash(
         [
-            f"Weet u zeker dat u ‘{contact_list.original_file_name}’ wilt verwijderen?",
+            f"Are you sure you want to delete ‘{contact_list.original_file_name}’?",
         ],
         "delete",
     )

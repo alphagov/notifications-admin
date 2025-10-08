@@ -1,0 +1,49 @@
+{% extends "withnav_template.html" %}
+{% from "components/ajax-block.html" import ajax_block %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = "Dagelijkse {} limiet ".format(1|message_count_noun(daily_limit_type)) %}
+
+
+{% block service_page_title %}
+{{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+{{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+        {{ page_header(page_title) }}
+        <p class="govuk-body">
+            U kunt naartoe sturen{{ current_service.get_message_limit(daily_limit_type)|message_count(daily_limit_type) }} per dag.
+        </p>
+
+        {{ ajax_block(partials, updates_url, 'remaining_limit') }}
+
+        <h2 class="heading-medium">Als u de dagelijkse {{ 1|message_count_noun(daily_limit_type) }} -limiet moet wijzigen</h2>
+
+        <p class="govuk-body">
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">Neem contact met ons op</a> en laat het ons weten:
+        </p>
+
+        <ul class="govuk-list govuk-list--bullet">
+            <li>what you need to change your limit to</li>
+            {% if daily_limit_type == "letter" %}
+                <li>de start- en einddata van uw briefcampagne</li>
+                <lihet totale aantal letters dat uw service gedurende deze tijd zal verzenden</li>
+                <li>het aantal pagina's per letter</li>
+                <li>de verzendklasse die u gaat gebruiken</li>
+            {% else %}
+                <li>hoe lang moet u uw limiet verhogen</li>
+                <li>het totale aantal {{ 3|message_count_noun(daily_limit_type) }} dat uw service gedurende deze tijd zal verzenden</li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

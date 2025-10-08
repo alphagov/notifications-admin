@@ -18,8 +18,9 @@ Account aanmaken
     </p>
     {% call form_wrapper() %}
       {#
-        Dit veld is bedoeld zodat wachtwoordmanagers ook de gebruikersnaam kunnen opslaan,
-        maar het moet niet zichtbaar zijn voor gebruikers en ook niet verwerkt worden door de view.
+        This field is to enable password managers to capture the username as
+        well as the password, but should not be visible to users, nor should
+        the view process the input.
       #}
       <div class="govuk-visually-hidden">
         <label for="username" aria-hidden="true">E-mail</label>
@@ -27,12 +28,10 @@ Account aanmaken
       </div>
       {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
       {% if invited_user.auth_type == 'sms_auth' %}
-        <div class="extra-tracking">
-          {{ form.mobile_number(param_extensions={
-              "classes": "govuk-!-width-three-quarters",
-              "hint": {"text": "We sturen u een beveiligingscode per sms"}
-          }) }}
-        </div>
+        {{ form.mobile_number(param_extensions={
+            "classes": "govuk-!-width-three-quarters govuk-input--extra-letter-spacing",
+            "hint": {"text": "We sturen u een beveiligingscode per sms"}
+        }) }}
       {% endif %}
       {{ form.password(param_extensions={
           "classes": "govuk-!-width-three-quarters",

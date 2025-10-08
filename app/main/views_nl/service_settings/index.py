@@ -13,7 +13,6 @@ from flask import (
 from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
-from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 from app import (
@@ -26,7 +25,6 @@ from app import (
 )
 from app.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.event_handlers import Events
-from app.extensions import zendesk_client
 from app.main import json_updates, main
 from app.main.forms import (
     AdminBillingDetailsForm,
@@ -71,21 +69,17 @@ from app.models.organisation import Organisation
 from app.models.sms_rate import SMSRate
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES, SENDING_STATUSES
 from app.utils.services import service_has_or_is_expected_to_send_x_or_more_notifications
-from app.utils.user import (
-    user_has_permissions,
-    user_is_gov_user,
-    user_is_platform_admin,
-)
+from app.utils.user import user_has_permissions, user_is_platform_admin
 
 PLATFORM_ADMIN_SERVICE_PERMISSIONS = {
-    "inbound_sms": {"title": "Receive inbound SMS", "requires": "sms", "endpoint": ".service_set_inbound_number"},
-    "email_auth": {"title": "Email authentication"},
-    "sms_to_uk_landlines": {"title": "Sending SMS to UK landlines"},
-    "economy_letter_sending": {"title": "Sending economy letters", "requires": "letter"},
+    "inbound_sms": {"title": "Inkomende sms ontvangen", "requires": "sms", "endpoint": ".service_set_inbound_number"},
+    "email_auth": {"title": "E-mailauthenticatie"},
+    "sms_to_uk_landlines": {"title": "Sms-berichten naar Britse vaste nummers versturen"},
 }
 
+
 THANKS_FOR_BRANDING_REQUEST_MESSAGE = (
-    "Thanks for your branding request. We’ll get back to you by the end of the next working day."
+    "Bedankt voor uw aanvraag voor branding. We nemen uiterlijk aan het einde van de volgende werkdag contact met u op."
 )
 
 
@@ -105,7 +99,7 @@ def service_name_change(service_id):
 
     if form.validate_on_submit():
         try:
-            current_service.update(name=form.name.data)
+            current_service.update(name=form.name.data, confirmed_unique=False)
         except HTTPError as http_error:
             if http_error.status_code == 400 and (
                 error_message := service_api_client.parse_edit_service_http_error(http_error)
@@ -173,7 +167,7 @@ def service_data_retention(service_id):
         service_api_client.set_service_data_retention(
             service_id=service_id, days_of_retention=form.days_of_retention.data
         )
-        flash(f"You’ve changed the data retention period to {form.days_of_retention.data} days", "default")
+        flash(f"De bewaartermijn van gegevens is gewijzigd naar {form.days_of_retention.data} dagen", "default")
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
@@ -211,55 +205,6 @@ def estimate_usage(service_id):
         "views/service-settings/estimate-usage.html",
         form=form,
     )
-
-
-@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["GET"])
-@user_has_permissions("manage_service")
-def request_to_go_live(service_id):
-    if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=True)
-
-    return render_template("views/service-settings/request-to-go-live.html")
-
-
-@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["POST"])
-@user_has_permissions("manage_service")
-@user_is_gov_user
-def submit_request_to_go_live(service_id):
-    ticket_message = render_template("support-tickets/go-live-request.txt") + "\n"
-
-    if current_service.organisation.can_approve_own_go_live_requests:
-        subject = f"Self approve go live request - {current_service.name}"
-        notify_task_type = "notify_task_go_live_request_self_approve"
-    else:
-        subject = f"Request to go live - {current_service.name}"
-        notify_task_type = "notify_task_go_live_request"
-
-    ticket = NotifySupportTicket(
-        subject=subject,
-        message=ticket_message,
-        ticket_type=NotifySupportTicket.TYPE_TASK,
-        notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
-        user_name=current_user.name,
-        user_email=current_user.email_address,
-        requester_sees_message_content=False,
-        org_id=current_service.organisation_id,
-        org_type=current_service.organisation_type,
-        service_id=current_service.id,
-        notify_task_type=notify_task_type,
-        user_created_at=current_user.created_at,
-    )
-    zendesk_client.send_ticket_to_zendesk(ticket)
-
-    current_service.update(
-        go_live_user=current_user.id,
-        has_active_go_live_request=True,
-    )
-
-    current_service.notify_organisation_users_of_request_to_go_live()
-
-    flash("Thanks for your request to go live. We’ll get back to you within one working day.", "default")
-    return redirect(url_for(".service_settings", service_id=service_id))
 
 
 @main.route("/services/<uuid:service_id>/service-settings/switch-live", methods=["GET", "POST"])
@@ -340,7 +285,7 @@ def archive_service(service_id):
         Events.archive_service(service_id=service_id, archived_by_id=current_user.id)
 
         flash(
-            f"‘{current_service.name}’ was deleted",
+            f"‘{current_service.name}’ is verwijderd",
             "default_with_tick",
         )
         return redirect(url_for(".your_services"))
@@ -569,7 +514,7 @@ def service_edit_email_reply_to(service_id, reply_to_email_id):
             )
 
     if request.endpoint == "main.service_confirm_delete_email_reply_to":
-        flash("Are you sure you want to delete this reply-to email address?", "delete")
+        flash("Weet u zeker dat u dit reply-to e-mailadres wilt verwijderen?", "delete")
     return render_template(
         "views/service-settings/email-reply-to/edit.html",
         form=form,
@@ -667,7 +612,47 @@ def set_per_day_international_sms_message_limit(service_id):
         "views/service-settings/set-message-limit-for-international-sms.html",
         form=form,
         error_summary_enabled=True,
+        partials=get_daily_limit_partials(daily_limit_type="international_sms"),
+        updates_url=url_for(
+            "json_updates.view_remaining_limit",
+            service_id=service_id,
+            daily_limit_type="international_sms",
+        ),
     )
+
+
+@main.route(
+    "/services/<uuid:service_id>/service-settings/daily-message-limit/<daily_limit_type:daily_limit_type>",
+    methods=["GET"],
+)
+@user_has_permissions("manage_service")
+def set_daily_message_limit(service_id, daily_limit_type):
+    return render_template(
+        "views/service-settings/daily-message-limit.html",
+        daily_limit_type=daily_limit_type,
+        partials=get_daily_limit_partials(daily_limit_type=daily_limit_type),
+        updates_url=url_for(
+            "json_updates.view_remaining_limit",
+            service_id=service_id,
+            daily_limit_type=daily_limit_type,
+        ),
+    )
+
+
+@json_updates.route(
+    "/services/<uuid:service_id>/service-settings/<daily_limit_type:daily_limit_type>/remaining-today.json"
+)
+@user_has_permissions("manage_service")
+def view_remaining_limit(service_id, daily_limit_type):
+    return jsonify(**get_daily_limit_partials(daily_limit_type=daily_limit_type))
+
+
+def get_daily_limit_partials(daily_limit_type):
+    return {
+        "remaining_limit": render_template(
+            "partials/daily-limits/remaining-limit.html", daily_limit_type=daily_limit_type
+        ),
+    }
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-international-letters", methods=["GET", "POST"])
@@ -710,7 +695,7 @@ def service_receive_text_messages_start(service_id):
             inbound_number_id=sms_sender["inbound_number_id"],
         )
 
-        flash("You added a phone number to your service.", "default_with_tick")
+        flash("U heeft een telefoonnummer aan uw dienst toegevoegd.", "default_with_tick")
         return redirect(url_for(".service_receive_text_messages", service_id=service_id))
 
     return render_template("views/service-settings/receive-text-messages-start.html")
@@ -726,21 +711,29 @@ def service_receive_text_messages_stop(service_id):
     inbound_number = current_service.inbound_number
 
     if form.validate_on_submit():
-        archive = form.removal_options.data == "true"
+        if current_service.default_sms_sender == current_service.inbound_number:
+            form.removal_options.errors.append(
+                "You need to change your default text message sender ID before you can continue"
+            )
 
-        try:
-            service_api_client.remove_service_inbound_sms(service_id, archive)
-            return redirect(
-                url_for(
-                    ".service_receive_text_messages_stop_success", service_id=service_id, inbound_number=inbound_number
+        else:
+            archive = form.removal_options.data == "true"
+
+            try:
+                service_api_client.remove_service_inbound_sms(service_id, archive)
+                return redirect(
+                    url_for(
+                        ".service_receive_text_messages_stop_success",
+                        service_id=service_id,
+                        inbound_number=inbound_number,
+                    )
                 )
-            )
 
-        except Exception as e:
-            current_app.logger.error(
-                "Error removing inbound number %s for service %s: %s", inbound_number, service_id, e
-            )
-            form.removal_options.errors.append("Failed to remove number from service")
+            except Exception as e:
+                current_app.logger.error(
+                    "Error removing inbound number %s for service %s: %s", inbound_number, service_id, e
+                )
+                form.removal_options.errors.append("Failed to remove number from service")
 
     recent_use_date = None
 
@@ -958,7 +951,7 @@ def service_edit_letter_contact(service_id, letter_contact_id):
         return redirect(url_for(".service_letter_contact_details", service_id=service_id))
 
     if request.endpoint == "main.service_confirm_delete_letter_contact":
-        flash("Are you sure you want to delete this contact block?", "delete")
+        flash("Weet u zeker dat u dit contactblok wilt verwijderen?", "delete")
     return render_template(
         "views/service-settings/letter-contact/edit.html",
         form=form,
@@ -1045,7 +1038,7 @@ def service_edit_sms_sender(service_id, sms_sender_id):
 
     form.is_default.data = sms_sender["is_default"]
     if request.endpoint == "main.service_confirm_delete_sms_sender":
-        flash("Are you sure you want to delete this text message sender ID?", "delete")
+        flash("Weet u zeker dat u deze sms-afzender-ID wilt verwijderen?", "delete")
     return render_template(
         "views/service-settings/sms-sender/edit.html",
         form=form,
@@ -1177,15 +1170,15 @@ def service_set_branding_add_to_branding_pool_step(service_id, branding_type):
     if form.validate_on_submit():
         # The service’s branding gets updated either way
         current_service.update(**{f"{branding_type}_branding": branding_id})
-        message = f"The {branding_type} branding has been set to {branding_name}"
+        message = f"De {branding_type}-branding is ingesteld op {branding_name}"
 
         # If the platform admin chose "yes" the branding is added to the organisation's branding pool
         if form.add_to_pool.data == "yes":
             branding_ids = [branding_id]
             add_brandings_to_pool(org_id, branding_ids)
             message = (
-                f"The {branding_type} branding has been set to {branding_name} and it has been "
-                f"added to {current_service.organisation.name}'s {branding_type} branding pool"
+                f"De {branding_type}-branding is ingesteld op {branding_name} en toegevoegd aan "
+                f"de {branding_type}-brandingpool van {current_service.organisation.name}"
             )
 
         flash(message, "default_with_tick")

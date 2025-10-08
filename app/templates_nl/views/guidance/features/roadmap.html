@@ -3,76 +3,69 @@
 {% from "components/content-metadata.html" import content_metadata %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Over Notify' %}
+{% set navigation_label_prefix = 'About NotifyNL' %}
 
 {% block per_page_title %}
-  Routekaart
+  Roadmap
 {% endblock %}
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Routekaart</h1>
+  <h1 class="heading-large">Roadmap</h1>
 
   {{ content_metadata(
     data={
-      "Laatst bijgewerkt": "20 maart 2025",
-      "Volgende beoordeling": "20 juni 2025"
+      "Last updated": "22 July 2025",
+      "Next review due": "22 September 2025"
     }
   ) }}
 
-  <p class="govuk-body">De routekaart van NotifyNL laat zien waar we aan werken en enkele <a class="govuk-link govuk-link--no-visited-state" href="#things-we-have-done">zaken die we hebben afgerond</a>.</p>
-  <p class="govuk-body">De routekaart is slechts een richtlijn. Het omvat niet alles wat we doen, en sommige zaken kunnen veranderen.</p>
-  <p class="govuk-body">U kunt <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">contact met ons opnemen</a> als u vragen heeft over de routekaart, wilt meedoen aan gebruikersonderzoek of suggesties heeft voor nieuwe functionaliteiten.</p>
+  <p class="govuk-body">The NotifyNL roadmap shows what we’re working on and some of the <a class="govuk-link govuk-link--no-visited-state" href="#things-we-have-done">things we’ve done</a>.</p>
+  <p class="govuk-body">The roadmap is only a guide. It does not cover everything we do, and some things may change.</p>
+  <p class="govuk-body">You can <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">contact us</a> if you have any questions about the roadmap, want to get involved in user research or have suggestions for new features.</p>
 
-  <h2 class="heading-medium" id="things-we-are-working-on">Waar we nu aan werken</h2>
+  <h2 class="heading-medium" id="things-we-are-working-on">Things we’re working on now</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>Verbeteren van de manier waarop we onze prestaties meten</li>
-    <li>‘Economy mail’ toevoegen aan de lijst met verzendopties</li>
-    <li>Het makkelijker maken om Notify te gaan gebruiken</li>
-    <li>Gebruikers laten deelnemen aan een bestaande dienst</li>
-    <li>Onze front-end code verbeteren om te voldoen aan <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> toegankelijkheidsdoelen</li>
-    <li>Websitegebruikers bestanden per e-mail laten versturen</li>
-    <li>Verbeteren van de Notify API</li>
-    <li>High-volume diensten een rapport laten downloaden van de berichten die zij hebben verstuurd</li>
-    <li>Onze <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">beveiliging</a> herzien volgens het Cyber Assessment Framework</li>
-    <li>Manieren onderzoeken om diensten te helpen betere berichten te schrijven</li>
-    <li>Onze interne monitoring- en waarschuwingssystemen bijwerken</li>
-    <li>Ons proces voor het opsporen van sms-fraude herzien</li>
+    <li>Improve how we measure our performance</li>
+    <li>Improve the way we find problems so we can fix them sooner</li>
+    <li>Make sure NotifyNL does not slow down when services send a lot of messages</li>
+    <li>Make it easier to start using NotifyNL</li>
+    <li>Let website users send files by email</li>
+    <li>Let high volume services download a report of the messages they’ve sent</li>
+    <li>Review <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">our security</a> in line with the Cyber Assessment Framework</li>
+    <li>Update our internal monitoring and alerting tools</li>
+    <li>Review our process for identifying text message fraud</li>
+    <li>Improve how we manage our rate limits and capacity</li>
+    <li>Give services more control over the way NotifyNL handles personalised content</li>
   </ul>
 
-  <h2 class="heading-medium" id="things-we-will-do-later">Waar we later aan werken</h2>
+  <h2 class="heading-medium" id="things-we-will-do-later">Things we’ll do later</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>Nieuwe manieren onderzoeken om onze capaciteit te vergroten</li>
-    <li>Het begrijpelijker maken hoe sms-prijzen werken</li>
-    <li>Het facturatie- en betalingsproces verbeteren</li>
-    <li>Het makkelijker maken voor diensten om de gebruiksgegevens te zien die ze nodig hebben</li>
-    <li>Diensten via de API laten toevoegen en bewerken van berichtsjablonen</li>
-    <li>Manieren onderzoeken om de relatie tussen organisaties en hun diensten te vereenvoudigen</li>
-    <li>Meer organisaties hun eigen diensten laten goedkeuren (publieke <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/agile-delivery/how-the-beta-phase-works">bèta</a>)</li>
+
+    <li>Make it easier to understand how text message pricing works</li>
+    <li>Improve the billing and payment process</li>
+    <li>Make it easier for services to see the usage data they need</li>
+    <li>Let services add and edit message templates via the API</li>
+    <li>Explore ways to simplify the relationship between organisations and their services</li>
+    <li>Let more organisations approve their own services (public <a class="govuk-link govuk-link--no-visited-state" href="https://www.gov.uk/service-manual/agile-delivery/how-the-beta-phase-works">beta</a>)</li>
   </ul>
 
-  <h2 class="heading-medium" id="things-we-have-done">Wat we hebben gedaan</h2>
+  <h2 class="heading-medium" id="things-we-have-done">Things we’ve done</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>API callbacks toegevoegd voor geretourneerde brieven</li>
-    <li>Een nieuwe ontwikkelomgeving toegevoegd voor het prototypen en testen van nieuwe functionaliteiten</li>
-    <li>Onze jaarlijkse IT-gezondheidscheck uitgevoerd</li>
-    <li>Een nieuwe omgeving en deployment pipeline toegevoegd om ontwikkeling veiliger te maken</li>
-    <li>NCSC-richtlijnen voor NHS-diensten nageleefd door gebruik van een consistente <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_text_message_sender') }}">sms-afzender-ID</a></li>
-    <li>Onze ontwerpcomponenten gemigreerd naar versie 5 van het <a class="govuk-link govuk-link--no-visited-state" href="https://design-system.service.gov.uk/components/">GOV.UK Design System</a></li>
-    <li>Ontvangers kunnen zich met één klik afmelden voor e-mails</li>
-    <li>Diensten kunnen <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_unsubscribe_links') }}">afmeldverzoeken beheren</a></li>
-    <li>JPG en PNG toegevoegd aan de lijst met bestandstypen die diensten per e-mail kunnen versturen</li>
-    <li>Moeilijker gemaakt om brieven naar niet-bestaande adressen te versturen</li>
-    <li>Nieuwe manieren gevonden om ontvangers te beschermen tegen sms-fraude</li>
-    <li>Diensten die de Notify API gebruiken kunnen hun facturatiegegevens inzien</li>
-    <li>Een update van onze <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">gebruikersvoorwaarden</a> aangekondigd</li>
-    <li>Verschillende problemen opgelost die vermeld staan in onze <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.accessibility_statement') }}">toegankelijkheidsverklaring</a></li>
-    <li>API-verbeteringen geïdentificeerd en geprioriteerd (ontdekking)</li>
-    <li>Onze applicaties gemigreerd van GOV.UK PaaS naar <a class="govuk-link govuk-link--no-visited-state" href="https://gds.blog.gov.uk/2024/08/14/how-we-migrated-gov-uk-notify-to-aws-elastic-container-service">Amazon Elastic Container Service</a></li>
-    <li>Nieuwe notificatiekanalen onderzocht (ontdekking)</li>
+    <li>Explored ways to help services write better messages</li>
+    <li>Added ‘economy mail’ to the list of postage options</li>
+    <li>Let users join an existing service</li>
+    <li>Improved our front-end code to meet <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> targets for accessibility</li>
+    <li>Added API callbacks for undelivered letters, allowing users to receive an automatic update when a letter is returned</li>
+    <li>Met NCSC guidelines for NHS services by making sure they use a consistent <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_text_message_sender') }}">text message sender ID</a></li>
+    <li>Moved our design components to version 5 of the <a class="govuk-link govuk-link--no-visited-state" href="https://design-system.service.gov.uk/components/">GOV.UK Design System</a></li>
+    <li>Let recipients ask to unsubscribe from emails in one click</li>
+    <li>Let services manage <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_unsubscribe_links') }}">unsubscribe requests</a></li>
+    <li>Added JPG and PNG to the list of file formats a service can send by email</li>
+    <li>Made it harder to send letters to addresses that do not exist</li>
   </ul>
 
 {% endblock %}

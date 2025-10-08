@@ -128,7 +128,7 @@ def email_branding_govuk(service_id):
     if request.method == "POST":
         current_service.update(email_branding=None)
 
-        flash("Je hebt je e-mailhuisstijl bijgewerkt", "default")
+        flash("You’ve updated your email branding", "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
@@ -400,8 +400,7 @@ def email_branding_set_alt_text(service_id):
                 current_service.organisation.update(email_branding_id=new_email_branding.id, delete_services_cache=True)
 
         flash(
-            "Je hebt de e-mailhuisstijl gewijzigd. Stuur jezelf een e-mail om te controleren of alles er goed uitziet.",
-            "default_with_tick",
+            "You’ve changed your email branding. Send yourself an email to make sure it looks OK.", "default_with_tick"
         )
 
         return redirect(url_for("main.service_settings", service_id=service_id))
@@ -545,13 +544,13 @@ def branding_option_preview(service_id, branding_type):
     try:
         chosen_branding = branding_pool.get_item_by_id(request.args.get("branding_choice"))
     except branding_pool.NotFound:
-        flash("Er is geen huisstijl gevonden bij deze ID.")
+        flash("No branding found for this id.")
         return redirect(url_for(f".{branding_type}_branding_options", service_id=current_service.id))
 
     if request.method == "POST":
         current_service.update(**{f"{branding_type}_branding": chosen_branding.id})
 
-        flash(f"Je hebt de {branding_type}-huisstijl bijgewerkt", "default")
+        flash(f"You’ve updated your {branding_type} branding", "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
@@ -581,7 +580,7 @@ def branding_nhs(service_id, branding_type):
     if request.method == "POST":
         current_service.update(**{f"{branding_type}_branding": branding})
 
-        flash(f"U heeft de {branding_type}-huisstijl bijgewerkt", "default")
+        flash(f"You’ve updated your {branding_type} branding", "default")
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(
@@ -792,7 +791,7 @@ def letter_branding_set_name(service_id):
                     delete_services_cache=True,
                 )
 
-        flash("U heeft de huisstijl voor brieven gewijzigd.", "default_with_tick")
+        flash("You’ve changed your letter branding.", "default_with_tick")
 
         return redirect(url_for("main.service_settings", service_id=service_id))
 

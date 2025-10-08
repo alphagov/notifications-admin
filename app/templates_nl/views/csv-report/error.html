@@ -1,0 +1,20 @@
+{% extends "withnav_template.html" %}
+{% from "components/banner.html" import banner_wrapper %}
+
+{% set page_title = 'We konden uw rapport niet maken' %}
+{% block per_page_title %}
+  Error: {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {% call banner_wrapper(type='dangerous') %}
+      <h1 class='banner-title'>
+        {{ page_title}}
+      </h1>
+      <p class="govuk-body error-text-colour govuk-!-font-weight-bold">Please <a class="govuk-link govuk-link--no-visited-state error-text-colour" href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback') }}">contactondersteuning</a>.</p>
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

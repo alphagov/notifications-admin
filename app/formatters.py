@@ -58,7 +58,7 @@ def format_time_24h(date):
     return utc_string_to_aware_gmt_datetime(date).strftime("%H:%M")
 
 
-def get_human_day(time, date_prefix=""):
+def get_human_day(time, date_prefix="", include_day_of_week=False):
     #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
     date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
     now = datetime.utcnow()
@@ -69,13 +69,12 @@ def get_human_day(time, date_prefix=""):
         return "today"
     if date == (now - timedelta(days=1)).date():
         return "yesterday"
-    if date.strftime("%Y") != now.strftime("%Y"):
-        return "{} {} {}".format(
-            date_prefix,
-            _format_datetime_short(date),
-            date.strftime("%Y"),
-        ).strip()
-    return f"{date_prefix} {_format_datetime_short(date)}".strip()
+
+    date_prefix = f"{date_prefix} " if date_prefix else ""
+    day_of_week = date.strftime("%A ") if include_day_of_week else ""
+    year = date.strftime(" %Y") if date.strftime("%Y") != now.strftime("%Y") else ""
+
+    return f"{date_prefix}{day_of_week}{_format_datetime_short(date)}{year}"
 
 
 def format_time(date):
@@ -160,8 +159,8 @@ def format_notification_status(status, template_type):
             "temporary-failure": "Inbox not accepting messages right now",
             "permanent-failure": "Email address does not exist",
             "delivered": "Delivered",
-            "sending": "Sending",
-            "created": "Sending",
+            "sending": "Delivering",
+            "created": "Delivering",
             "sent": "Delivered",
         },
         "sms": {
@@ -170,9 +169,9 @@ def format_notification_status(status, template_type):
             "temporary-failure": "Phone not accepting messages right now",
             "permanent-failure": "Not delivered",
             "delivered": "Delivered",
-            "sending": "Sending",
-            "created": "Sending",
-            "pending": "Sending",
+            "sending": "Delivering",
+            "created": "Delivering",
+            "pending": "Delivering",
             "sent": "Sent to an international number",
             "validation-failed": "Validation failed",
         },

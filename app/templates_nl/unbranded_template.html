@@ -1,6 +1,10 @@
 {% extends "govuk_frontend_jinja/template.html"%}
 
 {% set cspNonce = request.csp_nonce %}
+{# govukRebrand needs to be set due to a check #}
+{# upstream but as there no favicons or header or footer #}
+{# nothing changes #}
+{% set govukRebrand = False %}
 
 {% block headIcons %}
 {% endblock %}

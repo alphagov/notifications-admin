@@ -1,0 +1,18 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+
+{% set page_title = 'Uw rapport is niet meer beschikbaar' %}
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {{ page_header(page_title) }}
+        <p class="govuk-body">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_dashboard', service_id=current_service.id) }}">Ga terug naar het dashboard om een ​​nieuw rapport te downloaden</a>
+        </p>
+    </div>
+  </div>
+{% endblock %}

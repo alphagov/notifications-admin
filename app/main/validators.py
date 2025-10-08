@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 from flask import current_app, render_template
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 from notifications_utils.field import Field
-from notifications_utils.formatters import formatted_list
+from notifications_utils.formatters import autolink_urls, formatted_list
+from notifications_utils.markdown import notify_email_markdown
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
 from notifications_utils.recipient_validation.notifynl.phone_number import PhoneNumber
@@ -348,6 +349,16 @@ class NotifyInputRequired(InputRequired):
 class NotifyUrlValidator(URL):
     def __init__(self, thing="a URL in the correct format"):
         super().__init__(message=f"Enter {thing}")
+
+
+class CannotContainURLsOrLinks:
+    def __init__(self, *, thing):
+        self.thing = thing
+
+    def __call__(self, form, field):
+        for func in (autolink_urls, notify_email_markdown):
+            if "<a href=" in func(field.data):
+                raise ValidationError(f"{self.thing.capitalize()} cannot contain a URL")
 
 
 class Length(WTFormsLength):

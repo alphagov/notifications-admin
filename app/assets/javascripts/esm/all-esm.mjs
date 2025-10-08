@@ -1,5 +1,5 @@
 // GOVUK Frontend modules
-import { createAll, Header, Button, Radios, ErrorSummary, SkipLink, Tabs } from 'govuk-frontend';
+import { createAll, Header, Button, Radios, ErrorSummary, SkipLink, Tabs, ServiceNavigation } from 'govuk-frontend';
 
 import CollapsibleCheckboxes from './collapsible-checkboxes.mjs';
 import FocusBanner from './focus-banner.mjs';
@@ -14,6 +14,9 @@ import RadiosWithImages from './radios-with-images.mjs';
 
 import LiveSearch from './live-search.mjs';
 import EnhancedTextbox from './enhanced-textbox.mjs';
+import CheckReportStatus from './check-report-status.mjs';
+import LiveCheckboxControls from './live-checkbox-controls.mjs';
+import AddBrandingOptionsControls from './add-branding-options-controls.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -24,6 +27,7 @@ createAll(Radios);
 createAll(ErrorSummary);
 createAll(SkipLink);
 createAll(Tabs);
+createAll(ServiceNavigation);
 
 const $livesearch = document.querySelector('[data-notify-module="live-search"]');
 if ($livesearch) {
@@ -81,6 +85,21 @@ if ($radiosWithImagesArray.length > 0) {
 const $enhancedTextboxArray = document.querySelectorAll('[data-notify-module="enhanced-textbox"]');
 if ($enhancedTextboxArray.length > 0) {
   $enhancedTextboxArray.forEach((el) => new EnhancedTextbox(el));
+}
+
+const $checkReportStatusEl = document.querySelector('[data-notify-module="check-report-status"]');
+if ($checkReportStatusEl) {
+  new CheckReportStatus($checkReportStatusEl).checkStatus();
+}
+
+const $authTypeForm = document.querySelector('[data-notify-module="set-auth-type-form"]');
+if ($authTypeForm) {
+  new LiveCheckboxControls($authTypeForm);
+}
+
+const $addBrandingOptionsForm = document.querySelector('[data-notify-module="add-branding-options-form"]');
+if ($addBrandingOptionsForm) {
+  new AddBrandingOptionsControls($addBrandingOptionsForm);
 }
 
 const focusBanner = new FocusBanner();

@@ -15,10 +15,10 @@ def accept_invite(token):
     if not current_user.is_anonymous and current_user.email_address.lower() != invited_user.email_address.lower():
         message = Markup(
             """
-            U bent aangemeld als {}.
-            Deze uitnodiging is voor een ander e-mailadres.
-            <a href={} class="govuk-link govuk-link--no-visited-state">Afmelden</a>
-            en klik daarna opnieuw op de link om deze uitnodiging te accepteren.
+            You’re signed in as {}.
+            This invite is for another email address.
+            <a href={} class="govuk-link govuk-link--no-visited-state">Sign out</a>
+            and click the link again to accept this invite.
             """.format(current_user.email_address, url_for("main.sign_out"))
         )
 
@@ -47,13 +47,13 @@ def accept_invite(token):
             return redirect(url_for("main.service_dashboard", service_id=invited_user.service))
         else:
             service = Service.from_id(invited_user.service)
-            # als de dienst waaraan u wordt toegevoegd het type verificatie kan wijzigen, controleer dan of dit kan;
-            # als de gebruiker een Platformbeheerder is, laten we dit ongewijzigd om te voorkomen dat
-            # iemand het verificatietype naar iets minder veilig kan wijzigen
+            # if the service you're being added to can modify auth type, then check if we can do this;
+            # if the user is a Platform Admin, we silently leave this unchanged to prevent a security
+            # issue where someone could switch their auth type to something less secure
             if service.has_permission("email_auth") and not existing_user.platform_admin:
                 if invited_user.auth_type == "email_auth" or (
-                    # ze hebben een telefoonnummer; we willen dat ze dit gaan gebruiken.
-                    # als ze geen mobiel nummer hebben, negeren we deze optie uit de uitnodiging
+                    # they have a phone number, we want them to start using it.
+                    # if they dont have a mobile we just ignore that option of the invite
                     existing_user.mobile_number and invited_user.auth_type == "sms_auth"
                 ):
                     existing_user.update(auth_type=invited_user.auth_type)
@@ -75,10 +75,10 @@ def accept_org_invite(token):
     if not current_user.is_anonymous and current_user.email_address.lower() != invited_org_user.email_address.lower():
         message = Markup(
             """
-            U bent aangemeld als {}.
-            Deze uitnodiging is voor een ander e-mailadres.
-            <a class="govuk-link govuk-link--no-visited-state" href={}>Afmelden</a>
-            en klik daarna opnieuw op de link om deze uitnodiging te accepteren.
+            You’re signed in as {}.
+            This invite is for another email address.
+            <a class="govuk-link govuk-link--no-visited-state" href={}>Sign out</a>
+            and click the link again to accept this invite.
             """.format(current_user.email_address, url_for("main.sign_out"))
         )
 

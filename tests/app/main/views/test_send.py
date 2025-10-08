@@ -2378,6 +2378,8 @@ def test_send_test_works_as_letter_preview(
         filetype=filetype,
     )
 
+    assert "Set-Cookie" not in response.headers
+
     mock_get_service_letter_template.assert_called_with(service_id, template_id, None)
 
     assert response.get_data(as_text=True) == "foo"

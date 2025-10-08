@@ -335,6 +335,7 @@ def test_routes_have_permissions_decorators():
 def test_routes_require_types(client_request):
     partial_param_name_to_type = {
         "_id": "uuid",
+        "daily_limit_type": "daily_limit_type",
         "template_type": "template_type",
         "notification_type": "template_type",
         "branding_type": "branding_type",

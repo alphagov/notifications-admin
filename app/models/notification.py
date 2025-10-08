@@ -10,7 +10,7 @@ from notifications_utils.template import (
 from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
-from app.notify_client.api_key_api_client import KEY_TYPE_TEST
+from app.models.api_key import APIKey
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES
@@ -63,7 +63,7 @@ class Notification(JSONModel):
 
     @property
     def sent_with_test_key(self):
-        return self.key_type == KEY_TYPE_TEST
+        return self.key_type == APIKey.TYPE_TEST
 
     @property
     def sent_by(self):
@@ -125,7 +125,7 @@ class Notification(JSONModel):
     @property
     def estimated_letter_delivery_date(self):
         if self.notification_type == "letter":
-            return get_letter_timings(self.created_at.replace(tzinfo=None), postage=self.postage).earliest_delivery
+            return get_letter_timings(self.created_at.replace(tzinfo=None), postage=self.postage).latest_delivery
 
     @property
     def letter_can_be_cancelled(self):

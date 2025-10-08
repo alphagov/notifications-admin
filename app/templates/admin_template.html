@@ -1,11 +1,14 @@
 {% extends "govuk_frontend_jinja/template.html"%}
+{% from "govuk_frontend_jinja/components/service-navigation/macro.html" import govukServiceNavigation %}
 
 {% set cspNonce = request.csp_nonce %}
+{# toggle to enable new styles for rebrand #}
+{% set govukRebrand = True %}
 
 {% block headIcons %}
   <link rel="icon" sizes="48x48" href="{{ asset_url('images/favicon.ico') }}">
   <link rel="icon" sizes="any" href="{{ asset_url('images/favicon.svg') }}" type="image/svg+xml">
-  <link rel="mask-icon" href="{{ asset_url('images/govuk-icon-mask.svg') }}" color="#0b0c0c">
+  <link rel="mask-icon" href="{{ asset_url('images/govuk-icon-mask.svg') }}" color="{{'#1d70b8' if govukRebrand else '#0b0c0c'}}">
   <link rel="apple-touch-icon" href="{{ asset_url('images/govuk-icon-180.png') }}">
   <link rel="manifest" href="{{ asset_url('manifest.json') }}">
 {% endblock %}
@@ -18,9 +21,14 @@
   <link rel="stylesheet" media="print" href="{{ asset_url('stylesheets/print.css') }}" />
   {% block extra_stylesheets %}
   {% endblock %}
-  <style>
-      .govuk-header__container { border-color: {{header_colour}} }
-  </style>
+  {# rebranded header no longer uses bottom border #}
+  {# so not rendering until we have a different solution #}
+  {# for indicating different envs #}
+  {% if not govukRebrand %}
+    <style>
+        .govuk-header__container { border-color: {{header_colour}} }
+    </style>
+  {% endif %}
   {% if g.hide_from_search_engines %}
     <meta name="robots" content="noindex" />
   {% endif %}
@@ -46,9 +54,15 @@
   {{ govukHeader({
     "homepageUrl": url_for('main.show_accounts_or_dashboard'),
     "productName": "Notify",
+    "assetsPath": asset_path + "images",
+    "rebrand": govukRebrand,
+    "serviceName": None,
+    "navigation": [],
+  }) }}
+
+  {{ govukServiceNavigation({
     "navigation": header_navigation.visible_header_nav(),
-    "navigationClasses": "govuk-header__navigation--end",
-    "assetsPath": asset_path + "images"
+    "classes": "govuk-service-navigation--inverse" if request.endpoint == "main.index" else ""
   }) }}
 {% endblock %}
 
@@ -76,6 +90,7 @@
 
   {{ govukFooter({
     "classes": "js-footer",
+    "rebrand": govukRebrand,
     "navigation": [
       {
         "title": "About Notify",

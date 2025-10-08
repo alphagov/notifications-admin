@@ -13,7 +13,6 @@ from app.main.forms import (
     ChangeNonGovEmailForm,
     InviteUserForm,
     JoinServiceRequestApproveForm,
-    JoinServiceRequestSetPermissionsForm,
     PermissionsForm,
     SearchUsersForm,
 )
@@ -80,7 +79,7 @@ def invite_user(service_id, user_id=None):
             form.folder_permissions.data,
         )
 
-        flash(f"Uitnodiging verstuurd naar {invited_user.email_address}", "default_with_tick")
+        flash(f"Invite sent to {invited_user.email_address}", "default_with_tick")
         return redirect(url_for(".manage_users", service_id=service_id))
 
     return render_template(
@@ -183,25 +182,24 @@ def service_join_request_choose_permissions(service_id, request_id):
     requested_by = service_join_request.requester
     requested_by_user = User.from_id(requested_by["id"])
 
-    form = JoinServiceRequestSetPermissionsForm(
-        all_template_folders=current_service.all_template_folders,
-        folder_permissions=[f["id"] for f in current_service.all_template_folders],
-        disable_sms_auth=False if requested_by_user.mobile_number else True,
-    )
-
-    if not current_service.has_permission("email_auth"):
-        form.login_authentication.data = "sms_auth"
+    form = PermissionsForm.from_user_and_service(requested_by_user, current_service)
 
     if form.validate_on_submit():
-        service_join_request.update(
-            status=SERVICE_JOIN_REQUEST_APPROVED,
-            status_changed_by_id=current_user.id,
-            permissions=translate_permissions_from_ui_to_db(form.permissions_field.data),
-            folder_permissions=form.folder_permissions.data,
-            auth_type=form.login_authentication.data,
-        )
+        update_kwargs = {
+            "status": SERVICE_JOIN_REQUEST_APPROVED,
+            "status_changed_by_id": current_user.id,
+            "permissions": translate_permissions_from_ui_to_db(form.permissions_field.data),
+            "folder_permissions": form.folder_permissions.data,
+        }
 
-        flash(f"{requested_by_user.name} is lid geworden van deze dienst", "default_with_tick")
+        # Only change the auth type if this is supported for a service. If a user logs in with a
+        # security key, we generally don't want them to be able to use something less secure.
+        if current_service.has_permission("email_auth") and not requested_by_user.webauthn_auth:
+            update_kwargs["auth_type"] = form.login_authentication.data
+
+        service_join_request.update(**update_kwargs)
+
+        flash(f"{requested_by_user.name} has joined this service", "default_with_tick")
         return redirect(url_for(".manage_users", service_id=service_id))
 
     return render_template(
@@ -249,9 +247,8 @@ def edit_user_permissions(service_id, user_id):
             folder_permissions=form.folder_permissions.data,
             set_by_id=current_user.id,
         )
-        # Alleen wijzigen van auth type als deze optie ondersteund wordt door de dienst.
-        # Als een gebruiker met een security key inlogt, willen we niet dat diegene iets minder
-        # veilig kan gebruiken.
+        # Only change the auth type if this is supported for a service. If a user logs in with a
+        # security key, we generally don't want them to be able to use something less secure.
         if current_service.has_permission("email_auth") and not user.webauthn_auth:
             user.update(auth_type=form.login_authentication.data)
         return redirect(url_for(".manage_users", service_id=service_id))
@@ -270,7 +267,7 @@ def remove_user_from_service(service_id, user_id):
     try:
         service_api_client.remove_user_from_service(service_id, user_id)
     except HTTPError as e:
-        msg = "U kunt de laatste gebruiker van een organisatie niet verwijderen"
+        msg = "You cannot remove the only user for a service"
         if e.status_code == 400 and msg in e.message:
             flash(msg, "info")
             return redirect(url_for(".manage_users", service_id=service_id))
@@ -337,10 +334,7 @@ def confirm_edit_user_email(service_id, user_id):
 
         return redirect(url_for(".manage_users", service_id=service_id))
     return render_template(
-        "views/manage-users/confirm-edit-user-email.html",
-        user=user,
-        service_id=service_id,
-        new_email=new_email,
+        "views/manage-users/confirm-edit-user-email.html", user=user, service_id=service_id, new_email=new_email
     )
 
 
@@ -406,5 +400,5 @@ def cancel_invited_user(service_id, invited_user_id):
 
     invited_user = InvitedUser.by_id_and_service_id(service_id, invited_user_id)
 
-    flash(f"Uitnodiging geannuleerd voor {invited_user.email_address}", "default_with_tick")
+    flash(f"Invitation cancelled for {invited_user.email_address}", "default_with_tick")
     return redirect(url_for("main.manage_users", service_id=service_id))

@@ -7,7 +7,7 @@
 <div class="ajax-block-container">
   {% if verification_status == "pending" %}
     <div role="status"></div>
-    {{ page_header('Controle van het antwoordadres') }}
+    {{ page_header('Controle van het antwoord-e-mailadres') }}
     <div role="status">
       <p class="govuk-body">
         We moeten controleren of ‘{{ reply_to_email_address }}’ een echt e-mailadres is.
@@ -24,7 +24,7 @@
       <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.service_verify_reply_to_address', service_id=service_id, notification_id=notification_id, is_default=is_default, replace=replace) }}">Vernieuwen</a>
     </p>
   {% elif verification_status == "success" %}
-    {{ page_header('Controle van het antwoordadres') }}
+    {{ page_header('Controle van het antwoord-e-mailadres') }}
     <div role="status">
       <p class="govuk-body">
         De controle is voltooid.
@@ -44,7 +44,7 @@
     <div class="bottom-gutter">
       {% call banner_wrapper(type='dangerous') %}
         <h2 class='banner-title'>
-          Er is een probleem met uw antwoordadres
+          Er is een probleem met uw antwoord-e-mailadres
         </h2>
         <p class="govuk-body">
           We hebben een e-mail gestuurd naar ‘{{ reply_to_email_address }}’, maar deze kon niet worden afgeleverd.
@@ -54,7 +54,7 @@
         </p>
       {% endcall %}
     </div>
-    {{ page_header('Controle van het antwoordadres') }}
+    {{ page_header('Controle van het antwoord-e-mailadres') }}
     {% if replace %}
       {% set form_url = url_for('main.service_edit_email_reply_to', service_id=service_id, reply_to_email_id=replace) %}
     {% else %}

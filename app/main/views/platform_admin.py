@@ -97,7 +97,7 @@ def get_status_box_data(stats, key, label, threshold=FAILURE_THRESHOLD):
 
 
 def get_tech_failure_status_box_data(stats):
-    stats = get_status_box_data(stats, "technical-failure", "technische fouten", ZERO_FAILURE_THRESHOLD)
+    stats = get_status_box_data(stats, "technical-failure", "technical failures", ZERO_FAILURE_THRESHOLD)
     stats.pop("percentage")
     return stats
 
@@ -109,11 +109,11 @@ def make_columns(global_stats, complaints_number):
             "black_box": {"number": global_stats["email"]["total"], "notification_type": "email"},
             "other_data": [
                 get_tech_failure_status_box_data(global_stats["email"]),
-                get_status_box_data(global_stats["email"], "permanent-failure", "permanente fouten"),
-                get_status_box_data(global_stats["email"], "temporary-failure", "tijdelijke fouten"),
+                get_status_box_data(global_stats["email"], "permanent-failure", "permanent failures"),
+                get_status_box_data(global_stats["email"], "temporary-failure", "temporary failures"),
                 {
                     "number": complaints_number,
-                    "label": "klachten",
+                    "label": "complaints",
                     "failing": is_over_threshold(
                         complaints_number, global_stats["email"]["total"], COMPLAINT_THRESHOLD
                     ),
@@ -121,17 +121,17 @@ def make_columns(global_stats, complaints_number):
                     "url": url_for("main.platform_admin_list_complaints"),
                 },
             ],
-            "test_data": {"number": global_stats["email"]["test-key"], "label": "test-e-mails"},
+            "test_data": {"number": global_stats["email"]["test-key"], "label": "test emails"},
         },
         # sms
         {
             "black_box": {"number": global_stats["sms"]["total"], "notification_type": "sms"},
             "other_data": [
                 get_tech_failure_status_box_data(global_stats["sms"]),
-                get_status_box_data(global_stats["sms"], "permanent-failure", "permanente fouten"),
-                get_status_box_data(global_stats["sms"], "temporary-failure", "tijdelijke fouten"),
+                get_status_box_data(global_stats["sms"], "permanent-failure", "permanent failures"),
+                get_status_box_data(global_stats["sms"], "temporary-failure", "temporary failures"),
             ],
-            "test_data": {"number": global_stats["sms"]["test-key"], "label": "test sms-berichten"},
+            "test_data": {"number": global_stats["sms"]["test-key"], "label": "test text messages"},
         },
         # letter
         {
@@ -139,10 +139,10 @@ def make_columns(global_stats, complaints_number):
             "other_data": [
                 get_tech_failure_status_box_data(global_stats["letter"]),
                 get_status_box_data(
-                    global_stats["letter"], "virus-scan-failed", "virus-scan fouten", ZERO_FAILURE_THRESHOLD
+                    global_stats["letter"], "virus-scan-failed", "virus scan failures", ZERO_FAILURE_THRESHOLD
                 ),
             ],
-            "test_data": {"number": global_stats["letter"]["test-key"], "label": "test-brieven"},
+            "test_data": {"number": global_stats["letter"]["test-key"], "label": "test letters"},
         },
     ]
 
@@ -159,22 +159,22 @@ def live_services_csv():
     results = service_api_client.get_live_services_data()["data"]
 
     column_names = {
-        "service_id": "Service-ID",
-        "organisation_name": "Organisatie",
-        "organisation_type": "Type organisatie",
-        "service_name": "Dienstnaam",
-        "consent_to_research": "Toestemming voor onderzoek",
-        "contact_name": "Hoofdcontactpersoon",
-        "contact_email": "Contact e-mailadres",
-        "contact_mobile": "Contact mobiel",
-        "live_date": "Ingebruiknamedatum",
-        "sms_volume_intent": "SMS-volume intentie",
-        "email_volume_intent": "E-mailvolume intentie",
-        "letter_volume_intent": "Briefvolume intentie",
-        "sms_totals": "Verzonden SMS dit jaar",
-        "email_totals": "Verzonden e-mails dit jaar",
-        "letter_totals": "Verzonden brieven dit jaar",
-        "free_sms_fragment_limit": "Gratis SMS-tegoed",
+        "service_id": "Service ID",
+        "organisation_name": "Organisation",
+        "organisation_type": "Organisation type",
+        "service_name": "Service name",
+        "consent_to_research": "Consent to research",
+        "contact_name": "Main contact",
+        "contact_email": "Contact email",
+        "contact_mobile": "Contact mobile",
+        "live_date": "Live date",
+        "sms_volume_intent": "SMS volume intent",
+        "email_volume_intent": "Email volume intent",
+        "letter_volume_intent": "Letter volume intent",
+        "sms_totals": "SMS sent this year",
+        "email_totals": "Emails sent this year",
+        "letter_totals": "Letters sent this year",
+        "free_sms_fragment_limit": "Free sms allowance",
     }
 
     # initialise with header row
@@ -191,7 +191,7 @@ def live_services_csv():
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())} rapport diensten.csv"',
+            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())} live services report.csv"',
         },
     )
 
@@ -225,7 +225,7 @@ def notifications_sent_by_service():
             {
                 "Content-Type": "text/csv; charset=utf-8",
                 "Content-Disposition": (
-                    f'attachment; filename="Meldingstatus per dienst van {start_date} tot {end_date}.csv"'
+                    f'attachment; filename="{start_date} to {end_date} notification status per service report.csv"'
                 ),
             },
         )
@@ -263,7 +263,7 @@ def get_billing_report():
         try:
             result = billing_api_client.get_data_for_billing_report(start_date, end_date)
         except HTTPError as e:
-            message = "Datum moet binnen één boekjaar vallen."
+            message = "Date must be in a single financial year."
             if e.status_code == 400 and e.message == message:
                 flash(message)
                 return render_template("views/platform-admin/get-billing-report.html", form=form)
@@ -293,11 +293,11 @@ def get_billing_report():
                 200,
                 {
                     "Content-Type": "text/csv; charset=utf-8",
-                    "Content-Disposition": f'attachment; filename="Facturatie Rapport {start_date} tot {end_date}.csv"',
+                    "Content-Disposition": f'attachment; filename="Billing Report from {start_date} to {end_date}.csv"',
                 },
             )
         else:
-            flash("Geen resultaten voor de gekozen data")
+            flash("No results for dates")
     return render_template(
         "views/platform-admin/get-billing-report.html",
         form=form,
@@ -306,6 +306,7 @@ def get_billing_report():
 
 
 @main.route("/platform-admin/reports/dvla-billing", methods=["GET", "POST"])
+@user_is_platform_admin
 def get_dvla_billing_report():
     form = BillingReportDateFilterForm()
 
@@ -313,18 +314,18 @@ def get_dvla_billing_report():
         start_date = form.start_date.data
         end_date = form.end_date.data
         headers = [
-            "verzenddatum",
-            "portokosten",
-            "DVLA kostendrempel",
-            "vellen",
-            "tarief (£)",
-            "brieven",
-            "kosten (£)",
+            "despatch date",
+            "postage",
+            "DVLA cost threshold",
+            "sheets",
+            "rate (£)",
+            "letters",
+            "cost (£)",
         ]
         try:
             result = billing_api_client.get_data_for_dvla_billing_report(start_date, end_date)
         except HTTPError as e:
-            message = "Datum moet binnen één boekjaar vallen."
+            message = "Date must be in a single financial year."
             if e.status_code == 400 and e.message == message:
                 flash(message)
                 return render_template("views/platform-admin/get-dvla-billing-report.html", form=form)
@@ -349,12 +350,12 @@ def get_dvla_billing_report():
                 {
                     "Content-Type": "text/csv; charset=utf-8",
                     "Content-Disposition": (
-                        f'attachment; filename="DVLA Facturatie Rapport van {start_date} tot {end_date}.csv"'
+                        f'attachment; filename="DVLA Billing Report from {start_date} to {end_date}.csv"'
                     ),
                 },
             )
         else:
-            flash("Geen resultaten voor de gekozen data")
+            flash("No results for dates")
     return render_template("views/platform-admin/get-dvla-billing-report.html", form=form)
 
 
@@ -687,9 +688,7 @@ def get_url_for_notify_record(uuid_):
             "inbound_number": _EndpointSpec(".inbound_sms_admin"),
             "api_key": _EndpointSpec(".api_keys", with_service_id=True),
             "template_folder": _EndpointSpec(".choose_template", "template_folder_id", with_service_id=True),
-            "service_inbound_api": _EndpointSpec(".received_text_messages_callback", with_service_id=True),
-            "delivery_status_callback_api": _EndpointSpec(".delivery_status_callback", with_service_id=True),
-            "returned_letters_callback_api": _EndpointSpec(".returned_letters_callback", with_service_id=True),
+            "service_callback_api": _EndpointSpec(".api_callbacks", with_service_id=True),
             "complaint": _EndpointSpec(".platform_admin_list_complaints"),
             "inbound_sms": _EndpointSpec(
                 ".conversation", "notification_id", with_service_id=True, extra={"_anchor": f"n{uuid_}"}
@@ -782,24 +781,24 @@ def platform_admin_users_list():
     ).get("data", [])
 
     if not results:
-        flash("Geen resultaten gevonden voor de geselecteerde filters")
+        flash("No results for filters selected")
         return render_template("views/platform-admin/users-list.html", form=form, error_summary_enabled=True)
 
     column_names = {
-        "name": "Naam",
-        "email_address": "E-mailadres",
-        "created_at": "Aangemaakt op",
-        "take_part_in_research": "Deelname onderzoek",
-        "is_team_member_of_organisation": "Is lid van organisatie",
-        "num_live_services": "Aantal actieve diensten",
-        "live_service_permissions": "Toegangsrechten actieve diensten",
+        "name": "Name",
+        "email_address": "Email",
+        "created_at": "Created At",
+        "take_part_in_research": "Research Opt In",
+        "is_team_member_of_organisation": "Is Org Team Member",
+        "num_live_services": "Number of Live Services",
+        "live_service_permissions": "Live Service Permissions",
     }
 
     live_services_data = [list(column_names.values())]
 
     def format_user_row(user):
         created_at = datetime.strptime(user["created_at"], "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%d-%m-%Y")
-        is_team_member_of_org = "Ja" if user.get("organisations", []) else "Nee"
+        is_team_member_of_org = "Yes" if user.get("organisations", []) else "No"
         live_service_permissions = build_live_service_permissions_for_users_list(
             user["services"], user["permissions"], selected_permissions
         )
@@ -808,7 +807,7 @@ def platform_admin_users_list():
             "name": user["name"],
             "email_address": user["email_address"],
             "created_at": created_at,
-            "take_part_in_research": "Ja" if user["take_part_in_research"] else "Nee",
+            "take_part_in_research": "Yes" if user["take_part_in_research"] else "No",
             "is_team_member_of_organisation": is_team_member_of_org,
             "num_live_services": len(user["services"]),
             "live_service_permissions": live_service_permissions,
@@ -821,7 +820,7 @@ def platform_admin_users_list():
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())}_gebruikerslijst.csv"',
+            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())}_users_list.csv"',
         },
     )
 
@@ -844,7 +843,7 @@ def build_live_service_permissions_for_users_list(services, permissions, selecte
         filtered_permissions = translated_perms.intersection(set(selected_permissions))
 
         if filtered_permissions:
-            service_name = service_name_lookup.get(service_id, f"Dienst {service_id}")
+            service_name = service_name_lookup.get(service_id, f"Service {service_id}")
             service_permissions.append(f"{service_name}: {', '.join(filtered_permissions)}")
 
     return "; ".join(service_permissions)

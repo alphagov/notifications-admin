@@ -1,4 +1,5 @@
 $product-page-blue: #1D70B8;
+$product-page-underline-colour: rgb(govuk-colour("white"), 0.25);
 // See https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/button/_button.scss#L24
 $button-shadow-size: $govuk-border-width-form-element;
 
@@ -6,26 +7,22 @@ $button-shadow-size: $govuk-border-width-form-element;
 
   &-intro {
 
-    // The GOV.UK Frontend header component wraps content that is `position: relative`
-    // This changes its z-index position, putting it above the `<main>` section in the stacking order
-    // We need the `<main>` section to be above it, like the default order, so when we apply the
-    // negative margin-top it overlaps the theme bar at the bottom of the header
-    position: relative;
-    margin: -10px 0 govuk-spacing(6) * 1.5 0;
+    margin: 0 0 govuk-spacing(6) * 1.5 0;
     background: $product-page-blue;
     color: govuk-colour("white");
+    padding-top: 2px;
 
     &-wrapper {
 
       @include govuk-width-container;
       user-select: none;
-      padding: 0 0 govuk-spacing(9) 0;
+      padding: govuk-spacing(6) 0 govuk-spacing(9) 0;
 
       @include govuk-media-query($from: desktop) {
         background-image: file-url('product/proposition-illustration.png');
         background-size: 320px;
         background-repeat: no-repeat;
-        background-position: right -6px top 100px;
+        background-position: right -6px top 55px;
       }
 
       &--alternative {

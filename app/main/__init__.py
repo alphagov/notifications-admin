@@ -1,10 +1,10 @@
 from flask import Blueprint, request, session
 
-from app.constants import JSON_UPDATES_BLUEPRINT_NAME
+from app.constants import JSON_UPDATES_BLUEPRINT_NAME, NO_COOKIE_BLUEPRINT_NAME
 
 main = Blueprint("main", __name__)
 json_updates = Blueprint(JSON_UPDATES_BLUEPRINT_NAME, __name__)
-no_cookie = Blueprint("no_cookie", __name__)
+no_cookie = Blueprint(NO_COOKIE_BLUEPRINT_NAME, __name__)
 
 from app.main.views_nl import (  # noqa
     add_service,
@@ -24,10 +24,11 @@ from app.main.views_nl import (  # noqa
     jobs,
     join_service,
     letter_branding,
-    make_service_live,
+    make_your_service_live,
     manage_users,
     new_password,
     notifications,
+    org_member_make_service_live,
     performance,
     platform_admin,
     pricing,
@@ -42,8 +43,8 @@ from app.main.views_nl import (  # noqa
     templates,
     tour,
     two_factor,
-    unsubscribe_requests,
     uploads,
+    unsubscribe_requests,
     verify,
     webauthn_credentials,
     your_account,

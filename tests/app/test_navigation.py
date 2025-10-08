@@ -10,6 +10,7 @@ from app.overrides_nl.navigation import (
     OrgNavigation,
     PlatformAdminNavigation,
 )
+from tests import service_json
 from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, normalize_spaces
 
 EXCLUDED_ENDPOINTS = set(
@@ -61,6 +62,7 @@ EXCLUDED_ENDPOINTS = set(
             "confirm_edit_user_email",
             "confirm_edit_user_mobile_number",
             "confirm_redact_template",
+            "confirm_service_is_unique",
             "contact_list",
             "conversation_reply_with_template",
             "conversation_reply",
@@ -133,6 +135,7 @@ EXCLUDED_ENDPOINTS = set(
             "guidance_attach_pages",
             "guidance_billing_details",
             "guidance_bulk_sending",
+            "guidance_daily_limits",
             "guidance_data_retention_period",
             "guidance_delivery_times",
             "guidance_email_branding",
@@ -180,6 +183,7 @@ EXCLUDED_ENDPOINTS = set(
             "json_updates.service_verify_reply_to_address_updates",
             "json_updates.view_job_updates",
             "json_updates.view_notification_updates",
+            "json_updates.view_remaining_limit",
             "join_service_ask",
             "join_service_you_have_asked",
             "letter_branding_options",
@@ -251,8 +255,12 @@ EXCLUDED_ENDPOINTS = set(
             "remove_user_from_organisation",
             "remove_user_from_service",
             "rename_template",
+            "report_ready",
+            "report_request",
             "report_request_download",
+            "report_request_status_json",
             "request_to_go_live",
+            "request_to_go_live_old_path",
             "resend_email_link",
             "resend_email_verification",
             "returned_letter_summary",
@@ -320,6 +328,7 @@ EXCLUDED_ENDPOINTS = set(
             "service_switch_live",
             "service_verify_reply_to_address",
             "services_or_dashboard",
+            "set_daily_message_limit",
             "set_free_sms_allowance",
             "set_per_day_international_sms_message_limit",
             "set_per_day_message_limit",
@@ -331,6 +340,7 @@ EXCLUDED_ENDPOINTS = set(
             "sign_out",
             "start_job",
             "submit_request_to_go_live",
+            "submit_request_to_go_live_old_path",
             "support_public",
             "support",
             "template_history",
@@ -500,7 +510,7 @@ def test_a_page_should_have_selected_header_navigation_item(
     selected_nav_item,
 ):
     page = client_request.get(endpoint, service_id=SERVICE_ONE_ID)
-    selected_nav_items = page.select(".govuk-header__navigation-item--active")
+    selected_nav_items = page.select(".govuk-service-navigation__item--active")
     assert len(selected_nav_items) == 1
     assert selected_nav_items[0].text.strip() == selected_nav_item
 
@@ -553,11 +563,21 @@ def test_a_page_should_nave_selected_platform_admin_navigation_item(
 
 def test_navigation_urls(
     client_request,
+    active_user_with_permissions,
+    mock_get_organisation,
     mock_get_service_templates,
     mock_get_template_folders,
     mock_get_api_keys,
+    mocker,
 ):
+    service_one_json = service_json(
+        SERVICE_ONE_ID, users=[active_user_with_permissions["id"]], restricted=False, organisation_id=ORGANISATION_ID
+    )
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one_json})
+
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
+    # 'Make your service' live link is not included - the user has the manage settings permission,
+    # but the service is already live
     assert [a["href"] for a in page.select(".navigation a")] == [
         f"/services/{SERVICE_ONE_ID}",
         f"/services/{SERVICE_ONE_ID}/templates",
@@ -580,7 +600,7 @@ def test_caseworkers_get_caseworking_navigation(
 ):
     client_request.login(active_caseworking_user)
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("header + .govuk-width-container nav").text) == (
+    assert normalize_spaces(page.select_one(".govuk-service-navigation + .govuk-width-container nav").text) == (
         "Templates Sent messages Uploads Team members"
     )
 
@@ -596,13 +616,13 @@ def test_caseworkers_see_jobs_nav_if_jobs_exist(
 ):
     client_request.login(active_caseworking_user)
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("header + .govuk-width-container nav").text) == (
+    assert normalize_spaces(page.select_one(".govuk-service-navigation + .govuk-width-container nav").text) == (
         "Templates Sent messages Uploads Team members"
     )
 
 
 @pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
-def test_make_service_live_link_is_shown_in_limited_circumstances(
+def test_make_this_service_live_link_is_shown_in_limited_circumstances(
     client_request,
     service_one,
     platform_admin_user,
@@ -622,8 +642,35 @@ def test_make_service_live_link_is_shown_in_limited_circumstances(
     last_navigation_item = page.select(".navigation li")[-1]
 
     assert last_navigation_item["class"] == ["navigation__item", "navigation__item--with-separator"]
-    assert normalize_spaces(last_navigation_item.text) == "Make service live"
+    assert normalize_spaces(last_navigation_item.text) == "Make this service live"
     assert last_navigation_item.select_one("a")["href"] == url_for(
         "main.org_member_make_service_live_start",
+        service_id=SERVICE_ONE_ID,
+    )
+
+
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
+def test_make_your_service_live_link_shows_if_service_is_in_trial_mode_and_user_has_manage_settings_permission(
+    client_request,
+    service_one,
+    active_user_with_permissions,
+    mock_get_service_templates,
+    mock_get_template_folders,
+    mock_get_api_keys,
+    fake_uuid,
+):
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = fake_uuid
+
+    client_request.login(active_user_with_permissions)
+
+    page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
+
+    last_navigation_item = page.select(".navigation li")[-1]
+
+    assert last_navigation_item["class"] == ["navigation__item", "navigation__item--with-separator"]
+    assert normalize_spaces(last_navigation_item.text) == "Make your service live"
+    assert last_navigation_item.select_one("a")["href"] == url_for(
+        "main.request_to_go_live",
         service_id=SERVICE_ONE_ID,
     )

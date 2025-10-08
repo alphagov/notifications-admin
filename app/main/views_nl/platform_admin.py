@@ -306,6 +306,7 @@ def get_billing_report():
 
 
 @main.route("/platform-admin/reports/dvla-billing", methods=["GET", "POST"])
+@user_is_platform_admin
 def get_dvla_billing_report():
     form = BillingReportDateFilterForm()
 
@@ -687,9 +688,7 @@ def get_url_for_notify_record(uuid_):
             "inbound_number": _EndpointSpec(".inbound_sms_admin"),
             "api_key": _EndpointSpec(".api_keys", with_service_id=True),
             "template_folder": _EndpointSpec(".choose_template", "template_folder_id", with_service_id=True),
-            "service_inbound_api": _EndpointSpec(".received_text_messages_callback", with_service_id=True),
-            "delivery_status_callback_api": _EndpointSpec(".delivery_status_callback", with_service_id=True),
-            "returned_letters_callback_api": _EndpointSpec(".returned_letters_callback", with_service_id=True),
+            "service_callback_api": _EndpointSpec(".api_callbacks", with_service_id=True),
             "complaint": _EndpointSpec(".platform_admin_list_complaints"),
             "inbound_sms": _EndpointSpec(
                 ".conversation", "notification_id", with_service_id=True, extra={"_anchor": f"n{uuid_}"}

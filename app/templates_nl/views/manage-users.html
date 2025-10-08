@@ -37,9 +37,9 @@
                 </span>&ensp;
               {%- endif -%}
               <span class="hint">
-              {%- if user.status == 'pending' -%}
+              {%- if user.is_invited_user and user.status == 'pending' -%}
                 <span class="live-search-relevant">{{ user.email_address }}</span> (uitgenodigd)
-              {%- elif user.status == 'cancelled' -%}
+              {%- elif user.is_invited_user and user.status == 'cancelled' -%}
                 <span class="live-search-relevant">{{ user.email_address }}</span> (uitnodiging geannuleerd)
               {%- elif user.id == current_user.id -%}
                 <span class="live-search-relevant">(jij)</span>
@@ -56,7 +56,7 @@
                 ) }}
               {% endfor %}
             </ul>
-            {# alleen tonen als de dienst mappen heeft #}
+            {# only show if the service has folders #}
             {% if current_service.all_template_folders %}
               <p class="govuk-body tick-cross__hint">
                 {% set folder_count = user.template_folders_for_service(current_service) | length %}
@@ -79,7 +79,7 @@
             </div>
             <div class="govuk-grid-column-one-quarter">
               {% if current_user.has_permissions('manage_service') %}
-                {% if user.status == 'pending' %}
+                {% if user.is_invited_user and user.status == 'pending' %}
                   <a class="user-list-edit-link govuk-link govuk-link--no-visited-state" href="{{ url_for('main.cancel_invited_user', service_id=current_service.id, invited_user_id=user.id)}}">Uitnodiging annuleren<span class="govuk-visually-hidden"> voor {{ user.email_address }}</span></a>
                 {% elif user.is_editable_by(current_user) %}
                   <a class="user-list-edit-link govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id)}}">Gegevens wijzigen<span class="govuk-visually-hidden"> voor {{ user.name }} {{ user.email_address }}</span></a>

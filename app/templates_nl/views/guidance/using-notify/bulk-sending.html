@@ -15,7 +15,7 @@
 
   <p class="govuk-body">U kunt een batch van maximaal {{ max_spreadsheet_rows|format_thousands }} berichten tegelijk versturen.</p>
 
-  <p class="govuk-body">Er geldt een standaard maximum van {{ rate_limits|formatted_list(before_each="", after_each="") }}. Heeft u vragen over deze limieten, <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.support") }}>neem dan contact met ons op</a>.</p>
+  <p class="govuk-body">Er is een <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_daily_limits" )}}">dagelijkse limiet</a> aan het aantal berichten dat u kunt versturen.</p>
 
   <p class="govuk-body">Om een batch berichten te versturen:</p>
 
@@ -28,21 +28,5 @@
   <p class="govuk-body">Lees <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_personalisation" )}}>hoe u uw berichten personaliseert</a>.</p>
 
   <p class="govuk-body">U kunt ook <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.guidance_schedule_messages" )}}>een batch e-mails en sms-berichten plannen</a>.</p>
-
-  <h2 class="heading-medium">Internationale sms-berichten</h2>
-  <p class="govuk-body">Er geldt een standaard daglimiet van 100 internationale sms-berichten. Deze limiet maakt deel uit van de dagelijkse sms-toelage.</p>
-  <p class="govuk-body">Om de dagelijkse limiet voor internationale sms-berichten aan te passen:</p>
-
-  <ol class="govuk-list govuk-list--number">
-    <li>Ga naar <b class="govuk-!-font-weight-bold">Instellingen</b></li>
-    <li>Selecteer <b class="govuk-!-font-weight-bold">Wijzigen</b> bij de regel <b class="govuk-!-font-weight-bold">Limiet voor internationale sms-berichten</b></li>
-  </ol>
-
-  <p class="govuk-body">Houd bij het wijzigen van de limiet rekening met:</p>
-
-  <ul class="govuk-list govuk-list--bullet">
-    <li>hoeveel internationale berichten uw dienst dagelijks moet versturen</li>
-    <li>de eventuele kosten voor uw dienst bij fraude, zoals <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/guidance/business-communications-sms-and-telephone-best-practice">kunstmatige verhoging van het verkeer</a></li>
-  </ul>
 
 {% endblock %}

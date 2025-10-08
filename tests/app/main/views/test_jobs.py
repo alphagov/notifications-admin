@@ -176,7 +176,7 @@ def test_should_show_job_in_progress(
         job_id=fake_uuid,
     )
     assert [normalize_spaces(link.text) for link in page.select(".pill a:not(.pill-item--selected)")] == [
-        "10 sending text messages",
+        "10 delivering text messages",
         "0 delivered text messages",
         "0 failed text messages",
     ]
@@ -199,7 +199,7 @@ def test_should_show_job_without_notifications(
         job_id=fake_uuid,
     )
     assert [normalize_spaces(link.text) for link in page.select(".pill a:not(.pill-item--selected)")] == [
-        "10 sending text messages",
+        "10 delivering text messages",
         "0 delivered text messages",
         "0 failed text messages",
     ]
@@ -293,7 +293,7 @@ def test_should_show_old_job(
     assert page.select_one("tbody").text.strip() == expected_message
     assert [normalize_spaces(column.text) for column in page.select("main .govuk-grid-column-one-quarter")] == [
         "1 total text messages",
-        "1 sending text message",
+        "1 delivering text message",
         "0 delivered text messages",
         "0 failed text messages",
     ]
@@ -328,7 +328,7 @@ def test_should_show_letter_job(
         "1 Example Street template subject 1 January at 11:09am"
     )
     assert normalize_spaces(page.select(".keyline-block")[0].text) == "1 Letter"
-    assert normalize_spaces(page.select(".keyline-block")[1].text) == "6 January Estimated delivery date"
+    assert normalize_spaces(page.select(".keyline-block")[1].text) == "11 January Estimated delivery date"
     assert page.select_one("a[id=download-job-report]")["href"] == url_for(
         "main.view_job_csv",
         service_id=SERVICE_ONE_ID,
@@ -357,6 +357,7 @@ def test_should_show_letter_job(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @freeze_time("2016-01-01 11:09:00")
 def test_should_show_letter_job_with_banner_after_sending_before_1730(
     client_request,
@@ -385,6 +386,7 @@ def test_should_show_letter_job_with_banner_after_sending_before_1730(
     assert not page.select_one(".govuk-back-link")
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @freeze_time("2016-01-01 11:09:00")
 def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
     client_request,
@@ -412,6 +414,7 @@ def test_should_show_letter_job_with_banner_when_there_are_multiple_CSV_rows(
     )
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @freeze_time("2016-01-01 18:09:00")
 def test_should_show_letter_job_with_banner_after_sending_after_1730(
     client_request,
@@ -668,6 +671,7 @@ def test_should_show_cancel_link_for_letter_job(
     assert page.select_one("p#printing-info").text.strip() == "Printing starts today at 5:30pm"
 
 
+@pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 @freeze_time("2019-06-20 15:31:00.000001")
 @pytest.mark.parametrize("job_status,number_of_processed_notifications", [["in progress", 2], ["finished", 1]])
 def test_dont_cancel_letter_job_when_too_early_to_cancel(

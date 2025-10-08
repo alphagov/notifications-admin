@@ -69,7 +69,7 @@ def add_organisation():
         except HTTPError as e:
             org_name_exists_message = "Organisation name already exists"
             if e.status_code == 400 and org_name_exists_message in e.message:
-                form.name.errors.append("Deze organisatienaam is al in gebruik")
+                form.name.errors.append("This organisation name is already in use.")
             else:
                 raise e
 
@@ -93,9 +93,9 @@ def add_organisation_from_gp_service(service_id):
                 agreement_signed=False,
             ).associate_service(service_id)
         except HTTPError as e:
-            org_name_exists_message = "Organisatienaam bestaat al"
+            org_name_exists_message = "Organisation name already exists"
             if e.status_code == 400 and org_name_exists_message in e.message:
-                flash("Deze organisatienaam is al in gebruik.")
+                flash("This organisation name is already in use.")
             else:
                 raise e
 
@@ -168,15 +168,15 @@ def download_organisation_usage_report(org_id):
     services_usage, _ = current_organisation.services_and_usage(financial_year=selected_year)
 
     unit_column_names = {
-        "service_id": "Service-ID",
-        "service_name": "Servicenaam",
-        "emails_sent": "Verzonden e-mails",
-        "sms_remainder": "Overgebleven sms-tegoed",
+        "service_id": "Service ID",
+        "service_name": "Service Name",
+        "emails_sent": "Emails sent",
+        "sms_remainder": "Free text message allowance remaining",
     }
 
     monetary_column_names = {
-        "sms_cost": "Uitgaven aan sms (€)",
-        "letter_cost": "Uitgaven aan brieven (€)",
+        "sms_cost": "Spent on text messages (£)",
+        "letter_cost": "Spent on letters (£)",
     }
 
     org_usage_data = [list(unit_column_names.values()) + list(monetary_column_names.values())] + [
@@ -191,7 +191,7 @@ def download_organisation_usage_report(org_id):
         {
             "Content-Type": "text/csv; charset=utf-8",
             "Content-Disposition": (
-                'inline;filename="{} gebruiksrapport organisatie jaar {} - gegenereerd op {}.csv"'.format(
+                'inline;filename="{} organisation usage report for year {} - generated on {}.csv"'.format(
                     current_organisation.name, selected_year, datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
                 )
             ),
@@ -233,7 +233,7 @@ def invite_org_user(org_id):
             permissions=list(form.permissions),
         )
 
-        flash(f"Uitnodiging verzonden naar {invited_org_user.email_address}", "default_with_tick")
+        flash(f"Invite sent to {invited_org_user.email_address}", "default_with_tick")
         return redirect(url_for(".manage_org_users", org_id=org_id))
 
     return render_template(
@@ -284,7 +284,7 @@ def cancel_invited_org_user(org_id, invited_user_id):
 
     invited_org_user = InvitedOrgUser.by_id_and_org_id(org_id, invited_user_id)
 
-    flash(f"Uitnodiging geannuleerd voor {invited_org_user.email_address}", "default_with_tick")
+    flash(f"Invitation cancelled for {invited_org_user.email_address}", "default_with_tick")
     return redirect(url_for("main.manage_org_users", org_id=org_id))
 
 
@@ -305,7 +305,7 @@ def edit_organisation_name(org_id):
         except HTTPError as http_error:
             error_msg = "Organisation name already exists"
             if http_error.status_code == 400 and error_msg in http_error.message:
-                form.name.errors.append("Deze organisatienaam is al in gebruik")
+                form.name.errors.append("This organisation name is already in use")
             else:
                 raise http_error
         else:
@@ -403,7 +403,7 @@ def edit_organisation_domains(org_id):
         except HTTPError as e:
             error_message = "Domain already exists"
             if e.status_code == 400 and error_message in e.message:
-                flash("Dit domein is al in gebruik", "error")
+                flash("This domain is already in use", "error")
                 return render_template(
                     "views/organisations/organisation/settings/edit-domains.html",
                     form=form,
@@ -546,11 +546,11 @@ def archive_organisation(org_id):
             else:
                 raise e
 
-        flash(f"‘{current_organisation.name}’ is verwijderd", "default_with_tick")
+        flash(f"‘{current_organisation.name}’ was deleted", "default_with_tick")
         return redirect(url_for(".your_services"))
 
     flash(
-        f"Weet u zeker dat u ‘{current_organisation.name}’ wilt verwijderen? Actie kan niet ongedaan worden gemaakt.",
+        f"Are you sure you want to delete ‘{current_organisation.name}’? There’s no way to undo this.",
         "delete",
     )
     return organisation_settings(org_id)

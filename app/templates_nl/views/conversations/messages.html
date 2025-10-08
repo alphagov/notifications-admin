@@ -8,11 +8,18 @@
         {{ message.created_at | format_datetime_relative }}
       </time>
     {% endset %}
-  {% elif message.status in ['pending', 'sending', 'created'] %}
+  {% elif message.status == 'created' %}
     {% set status_text_in_heading = 'Bezig met verzenden sinds' %}
     {% set visual_status_text %}
       <time class="sms-message-status sms-message-status-outbound hint" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
         bezig met verzenden
+      </time>
+    {% endset %}
+  {% elif message.status in ['pending', 'sending'] %}
+    {% set status_text_in_heading = 'Delivering since' %}
+    {% set visual_status_text %}
+      <time class="sms-message-status sms-message-status-outbound hint" datetime="{{ message.created_at | format_datetime_numeric }}" tabindex="-1">
+        delivering
       </time>
     {% endset %}
   {% else %}

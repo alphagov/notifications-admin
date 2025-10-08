@@ -77,7 +77,7 @@
             {{ notification.letter_print_day }}
           </p>
           <p class="govuk-body">
-            Geschatte bezorgdatum: {{ notification.estimated_letter_delivery_date|format_day_of_week }} {{ notification.estimated_letter_delivery_date|format_date_short }}
+            Geschatte levering door {{ notification.estimated_letter_delivery_date|format_day_of_week }} {{ notification.estimated_letter_delivery_date|format_date_short }}
           </p>
         {% endif %}
       {% endif %}

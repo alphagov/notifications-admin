@@ -23,6 +23,7 @@
         See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages', _anchor='international-numbers') }}">pricing</a> for the list
         of rates.
       </p>
+      <p class="govuk-body">The daily limit for your service is {{current_service.international_sms_message_limit}}. You can change the daily international text message limit in <b class="govuk-!-font-weight-bold">Settings</b>.</p>
       {% call form_wrapper() %}
         {{ form.enabled }}
         {{ page_footer('Save') }}

@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Any
 
 from flask import abort, current_app
-from notifications_python_client.errors import HTTPError
 from notifications_utils.serialised_model import SerialisedModelCollection
 from werkzeug.utils import cached_property
 
@@ -15,13 +14,13 @@ from app.constants import (
     SIGN_IN_METHOD_TEXT_OR_EMAIL,
 )
 from app.models import JSONModel
+from app.models.api_key import APIKeys
 from app.models.branding import EmailBranding, LetterBranding
 from app.models.contact_list import ContactLists
 from app.models.job import ImmediateJobs, PaginatedJobs, PaginatedUploads, ScheduledJobs
 from app.models.organisation import Organisation
 from app.models.unsubscribe_requests_report import UnsubscribeRequestsReports
 from app.models.user import InvitedUsers, User, Users
-from app.notify_client.api_key_api_client import api_key_api_client
 from app.notify_client.billing_api_client import billing_api_client
 from app.notify_client.inbound_number_client import inbound_number_client
 from app.notify_client.invite_api_client import invite_api_client
@@ -38,6 +37,7 @@ class Service(JSONModel):
     billing_contact_email_addresses: str
     billing_contact_names: str
     billing_reference: str
+    confirmed_unique: bool
     contact_link: str
     count_as_live: bool
     custom_email_sender_name: str
@@ -45,7 +45,6 @@ class Service(JSONModel):
     go_live_at: datetime
     has_active_go_live_request: bool
     id: Any
-    inbound_api: Any
     email_message_limit: int
     international_sms_message_limit: int
     sms_message_limit: int
@@ -75,7 +74,6 @@ class Service(JSONModel):
         "international_letters",
         "international_sms",
         "sms_to_uk_landlines",
-        "economy_letter_sending",
     )
 
     @classmethod
@@ -416,6 +414,7 @@ class Service(JSONModel):
                 self.has_templates,
                 not self.needs_to_add_email_reply_to_address,
                 not self.needs_to_change_sms_sender,
+                self.confirmed_unique,
             )
         )
 
@@ -561,13 +560,7 @@ class Service(JSONModel):
 
     @cached_property
     def api_keys(self):
-        return sorted(
-            api_key_api_client.get_api_keys(self.id)["apiKeys"],
-            key=lambda key: key["name"].lower(),
-        )
-
-    def get_api_key(self, id):
-        return self._get_by_id(self.api_keys, id)
+        return APIKeys(self.id)
 
     @property
     def able_to_accept_agreement(self):
@@ -618,9 +611,10 @@ class Service(JSONModel):
     def remaining_messages(self, notification_type):
         if notification_type == "international_sms" and not self.has_permission("international_sms"):
             return 0
-        return self.get_message_limit(notification_type) - (
-            service_api_client.get_notification_count(self.id, notification_type=notification_type)
-        )
+        return self.get_message_limit(notification_type) - self.sent_today(notification_type)
+
+    def sent_today(self, notification_type):
+        return service_api_client.get_notification_count(self.id, notification_type=notification_type)
 
     @property
     def sign_in_method(self) -> str:
@@ -657,25 +651,17 @@ class Service(JSONModel):
 
     @property
     def inbound_sms_callback_details(self):
-        if self.inbound_api:
-            try:
-                return service_api_client.get_service_callback_api(self.id, self.inbound_api[0], "inbound_sms")
-            except HTTPError:
-                pass
-        try:
-            return self._callback_service_callback_details("inbound_sms")
-        except HTTPError:
-            pass
+        return self.get_service_callback_details("inbound_sms")
 
     @property
     def delivery_status_callback_details(self):
-        return self._callback_service_callback_details("delivery_status")
+        return self.get_service_callback_details("delivery_status")
 
     @property
     def returned_letters_callback_details(self):
-        return self._callback_service_callback_details("returned_letter")
+        return self.get_service_callback_details("returned_letter")
 
-    def _callback_service_callback_details(self, callback_type):
+    def get_service_callback_details(self, callback_type):
         if callback_api := self.service_callback_api:
             for row in callback_api:
                 if row["callback_type"] == callback_type:

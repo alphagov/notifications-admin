@@ -3,6 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block service_page_title %}
   Wijzig posttarief
@@ -31,12 +32,30 @@
       <h2 class="govuk-heading-m">
         Bezorgtijden
       </h2>
-      <p class="govuk-body">
-        Brieven die vóór 17:30 uur worden verstuurd, worden de volgende werkdag (maandag tot en met vrijdag) verzonden.
-      </p>
-      <p class="govuk-body">
-        Brieven met eersteklas post worden één dag na verzending bezorgd. Brieven met tweedeklas post worden twee dagen na verzending bezorgd.
-      </p>
+      <p class="govuk-body">Brieven worden vóór 17:30 uur gedrukt en de eerstvolgende werkdag (maandag t/m vrijdag) verzonden.</p>
+      <p class="govuk-body">De geschatte levertijden zijn gebaseerd op de datum waarop een brief wordt verzonden.</p>
+
+  <div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Estimated delivery times for letters',
+      field_headings=['Postage', 'Estimated delivery time'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for column_heading, description in [
+        ('First class', '1 to 2 days'),
+        ('Second class', '2 to 3 days'),
+        ('Economy mail', 'Up to 8 days'),
+        ('International (Europe)', '3 to 5 days'),
+        ('International (rest of the world)', '6 to 7 days'),
+        ] %}
+        {% call row() %}
+          {{ text_field(column_heading) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
       <p class="govuk-body">
         Royal Mail bezorgt van maandag tot en met zaterdag, met uitzondering van officiële feestdagen.
       </p>

@@ -1,4 +1,5 @@
 {% from "components/service-link.html" import service_link %}
+{% from "components/table.html" import mapping_table, row, text_field %}
 
 {% extends "content_template.html" %}
 
@@ -29,11 +30,39 @@
   <p class="govuk-body">Nadat een sms is verzonden, probeert onze sms-provider deze tot 72 uur bij de ontvanger af te leveren.</p>
   <p class="govuk-body">We sturen sms-berichten via verschillende providers. Als één provider faalt, schakelt Notify over naar een andere, zodat uw sms-berichten niet worden beïnvloed.</p>
 
-  <h2 id="letters" class="heading-medium">Brieven</h2>
-  <p class="govuk-body">Brieven worden om 17:30 uur gedrukt en de volgende werkdag (maandag tot en met vrijdag) verzonden.</p>
+  <h2 id="letters" class="heading-medium">Letters</h2>
+  <p class="govuk-body">Brieven worden om 17:30 uur gedrukt en de volgende werkdag (maandag tot en met vrijdag met uitzondering van feestdagen) verzonden.</p>
+  <p class="govuk-body">Estimated delivery times are based on the date a letter is dispatched.</p>
 
-  <p class="govuk-body">Brieven in eersteklas post worden één dag na verzending bezorgd. Tweedeklas post wordt twee dagen na verzending bezorgd. Royal Mail bezorgt van maandag tot en met zaterdag, met uitzondering van feestdagen.</p>
-  <p class="govuk-body">Brieven naar Europa worden binnen 3 tot 5 dagen bezorgd. Brieven naar andere landen wereldwijd hebben 5 tot 7 dagen nodig voor bezorging.</p>
+<div class="govuk-inset-text">
+    <p class="govuk-body">
+    Vanaf 28 juli duren de tweede klasse brieven 3 tot 4 dagen om te leveren.eren.
+    </p>
+</div>
+
+<div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Geschatte levertijden voor letters',
+      field_headings=['Porto', 'Geschatte levertijd'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for column_heading, description in [
+        ('Eerste klas', '1 tot 2 dagen (maandag tot zaterdag)'),
+        ('Tweede klas', '3 tot 4 werkdagen'),
+        ('Economy Mail', 'Maximaal 6 werkdagen'),
+        ('Internationaal (Europa)', '3 tot 5 werkdagen'),
+        ('Internationaal (rest van de wereld)', '6 tot 7 werkdagen'),
+        ] %}
+        {% call row() %}
+          {{ text_field(column_heading) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+
+  <p class="govuk-body">Zie een lijst met <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">verzendprijzen</a>.</p>
 
   <h2 id="returned-mail" class="heading-medium">Retour gezonden brieven</h2>
   <p class="govuk-body">Elke brief die wij versturen bevat het adres van onze drukkerij op de achterkant van de envelop. U kunt het retouradres niet aanpassen.</p>

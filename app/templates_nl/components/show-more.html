@@ -1,7 +1,10 @@
 {% macro show_more(url, label, with_border=True) %}
-<div class="show-more {% if not with_border %}show-more--no-border{% endif %}">
-  <a href="{{ url }}" class="govuk-link govuk-link--no-visited-state show-more__link">
-    <span>{{ label }}</span>
-  </a>
-</div>
+  <div class="show-more {% if not with_border %}show-more--no-border{% endif %}">
+      <a
+        href="{{ url }}"
+        class="govuk-link govuk-link--no-visited-state show-more__link"
+      >
+        <span>{{ label }}</span>
+      </a>
+  </div>
 {% endmacro %}

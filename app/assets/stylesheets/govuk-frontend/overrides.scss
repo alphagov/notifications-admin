@@ -68,3 +68,37 @@ $link-colour-on-grey-background: #1852ab;
     box-shadow: inset 0px -4px $govuk-focus-text-colour, inset 0px 15px $govuk-focus-colour, inset 15px 0px $govuk-focus-colour, inset 0px -11px $govuk-focus-colour;
   }
 }
+
+
+// adjust header navigation menu button positioning for rebrand
+// menu button sits height due to taller header
+// this centrally aligns is with GOV.UK and product name
+// applied only when rebrans is turned on
+// remove when we move to service navigation
+
+.govuk-template--rebranded .govuk-header__menu-button {
+  @include govuk-media-query($until: desktop) {
+    top: 21px;
+  }
+}
+
+
+// make 'GOV.UK Notify' logo sit on top of any content below it
+// mainly to stop the breadcrumb, which has a negative margin-top,
+// overlapping its focus style
+.govuk-header__link--homepage:focus {
+  position: relative;
+  z-index: 1;
+}
+
+
+.govuk-footer__crown {
+  display: none;
+}
+
+// align last item in the service navigation to the right on large vieport
+ @include govuk-media-query($from: tablet) {
+  .govuk-service-navigation__item:last-child {
+    margin-left: auto;
+  }
+ }

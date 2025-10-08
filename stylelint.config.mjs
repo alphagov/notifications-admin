@@ -21,6 +21,10 @@ export default {
     "scss/dollar-variable-pattern": null,
     "scss/operator-no-unspaced": null,
     "declaration-block-no-shorthand-property-overrides": null,
-    "scss/double-slash-comment-whitespace-inside": null
+    "scss/double-slash-comment-whitespace-inside": null,
+    "declaration-property-value-keyword-no-deprecated": [
+      true,
+      { "ignoreKeywords": ["break-word"] }
+    ]
   }
 }

@@ -35,7 +35,7 @@
 
   {% endif %}
 
-  <div class="govuk-grid-column-full {% if message_type == 'sms' %}extra-tracking{% endif %}">
+  <div class="govuk-grid-column-full">
   {% call form_wrapper(
     action=url_for('main.view_notifications', service_id=current_service.id, message_type=message_type, search_query=search_query),
     class="govuk-grid-row notify-simple-search-form"
@@ -53,7 +53,8 @@
                 prefix='Zoek op',
                 prefix_plural='Zoek op'
               )
-            }
+            },
+            "classes": "govuk-input--extra-letter-spacing" if message_type == "sms" else ""
           }
         )
       }}
@@ -70,21 +71,44 @@
   {% endcall %}
 
   {% if current_user.has_permissions('view_activity') %}
-    <p class="bottom-gutter">
+    {% set retention_text %}
+      Data available for {{ partials.service_data_retention_days }} days
+    {% endset %}
+    {% if report_request_feature_flag or current_user.platform_admin %}
+      <div class="govuk-button-group govuk-button-group--flex-start">
+        {% call form_wrapper(class='csv-request-form form--inline') %}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="report_type" value="notifications_report">
+          {{ govukButton({
+            "html": 'Download dit rapport (CSV)',
+            "classes": "govuk-button--as-link",
+            "attributes": {
+              "role": "link"
+            }
+          }) }}
+        {% endcall %}
+        <p class="govuk-body">
+          {{ retention_text }}
+        </p>
+      </div>
+      {% else %}
         {% if can_download %}
+        <p class="bottom-gutter">
             <a href="{{ download_link }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">
                 Download dit rapport (<abbr title="Comma separated values">CSV</abbr>)
             </a>
-
+          &emsp;
+          {{ retention_text }}
+        </p>
         {% else %}
-            <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold" href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback') }}">
-                Neem contact op met de helpdesk om dit rapport te downloaden
-            </a>
+        <p class="bottom-gutter">
+          <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold" href="{{ url_for('main.feedback', ticket_type='ask-question-give-feedback') }}">
+              Neem contact op met de helpdesk om dit rapport te downloaden
+          </a>
+        </p>
         {% endif %}
-        &emsp;
-        Gegevens zijn {{ partials.service_data_retention_days }} dagen beschikbaar
-    </p>
-  {% endif %}
+      {% endif %}
+    {% endif %}
 
   {{ ajax_block(
     partials,

@@ -2,7 +2,7 @@ from flask import abort, redirect, render_template, session
 
 from app import current_service, current_user, service_api_client, url_for
 from app.main import main
-from app.main.views_nl.send import (
+from app.main.views.send import (
     all_placeholders_in_session,
     fields_to_fill_in,
     get_normalised_placeholders_from_session,

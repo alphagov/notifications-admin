@@ -1,0 +1,25 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "views/csv-report/_requested-report-text.html" import report_text %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+
+{% set page_title = 'Uw rapport is klaar om te downloaden' %}
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {{ page_header(page_title) }}
+      <p class="govuk-body">We hebben een CSV -bestand gemaakt {{ report_text(report_request.parameter['notification_type'],report_request.parameter['notification_status']) }} Van het laatste {{ retention_period }} dagen.</p>
+      <!-- we don't have that data available -->
+      <!-- <p class="govuk-body">The report is ((filesize))MB.</p>
+      <p class="govuk-body">Dit bestand is beschikbaar om te downloaden tot ((time)) op ((date)).</p> -->
+      {{ govukButton({
+        "html": "Downloaden",
+        "href": url_for('main.report_request_download', service_id=current_service.id, report_request_id=report_request.id)
+      }) }}
+    </div>
+  </div>
+{% endblock %}

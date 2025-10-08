@@ -33,7 +33,7 @@ def unsubscribe_request_report(service_id, batch_id=None):
         data = {"report_has_been_processed": report_has_been_processed}
         service_api_client.process_unsubscribe_request_report(service_id, batch_id=batch_id, data=data)
         flash(
-            f"Rapport {report.title} gemarkeerd als {'voltooid' if report_has_been_processed else 'niet voltooid'}",
+            f"Report for {report.title} marked as {'completed' if report_has_been_processed else 'not completed'}",
             "default_with_tick",
         )
         return redirect(url_for("main.unsubscribe_request_reports_summary", service_id=service_id, batch_id=batch_id))
@@ -54,11 +54,11 @@ def download_unsubscribe_request_report(service_id, batch_id=None):
 
     report = service_api_client.get_unsubscribe_request_report(service_id, batch_id)
     column_names = {
-        "email_address": "E-mailadres",
-        "template_name": "Sjabloonnaam",
-        "original_file_name": "Originele naam van geüpload spreadsheetbestand",
-        "template_sent_at": "Sjabloon verzonden op",
-        "unsubscribe_request_received_at": "Afmeldverzoek ontvangen op",
+        "email_address": "Email address",
+        "template_name": "Template name",
+        "original_file_name": "Uploaded spreadsheet file name",
+        "template_sent_at": "Template sent at",
+        "unsubscribe_request_received_at": "Unsubscribe request received at",
     }
     # initialise with header row
     data = [list(column_names.values())]
@@ -69,9 +69,9 @@ def download_unsubscribe_request_report(service_id, batch_id=None):
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": f'attachment; filename="Afmeldverzoeken e-mail '
+            "Content-Disposition": f'attachment; filename="Email unsubscribe requests '
             f"{format_date_numeric(report['earliest_timestamp'])} "
-            f"tot {format_date_numeric(report['latest_timestamp'])}.csv",
+            f"to {format_date_numeric(report['latest_timestamp'])}.csv",
         },
     )
 

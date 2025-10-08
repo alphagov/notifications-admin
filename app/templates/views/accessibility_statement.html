@@ -12,8 +12,8 @@
   {{ content_metadata(
     data={
       "Published": "23 September 2020",
-      "Last updated": "13 May 2025",
-      "Next review due": "30 June 2025"
+      "Last updated": "15 July 2025",
+      "Next review due": "31 July 2025"
     }
     ) }}
     {# Last non-functional changes: 13 December 2024 #}
@@ -43,12 +43,11 @@
   <h2 class="heading-medium" id="how-accessible-this-website-is">How accessible this website is</h2>
 
   <p class="govuk-body">
-    We know some parts of this website are not fully accessible:
+    We know some parts of this website are not fully accessible.
   </p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>pages for template folders may be announced in a confusing way by screen readers</li>
-    <li>the Notify status page has several accessibility issues</li>
-  </ul>
+  <p class="govuk-body">
+    the Notify status page has several accessibility issues
+  </p>
 
   <p class="govuk-body">
     We also know that the emails Notify sends are not fully accessible. The NVDA screen reader announces extra spaces in emails when you view them in Microsoft Outlook.
@@ -100,14 +99,6 @@
     The following content on the Notify website is not compliant with the WCAG version 2.2 AA standard:
   </p>
 
-  <h3 class="heading-small" id="problems-with-using-the-interface">Problems with using the interface</h3>
-
-  <ol class="govuk-list govuk-list--number">
-    <li>
-      Page headings on pages for folders can be confusing when using a screen reader. We have redesigned them and will be testing this new design for the same problems soon.
-    </li>
-  </ol>
-
   <h3 class="heading-small" id="pdfs-documents">
     PDFs and other documents
   </h3>
@@ -133,17 +124,8 @@
     <li>missing level 1 headings (users may not be able to accurately determine the structure of content on the page)</li>
     <li>our status incident page is missing the main heading and the status home page has an incorrect heading hierarchy – this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#info-and-relationships">success criterion 1.3.1: info and relationships</a></li>
     <li>our status page subscribe to updates forms, when submitted with incorrect data, do not inform screen reader users of the error message when it becomes available – this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#status-messages">success criterion 4.1.3: status messages</a></li>
-    <li>some form fields to subscribe to status incident updates are not correctly set up for autocomplete – this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#identify-input-purpose">success criterion 1.3.5: identify input purpose</a></li>
     <li>incident titles are colour-coded, with no other visual indication or text – this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#use-of-color">success criterion 1.4.1: use of color</a></li>
-    <li>links are identified only by colour with no other visual indication - this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#use-of-color">success criterion 1.4.1: use of color</a></li>
-    <li>popup to subscribe for status incident updates is partially cut off when zoomed in at 200% - this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#resize-text">success criterion 1.4.4: resize text</a></li>
-    <li>popup to subscribe for status incident updates is almost entirely cut off and unusable when zoomed in at 400% - this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#reflow">success criterion 1.4.10: reflow</a></li>
-    <li>icons to subscribe to various types of status incident updates do not have enough colour contrast when in focus - this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#non-text-contrast">success criterion 1.4.11: non-text contrast</a></li>
-    <li>there is no mechanism to skip to the main content on nearly all pages - this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#bypass-blocks">success criterion 2.4.1: bypass blocks</a></li>
-    <li>hidden incidents in the incident history are revealed above the ‘show’ button, which means some users might miss them - this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#focus-order">success criterion 2.4.3: focus order</a></li>
     <li>there is only one way to get to some pages. Many of these pages can only be reached using inaccessible controls - this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#multiple-ways">success criterion  success criterion 2.4.5: multiple ways</a></li>
-    <li>subscribe buttons that do different things have identical labels - this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#consistent-identification">success criterion 3.2.4: consistent identification</a></li>
-    <li>it is not clear that the button to subscribe to status incident updates for a single incident will open a popup - this fails <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG21/#name-role-value">success criterion 4.1.2: name, role, value</a></li>
   </ul>
 
   <h2 class="heading-medium" id="how-we-tested-this-service">
@@ -151,7 +133,10 @@
   </h2>
 
   <p class="govuk-body">
-    We revised what makes up the common tasks GOV.UK Notify users need to complete and tested them against WCAG 2.2 in September 2024. We are now in the process of fixing all issues identified by this testing. All tests were carried out by the Digital Accessibility Centre.
+    All status pages across GDS were audited by an internal accessibility specialist in January 2025. The resulting issues are now listed in this statement and being worked on.
+  </p>
+  <p class="govuk-body">
+    We revised what makes up the common tasks GOV.UK Notify users need to complete and tested them against WCAG 2.2 in September 2024. All tests were carried out by the Digital Accessibility Centre.
   </p>
   <p class="govuk-body">
     The parts of the website used to add <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_email_branding') }}">email branding</a> or <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_letter_branding') }}">letter branding</a> were tested on 9 October 2023. The button for copying text in the page to your clipboard and the component for choosing the day and time to send notifications were also tested as part of this.

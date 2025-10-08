@@ -1,0 +1,73 @@
+{% extends "content_template.html" %}
+
+{% from "components/table.html" import mapping_table, row, text_field %}
+{% from "components/service-link.html" import service_link %}
+
+{# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
+{% set navigation_label_prefix = "Using Notify" %}
+
+{% block per_page_title %}
+  Daily limits
+{% endblock %}
+
+{% block content_column_content %}
+
+<h1 class="heading-large">Daily limits</h1>
+<div class="bottom-gutter-3-2">
+<p class="govuk-body">Er is een limiet aan het aantal berichten dat u elke dag kunt verzenden. </p>
+<p class="govuk-body">Als u deze grenzen moet bespreken, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">Neem contact met ons op</a>.</p>
+
+  {% call mapping_table(
+    caption="Notification Daily limits",
+    field_headings=["Message type", "Daily limit"],
+    field_headings_visible=True,
+    caption_visible=False,
+    equal_length=True,
+  ) %}
+    {% for message, limit in  [
+    ("E -mails", rate_limits.email),
+    ("SMS -berichten", rate_limits.sms),
+    ("letters", rate_limits.letter)]
+    %}
+      {% call row() %}
+        {{ text_field(message) }}
+        {{ text_field(limit) }}
+      {% endcall %}
+    {% endfor %}
+  {% endcall %}
+  </div>
+
+<h2 class="heading-medium">International text message limit</h2>
+
+  <p class="govuk-body">Standaard kunt u slechts 100 sms -berichten per dag naar internationale telefoonnummers verzenden.Dit telt voor uw totale dagelijkse limiet van 250.000 sms -berichten.</p>
+
+  <p class="govuk-body">We stellen deze limiet in om u te beschermen tegen de dreiging van sms -fraude.</p>
+
+  <p class="govuk-body">Fraude kan uw organisatie veel geld kosten als u geen stappen onderneemt om uzelf te beschermen.</p>
+
+  <p class="govuk-body">Het National Cyber ​​Security Center (NCSC) heeft een blogpost geschreven met de naam <a class="govuk-link govuk-link--no-visited-state" href="https://www.ncsc.gov.uk/blog-post/ait-fraud-what-you-need-to-know">‘AIT -fraude: wat u moet weten’</a>.</p>
+
+<h3 class="heading-small">Als u de limiet van het internationale sms -bericht moet wijzigen</h3>
+
+  <ol class="govuk-list govuk-list--number">
+    <li>Bereken hoeveel internationale sms -berichten u elke dag moet verzenden en baseer uw nieuwe limiet daarop.</li>
+    <li>Gaan naar {{ service_link(current_service, 'main.service_settings', 'Settings') }}.</li>
+   <li>Uitkiezen <b class="govuk-!-font-weight-bold">Wijziging</b> op de <b class="govuk-!-font-weight-bold">limiet van het internationale sms -bericht</b> rij.</li>
+ </ol>
+
+ <p class="govuk-body">Je zou ook moeten:</p>
+
+    <ul class="govuk-list govuk-list--bullet">
+     <li>Volg hoeveel berichten u elke dag verzendt</li>
+     <li>Stel een waarschuwing in uw systeem in voor alles wat niet normaal is</li>
+     <li>Stop uw service om herhaaldelijk berichten naar hetzelfde nummer te verzenden</li>
+    </ul>
+
+<h3 class="heading-small">Als u geen internationale sms -berichten hoeft te verzenden:</h3>
+
+  <ol class="govuk-list govuk-list--number">
+   <li>Gaan naar {{ service_link(current_service, 'main.service_settings', 'Settings') }}.</li>
+   <li>Uitkiezen <b class="govuk-!-font-weight-bold">Wijziging</b> op de <b class="govuk-!-font-weight-bold">Stuur internationale sms -berichten</b> rij.</li>
+ </ol>
+
+{% endblock %}

@@ -55,7 +55,7 @@ from app.main.forms import (
     TemplateFolderForm,
     WelshLetterTemplateForm,
 )
-from app.main.views_nl.send import get_sender_details
+from app.main.views.send import get_sender_details
 from app.models.service import Service
 from app.models.template_list import TemplateList, UserTemplateList, UserTemplateLists
 from app.s3_client.s3_letter_upload_client import (
@@ -181,7 +181,7 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
         )
 
     if "templates_and_folders" in templates_and_folders_form.errors:
-        flash("Selecteer ten minste een bestand of map")
+        flash("Select at least one template or folder")
 
     initial_state = request.args.get("initial_state")
     if request.method == "GET" and initial_state:
@@ -605,7 +605,7 @@ def delete_template_folder(service_id, template_folder_id):
             else:
                 abort(500, e)
     else:
-        flash(f"Weet u zeker dat u de ‘{template_folder['name']}’ map wilt verwijderen?", "delete")
+        flash(f"Are you sure you want to delete the ‘{template_folder['name']}’ folder?", "delete")
         return manage_template_folder(service_id, template_folder_id)
 
 
@@ -760,7 +760,7 @@ def edit_service_template(service_id, template_id, language=None):
                     form.template_content.errors.extend(e.message["content"])
                 elif "content" in e.message and any(x == QR_CODE_TOO_LONG for x in e.message["content"]):
                     form.template_content.errors.append(
-                        "Kan geen bruikbare QR-code maken: de ingevoerde link is te lang"
+                        "Cannot create a usable QR code - the link you entered is too long"
                     )
                 else:
                     raise e
@@ -869,17 +869,18 @@ def delete_service_template(service_id, template_id):
     try:
         last_used_notification = template_statistics_client.get_last_used_date_for_template(service_id, template.id)
         message = (
-            "Deze template is het afgelopen jaar niet gebruikt."
+            "This template has not been used within the last year."
             if not last_used_notification
-            else f"Deze template is voor het laatst gebruikt {format_delta(last_used_notification)} geleden."
+            else f"This template was last used {format_delta(last_used_notification)}."
         )
+
     except HTTPError as e:
         if e.status_code == 404:
             message = None
         else:
             raise e
 
-    flash([f"Weet u zeker dat u ‘{template.name}’ wilt verwijderen?", message, template.name], "delete")
+    flash([f"Are you sure you want to delete ‘{template.name}’?", message, template.name], "delete")
     return render_template(
         "views/templates/template.html",
         template=template,
@@ -915,10 +916,7 @@ def confirm_redact_template(service_id, template_id):
 def redact_template(service_id, template_id):
     service_api_client.redact_service_template(service_id, template_id)
 
-    flash(
-        "Gepersonaliseerde inhoud wordt verborgen voor berichten die met deze template worden verstuurd",
-        "default_with_tick",
-    )
+    flash("Personalised content will be hidden for messages sent with this template", "default_with_tick")
 
     return redirect(
         url_for(
@@ -1016,9 +1014,7 @@ def edit_template_postage(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     if template.template_type != "letter":
         abort(404)
-    form = LetterTemplatePostageForm(
-        **template._template, show_economy_class=current_service.has_permission("economy_letter_sending")
-    )
+    form = LetterTemplatePostageForm(**template._template)
     if form.validate_on_submit():
         postage = form.postage.data
         service_api_client.update_service_template(service_id, template_id, postage=postage)
@@ -1157,7 +1153,7 @@ def letter_template_edit_pages(template_id, service_id):
         )
 
     flash(
-        f"Weet u zeker dat u de bijlage ‘{template.attachment.original_filename}’ wilt verwijderen?",
+        f"Are you sure you want to remove the ‘{template.attachment.original_filename}’ attachment?",
         "remove",
     )
 
@@ -1226,10 +1222,10 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
     if attachment_page_count + template.page_count > template.max_page_count:
         raise LetterAttachmentFormError(
             detail=(
-                f"Brieven mogen maximaal {template.max_page_count} pagina’s bevatten "
-                f"({template.max_sheet_count} dubbelzijdige vellen papier). "
-                "In totaal zijn uw brieftemplate en de bijlage samen "
-                f"{template.page_count + attachment_page_count} pagina’s lang."
+                f"Letters must be {template.max_page_count} pages or less "
+                f"({template.max_sheet_count} double-sided sheets of paper). "
+                "In total, your letter template and the file you attached are "
+                f"{template.page_count + attachment_page_count} pages long."
             )
         )
 

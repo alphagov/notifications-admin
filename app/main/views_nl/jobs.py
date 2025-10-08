@@ -49,8 +49,8 @@ def view_job(service_id, job_id):
     filter_args = parse_filter_args(request.args)
     filter_args["status"] = set_status_filters(filter_args)
 
-    just_sent_message = "Your {} been sent. Printing starts {} at 5:30pm.".format(
-        "letter has" if job.notification_count == 1 else "letters have", printing_today_or_tomorrow(job.created_at)
+    just_sent_message = "Uw {} is verzonden. Het printen start {} om 17:30 uur.".format(
+        "brief is" if job.notification_count == 1 else "brieven zijn", printing_today_or_tomorrow(job.created_at)
     )
 
     if job.scheduled:
@@ -137,7 +137,7 @@ def cancel_letter_job(service_id, job_id):
 
         # reduce to just == FINISHED_ALL_NOTIFICATIONS_CREATED_JOB_STATUS once api support rolled out
         if job.status not in JobApiClient.FINISHED_JOB_STATUSES or job.notifications_created < job.notification_count:
-            flash("We are still processing these letters, please try again in a minute.", "try again")
+            flash("We zijn deze brieven nog aan het verwerken, probeer het over een minuut opnieuw.", "try again")
             return view_job(service_id, job_id)
         try:
             number_of_letters = job.cancel()
@@ -145,12 +145,12 @@ def cancel_letter_job(service_id, job_id):
             flash(e.message, "dangerous")
             return redirect(url_for("main.view_job", service_id=service_id, job_id=job_id))
         flash(
-            f"Cancelled {format_thousands(number_of_letters)} letters from {job.original_file_name}",
+            f"Annulering van {format_thousands(number_of_letters)} brieven uit {job.original_file_name} is gelukt",
             "default_with_tick",
         )
         return redirect(url_for("main.service_dashboard", service_id=service_id))
 
-    flash("Are you sure you want to cancel sending these letters?", "cancel")
+    flash("Weet u zeker dat u wilt stoppen met het versturen van deze brieven?", "cancel")
     return view_job(service_id, job_id)
 
 
@@ -179,15 +179,15 @@ def _get_job_counts(job):
         for label, query_param, count in [
             [
                 Markup(
-                    f"""total<span class="govuk-visually-hidden">
-                    {"text message" if job_type == "sms" else job_type}s</span>"""
+                    f"""totaal<span class="govuk-visually-hidden">
+                    {"sms" if job_type == "sms" else job_type}s</span>"""
                 ),
                 "",
                 job.notification_count,
             ],
             [
                 Markup(
-                    f"""sending<span class="govuk-visually-hidden">
+                    f"""verzenden<span class="govuk-visually-hidden">
                     {message_count_noun(job.notifications_sending, job_type)}</span>"""
                 ),
                 "sending",
@@ -195,7 +195,7 @@ def _get_job_counts(job):
             ],
             [
                 Markup(
-                    f"""delivered<span class="govuk-visually-hidden">
+                    f"""bezorgd<span class="govuk-visually-hidden">
                     {message_count_noun(job.notifications_delivered, job_type)}</span>"""
                 ),
                 "delivered",
@@ -203,7 +203,7 @@ def _get_job_counts(job):
             ],
             [
                 Markup(
-                    f"""failed<span class="govuk-visually-hidden">
+                    f"""mislukt<span class="govuk-visually-hidden">
                     {message_count_noun(job.notifications_failed, job_type)}</span>"""
                 ),
                 "failed",

@@ -15,12 +15,10 @@ Account aanmaken
     <p class="govuk-body">Uw account wordt aangemaakt met dit e-mailadres: {{invited_org_user.email_address}}</p>
     {% call form_wrapper() %}
       {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
-      <div class="extra-tracking">
         {{ form.mobile_number(param_extensions={
-            "classes": "govuk-!-width-three-quarters",
+            "classes": "govuk-!-width-three-quarters govuk-input--extra-letter-spacing",
             "hint": {"text": "We sturen u een beveiligingscode per sms"}
         }) }}
-      </div>
       {{ form.password(param_extensions={
           "classes": "govuk-!-width-three-quarters",
           "hint": {"text": "Minimaal 8 tekens"},

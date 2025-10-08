@@ -11,7 +11,7 @@ from app.utils.user import user_has_permissions
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_start(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+        return render_template("views/service-already-live.html", prompt_to_switch_service=False), 410
 
     if current_user.platform_admin and not current_service.organisation_id:
         return render_template("views/service-settings/service-no-organisation.html"), 410
@@ -29,7 +29,7 @@ def org_member_make_service_live_start(service_id):
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_check_unique(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+        return render_template("views/service-already-live.html", prompt_to_switch_service=False), 410
 
     if not current_user.can_make_service_live(current_service):
         abort(403)
@@ -72,7 +72,7 @@ def org_member_make_service_live_check_unique(service_id):
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_service_name(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+        return render_template("views/service-already-live.html", prompt_to_switch_service=False), 410
 
     if not current_user.can_make_service_live(current_service):
         abort(403)
@@ -83,10 +83,10 @@ def org_member_make_service_live_service_name(service_id):
         return redirect(url_for(".org_member_make_service_live_decision", service_id=current_service.id, unique=unique))
 
     form = OnOffSettingForm(
-        truthy="Yes",
-        falsey="No",
-        name=f"Is the service name ‘{current_service.name}’ easy to understand?",
-        choices_for_error_message="‘yes’ if the service name is easy to understand",
+        truthy="Ja",
+        falsey="Nee",
+        name=f"Is de naam van de dienst ‘{current_service.name}’ duidelijk te begrijpen?",
+        choices_for_error_message="‘ja’ als de naam van de dienst duidelijk te begrijpen is",
     )
 
     # Re-populate the form field data from URL query args, if present. This allows backlinks to take a user back to
@@ -131,7 +131,7 @@ def org_member_make_service_live_service_name(service_id):
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_contact_user(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+        return render_template("views/service-already-live.html", prompt_to_switch_service=False), 410
 
     if not current_user.can_make_service_live(current_service):
         abort(403)
@@ -166,7 +166,7 @@ def org_member_make_service_live_contact_user(service_id):
 @user_has_permissions(allow_org_user=True)
 def org_member_make_service_live_decision(service_id):
     if current_service.live:
-        return render_template("views/service-settings/service-already-live.html", prompt_to_switch_service=False), 410
+        return render_template("views/service-already-live.html", prompt_to_switch_service=False), 410
 
     if not current_user.can_make_service_live(current_service):
         abort(403)
@@ -178,17 +178,17 @@ def org_member_make_service_live_decision(service_id):
     cannot_approve = unique == "no"
 
     form = ServiceGoLiveDecisionForm(
-        name="What would you like to do?",
-        truthy="Approve the request and make this service live",
-        falsey="Reject the request",
-        choices_for_error_message="reject" if unique == "no" else "approve or reject",
+        name="Wat wilt u doen?",
+        truthy="Het verzoek goedkeuren en deze dienst live zetten",
+        falsey="Het verzoek afwijzen",
+        choices_for_error_message="afwijzen" if unique == "no" else "goedkeuren of afwijzen",
     )
     if cannot_approve and form.enabled.data is True:
         form.enabled.data = None
 
     if form.validate_on_submit():
         if form.enabled.data:
-            flash("This service is now live. We’ll email the team to let them know.", "default_with_tick")
+            flash("Deze dienst is nu live. We sturen het team een e-mail om hen te informeren.", "default_with_tick")
         else:
             organisations_client.notify_service_member_of_rejected_go_live_request(
                 service_id=service_id,
@@ -201,8 +201,8 @@ def org_member_make_service_live_decision(service_id):
             )
             flash(
                 (
-                    "You rejected the request to go live for this service. "
-                    f"We’ll email {current_service.go_live_user.name} to let them know."
+                    "U heeft het verzoek om deze dienst live te zetten afgewezen. "
+                    f"We sturen {current_service.go_live_user.name} een e-mail om dit te laten weten."
                 ),
                 "default",
             )

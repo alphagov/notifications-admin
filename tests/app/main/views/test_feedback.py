@@ -60,7 +60,6 @@ def test_get_support_index_page_when_signed_out(
 
 
 @pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
-@freeze_time("2016-12-12 12:00:00.000000")
 @pytest.mark.parametrize(
     "support_type, expected_h1",
     [
@@ -69,8 +68,9 @@ def test_get_support_index_page_when_signed_out(
     ],
 )
 def test_choose_support_type(
-    client_request, mock_get_non_empty_organisations_and_services_for_user, support_type, expected_h1
+    client_request, mock_get_non_empty_organisations_and_services_for_user, mocker, support_type, expected_h1
 ):
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     page = client_request.post(
         "main.support",
         _data={"support_type": support_type},
@@ -82,10 +82,11 @@ def test_choose_support_type(
     assert page.select_one("form").find("p").text.strip() == "We’ll reply to test@user.gov.uk"
 
 
-@freeze_time("2016-12-12 12:00:00.000000")
 def test_get_support_as_someone_in_the_public_sector(
     client_request,
+    mocker,
 ):
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     client_request.logout()
     page = client_request.post(
         "main.support",
@@ -116,11 +117,11 @@ def test_get_support_as_member_of_public(
     assert not page.select("form button")
 
 
-@freeze_time("2016-12-12 12:00:00.000000")
 @pytest.mark.parametrize(
     "ticket_type, expected_status_code", [(PROBLEM_TICKET_TYPE, 200), (QUESTION_TICKET_TYPE, 200), ("gripe", 404)]
 )
-def test_get_feedback_page(client_request, ticket_type, expected_status_code):
+def test_get_feedback_page(client_request, mocker, ticket_type, expected_status_code):
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     client_request.logout()
     client_request.get(
         "main.feedback",
@@ -129,9 +130,9 @@ def test_get_feedback_page(client_request, ticket_type, expected_status_code):
     )
 
 
-@freeze_time("2016-12-12 12:00:00.000000")
 def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
     client_request.logout()
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
         "app.main.views_nl.feedback.zendesk_client.send_ticket_to_zendesk",
@@ -176,9 +177,9 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
     )
 
 
-@pytest.mark.freeze_time("2024-07-08 12:00")
 def test_does_not_add_internal_note_to_tickets_created_by_suspended_users(client_request, mocker):
     client_request.logout()
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     mocker.patch(
         "app.main.views_nl.feedback.zendesk_client.send_ticket_to_zendesk",
         return_value=None,
@@ -197,9 +198,9 @@ def test_does_not_add_internal_note_to_tickets_created_by_suspended_users(client
     assert not mock_update_ticket_with_internal_note.called
 
 
-@pytest.mark.freeze_time("2024-07-08 12:00")
 def test_does_not_add_internal_note_to_ticket_if_error_creating_ticket(client_request, mocker):
     client_request.logout()
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     mocker.patch(
         "app.main.views_nl.feedback.zendesk_client.send_ticket_to_zendesk",
         side_effect=ZendeskError("error from Zendesk"),
@@ -219,7 +220,6 @@ def test_does_not_add_internal_note_to_ticket_if_error_creating_ticket(client_re
     assert not mock_update_ticket_with_internal_note.called
 
 
-@pytest.mark.freeze_time("2016-12-12 12:00:00.000000")
 @pytest.mark.parametrize(
     "data", [{"feedback": "blah"}, {"feedback": "blah", "name": "Ignored", "email_address": "ignored@email.com"}]
 )
@@ -239,6 +239,7 @@ def test_passes_user_details_through_flow(
     expected_subject,
     data,
 ):
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mock_send_ticket_to_zendesk = mocker.patch(
         "app.main.views_nl.feedback.zendesk_client.send_ticket_to_zendesk",
@@ -288,13 +289,13 @@ def test_passes_user_details_through_flow(
     assert not mock_update_ticket_with_internal_note.called
 
 
-@pytest.mark.freeze_time("2016-12-12 12:00:00.000000")
 def test_zendesk_subject_doesnt_show_env_flag_on_prod(
     notify_admin,
     client_request,
     mock_get_non_empty_organisations_and_services_for_user,
     mocker,
 ):
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     mock_create_ticket = mocker.spy(NotifySupportTicket, "__init__")
     mocker.patch(
         "app.main.views_nl.feedback.zendesk_client.send_ticket_to_zendesk",
@@ -335,7 +336,6 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
     )
 
 
-@freeze_time("2016-12-12 12:00:00.000000")
 @pytest.mark.parametrize(
     "data",
     [
@@ -356,19 +356,20 @@ def test_email_address_required_for_problems_and_questions(
     data,
     ticket_type,
 ):
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     mocker.patch("app.main.views_nl.feedback.zendesk_client")
     client_request.logout()
     page = client_request.post("main.feedback", ticket_type=ticket_type, _data=data, _expected_status=200)
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Enter your email address"
 
 
-@freeze_time("2016-12-12 12:00:00.000000")
 @pytest.mark.parametrize("ticket_type", (PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE))
 def test_email_address_must_be_valid_if_provided_to_support_form(
     client_request,
     mocker,
     ticket_type,
 ):
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     client_request.logout()
     page = client_request.post(
         "main.feedback",
@@ -614,14 +615,15 @@ def test_triage_redirects_to_correct_url(
         ({}, partial(url_for, "main.support"), "Report a problem"),
     ],
 )
-@freeze_time("2012-12-12 12:12")
 def test_back_link_from_form(
     client_request,
     mock_get_non_empty_organisations_and_services_for_user,
+    mocker,
     extra_args,
     expected_back_link,
     expected_page_title,
 ):
+    mocker.patch("app.main.views_nl.feedback.in_business_hours", return_value=True)
     page = client_request.get("main.feedback", ticket_type=PROBLEM_TICKET_TYPE, **extra_args)
     assert page.select_one(".govuk-back-link")["href"] == expected_back_link()
     assert normalize_spaces(page.select_one("h1").text) == expected_page_title

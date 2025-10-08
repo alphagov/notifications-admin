@@ -40,7 +40,7 @@
     {% if not items %}
       {% call row() %}
         <td class="table-empty-message" colspan="{{ field_headings | length }}">
-          Geen gegevens beschikbaar
+          {{ empty_message }}
         </td>
       {% endcall %}
     {% endif %}

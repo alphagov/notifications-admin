@@ -140,7 +140,6 @@ def test_shows_back_link_if_come_from_your_services_page(
 @pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
 def test_should_add_service_and_redirect_to_tour_when_no_services(
     client_request,
-    mock_create_service,
     mock_create_service_template,
     mock_get_services_with_no_services,
     api_user_active,
@@ -157,6 +156,12 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         "app.organisations_client.get_organisation_by_domain",
         return_value=organisation_json(organisation_type=inherited),
     )
+
+    mock_create_service = mocker.patch(
+        "app.notify_client.service_api_client.ServiceAPIClient.post",
+        return_value={"data": {"id": 101}},
+    )
+
     client_request.post(
         "main.add_service",
         _data={
@@ -171,16 +176,23 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         ),
     )
     assert mock_get_services_with_no_services.called
+
     mock_create_service.assert_called_once_with(
-        service_name="testing the post",
-        organisation_type=persisted,
-        email_message_limit=50,
-        international_sms_message_limit=100,
-        sms_message_limit=50,
-        letter_message_limit=50,
-        restricted=True,
-        user_id=api_user_active["id"],
+        "/service",
+        {
+            "created_by": api_user_active["id"],
+            "name": "testing the post",
+            "organisation_type": persisted,
+            "active": True,
+            "email_message_limit": 50,
+            "international_sms_message_limit": 100,
+            "sms_message_limit": 50,
+            "letter_message_limit": 50,
+            "user_id": "6ce466d0-fd6a-11e5-82f5-e0accb9d11a6",
+            "restricted": True,
+        },
     )
+
     mock_create_service_template.assert_called_once_with(
         name="Example text message template",
         type_="sms",
@@ -381,7 +393,6 @@ def test_add_service_fails_if_service_name_fails_validation(
     assert error_message in page.select_one(".govuk-error-message").text
 
 
-@pytest.mark.freeze_time("2021-01-01")
 @pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
 def test_should_return_form_errors_with_duplicate_service_name_regardless_of_case(
     client_request,

@@ -1013,16 +1013,8 @@ class TestPlatformAdminSearch:
                 "/services/abc/templates/all/folders/abcdef12-3456-7890-abcd-ef1234567890",
             ),
             (
-                {"type": "service_inbound_api", "context": {"service_id": "abc"}},
-                "/services/abc/api/callbacks/received-text-messages-callback",
-            ),
-            (
-                {"type": "delivery_status_callback_api", "context": {"service_id": "abc"}},
-                "/services/abc/api/callbacks/delivery-status-callback",
-            ),
-            (
-                {"type": "returned_letters_callback_api", "context": {"service_id": "abc"}},
-                "/services/abc/api/callbacks/returned-letters-callback",
+                {"type": "service_callback_api", "context": {"service_id": "abc"}},
+                "/services/abc/api/callbacks",
             ),
             ({"type": "complaint"}, "/platform-admin/complaints"),
             (

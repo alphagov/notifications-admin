@@ -6,7 +6,7 @@ from notifications_utils.international_billing_rates import INTERNATIONAL_BILLIN
 
 from app.main import main
 from app.main.forms import SearchByNameForm
-from app.main.views_nl.sub_navigation_dictionaries import pricing_nav
+from app.main.views.sub_navigation_dictionaries import pricing_nav
 from app.models.letter_rates import LetterRates
 from app.models.sms_rate import SMSRate
 

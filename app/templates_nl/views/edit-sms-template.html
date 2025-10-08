@@ -18,9 +18,7 @@
 
     {{ page_header('{} sms-sjabloon'.format(heading_action)) }}
 
-    {% if current_service.prefix_sms %}
-      {% set content_hint = 'Uw bericht begint met uw servicenaam' %}
-    {% endif %}
+    {% set content_hint = {"text": "Uw bericht begint met uw servicenaam"} if current_service.prefix_sms else {} %}
 
     {% call form_wrapper() %}
       <div class="govuk-grid-row">

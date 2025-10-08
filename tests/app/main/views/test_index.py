@@ -36,6 +36,8 @@ def test_non_logged_in_user_can_see_homepage(
     )
     assert page.select_one("#whos-using-notify a")["href"] == url_for("main.performance")
 
+    assert "From 59 pence to print and post a one page letter" in normalize_spaces(page.text)
+
 
 def test_logged_in_user_redirects_to_your_services(client_request):
     client_request.get(
@@ -369,24 +371,20 @@ def test_sms_price(
 
 
 @pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
-def test_bulk_sending_limits(client_request):
-    page = client_request.get("main.guidance_bulk_sending")
-    paragraphs = page.select("main p")
+def test_guidance_daily_limits(client_request):
+    page = client_request.get("main.guidance_daily_limits")
+    limits_table_rows = page.select("main tr")
 
-    assert normalize_spaces(paragraphs[0].text) == "You can send a batch of up to 100,000 messages at once."
-    assert normalize_spaces(paragraphs[1].text) == (
-        "There’s a default maximum limit of 250,000 emails, 250,000 text messages and 20,000 letters. "
-        "If you need to discuss these limits, contact us."
-    )
+    assert [normalize_spaces(row.text) for row in limits_table_rows] == [
+        "Message type Daily limit",
+        "Emails 250,000",
+        "Text messages 250,000",
+        "Letters 20,000",
+    ]
 
 
 @pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
 def test_trial_mode_sending_limits(client_request):
     page = client_request.get("main.guidance_trial_mode")
 
-    assert [normalize_spaces(li.text) for li in page.select_one("main ul").select("li")] == [
-        "send messages to yourself and other people in your team",
-        "send 50 emails per day",
-        "send 50 text messages per day",
-        "create letter templates, but not send them",
-    ]
+    assert normalize_spaces("There’s a daily limit of 50 emails and 50 text messages.") in page.text

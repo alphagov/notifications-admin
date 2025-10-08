@@ -350,7 +350,7 @@ def test_empty_inbox(
     )
 
     assert normalize_spaces(page.select("tbody tr")) == (
-        "When users text your service’s phone number (0781239871) you’ll see the messages here"
+        "When users text your service’s phone number (07812398712) you’ll see the messages here"
     )
     assert not page.select("a[download]")
     assert not page.select("li.next-page")
@@ -1201,12 +1201,13 @@ def test_usage_page_monthly_breakdown(
     assert "249,860 free text messages" in monthly_breakdown
 
     assert "February" in monthly_breakdown
-    assert "£29.55" in monthly_breakdown
+    assert "30.63" in monthly_breakdown
     assert "140 free text messages" in monthly_breakdown
     assert "960 text messages at 1.65p" in monthly_breakdown
     assert "33 text messages at 1.70p" in monthly_breakdown
     assert "5 first class letters at 33p" in monthly_breakdown
     assert "10 second class letters at 31p" in monthly_breakdown
+    assert "6 economy mail letters at 18p" in monthly_breakdown
     assert "3 international letters at 55p" in monthly_breakdown
     assert "7 international letters at 84p" in monthly_breakdown
 
@@ -1249,8 +1250,9 @@ def test_usage_page_letter_breakdown_ordered_by_postage_and_rate(
 
     assert normalize_spaces(postage_details[3].text) == "5 first class letters at 33p"
     assert normalize_spaces(postage_details[4].text) == "10 second class letters at 31p"
-    assert normalize_spaces(postage_details[5].text) == "3 international letters at 55p"
-    assert normalize_spaces(postage_details[6].text) == "7 international letters at 84p"
+    assert normalize_spaces(postage_details[5].text) == "6 economy mail letters at 18p"
+    assert normalize_spaces(postage_details[6].text) == "3 international letters at 55p"
+    assert normalize_spaces(postage_details[7].text) == "7 international letters at 84p"
 
 
 @pytest.mark.skip(reason="[NOTIFYNL] Translation issue")

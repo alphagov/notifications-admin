@@ -5,6 +5,8 @@
   <meta name="description" content="GOV.UK Notify lets you send emails, text messages and letters to your users. Try it now if you work in central government, a local authority, or the NHS.">
 {% endblock %}
 
+{% set bodyClasses = "product-page" %}
+
 {% block pageTitle %}
   GOV.UK Notify
 {% endblock %}
@@ -13,16 +15,6 @@
 
   <div class="product-page-intro">
     <div class="product-page-intro-wrapper" data-notify-module="homepage">
-      <nav class="breadcrumbs breadcrumbs--inverse" aria-label="Breadcrumbs">
-       <ol itemscope itemtype="http://schema.org/BreadcrumbList">
-         <li class="breadcrumbs__item" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-           <a class="govuk-link govuk-link--inverse" href="https://www.gov.uk/service-toolkit#gov-uk-services" itemprop="item"><span itemprop="name">GOV.UK services</span></a>
-         </li>
-         <li class="breadcrumbs__item breadcrumbs__item--active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-           <a class="govuk-link govuk-link--inverse" href="#main" itemprop="item"><span itemprop="name">GOV.UK Notify</span></a>
-         </li>
-       </ol>
-      </nav>
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
           <h1>
@@ -147,7 +139,7 @@
         </div>
         <div class="govuk-grid-column-one-half">
           <h3 class="govuk-visually-hidden">Letters</h3>
-          <div class="product-page-big-number">{{ one_page_second_class_letter_cost|format_pennies_as_currency(long=True) }}</div>
+          <div class="product-page-big-number">From {{ letter_rates|min|format_pennies_as_currency(long=True) }}</div>
           to print and post a one page letter
         </div>
         <div class="govuk-grid-column-one-half">

@@ -11,14 +11,14 @@
     API-integratie
   </h1>
 
-  <nav class="govuk-grid-row bottom-gutter-1-2">
-    <div class="govuk-grid-column-one-third">
+  <nav class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third govuk-!-margin-bottom-3">
       <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('main.api_keys', service_id=current_service.id) }}">API-sleutels</a>
     </div>
-    <div class="govuk-grid-column-one-third">
+    <div class="govuk-grid-column-one-third govuk-!-margin-bottom-3">
       <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('main.guest_list', service_id=current_service.id) }}">Gastenlijst</a>
     </div>
-    <div class="govuk-grid-column-one-third">
+    <div class="govuk-grid-column-one-third govuk-!-margin-bottom-3">
       <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for(callbacks_link, service_id=current_service.id) }}">Callbacks</a>
     </div>
   </nav>

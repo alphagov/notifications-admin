@@ -1,15 +1,20 @@
-from abc import abstractmethod
+from abc import ABC, ABCMeta, abstractmethod
 from functools import total_ordering
 
 from flask import abort
 from notifications_utils.serialised_model import (
     SerialisedModel,
     SerialisedModelCollection,
+    SerialisedModelMeta,
 )
 
 
+class JSONModelMeta(SerialisedModelMeta, ABCMeta):
+    pass
+
+
 @total_ordering
-class SortingAndEqualityMixin:
+class JSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
     @property
     @abstractmethod
     def __sort_attribute__(self):
@@ -38,8 +43,6 @@ class SortingAndEqualityMixin:
     def __hash__(self):
         return hash(self.id)
 
-
-class JSONModel(SerialisedModel, SortingAndEqualityMixin):
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}

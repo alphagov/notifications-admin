@@ -95,6 +95,10 @@ def using_notify_nav():
                     "link": "main.guidance_bulk_sending",
                 },
                 {
+                    "name": "Dagelijkse limieten",
+                    "link": "main.guidance_daily_limits",
+                },
+                {
                     "name": "Bewaartermijn gegevens",
                     "link": "main.guidance_data_retention_period",
                 },

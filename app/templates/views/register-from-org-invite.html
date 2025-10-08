@@ -15,12 +15,10 @@ Create an account
     <p class="govuk-body">Your account will be created with this email: {{invited_org_user.email_address}}</p>
     {% call form_wrapper() %}
       {{ form.name(param_extensions={"classes": "govuk-!-width-three-quarters"}) }}
-      <div class="extra-tracking">
-        {{ form.mobile_number(param_extensions={
-            "classes": "govuk-!-width-three-quarters",
-            "hint": {"text": "We’ll send you a security code by text message"}
-        }) }}
-      </div>
+      {{ form.mobile_number(param_extensions={
+          "classes": "govuk-!-width-three-quarters govuk-input--extra-letter-spacing",
+          "hint": {"text": "We’ll send you a security code by text message"}
+      }) }}
       {{ form.password(param_extensions={
           "classes": "govuk-!-width-three-quarters",
           "hint": {"text": "At least 8 characters"},

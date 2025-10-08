@@ -28,9 +28,9 @@
                 <span class="heading-small">{{ user.name }}</span>&ensp;
               {%- endif -%}
               <span class="hint">
-                {%- if user.status == 'pending' -%}
+                {%- if user.is_invited_user and user.status == 'pending' -%}
                   {{ user.email_address }} (uitgenodigd)
-                {%- elif user.status == 'cancelled' -%}
+                {%- elif user.is_invited_user and user.status == 'cancelled' -%}
                   {{ user.email_address }} (uitnodiging geannuleerd)
                 {%- elif user.id == current_user.id -%}
                   (u)

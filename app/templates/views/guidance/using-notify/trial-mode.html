@@ -11,41 +11,30 @@
 
   <h1 class="heading-large">Trial mode</h1>
 
-  <p class="govuk-body">When you add a new service it will start in trial mode. This lets you try out GOV.UK Notify for free, with a few restrictions.</p>
-  <p class="govuk-body">While your service is in trial mode you can only:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>send messages to yourself and other people in your team</li>
-    <li>send {{ email_and_sms_daily_limit | message_count('email') }} per day</li>
-    <li>send {{ email_and_sms_daily_limit | message_count('sms') }} per day</li>
-    <li>create letter templates, but not send them</li>
-  </ul>
+  <p class="govuk-body">When you add a new service it will start in trial mode.</p>
+  <p class="govuk-body">While your service is in trial mode, you can only send messages to yourself and your team members.</p>
+  <p class="govuk-body">There’s a daily limit of {{ email_and_sms_daily_limit | message_count('email') }} and {{ email_and_sms_daily_limit | message_count('sms') }}.</p>
+  <p class="govuk-body">You cannot send any letters in trial mode, but you can still create letter templates and upload letters, to see how it works.</p>
 
   <div class="govuk-inset-text"> 
-    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">GP surgeries</a> cannot send any text messages in trial mode.</p>
+    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">GP surgeries and pharmacies</a> cannot send any text messages in trial mode.</p>
   </div>
 
-    {% if current_service and current_service.trial_mode %}
-  <p class="govuk-body">
-    To remove these restrictions, you can <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">request to go live</a>.</p>
-    {% else %}
-  <p class="govuk-body">
-    To remove these restrictions:
-  </p>
-  <ol class="govuk-list govuk-list--number">
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in') }}">Sign in to Notify</a>.</li>
-    <li>Go to the <b class="govuk-!-font-weight-bold">Settings</b> page.</li>
-    <li>Select <b class="govuk-!-font-weight-bold">Request to go live</b>.</li>
-  </ol>
-    {% endif %}
- <p class="govuk-body">
-    When we receive your request we’ll get back to you by the end of the next working day.
-  </p>
-  <h2 class="heading-medium" id="before-you-request-to-go-live">Before you request to go live</h2>
-  <p class="govuk-body">You must:</p>
+  <h2 class="heading-medium" id="how-to-switch-off-trial-mode">How to switch off trial mode</h2>
+
+  {% if current_service and current_service.trial_mode %}
+  <p class="govuk-body">Complete the tasks on the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">Make your service live</a> page.</p>  
+  {% else %}
+  <p class="govuk-body">Complete the tasks on the <b class="govuk-!-font-weight-bold">Make your service live</b> page.</p>
+  {% endif %}
+  <p class="govuk-body">You’ll need to:</p>
   <ul class="govuk-list govuk-list--bullet">
+    <li>confirm your service is the only one of its kind in your organisation</li>
     <li>add examples of the messages you want to send</li>
     <li>update your settings so you’re ready to send and receive messages</li>
-    <li>accept our data processing and financial agreement</li>
   </ul>
+  <p class="govuk-body">If your organisation is new to GOV.UK Notify, we’ll ask you to accept our data processing and financial agreement.</p>
+  <p class="govuk-body">It can take up to one working day to make your service live.</p>
+  <p class="govuk-body">This is so we can check that you’ve met our terms of use.</p>
 
 {% endblock %}

@@ -306,10 +306,10 @@ def multiple_sms_senders(notify_admin, mocker):
             {
                 "id": "1234",
                 "service_id": service_id,
-                "sms_sender": "Example",
+                "sms_sender": "07812398712",
                 "is_default": True,
                 "created_at": datetime.utcnow(),
-                "inbound_number_id": "1234",
+                "inbound_number_id": "4321",
                 "updated_at": None,
             },
             {
@@ -1456,7 +1456,7 @@ def mock_revoke_api_key(notify_admin, mocker):
     def _revoke(service_id, key_id):
         return {}
 
-    return mocker.patch("app.api_key_api_client.revoke_api_key", side_effect=_revoke)
+    return mocker.patch("app.models.api_key.api_key_api_client.revoke_api_key", side_effect=_revoke)
 
 
 @pytest.fixture(scope="function")
@@ -1464,16 +1464,23 @@ def mock_get_api_keys(notify_admin, mocker, fake_uuid):
     def _get_keys(service_id, key_id=None):
         keys = {
             "apiKeys": [
+                api_key_json(id_=fake_uuid, name="some key name", key_type="normal"),
                 api_key_json(
-                    id_=fake_uuid,
-                    name="some key name",
+                    id_="1234567",
+                    name="another key name",
+                    expiry_date=str(date.fromtimestamp(0)),
+                    key_type="test",
                 ),
-                api_key_json(id_="1234567", name="another key name", expiry_date=str(date.fromtimestamp(0))),
+                api_key_json(
+                    id_=str(uuid4()),
+                    name="third key",
+                    key_type="team",
+                ),
             ]
         }
         return keys
 
-    return mocker.patch("app.api_key_api_client.get_api_keys", side_effect=_get_keys)
+    return mocker.patch("app.models.api_key.api_key_api_client.get_api_keys", side_effect=_get_keys)
 
 
 @pytest.fixture(scope="function")
@@ -1482,7 +1489,7 @@ def mock_get_no_api_keys(notify_admin, mocker):
         keys = {"apiKeys": []}
         return keys
 
-    return mocker.patch("app.api_key_api_client.get_api_keys", side_effect=_get_keys)
+    return mocker.patch("app.models.api_key.api_key_api_client.get_api_keys", side_effect=_get_keys)
 
 
 @pytest.fixture(scope="function")
@@ -2156,7 +2163,7 @@ def mock_get_most_recent_inbound_usage_date(mocker):
 @pytest.fixture(scope="function")
 def mock_get_inbound_number_for_service(notify_admin, mocker):
     return mocker.patch(
-        "app.inbound_number_client.get_inbound_sms_number_for_service", return_value={"data": {"number": "0781239871"}}
+        "app.inbound_number_client.get_inbound_sms_number_for_service", return_value={"data": {"number": "07812398712"}}
     )
 
 
@@ -2448,6 +2455,17 @@ def mock_get_monthly_usage_for_service(notify_admin, mocker):
                 "charged_units": 960,
                 "free_allowance_used": 140,
                 "cost": 15.84,
+            },
+            {
+                "month": "February",
+                "notification_type": "letter",
+                "rate": 0.18,
+                "chargeable_units": 6,
+                "notifications_sent": 6,
+                "postage": "economy",
+                "charged_units": 6,
+                "free_allowance_used": 0,
+                "cost": 1.08,
             },
             {
                 "month": "February",
@@ -3192,6 +3210,8 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
 
 
 def normalize_spaces(input):
+    if input is None:
+        return None
     if isinstance(input, str):
         return " ".join(input.split())
     return normalize_spaces(" ".join(item.text for item in input))
@@ -4430,26 +4450,31 @@ def mock_create_service_join_request(notify_admin, mocker):
 def mock_get_letter_rates(mocker):
     def _get_letter_rates():
         return [
-            {"post_class": "second", "rate": "0.61", "sheet_count": 1, "start_date": "2024-06-30T23:00:00"},
-            {"post_class": "first", "rate": "0.97", "sheet_count": 1, "start_date": "2024-06-30T23:00:00"},
-            {"post_class": "europe", "rate": "1.44", "sheet_count": 1, "start_date": "2024-01-02T00:00:00"},
-            {"post_class": "rest-of-world", "rate": "1.44", "sheet_count": 1, "start_date": "2024-01-02T00:00:00"},
-            {"post_class": "second", "rate": "0.65", "sheet_count": 2, "start_date": "2024-06-30T23:00:00"},
-            {"post_class": "first", "rate": "1.01", "sheet_count": 2, "start_date": "2024-06-30T23:00:00"},
-            {"post_class": "europe", "rate": "1.49", "sheet_count": 2, "start_date": "2024-01-02T00:00:00"},
-            {"post_class": "rest-of-world", "rate": "1.49", "sheet_count": 2, "start_date": "2024-01-02T00:00:00"},
-            {"post_class": "second", "rate": "0.68", "sheet_count": 3, "start_date": "2024-06-30T23:00:00"},
-            {"post_class": "first", "rate": "1.05", "sheet_count": 3, "start_date": "2024-06-30T23:00:00"},
-            {"post_class": "europe", "rate": "1.53", "sheet_count": 3, "start_date": "2024-01-02T00:00:00"},
-            {"post_class": "rest-of-world", "rate": "1.53", "sheet_count": 3, "start_date": "2024-01-02T00:00:00"},
-            {"post_class": "second", "rate": "0.75", "sheet_count": 4, "start_date": "2024-06-30T23:00:00"},
-            {"post_class": "first", "rate": "1.11", "sheet_count": 4, "start_date": "2024-06-30T23:00:00"},
-            {"post_class": "europe", "rate": "1.58", "sheet_count": 4, "start_date": "2024-01-02T00:00:00"},
-            {"post_class": "rest-of-world", "rate": "1.58", "sheet_count": 4, "start_date": "2024-01-02T00:00:00"},
-            {"post_class": "second", "rate": "0.79", "sheet_count": 5, "start_date": "2024-06-30T23:00:00"},
-            {"post_class": "first", "rate": "1.15", "sheet_count": 5, "start_date": "2024-06-30T23:00:00"},
-            {"post_class": "europe", "rate": "1.63", "sheet_count": 5, "start_date": "2024-01-02T00:00:00"},
-            {"post_class": "rest-of-world", "rate": "1.63", "sheet_count": 5, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "economy", "rate": "0.59", "sheet_count": 1, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "second", "rate": "0.68", "sheet_count": 1, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "first", "rate": "1.49", "sheet_count": 1, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "europe", "rate": "1.56", "sheet_count": 1, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "rest-of-world", "rate": "1.56", "sheet_count": 1, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "economy", "rate": "0.64", "sheet_count": 2, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "second", "rate": "0.72", "sheet_count": 2, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "first", "rate": "1.53", "sheet_count": 2, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "europe", "rate": "1.61", "sheet_count": 2, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "rest-of-world", "rate": "1.61", "sheet_count": 2, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "economy", "rate": "0.68", "sheet_count": 3, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "second", "rate": "0.77", "sheet_count": 3, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "first", "rate": "1.57", "sheet_count": 3, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "europe", "rate": "1.66", "sheet_count": 3, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "rest-of-world", "rate": "1.66", "sheet_count": 3, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "economy", "rate": "0.77", "sheet_count": 4, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "second", "rate": "0.82", "sheet_count": 4, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "first", "rate": "1.63", "sheet_count": 4, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "europe", "rate": "1.71", "sheet_count": 4, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "rest-of-world", "rate": "1.71", "sheet_count": 4, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "economy", "rate": "0.78", "sheet_count": 5, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "second", "rate": "0.86", "sheet_count": 5, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "first", "rate": "1.67", "sheet_count": 5, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "europe", "rate": "1.76", "sheet_count": 5, "start_date": "2024-01-02T00:00:00"},
+            {"post_class": "rest-of-world", "rate": "1.76", "sheet_count": 5, "start_date": "2024-01-02T00:00:00"},
         ]
 
     return mocker.patch("app.models.letter_rates.LetterRates._get_items", side_effect=_get_letter_rates)
@@ -4484,3 +4509,14 @@ def mock_get_notifications_count_for_service(mocker):
 @pytest.fixture(scope="function")
 def fake_nonce():
     return "TESTs5Vr8v3jgRYLoQuVwA"
+
+
+@pytest.fixture
+def mock_get_service_settings_page_common(
+    mock_get_all_letter_branding,
+    mock_get_inbound_number_for_service,
+    mock_get_free_sms_fragment_limit,
+    mock_get_service_data_retention,
+    mock_get_organisation,
+):
+    return

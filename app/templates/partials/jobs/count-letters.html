@@ -13,7 +13,7 @@
   <div class="govuk-grid-column-one-half">
     <div class="keyline-block">
       {{ big_number(
-        job.letter_timings.earliest_delivery|string|format_date_short,
+        job.letter_timings.latest_delivery|string|format_date_short,
         'Estimated delivery date',
         smaller=True
       )}}

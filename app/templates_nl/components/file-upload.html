@@ -19,7 +19,7 @@
     class="{% if field.errors and show_errors %}form-group-error{% endif %}"
     data-notify-module="file-upload"
   >
-    <label class="file-upload-label" for="{{ field.id }}">
+    <label class="file-upload-label" for="{{ field.name }}">
       {{ field.label.text }}
       {% if hint %}
         <span class="form-hint">{{ hint }}</span>
@@ -28,19 +28,16 @@
         <span class="error-message">{{ field.errors[0] }}</span>
       {% endif %}
     </label>
-
-    {{ field(
-      class='file-upload-field',
-      accept=allowed_file_extensions|format_list_items('.{item}')|join(',')|e,
-      data_button_text=button_text
-    ) }}
-
+    {{ field(**{
+      'class': 'file-upload-field',
+      'accept': allowed_file_extensions|format_list_items('.{item}')|join(',')|e,
+      'data-button-text': button_text
+    }) }}
     {% if alternate_link and alternate_link_text %}
       <span class="file-upload-alternate-link">
         of <a class="govuk-link govuk-link--no-visited-state" href="{{ alternate_link }}">{{ alternate_link_text }}</a>
       </span>
     {% endif %}
-
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     {{ govukButton({ "text": "Verzenden", "classes": "file-upload-submit" }) }}
   </form>

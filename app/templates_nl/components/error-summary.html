@@ -3,11 +3,13 @@
 {%- macro addErrorsForFieldList(field, errors) -%}
   {%- for entry in field.entries -%}
     {%- if entry.errors -%}
-      {% set entryNum = loop.index|string %}
-      {%- do errors.append({
-        "href": "#" ~ field.id ~ "-" ~ entryNum,
-        "text": entry.error_summary_messages[0] | format((field.thing ~ " " ~ entryNum)) | sentence_case()
-      }) -%}
+      {% set entryNum = loop.index | string %}
+      {%- do errors.append(
+        {
+          "href": "#" + field.id + '-' + entryNum,
+          "text": entry.error_summary_messages[0] | format((field.thing + ' ' + entryNum)) | sentence_case()
+        }
+      ) -%}
     {%- endif -%}
   {%- endfor -%}
 {%- endmacro -%}
@@ -17,25 +19,27 @@
     {% set errors = [] %}
     {% for field_name, error_list in form.errors.items() %}
       {% if field_name %}
-        {% if form[field_name].entries is defined %} {# FieldList #}
-          {{ addErrorsForFieldList(form[field_name], errors) }}
-        {% else %}
-          {% do errors.append({
-            "href": "#" ~ (form[field_name].error_summary_id if form[field_name].error_summary_id is defined else form[field_name].id),
-            "text": error_list[0] | striptags
-          }) %}
-        {% endif %}
-      {% else %}
-        {# Form-level error #}
+        {%- if form[field_name].entries -%} {# field is a FieldList #}
+          {{- addErrorsForFieldList(form[field_name], errors) -}}
+        {%- else -%}
+          {% do errors.append(
+            {
+              "href": "#" + (form[field_name].error_summary_id if form[field_name].error_summary_id != undefined else form[field_name].id),
+              "text": error_list[0] | striptags
+            }
+          ) %}
+        {%- endif -%}
+      {%- else -%}
+        {# field_name is None for form level errors #}
         {% do errors.append({"text": error_list[0]}) %}
       {% endif %}
     {% endfor %}
 
     {% set extra_params = error_summary_extra_params if error_summary_extra_params else {} %}
-    {% set required_params = {
+    {% set required_params =  {
       "titleText": "Er is een probleem",
       "errorList": errors
-    } %}
+    }%}
     {% set all_params = dict(required_params, **extra_params) %}
     {{ govukErrorSummary(all_params) }}
   {% endif %}

@@ -50,6 +50,14 @@ def test_logged_in_user_redirects_to_account(
     ],
 )
 @pytest.mark.skip(reason="[NOTIFYNL] email_domains.txt change breaks this.")
+@pytest.mark.parametrize(
+    "name",
+    (
+        "Some One Valid",
+        "Mr. Firstname Lastname",  # dots are fine
+        "test@example.com",  # email addresses are fine (lots of users do this for some reason)
+    ),
+)
 def test_register_creates_new_user_and_redirects_to_continue_page(
     client_request,
     mock_send_verify_code,
@@ -59,10 +67,11 @@ def test_register_creates_new_user_and_redirects_to_continue_page(
     mock_send_verify_email,
     phone_number_to_register_with,
     password,
+    name,
 ):
     client_request.logout()
     user_data = {
-        "name": "Some One Valid",
+        "name": name,
         "email_address": "notfound@example.gov.uk",
         "mobile_number": phone_number_to_register_with,
         "password": password,
@@ -95,6 +104,38 @@ def test_register_continue_handles_missing_session_sensibly(
     client_request.get(
         "main.registration_continue",
         _expected_redirect=url_for("main.show_accounts_or_dashboard"),
+    )
+
+
+@pytest.mark.skip(reason="[NOTIFYNL] Missing mock in overriden views")
+@pytest.mark.parametrize(
+    "name",
+    (
+        "https://example.com",
+        "firstname http://example.com lastname",
+        "click [here](http://example.com)",
+        "click [here](example.com)",
+        "example.com/index.html?foo=bar#baz",
+    ),
+)
+def test_register_form_returns_error_when_name_contains_url(
+    client_request,
+    name,
+):
+    client_request.logout()
+    page = client_request.post(
+        "main.register",
+        _data={
+            "name": name,
+            "email_address": "bad_mobile@example.gov.uk",
+            "mobile_number": "not good",
+            "password": "validPassword!",
+        },
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
+        "Error: Your full name cannot contain a URL"
     )
 
 

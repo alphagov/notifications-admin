@@ -34,9 +34,9 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 }
 
 .radio-select__expander {
-  border-top-color: rgba(255, 255, 255, 0.2);
-  border-left-color: rgba(0, 0, 0, 0.02);
-  border-right-color: rgba(0, 0, 0, 0.02);
+  border-top-color: rgb(255, 255, 255, 0.2);
+  border-left-color: rgb(0, 0, 0, 0.02);
+  border-right-color: rgb(0, 0, 0, 0.02);
   display: block;
   width: 100%;
 }

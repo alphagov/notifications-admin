@@ -1,4 +1,5 @@
 {% from "components/service-link.html" import service_link %}
+{% from "components/table.html" import mapping_table, row, text_field %}
 
 {% extends "content_template.html" %}
 
@@ -30,10 +31,41 @@
   <p class="govuk-body">We send text messages through different providers. If one provider fails, Notify switches to another so that your text messages are not affected.</p>
 
   <h2 id="letters" class="heading-medium">Letters</h2>
-  <p class="govuk-body">Letters are printed at 5:30pm and dispatched the next working day (Monday to Friday).</p>
+  <p class="govuk-body">Letters are printed at 5:30pm and dispatched the next working day (Monday to Friday, excluding bank holidays).</p>
+  <p class="govuk-body">Estimated delivery times are based on the date a letter is dispatched.</p>
 
-  <p class="govuk-body">First class letters should be delivered one day after they’re dispatched. Second class letters should be delivered 2 days after they’re dispatched. Royal Mail delivers from Monday to Saturday, excluding bank holidays.</p>
-  <p class="govuk-body">Letters to Europe should be delivered 3 to 5 days after they’re dispatched. Letters sent anywhere else in the world should take 5 to 7 days to arrive.</p>
+<div class="govuk-inset-text">
+    <p class="govuk-body">
+    From 28 July, second class letters will take 3 to 4 days to deliver.
+    </p>
+    <p class="govuk-body">
+    For more information, <a class="govuk-link govuk-link--no-visited-state" href="https://www.ofcom.org.uk/post/royal-mail/reforming-the-postal-service-so-it-delivers-what-people-need">visit the Ofcom website</a>.
+    </p>
+</div>
+
+<div class="bottom-gutter-3-2">
+    {% call mapping_table(
+      caption='Estimated delivery times for letters',
+      field_headings=['Postage', 'Estimated delivery time'],
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for column_heading, description in [
+        ('First class', '1 to 2 days (Monday to Saturday)'),
+        ('Second class', '3 to 4 working days'),
+        ('Economy mail', 'Up to 6 working days'),
+        ('International (Europe)', '3 to 5 working days'),
+        ('International (rest of the world)', '6 to 7 working days'),
+        ] %}
+        {% call row() %}
+          {{ text_field(column_heading) }}
+          {{ text_field(description) }}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+
+  <p class="govuk-body">See a list of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">postage prices</a>.</p>
 
   <h2 id="returned-mail" class="heading-medium">Returned letters</h2>
   <p class="govuk-body">Every letter we send includes our print provider’s address on the back of the envelope. You cannot customise the return address.</p>

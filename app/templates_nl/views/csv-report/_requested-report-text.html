@@ -1,0 +1,12 @@
+{%- macro report_text(channel, status) -%}
+  {% if channel == 'sms' %}
+    {%- set channel_plural = 'sms -berichten' -%}
+  {% else %}
+    {%- set channel_plural = channel + 's' -%}
+  {% endif %}
+  {% if status == 'all' or status == 'sending,delivered,failed' %}
+    {{- 'alle ' + channel_plural -}}
+  {% else %}
+    {{ channel_plural + ' met de ' + '‘' + status + '’' + ' status' -}}
+  {% endif %}
+{%- endmacro %}

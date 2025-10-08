@@ -1,20 +1,12 @@
 {% macro copy_to_clipboard(value, name, thing) %}
-  {% if name|lower == thing|lower %}
+  {% if name and name|lower == thing|lower %}
     <h2 class="copy-to-clipboard__name">
       {{ name }}
     </h2>
   {% endif %}
-  <div
-    data-notify-module="copy-to-clipboard"
-    data-value="{{ value }}"
-    data-thing="{{ thing }}"
-    data-name="{{ name }}"
-  >
+  <div data-notify-module="copy-to-clipboard" data-value="{{ value }}" data-thing="{{ thing }}" data-name="{{ name or "" }}">
     <span class="copy-to-clipboard__value">
-      {% if name|lower != thing|lower %}
-        <span class="govuk-visually-hidden">{{ thing }}: </span> {# visually hidden label #}
-      {% endif %}
-      {{ value }}
+      {%- if name and name|lower != thing|lower %}<span class="govuk-visually-hidden">{{ thing }}: </span>{% endif %}{{ value -}}
     </span>
     <span class="copy-to-clipboard__notice" aria-live="assertive"></span>
   </div>

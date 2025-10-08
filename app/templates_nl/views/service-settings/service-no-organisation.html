@@ -1,20 +1,33 @@
 {% extends "withnav_template.html" %}
 {% from "components/page-header.html" import page_header %}
-
-{% set title = "Deze dienst behoort niet tot een organisatie" %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  {{ title }}
+  Stuur internationale brieven
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header(title) }}
-
-  <p class="govuk-body">
-    U dient deze dienst eerst
-    <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('.link_service_to_organisation', service_id=current_service.id) }}">te koppelen aan een organisatie</a>
-    voordat u deze live kunt zetten.
-  </p>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      {{ page_header('Send international letters') }}
+      <p class="govuk-body">
+        Het kost meer om een ​​brief naar een internationaal adres te sturen.
+      </p>
+      <p class="govuk-body">
+        Zie <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">Prijzen </a> Voor de lijst met tarieven.
+      </p>
+      {% call form_wrapper() %}
+        {{ form.enabled }}
+        {{ page_footer('Save') }}
+      {% endcall %}
+    </div>
+  </div>
 
 {% endblock %}

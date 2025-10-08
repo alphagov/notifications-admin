@@ -5,11 +5,20 @@ import copy from 'rollup-plugin-copy';
 import styles from "rollup-plugin-styler";
 import postCSSReplace from 'postcss-replace';
 
+// toggle to enable rebrand styles
+const enableRebrand = true;
 const paths = {
   src: 'app/assets/',
   dist: 'app/static/',
   npm: 'node_modules/',
   govuk_frontend: 'node_modules/govuk-frontend/dist/'
+};
+
+// separate path config for govuk-frontend assets, so we can manage rebrand paths easily
+const govukFrontendAssetPaths = {
+  images: `${paths.govuk_frontend}govuk/assets/${enableRebrand ? 'rebrand/': ''}images/**/*`,
+  fonts: `${paths.govuk_frontend}govuk/assets/fonts/**/*`,
+  manifest: `${paths.govuk_frontend}govuk/assets/${enableRebrand ? 'rebrand/': ''}manifest.json`,
 };
 
 const isDevelopment = Boolean(process.env.NOTIFY_ENVIRONMENT === 'development')
@@ -31,9 +40,10 @@ export default [
       copy({
         targets: [
           { src: paths.src + 'error_pages/**/*', dest: paths.dist + 'error_pages/' },
-          { src: [ paths.src + 'images/**/*', paths.govuk_frontend + 'govuk/assets/images/**/*' ], dest: paths.dist + 'images/' },
-          { src: paths.govuk_frontend + 'govuk/assets/fonts/**/*', dest: paths.dist + 'fonts/' },
-          { src: paths.govuk_frontend + 'govuk/assets/manifest.json', dest: paths.dist }
+          { src: paths.src + 'images/**/*', dest: paths.dist + 'images/' },
+          { src: govukFrontendAssetPaths.images, dest: paths.dist + 'images/' },
+          { src: govukFrontendAssetPaths.fonts, dest: paths.dist + 'fonts/' },
+          { src: govukFrontendAssetPaths.manifest, dest: paths.dist }
         ]
       }),
     ]
@@ -95,10 +105,7 @@ export default [
       paths.src + 'javascripts/updateContent.js',
       paths.src + 'javascripts/preventDuplicateFormSubmissions.js',
       paths.src + 'javascripts/fullscreenTable.js',
-      paths.src + 'javascripts/liveCheckboxControls.js',
       paths.src + 'javascripts/templateFolderForm.js',
-      paths.src + 'javascripts/addBrandingOptionsForm.js',
-      paths.src + 'javascripts/setAuthTypeForm.js',
       paths.src + 'javascripts/registerSecurityKey.js',
       paths.src + 'javascripts/authenticateSecurityKey.js',
       paths.src + 'javascripts/updateStatus.js',

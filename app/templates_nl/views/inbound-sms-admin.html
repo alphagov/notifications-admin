@@ -52,7 +52,9 @@ Inkomende sms
               {% endif %}
               </td>
               <td>
-                  <a href="{{ url_for('main.service_dashboard', service_id=value.service.id) }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-size-24 govuk-!-font-weight-bold">{{ value.service.name }}</a>
+                  {% if value.service %}
+                    <a href="{{ url_for('main.service_dashboard', service_id=value.service.id) }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-size-24 govuk-!-font-weight-bold">{{ value.service.name }}</a>
+                  {% endif %}
               </td>
           </tr>
           {% endfor %}

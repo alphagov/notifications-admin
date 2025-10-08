@@ -792,8 +792,6 @@ def test_uploaded_letter_preview_displays_all_postage_for_service_with_permissio
         "is_precompiled_letter": True,
     }
 
-    service_one.update({"permissions": ["economy_letter_sending"]})
-
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mocker.patch(
@@ -838,69 +836,6 @@ def test_uploaded_letter_preview_displays_all_postage_for_service_with_permissio
         ("first", "First class"),
         ("second", "Second class"),
         ("economy", "Economy mail"),
-    ]
-
-
-def test_uploaded_letter_preview_displays_only_first_and_second_class(
-    active_user_with_permissions,
-    service_one,
-    client_request,
-    fake_uuid,
-    mocker,
-):
-    letter_template = {
-        "service": SERVICE_ONE_ID,
-        "template_type": "letter",
-        "reply_to_text": "",
-        "postage": "second",
-        "subject": "hi",
-        "content": "my letter",
-        "is_precompiled_letter": True,
-    }
-
-    mocker.patch("uuid.uuid4", return_value=fake_uuid)
-    mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-    mocker.patch(
-        "app.template_preview_client.sanitise_letter",
-        return_value=Mock(
-            content="The sanitised content",
-            json=lambda: {"file": "VGhlIHNhbml0aXNlZCBjb250ZW50", "recipient_address": "The Queen"},
-        ),
-    )
-    mocker.patch("app.main.views_nl.uploads.upload_letter_to_s3")
-    mocker.patch("app.main.views_nl.uploads.backup_original_letter_to_s3")
-    mocker.patch("app.main.views_nl.uploads.pdf_page_count", return_value=3)
-    do_mock_get_page_counts_for_letter(mocker, count=3)
-    mocker.patch(
-        "app.main.views_nl.uploads.get_letter_metadata",
-        return_value=LetterMetadata(
-            {
-                "filename": "tests/test_pdf_files/one_page_pdf.pdf",
-                "page_count": "3",
-                "status": "valid",
-                "recipient": "The Queen",
-            }
-        ),
-    )
-    mocker.patch("app.models.service.service_api_client.get_precompiled_template", return_value=letter_template)
-
-    service_one["restricted"] = False
-    client_request.login(active_user_with_permissions, service=service_one)
-
-    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
-        page = client_request.post(
-            "main.upload_letter",
-            service_id=SERVICE_ONE_ID,
-            _data={"file": file},
-            _follow_redirects=True,
-        )
-
-    radio_inputs = page.select("input[type=radio]")
-
-    assert len(radio_inputs) == 2
-    assert [(radio["value"], page.select_one(f"label[for={radio['id']}]").text.strip()) for radio in radio_inputs] == [
-        ("first", "First class"),
-        ("second", "Second class"),
     ]
 
 
@@ -961,7 +896,7 @@ def test_send_uploaded_letter_sends_letter_and_redirects_to_notification_page(
     mock_send = mocker.patch("app.main.views_nl.uploads.notification_api_client.send_precompiled_letter")
     mocker.patch("app.main.views_nl.uploads.get_letter_metadata", return_value=metadata)
 
-    service_one["permissions"] = ["letter", "economy_letter_sending"]
+    service_one["permissions"] = ["letter"]
 
     client_request.post(
         "main.send_uploaded_letter",

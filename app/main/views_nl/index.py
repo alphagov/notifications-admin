@@ -13,13 +13,14 @@ from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import HTMLEmailTemplate
 
 from app import status_api_client
-from app.formatters import message_count
+from app.formatters import format_thousands
 from app.main import main
 from app.main.forms import FieldWithNoneOption
 from app.main.views_nl.sub_navigation_dictionaries import features_nav, using_notify_nav
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
 from app.models.sms_rate import SMSRate
+from app.utils.user import user_has_permissions
 
 redirects = Blueprint("redirects", __name__)
 main.register_blueprint(redirects)
@@ -34,7 +35,7 @@ def index():
         "views/signedout.html",
         sms_rate=SMSRate(),
         counts=status_api_client.get_count_of_live_services_and_organisations(),
-        one_page_second_class_letter_cost=LetterRates().get(sheet_count=1, post_class="second"),
+        letter_rates=LetterRates().rates,
     )
 
 
@@ -98,6 +99,7 @@ def email_template():
                 brand_logo=branding.logo_url,
                 brand_banner=branding.has_brand_banner,
                 brand_alt_text=branding.alt_text,
+                rebrand=True,
             )
         )
     )
@@ -172,10 +174,19 @@ def guidance_bulk_sending():
     return render_template(
         "views/guidance/using-notify/bulk-sending.html",
         max_spreadsheet_rows=RecipientCSV.max_rows,
-        rate_limits=[
-            message_count(limit, channel)
-            for channel, limit in current_app.config["DEFAULT_LIVE_SERVICE_RATE_LIMITS"].items()
-        ],
+        navigation_links=using_notify_nav(),
+    )
+
+
+@main.route("/using-notify/daily-limits")
+def guidance_daily_limits():
+    rate_limits = {
+        type: format_thousands(limit) for type, limit in current_app.config["DEFAULT_LIVE_SERVICE_RATE_LIMITS"].items()
+    }
+    return render_template(
+        "views/guidance/using-notify/daily-limits.html",
+        max_spreadsheet_rows=RecipientCSV.max_rows,
+        rate_limits=rate_limits,
         navigation_links=using_notify_nav(),
     )
 
@@ -379,6 +390,18 @@ def user_profile_confirm_delete_security_key(key_id):
 @main.route("/user-profile/security-keys/<uuid:key_id>/delete", methods=["POST"])
 def user_profile_delete_security_key(key_id):
     return redirect(url_for("main.your_account_delete_security_key"), 301)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["GET"])
+@user_has_permissions("manage_service")
+def request_to_go_live_old_path(service_id):
+    return redirect(url_for("main.request_to_go_live", service_id=service_id), 301)
+
+
+@main.route("/services/<uuid:service_id>/service-settings/request-to-go-live", methods=["POST"])
+@user_has_permissions("manage_service")
+def submit_request_to_go_live_old_path(service_id):
+    return redirect(url_for("main.submit_request_to_go_live", service_id=service_id), 301)
 
 
 def historical_redirects(new_endpoint, **kwargs):

@@ -45,7 +45,7 @@ def sign_in():
                 if session.get("invited_user_id"):
                     invited_user = InvitedUser.from_session()
                     if user.email_address.lower() != invited_user.email_address.lower():
-                        flash("U kunt geen uitnodiging voor een ander accepteren.")
+                        flash("You cannot accept an invite for another person.")
                         session.pop("invited_user_id", None)
                         abort(403)
                     else:
@@ -60,11 +60,11 @@ def sign_in():
                 if user.webauthn_auth:
                     return redirect(url_for(".two_factor_webauthn", next=redirect_url))
 
-        # Vaag foutbericht bij inloggen als gebruiker onbekend, geblokkeerd, inactief of wachtwoord onjuist
+        # Vague error message for login in case of user not known, locked, inactive or password not verified
         flash(
             Markup(
-                f"Het e-mailadres of wachtwoord dat u hebt ingevoerd is onjuist."
-                f"&ensp;<a href={password_reset_url} class='govuk-link'>Wachtwoord vergeten?</a>"
+                f"The email address or password you entered is incorrect."
+                f"&ensp;<a href={password_reset_url} class='govuk-link'>Forgotten your password?</a>"
             )
         )
 

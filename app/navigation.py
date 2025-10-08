@@ -61,6 +61,7 @@ class HeaderNavigation(Navigation):
             "guidance_api_documentation",
             "guidance_attach_pages",
             "guidance_bulk_sending",
+            "guidance_daily_limits",
             "guidance_data_retention_period",
             "guidance_delivery_times",
             "guidance_email_branding",
@@ -145,7 +146,7 @@ class HeaderNavigation(Navigation):
         },
     }
 
-    # header HTML now comes from GOVUK Frontend so requires a boolean, not an attribute
+    # ServiceNavigation items require Boolean for "active" state
     def is_selected(self, navigation_item):
         return request.endpoint in self.mapping[navigation_item]
 
@@ -153,7 +154,6 @@ class HeaderNavigation(Navigation):
         from app import current_user
 
         nav_items = [
-            {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
             {"href": url_for("main.guidance_features"), "text": "Features", "active": self.is_selected("features")},
             {"href": url_for("main.guidance_pricing"), "text": "Pricing", "active": self.is_selected("pricing")},
             {
@@ -161,6 +161,7 @@ class HeaderNavigation(Navigation):
                 "text": "Using Notify",
                 "active": self.is_selected("using-notify"),
             },
+            {"href": url_for("main.support"), "text": "Support", "active": self.is_selected("support")},
         ]
 
         if current_user.platform_admin:
@@ -173,6 +174,16 @@ class HeaderNavigation(Navigation):
             )
 
         if current_user.is_authenticated:
+            # we want the item first in the list
+            nav_items.insert(
+                0,
+                {
+                    "href": url_for("main.your_services"),
+                    "text": "Your services",
+                    "active": not any(self.is_selected(item) for item in self.mapping.keys()),
+                },
+            )
+
             nav_items.append(
                 {
                     "href": url_for("main.your_account"),
@@ -263,8 +274,6 @@ class MainNavigation(Navigation):
             "usage",
         },
         "settings": {
-            "add_organisation_from_gp_service",
-            "add_organisation_from_nhs_local_service",
             "branding_nhs",
             "branding_option_preview",
             "email_branding_choose_banner_colour",
@@ -277,17 +286,12 @@ class MainNavigation(Navigation):
             "email_branding_request_government_identity_logo",
             "email_branding_set_alt_text",
             "email_branding_upload_logo",
-            "estimate_usage",
             "letter_branding_options",
             "letter_branding_request",
             "link_service_to_organisation",
-            "request_to_go_live",
             "service_add_email_reply_to",
             "service_add_letter_contact",
             "service_add_sms_sender",
-            "service_agreement",
-            "service_accept_agreement",
-            "service_confirm_agreement",
             "service_confirm_delete_email_reply_to",
             "service_confirm_delete_letter_contact",
             "service_confirm_delete_sms_sender",
@@ -317,11 +321,11 @@ class MainNavigation(Navigation):
             "service_verify_reply_to_address",
             "service_settings",
             "service_sms_senders",
+            "set_daily_message_limit",
             "set_free_sms_allowance",
             "set_per_day_international_sms_message_limit",
             "set_per_day_message_limit",
             "set_per_minute_rate_limit",
-            "submit_request_to_go_live",
         },
         "api-integration": {
             "api_callbacks",
@@ -336,11 +340,22 @@ class MainNavigation(Navigation):
             "guest_list",
             "old_guest_list",
         },
-        "make-service-live": {
-            "org_member_make_service_live_start",
-            "org_member_make_service_live_service_name",
+        "make-this-service-live": {
             "org_member_make_service_live_check_unique",
             "org_member_make_service_live_contact_user",
+            "org_member_make_service_live_decision",
+            "org_member_make_service_live_service_name",
+            "org_member_make_service_live_start",
+        },
+        "make-your-service-live": {
+            "add_organisation_from_gp_service",
+            "add_organisation_from_nhs_local_service",
+            "confirm_service_is_unique",
+            "estimate_usage",
+            "request_to_go_live",
+            "service_agreement",
+            "service_accept_agreement",
+            "service_confirm_agreement",
         },
     }
 

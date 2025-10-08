@@ -46,9 +46,9 @@ def platform_admin_view_email_branding(branding_id):
 
     if request.endpoint == "main.platform_admin_confirm_archive_email_branding":
         if email_branding.is_used_by_orgs_or_services:
-            flash("Deze e-mailbranding wordt gebruikt. Verwijderen is niet mogelijk.")
+            flash("This email branding is in use. You cannot delete it.")
         else:
-            flash("Weet u zeker dat u deze e-mailbranding wilt verwijderen?", "delete")
+            flash("Are you sure you want to delete this email branding?", "delete")
 
     return render_template(
         "views/email-branding/view-branding.html",

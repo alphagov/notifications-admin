@@ -1,148 +1,126 @@
-{% extends "govuk_frontend_jinja/template-nl.html"%}
-
+{% extends "govuk_frontend_jinja/template-nl.html" %}
+{% from "govuk_frontend_jinja/components/service-navigation/macro.html" import govukServiceNavigation %}
 {% set cspNonce = request.csp_nonce %}
+{# toggle to enable new styles for rebrand #}
+{% set govukRebrand = True %}
 
 {% block headIcons %}
-<link rel="icon" sizes="48x48" href="{{ asset_url('images/favicon.ico') }}">
-<link rel="icon" sizes="any" href="{{ asset_url('images/favicon.svg') }}" type="image/svg+xml">
-<link rel="mask-icon" href="{{ asset_url('images/govuk-icon-mask.svg') }}" color="#0b0c0c">
-<link rel="apple-touch-icon" href="{{ asset_url('images/govuk-icon-180.png') }}">
-<link rel="manifest" href="{{ asset_url('manifest.json') }}">
+  <link rel="icon" sizes="48x48" href="{{ asset_url('images/favicon.ico') }}">
+  <link rel="icon" sizes="any" href="{{ asset_url('images/favicon.svg') }}" type="image/svg+xml">
+  <link rel="mask-icon" href="{{ asset_url('images/govuk-icon-mask.svg') }}" color="#0b0c0c">
+  <link rel="apple-touch-icon" href="{{ asset_url('images/govuk-icon-180.png') }}">
+  <link rel="manifest" href="{{ asset_url('manifest.json') }}">
 {% endblock %}
 
 {% block head %}
-{%- for font in font_paths %}
-<link rel="preload" href="{{ asset_url(font, with_querystring_hash=False) }}" as="font" type="font/woff2" crossorigin>
-{%- endfor %}
-<link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main.css') }}" />
-<link rel="stylesheet" media="print" href="{{ asset_url('stylesheets/print.css') }}" />
-{% block extra_stylesheets %}
-{% endblock %}
-<style>
-  .govuk-header__container {
-    border-color: {
-        {
-        header_colour
-      }
-    }
-  }
-</style>
-{% if g.hide_from_search_engines %}
-<meta name="robots" content="noindex" />
-{% endif %}
-<meta name="google-site-verification" content="niWnSqImOWz6mVQTYqNb5tFK8HaKSB4b3ED4Z9gtUQ0" />
-{% block meta_format_detection %}
-<meta name="format-detection" content="telephone=no">
-{% endblock %}
-{% block meta %}
-{% endblock %}
+  {%- for font in font_paths %}
+    <link rel="preload"
+          href="{{ asset_url(font, with_querystring_hash=False) }}"
+          as="font" type="font/woff2" crossorigin>
+  {%- endfor %}
+
+  <link rel="stylesheet" media="screen" href="{{ asset_url('stylesheets/main.css') }}" />
+  <link rel="stylesheet" media="print" href="{{ asset_url('stylesheets/print.css') }}" />
+
+  {% block extra_stylesheets %}{% endblock %}
+
+  {# rebranded header no longer uses bottom border
+     so not rendering until we have a different solution
+     for indicating different envs #}
+  {% if not govukRebrand %}
+    <style>
+      .govuk-header__container { border-color: {{ header_colour }} }
+    </style>
+  {% endif %}
+
+  {% if g.hide_from_search_engines %}
+    <meta name="robots" content="noindex" />
+  {% endif %}
+
+  <meta name="google-site-verification"
+        content="niWnSqImOWz6mVQTYqNb5tFK8HaKSB4b3ED4Z9gtUQ0" />
+
+  {% block meta_format_detection %}
+    <meta name="format-detection" content="telephone=no">
+  {% endblock %}
+
+  {% block meta %}{% endblock %}
 {% endblock %}
 
 {% block pageTitle %}
-{% block errorPrefix %}{% if form and form.errors %}Fout: {% endif %}{% endblock %}
-{% block per_page_title %}{% endblock %} – NotifyNL
+  {% block errorPrefix %}{% if form and form.errors %}Fout: {% endif %}{% endblock %}
+  {% block per_page_title %}{% endblock %} – NotifyNL
 {% endblock %}
 
 {% block bodyStart %}
-{% block extra_javascripts_before_body %}
-{% endblock %}
+  {% block extra_javascripts_before_body %}{% endblock %}
 {% endblock %}
 
 {% block header %}
-{{ govukHeader({
-"homepageUrl": url_for('main.show_accounts_or_dashboard'),
-"productName": "NotifyNL",
-"navigation": header_navigation.visible_header_nav(),
-"navigationClasses": "govuk-header__navigation--end",
-"assetsPath": asset_path + "images"
-}) }}
+  {{ govukHeader({
+    "homepageUrl": url_for('main.show_accounts_or_dashboard'),
+    "productName": "NotifyNL",
+    "assetsPath": asset_path + "images",
+    "rebrand": govukRebrand,
+    "serviceName": None,
+    "navigation": []
+  }) }}
+
+  {{ govukServiceNavigation({
+    "navigation": header_navigation.visible_header_nav(),
+    "classes": "govuk-service-navigation--inverse"
+               if request.endpoint == "main.index" else ""
+  }) }}
 {% endblock %}
 
 {% block footer %}
-{% set meta_items = [
-{
-"href": url_for("main.privacy"),
-"text": "Privacy"
-},
-{
-"href": url_for("main.accessibility_statement"),
-"text": "Toegankelijkheidsverklaring"
-},
-{
-"href": url_for("main.terms_of_use"),
-"text": "Gebruiksvoorwaarden"
-},
-{
-"href": url_for("main.cookies"),
-"text": "Cookies"
-}
-] %}
+  {% set meta_items = [
+    { "href": url_for("main.privacy"), "text": "Privacy" },
+    { "href": url_for("main.accessibility_statement"), "text": "Toegankelijkheidsverklaring" },
+    { "href": url_for("main.terms_of_use"), "text": "Gebruiksvoorwaarden" },
+    { "href": url_for("main.cookies"), "text": "Cookies" }
+  ] %}
 
-{% set meta_suffix = 'Ontwikkeld door de <a
-  href="https://www.gov.uk/government/organisations/government-digital-service" class="govuk-footer__link">Government
-  Digital Service</a>' %}
+  {% set meta_suffix = 'Ontwikkeld door de <a
+    href="https://www.gov.uk/government/organisations/government-digital-service"
+    class="govuk-footer__link">Government Digital Service</a>' %}
 
-{{ govukFooter({
-"classes": "js-footer",
-"navigation": [
-{
-"title": "Over Notify",
-"columns": 1,
-"width": "one-half",
-"items": [
-{
-"href": url_for("main.guidance_features"),
-"text": "Functionaliteiten"
-},
-{
-"href": url_for("main.guidance_pricing"),
-"text": "Kosten"
-},
-{
-"href": url_for("main.guidance_using_notify"),
-"text": "Gebruik van Notify"
-},
-{
-"href": "https://gds.blog.gov.uk/category/gov-uk-notify/",
-"text": "Blog"
-}
-]
-},
-{
-"title": "Ondersteuning",
-"columns": 1,
-"width": "one-half",
-"items": [
-{
-"href": url_for('main.support'),
-"text": "Neem contact op met ondersteuning"
-},
-{
-"href": "https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC",
-"text": "Chat met ons op Slack"
-},
-{
-"href": "https://status.notifications.service.gov.uk",
-"text": "Systeemstatus"
-},
-{
-"href": url_for("main.guidance_api_documentation"),
-"text": "API-documentatie"
-}
-]
-},
-],
-"meta": {
-"items": meta_items,
-"html": meta_suffix
-}
-}) }}
+  {{ govukFooter({
+    "classes": "js-footer",
+    "navigation": [
+      {
+        "title": "Over Notify",
+        "columns": 1,
+        "width": "one-half",
+        "items": [
+          { "href": url_for("main.guidance_features"), "text": "Functionaliteiten" },
+          { "href": url_for("main.guidance_pricing"), "text": "Kosten" },
+          { "href": url_for("main.guidance_using_notify"), "text": "Gebruik van Notify" },
+          { "href": "https://gds.blog.gov.uk/category/gov-uk-notify/", "text": "Blog" }
+        ]
+      },
+      {
+        "title": "Ondersteuning",
+        "columns": 1,
+        "width": "one-half",
+        "items": [
+          { "href": url_for("main.support"), "text": "Neem contact op met ondersteuning" },
+          { "href": "https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC", "text": "Chat met ons op Slack" },
+          { "href": "https://status.notifications.service.gov.uk", "text": "Systeemstatus" },
+          { "href": url_for("main.guidance_api_documentation"), "text": "API-documentatie" }
+        ]
+      }
+    ],
+    "meta": {
+      "items": meta_items,
+      "html": meta_suffix
+    }
+  }) }}
 {% endblock %}
 
 {% block bodyEnd %}
-{% block extra_javascripts %}
-{% endblock %}
+  {% block extra_javascripts %}{% endblock %}
 
-<script type="module" src="{{ asset_url('javascripts/all-esm.mjs') }}"></script>
-<script type="text/javascript" src="{{ asset_url('javascripts/all.js') }}"></script>
+  <script type="module" src="{{ asset_url('javascripts/all-esm.mjs') }}"></script>
+  <script type="text/javascript" src="{{ asset_url('javascripts/all.js') }}"></script>
 {% endblock %}

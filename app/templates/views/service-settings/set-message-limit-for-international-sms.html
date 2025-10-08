@@ -1,4 +1,5 @@
 {% extends "withnav_template.html" %}
+{% from "components/ajax-block.html" import ajax_block %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
@@ -21,8 +22,11 @@
     <div class="govuk-grid-column-five-sixths">
         {{ page_header(page_title) }}
         <p class="govuk-body">
-            Number of international text meesages the service is allowed to send each day.
+            Number of international text messages the service is allowed to send each day.
         </p>
+
+        {{ ajax_block(partials, updates_url, 'remaining_limit') }}
+
         <p class="govuk-body">
             When choosing a limit you should think about:
         </p>

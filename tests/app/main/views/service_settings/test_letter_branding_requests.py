@@ -312,7 +312,9 @@ def test_POST_letter_branding_request_creates_zendesk_ticket(
     org_id,
     expected_org_name,
 ):
-    mock_send_zendesk = mocker.patch("app.main.views_nl.service_settings.index.zendesk_client.send_ticket_to_zendesk")
+    mock_send_zendesk = mocker.patch(
+        "app.main.views_nl.service_settings.branding.zendesk_client.send_ticket_to_zendesk"
+    )
     service_one["organisation"] = org_id
 
     client_request.post(

@@ -1,0 +1,54 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+
+{% set title = "Confirm that your service is unique" %}
+
+{% block service_page_title %}
+    {{ title }}
+{% endblock %}
+
+{% block backLink %}
+    {{ govukBackLink({ "href": back_link }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+    {{ page_header(title) }}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-five-sixths">
+
+            <p class="govuk-body">
+                Uw service moet de enige in zijn soort in uw organisatie zijn.
+            </p>
+
+            <p class="govuk-body">
+                Voordat u een verzoek verzendt om live te gaan, controleert u of uw servicenaam beschrijft waar uw berichten over gaan, evenals wie ze komen.
+            </p>
+
+            <p class="govuk-body">
+                Dit zal ons helpen te begrijpen of uw service uniek is.
+            </p>
+
+            <p class="govuk-body">
+                Niet opnemen:
+            </p>
+
+            <ul class="govuk-list govuk-list--bullet">
+                <li> Acroniemen, initialismen of afkortingen tenzij uw ontvangers er bekend mee zijn </li>
+                <li> Uw eigen naam of de naam van een persoon </li>
+                <li> De naam van een webtoepassing of backoffice -systeem </li>
+            </ul>
+
+            {% call form_wrapper() %}
+                {{ form.name }}
+                {{ page_footer('Confirm') }}
+            {% endcall %}
+
+        </div>
+    </div>
+
+{% endblock %}

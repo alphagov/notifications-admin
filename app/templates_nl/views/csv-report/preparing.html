@@ -1,0 +1,26 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "views/csv-report/_requested-report-text.html" import report_text %}
+
+{% set page_title = 'Uw rapport voorbereiden' %}
+{% block per_page_title %}
+  {{ page_title }}
+{% endblock %}
+
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+      {{ page_header(page_title, classes="loading-indicator") }}
+      <div role="status" data-notify-module="check-report-status">
+        <p class="govuk-body">We maken een CSV -bestand van {{ report_text(report_request.parameter['notification_type'],report_request.parameter['notification_status']) }} van het laatste {{ retention_period }} dagen.
+        <p class="govuk-body">Dit kan tot 5 minuten duren.</p>
+        <p class="govuk-body">Sluit deze pagina niet af.</p>
+
+        <p class="js-hidden govuk-body">
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.report_request', service_id=current_service.id, report_request_id=report_request.id) }}">Vernieuw de pagina om te controleren op een update</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

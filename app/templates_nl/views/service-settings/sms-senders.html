@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Sms-bericht afzender-ID's
+  Sms-bericht afzender-IDs
 {% endblock %}
 
 {% block backLink %}
@@ -14,12 +14,12 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Sms-bericht afzender-ID\'s') }}
+  {{ page_header('Sms-bericht afzender-IDs') }}
 
   <div class="user-list">
     {% if not current_service.sms_senders %}
       <div class="user-list-item">
-        <p class="govuk-body user-list-item-blank hint">U heeft nog geen sms-afzender-ID's toegevoegd</p>
+        <p class="govuk-body user-list-item-blank hint">U heeft nog geen sms-afzender-IDs toegevoegd</p>
       </div>
     {% endif %}
     {% for item in current_service.sms_senders_with_hints %}

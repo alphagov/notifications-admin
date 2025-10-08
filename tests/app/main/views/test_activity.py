@@ -2,19 +2,26 @@ import json
 import uuid
 from collections import namedtuple
 from functools import partial
+from unittest import mock
 from urllib.parse import parse_qs, urlparse
 
 import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from app.main.views_nl.dashboard import cache_search_query, get_status_filters, make_cache_key
+from app.main.views_nl.dashboard import (
+    cache_search_query,
+    get_status_filters,
+    make_cache_key,
+    post_report_request_and_redirect,
+)
 from app.main.views_nl.jobs import get_time_left
 from app.models.service import Service
 from app.utils import SEVEN_DAYS_TTL, get_sha512_hashed
 from tests.conftest import (
     SERVICE_ONE_ID,
     create_active_caseworking_user,
+    create_active_user_empty_permissions,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
     create_notifications,
@@ -287,6 +294,7 @@ def test_can_show_notifications_if_data_retention_not_available(
         "Active user - notifications count above threshold, no download link",
     ],
 )
+@mock.patch("app.main.views_nl.dashboard.REPORT_REQUEST_MAX_NOTIFICATIONS", 0)
 def test_link_to_download_notifications(
     client_request,
     mock_get_notifications,
@@ -306,6 +314,114 @@ def test_link_to_download_notifications(
     page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID, **query_parameters)
     download_link = page.select_one("a[href*='download-notifications.csv']")
     assert (download_link["href"] if download_link else None) == expected_download_link(service_id=SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize("message_type", ["email", "sms", "letter"])
+@pytest.mark.parametrize(
+    "given_status, expected_status",
+    [
+        ("sending,delivered,failed", "all"),
+        (None, "all"),
+        ("sending", "sending"),
+        ("delivered", "delivered"),
+        ("failed", "failed"),
+    ],
+)
+def test_view_notifications_calls_report_request_method_with_expected_args(
+    client_request,
+    mock_get_notifications_count_for_service,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_get_notifications,
+    fake_uuid,
+    message_type,
+    given_status,
+    expected_status,
+    mocker,
+):
+    mock_create_report_request = mocker.patch("app.report_request_api_client.create_report_request")
+
+    kwargs = {
+        "message_type": message_type,
+        "service_id": SERVICE_ONE_ID,
+        "_data": {"report_type": "notifications_status_csv"},
+    }
+    if given_status:
+        kwargs["status"] = given_status
+
+    client_request.post("main.view_notifications", **kwargs)
+
+    mock_create_report_request.assert_called_once_with(
+        SERVICE_ONE_ID,
+        "notifications_status_csv",
+        {
+            "user_id": mocker.ANY,
+            "report_type": "notifications_status_csv",
+            "notification_type": message_type,
+            "notification_status": expected_status,
+        },
+    )
+
+
+@pytest.mark.parametrize(
+    "user, notifications_count, expect_download_link",
+    [
+        (
+            create_active_user_view_permissions(),
+            900000,
+            True,
+        ),
+        (
+            create_active_user_empty_permissions(),
+            500,
+            False,
+        ),
+        (
+            create_active_user_empty_permissions(),
+            900002,  # Above the threshold, should return None
+            False,
+        ),
+    ],
+)
+@mock.patch("app.main.views_nl.dashboard.REPORT_REQUEST_MAX_NOTIFICATIONS", 900001)
+def test_report_request_notifications_link(
+    client_request,
+    mocker,
+    fake_uuid,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_has_no_jobs,
+    mock_get_no_api_keys,
+    user,
+    mock_get_notifications_count_for_service,
+    notifications_count,
+    expect_download_link,
+):
+    client_request.login(user)
+    mock_get_notifications_count_for_service.return_value = notifications_count
+
+    page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID)
+    report_request_link = page.select_one("button.govuk-button--as-link")
+
+    if expect_download_link:
+        assert report_request_link is not None
+
+        mocker.patch("app.report_request_api_client.create_report_request", return_value=fake_uuid)
+        client_request.post(
+            "main.view_notifications",
+            service_id=SERVICE_ONE_ID,
+            message_type="email",
+            _data={"report_type": "notifications_status_csv"},
+            _expected_status=302,
+            _expected_redirect=url_for(
+                "main.report_request",
+                service_id=SERVICE_ONE_ID,
+                report_request_id=fake_uuid,
+            ),
+        )
+    else:
+        assert report_request_link is None
 
 
 def test_download_not_available_to_users_without_dashboard(
@@ -664,7 +780,7 @@ def test_get_status_filters_calculates_stats(client_request):
 
     assert {label: count for label, _option, _link, count in ret} == {
         "total": 6,
-        "sending": 3,
+        "delivering": 3,
         "failed": 2,
         "delivered": 1,
     }
@@ -673,7 +789,7 @@ def test_get_status_filters_calculates_stats(client_request):
 def test_get_status_filters_in_right_order(client_request):
     ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS, None)
 
-    assert [label for label, _option, _link, _count in ret] == ["total", "sending", "delivered", "failed"]
+    assert [label for label, _option, _link, _count in ret] == ["total", "delivering", "delivered", "failed"]
 
 
 def test_get_status_filters_constructs_links(client_request):
@@ -804,13 +920,13 @@ def test_big_numbers_dont_show_for_letters(
 @pytest.mark.parametrize(
     "message_type, status, expected_hint_status, single_line",
     [
-        ("email", "created", "Sending since 27 September at 5:30pm", True),
-        ("email", "sending", "Sending since 27 September at 5:30pm", True),
+        ("email", "created", "Delivering since 27 September at 5:30pm", True),
+        ("email", "sending", "Delivering since 27 September at 5:30pm", True),
         ("email", "temporary-failure", "Inbox not accepting messages right now 27 September at 5:31pm", False),
         ("email", "permanent-failure", "Email address does not exist 27 September at 5:31pm", False),
         ("email", "delivered", "Delivered 27 September at 5:31pm", True),
-        ("sms", "created", "Sending since 27 September at 5:30pm", True),
-        ("sms", "sending", "Sending since 27 September at 5:30pm", True),
+        ("sms", "created", "Delivering since 27 September at 5:30pm", True),
+        ("sms", "sending", "Delivering since 27 September at 5:30pm", True),
         ("sms", "temporary-failure", "Phone not accepting messages right now 27 September at 5:31pm", False),
         ("sms", "permanent-failure", "Not delivered 27 September at 5:31pm", False),
         ("sms", "delivered", "Delivered 27 September at 5:31pm", True),
@@ -820,12 +936,37 @@ def test_big_numbers_dont_show_for_letters(
         ("letter", "delivered", "27 September at 5:30pm", True),
         ("letter", "received", "27 September at 5:30pm", True),
         ("letter", "accepted", "27 September at 5:30pm", True),
-        ("letter", "cancelled", "27 September at 5:30pm", False),  # The API won’t return cancelled letters
-        ("letter", "permanent-failure", "Permanent failure 27 September at 5:31pm", False),
-        ("letter", "temporary-failure", "27 September at 5:30pm", False),  # Not currently a real letter status
+        (
+            "letter",
+            "cancelled",
+            "27 September at 5:30pm",
+            False,
+        ),  # The API won’t return cancelled letters
+        (
+            "letter",
+            "permanent-failure",
+            "Permanent failure 27 September at 5:31pm",
+            False,
+        ),
+        (
+            "letter",
+            "temporary-failure",
+            "27 September at 5:30pm",
+            False,
+        ),  # Not currently a real letter status
         ("letter", "virus-scan-failed", "Virus detected 27 September at 5:30pm", False),
-        ("letter", "validation-failed", "Validation failed 27 September at 5:30pm", False),
-        ("letter", "technical-failure", "Technical failure 27 September at 5:30pm", False),
+        (
+            "letter",
+            "validation-failed",
+            "Validation failed 27 September at 5:30pm",
+            False,
+        ),
+        (
+            "letter",
+            "technical-failure",
+            "Technical failure 27 September at 5:30pm",
+            False,
+        ),
     ],
 )
 def test_sending_status_hint_displays_correctly_on_notifications_page(
@@ -915,6 +1056,7 @@ CanDownloadLinkTestCase = namedtuple(
         "Above threshold - Download link not present, support link present",
     ],
 )
+@mock.patch("app.main.views_nl.dashboard.REPORT_REQUEST_MAX_NOTIFICATIONS", 0)
 def test_view_notifications_can_download(
     client_request,
     mock_get_notifications,
@@ -935,6 +1077,61 @@ def test_view_notifications_can_download(
         assert download_link is not None
     else:
         assert download_link is None
+
+    # check support link
+    support_link = page.select_one("a[href*='/support/ask-question-give-feedback']")
+    if test_case.expected_support_link_present:
+        assert support_link is not None
+    else:
+        assert support_link is None
+
+
+@pytest.mark.parametrize(
+    "test_case",
+    [
+        CanDownloadLinkTestCase(
+            notifications_count=100,
+            can_download=True,
+            expected_download_link_present=True,
+            expected_support_link_present=False,
+        ),
+        CanDownloadLinkTestCase(
+            notifications_count=900000,
+            can_download=True,
+            expected_download_link_present=False,
+            expected_support_link_present=True,
+        ),
+    ],
+    ids=[
+        "Below threshold - Report request download link present, support link not present",
+        "Above threshold - Report request download link not present, support link present",
+    ],
+)
+@mock.patch("app.main.views_nl.dashboard.REPORT_REQUEST_MAX_NOTIFICATIONS", 850000)
+def test_download_link_and_report_request_notifications(
+    client_request,
+    mock_get_notifications,
+    mock_get_service_statistics,
+    mock_get_service_data_retention,
+    mock_has_no_jobs,
+    mock_get_no_api_keys,
+    mock_get_notifications_count_for_service,
+    test_case: CanDownloadLinkTestCase,
+):
+    mock_get_notifications_count_for_service.return_value = test_case.notifications_count
+
+    page = client_request.get("main.view_notifications", service_id=SERVICE_ONE_ID)
+
+    # check report request download link
+    report_request_link = page.select_one("button.govuk-button--as-link")
+    if test_case.expected_download_link_present:
+        assert report_request_link is not None
+    else:
+        assert report_request_link is None
+
+    # when report request feature is ON, the old download link should not be present
+    old_download_link = page.select_one("a[href*='download-notifications.csv']")
+    assert old_download_link is None
 
     # check support link
     support_link = page.select_one("a[href*='/support/ask-question-give-feedback']")
@@ -1170,3 +1367,43 @@ def test_ajax_blocks_have_same_resource(
         # ensure both ajax blocks have a data-form, so that they both issue the same POST request to the json endpoint
         assert block["data-form"] == "search-form"
     assert {block["data-key"] for block in ajax_blocks} == {"counts", "notifications"}
+
+
+def test_view_notifications_post_report_request(
+    client_request,
+    mock_get_service,
+    mocker,
+):
+    mocker.patch(
+        "app.notify_client.report_request_api_client.ReportRequestClient.post",
+        return_value={"data": {"id": "mock_report_request_id"}},
+    )
+
+    mock_current_user = create_active_user_with_permissions()
+
+    mock_create_report_request = mocker.patch(
+        "app.main.views_nl.dashboard.report_request_api_client.create_report_request",
+        return_value="mock_report_request_id",
+    )
+    report_type = "notifications_report"
+    message_type = "email"
+    status = "delivered"
+    response = post_report_request_and_redirect(mock_get_service, report_type, message_type, status)
+
+    mock_create_report_request.assert_called_once_with(
+        mock_get_service.id,
+        report_type,
+        {
+            "user_id": mock_current_user["id"],
+            "report_type": report_type,
+            "notification_type": message_type,
+            "notification_status": status,
+        },
+    )
+
+    assert response.status_code == 302
+    assert response.location == url_for(
+        "main.report_request",
+        service_id=mock_get_service.id,
+        report_request_id="mock_report_request_id",
+    )

@@ -19,10 +19,8 @@
   {% call form_wrapper() %}
     {{ form.billing_contact_names(param_extensions={"classes": "govuk-!-width-full"}) }}
     {{ form.billing_contact_email_addresses(param_extensions={"classes": "govuk-!-width-full"}) }}
-  <div class="extra-tracking">
-      {{ form.billing_reference(param_extensions={"classes": "govuk-!-width-full"}) }}
-      {{ form.purchase_order_number(param_extensions={"classes": "govuk-!-width-full"}) }}
-  </div>
+    {{ form.billing_reference(param_extensions={"classes": "govuk-!-width-full govuk-input--extra-letter-spacing"}) }}
+    {{ form.purchase_order_number(param_extensions={"classes": "govuk-!-width-full govuk-input--extra-letter-spacing"}) }}
     {{ form.notes(param_extensions={
       "classes": "govuk-!-width-full",
       "rows": "4",

@@ -21,11 +21,11 @@
     <div class="govuk-grid-column-five-sixths">
 
       <p class="govuk-body">
-        U bent verantwoordelijk voor het controleren of deze dienst de enige in zijn soort is binnen uw organisatie.
+        ‘{{ current_service.name }}’ moet de enige service in zijn soort zijn binnen uw organisatie.
       </p>
 
       <p class="govuk-body">
-        Voordat u doorgaat, dient u de lijst met
+        Voordat u verdergaat, controleert u de lijst met
         <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation.id) }}" class="govuk-link govuk-link--no-visited-state">diensten van {{ current_service.organisation.name }}</a> te bekijken.
       </p>
 

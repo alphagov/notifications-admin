@@ -42,7 +42,8 @@
       "html": "Onderwerp"
     },
     "value": {
-      "html": subject
+      "classes": "" if subject else "govuk-hint",
+      "html": subject or "Onderwerp vermist",
     }
 }) %}
 

@@ -8,7 +8,7 @@ from app.main.forms import (
     RegisterUserFromInviteForm,
     RegisterUserFromOrgInviteForm,
 )
-from app.main.views_nl.verify import activate_user
+from app.main.views.verify import activate_user
 from app.models.user import InvitedOrgUser, InvitedUser, User
 from app.utils import hide_from_search_engines
 from app.utils.login import redirect_if_logged_in

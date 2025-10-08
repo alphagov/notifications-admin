@@ -14,16 +14,18 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     first_row = pricing_rows[0]
     assert "1 sheet" in first_row.text
 
-    assert "61p + VAT" in first_row.text
-    assert "97p + VAT" in first_row.text
-    assert "£1.44 + VAT" in first_row.text
+    assert "59p" in first_row.text
+    assert "68p" in first_row.text
+    assert "£1.49" in first_row.text
+    assert "£1.56" in first_row.text
 
     last_row = pricing_rows[-1]
     assert "5 sheets" in last_row.text
 
-    assert "79p + VAT" in last_row.text
-    assert "£1.15 + VAT" in last_row.text
-    assert "£1.63 + VAT" in last_row.text
+    assert "78p" in last_row.text
+    assert "86p" in last_row.text
+    assert "£1.67" in last_row.text
+    assert "£1.76" in last_row.text
 
 
 @pytest.mark.skip(reason="[NOTIFYNL] Translation issue")
@@ -39,8 +41,11 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     (
         (
             0.0233,
-            "International text message rates have changed.",
-            "Find out what it costs to send text messages to international numbers.",
+            "Each unique service you add has an annual allowance of free text messages.",
+            (
+                "When a service has used its annual allowance, it costs 2.33 pence (plus VAT) "
+                "for each text message you send."
+            ),
         ),
     ),
 )

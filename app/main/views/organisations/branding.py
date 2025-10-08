@@ -32,11 +32,11 @@ def _handle_remove_email_branding(remove_branding_id) -> Response | None:
     try:
         remove_branding = current_organisation.email_branding_pool.get_item_by_id(remove_branding_id)
     except current_organisation.email_branding_pool.NotFound:
-        abort(400, f"Ongeldige e-mailbranding-ID {remove_branding_id} voor {current_organisation}")
+        abort(400, f"Invalid email branding ID {remove_branding_id} for {current_organisation}")
 
     if request.method == "POST":
         organisations_client.remove_email_branding_from_pool(current_organisation.id, remove_branding_id)
-        confirmation_message = f"E-mailbranding ‘{remove_branding.name}’ verwijderd."
+        confirmation_message = f"Email branding ‘{remove_branding.name}’ removed."
         flash(confirmation_message, "default_with_tick")
         return redirect(url_for("main.organisation_email_branding", org_id=current_organisation.id))
 
@@ -79,7 +79,7 @@ def _handle_change_default_email_branding_to_govuk(is_central_government) -> Res
                 current_brand=current_brand,
             )
         )
-        flash(confirmation_question, "maak deze e-mailbranding de standaard")
+        flash(confirmation_question, "make this email branding the default")
 
     return None
 
@@ -97,7 +97,7 @@ def _handle_change_default_email_branding(form, new_default_branding_id) -> Resp
             return current_organisation.email_branding_pool.get_item_by_id(branding_id).name
         except current_organisation.email_branding_pool.NotFound:
             current_app.logger.info(
-                "E-mailbranding-ID %(branding_id)s niet aanwezig in de e-mailbranding van organisatie %(org_name)s.",
+                "Email branding ID %(branding_id)s is not present in organisation %(org_name)s's email branding pool.",
                 {"branding_id": branding_id, "org_name": current_organisation.name},
             )
             abort(400)
@@ -122,7 +122,7 @@ def _handle_change_default_email_branding(form, new_default_branding_id) -> Resp
         )
         flash(
             confirmation_question,
-            "maak deze e-mailbranding de standaard",
+            "make this email branding the default",
         )
 
     # This form submission handles users pressing `Make default` on a brand. We handle two cases here:
@@ -192,9 +192,9 @@ def add_organisation_email_branding_options(org_id):
         organisations_client.add_brandings_to_email_branding_pool(org_id, selected_email_branding_ids)
 
         if len(selected_email_branding_ids) == 1:
-            msg = "1 e-mailbranding-optie toegevoegd"
+            msg = "1 email branding option added"
         else:
-            msg = f"{len(selected_email_branding_ids)} e-mailbranding-opties toegevoegd"
+            msg = f"{len(selected_email_branding_ids)} email branding options added"
 
         flash(msg, "default_with_tick")
         return redirect(url_for(".organisation_email_branding", org_id=org_id))
@@ -216,11 +216,11 @@ def _handle_remove_letter_branding(remove_branding_id):
     try:
         remove_branding = current_organisation.letter_branding_pool.get_item_by_id(remove_branding_id)
     except current_organisation.letter_branding_pool.NotFound:
-        abort(400, f"Ongeldige briefbranding-ID {remove_branding_id} voor {current_organisation}")
+        abort(400, f"Invalid letter branding ID {remove_branding_id} for {current_organisation}")
 
     if request.method == "POST":
         organisations_client.remove_letter_branding_from_pool(current_organisation.id, remove_branding_id)
-        flash(f"Briefbranding ‘{remove_branding.name}’ verwijderd.", "default_with_tick")
+        flash(f"Letter branding ‘{remove_branding.name}’ removed.", "default_with_tick")
         return redirect(url_for("main.organisation_letter_branding", org_id=current_organisation.id))
     else:
         flash(
@@ -251,8 +251,9 @@ def _handle_change_default_letter_branding_to_none():
                     "partials/flash_messages/letter_branding_confirm_change_default_to_none.html",
                 )
             ),
-            "geen standaard briefbranding gebruiken",
+            "remove default letter branding",
         )
+
 
 def _handle_change_default_letter_branding(form, new_default_branding_id):
     """
@@ -267,7 +268,7 @@ def _handle_change_default_letter_branding(form, new_default_branding_id):
             return current_organisation.letter_branding_pool.get_item_by_id(branding_id).name
         except current_organisation.letter_branding_pool.NotFound:
             current_app.logger.info(
-                "Branding id %(id)s is bestaat niet in %(org_name)s's branding lijst.",
+                "Letter branding ID %(id)s is not present in organisation %(org_name)s's letter branding pool.",
                 {"id": branding_id, "org_name": current_organisation.name},
             )
             abort(400)
@@ -291,7 +292,7 @@ def _handle_change_default_letter_branding(form, new_default_branding_id):
         )
         flash(
             confirmation_question,
-            "maak deze branding standaard",
+            "make this letter branding the default",
         )
 
     # This form submission handles users pressing `Make default` on a brand. We handle two cases here:
@@ -332,12 +333,9 @@ def organisation_letter_branding(org_id):
     elif response := _handle_change_default_letter_branding(form, new_default_branding_id):
         return response
 
-    show_use_no_branding_as_default_link = current_organisation.letter_branding_id is not None
-
     return render_template(
         "views/organisations/organisation/settings/letter-branding-options.html",
         form=form,
-        show_use_no_branding_as_default_link=show_use_no_branding_as_default_link,
     )
 
 
@@ -357,9 +355,9 @@ def add_organisation_letter_branding_options(org_id):
         organisations_client.add_brandings_to_letter_branding_pool(org_id, selected_letter_branding_ids)
 
         if len(selected_letter_branding_ids) == 1:
-            msg = "1 briefbranding-optie toegevoegd"
+            msg = "1 letter branding option added"
         else:
-            msg = f"{len(selected_letter_branding_ids)} briefbranding-opties toegevoegd"
+            msg = f"{len(selected_letter_branding_ids)} letter branding options added"
 
         flash(msg, "default_with_tick")
         return redirect(url_for(".organisation_letter_branding", org_id=org_id))

@@ -25,6 +25,8 @@ $govuk-assets-path: "/static/";
 @import "govuk/components/textarea/index";
 @import "govuk/components/summary-list/index";
 @import "govuk/components/tag/index";
+@import "govuk/components/task-list/index";
+@import "govuk/components/service-navigation/index";
 
 @import "govuk/utilities";
 @import "govuk/overrides";

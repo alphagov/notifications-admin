@@ -24,7 +24,7 @@ from app.utils.login import (
 
 @main.route("/two-factor-email-sent", methods=["GET"])
 def two_factor_email_sent():
-    title = "E-mail opnieuw verzonden" if request.args.get("email_resent") else "Controleer uw e-mail"
+    title = "Email resent" if request.args.get("email_resent") else "Check your email"
     return render_template("views/two-factor-email.html", title=title, redirect_url=request.args.get("next"))
 
 
@@ -38,7 +38,7 @@ def two_factor_email_interstitial(token):
 def two_factor_email(token):
     redirect_url = request.args.get("next")
 
-    # controleert of de URL geldig is en niet is verlopen
+    # checks url is valid, and hasn't timed out
     try:
         token_data = check_token(
             token,
@@ -51,7 +51,7 @@ def two_factor_email(token):
 
     token = Token(token_data)
 
-    # controleert of de code al is gebruikt
+    # checks if code was already used
     logged_in, msg = user_api_client.check_verify_code(token.user_id, token.secret_code, "email")
 
     if not logged_in:
@@ -100,6 +100,6 @@ def two_factor_webauthn():
 
 @main.route("/re-validate-email", methods=["GET"])
 def revalidate_email_sent():
-    title = "E-mail opnieuw verzonden" if request.args.get("email_resent") else "Controleer uw e-mail"
+    title = "Email resent" if request.args.get("email_resent") else "Check your email"
     redirect_url = request.args.get("next")
     return render_template("views/re-validate-email-sent.html", title=title, redirect_url=redirect_url)

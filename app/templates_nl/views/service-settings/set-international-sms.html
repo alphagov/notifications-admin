@@ -23,6 +23,7 @@
       <p class="govuk-body">
         Bekijk de <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages', _anchor='international-numbers') }}">tarieven</a> voor een overzicht van de kosten.
       </p>
+      <p class="govuk-body">De dagelijkse limiet voor uw service is {{current_service.international_sms_message_limit}}. U kunt de dagelijkse limiet voor internationale sms-berichten wijzigen in <b class="govuk-!-font-weight-bold">Instellingen</b>.</p>
       {% call form_wrapper() %}
         {{ form.enabled }}
         {{ page_footer('Opslaan') }}

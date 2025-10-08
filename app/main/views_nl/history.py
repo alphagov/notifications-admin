@@ -5,7 +5,7 @@ from flask import render_template, request
 
 from app import current_service, format_date_numeric
 from app.main import main
-from app.models.event import APIKeyEvent, APIKeyEvents, ServiceEvents
+from app.models_nl.event import APIKeyEvent, APIKeyEvents, ServiceEvents
 from app.utils.user import user_has_permissions
 
 

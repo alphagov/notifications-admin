@@ -1,7 +1,7 @@
 {% extends "content_template.html" %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
-{% set navigation_label_prefix = 'Notify gebruiken' %}
+{% set navigation_label_prefix = 'NotifyNL gebruiken' %}
 
 {% block per_page_title %}
   Proefmodus
@@ -11,44 +11,30 @@
 
   <h1 class="heading-large">Proefmodus</h1>
 
-  <p class="govuk-body">Wanneer u een nieuwe dienst toevoegt, start deze in de proefmodus. Hiermee kunt u NotifyNL gratis uitproberen, met een paar beperkingen.</p>
-  <p class="govuk-body">Zolang uw dienst in de proefmodus staat, kunt u alleen:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>berichten naar uzelf en andere mensen in uw team sturen</li>
-    <li>{{ email_and_sms_daily_limit | message_count('email') }} per dag versturen</li>
-    <li>{{ email_and_sms_daily_limit | message_count('sms') }} per dag versturen</li>
-    <li>briefsjablonen maken, maar deze niet versturen</li>
-  </ul>
+  <p class="govuk-body">Wanneer je een nieuwe dienst toevoegt, start deze in proefmodus.</p>
+  <p class="govuk-body">Zolang je dienst in proefmodus staat, kun je alleen berichten sturen naar jezelf en je teamleden.</p>
+  <p class="govuk-body">Er is een dagelijkse limiet van {{ email_and_sms_daily_limit | message_count('email') }} en {{ email_and_sms_daily_limit | message_count('sms') }}.</p>
+  <p class="govuk-body">Je kunt geen brieven versturen in proefmodus, maar je kunt nog steeds briefsjablonen maken en brieven uploaden om te zien hoe het werkt.</p>
 
   <div class="govuk-inset-text">
-    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">Huisartspraktijken</a> kunnen in proefmodus geen sms-berichten versturen.</p>
+    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">Huisartsenpraktijken en apotheken</a> kunnen in proefmodus geen sms-berichten versturen.</p>
   </div>
 
+  <h2 class="heading-medium" id="how-to-switch-off-trial-mode">Hoe je proefmodus uitschakelt</h2>
+
   {% if current_service and current_service.trial_mode %}
-  <p class="govuk-body">
-    Om deze beperkingen op te heffen, kunt u <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">verzoek doen om live te gaan</a>.
-  </p>
+  <p class="govuk-body">Voltooi de taken op de pagina <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">Maak je dienst live</a>.</p>
   {% else %}
-  <p class="govuk-body">
-    Om deze beperkingen op te heffen:
-  </p>
-  <ol class="govuk-list govuk-list--number">
-    <li><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in') }}">Log in bij Notify</a>.</li>
-    <li>Ga naar de <b class="govuk-!-font-weight-bold">Instellingen</b> pagina.</li>
-    <li>Selecteer <b class="govuk-!-font-weight-bold">Verzoek om live te gaan</b>.</li>
-  </ol>
+  <p class="govuk-body">Voltooi de taken op de pagina <b class="govuk-!-font-weight-bold">Maak je dienst live</b>.</p>
   {% endif %}
-
-  <p class="govuk-body">
-    Wanneer wij uw verzoek ontvangen, nemen wij uiterlijk de volgende werkdag contact met u op.
-  </p>
-
-  <h2 class="heading-medium" id="before-you-request-to-go-live">Voordat u een verzoek doet om live te gaan</h2>
-  <p class="govuk-body">U moet:</p>
+  <p class="govuk-body">Je moet het volgende doen:</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>voorbeelden toevoegen van de berichten die u wilt versturen</li>
-    <li>uw instellingen bijwerken zodat u klaar bent om berichten te versturen en te ontvangen</li>
-    <li>onze overeenkomst over gegevensverwerking en financiën accepteren</li>
+    <li>bevestigen dat jouw dienst de enige in zijn soort binnen je organisatie is</li>
+    <li>voorbeelden toevoegen van de berichten die je wilt versturen</li>
+    <li>je instellingen bijwerken zodat je klaar bent om berichten te versturen en te ontvangen</li>
   </ul>
+  <p class="govuk-body">Als jouw organisatie nieuw is bij NotifyNL, vragen we je ons gegevensverwerkings- en financiële akkoord te accepteren.</p>
+  <p class="govuk-body">Het kan tot één werkdag duren voordat je dienst live gaat.</p>
+  <p class="govuk-body">Dit is zodat we kunnen controleren dat je aan onze gebruiksvoorwaarden voldoet.</p>
 
 {% endblock %}

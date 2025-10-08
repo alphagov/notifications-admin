@@ -15,8 +15,8 @@
 
   {{ content_metadata(
     data={
-      "Last updated": "20 March 2025",
-      "Next review due": "20 June 2025"
+      "Last updated": "22 July 2025",
+      "Next review due": "22 September 2025"
     }
   ) }}
 
@@ -28,23 +28,22 @@
 
   <ul class="govuk-list govuk-list--bullet">
     <li>Improve how we measure our performance</li>
-    <li>Add ‘economy mail’ to the list of postage options</li>
+    <li>Improve the way we find problems so we can fix them sooner</li>
+    <li>Make sure Notify does not slow down when services send a lot of messages</li>    
     <li>Make it easier to start using Notify</li>
-    <li>Let users join an existing service</li>
-    <li>Improve our front-end code to meet <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> targets for accessibility</li>
     <li>Let website users send files by email</li>
-    <li>Improve the Notify API</li>
     <li>Let high volume services download a report of the messages they’ve sent</li>
     <li>Review <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_security') }}">our security</a> in line with the Cyber Assessment Framework</li>
-    <li>Explore ways to help services write better messages</li>
-    <li>Update our internal monitoring and alerting tools</li>
+    <li>Update our internal monitoring and alerting tools</li>   
     <li>Review our process for identifying text message fraud</li>
+    <li>Improve how we manage our rate limits and capacity</li> 
+    <li>Give services more control over the way Notify handles personalised content</li>
   </ul>
 
   <h2 class="heading-medium" id="things-we-will-do-later">Things we’ll do later</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>Explore new ways to increase our capacity</li>
+
     <li>Make it easier to understand how text message pricing works</li>
     <li>Improve the billing and payment process</li>
     <li>Make it easier for services to see the usage data they need</li>
@@ -56,23 +55,17 @@
   <h2 class="heading-medium" id="things-we-have-done">Things we’ve done</h2>
 
   <ul class="govuk-list govuk-list--bullet">
-    <li>Added API callbacks for returned letters</li>
-    <li>Added a new developer environment for prototyping and testing new features</li>
-    <li>Carried out our annual IT health check</li>
-    <li>Added a new environment and deployment pipeline to make development more secure</li>
+    <li>Explored ways to help services write better messages</li>
+    <li>Added ‘economy mail’ to the list of postage options</li>
+    <li>Let users join an existing service</li>
+    <li>Improved our front-end code to meet <a class="govuk-link govuk-link--no-visited-state" href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> targets for accessibility</li>    
+    <li>Added API callbacks for undelivered letters, allowing users to receive an automatic update when a letter is returned</li>
     <li>Met NCSC guidelines for NHS services by making sure they use a consistent <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_text_message_sender') }}">text message sender ID</a></li>
     <li>Moved our design components to version 5 of the <a class="govuk-link govuk-link--no-visited-state" href="https://design-system.service.gov.uk/components/">GOV.UK Design System</a></li>
     <li>Let recipients ask to unsubscribe from emails in one click</li>
     <li>Let services manage <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_unsubscribe_links') }}">unsubscribe requests</a></li>
     <li>Added JPG and PNG to the list of file formats a service can send by email</li>
     <li>Made it harder to send letters to addresses that do not exist</li>
-    <li>Found new ways to protect recipients from text message fraud</li>
-    <li>Let services that use the Notify API see their billing data</li>
-    <li>Announced an update to our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a></li>
-    <li>Fixed several issues listed on our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.accessibility_statement') }}">accessibility statement</a></li>
-    <li>Identified and prioritised API improvements (discovery)</li>
-    <li>Migrated our applications from GOV.UK PaaS to <a class="govuk-link govuk-link--no-visited-state" href="https://gds.blog.gov.uk/2024/08/14/how-we-migrated-gov-uk-notify-to-aws-elastic-container-service">Amazon Elastic Container Service</a></li>
-    <li>Explored new channels for notifications (discovery)</li>
   </ul>
     
 {% endblock %}

@@ -1,10 +1,11 @@
 import weakref
 from contextlib import suppress
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from functools import partial
 from html import escape
 from itertools import chain
+from math import ceil
 from numbers import Number
 
 import pytz
@@ -16,12 +17,13 @@ from flask_wtf.file import FileField as FileField_wtf
 from markupsafe import Markup
 from notifications_utils.countries.data import Postage
 from notifications_utils.formatters import strip_all_whitespace
-from notifications_utils.insensitive_dict import InsensitiveDict
+from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
 from notifications_utils.recipient_validation.notifynl.phone_number import PhoneNumber as PhoneNumberUtils
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
+from notifications_utils.timezones import local_timezone, utc_string_to_aware_gmt_datetime
 from ordered_set import OrderedSet
 from werkzeug.utils import cached_property
 from wtforms import (
@@ -63,11 +65,13 @@ from app.formatters import (
     format_auth_type,
     format_date_human,
     format_thousands,
+    get_human_day,
     guess_name_from_email_address,
     message_count_noun,
     sentence_case,
 )
 from app.main.validators import (
+    CannotContainURLsOrLinks,
     CharactersNotAllowed,
     CommonlyUsedPassword,
     CsvFileValidator,
@@ -112,37 +116,24 @@ from app.utils.user_permissions import (
 
 
 def get_time_value_and_label(future_time):
-    timestamp = future_time.astimezone(pytz.timezone("Europe/London"))
     return (
         future_time.replace(tzinfo=None).isoformat(),
-        f"{get_human_day(timestamp)} at {get_human_time(timestamp)}",
+        f"{get_human_day(future_time, include_day_of_week=True).title()} at {get_human_time(future_time)}",
     )
 
 
 def get_human_time(time):
+    time = utc_string_to_aware_gmt_datetime(time)
     return {"0": "midnight", "12": "midday"}.get(time.strftime("%-H"), time.strftime("%-I%p").lower())
 
 
-def get_human_day(time):
-    date_format = "%A %-d %B"  # for example "Monday 4 January"
-
-    #  Add 1 hour to get ‘midnight today’ instead of ‘midnight tomorrow’
-    time = (time - timedelta(hours=1)).strftime(date_format)
-    if time == datetime.utcnow().strftime(date_format):
-        return "Today"
-    if time == (datetime.utcnow() + timedelta(days=1)).strftime(date_format):
-        return "Tomorrow"
-
-    return time
-
-
 def get_furthest_possible_scheduled_time():
-    return (datetime.utcnow() + timedelta(days=7)).replace(hour=0)
+    return (datetime.now(local_timezone) + timedelta(days=7)).replace(hour=0, minute=0, second=0)
 
 
 def get_next_hours_until(until):
-    now = datetime.utcnow()
-    hours = int((until - now).total_seconds() / (60 * 60))
+    now = datetime.now(UTC)
+    hours = ceil((until - now).total_seconds() / (60 * 60))
     return [
         (now + timedelta(hours=i)).replace(minute=0, second=0, microsecond=0).replace(tzinfo=pytz.utc)
         for i in range(1, hours + 1)
@@ -150,10 +141,13 @@ def get_next_hours_until(until):
 
 
 def get_next_days_until(until):
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     days = int((until - now).total_seconds() / (60 * 60 * 24))
 
-    return [get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc)) for i in range(days + 1)]
+    return [
+        get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc), include_day_of_week=True).title()
+        for i in range(days + 1)
+    ]
 
 
 class RadioField(WTFormsRadioField):
@@ -339,7 +333,13 @@ class SMSCode(GovukTextInputField):
     # the design system recommends against ever using `type="number"`. "tel" makes mobile browsers
     # show a phone keypad input rather than a full qwerty keyboard.
     input_type = "tel"
-    param_extensions = {"attributes": {"pattern": "[0-9]*"}}
+    param_extensions = {
+        "attributes": {
+            "pattern": "[0-9]*",
+            "data-notify-module": "autofocus",
+        },
+        "classes": "govuk-input govuk-input--width-5 govuk-input--extra-letter-spacing",
+    }
     validators = [
         NotifyDataRequired(thing="your text message code"),
         Regexp(regex=r"^\d+$", message="Numbers only"),
@@ -588,7 +588,13 @@ class LoginForm(StripWhitespaceForm):
 
 
 class RegisterUserForm(StripWhitespaceForm):
-    name = GovukTextInputField("Full name", validators=[NotifyDataRequired(thing="your full name")])
+    name = GovukTextInputField(
+        "Full name",
+        validators=[
+            NotifyDataRequired(thing="your full name"),
+            CannotContainURLsOrLinks(thing="your full name"),
+        ],
+    )
     email_address = make_email_address_field(gov_user=True, thing="your email address")
     mobile_number = valid_phone_number(international=True)
     password = make_password_field(thing="your password")
@@ -1035,14 +1041,6 @@ class JoinServiceRequestApproveForm(StripWhitespaceForm):
         thing="an option",
         param_extensions={"fieldset": {"legend": {"classes": ""}}},
         default=SERVICE_JOIN_REQUEST_APPROVED,
-    )
-
-
-class JoinServiceRequestSetPermissionsForm(PermissionsForm):
-    custom_field_order: tuple = (
-        "permissions_field",
-        "folder_permissions",
-        "login_authentication",
     )
 
 
@@ -1524,18 +1522,13 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
     choices = [
         ("first", "First class"),
         ("second", "Second class"),
+        ("economy", "Economy mail"),
     ]
-
-    def __init__(self, *args, show_economy_class, **kwargs):
-        super().__init__(*args, **kwargs)
-        if show_economy_class:
-            self.postage.choices.append(("economy", "Economy mail"))
-            self.postage.thing = "first class, second class or economy mail"
 
     postage = GovukRadiosField(
         "Choose the postage for this letter template",
         choices=choices,
-        thing="first class or second class",
+        thing="first class, second class or economy mail",
         validators=[DataRequired()],
     )
 
@@ -1552,13 +1545,8 @@ class LetterTemplateLanguagesForm(StripWhitespaceForm):
 
 
 class LetterUploadPostageForm(StripWhitespaceForm):
-    choices = [("first", "First class"), ("second", "Second class")]
-
-    def __init__(self, *args, postage_zone, show_economy_class, **kwargs):
+    def __init__(self, *args, postage_zone, **kwargs):
         super().__init__(*args, **kwargs)
-
-        if show_economy_class:
-            self.postage.choices.append(("economy", "Economy mail"))
 
         if postage_zone != Postage.UK:
             self.postage.choices = [(postage_zone, "")]
@@ -1570,7 +1558,11 @@ class LetterUploadPostageForm(StripWhitespaceForm):
 
     postage = GovukRadiosField(
         "Choose the postage for this letter",
-        choices=choices,
+        choices=[
+            ("first", "First class"),
+            ("second", "Second class"),
+            ("economy", "Economy mail"),
+        ],
         default="second",
         validators=[DataRequired()],
     )
@@ -1611,7 +1603,10 @@ class CsvUploadForm(StripWhitespaceForm):
 class ChangeNameForm(StripWhitespaceForm):
     new_name = GovukTextInputField(
         "Change your name",
-        validators=[NotifyDataRequired(thing="your name")],
+        validators=[
+            NotifyDataRequired(thing="your name"),
+            CannotContainURLsOrLinks(thing="your name"),
+        ],
     )
 
 
@@ -1662,7 +1657,7 @@ class ChooseTimeForm(StripWhitespaceForm):
 
 class CreateKeyForm(StripWhitespaceForm):
     def __init__(self, existing_keys, *args, **kwargs):
-        self.existing_key_names = [key["name"].lower() for key in existing_keys if not key["expiry_date"]]
+        self.existing_key_names = InsensitiveSet(key.name for key in existing_keys if not key.expiry_date)
         super().__init__(*args, **kwargs)
 
     key_name = GovukTextInputField(
@@ -1675,7 +1670,7 @@ class CreateKeyForm(StripWhitespaceForm):
     )
 
     def validate_key_name(self, key_name):
-        if key_name.data.lower() in self.existing_key_names:
+        if key_name.data in self.existing_key_names:
             raise ValidationError("A key with this name already exists")
 
 

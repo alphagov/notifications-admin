@@ -25,13 +25,15 @@
   {{ govukErrorSummary({
     "classes": "webauthn__api-missing",
     "titleText": "Er is een probleem",
-    "descriptionText": "Uw browser ondersteunt beveiligingssleutels niet. Probeer in te loggen bij Notify met een andere browser."
+    "descriptionText": "Uw browser ondersteunt beveiligingssleutels niet. Probeer in te loggen bij Notify met een andere browser.",
+    "errorList": [],
   }) }}
 
   {{ govukErrorSummary({
     "classes": "webauthn__no-js",
     "titleText": "Er is een probleem",
-    "descriptionText": "JavaScript is niet beschikbaar op deze pagina. Beveiligingssleutels hebben JavaScript nodig om te functioneren."
+    "descriptionText": "JavaScript is niet beschikbaar op deze pagina. Beveiligingssleutels hebben JavaScript nodig om te functioneren.",
+    "errorList": [],
   }) }}
 
   {% set keyProblemDescription %}
@@ -43,7 +45,8 @@
     "classes": "govuk-!-display-none",
     "attributes": { "aria-live": "polite", "tabindex":"-1" },
     "titleText": "Er is een probleem met uw beveiligingssleutels",
-    "descriptionHtml": keyProblemDescription
+    "descriptionHtml": keyProblemDescription,
+    "errorList": [],
   }) }}
 {% endset %}
 

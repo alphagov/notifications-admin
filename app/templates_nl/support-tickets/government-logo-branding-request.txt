@@ -7,15 +7,33 @@ Service: {{ current_service.name }}
 {{ url_for('main.service_dashboard', service_id=current_service.id, _external=True) }}
 
 ---
-Gevraagd overheidslogo tekst: {{ logo_text }}
+
+## Create a new government identity logo
+{% if branding_choice == "govuk_and_org" %}
 {% set create_logo_url = url_for(
-  'main.create_email_branding_government_identity_logo', text=logo_text, _external=True
+'main.create_email_branding_government_identity_logo', text=logo_text, brand_type="both", _external=True
 ) %}
-{% if branding_choice == "govuk_and_org" %}Deze service heeft gevraagd dat zowel het GOV.UK-logo als het organisatielogo zichtbaar zijn.
+{% else %}
 {% set create_logo_url = url_for(
-  'main.create_email_branding_government_identity_logo', text=logo_text, brand_type="both", _external=True
+'main.create_email_branding_government_identity_logo', text=logo_text, _external=True
 ) %}
-{% elif branding_choice == "organisation" %}Deze service heeft organisatiebranding gevraagd.
+{% endif %}
+
+Open this link to create a new government identity logo: {{ create_logo_url }}
+
+1. Select the coat of arms or insignia for {% if current_service.organisation %}{{current_service.organisation.name}}. If this organisation is not listed, select ‘HM Government’. {% else %}the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.{% endif %}
+2. Select the stripe colour for {% if current_service.organisation -%}{{current_service.organisation.name}}. If this organisation is not listed, select ‘HM Government’.{% else %}the organisation the service belongs to. If the organisation is not listed, select ‘HM Government’.{% endif %}
+3. Check that the logo text says: {{ logo_text }}
+4. Check that the brand type selected is: {% if branding_choice == "govuk_and_org" %}GOV.UK and branding{% else %}Branding only{% endif %}
+5. Select ‘Save’.
+
+
+## Set the email branding for this service
+
+Open this link to select the new email branding for {{ current_service.name }}: {{ url_for('main.service_set_branding', service_id=current_service.id, branding_type='email', _external=True) }}
+
+
+Deze service heeft organisatiebranding gevraagd.
 
 {% endif %}Maak dit logo aan: {{ create_logo_url }}
 

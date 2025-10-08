@@ -90,6 +90,12 @@ def _get_example_performance_data():
                 "service_name": "Example service 3",
             },
             {
+                "organisation_id": uuid.uuid4(),
+                "organisation_name": "lowercase organisation",
+                "service_id": uuid.uuid4(),
+                "service_name": "example service",
+            },
+            {
                 # On production there should be no live services without an
                 # organisation, but this isn’t always true in people’s local
                 # environments
@@ -172,6 +178,7 @@ def test_should_render_performance_page(
         "Organisation Number of live services "
         "Department of Examples and Patterns 2 "
         "Department of One Service 1 "
+        "lowercase organisation 1 "
         "No organisation 1"
     )
 

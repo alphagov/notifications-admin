@@ -12,17 +12,17 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     libcurl4 \
     curl \
-    && apt-get -y clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    && rm -rf /var/lib/apt/lists/* /tmp/*
 
 WORKDIR /home/vcap/app
 
 
 ##### Frontend Build Image ###################################################
 ARG NOTIFY_ENVIRONMENT=development
-ARG NODE_VERSION=20
 
-FROM ghcr.io/alphagov/notify/unit-tests-image:python311-node20 as frontend_build
+FROM --platform=linux/amd64 node:22-bookworm-slim AS frontend_build
+
+SHELL ["/bin/bash", "-c"]
 
 WORKDIR /usr/frontend
 COPY app app
@@ -40,7 +40,6 @@ RUN echo "Install OS dependencies for python app requirements" &&  \
     build-essential \
     git \
     libxml2-dev libxslt-dev zlib1g-dev \
-    && apt-get -y clean \
     && rm -rf /var/lib/apt/lists/* /tmp/*
 
 COPY requirements.txt .
@@ -91,7 +90,6 @@ RUN echo "Install OS dependencies for test build" && \
       curl \
       libxml2-dev libxslt-dev zlib1g-dev \
       git && \
-    apt-get -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/*
 
 RUN usermod -aG sudo notify
