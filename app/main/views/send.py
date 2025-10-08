@@ -121,15 +121,22 @@ def send_messages(service_id, template_id):
     form = CsvUploadForm()
     if form.validate_on_submit():
         try:
+            extra = {"user_id": current_user.id, "file_name": form.file.data.filename}
             current_app.logger.info(
-                "User %(user_id)s uploaded %(filename)s",
-                {"user_id": current_user.id, "filename": form.file.data.filename},
+                "User %(user_id)s uploaded %(file_name)s",
+                extra,
+                extra=extra,
             )
+
             upload_id = s3upload(service_id, Spreadsheet.from_file_form(form).as_dict, current_app.config["AWS_REGION"])
+
+            extra = {"file_name": form.file.data.filename, "upload_id": upload_id}
             current_app.logger.info(
-                "%(filename)s persisted in S3 as %(upload_id)s",
-                {"filename": form.file.data.filename, "upload_id": upload_id},
+                "%(file_name)s persisted in S3 as %(upload_id)s",
+                extra,
+                extra=extra,
             )
+
             file_name_metadata = unicode_truncate(SanitiseASCII.encode(form.file.data.filename), 1600)
             set_metadata_on_csv_upload(service_id, upload_id, original_file_name=file_name_metadata)
             return redirect(
@@ -141,10 +148,20 @@ def send_messages(service_id, template_id):
                 )
             )
         except (UnicodeDecodeError, BadZipFile, XLRDError):
-            current_app.logger.warning("Could not read %s", form.file.data.filename, exc_info=True)
+            current_app.logger.warning(
+                "Could not read %s",
+                form.file.data.filename,
+                exc_info=True,
+                extra={"file_name": form.file.data.filename},
+            )
             form.file.errors = ["Notify cannot read this file - try using a different file type"]
         except XLDateError:
-            current_app.logger.warning("Could not parse numbers/dates in %s", form.file.data.filename, exc_info=True)
+            current_app.logger.warning(
+                "Could not parse numbers/dates in %s",
+                form.file.data.filename,
+                exc_info=True,
+                extra={"file_name": form.file.data.filename},
+            )
             form.file.errors = ["Notify cannot read this file - try saving it as a CSV instead"]
     elif form.errors:
         # just show the first error, as we don't expect the form to have more
@@ -1035,9 +1052,11 @@ def send_notification(service_id, template_id):
             sender_id=session.get("sender_id", None),
         )
     except HTTPError as exception:
+        extra = {"service_id": current_service.id, "error_message": exception.message}
         current_app.logger.info(
-            'Service %(service_id)s could not send notification: "%(message)s"',
-            {"service_id": current_service.id, "message": exception.message},
+            "Service %(service_id)s could not send notification: %(error_message)r",
+            extra,
+            extra=extra,
         )
         return render_template(
             "views/notifications/check.html",

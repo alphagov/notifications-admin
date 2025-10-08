@@ -38,7 +38,11 @@ def s3download(service_id, upload_id, bucket=None):
         key = get_csv_upload(service_id, upload_id, bucket)
         contents = key.get()["Body"].read().decode("utf-8")
     except botocore.exceptions.ClientError as e:
-        current_app.logger.error("Unable to download s3 file %s", FILE_LOCATION_STRUCTURE.format(service_id, upload_id))
+        extra = {
+            "upload_id": upload_id,
+        }
+        extra["s3_key"], extra["s3_bucket"] = get_csv_location(service_id, upload_id, bucket)
+        current_app.logger.error("Unable to download s3 file %(s3_key)s from bucket %(s3_bucket)s", extra, extra=extra)
         raise e
     return contents
 
@@ -57,5 +61,9 @@ def get_csv_metadata(service_id, upload_id, bucket=None):
         key = get_csv_upload(service_id, upload_id, bucket)
         return key.get()["Metadata"]
     except botocore.exceptions.ClientError as e:
-        current_app.logger.error("Unable to download s3 file %s", FILE_LOCATION_STRUCTURE.format(service_id, upload_id))
+        extra = {
+            "upload_id": upload_id,
+        }
+        extra["s3_key"], extra["s3_bucket"] = get_csv_location(service_id, upload_id, bucket)
+        current_app.logger.error("Unable to download s3 file %(s3_key)s from bucket %(s3_bucket)s", extra, extra=extra)
         raise e
