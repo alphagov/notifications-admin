@@ -57,7 +57,7 @@ flask-wtf==1.2.1
     # via -r requirements.in
 gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
     # via -r requirements.in
-govuk-bank-holidays==0.15
+govuk-bank-holidays==0.17
     # via notifications-utils
 govuk-frontend-jinja==3.6.0
     # via -r requirements.in
@@ -102,7 +102,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==10.0.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@8a998cf82afe070c9cb2f33913560d67b99a25c8
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@dd749865080ca7262c974c6bf0b12c3a3c739515
     # via -r requirements.in
 openpyxl==3.1.5
     # via pyexcel-xlsx
