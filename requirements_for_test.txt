@@ -217,7 +217,7 @@ pyjwt==2.4.0
     # via
     #   -r requirements.txt
     #   notifications-python-client
-pypdf==3.13.0
+pypdf==6.0.0
     # via
     #   -r requirements.txt
     #   notifications-utils
