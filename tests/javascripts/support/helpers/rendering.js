@@ -5,23 +5,6 @@
 
 const triggerEvent = require('./events.js').triggerEvent;
 
-function getDescriptorForProperty (prop, obj) {
-  const descriptors = Object.getOwnPropertyDescriptors(obj);
-  const prototype = Object.getPrototypeOf(obj);
-
-  if ((descriptors !== {}) && (prop in descriptors)) {
-    return descriptors[prop];
-  }
-
-  // if not in this object's descriptors, check the prototype chain
-  if (prototype !== null) {
-    return getDescriptorForProperty(prop, prototype);
-  }
-
-  // no descriptor for this prop and no prototypes left in the chain
-  return null;
-};
-
 class WindowMock {
   constructor (jest) {
     this._defaults = {
@@ -135,13 +118,18 @@ class WindowMock {
   }
 }
 
-class ScreenRenderItem {
-  constructor (jest, node) {
+class MockedElementItem {
+  constructor (jest, itemName, nodeRef) {
 
     this._jest = jest;
-    this._node = node;
-    this._storeProps();
-    this._mockAPICalls();
+    this.itemName = itemName;
+    this.nodeRef = nodeRef;
+    this.data = {};
+
+    // The mocked methods will run on an element, so `this` will reference it
+    // Use a closure to give them access to this.data
+    this.getBoundingClientRect = this.mockGetBoundingClientRect(this.data);
+    this.getClientRects = this.mockGetClientRects(this.data);
 
   }
 
@@ -149,116 +137,220 @@ class ScreenRenderItem {
 
     // check all the item data is present
     const itemProps = Object.keys(itemData);
-    const missingKeys = ScreenRenderItem.REQUIRED_PROPS.filter(prop => !itemProps.includes(prop));
-
-    this._data = {};
+    const missingKeys = MockedElementItem.REQUIRED_PROPS.filter(prop => !itemProps.includes(prop));
 
     if (missingKeys.length) {
-      throw Error(`${itemData.name ? itemData.name : itemProps.join(', ')} is missing these properties: ${missingKeys.join(', ')}`);
+      throw Error(`${this.itemName} is missing these properties: ${missingKeys.join(', ')}`);
     }
 
     // default left if not set
     if (!('offsetLeft' in itemData)) { itemData.offsetLeft = 0; }
 
     // copy onto internal store
-    Object.assign(this._data, itemData);
+    Object.assign(this.data, itemData);
 
   }
 
-  _getBoundingClientRect () {
-    const {offsetHeight, offsetWidth, offsetTop, offsetLeft} = this._data;
-    const x = offsetLeft - window.scrollX;
-    const y = offsetTop - window.scrollY;
+  mockGetBoundingClientRect (data) {
 
-    return {
-      'x': x,
-      'y': y,
-      'top': (offsetHeight < 0) ? y + offsetHeight : y,
-      'left': (offsetWidth < 0) ? x + offsetWidth : x,
-      'bottom': (offsetTop + offsetHeight) - window.scrollY,
-      'right': (offsetLeft + offsetWidth) - window.scrollX,
+    return function () {
+
+      const {offsetHeight, offsetWidth, offsetTop, offsetLeft} = data;
+      const x = offsetLeft - window.scrollX;
+      const y = offsetTop - window.scrollY;
+
+      return {
+        'x': x,
+        'y': y,
+        'top': (offsetHeight < 0) ? y + offsetHeight : y,
+        'left': (offsetWidth < 0) ? x + offsetWidth : x,
+        'bottom': (offsetTop + offsetHeight) - window.scrollY,
+        'right': (offsetLeft + offsetWidth) - window.scrollX,
+      };
+
+    }
+
+  }
+
+  mockGetClientRects (data) {
+
+    return function () {
+
+      return [this.getBoundingClientRect()]
+
+    }
+
+  }
+
+}
+
+MockedElementItem.OFFSET_PROPS = ['offsetHeight', 'offsetWidth', 'offsetTop', 'offsetLeft'];
+MockedElementItem.REQUIRED_PROPS = ['offsetHeight', 'offsetWidth', 'offsetTop'];
+
+class ScreenMock {
+  constructor (jest) {
+
+    this._jest = jest
+    this._mockedElements = {};
+    this._descriptorStore = {};
+    this._patchClientRectsMethods();
+    this._patchOffsetProps();
+
+  }
+
+  // nodeRef can be either of:
+  // - an element node
+  // - a CSS selector string matching an element
+  //
+  // So check which type and if it matches the sent node
+  _matchesNode (node, nodeRef) {
+
+    if (nodeRef instanceof Element) {
+      return node === nodeRef;
+    }
+
+    // nodeRef not pointing to an actual Node are assumed to be CSS selector strings
+    return node === document.querySelector(nodeRef);
+
+  }
+
+  _getMockItemForElement (el) {
+
+    const matches = Object.values(this._mockedElements).filter(
+      mockedElementItem => this._matchesNode(el, mockedElementItem.nodeRef)
+    );
+
+    if (matches.length === 0) {
+      return null;
+    }
+
+    return matches[0];
+
+  }
+
+
+  // Add getClientRects & getBoundingClientRect for all HTML elements.
+  // HTMLElement normally delegates to Element.prototype for those methods.
+  // This replaces them at the HTMLElement level with custom logic that either
+  // - uses a mocked version on the mockedElementItem for the element, if it exists, or
+  // - delegates to the original method on Element.prototype if not
+  _patchClientRectsMethods () {
+
+    const _self = this;
+
+    // Replace with function that uses mockedElement if exists or falls back to variant of original
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      const mockedElementItem = _self._getMockItemForElement(this);
+
+      if (mockedElementItem === null) {
+        return Element.prototype.getBoundingClientRect.bind(this)()
+      } else {
+        return mockedElementItem.getBoundingClientRect.bind(this)()
+      }
+    };
+
+    HTMLElement.prototype.getClientRects = function () {
+      const mockedElementItem = _self._getMockItemForElement(this);
+
+      if (mockedElementItem === null) {
+        return Element.prototype.getClientRects.bind(this)()
+      } else {
+        return mockedElementItem.getClientRects.bind(this)()
+      }
     };
 
   }
 
-  reset () {
+  // Patch offset props by replacing them with property descriptors that either
+  // - access the mocked data, if a mockedElementItem exists for the element, or
+  // - pass through to the getter/setter on the original descriptor if not
+  _patchOffsetProps () {
 
-    // reset DOMRect mock
-    this._node.getBoundingClientRect.mockClear();
+    MockedElementItem.OFFSET_PROPS.forEach(prop => {
 
-    ScreenRenderItem.OFFSET_PROPS.forEach(prop => {
+      const _self = this;
+      const descriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, prop);
 
-      if (prop in this._propStore) {
-        // replace property implementation
-        Object.defineProperty(this._node, prop, this._propStore[prop]);
-      }
+      // Cache the original descriptor, for reinstatement later
+      this._descriptorStore[prop] = descriptor;
 
-    });
-
-  }
-
-  _storeProps () {
-
-    this._propStore = {};
-
-    ScreenRenderItem.OFFSET_PROPS.forEach(prop => {
-      const descriptor = getDescriptorForProperty(prop, this._node);
-
-      if (descriptor !== null) {
-        this._propStore[prop] = descriptor;
-      }
-    });
-
-  }
-
-  // mock any calls to the node's DOM API for position/dimension
-  _mockAPICalls () {
-
-    // proxy getBoundingClientRect and getClientRects calls to item data
-    // assumes getClientRects only returns one clientRect
-    this._jest.spyOn(this._node, 'getBoundingClientRect').mockImplementation(() => this._getBoundingClientRect());
-    this._jest.spyOn(this._node, 'getClientRects').mockImplementation(() => [this._getBoundingClientRect()]);
-
-    // handle calls to offset properties
-    ScreenRenderItem.OFFSET_PROPS.forEach(prop => {
-
-      this._jest.spyOn(this._node, prop, 'get').mockImplementation(() => this._data[prop]);
-
-      // proxy DOM API sets for offsetValues (not possible to mock directly)
-      Object.defineProperty(this._node, prop, {
+      // Replace property with custom that returns mocked data
+      Object.defineProperty(HTMLElement.prototype, prop, {
         configurable: true,
-        set: jest.fn(value => {
-          this._data[prop] = value;
-          return true;
-        })
+        get: function () {
+
+          const mockItemForElement = _self._getMockItemForElement(this);
+
+          // Return mocked data, if present
+          if (mockItemForElement !== null) {
+            return mockItemForElement.data[prop];
+          }
+
+          // Otherwise, use the original descriptor
+          return descriptor.get.bind(this)();
+
+        },
+        set: function (val) {
+
+          const mockItemForElement = _self._getMockItemForElement(this);
+
+          // Set mocked data to value, if present
+          if (mockItemForElement !== null) {
+            mockItemForElement.data[prop] = val;
+          }
+
+          // Otherwise, use the original descriptor
+          if (descriptor.set !== undefined) { // offset props are readonly so guard against this
+            descriptor.set.bind(this)(val);
+          }
+
+        }
       });
 
     });
 
   }
 
-}
-ScreenRenderItem.OFFSET_PROPS = ['offsetHeight', 'offsetWidth', 'offsetTop', 'offsetLeft'];
-ScreenRenderItem.REQUIRED_PROPS = ['name', 'offsetHeight', 'offsetHeight', 'offsetWidth', 'offsetTop'];
+  // Clear mock methods getClientRects & getBoundingClientRect method to return element to default state
+  _resetHTMLElementMethods () {
 
-class ScreenMock {
-  constructor (jest) {
-
-    this._jest = jest
-    this._items = {};
+    // Go back to HTMLElement having no copy of these methods on its own prototype.
+    // It normally herits them from Element, it's parent class.
+    // Deleting them here will go back to that state.
+    delete HTMLElement.prototype.getClientRects;
+    delete HTMLElement.prototype.getBoundingClientRect;
 
   }
 
-  mockPositionAndDimension (itemName, node, itemData) {
+  // Use original property descriptors to return all offset properties to their default state
+  _resetHTMLElementProps () {
 
-    if (itemName in this._items) { throw new Error(`${itemName} already has its position and dimension mocked`); }
+    MockedElementItem.OFFSET_PROPS.forEach(prop => {
 
-    const data = Object.assign({ 'name': itemName }, itemData);
-    const item = new ScreenRenderItem(this._jest, node);
+      if (prop in this._descriptorStore) {
+        // Replace property implementation
+        Object.defineProperty(HTMLElement.prototype, prop, this._descriptorStore[prop]);
+      }
 
-    item.setData(data);
+    });
 
-    this._items[itemName] = item;
+  }
+
+  mockPositionAndDimension (itemName, nodeRef, itemData) {
+
+    if (arguments.length < 3) {
+      throw new Error(`ScreenMock.mockPositionAndDimension needs itemName, nodeRef and itemData. ${arguments.join(', ')} provided`);
+    }
+
+    if (itemName in this._mockedElements) {
+      throw new Error(`An element called '${itemName}' already has its position and dimension mocked`);
+    }
+
+    const item = new MockedElementItem(this._jest, itemName, nodeRef);
+
+    item.setData(itemData);
+
+    this._mockedElements[itemName] = item;
 
   }
 
@@ -287,7 +379,8 @@ class ScreenMock {
 
   reset () {
 
-    Object.keys(this._items).forEach(itemName => this._items[itemName].reset());
+    this._resetHTMLElementProps();
+    this._resetHTMLElementMethods();
 
   }
 
