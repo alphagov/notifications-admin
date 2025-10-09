@@ -4000,9 +4000,10 @@ def test_should_show_page_to_set_per_day_international_sms_message_limit(
     # form prefilled with current limit
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "500"
     # today's remaining limit pulled and displayed
-    assert mock_get_notification_count.called_once_with(
-        service_id=SERVICE_ONE_ID, notification_type="international_sms"
-    )
+    assert mock_get_notification_count.call_args_list == [
+        call(SERVICE_ONE_ID, notification_type="international_sms"),
+        call(SERVICE_ONE_ID, notification_type="international_sms"),
+    ]
     assert (
         normalize_spaces(page.select(".ajax-block-container")[0].text)
         == "You have sent 1 international text message today (499 remaining)."
@@ -4060,7 +4061,10 @@ def test_should_show_daily_message_limit_page(
     assert normalize_spaces(page.select(".govuk-body")[0].text) == (f"You can send up to 1,000 {limit_noun}s per day.")
 
     # today's remaining limit pulled and displayed
-    assert mock_get_notification_count.called_once_with(service_id=SERVICE_ONE_ID, notification_type=daily_limit_type)
+    assert mock_get_notification_count.call_args_list == [
+        call(SERVICE_ONE_ID, notification_type=daily_limit_type),
+        call(SERVICE_ONE_ID, notification_type=daily_limit_type),
+    ]
     assert (
         normalize_spaces(page.select(".ajax-block-container")[0].text)
         == f"You have sent 1 {limit_noun} today (999 remaining)."
