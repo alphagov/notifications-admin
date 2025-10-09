@@ -4002,7 +4002,6 @@ def test_should_show_page_to_set_per_day_international_sms_message_limit(
     # today's remaining limit pulled and displayed
     assert mock_get_notification_count.call_args_list == [
         call(SERVICE_ONE_ID, notification_type="international_sms"),
-        call(SERVICE_ONE_ID, notification_type="international_sms"),
     ]
     assert (
         normalize_spaces(page.select(".ajax-block-container")[0].text)
@@ -4062,7 +4061,6 @@ def test_should_show_daily_message_limit_page(
 
     # today's remaining limit pulled and displayed
     assert mock_get_notification_count.call_args_list == [
-        call(SERVICE_ONE_ID, notification_type=daily_limit_type),
         call(SERVICE_ONE_ID, notification_type=daily_limit_type),
     ]
     assert (
