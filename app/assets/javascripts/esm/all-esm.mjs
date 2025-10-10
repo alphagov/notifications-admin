@@ -19,6 +19,7 @@ import LiveCheckboxControls from './live-checkbox-controls.mjs';
 import AddBrandingOptionsControls from './add-branding-options-controls.mjs';
 
 import RadioSelect from './radio-select.mjs';
+import FullscreenTable from './fullscreen-table.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -110,6 +111,11 @@ if ($radioSelectElementsArray.length > 0) {
   $radioSelectElementsArray.forEach(el => {
     new RadioSelect(el);
   });
+}
+
+const $fullScreenTableArray = document.querySelectorAll('[data-notify-module="fullscreen-table"]');
+if ($fullScreenTableArray.length > 0) {
+  $fullScreenTableArray.forEach(tableComponent => new FullscreenTable(tableComponent));
 }
 
 const focusBanner = new FocusBanner();
