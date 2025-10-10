@@ -151,5 +151,5 @@ def test_api_error_response_logging(
     assert (
         f"API {current_app.config['ADMIN_BASE_URL']}"
         "/user/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6/organisations-and-services "
-        "failed with status=400, message='not found'"
+        "failed with status 400: not found"
     ) in caplog.messages

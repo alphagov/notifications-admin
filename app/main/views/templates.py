@@ -1181,7 +1181,11 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
         # handles malformed files nicely - is this done yet?
         attachment_page_count = pdf_page_count(BytesIO(pdf_file_bytes))
     except PdfReadError:
-        current_app.logger.info("Invalid PDF uploaded for service_id: %s", service_id)
+        current_app.logger.info(
+            "Invalid PDF uploaded for service %s",
+            service_id,
+            extra={"service_id": service_id, "upload_id": upload_id},
+        )
         raise LetterAttachmentFormError(
             title="There’s a problem with your file",
             detail="Notify cannot read this PDF - save a new copy and try again",
@@ -1258,7 +1262,11 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
 def _copy_letter_attachment(from_template: Template, to_template: dict):
     letter_attachment_data: dict = from_template.get_raw("letter_attachment")
     if not letter_attachment_data:
-        current_app.logger.warning("No letter attachment found when copying template %s", from_template.id)
+        current_app.logger.warning(
+            "No letter attachment found when copying template %s",
+            from_template.id,
+            extra={"template_id": from_template.id},
+        )
         abort(400)
 
     letter_attachment = s3download(
