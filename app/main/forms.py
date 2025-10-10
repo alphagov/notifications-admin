@@ -7,7 +7,6 @@ from itertools import chain
 from math import ceil
 from numbers import Number
 
-import pytz
 from flask import request
 from flask_login import current_user
 from flask_wtf import FlaskForm as Form
@@ -134,7 +133,7 @@ def get_next_hours_until(until):
     now = datetime.now(UTC)
     hours = ceil((until - now).total_seconds() / (60 * 60))
     return [
-        (now + timedelta(hours=i)).replace(minute=0, second=0, microsecond=0).replace(tzinfo=pytz.utc)
+        (now + timedelta(hours=i)).replace(minute=0, second=0, microsecond=0).replace(tzinfo=UTC)
         for i in range(1, hours + 1)
     ]
 
@@ -144,7 +143,7 @@ def get_next_days_until(until):
     days = int((until - now).total_seconds() / (60 * 60 * 24))
 
     return [
-        get_human_day((now + timedelta(days=i)).replace(tzinfo=pytz.utc), include_day_of_week=True).title()
+        get_human_day((now + timedelta(days=i)).replace(tzinfo=UTC), include_day_of_week=True).title()
         for i in range(days + 1)
     ]
 

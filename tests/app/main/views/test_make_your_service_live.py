@@ -1,9 +1,8 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import ANY, Mock, PropertyMock, call
 from uuid import uuid4
 
 import pytest
-import pytz
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
@@ -922,7 +921,7 @@ def test_should_render_the_same_page_after_request_to_go_live(
         org_type="central",
         service_id=SERVICE_ONE_ID,
         notify_task_type="notify_task_go_live_request",
-        user_created_at=datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
+        user_created_at=datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=UTC),
     )
     mock_send_ticket_to_zendesk.assert_called_once()
 
@@ -1059,7 +1058,7 @@ def test_request_to_go_live_displays_go_live_notes_in_zendesk_ticket(
         org_type="central",
         service_id=SERVICE_ONE_ID,
         notify_task_type=expected_zendesk_task_type,
-        user_created_at=datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
+        user_created_at=datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=UTC),
     )
     mock_send_ticket_to_zendesk.assert_called_once()
 
