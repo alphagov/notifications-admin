@@ -338,13 +338,13 @@ class ScreenMock {
 
   }
 
-  mockPositionAndDimension (itemName, nodeRef, itemData) {
+  mockPositionAndDimension (itemName, nodeRef, itemData, reMock=false) {
 
     if (arguments.length < 3) {
       throw new Error(`ScreenMock.mockPositionAndDimension needs itemName, nodeRef and itemData. ${arguments.join(', ')} provided`);
     }
 
-    if (itemName in this._mockedElements) {
+    if (itemName in this._mockedElements && !reMock) {
       throw new Error(`An element called '${itemName}' already has its position and dimension mocked`);
     }
 
