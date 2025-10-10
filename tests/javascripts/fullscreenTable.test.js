@@ -114,6 +114,7 @@ describe('FullscreenTable', () => {
 
     $(window).off('scroll resize');
     document.body.innerHTML = '';
+    screenMock.reset();
 
   });
 
@@ -245,7 +246,7 @@ describe('FullscreenTable', () => {
 
     afterEach(() => {
 
-      screenMock.reset();
+      screenMock.resetPositionAndDimension(['container']);
 
     });
 
@@ -311,7 +312,7 @@ describe('FullscreenTable', () => {
 
     afterEach(() => {
 
-      screenMock.reset();
+      screenMock.resetPositionAndDimension(['fixed-table-first-col-header']);
 
     });
 
