@@ -290,7 +290,7 @@ def in_business_hours():
 
 
 def london_time_today_as_utc(hour, minute):
-    return local_timezone.localize(datetime.now().replace(hour=hour, minute=minute)).astimezone(UTC)
+    return datetime.now(local_timezone).replace(hour=hour, minute=minute).astimezone(UTC)
 
 
 def is_weekend(time):
