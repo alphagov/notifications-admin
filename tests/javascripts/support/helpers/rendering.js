@@ -162,6 +162,8 @@ class MockedElementItem {
       return {
         'x': x,
         'y': y,
+        'width': offsetWidth,
+        'height': offsetHeight,
         'top': (offsetHeight < 0) ? y + offsetHeight : y,
         'left': (offsetWidth < 0) ? x + offsetWidth : x,
         'bottom': (offsetTop + offsetHeight) - window.scrollY,
