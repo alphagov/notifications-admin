@@ -1,0 +1,5 @@
+User’s mobile number has changed
+
+Old mobile number: {{ old_mobile_number }}
+
+New mobile number: {{ new_mobile_number }}

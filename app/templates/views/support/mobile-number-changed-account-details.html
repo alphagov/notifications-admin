@@ -1,0 +1,34 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
+{% from "components/page-footer.html" import sticky_page_footer %}
+{% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  Enter your account details
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for("main.support_mobile_number_changed") }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ govuk_page_header("Enter your account details") }}
+
+    <p class="govuk-body">
+      We’ll use them to look up your GOV.UK Notify account before we contact you.
+    </p>
+      {% call form_wrapper() %}
+        {{ form.name(param_extensions={"classes": "govuk-!-width-full", "autocomplete": "name"}) }}
+        {{ form.email_address(param_extensions={"classes": "govuk-!-width-full", "autocomplete": "email"}) }}
+        {{ form.old_mobile_number(param_extensions={"classes": "govuk-!-width-full"}) }}
+        {{ form.new_mobile_number(param_extensions={"classes": "govuk-!-width-full"}) }}
+        {{ sticky_page_footer('Send') }}
+      {% endcall %}
+  </div>
+</div>
+
+{% endblock %}
