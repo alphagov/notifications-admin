@@ -286,14 +286,20 @@ describe('FullscreenTable', () => {
 
     beforeEach(() => {
 
-      rowNumberColumnHeader = container.querySelector('.table-field-heading-first');
-
       // set main content column width (used by module as gauge for table width)
       screenMock.window.setWidthTo(1024);
       document.querySelector('main').setAttribute('style', 'width: 712px');
 
       // set total width of column for row numbers in table to 40px
-      rowNumberColumnHeader.setAttribute('style', 'width: 40px');
+      screenMock.mockPositionAndDimension(
+        'fixed-table-first-col-header',
+        '.fullscreen-fixed-table .table-field-heading-first',
+        {
+          'offsetHeight': 50,
+          'offsetWidth': 40,
+          'offsetTop': 500
+        }
+      );
 
       // start module
       window.GOVUK.notifyModules.start();
