@@ -354,6 +354,12 @@ class ScreenMock {
 
   }
 
+  resetPositionAndDimension (itemNames) {
+
+    itemNames.forEach(itemName => delete this._mockedElements[itemName]);
+
+  }
+
   setWindow (windowData) {
 
     this.window = new WindowMock(this._jest);
