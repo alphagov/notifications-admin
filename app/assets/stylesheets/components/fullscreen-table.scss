@@ -64,6 +64,7 @@
       border-color: transparent;
       border-right-color: $govuk-border-colour;
       background: govuk-colour("white");
+      box-sizing: border-box;
     }
 
     .table-field-left-aligned {
