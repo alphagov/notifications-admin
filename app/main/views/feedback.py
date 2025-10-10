@@ -11,6 +11,7 @@ from notifications_utils.clients.zendesk.zendesk_client import (
 from notifications_utils.timezones import local_timezone
 
 from app import convert_to_boolean, current_service
+from app.constants import ZendeskTopicId
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import (
@@ -160,12 +161,29 @@ def support_email_address_changed():
     return render_template("views/support/email-address-changed.html")
 
 
-def create_sign_in_issues_zendesk_ticket(subject, message, name, email, notifiy_ticket_type=None):
+def create_sign_in_issues_zendesk_ticket(
+    subject,
+    message,
+    name,
+    email,
+    notifiy_ticket_type=None,
+    service_access_issue=False,
+):
     prefix = (
         ""
         if not current_app.config["FEEDBACK_ZENDESK_SUBJECT_PREFIX_ENABLED"]
         else f"[env: {current_app.config['NOTIFY_ENVIRONMENT']}] "
     )
+
+    custom_topics = [
+        {"id": ZendeskTopicId.topic_1, "value": "notify_topic_accessing"},
+        {"id": ZendeskTopicId.accessing_notify_1, "value": "notify_accessing_account"},
+    ]
+    if service_access_issue:
+        custom_topics += [
+            {"id": ZendeskTopicId.topic_2, "value": "notify_topic_accessing_2"},
+            {"id": ZendeskTopicId.accessing_notify_2, "value": "notify_accessing_service_2"},
+        ]
 
     ticket = NotifySupportTicket(
         subject=f"{prefix}{subject}",
@@ -175,6 +193,7 @@ def create_sign_in_issues_zendesk_ticket(subject, message, name, email, notifiy_
         user_name=name,
         user_email=email,
         requester_sees_message_content=False,
+        custom_topics=custom_topics,
     )
     zendesk_client.send_ticket_to_zendesk(ticket)
 
@@ -224,6 +243,7 @@ def support_mobile_number_changed_account_details():
             name=form.name.data,
             email=form.email_address.data,
             notifiy_ticket_type=NotifyTicketType.NON_TECHNICAL,
+            service_access_issue=True,
         )
 
         return redirect(url_for("main.thanks"))
@@ -280,6 +300,7 @@ def support_email_address_changed_account_details():
             name=form.name.data,
             email=form.new_email_address.data,
             notifiy_ticket_type=NotifyTicketType.NON_TECHNICAL,
+            service_access_issue=True,
         )
 
         return redirect(url_for("main.thanks"))
@@ -365,6 +386,10 @@ feedback_page_details = {
             "zendesk_subject": "Cannot sign in",
             "back_link": "main.support_problem",
             "notify_ticket_type": None,
+            "custom_topics": [
+                {"id": ZendeskTopicId.topic_1, "value": "notify_topic_accessing"},
+                {"id": ZendeskTopicId.accessing_notify_1, "value": "notify_accessing_account"},
+            ],
         },
     },
 }
@@ -434,6 +459,7 @@ def feedback(ticket_type):
             org_type=current_service.organisation_type if current_service else None,
             service_id=current_service.id if current_service else None,
             user_created_at=current_user.created_at,
+            custom_topics=feedback_page_details[ticket_type][category].get("custom_topics"),
         )
         zendesk_ticket_id = zendesk_client.send_ticket_to_zendesk(ticket)
 

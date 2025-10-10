@@ -12,6 +12,7 @@ from notifications_utils.clients.zendesk.zendesk_client import (
     ZendeskError,
 )
 
+from app.constants import ZendeskTopicId
 from app.main.views.feedback import ZENDESK_USER_LOGGED_OUT_NOTE, in_business_hours
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces, set_config_values
@@ -319,6 +320,10 @@ def test_support_no_security_code_account_details_submits_zendesk_ticket(client_
         user_email="test@gov.uk",
         notify_ticket_type=None,
         requester_sees_message_content=False,
+        custom_topics=[
+            {"id": ZendeskTopicId.topic_1, "value": "notify_topic_accessing"},
+            {"id": ZendeskTopicId.accessing_notify_1, "value": "notify_accessing_account"},
+        ],
     )
 
 
@@ -377,6 +382,12 @@ def test_support_mobile_number_changed_account_details_submits_zendesk_ticket(cl
         user_email="test@gov.uk",
         notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         requester_sees_message_content=False,
+        custom_topics=[
+            {"id": ZendeskTopicId.topic_1, "value": "notify_topic_accessing"},
+            {"id": ZendeskTopicId.accessing_notify_1, "value": "notify_accessing_account"},
+            {"id": ZendeskTopicId.topic_2, "value": "notify_topic_accessing_2"},
+            {"id": ZendeskTopicId.accessing_notify_2, "value": "notify_accessing_service_2"},
+        ],
     )
 
 
@@ -426,6 +437,10 @@ def test_support_no_email_link_account_details_submits_zendesk_ticket(client_req
         user_email="test@gov.uk",
         notify_ticket_type=None,
         requester_sees_message_content=False,
+        custom_topics=[
+            {"id": ZendeskTopicId.topic_1, "value": "notify_topic_accessing"},
+            {"id": ZendeskTopicId.accessing_notify_1, "value": "notify_accessing_account"},
+        ],
     )
 
 
@@ -484,6 +499,12 @@ def test_support_email_address_account_details_submits_zendesk_ticket(client_req
         user_email="new_address@gov.uk",
         notify_ticket_type=NotifyTicketType.NON_TECHNICAL,
         requester_sees_message_content=False,
+        custom_topics=[
+            {"id": ZendeskTopicId.topic_1, "value": "notify_topic_accessing"},
+            {"id": ZendeskTopicId.accessing_notify_1, "value": "notify_accessing_account"},
+            {"id": ZendeskTopicId.topic_2, "value": "notify_topic_accessing_2"},
+            {"id": ZendeskTopicId.accessing_notify_2, "value": "notify_accessing_service_2"},
+        ],
     )
 
 
@@ -625,6 +646,7 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
         org_type=None,
         service_id=None,
         user_created_at=None,
+        custom_topics=None,
     )
     mock_send_ticket_to_zendesk.assert_called_once()
     mock_update_ticket_with_internal_note.assert_called_once_with(
@@ -727,6 +749,7 @@ def test_passes_user_details_through_flow(
         org_type="central",
         service_id=SERVICE_ONE_ID,
         user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=datetime.UTC),
+        custom_topics=None,
     )
 
     assert mock_create_ticket.call_args[1]["message"] == "\n".join(
@@ -789,34 +812,47 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
         org_type="central",
         service_id=SERVICE_ONE_ID,
         user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=datetime.UTC),
+        custom_topics=None,
     )
 
 
 @pytest.mark.parametrize(
-    "ticket_type, category, expected_subject, notify_ticket_type",
+    "ticket_type, category, expected_subject, notify_ticket_type, topics",
     [
-        (QUESTION_TICKET_TYPE, None, "Question or feedback", None),
-        (PROBLEM_TICKET_TYPE, "something-else", "Problem", None),
-        (PROBLEM_TICKET_TYPE, "problem-sending", "Problem sending messages", None),
+        (QUESTION_TICKET_TYPE, None, "Question or feedback", None, None),
+        (PROBLEM_TICKET_TYPE, "something-else", "Problem", None, None),
+        (PROBLEM_TICKET_TYPE, "problem-sending", "Problem sending messages", None, None),
         (
             PROBLEM_TICKET_TYPE,
             "tech-error-live-services",
             "Urgent - Technical error (live service)",
             NotifyTicketType.TECHNICAL,
+            None,
         ),
         (
             PROBLEM_TICKET_TYPE,
             "tech-error-no-live-services",
             "Technical error (no live services)",
             NotifyTicketType.TECHNICAL,
+            None,
         ),
         (
             PROBLEM_TICKET_TYPE,
             "tech-error-signed-out",
             "Technical error (user not signed in)",
             NotifyTicketType.TECHNICAL,
+            None,
         ),
-        (PROBLEM_TICKET_TYPE, "cannot-sign-in", "Cannot sign in", None),
+        (
+            PROBLEM_TICKET_TYPE,
+            "cannot-sign-in",
+            "Cannot sign in",
+            None,
+            [
+                {"id": ZendeskTopicId.topic_1, "value": "notify_topic_accessing"},
+                {"id": ZendeskTopicId.accessing_notify_1, "value": "notify_accessing_account"},
+            ],
+        ),
     ],
 )
 def test_zendesk_subject_and_ticket_type_reflect_journey_taken_to_support_form(
@@ -827,6 +863,7 @@ def test_zendesk_subject_and_ticket_type_reflect_journey_taken_to_support_form(
     category,
     expected_subject,
     notify_ticket_type,
+    topics,
     mocker,
 ):
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=True)
@@ -859,6 +896,7 @@ def test_zendesk_subject_and_ticket_type_reflect_journey_taken_to_support_form(
         org_type="central",
         service_id=SERVICE_ONE_ID,
         user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=datetime.UTC),
+        custom_topics=topics,
     )
 
 
