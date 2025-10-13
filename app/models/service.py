@@ -615,7 +615,13 @@ class Service(JSONModel):
         return self.get_message_limit(notification_type) - self.sent_today(notification_type)
 
     def sent_today(self, notification_type):
-        return service_api_client.get_notification_count(self.id, notification_type=notification_type)
+        if not hasattr(self, "_sent_today"):
+            self._sent_today = {}
+        if notification_type not in self._sent_today:
+            self._sent_today[notification_type] = service_api_client.get_notification_count(
+                self.id, notification_type=notification_type
+            )
+        return self._sent_today[notification_type]
 
     @property
     def sign_in_method(self) -> str:
