@@ -1,8 +1,7 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from functools import partial
 
 import pytest
-import pytz
 from flask import url_for
 from freezegun import freeze_time
 
@@ -154,17 +153,17 @@ def test_sentence_case(sentence, sentence_case_sentence):
     "processing_started, data_retention_period, expected_message",
     [
         (
-            datetime(2020, 1, 4, 1, 0, 0),
+            datetime(2020, 1, 4, 1, 0, 0, tzinfo=UTC),
             7,
             "No messages to show",
         ),
         (
-            datetime(2020, 1, 2, 1, 0, 0),
+            datetime(2020, 1, 2, 1, 0, 0, tzinfo=UTC),
             7,
             "These messages have been deleted because they were sent more than 7 days ago",
         ),
     ],
 )
 def test_message_finished_processing_notification(processing_started, data_retention_period, expected_message):
-    message = message_finished_processing_notification(pytz.utc.localize(processing_started), data_retention_period)
+    message = message_finished_processing_notification(processing_started, data_retention_period)
     assert message == expected_message

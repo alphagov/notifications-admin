@@ -102,7 +102,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==10.0.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@dd749865080ca7262c974c6bf0b12c3a3c739515
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@c8df19cdf6a9f3e68c9a979b4f44f689a8fa58a5
     # via -r requirements.in
 openpyxl==3.1.5
     # via pyexcel-xlsx
@@ -146,8 +146,6 @@ python-dateutil==2.9.0.post0
     #   botocore
     #   notifications-utils
 python-json-logger==3.3.0
-    # via notifications-utils
-pytz==2024.2
     # via notifications-utils
 pyyaml==6.0.2
     # via notifications-utils

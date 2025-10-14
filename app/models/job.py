@@ -1,8 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-import pytz
 from notifications_utils.letter_timings import (
     CANCELLABLE_JOB_LETTER_STATUSES,
     get_letter_timings,
@@ -153,7 +152,7 @@ class Job(JSONModel):
             "created",
             # We have to make the time just before 5:30pm because a
             # letter uploaded at 5:30pm will be printed the next day
-            (self.created_at - timedelta(minutes=1)).astimezone(pytz.utc).isoformat(),
+            (self.created_at - timedelta(minutes=1)).astimezone(UTC).isoformat(),
             long_form=False,
         )
 

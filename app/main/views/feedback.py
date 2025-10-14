@@ -1,6 +1,5 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
-import pytz
 from flask import current_app, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_utils.bank_holidays import BankHolidays
@@ -9,6 +8,7 @@ from notifications_utils.clients.zendesk.zendesk_client import (
     NotifySupportTicketComment,
     NotifyTicketType,
 )
+from notifications_utils.timezones import local_timezone
 
 from app import convert_to_boolean, current_service
 from app.extensions import zendesk_client
@@ -482,7 +482,7 @@ def thanks():
 
 
 def in_business_hours():
-    now = datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.utcnow().replace(tzinfo=UTC)
 
     if is_weekend(now) or is_bank_holiday(now):
         return False
@@ -491,9 +491,7 @@ def in_business_hours():
 
 
 def london_time_today_as_utc(hour, minute):
-    return (
-        pytz.timezone("Europe/London").localize(datetime.now().replace(hour=hour, minute=minute)).astimezone(pytz.utc)
-    )
+    return datetime.now(local_timezone).replace(hour=hour, minute=minute).astimezone(UTC)
 
 
 def is_weekend(time):

@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
-import pytz
 from dateutil import parser
 from flask import url_for
 from notifications_utils.formatters import unescaped_formatted_list
@@ -16,7 +15,7 @@ from notifications_utils.timezones import (
 
 def printing_today_or_tomorrow(created_at):
     print_cutoff = convert_bst_to_utc(convert_utc_to_bst(datetime.utcnow()).replace(hour=17, minute=30)).replace(
-        tzinfo=pytz.utc
+        tzinfo=UTC
     )
     created_at = utc_string_to_aware_gmt_datetime(created_at)
 
@@ -28,7 +27,7 @@ def printing_today_or_tomorrow(created_at):
 
 def get_letter_printing_statement(status, created_at, long_form=True):
     if isinstance(created_at, datetime):
-        created_at = created_at.astimezone(pytz.utc).isoformat()
+        created_at = created_at.astimezone(UTC).isoformat()
     created_at_dt = parser.parse(created_at).replace(tzinfo=None)
     if letter_can_be_cancelled(status, created_at_dt):
         decription = "Printing starts" if long_form else "Printing"

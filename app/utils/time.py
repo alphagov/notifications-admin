@@ -1,6 +1,5 @@
 from datetime import UTC, datetime
 
-import pytz
 from notifications_utils.timezones import utc_string_to_aware_gmt_datetime
 
 
@@ -28,4 +27,4 @@ def is_less_than_days_ago(date_from_db, number_of_days):
 
 def to_utc_string(aware_datetime):
     # Format matches app.utils.DATETIME_FORMAT in the API codebase
-    return aware_datetime.astimezone(pytz.utc).replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    return aware_datetime.astimezone(UTC).replace(tzinfo=None).strftime("%Y-%m-%dT%H:%M:%S.%fZ")

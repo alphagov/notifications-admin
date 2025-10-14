@@ -3,7 +3,6 @@ from functools import partial
 from unittest.mock import ANY, PropertyMock
 
 import pytest
-import pytz
 from flask import url_for
 from freezegun import freeze_time
 from notifications_utils.clients.zendesk.zendesk_client import (
@@ -727,7 +726,7 @@ def test_passes_user_details_through_flow(
         org_id=None,
         org_type="central",
         service_id=SERVICE_ONE_ID,
-        user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
+        user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=datetime.UTC),
     )
 
     assert mock_create_ticket.call_args[1]["message"] == "\n".join(
@@ -789,7 +788,7 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
         org_id=None,
         org_type="central",
         service_id=SERVICE_ONE_ID,
-        user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
+        user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=datetime.UTC),
     )
 
 
@@ -859,7 +858,7 @@ def test_zendesk_subject_and_ticket_type_reflect_journey_taken_to_support_form(
         org_id=None,
         org_type="central",
         service_id=SERVICE_ONE_ID,
-        user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=pytz.utc),
+        user_created_at=datetime.datetime(2018, 11, 7, 8, 34, 54, 857402).replace(tzinfo=datetime.UTC),
     )
 
 
