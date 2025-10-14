@@ -1,22 +1,16 @@
-const helpers = require('./support/helpers');
+import FullscreenTable from '../../app/assets/javascripts/esm/fullscreen-table.mjs';
+import { jest } from '@jest/globals';
+import * as helpers from './support/helpers';
 
-beforeAll(() => {
-  // TODO: remove this when tests for sticky JS are written
-  require('../../app/assets/javascripts/stick-to-window-when-scrolling.js');
-
-  require('../../app/assets/javascripts/fullscreenTable.js');
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
-});
 
 describe('FullscreenTable', () => {
   let screenMock;
   let container;
+  let caption;
   let tableFrame;
   let table;
   let numberColumnFrame;
+  let fixedRowHeaders;
 
   beforeEach(() => {
 
@@ -86,7 +80,12 @@ describe('FullscreenTable', () => {
       scrollTop: 0
     });
 
+    window.GOVUK.stickAtBottomWhenScrolling = {
+      recalculate: jest.fn(() => {})
+    };
+
     // set up DOM
+    document.body.classList.add('govuk-frontend-supported')
     document.body.innerHTML =
       `<main>
         <div class="fullscreen-content" data-notify-module="fullscreen-table">
@@ -111,10 +110,10 @@ describe('FullscreenTable', () => {
   });
 
   afterEach(() => {
-
-    $(window).off('scroll resize');
     document.body.innerHTML = '';
     screenMock.reset();
+    window.GOVUK.stickAtBottomWhenScrolling.recalculate.mockClear();
+    jest.restoreAllMocks();
 
   });
 
@@ -123,7 +122,7 @@ describe('FullscreenTable', () => {
     test("it fixes the number column for each row without changing the semantics", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -139,7 +138,7 @@ describe('FullscreenTable', () => {
       const stickyJSSpy = jest.spyOn(window.GOVUK.stickAtBottomWhenScrolling, 'recalculate');
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       expect(stickyJSSpy.mock.calls.length).toBe(1);
 
@@ -150,10 +149,23 @@ describe('FullscreenTable', () => {
     describe("and the scrolling section is wider than its container", () => {
 
       beforeEach(() => {
-        $(container).css({ 'width': '640px' });
-        $('table', container).css({ 'width': '990px' });
 
-        window.GOVUK.notifyModules.start();
+        screenMock.mockPositionAndDimension('container', container, {
+          'offsetHeight': 500,
+          'offsetWidth': 640,
+          'offsetTop': 500
+        });
+        screenMock.mockPositionAndDimension('scrollable-table', container.querySelector('table'), {
+          'offsetHeight': 500,
+          'offsetWidth': 990,
+          'offsetTop': 500
+        });
+
+        new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
+      });
+
+      afterEach(() => {
+        screenMock.resetPositionAndDimension(['container', 'scrollable-table']);
       });
 
       test("it should be made focusable and have an accessible name matching the table caption", () => {
@@ -180,10 +192,24 @@ describe('FullscreenTable', () => {
     describe("and the scrolling section is the same width as its container", () => {
 
       beforeEach(() => {
-        $(container).css({ 'width': '640px' });
-        $('table', container).css({ 'width': '640px' });
 
-        window.GOVUK.notifyModules.start();
+        screenMock.mockPositionAndDimension('container', container, {
+          'offsetHeight': 500,
+          'offsetWidth': 640,
+          'offsetTop': 500
+        });
+        screenMock.mockPositionAndDimension('scrollable-table', container.querySelector('table'), {
+          'offsetHeight': 500,
+          'offsetWidth': 640,
+          'offsetTop': 500
+        });
+
+       new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
+      });
+
+      afterEach(() => {
+        screenMock.resetPositionAndDimension(['container', 'scrollable-table']);
+        screenMock.reset();
       });
 
       test("it shouldn't be made focusable or have an accessible name", () => {
@@ -206,7 +232,7 @@ describe('FullscreenTable', () => {
     test("the section providing the fixed row headers is not focusable and is hidden from assistive tech'", () => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       fixedRowHeaders = document.querySelector('.fullscreen-fixed-table');
 
@@ -222,9 +248,6 @@ describe('FullscreenTable', () => {
 
   describe("the height of the table should fit the vertical space available to it", () => {
 
-    let containerBoundingClientRectSpy;
-    let containerClientRectsSpy;
-
     beforeEach(() => {
 
       // set the height and offset of the window and table container from the top of the document
@@ -237,7 +260,7 @@ describe('FullscreenTable', () => {
       });
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -247,6 +270,7 @@ describe('FullscreenTable', () => {
     afterEach(() => {
 
       screenMock.resetPositionAndDimension(['container']);
+      screenMock.reset();
 
     });
 
@@ -283,13 +307,18 @@ describe('FullscreenTable', () => {
   });
 
   describe("the width of the table should fit the horizontal space available to it", () => {
-    let rowNumberColumnHeader;
 
     beforeEach(() => {
 
       // set main content column width (used by module as gauge for table width)
       screenMock.window.setWidthTo(1024);
-      document.querySelector('main').setAttribute('style', 'width: 712px');
+
+      screenMock.mockPositionAndDimension('main-element', 'main', {
+        'offsetHeight': 500,
+        'offsetWidth': 712,
+        'offsetTop': 0
+      });
+      
 
       // set total width of column for row numbers in table to 40px
       screenMock.mockPositionAndDimension(
@@ -298,12 +327,12 @@ describe('FullscreenTable', () => {
         {
           'offsetHeight': 50,
           'offsetWidth': 40,
-          'offsetTop': 500
+          'offsetTop': 0
         }
       );
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
@@ -311,15 +340,14 @@ describe('FullscreenTable', () => {
     });
 
     afterEach(() => {
-
-      screenMock.resetPositionAndDimension(['fixed-table-first-col-header']);
-
+      screenMock.resetPositionAndDimension(['fixed-table-first-col-header','main-element']);
+      screenMock.reset();
     });
 
     test("when the page has loaded", () => {
 
       // table should set its width to be that of `<main>`
-      expect(window.getComputedStyle(tableFrame)['width']).toEqual('712px');
+      expect(window.getComputedStyle(tableFrame).width).toEqual('712px');
 
       // table for number column has 4px extra to allow space for drop shadow
       expect(window.getComputedStyle(numberColumnFrame)['width']).toEqual('44px');
@@ -329,7 +357,11 @@ describe('FullscreenTable', () => {
     test("when the page has resized", () => {
 
       // resize window and content column
-      document.querySelector('main').setAttribute('style', 'width: 668px');
+      screenMock.mockPositionAndDimension('main-element', 'main', {
+        'offsetHeight': 500,
+        'offsetWidth': 668,
+        'offsetTop': 0
+      }, true);
       screenMock.window.resizeTo({ height: 768, width: 960 });
 
       // table should set its width to be that of `<main>`
@@ -360,16 +392,37 @@ describe('FullscreenTable', () => {
 
       // set main content column width (used by module as gauge for table width)
       screenMock.window.setWidthTo(1024);
-      document.querySelector('main').setAttribute('style', 'width: 712px');
+      screenMock.mockPositionAndDimension('main-element', 'main', {
+        'offsetHeight': 500,
+        'offsetWidth': 712,
+        'offsetTop': 0
+      });
 
       // start module
-      window.GOVUK.notifyModules.start();
+       new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       invisibleScrollableTopLeftCell = document.querySelector('.fullscreen-scrollable-table .table-field-heading-first');
       fixedTopLeftHeaderCell = document.querySelector('.fullscreen-fixed-table .table-field-heading-first');
 
-      invisibleScrollableTopLeftCell.setAttribute('style', 'width: 30px');
-      fixedTopLeftHeaderCell.setAttribute('style', 'width: 9px');
+      screenMock.mockPositionAndDimension(
+        'scrollable-table-first-col-header',
+        invisibleScrollableTopLeftCell,
+        {
+          'offsetHeight': 50,
+          'offsetWidth': 30,
+          'offsetTop': 0
+        }
+      );
+
+      screenMock.mockPositionAndDimension(
+        'fixed-table-first-col-header',
+        fixedTopLeftHeaderCell,
+        {
+          'offsetHeight': 50,
+          'offsetWidth': 9,
+          'offsetTop': 0
+        }
+      );
 
       screenMock.window.resizeTo({ height: 1000, width: 600 });
 
@@ -385,16 +438,29 @@ describe('FullscreenTable', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
       tableFrame = document.querySelector('.fullscreen-scrollable-table');
       table = tableFrame.querySelector('table');
       numberColumnFrame = document.querySelector('.fullscreen-fixed-table');
       rightEdgeShadow = container.querySelector('.fullscreen-right-shadow');
 
-      tableFrame.setAttribute('style', 'width: 742px');
-      table.setAttribute('style', 'width: 1000px');
+      screenMock.mockPositionAndDimension('scrollable-table-container', tableFrame, {
+        'offsetHeight': 500,
+        'offsetWidth': 742,
+        'offsetTop': 500
+      });
 
+      screenMock.mockPositionAndDimension('scrollable-table-table', table, {
+        'offsetHeight': 500,
+        'offsetWidth': 1000,
+        'offsetTop': 500
+      });
+
+    });
+
+    afterEach(() => {
+      screenMock.resetPositionAndDimension(['scrollable-table-container', 'scrollable-table-table']);
     });
 
     test("the right edge of the table scroll area should have a drop-shadow if it isn't scrolled", () => {
@@ -435,16 +501,27 @@ describe('FullscreenTable', () => {
 
     beforeEach(() => {
 
-      // make table wider than its container so it is made focusable
-      $(container).css({ 'width': '640px' });
-      $('table', container).css({ 'width': '990px' });
+      screenMock.mockPositionAndDimension('container', container, {
+        'offsetHeight': 500,
+        'offsetWidth': 640,
+        'offsetTop': 500
+      });
+
+      screenMock.mockPositionAndDimension('scrollable-table', container.querySelector('table'), {
+        'offsetHeight': 500,
+        'offsetWidth': 990,
+        'offsetTop': 500
+      });
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
-      tableFrame = document.querySelector('.fullscreen-scrollable-table');
+      tableFrame = container.querySelector('.fullscreen-scrollable-table');
       tableFrame.focus();
+    });
 
+     afterEach(() => {
+      screenMock.resetPositionAndDimension(['container', 'scrollable-table']);
     });
 
     test("it should make the parent frame a focus style", () => {
