@@ -81,36 +81,40 @@
     { "href": url_for("main.cookies"), "text": "Cookies" }
   ] %}
 
-  {% set meta_suffix = 'Ontwikkeld door de <a
-    href="https://www.gov.uk/government/organisations/government-digital-service"
-    class="govuk-footer__link">Government Digital Service</a>' %}
+  {% set meta_suffix = 'Ontwikkeld door <a
+    href="https://worth.systems"
+    class="govuk-footer__link">WORTH SYSTEMS</a>' %}
+
+  {% set footerNavigation = [
+    {
+      "title": "Over Notify",
+      "columns": 1,
+      "width": "one-half",
+      "items": [
+        { "href": url_for("main.guidance_features"), "text": "Functionaliteiten" },
+        { "href": url_for("main.guidance_pricing"), "text": "Kosten" },
+        { "href": url_for("main.guidance_using_notify"), "text": "Gebruik van Notify" },
+        { "href": "https://www.notificatie.nl/", "text": "NotifyNL" }
+      ]
+    },
+    {
+      "title": "Ondersteuning",
+      "columns": 1,
+      "width": "one-half",
+      "items": [
+        { "href": url_for("main.support"), "text": "Neem contact op met ondersteuning" },
+        { "href": url_for("main.guidance_api_documentation"), "text": "API-documentatie" },
+      ]
+    }
+  ] %}
+
+  {# add Slack link when available { "href": "https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC", "text": "Chat met ons op Slack" }, #}
+  {# add system status link when available { "href": "https://status.notifications.service.gov.uk", "text": "Systeemstatus" }, #}
+
 
   {{ govukFooter({
     "classes": "js-footer",
-    "navigation": [
-      {
-        "title": "Over Notify",
-        "columns": 1,
-        "width": "one-half",
-        "items": [
-          { "href": url_for("main.guidance_features"), "text": "Functionaliteiten" },
-          { "href": url_for("main.guidance_pricing"), "text": "Kosten" },
-          { "href": url_for("main.guidance_using_notify"), "text": "Gebruik van Notify" },
-          { "href": "https://gds.blog.gov.uk/category/gov-uk-notify/", "text": "Blog" }
-        ]
-      },
-      {
-        "title": "Ondersteuning",
-        "columns": 1,
-        "width": "one-half",
-        "items": [
-          { "href": url_for("main.support"), "text": "Neem contact op met ondersteuning" },
-          { "href": "https://ukgovernmentdigital.slack.com/messages/C0E1ADVPC", "text": "Chat met ons op Slack" },
-          { "href": "https://status.notifications.service.gov.uk", "text": "Systeemstatus" },
-          { "href": url_for("main.guidance_api_documentation"), "text": "API-documentatie" }
-        ]
-      }
-    ],
+    "navigation": footerNavigation,
     "meta": {
       "items": meta_items,
       "html": meta_suffix
