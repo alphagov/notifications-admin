@@ -1,0 +1,45 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  If your email address has changed
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for("main.support_cannot_sign_in") }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ page_header("If your email address has changed") }}
+
+    <p class="govuk-body">
+      Ask a member of your team with the ‘Manage settings, team and usage’ permission to update your email address.
+    </p>
+    <p class="govuk-body">
+      To do this, they should:
+    </p>
+    <ol class="govuk-list govuk-list--number">
+      <li>
+      Sign in to GOV.UK Notify.
+      </li>
+      <li>
+      Go to the <b class="govuk-!-font-weight-bold">Team members</b> page.
+      </li>
+      <li>
+      Find your name and select <b class="govuk-!-font-weight-bold">Change details</b>.
+      </li>
+      <li>
+      Select <b class="govuk-!-font-weight-bold">Change</b> next to your email address.
+      </li>
+    </ol>
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href={{ url_for("main.support_email_address_changed_account_details") }}>No one on my team can sign in</a>
+    </p>
+  </div>
+</div>
+
+{% endblock %}

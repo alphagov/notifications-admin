@@ -1683,11 +1683,77 @@ class SupportType(StripWhitespaceForm):
 
 
 class SupportProblemTypeForm(StripWhitespaceForm):
-    problem_type = GovukRadiosField(
+    def __init__(self, *args, user_logged_in, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if user_logged_in:
+            self.problem_type.choices = [
+                ("sending-messages", "I’m having problems sending messages"),
+                ("something-else", "Something else"),
+            ]
+        else:
+            self.problem_type.choices = [
+                ("signing-in", "I cannot sign in to my account"),
+                ("sending-messages", "I’m having problems sending messages"),
+                ("something-else", "Something else"),
+            ]
+
+    problem_type = GovukRadiosField("")
+
+
+class SupportSignInIssuesForm(StripWhitespaceForm):
+    sign_in_issue = GovukRadiosField(
+        "Tell us why you cannot sign in",
         choices=[
-            ("sending-messages", "I’m having problems sending messages"),
+            ("no-code", "I did not receive a text message with a security code"),
+            ("mobile-number-changed", "My mobile number has changed"),
+            ("no-email-link", "I did not receive an email with a link to sign in"),
+            ("email-address-changed", "My email address has changed"),
             ("something-else", "Something else"),
-        ]
+        ],
+    )
+
+
+class SupportNoSecurityCodeForm(StripWhitespaceForm):
+    name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
+    email_address = make_email_address_field(
+        label="Email address", gov_user=False, required=True, thing="your email address"
+    )
+    mobile_number = PhoneNumber(
+        "Mobile number",
+        validators=[NotifyDataRequired(thing="your mobile number"), ValidPhoneNumber(allow_international_sms=True)],
+    )
+
+
+class SupportMobileNumberChangedForm(StripWhitespaceForm):
+    name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
+    email_address = make_email_address_field(
+        label="Email address", gov_user=False, required=True, thing="your email address"
+    )
+    old_mobile_number = PhoneNumber(
+        "Old mobile number",
+        validators=[NotifyDataRequired(thing="your old mobile number"), ValidPhoneNumber(allow_international_sms=True)],
+    )
+    new_mobile_number = PhoneNumber(
+        "New mobile number",
+        validators=[NotifyDataRequired(thing="your new mobile number"), ValidPhoneNumber(allow_international_sms=True)],
+    )
+
+
+class SupportNoEmailLinkForm(StripWhitespaceForm):
+    name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
+    email_address = make_email_address_field(
+        label="Email address", gov_user=False, required=True, thing="your email address"
+    )
+
+
+class SupportEmailAddressChangedForm(StripWhitespaceForm):
+    name = GovukTextInputField("Name", validators=[NotifyDataRequired(thing="your name")])
+    old_email_address = make_email_address_field(
+        label="Old email address", gov_user=False, required=True, thing="your old email address"
+    )
+    new_email_address = make_email_address_field(
+        label="New email address", gov_user=False, required=True, thing="your new email address"
     )
 
 

@@ -1,0 +1,36 @@
+{% extends "withoutnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% block per_page_title %}
+  If you did not receive a security code
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for("main.support_cannot_sign_in") }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-two-thirds">
+    {{ page_header("If you did not receive a security code") }}
+
+    <p class="govuk-body">
+      Make sure that there are no issues with your device or network.
+    </p>
+    <ol class="govuk-list govuk-list--number">
+      <li>
+      Check that you can receive text messages from other numbers.
+      </li>
+      <li>
+      Switch your phone off and then back on again, then wait 5 minutes.
+      </li>
+    </ol>
+    <p class="govuk-body">
+      <a class="govuk-link govuk-link--no-visited-state" href={{url_for("main.support_no_security_code_account_details")}}>I am still waiting for a security code</a>
+    </p>
+  </div>
+</div>
+
+{% endblock %}
