@@ -841,9 +841,7 @@ def test_should_show_image_of_precompiled_letter_notification(
 ):
     notification = create_notification(template_type="letter", is_precompiled_letter=True)
     mocker.patch("app.notification_api_client.get_notification", return_value=notification)
-    mock_pdf_page_count = mocker.patch("app.main.views.notifications.pdf_page_count", return_value=1)
-
-    mocker.patch(
+    mock_get_notification_letter_preview = mocker.patch(
         "app.main.views.notifications.notification_api_client.get_notification_letter_preview",
         return_value={"content": base64.b64encode(b"foo").decode("utf-8")},
     )
@@ -856,7 +854,9 @@ def test_should_show_image_of_precompiled_letter_notification(
     )
 
     assert response.get_data(as_text=True) == "foo"
-    assert mock_pdf_page_count.called_once()
+    assert mock_get_notification_letter_preview.call_args_list == [
+        mocker.call(SERVICE_ONE_ID, fake_uuid, "png", page=None)
+    ]
 
 
 @freeze_time("2016-01-01 15:00")
