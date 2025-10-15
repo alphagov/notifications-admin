@@ -98,7 +98,6 @@ export default [
       paths.npm + 'textarea-caret/index.js',
       paths.npm + 'cbor-js/cbor.js',
       paths.src + 'javascripts/modules.js',
-      paths.src + 'javascripts/govuk-frontend-toolkit/show-hide-content.js',
       paths.src + 'javascripts/stick-to-window-when-scrolling.js',
       paths.src + 'javascripts/cookieCleanup.js',
       paths.src + 'javascripts/updateContent.js',
