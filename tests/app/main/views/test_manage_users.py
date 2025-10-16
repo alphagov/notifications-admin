@@ -142,14 +142,21 @@ def test_should_show_overview_page(
     active_user_view_permissions,
 ):
     current_user = user
+
     other_user = copy.deepcopy(active_user_view_permissions)
     other_user["email_address"] = "zzzzzzz@example.gov.uk"
     other_user["name"] = "ZZZZZZZZ"
     other_user["id"] = "zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz"
 
+    existing_user_reinvited = mock_get_invites_for_service.side_effect(SERVICE_ONE_ID)[-1]
+    existing_user = copy.deepcopy(active_user_view_permissions)
+    existing_user["email_address"] = existing_user_reinvited["email_address"]
+    existing_user["id"] = uuid.uuid4()
+
     mock_get_users = mocker.patch(
         "app.models.user.Users._get_items",
         return_value=[
+            existing_user,
             current_user,
             other_user,
         ],
@@ -160,8 +167,8 @@ def test_should_show_overview_page(
 
     assert normalize_spaces(page.select_one("h1").text) == "Team members"
     assert normalize_spaces(page.select(".user-list-item")[0].text) == expected_self_text
-    # [1:5] are invited users
-    assert normalize_spaces(page.select(".user-list-item")[6].text) == expected_coworker_text
+    # [1:6] are invited users
+    assert normalize_spaces(page.select(".user-list-item")[7].text) == expected_coworker_text
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
 
 

@@ -2264,7 +2264,7 @@ def mock_create_invite(notify_admin, mocker, sample_invite):
 def mock_get_invites_for_service(mocker, service_one, sample_invite):
     def _get_invites(service_id):
         data = []
-        for i in range(5):
+        for i in (3, 2, 1, 0, 0):  # Duplicate email addresses
             invite = copy.copy(sample_invite)
             invite["email_address"] = f"user_{i}@testnotify.gov.uk"
             data.append(invite)
