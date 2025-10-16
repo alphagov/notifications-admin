@@ -2,6 +2,10 @@
 #    uv pip compile requirements_for_test.in -o requirements_for_test.txt
 ago==0.0.95
     # via -r requirements.txt
+async-timeout==4.0.2
+    # via
+    #   -r requirements.txt
+    #   redis
 awscrt==0.20.11
     # via
     #   -r requirements.txt

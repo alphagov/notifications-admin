@@ -2,6 +2,8 @@
 #    uv pip compile requirements.in -o requirements.txt
 ago==0.0.95
     # via -r requirements.in
+async-timeout==4.0.2
+    # via redis
 awscrt==0.20.11
     # via botocore
 blinker==1.9.0

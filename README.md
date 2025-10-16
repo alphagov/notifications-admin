@@ -11,7 +11,7 @@ GOV.UK Notify admin application - https://www.notifications.service.gov.uk/
 
 ### Python version
 
-We run Python 3.13 in production.
+At the moment we run Python 3.11 in production.
 
 ### NodeJS & NPM
 
