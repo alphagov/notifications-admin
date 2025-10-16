@@ -613,6 +613,8 @@ class InvitedOrgUser(BaseUser):
         self.permissions = _dict["permissions"]
 
     def __eq__(self, other):
+        if not isinstance(other, InvitedOrgUser):
+            return False
         return (self.id, self.organisation, self._invited_by, self.email_address, self.status) == (
             other.id,
             other.organisation,
