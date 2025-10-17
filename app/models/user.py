@@ -577,8 +577,6 @@ class InvitedUser(BaseUser):
         return self.organisation == organisation_id and permission in self.organisation_permissions
 
     def __eq__(self, other):
-        if not isinstance(other, InvitedUser):
-            return False
         return (self.id, self.service, self._from_user, self.email_address, self.auth_type, self.status) == (
             other.id,
             other.service,

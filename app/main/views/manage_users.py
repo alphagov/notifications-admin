@@ -25,6 +25,16 @@ from app.utils.user_permissions import permission_options, translate_permissions
 @main.route("/services/<uuid:service_id>/users")
 @user_has_permissions(allow_org_user=True)
 def manage_users(service_id):
+
+    def key_func(user):
+        return [user]
+
+    # Passes on Python 3.11, 3.12, and 3.13
+    sorted(current_service.team_members)
+
+    # Passes on Python 3.11 and 3.12 but raises on Python 3.13
+    sorted(current_service.team_members, key=key_func)
+
     return render_template(
         "views/manage-users.html",
         users=current_service.team_members,
