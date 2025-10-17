@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient
+from app.notify_client import NotifyAdminAPIClient, api_client_request_session
 
 
 class TemplateStatisticsApiClient(NotifyAdminAPIClient):
@@ -28,7 +28,7 @@ _template_statistics_client_context_var: ContextVar[TemplateStatisticsApiClient]
 )
 get_template_statistics_client: LazyLocalGetter[TemplateStatisticsApiClient] = LazyLocalGetter(
     _template_statistics_client_context_var,
-    lambda: TemplateStatisticsApiClient(current_app),
+    lambda: TemplateStatisticsApiClient(current_app, request_session=api_client_request_session),
 )
 memo_resetters.append(lambda: get_template_statistics_client.clear())
 template_statistics_client = LocalProxy(get_template_statistics_client)
