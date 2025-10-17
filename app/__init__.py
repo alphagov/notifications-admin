@@ -411,9 +411,15 @@ def useful_headers_after_request(response):
 
 def register_errorhandlers(application):  # noqa (C901 too complex)
     def _error_response(error_code, error_page_template=None):
-        if error_page_template is None:
-            error_page_template = error_code
-        resp = make_response(render_template(f"error/{error_page_template}.html"), error_code)
+        template_file = f"error/{error_code}.html"
+
+        if error_code == 404 and request.view_args and "service_id" in request.view_args and g.current_service:
+            template_file = "error/404-service-page.html"
+
+        if error_page_template:
+            template_file = f"error/{error_page_template}.html"
+
+        resp = make_response(render_template(template_file), error_code)
         return useful_headers_after_request(resp)
 
     @application.errorhandler(HTTPError)

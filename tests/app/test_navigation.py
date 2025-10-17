@@ -680,3 +680,19 @@ def test_make_your_service_live_link_shows_if_service_is_in_trial_mode_and_user_
         "main.request_to_go_live",
         service_id=SERVICE_ONE_ID,
     )
+
+
+def test_navigation_displayed_on_service_page_404(
+    client_request,
+    mock_get_job_doesnt_exist,
+    fake_uuid,
+):
+    page = client_request.get(
+        "main.view_job",
+        service_id=SERVICE_ONE_ID,
+        job_id=fake_uuid,
+        _expected_status=404,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Page not found"
+    assert normalize_spaces(page.select_one(".navigation-service-name").text) == "service one"
+    assert len(page.select("nav.navigation .navigation__item")) == 8
