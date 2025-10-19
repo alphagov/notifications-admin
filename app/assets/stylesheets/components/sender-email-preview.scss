@@ -1,0 +1,70 @@
+.sender-email-preview-container {
+  display: none;
+}
+
+.#{$govuk-frontend-supported-css-class} .sender-email-preview-container {
+  display: block;
+}
+
+.sender-email-preview {
+  margin-bottom: govuk-spacing(6);
+  border: 1px solid $govuk-border-colour;
+  padding: govuk-spacing(2) govuk-spacing(3);
+
+  // Persist table view on smaller screens
+  // The summary-list component stacks its content on smaller screens by default
+  .govuk-summary-list {
+    display: table;
+    border-collapse: collapse;
+    margin-bottom: 0;
+  }
+
+  .govuk-summary-list__row {
+    display: table-row;
+  }
+
+  .govuk-summary-list__key,
+  .govuk-summary-list__value {
+    display: table-cell;
+    padding: govuk-spacing(2) govuk-spacing(3);
+  }
+
+  .govuk-summary-list__key {
+    color: $govuk-secondary-text-colour;
+    font-weight: normal;
+    padding-right: govuk-spacing(3);
+    width: 1em * ((35 + 5) / 16);
+
+    @include govuk-media-query($from: tablet) {
+      padding-left: govuk-spacing(6);
+      padding-right: govuk-spacing(4);
+    }
+  }
+
+  .govuk-summary-list__value {
+    padding-left: 0;
+    word-break: break-word;
+  }
+
+  @supports(grid-template-columns: subgrid) {
+    .govuk-summary-list {
+      display: grid;
+      grid-template-columns: min-content 1fr;
+    }
+
+    .govuk-summary-list__row {
+      grid-column: span 2;
+      display: grid;
+      grid-template-columns: subgrid;
+      margin-bottom: 0;
+    }
+
+    .govuk-summary-list__key,
+    .govuk-summary-list__value {
+      width: auto;
+      margin-bottom: 0
+    }
+  }
+
+}
+
