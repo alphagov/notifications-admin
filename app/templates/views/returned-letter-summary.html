@@ -14,7 +14,7 @@
 
 {% block maincolumn_content %}
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-five-sixths">
+  <div class="govuk-grid-column-full">
     {{ page_header('Returned letters') }}
     <p class="govuk-body">
       Reports are published once a month.
@@ -22,6 +22,11 @@
     <p class="govuk-body">
       You’ll only get a report if one or more of your letters is returned.
     </p>
+    {% if current_service.api_keys %}
+      <p class="govuk-body">
+        Follow the instructions in our <a href="{{ url_for("main.guidance_api_documentation") }}" class="govuk-link govuk-link--no-visited-state">API documentation</a> to automate identifying the returned&nbsp;letters.
+      </p>
+    {% endif %}
   </div>
 </div>
 <div class="dashboard-table">

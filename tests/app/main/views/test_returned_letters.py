@@ -1,4 +1,5 @@
 import uuid
+from unittest.mock import PropertyMock
 
 import pytest
 from flask import url_for
@@ -6,15 +7,46 @@ from flask import url_for
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 
-def test_returned_letter_summary(client_request, mocker):
+@pytest.mark.parametrize(
+    "service_has_api_keys, expected_paragraphs",
+    (
+        (
+            False,
+            [
+                "Reports are published once a month.",
+                "You’ll only get a report if one or more of your letters is returned.",
+            ],
+        ),
+        (
+            True,
+            [
+                "Reports are published once a month.",
+                "You’ll only get a report if one or more of your letters is returned.",
+                "Follow the instructions in our API documentation to automate identifying the returned letters.",
+            ],
+        ),
+    ),
+)
+def test_returned_letter_summary(
+    client_request,
+    service_has_api_keys,
+    expected_paragraphs,
+    mocker,
+):
     summary_data = [{"returned_letter_count": 1234, "reported_at": "2019-12-24"}]
     mock = mocker.patch("app.service_api_client.get_returned_letter_summary", return_value=summary_data)
+    mocker.patch(
+        "app.models.service.Service.api_keys",
+        new_callable=PropertyMock,
+        return_value=service_has_api_keys,
+    )
 
     page = client_request.get("main.returned_letter_summary", service_id=SERVICE_ONE_ID)
 
     mock.assert_called_once_with(SERVICE_ONE_ID)
 
     assert page.select_one("h1").string.strip() == "Returned letters"
+    assert [normalize_spaces(p.text) for p in page.select("main p.govuk-body")] == expected_paragraphs
     assert normalize_spaces(page.select_one(".table-field").text) == "24 December 2019 1,234 letters"
     assert page.select_one(".table-field a")["href"] == url_for(
         ".returned_letters",
@@ -23,7 +55,7 @@ def test_returned_letter_summary(client_request, mocker):
     )
 
 
-def test_returned_letter_summary_with_one_letter(client_request, mocker):
+def test_returned_letter_summary_with_one_letter(client_request, mock_get_api_keys, mocker):
     summary_data = [{"returned_letter_count": 1, "reported_at": "2019-12-24"}]
     mock = mocker.patch("app.service_api_client.get_returned_letter_summary", return_value=summary_data)
 
