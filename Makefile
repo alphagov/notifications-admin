@@ -87,12 +87,6 @@ check-env-vars: ## Check mandatory environment variables
 	$(if ${DEPLOY_ENV},,$(error Must specify DEPLOY_ENV))
 	$(if ${DNS_NAME},,$(error Must specify DNS_NAME))
 
-.PHONY: preview
-preview: ## Set environment to preview
-	$(eval export DEPLOY_ENV=preview)
-	$(eval export DNS_NAME="notify.works")
-	@true
-
 .PHONY: staging
 staging: ## Set environment to staging
 	$(eval export DEPLOY_ENV=staging)
