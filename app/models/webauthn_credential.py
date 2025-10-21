@@ -1,6 +1,6 @@
 import base64
 from datetime import datetime
-from typing import TypedDict
+from typing import Any, TypedDict
 
 from fido2 import cbor
 from fido2.cose import UnsupportedKey
@@ -32,7 +32,7 @@ class WebAuthnCredential(JSONModel):
     registration_response: str  # sent to API for later auditing (not used)
     created_at: datetime
     updated_at: datetime
-    logged_in_at: datetime | None  # This can be None if never logged in
+    logged_in_at: Any  # This can be None if never logged in
 
     __sort_attribute__ = "name"
 

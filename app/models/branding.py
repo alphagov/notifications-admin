@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import TypedDict
+from typing import Any, TypedDict
 
 from flask import current_app
 from flask_login import current_user
@@ -17,7 +17,7 @@ from app.notify_client.user_api_client import user_api_client
 class BrandingSerializedType(TypedDict):
     id: str
     name: str
-    created_by: str | None
+    created_by: Any
     created_at: datetime
     updated_at: datetime
 
@@ -25,7 +25,7 @@ class BrandingSerializedType(TypedDict):
 class Branding(JSONModel):
     id: str
     name: str
-    created_by: str | None
+    created_by: Any
     created_at: datetime
     updated_at: datetime
 
