@@ -1,5 +1,6 @@
 export default {
   extends: ["stylelint-config-standard-scss", "stylelint-config-gds/scss"],
+  ignoreFiles: ["venv/**"],
   // do not use these rules. We need to decide to fix our css if we want to adhere to them
   rules: {
     "length-zero-no-unit": null,
