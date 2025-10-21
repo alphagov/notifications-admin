@@ -22,7 +22,10 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             [
                 "Reports are published once a month.",
                 "You’ll only get a report if one or more of your letters is returned.",
-                "Follow the instructions in our API documentation to automate identifying the returned letters.",
+                (
+                    "Automate identifying the returned letters using the Notify API. "
+                    "Follow the instructions in our API documentation."
+                ),
             ],
         ),
     ),
