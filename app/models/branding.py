@@ -1,6 +1,6 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import TypedDict
 
 from flask import current_app
 from flask_login import current_user
@@ -14,10 +14,18 @@ from app.notify_client.organisations_api_client import organisations_client
 from app.notify_client.user_api_client import user_api_client
 
 
-class Branding(JSONModel):
-    id: Any
+class BrandingSerializedType(TypedDict):
+    id: str
     name: str
-    created_by: Any
+    created_by: str | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class Branding(JSONModel):
+    id: str
+    name: str
+    created_by: str | None
     created_at: datetime
     updated_at: datetime
 
@@ -33,7 +41,7 @@ class Branding(JSONModel):
     def name_like(self, name):
         return make_string_safe(name, whitespace="") == make_string_safe(self.name, whitespace="")
 
-    def serialize(self):
+    def serialize(self) -> BrandingSerializedType:
         return self._dict.copy()
 
 
