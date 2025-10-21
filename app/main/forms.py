@@ -2004,7 +2004,7 @@ class ServiceEmailSenderForm(StripWhitespaceForm):
         choices_for_error_message="same or custom",
         choices=[
             (False, "Use the name of your service"),
-            (True, "Enter a custom ‘from’ name"),
+            (True, "Enter a ‘from’ name"),
         ],
     )
 
