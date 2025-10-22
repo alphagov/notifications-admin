@@ -257,7 +257,7 @@ def test_update_letter_branding_when_uploading_invalid_file(
     )
 
     assert page.select_one("h1").text == "Update letter branding"
-    assert page.select_one(".error-message").text.strip() == "The logo must be an SVG file"
+    assert page.select_one(".govuk-error-message").text.strip() == "The logo must be an SVG file"
 
 
 def test_update_letter_branding_with_original_file_and_new_details(
@@ -424,7 +424,7 @@ def test_update_letter_branding_does_not_save_to_db_if_uploading_fails(
         _expected_status=200,
     )
     assert page.select_one("h1").text == "Update letter branding"
-    assert page.select_one(".error-message").text.strip() == "Error saving uploaded file - try uploading again"
+    assert page.select_one(".govuk-error-message").text.strip() == "Error saving uploaded file - try uploading again"
     assert not mock_client_update.called
     assert not mock_create_update_letter_branding_event.called
 
@@ -551,7 +551,7 @@ def test_create_letter_branding_fails_validation_when_uploading_SVG_with_bad_ele
     )
 
     assert normalize_spaces(page.select_one("h1").text) == "Add letter branding"
-    assert normalize_spaces(page.select_one(".error-message").text) == expected_error
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == expected_error
 
     assert page.select("div#logo-img") == []
 
@@ -571,7 +571,7 @@ def test_create_letter_branding_when_uploading_invalid_file(
         _follow_redirects=True,
     )
     assert page.select_one("h1").text == "Add letter branding"
-    assert page.select_one(".error-message").text.strip() == "The logo must be an SVG file"
+    assert page.select_one(".govuk-error-message").text.strip() == "The logo must be an SVG file"
 
 
 def test_create_new_letter_branding_shows_preview_of_logo(client_request, platform_admin_user, logo_client):
@@ -598,7 +598,7 @@ def test_create_letter_branding_shows_an_error_when_submitting_details_with_no_l
     )
 
     assert page.select_one("h1").text == "Add letter branding"
-    assert page.select_one(".error-message").text.strip() == "You need to upload a file to submit"
+    assert page.select_one(".govuk-error-message").text.strip() == "You need to upload a file to submit"
 
 
 def test_create_letter_branding_persists_logo_when_all_data_is_valid(

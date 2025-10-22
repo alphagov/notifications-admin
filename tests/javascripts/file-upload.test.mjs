@@ -94,7 +94,7 @@ describe('File upload', () => {
 
     let buttonLabel;
 
-    uploadLabel.innerHTML += '<span class="error-message">The logo must be a PNG file</span>';
+    uploadLabel.innerHTML += '<span class="govuk-error-message">The logo must be a PNG file</span>';
 
     // start module
     new FileUpload(document.querySelector('[data-notify-module="file-upload"]'));
