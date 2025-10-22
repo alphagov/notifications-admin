@@ -26,21 +26,19 @@
         {{ page_header('Tell us how many messages you expect to send') }}
       {% endif %}
       {% call form_wrapper() %}
-        <div class="form-group">
-          {{ form.volume_email(param_extensions={
-            "classes": "govuk-!-width-one-half",
-            "hint": {"text": "For example, 50,000"},
-          }) }}
-          {{ form.volume_sms(param_extensions={
-            "classes": "govuk-!-width-one-half",
-            "hint": {"text": "For example, 50,000"},
-          }) }}
-          {{ form.volume_letter(param_extensions={
-            "classes": "govuk-!-width-one-half",
-            "hint": {"text": "For example, 50,000"},
-          }) }}
-        </div>
-        {{ page_footer('Continue') }}
+        {{ form.volume_email(param_extensions={
+          "classes": "govuk-!-width-one-half",
+          "hint": {"text": "For example, 50,000"},
+        }) }}
+        {{ form.volume_sms(param_extensions={
+          "classes": "govuk-!-width-one-half",
+          "hint": {"text": "For example, 50,000"},
+        }) }}
+        {{ form.volume_letter(param_extensions={
+          "classes": "govuk-!-width-one-half",
+          "hint": {"text": "For example, 50,000"},
+        }) }}
+      {{ page_footer('Continue') }}
       {% endcall %}
     </div>
   </div>
