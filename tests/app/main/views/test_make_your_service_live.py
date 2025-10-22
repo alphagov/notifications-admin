@@ -298,66 +298,6 @@ def test_should_check_for_sending_things_right(
 
 
 @pytest.mark.parametrize(
-    "checklist_completed, agreement_signed, disabled_button",
-    (
-        (True, True, False),
-        (True, None, False),
-        (True, False, True),
-        (False, True, True),
-        (False, None, True),
-    ),
-)
-def test_should_show_disabled_go_live_button_if_checklist_not_complete(
-    client_request,
-    mocker,
-    mock_get_service_templates,
-    mock_get_users_by_service,
-    mock_get_service_organisation,
-    mock_get_invites_for_service,
-    single_sms_sender,
-    checklist_completed,
-    agreement_signed,
-    disabled_button,
-):
-    mocker.patch(
-        "app.models.service.Service.go_live_checklist_completed",
-        new_callable=PropertyMock,
-        return_value=checklist_completed,
-    )
-    mocker.patch(
-        "app.models.organisation.Organisation.agreement_signed",
-        new_callable=PropertyMock,
-        return_value=agreement_signed,
-        create=True,
-    )
-
-    for channel in ("email", "sms", "letter"):
-        mocker.patch(
-            f"app.models.service.Service.volume_{channel}",
-            create=True,
-            new_callable=PropertyMock,
-            return_value=0,
-        )
-
-    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
-    assert page.select_one("h1").text == "Make your service live"
-    assert page.select_one("form")["method"] == "post"
-    assert page.select_one("form button").text.strip() == "Send a request to go live"
-
-    if disabled_button:
-        assert normalize_spaces(page.select_one("main p:last-of-type").text) == (
-            "You must complete all the tasks before you can send a request to go live."
-        )
-        assert len(page.select_one("form button[disabled]")) == 1
-    else:
-        assert not any(
-            p.text == "You must complete all the tasks before you can send a request to go live."
-            for p in page.select("main p")
-        )
-        assert not (page.select_one("form button[disabled]"))
-
-
-@pytest.mark.parametrize(
     "has_active_go_live_request, expected_button",
     (
         (True, False),
@@ -938,27 +878,44 @@ def test_should_render_the_same_page_after_request_to_go_live(
     )
 
 
-def test_should_not_submit_the_form_if_not_all_tasks_completed(
+def test_should_show_an_error_if_not_all_tasks_completed(
     client_request,
     mocker,
     active_user_with_permissions,
+    service_one,
     single_reply_to_email_address,
     single_letter_contact_block,
     mock_get_organisations_and_services_for_user,
     single_sms_sender,
+    mock_get_service_organisation,
     mock_get_service_settings_page_common,
+    mock_get_service_templates,
     mock_get_users_by_service,
-    mock_update_service,
+    mock_get_invites_without_manage_permission,
+    mock_notify_users_of_request_to_go_live_for_service,
 ):
+    service_one["go_live_user"] = active_user_with_permissions["id"]
+
     mocker.patch(
         "app.models.service.Service.go_live_checklist_completed",
         new_callable=PropertyMock,
         return_value=False,
     )
-    client_request.post(
-        "main.request_to_go_live",
-        service_id=SERVICE_ONE_ID,
-        _expected_status=403,
+
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        side_effect=lambda org_id: organisation_json(
+            ORGANISATION_ID,
+            "Org 1",
+            agreement_signed=True,
+        ),
+    )
+
+    page = client_request.post("main.request_to_go_live", service_id=SERVICE_ONE_ID, _follow_redirects=True)
+
+    assert normalize_spaces(page.select_one(".banner-dangerous h2").text) == ("There is a problem")
+    assert normalize_spaces(page.select_one(".banner-dangerous p").text) == (
+        "Some of the tasks on this page are incomplete"
     )
 
 
