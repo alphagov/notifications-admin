@@ -410,7 +410,7 @@ def feedback(ticket_type):
     else:
         severe = None
 
-    out_of_hours_emergency = all(
+    emergency_ticket = all(
         (
             ticket_type != QUESTION_TICKET_TYPE,
             not in_business_hours(),
@@ -436,7 +436,7 @@ def feedback(ticket_type):
         feedback_msg = render_template(
             "support-tickets/support-ticket.txt",
             content=form.feedback.data,
-            out_of_hours_emergency=out_of_hours_emergency,
+            emergency_ticket=emergency_ticket,
         )
 
         prefix = (
@@ -452,7 +452,7 @@ def feedback(ticket_type):
             message=feedback_msg,
             ticket_type=get_zendesk_ticket_type(ticket_type),
             notify_ticket_type=feedback_page_details[ticket_type][category]["notify_ticket_type"],
-            p1=out_of_hours_emergency,
+            p1=emergency_ticket,
             user_name=user_name,
             user_email=user_email,
             org_id=current_service.organisation_id if current_service else None,
@@ -472,7 +472,7 @@ def feedback(ticket_type):
         return redirect(
             url_for(
                 ".thanks",
-                out_of_hours_emergency=out_of_hours_emergency,
+                emergency_ticket=emergency_ticket,
             )
         )
 
@@ -502,7 +502,7 @@ def bat_phone():
 def thanks():
     return render_template(
         "views/support/thanks.html",
-        out_of_hours_emergency=convert_to_boolean(request.args.get("out_of_hours_emergency")),
+        emergency_ticket=convert_to_boolean(request.args.get("emergency_ticket")),
         out_of_hours=not in_business_hours(),
     )
 

@@ -630,7 +630,7 @@ def test_passed_non_logged_in_user_details_through_flow(client_request, mocker):
         _data=data,
         _expected_redirect=url_for(
             "main.thanks",
-            out_of_hours_emergency=False,
+            emergency_ticket=False,
         ),
     )
 
@@ -671,7 +671,7 @@ def test_does_not_add_internal_note_to_tickets_created_by_suspended_users(client
         _data={"feedback": "blah", "name": "Anne Example", "email_address": "anne@example.com"},
         _expected_redirect=url_for(
             "main.thanks",
-            out_of_hours_emergency=False,
+            emergency_ticket=False,
         ),
     )
     assert not mock_update_ticket_with_internal_note.called
@@ -693,7 +693,7 @@ def test_does_not_add_internal_note_to_ticket_if_error_creating_ticket(client_re
             _data={"feedback": "blah", "name": "Anne Example", "email_address": "anne@example.com"},
             _expected_redirect=url_for(
                 "main.thanks",
-                out_of_hours_emergency=False,
+                emergency_ticket=False,
             ),
         )
     assert not mock_update_ticket_with_internal_note.called
@@ -735,7 +735,7 @@ def test_passes_user_details_through_flow(
         _expected_status=302,
         _expected_redirect=url_for(
             "main.thanks",
-            out_of_hours_emergency=False,
+            emergency_ticket=False,
         ),
     )
     mock_create_ticket.assert_called_once_with(
@@ -797,7 +797,7 @@ def test_zendesk_subject_doesnt_show_env_flag_on_prod(
             _expected_status=302,
             _expected_redirect=url_for(
                 "main.thanks",
-                out_of_hours_emergency=False,
+                emergency_ticket=False,
             ),
         )
 
@@ -883,7 +883,7 @@ def test_zendesk_subject_and_ticket_type_reflect_journey_taken_to_support_form(
         _expected_status=302,
         _expected_redirect=url_for(
             "main.thanks",
-            out_of_hours_emergency=False,
+            emergency_ticket=False,
         ),
     )
     mock_create_ticket.assert_called_once_with(
@@ -979,7 +979,7 @@ def test_email_address_must_be_valid_if_provided_to_support_form(
 
 
 @pytest.mark.parametrize(
-    "ticket_type, severe, is_in_business_hours, is_out_of_hours_emergency",
+    "ticket_type, severe, is_in_business_hours, is_emergency_ticket",
     [
         # business hours, never an emergency
         (PROBLEM_TICKET_TYPE, "yes", True, False),
@@ -1001,7 +1001,7 @@ def test_urgency(
     ticket_type,
     severe,
     is_in_business_hours,
-    is_out_of_hours_emergency,
+    is_emergency_ticket,
 ):
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=is_in_business_hours)
 
@@ -1019,12 +1019,12 @@ def test_urgency(
         _expected_status=302,
         _expected_redirect=url_for(
             "main.thanks",
-            out_of_hours_emergency=is_out_of_hours_emergency,
+            emergency_ticket=is_emergency_ticket,
         ),
     )
-    assert mock_ticket.call_args[1]["p1"] == is_out_of_hours_emergency
+    assert mock_ticket.call_args[1]["p1"] == is_emergency_ticket
 
-    if is_out_of_hours_emergency:
+    if is_emergency_ticket:
         assert "See runbook for help resolving" in mock_ticket.call_args[1]["message"]
     else:
         assert "See runbook for help resolving" not in mock_ticket.call_args[1]["message"]
@@ -1322,7 +1322,7 @@ def test_bat_email_page(
 
 
 @pytest.mark.parametrize(
-    "out_of_hours_emergency, out_of_hours, message",
+    "emergency_ticket, out_of_hours, message",
     (
         # Out of hours emergencies trump everything else
         (
@@ -1348,13 +1348,13 @@ def test_bat_email_page(
 def test_thanks(
     client_request,
     mocker,
-    out_of_hours_emergency,
+    emergency_ticket,
     out_of_hours,
     message,
 ):
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=(not out_of_hours))
     page = client_request.get(
         "main.thanks",
-        out_of_hours_emergency=out_of_hours_emergency,
+        emergency_ticket=emergency_ticket,
     )
     assert normalize_spaces(page.select_one("main").find("p").text) == message
