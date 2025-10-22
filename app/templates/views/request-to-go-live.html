@@ -125,14 +125,13 @@
             Only team members with a government email address can request to go live.
           </p>
         {% else %}
-          {% set go_live_disabled = True if (not current_service.go_live_checklist_completed) or (current_service.able_to_accept_agreement and not current_service.organisation.agreement_signed) else False %}
-          {% if go_live_disabled %}
-            <p class="govuk-body">
-              You must complete all the tasks before you can send a request to go live.
-            </p>
-          {% endif %}
           {% call form_wrapper() %}
-            {{ page_footer('Send a request to go live', disabled=go_live_disabled) }}
+            <div class="js-stick-at-bottom-when-scrolling">
+              <p class="govuk-body">
+                You must complete all the tasks before you can send a request to go live.
+              </p>
+              {{ page_footer('Send a request to go live') }}
+            </div>
           {% endcall %}
         {% endif %}
       {% endif %}
