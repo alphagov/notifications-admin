@@ -64,7 +64,7 @@ def test_robots(client_request):
         ("support_what_happened", {}),
         ("support_public", {}),
         ("feedback", {"ticket_type": QUESTION_TICKET_TYPE}),
-        ("feedback", {"ticket_type": PROBLEM_TICKET_TYPE}),
+        ("feedback", {"ticket_type": PROBLEM_TICKET_TYPE, "severe": "no"}),
         ("bat_phone", {}),
         ("thanks", {}),
         ("register", {}),

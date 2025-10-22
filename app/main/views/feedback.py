@@ -537,7 +537,6 @@ def needs_triage(ticket_type, severe):
             ticket_type != QUESTION_TICKET_TYPE,
             severe is None,
             (not current_user.is_authenticated or current_user.live_services),
-            not in_business_hours(),
         )
     )
 
