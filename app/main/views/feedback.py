@@ -410,17 +410,11 @@ def feedback(ticket_type):
     else:
         severe = None
 
-    emergency_ticket = all(
-        (
-            ticket_type != QUESTION_TICKET_TYPE,
-            not in_business_hours(),
-            severe,
-        )
-    )
-
     if needs_triage(ticket_type, severe):
         session["feedback_message"] = form.feedback.data
         return redirect(url_for(".support_problem"))
+
+    emergency_ticket = is_emergency_ticket(ticket_type, severe)
 
     if needs_escalation(ticket_type, severe):
         return redirect(url_for(".bat_phone"))
@@ -550,6 +544,16 @@ def needs_escalation(ticket_type, severe):
             not in_business_hours(),
         )
     )
+
+
+def is_emergency_ticket(ticket_type, severe):
+    if ticket_type != PROBLEM_TICKET_TYPE or not severe:
+        return False
+
+    if current_user.is_authenticated or not in_business_hours():
+        return True
+
+    return False
 
 
 def get_zendesk_ticket_type(ticket_type):

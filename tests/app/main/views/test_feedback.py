@@ -979,19 +979,27 @@ def test_email_address_must_be_valid_if_provided_to_support_form(
 
 
 @pytest.mark.parametrize(
-    "ticket_type, severe, is_in_business_hours, is_emergency_ticket",
+    "ticket_type, severe, is_in_business_hours, logged_in, is_emergency_ticket",
     [
-        # business hours, never an emergency
-        (PROBLEM_TICKET_TYPE, "yes", True, False),
-        (QUESTION_TICKET_TYPE, "yes", True, False),
-        (PROBLEM_TICKET_TYPE, "no", True, False),
-        (QUESTION_TICKET_TYPE, "no", True, False),
-        # out of hours, if the user says it’s not an emergency
-        (PROBLEM_TICKET_TYPE, "no", False, False),
-        (QUESTION_TICKET_TYPE, "no", False, False),
-        # out of hours, only problems can be emergencies
-        (PROBLEM_TICKET_TYPE, "yes", False, True),
-        (QUESTION_TICKET_TYPE, "yes", False, False),
+        # question tickets are never emergencies
+        (QUESTION_TICKET_TYPE, "yes", True, True, False),
+        (QUESTION_TICKET_TYPE, "yes", True, False, False),
+        (QUESTION_TICKET_TYPE, "yes", False, True, False),
+        (QUESTION_TICKET_TYPE, "yes", False, False, False),
+        (QUESTION_TICKET_TYPE, "no", True, True, False),
+        (QUESTION_TICKET_TYPE, "no", True, False, False),
+        (QUESTION_TICKET_TYPE, "no", False, True, False),
+        (QUESTION_TICKET_TYPE, "no", False, False, False),
+        # problem tickets if the user says it is not an emergency
+        (PROBLEM_TICKET_TYPE, "no", True, True, False),
+        (PROBLEM_TICKET_TYPE, "no", True, False, False),
+        (PROBLEM_TICKET_TYPE, "no", False, True, False),
+        (PROBLEM_TICKET_TYPE, "no", False, False, False),
+        # problem tickets, reported as emergencies, except for if a logged out user gets in touch out of hours -
+        # this would redirect instead of showing the support form
+        (PROBLEM_TICKET_TYPE, "yes", True, True, True),
+        (PROBLEM_TICKET_TYPE, "yes", True, False, False),
+        (PROBLEM_TICKET_TYPE, "yes", False, True, True),
     ],
 )
 def test_urgency(
@@ -1001,8 +1009,12 @@ def test_urgency(
     ticket_type,
     severe,
     is_in_business_hours,
+    logged_in,
     is_emergency_ticket,
 ):
+    if not logged_in:
+        client_request.logout()
+
     mocker.patch("app.main.views.feedback.in_business_hours", return_value=is_in_business_hours)
 
     mock_ticket = mocker.patch("app.main.views.feedback.NotifySupportTicket")
@@ -1010,12 +1022,13 @@ def test_urgency(
         "app.main.views.feedback.zendesk_client.send_ticket_to_zendesk",
         autospec=True,
     )
+    mocker.patch("app.main.views.feedback.zendesk_client.update_ticket", autospec=True)
 
     client_request.post(
         "main.feedback",
         ticket_type=ticket_type,
         severe=severe,
-        _data={"feedback": "blah", "email_address": "test@example.com"},
+        _data={"feedback": "blah", "name": "test user", "email_address": "test@example.com"},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.thanks",
