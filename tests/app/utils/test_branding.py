@@ -1,8 +1,9 @@
+from datetime import datetime
 from unittest.mock import PropertyMock
 
 import pytest
 
-from app.models.branding import EmailBranding, LetterBranding
+from app.models.branding import Branding, EmailBranding, LetterBranding
 from app.models.service import Service
 from app.utils.branding import get_email_choices, get_letter_choices
 from tests import organisation_json
@@ -398,3 +399,24 @@ def test_current_letter_branding_is_not_displayed_in_letter_branding_pool_option
 
     options = get_letter_choices(service)
     assert list(options) == expected_options
+
+
+def test_branding_serialize_returns_expected_dict_and_is_a_copy():
+    data = {
+        "id": "br-123",
+        "name": "My brand",
+        "created_by": None,
+        "created_at": datetime(2020, 1, 1, 0, 0),
+        "updated_at": datetime(2020, 1, 2, 0, 0),
+    }
+
+    branding = Branding(data)
+    serialized = branding.serialize()
+
+    # returns the same data
+    assert serialized == data
+
+    # but it's a copy: mutating the returned dict doesn't change the instance backing dict
+    serialized["name"] = "mutated"
+    assert branding.name == "My brand"
+    assert branding._dict["name"] == "My brand"
