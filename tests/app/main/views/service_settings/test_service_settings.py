@@ -39,6 +39,7 @@ from tests.conftest import (
     create_sms_sender,
     normalize_spaces,
 )
+from tests.utils import RedisClientMock
 
 FAKE_TEMPLATE_ID = uuid4()
 
@@ -3678,6 +3679,9 @@ def test_should_set_per_minute_rate_limit(
     mock_update_service,
     mocker,
 ):
+    mock_redis_delete_by_pattern = mocker.patch(
+        "app.extensions.RedisClient.delete_by_pattern", new_callable=RedisClientMock
+    )
     client_request.login(platform_admin_user)
     client_request.post(
         "main.set_per_minute_rate_limit",
@@ -3691,6 +3695,9 @@ def test_should_set_per_minute_rate_limit(
             SERVICE_ONE_ID,
             rate_limit=expected_api_argument,
         )
+    ]
+    assert mock_redis_delete_by_pattern.call_args_list == [
+        mocker.call("service-596364a0-858e-42c8-9062-a8fe822260eb-tokens*")
     ]
 
 
@@ -3765,6 +3772,9 @@ def test_should_show_error_for_invalid_message_limits(
     mocker,
     patches,
 ):
+    mock_redis_delete_by_pattern = mocker.patch(
+        "app.extensions.RedisClient.delete_by_pattern", new_callable=RedisClientMock
+    )
     for patch, patch_retval in patches.items():
         mocker.patch(patch, return_value=patch_retval)
 
@@ -3777,6 +3787,7 @@ def test_should_show_error_for_invalid_message_limits(
         _expected_status=200,
     )
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == expected_error_message
+    assert mock_redis_delete_by_pattern.called is False
 
 
 def test_old_set_letters_page_redirects(
