@@ -3696,9 +3696,7 @@ def test_should_set_per_minute_rate_limit(
             rate_limit=expected_api_argument,
         )
     ]
-    assert mock_redis_delete_by_pattern.call_args_list == [
-        mocker.call("service-596364a0-858e-42c8-9062-a8fe822260eb-tokens*")
-    ]
+    assert mock_redis_delete_by_pattern.call_args_list == [mocker.call("596364a0-858e-42c8-9062-a8fe822260eb-tokens*")]
 
 
 @pytest.mark.parametrize(

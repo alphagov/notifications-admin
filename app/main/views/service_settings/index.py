@@ -1107,7 +1107,7 @@ def set_per_minute_rate_limit(service_id):
 
     if form.validate_on_submit():
         current_service.update(rate_limit=form.rate_limit.data)
-        redis_client.delete_by_pattern(f"service-{current_service.id}-tokens*")
+        redis_client.delete_by_pattern(f"{current_service.id}-tokens*")
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template("views/service-settings/set-rate-limit.html", form=form, error_summary_enabled=True)
