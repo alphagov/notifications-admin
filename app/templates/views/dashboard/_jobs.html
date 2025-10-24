@@ -53,11 +53,18 @@
             {{ item.letter_printing_statement }}
           </span>
         {% else %}
+        {% if item.status == "cancelled" %}
+          <span class="file-list-hint-large" style="color:darkred">
+            Cancelled
+          </span>
+        {% else %}
           <span class="file-list-hint-large">
             Sent {{
               (item.scheduled_for or item.created_at)|format_datetime_relative
+
             }}
           </span>
+        {% endif %}
         {% endif %}
 
       </div>
