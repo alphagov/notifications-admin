@@ -25,6 +25,7 @@ from app import (
 )
 from app.constants import SIGN_IN_METHOD_TEXT_OR_EMAIL
 from app.event_handlers import Events
+from app.extensions import redis_client
 from app.main import json_updates, main
 from app.main.forms import (
     AdminBillingDetailsForm,
@@ -1106,7 +1107,7 @@ def set_per_minute_rate_limit(service_id):
 
     if form.validate_on_submit():
         current_service.update(rate_limit=form.rate_limit.data)
-
+        redis_client.delete_by_pattern(f"service-{current_service.id}-tokens*")
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template("views/service-settings/set-rate-limit.html", form=form, error_summary_enabled=True)
