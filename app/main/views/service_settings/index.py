@@ -144,11 +144,16 @@ def service_email_sender_change(service_id):
 @main.post("/services/<uuid:service_id>/service-settings/email-sender/preview-address")
 @user_has_permissions("manage_service")
 def service_email_sender_preview(service_id):
+    custom_sender_selected = request.form.get("use_custom_email_sender_name")
+    if custom_sender_selected == "True":
+        sender = request.form.get("custom_email_sender_name")
+    else:
+        sender = current_service.name
+
     return jsonify(
         {
             "html": render_template(
-                "partials/preview-email-sender-name.html",
-                email_sender_name=request.form.get("custom_email_sender_name"),
+                "partials/preview-email-sender-name.html", email_sender_name=sender, rich_preview=True
             )
         }
     )

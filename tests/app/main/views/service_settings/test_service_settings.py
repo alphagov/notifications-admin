@@ -5633,12 +5633,12 @@ class TestServiceEmailSenderChange:
             (
                 "custom sender name",
                 "True",
-                "‘From’ name custom sender name custom.sender.name@notifications.service.gov.uk",
+                "‘From’ name Do not use your own name or the name of someone on your team.",
             ),
             (
                 None,
                 "False",
-                "‘From’ name Example example@notifications.service.gov.uk",
+                "‘From’ name Do not use your own name or the name of someone on your team.",
             ),
         ],
     )
@@ -5653,21 +5653,17 @@ class TestServiceEmailSenderChange:
         service_one["custom_email_sender_name"] = custom_email_sender_name
         service_one["email_sender_local_part"] = "local.part"
         page = client_request.get("main.service_email_sender_change", service_id=SERVICE_ONE_ID, _expected_status=200)
-        assert page.select_one("h1").text == "Email ‘from’ name"
+        assert page.select_one("h1").text == "Choose a ‘from’ name"
         assert [normalize_spaces(radio.text) for radio in page.select(".govuk-radios__item")] == [
-            "Use the name of your service service one service.one@notifications.service.gov.uk",
-            "Enter a custom ‘from’ name",
+            "Use the name of your service",
+            "Enter a ‘from’ name",
         ]
         assert page.select_one("input[name=use_custom_email_sender_name][checked]")["value"] == expected_value
         assert normalize_spaces(page.select_one(".govuk-radios__conditional").text) == expected_conditional_content
-        custom_preview = page.select_one(
-            "#conditional-use_custom_email_sender_name-1 .govuk-hint[data-notify-module=update-status]"
-        )
-        assert custom_preview["data-target"] == "custom_email_sender_name"
+        preview = page.select_one(".sender-email-preview[data-notify-module=update-status]")
+        assert preview["data-target"] == "use_custom_email_sender_name"
         assert page.select_one("input#custom_email_sender_name[type=text]")
-        assert custom_preview["data-updates-url"] == url_for(
-            "main.service_email_sender_preview", service_id=SERVICE_ONE_ID
-        )
+        assert preview["data-updates-url"] == url_for("main.service_email_sender_preview", service_id=SERVICE_ONE_ID)
 
     @pytest.mark.parametrize(
         "custom_email_sender_name, error_message",
@@ -5732,29 +5728,62 @@ class TestServiceEmailSenderChange:
             custom_email_sender_name=custom_email_sender_name,
         )
 
+    # email sender change page preview contains html so instead of repeatably
+    # writing out the html in each expected output
+    # this helper method returns the html with input values
+    def expected_html_response(input, safe_input_local_part):
+        return f"""
+            <dl class="govuk-summary-list govuk-summary-list--no-border">
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key"> From </dt>
+                <dd class="govuk-summary-list__value">
+                    <span class="govuk-!-display-block govuk-!-margin-bottom-2">{input}</span>
+                    <span>{safe_input_local_part}@notifications.service.gov.uk</span>
+                </dd>
+                </div>
+            </dl>
+            """
+
     @pytest.mark.parametrize(
         "custom_email_sender_name, expected_preview",
         [
-            ("", "Example<br> example@notifications.service.gov.uk"),
-            (".", ".<br> example@notifications.service.gov.uk"),
-            ("Custom Name", "Custom Name<br> custom.name@notifications.service.gov.uk"),
-            ("GOV.UK Ειδοποίηση", "GOV.UK Ειδοποίηση<br> gov.uk.ειδοποιηση@notifications.service.gov.uk"),
+            ("", expected_html_response("Example", "example")),
+            (".", expected_html_response(".", "")),
+            ("Custom Name", expected_html_response("Custom Name", "custom.name")),
+            ("GOV.UK Ειδοποίηση", expected_html_response("GOV.UK Ειδοποίηση", "gov.uk.ειδοποιηση")),
             (
                 "<script>alert()</script>",
-                "&lt;script&gt;alert()&lt;/script&gt;<br> scriptalertscript@notifications.service.gov.uk",
+                expected_html_response("&lt;script&gt;alert()&lt;/script&gt;", "scriptalertscript"),
             ),
             # This example isn’t valid but we still preview it
-            ("test@example.com", "test@example.com<br> testexample.com@notifications.service.gov.uk"),
+            ("test@example.com", expected_html_response("test@example.com", "testexample.com")),
         ],
     )
-    def test_service_preview_email_sender_name(self, client_request, custom_email_sender_name, expected_preview):
+    def test_service_preview_email_sender_name_custom_sender(
+        self, client_request, custom_email_sender_name, expected_preview
+    ):
         response = client_request.post_response(
             "main.service_email_sender_preview",
             service_id=SERVICE_ONE_ID,
-            _data={"custom_email_sender_name": custom_email_sender_name},
+            _data={"use_custom_email_sender_name": "True", "custom_email_sender_name": custom_email_sender_name},
             _expected_status=200,
         )
-        assert normalize_spaces(response.get_json()["html"]) == expected_preview
+        assert normalize_spaces(response.get_json()["html"]) == normalize_spaces(expected_preview)
+
+    @pytest.mark.parametrize(
+        "expected_preview",
+        [
+            expected_html_response("service one", "service.one"),
+        ],
+    )
+    def test_service_preview_email_sender_name_service_name(self, client_request, expected_preview):
+        response = client_request.post_response(
+            "main.service_email_sender_preview",
+            service_id=SERVICE_ONE_ID,
+            _data={"use_custom_email_sender_name": "False"},
+            _expected_status=200,
+        )
+        assert normalize_spaces(response.get_json()["html"]) == normalize_spaces(expected_preview)
 
     @pytest.mark.parametrize(
         "use_custom_email_sender_name, custom_email_sender_name, expected_custom_email_sender_name",

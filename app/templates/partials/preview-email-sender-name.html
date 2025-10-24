@@ -1,4 +1,30 @@
-{% set email_sender_name = email_sender_name or '' %}
+{% set email_sender_name = email_sender_name or 'Example' %}
+
+{% if rich_preview %}
+    {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+    {% set email_preview_html %}
+        <span class="govuk-!-display-block govuk-!-margin-bottom-2">{{ email_sender_name }}</span>
+        <span>{{ email_sender_name|make_string_safe_for_email_local_part }}@notifications.service.gov.uk</span>
+    {% endset %}
+    {{ govukSummaryList({
+        "classes": "govuk-summary-list--no-border",
+        "rows": [
+            {
+                "key": {
+                    "text": "From"
+                },
+                "value": {
+                "classes": "",
+                "html": email_preview_html
+                }
+            }
+        ]
+    }) }}
+{% else %}
 
 {{ email_sender_name or 'Example' }}<br>
 {{ email_sender_name|make_string_safe_for_email_local_part or 'example' }}@notifications.service.gov.uk
+
+{% endif%}
+
+
