@@ -44,6 +44,7 @@
       this.$component = $(component);
       this.$textbox = $('#' + this.$component.data('target'));
 
+      this.$component.parent().removeAttr('hidden');
       this.$component
         .attr('id', id);
 

@@ -1,9 +1,9 @@
 .sender-email-preview-container {
-  display: none;
+  display: block;
 }
 
-.#{$govuk-frontend-supported-css-class} .sender-email-preview-container {
-  display: block;
+.sender-email-preview-container[hidden] {
+  display: none;
 }
 
 .sender-email-preview {
@@ -67,4 +67,3 @@
   }
 
 }
-

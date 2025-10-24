@@ -47,8 +47,10 @@ describe('Update content', () => {
         <span id="example-hint-text">Example hint text</span>
         <textarea name="template_content" id="template_content" aria-describedby="example-hint-text">Content of message</textarea>
       </form>
-      <div data-notify-module="update-status" data-updates-url="${updatesURL}" data-target="template_content">
-        Initial content
+      <div class="status-container" hidden>
+        <div data-notify-module="update-status" data-updates-url="${updatesURL}" data-target="template_content">
+          Initial content
+        </div>
       </div>
     `;
 
@@ -95,6 +97,16 @@ describe('Update content', () => {
     ).toEqual(
       "update-status"
     );
+
+  });
+
+  test("It should show the element containing the status", () => {
+
+    const statusContainer = document.querySelector('.status-container');
+
+    window.GOVUK.notifyModules.start();
+
+    expect(statusContainer.hasAttribute('hidden')).toBe(false);
 
   });
 
