@@ -96,9 +96,12 @@ def _handle_change_default_email_branding(form, new_default_branding_id) -> Resp
         try:
             return current_organisation.email_branding_pool.get_item_by_id(branding_id).name
         except current_organisation.email_branding_pool.NotFound:
+            extra = {"branding_id": branding_id, "organisation_name": current_organisation.name}
             current_app.logger.info(
-                "Email branding ID %(branding_id)s is not present in organisation %(org_name)s's email branding pool.",
-                {"branding_id": branding_id, "org_name": current_organisation.name},
+                "Email branding ID %(branding_id)s is not present in organisation "
+                "%(organisation_name)s's email branding pool.",
+                extra,
+                extra=extra,
             )
             abort(400)
 
@@ -267,9 +270,12 @@ def _handle_change_default_letter_branding(form, new_default_branding_id):
         try:
             return current_organisation.letter_branding_pool.get_item_by_id(branding_id).name
         except current_organisation.letter_branding_pool.NotFound:
+            extra = {"branding_id": branding_id, "organisation_name": current_organisation.name}
             current_app.logger.info(
-                "Letter branding ID %(id)s is not present in organisation %(org_name)s's letter branding pool.",
-                {"id": branding_id, "org_name": current_organisation.name},
+                "Letter branding ID %(branding_id)s is not present in organisation "
+                "%(organisation_name)s's letter branding pool.",
+                extra,
+                extra=extra,
             )
             abort(400)
 

@@ -737,7 +737,11 @@ def service_receive_text_messages_stop(service_id):
 
             except Exception as e:
                 current_app.logger.error(
-                    "Error removing inbound number %s for service %s: %s", inbound_number, service_id, e
+                    "Error removing inbound number %s for service %s: %s",
+                    inbound_number,
+                    service_id,
+                    e,
+                    extra={"inbound_number": inbound_number, "service_id": service_id},
                 )
                 form.removal_options.errors.append("Failed to remove number from service")
 
