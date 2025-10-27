@@ -410,17 +410,11 @@ def feedback(ticket_type):
     else:
         severe = None
 
-    out_of_hours_emergency = all(
-        (
-            ticket_type != QUESTION_TICKET_TYPE,
-            not in_business_hours(),
-            severe,
-        )
-    )
-
     if needs_triage(ticket_type, severe):
         session["feedback_message"] = form.feedback.data
         return redirect(url_for(".support_problem"))
+
+    emergency_ticket = is_emergency_ticket(ticket_type, severe)
 
     if needs_escalation(ticket_type, severe):
         return redirect(url_for(".bat_phone"))
@@ -436,7 +430,7 @@ def feedback(ticket_type):
         feedback_msg = render_template(
             "support-tickets/support-ticket.txt",
             content=form.feedback.data,
-            out_of_hours_emergency=out_of_hours_emergency,
+            emergency_ticket=emergency_ticket,
         )
 
         prefix = (
@@ -452,7 +446,7 @@ def feedback(ticket_type):
             message=feedback_msg,
             ticket_type=get_zendesk_ticket_type(ticket_type),
             notify_ticket_type=feedback_page_details[ticket_type][category]["notify_ticket_type"],
-            p1=out_of_hours_emergency,
+            p1=emergency_ticket,
             user_name=user_name,
             user_email=user_email,
             org_id=current_service.organisation_id if current_service else None,
@@ -472,7 +466,7 @@ def feedback(ticket_type):
         return redirect(
             url_for(
                 ".thanks",
-                out_of_hours_emergency=out_of_hours_emergency,
+                emergency_ticket=emergency_ticket,
             )
         )
 
@@ -502,7 +496,7 @@ def bat_phone():
 def thanks():
     return render_template(
         "views/support/thanks.html",
-        out_of_hours_emergency=convert_to_boolean(request.args.get("out_of_hours_emergency")),
+        emergency_ticket=convert_to_boolean(request.args.get("emergency_ticket")),
         out_of_hours=not in_business_hours(),
     )
 
@@ -537,7 +531,6 @@ def needs_triage(ticket_type, severe):
             ticket_type != QUESTION_TICKET_TYPE,
             severe is None,
             (not current_user.is_authenticated or current_user.live_services),
-            not in_business_hours(),
         )
     )
 
@@ -551,6 +544,16 @@ def needs_escalation(ticket_type, severe):
             not in_business_hours(),
         )
     )
+
+
+def is_emergency_ticket(ticket_type, severe):
+    if ticket_type != PROBLEM_TICKET_TYPE or not severe:
+        return False
+
+    if current_user.is_authenticated or not in_business_hours():
+        return True
+
+    return False
 
 
 def get_zendesk_ticket_type(ticket_type):
