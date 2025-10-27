@@ -1161,7 +1161,7 @@ class RenameServiceForm(StripWhitespaceForm):
 
 class RenameOrganisationForm(StripWhitespaceForm):
     name = GovukTextInputField(
-        "Organisation name",
+        "Change organisation name",
         validators=[
             NotifyDataRequired(thing="your organisation name"),
             MustContainAlphanumericCharacters(thing="organisation name"),
