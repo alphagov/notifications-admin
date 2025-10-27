@@ -1,5 +1,6 @@
-from flask import abort, flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for
 from flask_login import current_user
+from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
@@ -26,7 +27,17 @@ def submit_request_to_go_live(service_id):
     if (not current_service.go_live_checklist_completed) or (
         current_service.able_to_accept_agreement and not current_service.organisation.agreement_signed
     ):
-        abort(403)
+        flash(
+            Markup(
+                """
+                        <h2 class='govuk-heading-m'>There is a problem</h2>
+                        <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
+                            Some of the tasks on this page are incomplete
+                        </p>
+                    """
+            )
+        )
+        return redirect(url_for(".request_to_go_live", service_id=service_id))
 
     ticket_message = render_template("support-tickets/go-live-request.txt") + "\n"
     if current_service.organisation.can_approve_own_go_live_requests:
