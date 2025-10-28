@@ -31,9 +31,6 @@ $govuk-new-link-styles: true;
 // https://github.com/alphagov/govuk_elements
 @import './govuk-elements/helpers';
 @import './govuk-elements/elements-typography';
-@import './govuk-elements/forms';
-@import './govuk-elements/forms/form-multiple-choice';
-@import './govuk-elements/forms/form-validation';
 @import './govuk-elements/tables';
 
 // Specific to this application
