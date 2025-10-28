@@ -41,7 +41,7 @@
       </p>
       {{ file_upload(file_upload_form.file, allowed_file_extensions=['svg'], button_text='{} logo'.format('Update' if is_update else 'Upload')) }}
       {% call form_wrapper() %}
-        <div class="form-group">
+        <div class="govuk-form-group">
           {{ letter_branding_details_form.name(param_extensions={
             "formGroup": {"classes": "govuk-!-margin-top-3"}
           }) }}
