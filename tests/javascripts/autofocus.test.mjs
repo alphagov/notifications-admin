@@ -24,10 +24,10 @@ describe('Autofocus', () => {
     // set up DOM
     document.body.innerHTML =
       `<div id="wrapper">
-        <label class="form-label" for="search">
+        <label class="govuk-label" for="search">
           ${labelText}
         </label>
-        <input autocomplete="off" class="form-control form-control-1-1" id="search" name="search" type="search" value="" data-notify-module="autofocus">
+        <input autocomplete="off" class="govuk-input govuk-!-width-full" id="search" name="search" type="search" value="" data-notify-module="autofocus">
       </div>`;
 
     focusHandler = jest.fn();

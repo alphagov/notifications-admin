@@ -14,7 +14,7 @@ describe('Colour preview', () => {
     // set up DOM
     document.body.innerHTML = `
       <div class="govuk-form-group">
-        <label class="govuk-form-label" for="colour">
+        <label class="govuk-label" for="colour">
           Colour
         </label>
         <div class="govuk-input__wrapper">
