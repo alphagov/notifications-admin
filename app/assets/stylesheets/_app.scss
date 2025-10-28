@@ -182,12 +182,6 @@ details .arrow {
   margin-top: 5px;
 }
 
-.multiple-choice input:disabled+label {
-  opacity: 1;
-  color: $govuk-secondary-text-colour;
-  cursor: default;
-}
-
 .heading-inline {
   display: inline-block;
 }

@@ -35,40 +35,7 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 }
 
 .checkboxes-nested {
-
   margin-bottom: 10px;
-
-  .multiple-choice {
-
-    $circle-diameter: 39px;
-    $border-thickness: 4px;
-    $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
-    $govuk-border-colour: $govuk-border-colour;
-
-    float: none;
-    position: relative;
-
-    &:before {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: $border-indent;
-      width: $border-thickness;
-      height: 100%;
-      background: $govuk-border-colour;
-    }
-
-    label {
-      float: none;
-    }
-
-    [type=checkbox]+label::before {
-      // To overlap the grey inset line
-      background: govuk-colour("white");
-    }
-
-  }
-
 }
 
 .govuk-form-group--nested {

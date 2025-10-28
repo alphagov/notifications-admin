@@ -73,7 +73,6 @@ def test_get_should_not_render_radios_if_org_type_known(
     page = client_request.get("main.add_service")
     assert page.select_one("h1").text.strip() == "Enter a service name"
     assert page.select_one("input[name=name]").get("value") is None
-    assert not page.select(".multiple-choice")
 
 
 @pytest.mark.parametrize(
