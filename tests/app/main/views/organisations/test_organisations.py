@@ -405,7 +405,7 @@ def test_validation_of_gps_creating_organisations(
         _data=data,
         _expected_status=200,
     )
-    assert expected_error in page.select_one(".govuk-error-message, .error-message").text
+    assert expected_error in page.select_one(".govuk-error-message").text
     assert normalize_spaces(page.select_one("h1[id=page-header]").text) == expected_page_header
     assert normalize_spaces(page.select_one("label[for=same_as_service_name-0]")) == "Yes"
     assert normalize_spaces(page.select_one("label[for=same_as_service_name-1]")) == "No"
@@ -2221,7 +2221,7 @@ def test_view_edit_organisation_billing_details(
     )
     assert page.select_one("h1").text == "Edit organisation billing details"
 
-    assert [label.text.strip() for label in page.select("label.govuk-label") + page.select("label.form-label")] == [
+    assert [label.text.strip() for label in page.select("label.govuk-label")] == [
         "Contact names",
         "Contact email addresses",
         "Reference",

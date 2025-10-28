@@ -684,7 +684,7 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_when_no_man
         _test_page_title=False,
     )
     assert normalize_spaces(page.select_one("title").text) == "folder_two – Templates – service one – GOV.UK Notify"
-    form_labels = page.select("legend[class=form-label]")
+    form_labels = page.select("legend[class=govuk-fieldset__legend]")
     assert len(form_labels) == 0
     checkboxes = page.select("input[name=users_with_permission]")
     assert len(checkboxes) == 0
@@ -715,7 +715,7 @@ def test_get_manage_folder_viewing_permissions_for_users_not_visible_for_service
         _test_page_title=False,
     )
     assert normalize_spaces(page.select_one("title").text) == "folder_two – Templates – service one – GOV.UK Notify"
-    form_labels = page.select("legend[class=form-label]")
+    form_labels = page.select("legend[class=govuk-fieldset__legend]")
     assert len(form_labels) == 0
 
 
