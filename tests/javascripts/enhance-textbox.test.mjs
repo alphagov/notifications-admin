@@ -10,24 +10,21 @@ describe('Enhanced textbox', () => {
   let backgroundEl;
   let stylesheet;
 
-  beforeAll(() => {
+  function addCustomStyles () {
+
     // set some default styling
     stylesheet = document.createElement('style');
 
-    stylesheet.innerHTML = ".govuk-textarea-highlight__textbox { padding: 2px; width: 576px; border-width: 1px; }";
+    stylesheet.innerHTML = ".govuk-textarea-highlight__textbox { position: relative; padding: 2px; width: 576px; border-width: 1px; }";
     stylesheet.innerHTML += "textarea.govuk-textarea-highlight__textbox { height: 224px; }";
 
     document.getElementsByTagName('head')[0].appendChild(stylesheet);
-
-  });
-
-  afterAll(() => {
-
-    stylesheet.parentNode.removeChild(stylesheet);
-
-  });
+  }
 
   beforeEach(() => {
+
+    addCustomStyles();
+
     document.body.classList.add('govuk-frontend-supported');
     // set up DOM
     document.body.innerHTML = `
@@ -44,6 +41,7 @@ describe('Enhanced textbox', () => {
 
     document.body.innerHTML = '';
     jest.resetModules();
+    stylesheet.remove();
 
   });
 
@@ -63,6 +61,23 @@ describe('Enhanced textbox', () => {
       expect(backgroundEl.classList.contains('govuk-textarea-highlight__background')).toBe(true);
 
     });
+
+    test("If CSS hasn't loaded, expect the textbox to be left as is", () => {
+
+      // Simulate no CSS by removing the stylesheet we add
+      document.querySelector('head style').remove();
+
+      // start module
+      new EnhancedTextbox(textarea);
+
+      backgroundEl = textarea.nextElementSibling;
+
+      // both the textbox and the element behind need a wrapping element
+      expect(textarea.parentNode.classList.contains('govuk-textarea-highlight__wrapper')).toBe(false);
+
+      expect(backgroundEl).toBeNull();
+
+    })
 
     test("The element's dimensions and border-width should match those of the textbox", () => {
 
@@ -162,7 +177,7 @@ describe('Enhanced textbox', () => {
           <label class="govuk-label" for="template_content">Message</label>
           <textarea class="govuk-textarea govuk-!-width-full govuk-textarea-highlight__textbox" id="template_content" name="template_content" rows="8" data-notify-module="enhanced-textbox" data-autofocus-textbox="true"></textarea>
         </div>`;
-       
+
         textarea = document.querySelector('textarea');
 
         new EnhancedTextbox(textarea);
