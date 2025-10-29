@@ -6,7 +6,7 @@
   <div class="govuk-grid-row">
     <div id="total-email" class="govuk-grid-column-one-third">
       {{ big_number_with_status(
-        "<span class='loading-indicator'></span>"|safe,
+        "<span class='loading-indicator loading-indicator--vertically-centered loading-indicator--1'></span>"|safe,
         999|message_count_label('email', suffix='sent'),
         whitespace,
         whitespace,
@@ -18,7 +18,7 @@
     </div>
     <div id="total-sms" class="govuk-grid-column-one-third">
       {{ big_number_with_status(
-        "<span class='loading-indicator'></span>"|safe,
+        "<span class='loading-indicator loading-indicator--vertically-centered loading-indicator--2'></span>"|safe,
         999|message_count_label('sms', suffix='sent'),
         whitespace,
         whitespace,
@@ -30,7 +30,7 @@
     </div>
     <div id="total-letters" class="govuk-grid-column-one-third">
       {{ big_number_with_status(
-        "<span class='loading-indicator'></span>"|safe,
+        "<span class='loading-indicator loading-indicator--vertically-centered loading-indicator--3'></span>"|safe,
         999|message_count_label('letter', suffix='sent'),
         whitespace,
         whitespace,
