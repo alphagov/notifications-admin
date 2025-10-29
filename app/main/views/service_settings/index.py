@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
 from flask import (
     abort,
@@ -444,7 +444,7 @@ def get_service_verify_reply_to_address_partials(service_id, notification_id):
                     current_service.id, email_address=notification["to"], is_default=is_default
                 )
     seconds_since_sending = (
-        utc_string_to_aware_gmt_datetime(datetime.utcnow().isoformat())
+        utc_string_to_aware_gmt_datetime(datetime.now(UTC))
         - utc_string_to_aware_gmt_datetime(notification["created_at"])
     ).seconds
     if notification["status"] in FAILURE_STATUSES or (

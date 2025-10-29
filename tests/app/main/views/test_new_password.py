@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytest
 from flask import url_for
@@ -24,7 +24,7 @@ def test_should_render_new_password_template(
         "app.user_api_client.update_user_attribute",
         return_value=user,
     )
-    data = json.dumps({"email": user["email_address"], "created_at": str(datetime.utcnow())})
+    data = json.dumps({"email": user["email_address"], "created_at": str(datetime.now(UTC))})
     token = generate_token(data, notify_admin.config["SECRET_KEY"], notify_admin.config["DANGEROUS_SALT"])
 
     page = client_request.get_url(url_for_endpoint_with_token(".new_password", token=token))
@@ -39,7 +39,7 @@ def test_should_return_404_when_email_address_does_not_exist(
     mock_get_user_by_email_not_found,
 ):
     client_request.logout()
-    data = json.dumps({"email": "no_user@d.gov.uk", "created_at": str(datetime.utcnow())})
+    data = json.dumps({"email": "no_user@d.gov.uk", "created_at": str(datetime.now(UTC))})
     token = generate_token(data, notify_admin.config["SECRET_KEY"], notify_admin.config["DANGEROUS_SALT"])
     client_request.get_url(
         url_for_endpoint_with_token(".new_password", token=token),
@@ -64,7 +64,7 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(
 ):
     client_request.logout()
     user = mock_get_user_by_email_request_password_reset.return_value
-    data = json.dumps({"email": user["email_address"], "created_at": str(datetime.utcnow())})
+    data = json.dumps({"email": user["email_address"], "created_at": str(datetime.now(UTC))})
     token = generate_token(data, notify_admin.config["SECRET_KEY"], notify_admin.config["DANGEROUS_SALT"])
     client_request.post_url(
         url_for_endpoint_with_token(".new_password", token=token, next=redirect_url),
@@ -92,7 +92,7 @@ def test_should_redirect_to_two_factor_webauthn_when_password_reset_is_successfu
     client_request.logout()
     user = mock_get_user_by_email_request_password_reset.return_value
     user["auth_type"] = "webauthn_auth"
-    data = json.dumps({"email": user["email_address"], "created_at": str(datetime.utcnow())})
+    data = json.dumps({"email": user["email_address"], "created_at": str(datetime.now(UTC))})
     token = generate_token(data, notify_admin.config["SECRET_KEY"], notify_admin.config["DANGEROUS_SALT"])
     client_request.post_url(
         url_for_endpoint_with_token(".new_password", token=token, next=redirect_url),
@@ -114,7 +114,7 @@ def test_should_redirect_index_if_user_has_already_changed_password(
 ):
     client_request.logout()
     user = mock_get_user_by_email_user_changed_password.return_value
-    data = json.dumps({"email": user["email_address"], "created_at": str(datetime.utcnow())})
+    data = json.dumps({"email": user["email_address"], "created_at": str(datetime.now(UTC))})
     token = generate_token(data, notify_admin.config["SECRET_KEY"], notify_admin.config["DANGEROUS_SALT"])
     client_request.post_url(
         url_for_endpoint_with_token(".new_password", token=token),
@@ -151,7 +151,7 @@ def test_should_sign_in_when_password_reset_is_successful_for_email_auth(
     user = mock_get_user_by_email_request_password_reset.return_value
     mock_get_user = mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
     user["auth_type"] = "email_auth"
-    data = json.dumps({"email": user["email_address"], "created_at": str(datetime.utcnow())})
+    data = json.dumps({"email": user["email_address"], "created_at": str(datetime.now(UTC))})
     token = generate_token(data, notify_admin.config["SECRET_KEY"], notify_admin.config["DANGEROUS_SALT"])
 
     client_request.post_url(

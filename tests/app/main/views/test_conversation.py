@@ -1,6 +1,6 @@
 import json
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
@@ -214,7 +214,7 @@ def test_view_conversation_with_empty_inbound(
                     "user_number": "07900000001",
                     "notify_number": "07900000002",
                     "content": "",
-                    "created_at": datetime.utcnow().isoformat(),
+                    "created_at": datetime.now(UTC).isoformat(),
                     "id": fake_uuid,
                 }
             ],
