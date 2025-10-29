@@ -943,7 +943,7 @@ def filter_by_permissions(valuelist, permissions):
 
 class AuthTypeForm(StripWhitespaceForm):
     auth_type = GovukRadiosField(
-        "Sign-in method",
+        "",
         choices=[
             ("sms_auth", format_auth_type("sms_auth")),
             ("email_auth", format_auth_type("email_auth")),
