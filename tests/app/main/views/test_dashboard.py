@@ -1965,3 +1965,46 @@ def test_service_dashboard_shows_usage_in_correct_font_size(
 
     usage_columns = partial_page.select(expected_css_class)
     assert len(usage_columns) == 3
+
+
+def test_service_dashboard_skeleton(
+    client_request,
+    mock_get_service_templates,
+    mock_has_no_jobs,
+    mock_get_unsubscribe_requests_statistics,
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+):
+    page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
+
+    assert [(heading.name, normalize_spaces(heading.text)) for heading in page.select("main h1, main h2, main h3")] == [
+        ("h1", "Dashboard"),
+        ("h2", "In the last 7 days"),
+        ("h2", "This year"),
+    ]
+
+    totals = page.select_one("[data-key=totals]")
+    template_statistics = page.select_one("[data-key=template-statistics]")
+    usage = page.select_one("[data-key=usage]")
+
+    for partial_page in (totals, template_statistics, usage):
+        assert partial_page["data-resource"] == url_for(
+            "json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID
+        )
+
+    assert [normalize_spaces(column.text) for column in totals.select(".big-number-with-status")] == [
+        "emails sent failed – %",
+        "text messages sent failed – %",
+        "letters sent failed – %",
+    ]
+
+    assert normalize_spaces(template_statistics.select_one("table caption").text) == "By template"
+    assert template_statistics.select(".spark-bar")
+
+    assert [
+        normalize_spaces(column.text) for column in usage.select(".govuk-grid-column-one-third .big-number-smaller")
+    ] == [
+        "free email allowance",
+        "text messages",
+        "spent on letters",
+    ]

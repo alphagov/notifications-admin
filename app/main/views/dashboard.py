@@ -57,7 +57,7 @@ def service_dashboard(service_id):
     return render_template(
         "views/dashboard/dashboard.html",
         updates_url=url_for("json_updates.service_dashboard_updates", service_id=service_id),
-        partials=get_dashboard_partials(),
+        partials=get_dashboard_partials_lazy(),
     )
 
 
@@ -522,6 +522,16 @@ def aggregate_notifications_stats(template_statistics):
             notifications[stat["template_type"]]["failed"] += stat["count"]
 
     return notifications
+
+
+def get_dashboard_partials_lazy():
+    return {
+        "upcoming": render_template("views/dashboard/_upcoming.html"),
+        "inbox": render_template("views/dashboard/_inbox.html"),
+        "totals": render_template("views/dashboard/_totals-lazy.html"),
+        "template-statistics": render_template("views/dashboard/template-statistics-lazy.html"),
+        "usage": render_template("views/dashboard/_usage-lazy.html"),
+    }
 
 
 def get_dashboard_partials():
