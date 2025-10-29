@@ -34,7 +34,7 @@
 
     {% if current_user.has_permissions('manage_service') %}
       <h2 class='heading-medium'>This year</h2>
-      {{ ajax_block(partials, updates_url, 'usage') }}
+      {{ ajax_block(partials, url_for("json_updates.service_dashboard_usage_updates", service_id=current_service.id), 'usage') }}
       {{ show_more(
         url_for(".usage", service_id=current_service['id']),
         'See usage'

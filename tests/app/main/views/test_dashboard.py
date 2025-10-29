@@ -1876,7 +1876,9 @@ def test_service_dashboard_shows_usage(
 ):
     service_one["permissions"] = permissions
 
-    json_response = client_request.get_response("json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID)
+    json_response = client_request.get_response(
+        "json_updates.service_dashboard_usage_updates", service_id=SERVICE_ONE_ID
+    )
     json_content = json.loads(json_response.get_data(as_text=True))
     usage_partial = NotifyBeautifulSoup(json_content["usage"], "html.parser")
 
@@ -1903,7 +1905,9 @@ def test_service_dashboard_shows_free_allowance(
         ],
     )
 
-    json_response = client_request.get_response("json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID)
+    json_response = client_request.get_response(
+        "json_updates.service_dashboard_usage_updates", service_id=SERVICE_ONE_ID
+    )
     json_content = json.loads(json_response.get_data(as_text=True))
     usage_partial = NotifyBeautifulSoup(json_content["usage"], "html.parser")
 
@@ -1959,7 +1963,9 @@ def test_service_dashboard_shows_usage_in_correct_font_size(
         return_value=annual_usage,
     )
 
-    json_response = client_request.get_response("json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID)
+    json_response = client_request.get_response(
+        "json_updates.service_dashboard_usage_updates", service_id=SERVICE_ONE_ID
+    )
     json_content = json.loads(json_response.get_data(as_text=True))
     partial_page = NotifyBeautifulSoup(json_content["usage"], "html.parser")
 
@@ -1987,10 +1993,18 @@ def test_service_dashboard_skeleton(
     template_statistics = page.select_one("[data-key=template-statistics]")
     usage = page.select_one("[data-key=usage]")
 
-    for partial_page in (totals, template_statistics, usage):
-        assert partial_page["data-resource"] == url_for(
-            "json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID
-        )
+    assert totals["data-resource"] == url_for(
+        "json_updates.service_dashboard_updates",
+        service_id=SERVICE_ONE_ID,
+    )
+    assert template_statistics["data-resource"] == url_for(
+        "json_updates.service_dashboard_updates",
+        service_id=SERVICE_ONE_ID,
+    )
+    assert usage["data-resource"] == url_for(
+        "json_updates.service_dashboard_usage_updates",
+        service_id=SERVICE_ONE_ID,
+    )
 
     assert [normalize_spaces(column.text) for column in totals.select(".big-number-with-status")] == [
         "emails sent failed – %",

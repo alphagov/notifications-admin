@@ -67,6 +67,25 @@ def service_dashboard_updates(service_id):
     return jsonify(**get_dashboard_partials())
 
 
+@json_updates.route("/services/<uuid:service_id>/dashboard-usage.json")
+@user_has_permissions("manage_service")
+def service_dashboard_usage_updates(service_id):
+    free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(
+        current_service.id,
+        get_current_financial_year(),
+    )
+    yearly_usage = billing_api_client.get_annual_usage_for_service(
+        current_service.id,
+        get_current_financial_year(),
+    )
+    return jsonify(
+        usage=render_template(
+            "views/dashboard/_usage.html",
+            **get_annual_usage_breakdown(yearly_usage, free_sms_allowance),
+        )
+    )
+
+
 def make_cache_key(query_hash, service_id):
     return f"service-{service_id}-notification-search-query-hash-{query_hash}"
 
@@ -540,14 +559,7 @@ def get_dashboard_partials():
     stats = aggregate_notifications_stats(all_statistics)
 
     dashboard_totals = get_dashboard_totals(stats)
-    free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(
-        current_service.id,
-        get_current_financial_year(),
-    )
-    yearly_usage = billing_api_client.get_annual_usage_for_service(
-        current_service.id,
-        get_current_financial_year(),
-    )
+
     return {
         "upcoming": render_template(
             "views/dashboard/_upcoming.html",
@@ -564,10 +576,6 @@ def get_dashboard_partials():
             "views/dashboard/template-statistics.html",
             template_statistics=template_statistics,
             most_used_template_count=max([row["count"] for row in template_statistics] or [0]),
-        ),
-        "usage": render_template(
-            "views/dashboard/_usage.html",
-            **get_annual_usage_breakdown(yearly_usage, free_sms_allowance),
         ),
     }
 

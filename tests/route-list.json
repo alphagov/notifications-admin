@@ -158,6 +158,7 @@
     "/services/<uuid:service_id>/conversation/<uuid:notification_id>/reply-with/<uuid:template_id>",
     "/services/<uuid:service_id>/conversation/<uuid:notification_id>/reply-with/from-folder/<uuid:from_folder>",
     "/services/<uuid:service_id>/dashboard",
+    "/services/<uuid:service_id>/dashboard-usage.json",
     "/services/<uuid:service_id>/dashboard.json",
     "/services/<uuid:service_id>/data-retention",
     "/services/<uuid:service_id>/data-retention/<uuid:data_retention_id>/edit",
