@@ -1327,7 +1327,7 @@ class AdminNewOrganisationForm(
 
 class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
     free_sms_allowance = GovukIntegerField(
-        "Numbers of text message fragments per year",
+        "Free text message allowance",
         things="the number of text message fragments",
         validators=[
             NotifyInputRequired(thing="a number of text messages"),

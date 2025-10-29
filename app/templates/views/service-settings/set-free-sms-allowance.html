@@ -1,11 +1,10 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
-  Free text message allowance
+  {{ form.free_sms_allowance.label.text }}
 {% endblock %}
 
 {% block backLink %}
@@ -15,8 +14,15 @@
 {% block maincolumn_content %}
 
   {% call form_wrapper() %}
-    {{ page_header('Free text message allowance') }}
-    {{ form.free_sms_allowance }}
+    {{ form.free_sms_allowance(
+        param_extensions={
+          "hint": {"text": "The number of text message fragments per year"},
+          "label": {
+            "isPageHeading": True,
+            "classes": "govuk-label--l",
+          }
+        }
+    ) }}
     {{ page_footer('Save') }}
   {% endcall %}
 

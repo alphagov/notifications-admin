@@ -3558,7 +3558,7 @@ def test_should_show_page_to_set_sms_allowance(client_request, platform_admin_us
     client_request.login(platform_admin_user)
     page = client_request.get("main.set_free_sms_allowance", service_id=SERVICE_ONE_ID)
 
-    assert normalize_spaces(page.select_one("label").text) == "Numbers of text message fragments per year"
+    assert normalize_spaces(page.select_one("label").text) == "Free text message allowance"
     mock_get_free_sms_fragment_limit.assert_called_once_with(SERVICE_ONE_ID)
 
 
