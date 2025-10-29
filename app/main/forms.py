@@ -1037,7 +1037,6 @@ class JoinServiceRequestApproveForm(StripWhitespaceForm):
             (SERVICE_JOIN_REQUEST_REJECTED, "No"),
         ],
         thing="an option",
-        param_extensions={"fieldset": {"legend": {"classes": ""}}},
         default=SERVICE_JOIN_REQUEST_APPROVED,
     )
 
