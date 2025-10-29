@@ -1237,7 +1237,7 @@ class OrganisationCrownStatusForm(StripWhitespaceForm):
 
 class OrganisationAgreementSignedForm(StripWhitespaceForm):
     agreement_signed = GovukRadiosField(
-        "Has this organisation signed the agreement?",
+        "Has this organisation signed the data processing and financial agreement?",
         choices=[
             ("yes", "Yes"),
             ("no", "No"),
