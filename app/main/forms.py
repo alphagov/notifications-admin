@@ -1356,7 +1356,7 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
 
 class AdminServiceRateLimitForm(StripWhitespaceForm):
     rate_limit = GovukIntegerField(
-        "Number of messages the service can send in a rolling 60 second window",
+        "Rate limit",
         things="the number of messages",
         validators=[
             NotifyDataRequired(thing="a number of messages"),

@@ -3656,7 +3656,7 @@ def test_should_show_page_to_set_per_minute_rate_limit(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get("main.set_per_minute_rate_limit", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("label").text) == (
+    assert normalize_spaces(page.select_one(".govuk-hint").text) == (
         "Number of messages the service can send in a rolling 60 second window"
     )
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "3,000"
