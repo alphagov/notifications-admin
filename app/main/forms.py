@@ -1532,7 +1532,7 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
 
 class LetterTemplateLanguagesForm(StripWhitespaceForm):
     languages = GovukRadiosField(
-        "This will change the language used for the date and page numbers of your letter template.",
+        "Change language",
         choices=[
             (LetterLanguageOptions.english.value, "English only"),
             (LetterLanguageOptions.welsh_then_english.value, "Welsh followed by English"),
