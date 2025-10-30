@@ -101,7 +101,6 @@ export default [
       paths.src + 'javascripts/stick-to-window-when-scrolling.js',
       paths.src + 'javascripts/cookieCleanup.js',
       paths.src + 'javascripts/updateContent.js',
-      paths.src + 'javascripts/preventDuplicateFormSubmissions.js',
       paths.src + 'javascripts/templateFolderForm.js',
       paths.src + 'javascripts/registerSecurityKey.js',
       paths.src + 'javascripts/authenticateSecurityKey.js',
