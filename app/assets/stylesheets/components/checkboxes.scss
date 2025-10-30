@@ -34,10 +34,6 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 
 }
 
-.checkboxes-nested {
-  margin-bottom: 10px;
-}
-
 .govuk-form-group--nested {
 
   $border-thickness: $govuk-touch-target-size - $govuk-checkboxes-size;
@@ -62,10 +58,6 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 }
 .selection-content {
   margin-bottom: govuk-spacing(4);
-
-  .checkboxes-nested {
-    margin-bottom: 0;
-  }
 }
 
 .selection-footer {

@@ -876,7 +876,6 @@ def test_should_show_page_for_inviting_user(
     )
 
     assert "Invite a team member" in page.select_one("h1").text.strip()
-    assert not page.select_one("div.checkboxes-nested")
 
 
 def test_should_show_page_for_inviting_user_with_email_prefilled(
