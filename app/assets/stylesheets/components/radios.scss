@@ -149,12 +149,6 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   background: $govuk-border-colour;
 }
 
-.inline {
-  .multiple-choice {
-    margin-right: 15px;
-  }
-}
-
 .govuk-radios__input:disabled + .govuk-radios__label,
 .govuk-radios__input:disabled ~ .govuk-hint {
   opacity: 1;

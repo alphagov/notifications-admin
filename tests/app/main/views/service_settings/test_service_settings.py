@@ -5511,7 +5511,7 @@ def test_view_edit_service_billing_details(
     )
 
     assert page.select_one("h1").text == "Change billing details"
-    assert [label.text.strip() for label in page.select("label.govuk-label") + page.select("label.form-label")] == [
+    assert [label.text.strip() for label in page.select("label.govuk-label")] == [
         "Contact names",
         "Contact email addresses",
         "Reference",

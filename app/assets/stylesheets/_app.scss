@@ -1,18 +1,3 @@
-// Extra CSS overlaying elements
-.form-control-1-1 {
-  width: 100%;
-}
-
-.form-control-5em {
-
-  width: 100%;
-
-  @include govuk-media-query($from: tablet) {
-    width: 5em;
-  }
-
-}
-
 .column-main {
 
   .heading-large,
@@ -93,18 +78,8 @@ td {
   }
 }
 
-.form-label {
-  margin-bottom: 5px;
-}
-
 .hint {
   color: $govuk-secondary-text-colour;
-
-  .form-label + & {
-    display: block;
-    margin-top: -5px;
-    margin-bottom: 5px;
-  }
 }
 
 .spreadsheet {
@@ -205,12 +180,6 @@ details .arrow {
 .block-label-hint {
   @include govuk-font(16);
   margin-top: 5px;
-}
-
-.multiple-choice input:disabled+label {
-  opacity: 1;
-  color: $govuk-secondary-text-colour;
-  cursor: default;
 }
 
 .heading-inline {

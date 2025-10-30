@@ -33,9 +33,9 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
               <button name="operation" value="unknown" hidden=""></button>
               <div id="move_to_folder_radios" class="sticky-template-form" role="region" aria-label="Choose the folder to move selected items to">
                 <div class="js-will-stick-at-bottom-when-scrolling">
-                  <div class="form-group ">
-                    <fieldset id="move_to">
-                      <legend class="form-label">
+                  <div class="govuk-form-group ">
+                    <fieldset class="govuk-fieldset" id="move_to">
+                      <legend class="govuk-fieldset__legend">
                         Choose a folder
                       </legend>
                       <div class="govuk-radios">
@@ -81,9 +81,9 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
               </div>
               <div id="add_new_template_form" class="sticky-template-form" role="region" aria-label="Choose template type" ${newTemplateDataModules}>
                 <div class="js-will-stick-at-bottom-when-scrolling">
-                  <div class="form-group ">
-                    <fieldset id="add_template_by_template_type">
-                      <legend class="form-label">
+                  <div class="govuk-form-group ">
+                    <fieldset class="govuk-fieldset" id="add_template_by_template_type">
+                      <legend class="govuk-fieldset__legend">
                         New template
                       </legend>
                       <div class="govuk-radios__item">

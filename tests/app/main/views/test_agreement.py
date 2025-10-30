@@ -332,9 +332,7 @@ def test_accept_agreement_page_validates(
         _data=data,
         _expected_status=200,
     )
-    assert [
-        normalize_spaces(error.text) for error in page.select(".govuk-error-message, .error-message")
-    ] == expected_errors
+    assert [normalize_spaces(error.text) for error in page.select(".govuk-error-message")] == expected_errors
 
 
 @pytest.mark.parametrize(

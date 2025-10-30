@@ -21,7 +21,7 @@ class FileUpload {
 
     this.$form = $module;
     this.$field = this.$form.querySelector('.file-upload-field');
-    this.$fieldErrors = this.$form.querySelector('.file-upload-label .error-message');
+    this.$fieldErrors = this.$form.querySelector('.file-upload-label .govuk-error-message');
 
     // Note: label.file-upload-label, input.file-upload-field and button.file-upload-submit
     // are all hidden by CSS that uses the .govuk-frontend-supported class on the body tag
@@ -70,7 +70,7 @@ class FileUpload {
     const formErrors = Boolean(this.$fieldErrors);
     if (formErrors) {
       buttonHTMLStr = `
-        <label class="file-upload-button-label error-message" for="${fieldId}">
+        <label class="file-upload-button-label govuk-error-message" for="${fieldId}">
           <span class="govuk-visually-hidden">${buttonText} </span>
           ${this.$fieldErrors.textContent}
         </label>

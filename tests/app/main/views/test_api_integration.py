@@ -702,7 +702,7 @@ def test_callback_forms_can_be_cleared(
         ),
     )
 
-    assert not page.select(".error-message")
+    assert not page.select(".govuk-error-message")
 
     expected_parameter = f"{fake_uuid}?callback_type={callback_type}"
     mocked_delete.assert_called_once_with(expected_delete_url.format(service_one["id"], expected_parameter))
@@ -737,7 +737,7 @@ def test_callback_forms_can_be_cleared_when_callback_and_inbound_apis_are_empty(
         ),
     )
 
-    assert not page.select(".error-message")
+    assert not page.select(".govuk-error-message")
     assert mocked_delete.call_args_list == []
 
 

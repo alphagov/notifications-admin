@@ -1,7 +1,4 @@
 // https://github.com/alphagov/govuk-frontend/blob/v5.4.1/packages/govuk-frontend/src/govuk/components/checkboxes/_index.scss
-$govuk-touch-target-gutter: 4px;
-$govuk-checkboxes-size: 40px;
-$govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 .selection-summary {
   position: relative;
 
@@ -34,71 +31,8 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 
 }
 
-.checkboxes-nested {
-
-  margin-bottom: 10px;
-
-  .multiple-choice {
-
-    $circle-diameter: 39px;
-    $border-thickness: 4px;
-    $border-indent: ($circle-diameter / 2) - ($border-thickness / 2);
-    $govuk-border-colour: $govuk-border-colour;
-
-    float: none;
-    position: relative;
-
-    &:before {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: $border-indent;
-      width: $border-thickness;
-      height: 100%;
-      background: $govuk-border-colour;
-    }
-
-    label {
-      float: none;
-    }
-
-    [type=checkbox]+label::before {
-      // To overlap the grey inset line
-      background: govuk-colour("white");
-    }
-
-  }
-
-}
-
-.govuk-form-group--nested {
-
-  $border-thickness: $govuk-touch-target-size - $govuk-checkboxes-size;
-  position: relative;
-
-  // To equalise the spacing between the line and the top/bottom of
-  // the radio
-  margin-top: govuk-spacing(1) + ($border-thickness / 2);
-  margin-bottom: govuk-spacing(1) * -1;
-  padding-left: $govuk-checkboxes-size + govuk-spacing(3); //padding of the checkbox label
-  flex-basis: 100%;
-
-  &:before {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: $govuk-checkboxes-size / 2;
-    width: $border-thickness;
-    height: 100%;
-    background: $govuk-border-colour;
-  }
-}
 .selection-content {
   margin-bottom: govuk-spacing(4);
-
-  .checkboxes-nested {
-    margin-bottom: 0;
-  }
 }
 
 .selection-footer {

@@ -70,11 +70,11 @@ describe('Preview pane', () => {
           <div class="govuk-grid-column-full">
             <div data-notify-module="autofocus">
               <div class="live-search js-header" data-notify-module="live-search" data-targets=".govuk-radios__item">
-                <div class="form-group">
-                  <label class="form-label" for="search">
+                <div class="govuk-form-group">
+                  <label class="govuk-label for="search">
                       Search branding styles by name
                   </label>
-                  <input autocomplete="off" class="form-control form-control-1-1 " id="search" name="search" required="" rows="8" type="search" value="">
+                  <input autocomplete="off" class="govuk-input govuk-!-width-full" id="search" name="search" required="" rows="8" type="search" value="">
                 </div>
               </div>
             </div>

@@ -128,8 +128,8 @@ describe('RadioSelect', () => {
     document.body.classList.add('govuk-frontend-supported');
     document.body.innerHTML = `
       <form method="post" enctype="multipart/form-data" action="/services/6658542f-0cad-491f-bec8-ab8457700ead/start-job/ab3080c8-f2d1-4524-b199-9718ecf6eabc">
-        <fieldset>
-          <legend class="form-label">
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend">
             When should Notify send these messages?
           </legend>
           <div class="radio-select" data-notify-module="radio-select" data-days="${DAYS.join(',')}">
