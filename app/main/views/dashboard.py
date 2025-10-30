@@ -57,14 +57,33 @@ def service_dashboard(service_id):
     return render_template(
         "views/dashboard/dashboard.html",
         updates_url=url_for("json_updates.service_dashboard_updates", service_id=service_id),
-        partials=get_dashboard_partials(service_id),
+        partials=get_dashboard_partials_lazy(),
     )
 
 
 @json_updates.route("/services/<uuid:service_id>/dashboard.json")
 @user_has_permissions("view_activity")
 def service_dashboard_updates(service_id):
-    return jsonify(**get_dashboard_partials(service_id))
+    return jsonify(**get_dashboard_partials())
+
+
+@json_updates.route("/services/<uuid:service_id>/dashboard-usage.json")
+@user_has_permissions("manage_service")
+def service_dashboard_usage_updates(service_id):
+    free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(
+        current_service.id,
+        get_current_financial_year(),
+    )
+    yearly_usage = billing_api_client.get_annual_usage_for_service(
+        current_service.id,
+        get_current_financial_year(),
+    )
+    return jsonify(
+        usage=render_template(
+            "views/dashboard/_usage.html",
+            **get_annual_usage_breakdown(yearly_usage, free_sms_allowance),
+        )
+    )
 
 
 def make_cache_key(query_hash, service_id):
@@ -524,20 +543,23 @@ def aggregate_notifications_stats(template_statistics):
     return notifications
 
 
-def get_dashboard_partials(service_id):
-    all_statistics = template_statistics_client.get_template_statistics_for_service(service_id, limit_days=7)
+def get_dashboard_partials_lazy():
+    return {
+        "upcoming": render_template("views/dashboard/_upcoming.html"),
+        "inbox": render_template("views/dashboard/_inbox.html"),
+        "totals": render_template("views/dashboard/_totals-lazy.html"),
+        "template-statistics": render_template("views/dashboard/template-statistics-lazy.html"),
+        "usage": render_template("views/dashboard/_usage-lazy.html"),
+    }
+
+
+def get_dashboard_partials():
+    all_statistics = template_statistics_client.get_template_statistics_for_service(current_service.id, limit_days=7)
     template_statistics = aggregate_template_usage(all_statistics)
     stats = aggregate_notifications_stats(all_statistics)
 
     dashboard_totals = get_dashboard_totals(stats)
-    free_sms_allowance = billing_api_client.get_free_sms_fragment_limit_for_year(
-        current_service.id,
-        get_current_financial_year(),
-    )
-    yearly_usage = billing_api_client.get_annual_usage_for_service(
-        service_id,
-        get_current_financial_year(),
-    )
+
     return {
         "upcoming": render_template(
             "views/dashboard/_upcoming.html",
@@ -547,17 +569,13 @@ def get_dashboard_partials(service_id):
         ),
         "totals": render_template(
             "views/dashboard/_totals.html",
-            service_id=service_id,
+            service_id=current_service.id,
             statistics=dashboard_totals,
         ),
         "template-statistics": render_template(
             "views/dashboard/template-statistics.html",
             template_statistics=template_statistics,
             most_used_template_count=max([row["count"] for row in template_statistics] or [0]),
-        ),
-        "usage": render_template(
-            "views/dashboard/_usage.html",
-            **get_annual_usage_breakdown(yearly_usage, free_sms_allowance),
         ),
     }
 

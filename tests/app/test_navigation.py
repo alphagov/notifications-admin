@@ -182,6 +182,7 @@ EXCLUDED_ENDPOINTS = set(
             "json_updates.get_notifications_page_partials_as_json",
             "json_updates.inbox_updates",
             "json_updates.service_dashboard_updates",
+            "json_updates.service_dashboard_usage_updates",
             "json_updates.service_verify_reply_to_address_updates",
             "json_updates.view_job_updates",
             "json_updates.view_notification_updates",

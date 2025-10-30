@@ -1,0 +1,46 @@
+{% from "components/table.html" import list_table, row_heading, field %}
+{% from "components/show-more.html" import show_more %}
+
+<div class="ajax-block-container">
+    <div class='template-statistics-table'>
+      {% call(item, row_number) list_table(
+        [1],
+        caption="By template",
+        caption_visible=True,
+        empty_message='',
+        field_headings=[
+          'Template',
+          'Messages sent'
+        ],
+        field_headings_visible=False
+      ) %}
+
+        {% call row_heading() %}
+          <span class="template-statistics-table-template-name" aria-label="Loading data for templates">
+            <span class="spark-bar">
+              <span class="spark-bar-bar" style="width: 100%">
+                &nbsp;
+              </span>
+            </span>
+          </span>
+          <span class="template-statistics-table-hint">
+            &nbsp;
+          </span>
+        {% endcall %}
+
+        {% call field() %}
+          <span class="spark-bar" aria-label="Loading data for messages sent">
+            <span class="spark-bar-bar" style="width: 100%">
+              &nbsp;
+            </span>
+          </span>
+        {% endcall %}
+
+      {% endcall %}
+      {{ show_more(
+        url_for('main.template_usage', service_id=current_service.id),
+        'See templates used by month',
+        with_border=False
+      ) }}
+    </div>
+</div>

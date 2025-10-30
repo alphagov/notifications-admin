@@ -1,0 +1,6 @@
+{% macro loading_indicator(variant=None) %}
+  <span
+    class="loading-indicator loading-indicator--vertically-centered {% if variant %}loading-indicator--{{variant}}{% endif %}"
+    aria-label="Loading data for"
+  ></span>
+{% endmacro %}

@@ -1,0 +1,33 @@
+{% from "components/big-number.html" import big_number %}
+{% from "components/loading-indicator.html" import loading_indicator %}
+
+<div class='govuk-grid-row ajax-block-container'>
+  <div class='govuk-grid-column-one-third'>
+    <div class="keyline-block">
+      {{ big_number(
+        loading_indicator(3),
+        'free email allowance',
+        smaller=True
+      ) }}
+    </div>
+  </div>
+  <div class='govuk-grid-column-one-third'>
+    <div class="keyline-block">
+      {{ big_number(
+        loading_indicator(3),
+        'text messages',
+        smaller=True,
+      ) }}
+    </div>
+  </div>
+  <div class='govuk-grid-column-one-third'>
+    <div class="keyline-block">
+      {{ big_number(
+        loading_indicator(3),
+        'spent on letters',
+        currency="£",
+        smaller=True
+      ) }}
+    </div>
+  </div>
+</div>

@@ -15,6 +15,7 @@ from app.main.views.dashboard import (
     get_tuples_of_financial_years,
 )
 from tests import (
+    NotifyBeautifulSoup,
     organisation_json,
     service_json,
     validate_route_permission,
@@ -682,17 +683,13 @@ def test_should_show_recent_templates_on_dashboard(
         return_value=copy.deepcopy(stub_template_stats),
     )
 
-    page = client_request.get(
-        "main.service_dashboard",
-        service_id=SERVICE_ONE_ID,
-    )
+    json_response = client_request.get_response("json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID)
+    json_content = json.loads(json_response.get_data(as_text=True))
+    partial_page = NotifyBeautifulSoup(json_content["template-statistics"], "html.parser")
 
     mock_template_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
 
-    headers = [header.text.strip() for header in page.select("h2") + page.select("h1")]
-    assert "In the last 7 days" in headers
-
-    table_rows = page.select_one("tbody").select("tr")
+    table_rows = partial_page.select_one("tbody").select("tr")
 
     assert len(table_rows) == 4
 
@@ -743,18 +740,20 @@ def test_should_not_show_recent_templates_on_dashboard_if_only_one_template_used
         return_value=stats,
     )
 
-    page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
-    main = page.select_one("main").text
+    json_response = client_request.get_response("json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID)
+    json_content = json.loads(json_response.get_data(as_text=True))
+    template_statistics_partial = NotifyBeautifulSoup(json_content["template-statistics"], "html.parser")
+    totals_partial = NotifyBeautifulSoup(json_content["totals"], "html.parser")
 
     mock_template_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
 
     assert stats[0]["template_name"] == "one"
-    assert stats[0]["template_name"] not in main
+    assert stats[0]["template_name"] not in template_statistics_partial.text
 
     # count appears as total, but not per template
     expected_count = stats[0]["count"]
     assert expected_count == 50
-    assert normalize_spaces(page.select_one("#total-sms .big-number-smaller").text) == (
+    assert normalize_spaces(totals_partial.select_one("#total-sms .big-number-smaller").text) == (
         f"{expected_count} text messages sent"
     )
 
@@ -1542,12 +1541,11 @@ def test_service_dashboard_updates_gets_dashboard_totals(
         },
     )
 
-    page = client_request.get(
-        "main.service_dashboard",
-        service_id=SERVICE_ONE_ID,
-    )
+    json_response = client_request.get_response("json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID)
+    json_content = json.loads(json_response.get_data(as_text=True))
+    totals_partial = NotifyBeautifulSoup(json_content["totals"], "html.parser")
 
-    numbers = [number.text.strip() for number in page.select("span.big-number-number")]
+    numbers = [number.text.strip() for number in totals_partial.select("span.big-number-number")]
     assert "123" in numbers
     assert "456" in numbers
     assert "789" in numbers
@@ -1575,17 +1573,16 @@ def test_service_dashboard_totals_link_to_view_notifications(
         },
     )
 
-    page = client_request.get(
-        "main.service_dashboard",
-        service_id=SERVICE_ONE_ID,
-    )
+    json_response = client_request.get_response("json_updates.service_dashboard_updates", service_id=SERVICE_ONE_ID)
+    json_content = json.loads(json_response.get_data(as_text=True))
+    partial_page = NotifyBeautifulSoup(json_content["totals"], "html.parser")
 
-    big_number_links = page.select("a.big-number-link")
+    big_number_links = partial_page.select("a.big-number-link")
     email_link = next(filter(lambda a: normalize_spaces(a.text) == "123 emails sent", big_number_links))
     sms_link = next(filter(lambda a: normalize_spaces(a.text) == "456 text messages sent", big_number_links))
     letter_link = next(filter(lambda a: normalize_spaces(a.text) == "789 letters sent", big_number_links))
 
-    failed_links = page.select(
+    failed_links = partial_page.select(
         ".big-number-with-status .big-number-status a, .big-number-with-status .big-number-status-failing a"
     )
     failed_email_link = next(filter(lambda a: normalize_spaces(a.text) == "100 failed – 81.3%", failed_links))
@@ -1878,9 +1875,14 @@ def test_service_dashboard_shows_usage(
     permissions,
 ):
     service_one["permissions"] = permissions
-    page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
 
-    assert normalize_spaces(page.select_one("[data-key=usage]").text) == (
+    json_response = client_request.get_response(
+        "json_updates.service_dashboard_usage_updates", service_id=SERVICE_ONE_ID
+    )
+    json_content = json.loads(json_response.get_data(as_text=True))
+    usage_partial = NotifyBeautifulSoup(json_content["usage"], "html.parser")
+
+    assert normalize_spaces(usage_partial.text) == (
         "Unlimited free email allowance £29.85 spent on text messages £30.00 spent on letters"
     )
 
@@ -1903,9 +1905,13 @@ def test_service_dashboard_shows_free_allowance(
         ],
     )
 
-    page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
+    json_response = client_request.get_response(
+        "json_updates.service_dashboard_usage_updates", service_id=SERVICE_ONE_ID
+    )
+    json_content = json.loads(json_response.get_data(as_text=True))
+    usage_partial = NotifyBeautifulSoup(json_content["usage"], "html.parser")
 
-    usage_text = normalize_spaces(page.select_one("[data-key=usage]").text)
+    usage_text = normalize_spaces(usage_partial.text)
     assert "spent on text messages" not in usage_text
     assert "249,000 free text messages left" in usage_text
 
@@ -1957,7 +1963,62 @@ def test_service_dashboard_shows_usage_in_correct_font_size(
         return_value=annual_usage,
     )
 
+    json_response = client_request.get_response(
+        "json_updates.service_dashboard_usage_updates", service_id=SERVICE_ONE_ID
+    )
+    json_content = json.loads(json_response.get_data(as_text=True))
+    partial_page = NotifyBeautifulSoup(json_content["usage"], "html.parser")
+
+    usage_columns = partial_page.select(expected_css_class)
+    assert len(usage_columns) == 3
+
+
+def test_service_dashboard_skeleton(
+    client_request,
+    mock_get_service_templates,
+    mock_has_no_jobs,
+    mock_get_unsubscribe_requests_statistics,
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+):
     page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
 
-    usage_columns = page.select(f"[data-key=usage] {expected_css_class}")
-    assert len(usage_columns) == 3
+    assert [(heading.name, normalize_spaces(heading.text)) for heading in page.select("main h1, main h2, main h3")] == [
+        ("h1", "Dashboard"),
+        ("h2", "In the last 7 days"),
+        ("h2", "This year"),
+    ]
+
+    totals = page.select_one("[data-key=totals]")
+    template_statistics = page.select_one("[data-key=template-statistics]")
+    usage = page.select_one("[data-key=usage]")
+
+    assert totals["data-resource"] == url_for(
+        "json_updates.service_dashboard_updates",
+        service_id=SERVICE_ONE_ID,
+    )
+    assert template_statistics["data-resource"] == url_for(
+        "json_updates.service_dashboard_updates",
+        service_id=SERVICE_ONE_ID,
+    )
+    assert usage["data-resource"] == url_for(
+        "json_updates.service_dashboard_usage_updates",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    assert [normalize_spaces(column.text) for column in totals.select(".big-number-with-status")] == [
+        "emails sent failed – Unknown %",
+        "text messages sent failed – Unknown %",
+        "letters sent failed – Unknown %",
+    ]
+
+    assert normalize_spaces(template_statistics.select_one("table caption").text) == "By template"
+    assert template_statistics.select(".spark-bar")
+
+    assert [
+        normalize_spaces(column.text) for column in usage.select(".govuk-grid-column-one-third .big-number-smaller")
+    ] == [
+        "free email allowance",
+        "text messages",
+        "spent on letters",
+    ]

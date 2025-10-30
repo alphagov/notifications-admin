@@ -1,0 +1,46 @@
+{% from "components/big-number.html" import big_number_with_status %}
+{% from "components/loading-indicator.html" import loading_indicator %}
+
+{% set whitespace = "&ensp;"|safe %}
+{% set hidden_label = "<span class='govuk-visually-hidden'>Unknown </span>"|safe %}
+
+<div class="ajax-block-container">
+  <div class="govuk-grid-row">
+    <div id="total-email" class="govuk-grid-column-one-third">
+      {{ big_number_with_status(
+        loading_indicator(1),
+        999|message_count_label('email', suffix='sent'),
+        whitespace,
+        whitespace + hidden_label,
+        False,
+        failure_link=url_for("main.view_notifications", service_id=current_service.id, message_type='email', status='failed'),
+        link=url_for("main.view_notifications", service_id=current_service.id, message_type='email', status='sending,delivered,failed'),
+        smaller=True,
+      ) }}
+    </div>
+    <div id="total-sms" class="govuk-grid-column-one-third">
+      {{ big_number_with_status(
+        loading_indicator(2),
+        999|message_count_label('sms', suffix='sent'),
+        whitespace,
+        whitespace + hidden_label,
+        False,
+        failure_link=url_for("main.view_notifications", service_id=current_service.id, message_type='sms', status='failed'),
+        link=url_for("main.view_notifications", service_id=current_service.id, message_type='sms', status='sending,delivered,failed'),
+        smaller=True,
+      ) }}
+    </div>
+    <div id="total-letters" class="govuk-grid-column-one-third">
+      {{ big_number_with_status(
+        loading_indicator(3),
+        999|message_count_label('letter', suffix='sent'),
+        whitespace,
+        whitespace + hidden_label,
+        False,
+        failure_link=url_for("main.view_notifications", service_id=current_service.id, message_type='letter', status='failed'),
+        link=url_for("main.view_notifications", service_id=current_service.id, message_type='letter', status=''),
+        smaller=True,
+      ) }}
+    </div>
+  </div>
+</div>
