@@ -289,3 +289,31 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
     align-items: start;
   }
 }
+
+// used with nested checkboxes and radios
+// exampel use on templates page
+$govuk-touch-target-gutter: 4px;
+$govuk-checkboxes-size: 40px;
+$govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
+.govuk-form-group--nested {
+
+  $border-thickness: $govuk-touch-target-size - $govuk-checkboxes-size;
+  position: relative;
+
+  // To equalise the spacing between the line and the top/bottom of
+  // the radio
+  margin-top: govuk-spacing(1) + ($border-thickness / 2);
+  margin-bottom: govuk-spacing(1) * -1;
+  padding-left: $govuk-checkboxes-size + govuk-spacing(3); //padding of the checkbox label
+  flex-basis: 100%;
+
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: $govuk-checkboxes-size / 2;
+    width: $border-thickness;
+    height: 100%;
+    background: $govuk-border-colour;
+  }
+}
