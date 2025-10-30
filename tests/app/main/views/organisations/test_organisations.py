@@ -564,19 +564,19 @@ def test_organisation_services_shows_live_services_and_usage_with_count_of_1(
             ".big-number-smallest",
         ),
         (
-            {"emails_sent": 0, "sms_cost": 999_999, "letter_cost": 0},
+            {"emails_sent": 0, "sms_cost": 99_999, "letter_cost": 0},
             ".big-number-smaller",
         ),
         (
-            {"emails_sent": 0, "sms_cost": 1_000_000, "letter_cost": 0},
+            {"emails_sent": 0, "sms_cost": 100_000, "letter_cost": 0},
             ".big-number-smallest",
         ),
         (
-            {"emails_sent": 0, "sms_cost": 0, "letter_cost": 999_999},
+            {"emails_sent": 0, "sms_cost": 0, "letter_cost": 99_999},
             ".big-number-smaller",
         ),
         (
-            {"emails_sent": 0, "sms_cost": 0, "letter_cost": 1_000_000},
+            {"emails_sent": 0, "sms_cost": 0, "letter_cost": 100_000},
             ".big-number-smallest",
         ),
     ),

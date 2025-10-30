@@ -1114,12 +1114,12 @@ def test_usage_page_no_sms_spend(
     "annual_usage, expected_css_class, expected_item_count",
     (
         (
-            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 999_999}],
+            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 99_999}],
             ".big-number-smaller",
             9,
         ),
         (
-            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 1_000_000}],
+            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 100_000}],
             ".big-number-smallest",
             9,
         ),
@@ -1134,12 +1134,12 @@ def test_usage_page_no_sms_spend(
             8,
         ),
         (
-            [{"notification_type": "letter", "notifications_sent": 1, "cost": 999_999}],
+            [{"notification_type": "letter", "notifications_sent": 1, "cost": 99_999}],
             ".big-number-smaller",
             8,
         ),
         (
-            [{"notification_type": "letter", "notifications_sent": 1, "cost": 1_000_000}],
+            [{"notification_type": "letter", "notifications_sent": 1, "cost": 100_000}],
             ".big-number-smallest",
             8,
         ),
@@ -1920,11 +1920,11 @@ def test_service_dashboard_shows_free_allowance(
     "annual_usage, expected_css_class",
     (
         (
-            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 999_999}],
+            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 99_999}],
             ".big-number-smaller",
         ),
         (
-            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 1_000_000}],
+            [{"notification_type": "sms", "chargeable_units": 1, "charged_units": 1, "rate": 1, "cost": 100_000}],
             ".big-number-smallest",
         ),
         (
@@ -1936,11 +1936,11 @@ def test_service_dashboard_shows_free_allowance(
             ".big-number-smaller",  # Count of emails not shown on dashboard so doesn’t affect font size
         ),
         (
-            [{"notification_type": "letter", "notifications_sent": 1, "cost": 999_999}],
+            [{"notification_type": "letter", "notifications_sent": 1, "cost": 99_999}],
             ".big-number-smaller",
         ),
         (
-            [{"notification_type": "letter", "notifications_sent": 1, "cost": 1_000_000}],
+            [{"notification_type": "letter", "notifications_sent": 1, "cost": 100_000}],
             ".big-number-smallest",
         ),
     ),
