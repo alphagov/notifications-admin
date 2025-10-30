@@ -1934,7 +1934,7 @@ class ServiceEditInboundNumberForm(StripWhitespaceForm):
 
 
 class AdminNotesForm(StripWhitespaceForm):
-    notes = GovukTextareaField("Notes", validators=[])
+    notes = GovukTextareaField(validators=[])
 
 
 class AdminBillingDetailsForm(StripWhitespaceForm):

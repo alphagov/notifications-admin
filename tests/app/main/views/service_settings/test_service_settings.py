@@ -5462,8 +5462,7 @@ def test_view_edit_service_notes(
         "main.edit_service_notes",
         service_id=SERVICE_ONE_ID,
     )
-    assert page.select_one("h1").text == "Edit service notes"
-    assert page.select_one(".govuk-label").text.strip() == "Notes"
+    assert normalize_spaces(page.select_one("h1").text) == "Edit service notes"
     assert page.select_one("textarea").attrs["name"] == "notes"
 
 
