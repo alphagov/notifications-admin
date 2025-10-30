@@ -2007,9 +2007,9 @@ def test_service_dashboard_skeleton(
     )
 
     assert [normalize_spaces(column.text) for column in totals.select(".big-number-with-status")] == [
-        "emails sent failed – %",
-        "text messages sent failed – %",
-        "letters sent failed – %",
+        "emails sent failed – Unknown %",
+        "text messages sent failed – Unknown %",
+        "letters sent failed – Unknown %",
     ]
 
     assert normalize_spaces(template_statistics.select_one("table caption").text) == "By template"

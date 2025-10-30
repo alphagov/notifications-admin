@@ -1,10 +1,11 @@
 {% from "components/big-number.html" import big_number %}
+{% from "components/loading-indicator.html" import loading_indicator %}
 
 <div class='govuk-grid-row ajax-block-container'>
   <div class='govuk-grid-column-one-third'>
     <div class="keyline-block">
       {{ big_number(
-        "<span class='loading-indicator loading-indicator--vertically-centered loading-indicator--3'></span>"|safe,
+        loading_indicator(3),
         'free email allowance',
         smaller=True
       ) }}
@@ -13,7 +14,7 @@
   <div class='govuk-grid-column-one-third'>
     <div class="keyline-block">
       {{ big_number(
-        "<span class='loading-indicator loading-indicator--vertically-centered loading-indicator--2'></span>"|safe,
+        loading_indicator(3),
         'text messages',
         smaller=True,
       ) }}
@@ -22,7 +23,7 @@
   <div class='govuk-grid-column-one-third'>
     <div class="keyline-block">
       {{ big_number(
-        "<span class='loading-indicator loading-indicator--vertically-centered loading-indicator--1'></span>"|safe,
+        loading_indicator(3),
         'spent on letters',
         currency="£",
         smaller=True
