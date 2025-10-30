@@ -15,6 +15,15 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .loading-indicator {
+    &:after {
+      animation: none;
+      width: auto;
+    }
+  }
+}
+
 .loading-indicator--1 {
   &::after {
     animation-delay: -0.6s;
