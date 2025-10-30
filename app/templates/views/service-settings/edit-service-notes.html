@@ -15,18 +15,10 @@
 {% block maincolumn_content %}
 
     {{ page_header('Edit service notes') }}
-    {% call form_wrapper(
-      module="autofocus",
-      data_kwargs={'force-focus': True}
-    ) %}
+    {% call form_wrapper() %}
       {{ form.notes(param_extensions={
         "classes": "govuk-!-width-full",
         "rows": "4",
-        "attributes": {
-          "data-notify-module": "enhanced-textbox",
-          "data-highlight-placeholders": "false",
-          "data-autofocus-textbox": "true"
-        }
       }) }}
       {{ page_footer('Save') }}
     {% endcall %}
