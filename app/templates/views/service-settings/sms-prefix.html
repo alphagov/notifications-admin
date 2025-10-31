@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
@@ -14,10 +13,18 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Start text messages with service name') }}
-
   {% call form_wrapper() %}
-    {{ form.enabled }}
+    {{ form.enabled(
+        param_extensions={
+          "hint": {"text": "Start all text messages with ‘{}:’".format(current_service.name) },
+          "fieldset": {
+            "legend": {
+              "isPageHeading": True,
+              "classes": "govuk-fieldset__legend--l"
+            }
+          }
+        }
+    ) }}
     {{ page_footer('Save') }}
   {% endcall %}
 

@@ -5145,7 +5145,8 @@ def test_show_sms_prefixing_setting_page(
     mock_update_service,
 ):
     page = client_request.get("main.service_set_sms_prefix", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("legend").text) == "Start all text messages with ‘service one:’"
+    assert normalize_spaces(page.select_one("h1")) == "Start text messages with service name"
+    assert normalize_spaces(page.select_one(".govuk-hint").text) == "Start all text messages with ‘service one:’"
     radios = page.select("input[type=radio]")
     assert len(radios) == 2
     assert radios[0]["value"] == "True"

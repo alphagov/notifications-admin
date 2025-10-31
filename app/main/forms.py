@@ -2395,7 +2395,7 @@ class CallbackForm(StripWhitespaceForm):
 
 
 class SMSPrefixForm(StripWhitespaceForm):
-    enabled = OnOffField("")  # label is assigned on instantiation
+    enabled = OnOffField("Start text messages with service name")
 
 
 def get_placeholder_form_instance(
