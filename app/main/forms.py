@@ -2617,7 +2617,7 @@ class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
 
 class AdminReturnedLettersForm(StripWhitespaceForm):
     references = GovukTextareaField(
-        "Letter references",
+        "Submit returned letters",
         validators=[
             NotifyDataRequired(thing="the returned letter references"),
         ],
