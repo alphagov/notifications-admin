@@ -4,7 +4,7 @@
   var queues = {};
   var timeouts = {};
   var defaultInterval = 2000;
-  var interval = 0;
+  var intervals = {};
 
   var calculateBackoff = responseTime => parseInt(Math.max(
       (250 * Math.sqrt(responseTime)) - 1000,
@@ -63,7 +63,7 @@
           if (response.stop === 1) {
             window.clearTimeout(timeout); // stop polling
           } else {
-            interval = calculateBackoff(Date.now() - startTime); // keep polling but adjust for response time
+            intervals[resource] = calculateBackoff(Date.now() - startTime); // keep polling but adjust for response time
           }
         }
       ).fail(
@@ -78,7 +78,7 @@
     }
 
     timeout = window.setTimeout(
-      () => poll.apply(window, arguments), interval
+      () => poll.apply(window, arguments), intervals[resource]
     );
   };
 
@@ -90,7 +90,7 @@
       var key = $component.data('key');
       var resource = $component.data('resource');
       var form = $component.data('form');
-      interval = defaultInterval;
+      intervals[resource] = defaultInterval;
 
       // Replace component with contents.
       // The renderer does this anyway when diffing against the first response
@@ -103,7 +103,7 @@
           getQueue(resource),
           form
         ),
-        interval
+        intervals[resource]
       );
     };
 
