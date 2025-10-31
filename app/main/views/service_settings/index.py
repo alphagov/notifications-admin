@@ -543,7 +543,7 @@ def service_delete_email_reply_to(service_id, reply_to_email_id):
 
 
 @main.route("/services/<uuid:service_id>/service-settings/set-inbound-number", methods=["GET", "POST"])
-@user_has_permissions("manage_service")
+@user_is_platform_admin
 def service_set_inbound_number(service_id):
     available_inbound_numbers = inbound_number_client.get_available_inbound_sms_numbers()
     inbound_numbers_value_and_label = [(number["id"], number["number"]) for number in available_inbound_numbers["data"]]
