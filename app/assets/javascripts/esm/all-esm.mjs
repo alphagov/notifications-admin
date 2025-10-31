@@ -24,7 +24,9 @@ import FullscreenTable from './fullscreen-table.mjs';
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
 
-createAll(Button);
+createAll(Button, 
+  { preventDoubleClick: true }
+);
 createAll(Header);
 createAll(Radios);
 createAll(ErrorSummary);
