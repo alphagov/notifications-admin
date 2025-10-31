@@ -570,8 +570,6 @@ def service_set_inbound_number(service_id):
 def service_set_sms_prefix(service_id):
     form = SMSPrefixForm(enabled=current_service.prefix_sms)
 
-    form.enabled.label.text = f"Start all text messages with ‘{current_service.name}:’"
-
     if form.validate_on_submit():
         current_service.update(prefix_sms=form.enabled.data)
         return redirect(url_for(".service_settings", service_id=service_id))

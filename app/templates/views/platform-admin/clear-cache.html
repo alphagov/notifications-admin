@@ -8,12 +8,18 @@
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-medium">
-    Clear cache
-  </h1>
-
   {% call form_wrapper() %}
-    {{ form.model_type }}
+    {{ form.model_type(
+      param_extensions={
+        "hint": {"text": "What do you want to clear today?"},
+        "fieldset": {
+          "legend": {
+            "isPageHeading": True,
+            "classes": "heading-medium"
+          }
+        }
+      }
+    ) }}
     {{ page_footer('Clear') }}
   {% endcall %}
 

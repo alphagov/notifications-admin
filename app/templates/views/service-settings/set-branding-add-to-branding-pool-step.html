@@ -1,5 +1,4 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
@@ -15,8 +14,6 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-    {{ page_header(page_title) }}
-
     {% call form_wrapper() %}
       {% set hint_1 %}
         <ul class="govuk-list govuk-hint govuk-!-margin-bottom-0">
@@ -29,15 +26,20 @@
           <li class="govuk-!-margin-bottom-0">Only apply this branding to ‘{{current_service.name}}’</li>
         </ul>
       {% endset %}
-      {% set label_text %}
+      {% set hint_text %}
         Should other teams in {{current_service.organisation.name}} have the option to use this branding?
       {% endset %}
 
       {{
         form.add_to_pool(
           param_extensions={
+            "hint": {"text": hint_text},
             "fieldset": {
-              "legend": {"text": label_text}
+              "legend": {
+                "text": page_title,
+                "isPageHeading": True,
+                "classes": "govuk-fieldset__legend--l"
+              }
             },
             "items": [
               {"hint": {"html": hint_1} },

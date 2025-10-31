@@ -1,12 +1,11 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/table.html" import mapping_table, row, text_field %}
 
 {% block service_page_title %}
-  Change postage
+  {{ form.postage.label.text }}
 {% endblock %}
 
 {% block backLink %}
@@ -15,12 +14,13 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Change postage') }}
   {% call form_wrapper(class="govuk-!-margin-bottom-7") %}
     {{ form.postage(param_extensions={
+      "hint": {"text": "Choose the postage for this letter template"},
       "fieldset": {
           "legend": {
-              "classes": "",
+              "isPageHeading": True,
+              "classes": "govuk-fieldset__legend--l",
           },
       }
     }) }}
@@ -56,7 +56,7 @@
       {% endfor %}
     {% endcall %}
   </div>
-      
+
   <p class="govuk-body">Royal Mail delivers from Monday to Saturday, excluding bank holidays.</p>
   <p class="govuk-body">See a list of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">postage prices</a>.</p>
     </div>

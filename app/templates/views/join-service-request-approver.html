@@ -1,21 +1,23 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
+{% set page_title = requester.name + " wants to join your service" %}
+
 {% block service_page_title %}
-  {{ '{} wants to join your service'.format(requester.name) }}
+  {{ page_title }}
 {% endblock %}
 
 {% block maincolumn_content %}
 
-  {{ page_header('{} wants to join your service'.format(requester.name)) }}
-
   {% call form_wrapper() %}
     {{ form.join_service_approve_request(param_extensions={
+      "hint": {"text": "Do you want to let {} join ‘{}’?".format(requester.name, requested_service.name)},
       "fieldset": {
         "legend": {
-          "text": "Do you want to let {} join ‘{}’?".format(requester.name, requested_service.name),
+          "text": page_title,
+          "isPageHeading": True,
+          "classes": "govuk-fieldset__legend--l"
         },
       },
     }) }}

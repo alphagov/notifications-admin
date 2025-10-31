@@ -1958,9 +1958,8 @@ def test_service_join_request_pending(
     )
     assert f"{mock_requester['name']} wants to join your service" in page.text.strip()
     assert f"{mock_requester['name']} wants to join your service" in page.select_one("h1").text.strip()
-    assert (
-        f"Do you want to let {mock_requester['name']} join ‘{service_one['name']}’?"
-        in page.select_one("legend").text.strip()
+    assert f"Do you want to let {mock_requester['name']} join ‘{service_one['name']}’?" in normalize_spaces(
+        page.select_one(".govuk-hint").text
     )
 
     radio_buttons = page.select("input[name=join_service_approve_request]")
