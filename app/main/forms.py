@@ -2853,7 +2853,6 @@ class AcceptAgreementForm(StripWhitespaceForm):
 
 class ChangeSecurityKeyNameForm(StripWhitespaceForm):
     security_key_name = GovukTextInputField(
-        "Name of key",
         validators=[
             DataRequired(message="Enter a name for this key"),
             MustContainAlphanumericCharacters(thing="the name of the key"),
