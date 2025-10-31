@@ -1,11 +1,12 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
+{% set page_title = "Set {} data retention".format(notification_type|format_notification_type|lower) %}
+
 {% block service_page_title %}
-  Set data retention
+  {{ page_title }}
 {% endblock %}
 
 {% block backLink %}
@@ -14,10 +15,17 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Set data retention') }}
     {% call form_wrapper() %}
-      {{ notification_type | capitalize}}
-      {{  form.days_of_retention }}
+      {{  form.days_of_retention(
+            param_extensions={
+              "hint": {"text": "Days of retention"},
+              "label": {
+                "text": page_title,
+                  "isPageHeading": True,
+                  "classes": "govuk-label--l",
+              },
+            })
+      }}
       {{ page_footer('Save') }}
     {% endcall %}
 
