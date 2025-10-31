@@ -3446,7 +3446,13 @@ def test_get_service_set_letter_branding_add_to_branding_pool_step_protects_agai
         branding_id="234",
     )
     form = page.select_one("form")
-    for hint in form.select(".govuk-hint"):
+
+    hint_text = form.select(".govuk-hint")
+    assert normalize_spaces(hint_text[0]) == (
+        "Should other teams in organisation one have the option to use this branding?"
+    )
+
+    for hint in hint_text[1:]:
         assert not hint.select("script")
         assert "apply this branding to ‘<script>evil</script>’" in normalize_spaces(hint.text).lower()
 

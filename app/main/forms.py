@@ -2168,15 +2168,6 @@ class AdminSetBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
     add_to_pool = GovukRadiosField(
         choices=[("yes", "Yes"), ("no", "No")],
         thing="yes or no",
-        param_extensions={
-            "fieldset": {
-                "legend": {
-                    # This removes the `govuk-fieldset__legend--s` class, thereby
-                    # making the form label font regular weight, not bold
-                    "classes": "",
-                },
-            }
-        },
     )
 
 
