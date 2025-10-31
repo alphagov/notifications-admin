@@ -36,11 +36,12 @@
 
 {% macro no_service(
   heading,
-  no_live_service_text
+  heading_classes,
+  no_services_text
 ) %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-quarter">
-      <h2>
+      <h2 class="{{heading_classes}}">
         {{heading}}
       </h2>
     </div>
@@ -48,7 +49,7 @@
         <ul>
           <li class="browse-list-item">
             <p class="browse-list-hint">
-              {{no_live_service_text}}
+              {{no_services_text}}
             </p>
           </li>
         </ul>
@@ -99,38 +100,36 @@
       ) }}
     {% endif %}
 
+    {% if not (current_user.live_services or current_user.trial_mode_services) %}
+      {{ no_service(
+        heading='Services',
+        heading_classes='govuk-visually-hidden' if not current_user.organisations,
+        no_services_text='You are not a member of any services yet'
+      ) }}
+    {% endif %}
+
     {% if current_user.live_services %}
       {{ service_list(
         heading='Live services',
         services=current_user.live_services
       ) }}
-    {% else %}
-      {{ no_service(
-        heading='Live services',
-        no_live_service_text='No live services'
-      ) }}
     {% endif %}
-
     {% if current_user.trial_mode_services %}
       {{ service_list(
         heading='Trial mode services',
         services=current_user.trial_mode_services
       ) }}
-    {% else %}
-      {{ no_service(
-        heading='Trial mode services',
-        no_live_service_text='No trial mode services'
-      ) }}
     {% endif %}
-
   </nav>
 
   {% if can_add_service %}
     <div class="js-stick-at-bottom-when-scrolling">
       <div class="govuk-grid-row">
-        <div class="govuk-grid-column-one-quarter">
-          &nbsp;
-        </div>
+        {% if current_user.live_services or current_user.trial_mode_services or current_user.organisations %}
+          <div class="govuk-grid-column-one-quarter">
+            &nbsp;
+          </div>
+        {% endif %}
         <div class="govuk-grid-column-three-quarters">
         {{ govukButton({
           "element": "a",
