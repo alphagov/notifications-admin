@@ -2609,7 +2609,6 @@ class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
 
 class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
     days_of_retention = GovukIntegerField(
-        label="Days of retention",
         things="a number of days",
         validators=[validators.NumberRange(min=3, max=90, message="The number of days must be between 3 and 90")],
     )
