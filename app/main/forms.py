@@ -1523,7 +1523,7 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
     ]
 
     postage = GovukRadiosField(
-        "Choose the postage for this letter template",
+        "Change postage",
         choices=choices,
         thing="first class, second class or economy mail",
         validators=[DataRequired()],
