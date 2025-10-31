@@ -1696,7 +1696,7 @@ class SupportProblemTypeForm(StripWhitespaceForm):
                 ("something-else", "Something else"),
             ]
 
-    problem_type = GovukRadiosField("")
+    problem_type = GovukRadiosField("Report a problem")
 
 
 class SupportSignInIssuesForm(StripWhitespaceForm):
