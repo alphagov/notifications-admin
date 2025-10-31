@@ -1,8 +1,17 @@
 from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 
+def test_set_inbound_sms_requires_platform_admin_permission(client_request, service_one):
+    client_request.get(
+        "main.service_set_inbound_number",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
+
+
 def test_set_inbound_sms_sets_a_number_for_service(
     client_request,
+    platform_admin_user,
     multiple_available_inbound_numbers,
     mock_no_inbound_number_for_service,
     mocker,
@@ -12,6 +21,8 @@ def test_set_inbound_sms_sets_a_number_for_service(
     data = {
         "inbound_number": "781d9c60-7a7e-46b7-9896-7b045b992fa5",
     }
+
+    client_request.login(platform_admin_user)
 
     client_request.post(
         "main.service_set_inbound_number",
@@ -27,8 +38,10 @@ def test_set_inbound_sms_sets_a_number_for_service(
 
 
 def test_set_inbound_sms_when_no_available_inbound_numbers(
-    client_request, service_one, no_available_inbound_numbers, mock_no_inbound_number_for_service
+    client_request, platform_admin_user, service_one, no_available_inbound_numbers, mock_no_inbound_number_for_service
 ):
+    client_request.login(platform_admin_user)
+
     page = client_request.get("main.service_set_inbound_number", service_id=service_one["id"])
 
     assert normalize_spaces(page.select_one("main p").text) == "No available inbound numbers"
@@ -36,10 +49,13 @@ def test_set_inbound_sms_when_no_available_inbound_numbers(
 
 def test_set_inbound_sms_when_service_already_has_sms(
     client_request,
+    platform_admin_user,
     service_one,
     multiple_available_inbound_numbers,
     mock_get_inbound_number_for_service,
 ):
+    client_request.login(platform_admin_user)
+
     page = client_request.get("main.service_set_inbound_number", service_id=service_one["id"])
 
     assert normalize_spaces(page.select_one("main p").text) == "This service already has an inbound number"
@@ -47,10 +63,13 @@ def test_set_inbound_sms_when_service_already_has_sms(
 
 def test_set_inbound_sms_when_service_does_not_have_sms(
     client_request,
+    platform_admin_user,
     service_one,
     multiple_available_inbound_numbers,
     mock_no_inbound_number_for_service,
 ):
+    client_request.login(platform_admin_user)
+
     page = client_request.get("main.service_set_inbound_number", service_id=service_one["id"])
 
     assert normalize_spaces(page.select_one("input")["name"]) == "inbound_number"
