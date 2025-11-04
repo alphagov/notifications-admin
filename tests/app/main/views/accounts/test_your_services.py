@@ -143,8 +143,6 @@ def test_your_services_should_show_your_services_page_if_no_services(
 ):
     mock_get_orgs_and_services.return_value = {"organisations": [], "services": []}
     page = client_request.get("main.your_services")
-    no_live_service = page.select("nav ul")[1].select("li")
-    no_live_trial_mode = page.select("nav ul")[2].select("li")
 
     links = page.select("main#main-content a")
     assert len(links) == 1
@@ -152,9 +150,8 @@ def test_your_services_should_show_your_services_page_if_no_services(
     assert normalize_spaces(page.select_one("h1").text) == "Your services"
     assert normalize_spaces(add_service_link.text) == "Add a new service"
     assert add_service_link["href"] == url_for("main.add_service")
-    assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == ["Live services", "Trial mode services"]
-    assert normalize_spaces(no_live_service[0].text) == "No live services"
-    assert normalize_spaces(no_live_trial_mode[0].text) == "No trial mode services"
+    assert normalize_spaces(page.select("main p")) == "You are not a member of any services yet"
+    assert page.select_one("main h2")["class"][0] == "govuk-visually-hidden"
 
 
 def test_your_services_should_show_join_service_button(
@@ -189,8 +186,7 @@ def test_your_services_should_show_join_service_button(
             {"organisations": [], "services": []},
             [
                 "Platform admin",
-                "Live services",
-                "Trial mode services",
+                "Services",
             ],
         ),
         (
@@ -217,7 +213,6 @@ def test_your_services_should_show_join_service_button(
             [
                 "Platform admin",
                 "Live services",
-                "Trial mode services",
             ],
         ),
         (
@@ -234,7 +229,6 @@ def test_your_services_should_show_join_service_button(
             },
             [
                 "Platform admin",
-                "Live services",
                 "Trial mode services",
             ],
         ),
@@ -272,8 +266,7 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
         (
             {"organisations": [], "services": []},
             [
-                "Live services",
-                "Trial mode services",
+                "Services",
             ],
             "Your services",
         ),
@@ -297,11 +290,7 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
                 ],
                 "services": [],
             },
-            [
-                "Organisations",
-                "Live services",
-                "Trial mode services",
-            ],
+            ["Organisations", "Services"],
             "Your organisations and services",
         ),
         (
@@ -318,7 +307,6 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
             },
             [
                 "Live services",
-                "Trial mode services",
             ],
             "Your services",
         ),
@@ -335,7 +323,6 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
                 ],
             },
             [
-                "Live services",
                 "Trial mode services",
             ],
             "Your services",
