@@ -1,7 +1,8 @@
 The user did not receive an email link.
 
-Follow the instructions in the support manual.
+---
 
-Search for ’I did not receive an email with a link to sign in’.
+1. Open the [GOV.UK Notify support manual](https://docs.google.com/document/d/1F41AxZdwjebI4yCIhUQvs72ozHfG2aqCnhelSYu_Wi0/edit?usp=sharing).
+2. Search for ’I did not receive an email with a link to sign in’.
 
 Email address: {{ user_email_address }}
