@@ -1,3 +1,7 @@
-User did not receive an email link
+The user did not receive an email link.
+
+Follow the instructions in the support manual.
+
+Search for ’I did not receive an email with a link to sign in’.
 
 Email address: {{ user_email_address }}
