@@ -14,10 +14,10 @@ all_ui_permissions = set(permission_mappings.keys())
 all_db_permissions = set(chain(*permission_mappings.values()))
 
 permission_options = (
+    ("manage_service", "Manage settings, team and usage"),
     ("view_activity", "See dashboard"),
     ("send_messages", "Send messages"),
     ("manage_templates", "Add and edit templates"),
-    ("manage_service", "Manage settings, team and usage"),
     ("manage_api_keys", "Manage API integration"),
 )
 
