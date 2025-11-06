@@ -1,4 +1,8 @@
-User’s mobile number has changed
+The user’s mobile number has changed.
+
+Follow the instructions in the GOV.UK Notify Support Manual.
+
+Search for ‘User asks us to change their mobile number’
 
 Old mobile number: {{ old_mobile_number }}
 
