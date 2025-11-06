@@ -375,7 +375,7 @@ def test_support_mobile_number_changed_account_details_submits_zendesk_ticket(cl
     assert normalize_spaces(page.select_one("h1").text) == "Thanks for contacting us"
     mock_create_ticket.assert_called_once_with(
         ANY,
-        subject="[env: test] Change mobile number",
+        subject="[env: test] Mobile number has changed",
         message="User’s mobile number has changed\n\nOld mobile number: 07000000000\n\nNew mobile number: 07000000001",
         ticket_type="incident",
         user_name="User",
@@ -489,7 +489,7 @@ def test_support_email_address_account_details_submits_zendesk_ticket(client_req
     assert normalize_spaces(page.select_one("h1").text) == "Thanks for contacting us"
     mock_create_ticket.assert_called_once_with(
         ANY,
-        subject="[env: test] Change email address",
+        subject="[env: test] Email address has changed",
         message=(
             "User’s email address has changed\n\n"
             "Old email address: old_address@gov.uk\n\nNew email address: new_address@gov.uk"
