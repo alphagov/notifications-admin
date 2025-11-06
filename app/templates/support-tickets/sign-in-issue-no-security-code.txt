@@ -1,3 +1,7 @@
-User did not receive a security code
+The user did not receive a security code.
+
+Follow the instructions in the support manual.
+
+Search for ‘I did not receive a text message with a security code’.
 
 Mobile number: {{ user_mobile }}
