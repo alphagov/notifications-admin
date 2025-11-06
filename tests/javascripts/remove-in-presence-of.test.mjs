@@ -1,19 +1,15 @@
-beforeAll(() => {
-  require('../../app/assets/javascripts/removeInPresenceOf.js')
-});
-
-afterAll(() => {
-  require('./support/teardown.js');
-});
+import RemoveInPresenceOf from '../../app/assets/javascripts/esm/remove-in-presence-of.mjs';
+import { jest } from '@jest/globals';
 
 describe("Remove in presence of", () => {
   beforeEach(() => {
+    document.body.classList.add('govuk-frontend-supported');
     document.body.innerHTML = `
       <main id="main-content">
         <div id="old-content" data-notify-module="remove-in-presence-of" data-target-element-id="new-content">old content</div>
       </main>
     `;
-    window.GOVUK.notifyModules.start();
+    new RemoveInPresenceOf(document.querySelector('[data-notify-module="remove-in-presence-of"]'))
   });
 
   describe("The page", () => {
@@ -23,6 +19,7 @@ describe("Remove in presence of", () => {
     });
 
     test("Removes the existing element when a new element is added", async () => {
+      
 
       let outcome = new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -38,7 +35,6 @@ describe("Remove in presence of", () => {
       document.getElementById("main-content").append(newContent);
 
       await outcome;
-
     });
   });
 

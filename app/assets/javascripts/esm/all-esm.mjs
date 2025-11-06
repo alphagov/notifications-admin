@@ -20,6 +20,7 @@ import AddBrandingOptionsControls from './add-branding-options-controls.mjs';
 
 import RadioSelect from './radio-select.mjs';
 import FullscreenTable from './fullscreen-table.mjs';
+import RemoveInPresenceOf from './remove-in-presence-of.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -118,6 +119,11 @@ if ($radioSelectElementsArray.length > 0) {
 const $fullScreenTableArray = document.querySelectorAll('[data-notify-module="fullscreen-table"]');
 if ($fullScreenTableArray.length > 0) {
   $fullScreenTableArray.forEach(tableComponent => new FullscreenTable(tableComponent));
+}
+
+const $elementToRemove = document.querySelector('[data-notify-module="remove-in-presence-of"]');
+if ($elementToRemove) {
+  new RemoveInPresenceOf($elementToRemove);
 }
 
 const focusBanner = new FocusBanner();
