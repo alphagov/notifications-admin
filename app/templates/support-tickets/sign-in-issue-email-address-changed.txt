@@ -1,4 +1,8 @@
-User’s email address has changed
+The user’s email address has changed
+
+Follow the instructions in the GOV.UK Notify Support Manual.
+
+Search for ‘User asks us to change their email address’.
 
 Old email address: {{ old_email_address }}
 
