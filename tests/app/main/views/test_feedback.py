@@ -491,7 +491,6 @@ def test_support_email_address_account_details_submits_zendesk_ticket(client_req
         ANY,
         subject="[env: test] Email address has changed",
         message=(
-            "User’s email address has changed\n\n"
             "Old email address: old_address@gov.uk\n\nNew email address: new_address@gov.uk"
         ),
         ticket_type="incident",
