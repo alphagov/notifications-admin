@@ -1,6 +1,6 @@
 import pytest
 
-from app.models import JSONModel
+from app.models import JSONModel, StrictJSONModel
 
 
 def test_looks_up_from_dict():
@@ -56,6 +56,17 @@ def test_model_raises_keyerror_if_item_missing_from_dict():
         Custom({}).foo  # noqa: B018
 
     assert str(e.value) == "'Custom' object has no attribute 'foo'"
+
+
+def test_strict_model_raises_keyerror_if_item_missing_from_dict_on_instantiation():
+    class Custom(StrictJSONModel):
+        foo: str
+        __sort_attribute__ = "foo"
+
+    with pytest.raises(KeyError) as e:
+        Custom({})
+
+    assert str(e.value) == "'foo'"
 
 
 @pytest.mark.parametrize(
