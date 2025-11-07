@@ -1,11 +1,11 @@
 from datetime import datetime
 
 from app.formatters import format_pennies_as_currency
-from app.models import JSONModel
+from app.models import StrictJSONModel
 from app.notify_client.sms_rate_client import sms_rate_api_client
 
 
-class SMSRate(JSONModel):
+class SMSRate(StrictJSONModel):
     rate: float
     valid_from: datetime
 
