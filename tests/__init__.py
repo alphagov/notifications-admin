@@ -382,8 +382,15 @@ def template_version_json(service_id, id_, created_by, version=1, created_at=Non
     return template
 
 
-def api_key_json(id_, name, expiry_date=None, key_type="normal"):
-    return {"id": id_, "name": name, "expiry_date": expiry_date, "key_type": key_type}
+def api_key_json(id_, name, expiry_date=None, created_at=None, created_by=None, key_type="normal"):
+    return {
+        "id": id_,
+        "name": name,
+        "expiry_date": expiry_date,
+        "key_type": key_type,
+        "created_at": created_at,
+        "created_by": created_by,
+    }
 
 
 def invite_json(
