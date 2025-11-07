@@ -36,18 +36,18 @@ from tests.conftest import (
             create_active_user_with_permissions(),
             (
                 "Test User (you) "
+                "Can Manage settings, team and usage "
                 "Can See dashboard "
                 "Can Send messages "
                 "Can Add and edit templates "
-                "Can Manage settings, team and usage "
                 "Can Manage API integration"
             ),
             (
                 "ZZZZZZZZ zzzzzzz@example.gov.uk "
+                "Cannot Manage settings, team and usage "
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage settings, team and usage "
                 "Cannot Manage API integration "
                 "Change details for ZZZZZZZZ zzzzzzz@example.gov.uk"
             ),
@@ -56,18 +56,18 @@ from tests.conftest import (
             create_active_user_empty_permissions(),
             (
                 "Test User With Empty Permissions (you) "
+                "Cannot Manage settings, team and usage "
                 "Cannot See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage settings, team and usage "
                 "Cannot Manage API integration"
             ),
             (
                 "ZZZZZZZZ zzzzzzz@example.gov.uk "
+                "Cannot Manage settings, team and usage "
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage settings, team and usage "
                 "Cannot Manage API integration"
             ),
         ),
@@ -75,18 +75,18 @@ from tests.conftest import (
             create_active_user_view_permissions(),
             (
                 "Test User With Permissions (you) "
+                "Cannot Manage settings, team and usage "
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage settings, team and usage "
                 "Cannot Manage API integration"
             ),
             (
                 "ZZZZZZZZ zzzzzzz@example.gov.uk "
+                "Cannot Manage settings, team and usage "
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage settings, team and usage "
                 "Cannot Manage API integration"
             ),
         ),
@@ -94,18 +94,18 @@ from tests.conftest import (
             create_active_user_manage_template_permissions(),
             (
                 "Test User With Permissions (you) "
+                "Cannot Manage settings, team and usage "
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Can Add and edit templates "
-                "Cannot Manage settings, team and usage "
                 "Cannot Manage API integration"
             ),
             (
                 "ZZZZZZZZ zzzzzzz@example.gov.uk "
+                "Cannot Manage settings, team and usage "
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage settings, team and usage "
                 "Cannot Manage API integration"
             ),
         ),
@@ -113,18 +113,18 @@ from tests.conftest import (
             create_active_user_manage_template_permissions(),
             (
                 "Test User With Permissions (you) "
+                "Cannot Manage settings, team and usage "
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Can Add and edit templates "
-                "Cannot Manage settings, team and usage "
                 "Cannot Manage API integration"
             ),
             (
                 "ZZZZZZZZ zzzzzzz@example.gov.uk "
+                "Cannot Manage settings, team and usage "
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage settings, team and usage "
                 "Cannot Manage API integration"
             ),
         ),
@@ -287,19 +287,19 @@ def test_should_show_caseworker_on_overview_page(
     assert normalize_spaces(page.select_one("h1").text) == "Team members"
     assert normalize_spaces(page.select(".user-list-item")[0].text) == (
         "Test User With Permissions (you) "
+        "Cannot Manage settings, team and usage "
         "Can See dashboard "
         "Cannot Send messages "
         "Cannot Add and edit templates "
-        "Cannot Manage settings, team and usage "
         "Cannot Manage API integration"
     )
     # [1:5] are invited users
     assert normalize_spaces(page.select(".user-list-item")[6].text) == (
         "Test User zzzzzzz@example.gov.uk "
+        "Cannot Manage settings, team and usage "
         "Cannot See dashboard "
         "Can Send messages "
         "Cannot Add and edit templates "
-        "Cannot Manage settings, team and usage "
         "Cannot Manage API integration"
     )
 
@@ -356,10 +356,10 @@ def test_service_without_caseworking_doesnt_show_admin_vs_caseworker(
 
     for idx in range(len(permission_checkboxes)):
         assert permission_checkboxes[idx]["name"] == "permissions_field"
-    assert permission_checkboxes[0]["value"] == "view_activity"
-    assert permission_checkboxes[1]["value"] == "send_messages"
-    assert permission_checkboxes[2]["value"] == "manage_templates"
-    assert permission_checkboxes[3]["value"] == "manage_service"
+    assert permission_checkboxes[0]["value"] == "manage_service"
+    assert permission_checkboxes[1]["value"] == "view_activity"
+    assert permission_checkboxes[2]["value"] == "send_messages"
+    assert permission_checkboxes[3]["value"] == "manage_templates"
     assert permission_checkboxes[4]["value"] == "manage_api_keys"
 
 
@@ -485,10 +485,10 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
             "main.edit_user_permissions",
             {"user_id": sample_uuid()},
             [
+                ("manage_service", True),
                 ("view_activity", True),
                 ("send_messages", True),
                 ("manage_templates", True),
-                ("manage_service", True),
                 ("manage_api_keys", True),
             ],
         ),
@@ -496,10 +496,10 @@ def test_user_with_no_mobile_number_cant_be_set_to_sms_auth(
             "main.invite_user",
             {},
             [
+                ("manage_service", False),
                 ("view_activity", False),
                 ("send_messages", False),
                 ("manage_templates", False),
-                ("manage_service", False),
                 ("manage_api_keys", False),
             ],
         ),
@@ -1223,10 +1223,10 @@ def test_cancel_invited_user_doesnt_work_if_user_not_invited_to_this_service(
             "pending",
             (
                 "invited_user@test.gov.uk (invited) "
+                "Can Manage settings, team and usage "
                 "Can See dashboard "
                 "Can Send messages "
                 "Cannot Add and edit templates "
-                "Can Manage settings, team and usage "
                 "Can Manage API integration "
                 "Cancel invitation for invited_user@test.gov.uk"
             ),
@@ -1236,10 +1236,10 @@ def test_cancel_invited_user_doesnt_work_if_user_not_invited_to_this_service(
             (
                 "invited_user@test.gov.uk (cancelled invite) "
                 # all permissions are greyed out
+                "Cannot Manage settings, team and usage "
                 "Cannot See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage settings, team and usage "
                 "Cannot Manage API integration"
             ),
         ),
@@ -2278,10 +2278,10 @@ def test_service_join_request_choose_permissions(
     assert f"{mock_requester['email_address']}" in page.select_one("p").text.strip()
 
     permission_checkboxes = page.select("input[name='permissions_field']")
-    assert permission_checkboxes[0]["value"] == "view_activity"
-    assert permission_checkboxes[1]["value"] == "send_messages"
-    assert permission_checkboxes[2]["value"] == "manage_templates"
-    assert permission_checkboxes[3]["value"] == "manage_service"
+    assert permission_checkboxes[0]["value"] == "manage_service"
+    assert permission_checkboxes[1]["value"] == "view_activity"
+    assert permission_checkboxes[2]["value"] == "send_messages"
+    assert permission_checkboxes[3]["value"] == "manage_templates"
     assert permission_checkboxes[4]["value"] == "manage_api_keys"
 
     folder_checkboxes = page.select("input[name='folder_permissions']")
