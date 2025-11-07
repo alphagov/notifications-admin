@@ -21,6 +21,7 @@ import AddBrandingOptionsControls from './add-branding-options-controls.mjs';
 import RadioSelect from './radio-select.mjs';
 import FullscreenTable from './fullscreen-table.mjs';
 import RemoveInPresenceOf from './remove-in-presence-of.mjs';
+import AuthenticateSecurityKey from './authenticate-security-key.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -124,6 +125,11 @@ if ($fullScreenTableArray.length > 0) {
 const $elementToRemove = document.querySelector('[data-notify-module="remove-in-presence-of"]');
 if ($elementToRemove) {
   new RemoveInPresenceOf($elementToRemove);
+}
+
+const $authenticateSecurityKey = document.querySelector('[data-notify-module="authenticate-security-key"]');
+if ($authenticateSecurityKey) {
+  new AuthenticateSecurityKey($authenticateSecurityKey);
 }
 
 const focusBanner = new FocusBanner();
