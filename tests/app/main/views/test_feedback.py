@@ -376,7 +376,7 @@ def test_support_mobile_number_changed_account_details_submits_zendesk_ticket(cl
     mock_create_ticket.assert_called_once_with(
         ANY,
         subject="[env: test] Mobile number has changed",
-        message="User’s mobile number has changed\n\nOld mobile number: 07000000000\n\nNew mobile number: 07000000001",
+        message="Old mobile number: 07000000000\n\nNew mobile number: 07000000001",
         ticket_type="incident",
         user_name="User",
         user_email="test@gov.uk",
