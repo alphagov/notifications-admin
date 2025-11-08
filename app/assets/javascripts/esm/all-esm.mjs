@@ -22,6 +22,7 @@ import RadioSelect from './radio-select.mjs';
 import FullscreenTable from './fullscreen-table.mjs';
 import RemoveInPresenceOf from './remove-in-presence-of.mjs';
 import AuthenticateSecurityKey from './authenticate-security-key.mjs';
+import RegisterSecurityKey from './register-security-key.mjs';
 
 // Modules from 3rd party vendors
 import morphdom from 'morphdom';
@@ -130,6 +131,11 @@ if ($elementToRemove) {
 const $authenticateSecurityKey = document.querySelector('[data-notify-module="authenticate-security-key"]');
 if ($authenticateSecurityKey) {
   new AuthenticateSecurityKey($authenticateSecurityKey);
+}
+
+const $registerSecurityKey = document.querySelector('[data-notify-module="register-security-key"]');
+if ($registerSecurityKey) {
+  new RegisterSecurityKey($registerSecurityKey);
 }
 
 const focusBanner = new FocusBanner();
