@@ -3,9 +3,9 @@
 <nav>
   <a class="govuk-link govuk-link--inverse pill-separate-item" href="{{ url_for('main.choose_template', service_id=current_service.id) }}">
     {% if current_service.has_permission('letter') %}
-      Write an email, text message or letter
+      Add an email, text message or letter template
     {% else %}
-      Write an email or text message
+      Add an email or text message template
     {% endif %}
   </a>
 </nav>
