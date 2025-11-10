@@ -2,18 +2,20 @@
 {% from "components/page-footer.html" import sticky_page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
-{% set page_title = 'Submit returned letters' %}
-
 {% block per_page_title %}
-  {{ page_title }}
+  {{ form.references.label.text }}
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-medium">{{ page_title }}</h1>
   {% call form_wrapper() %}
     {{ form.references(param_extensions={
       "classes": "govuk-!-width-full",
+      "hint": {"text": "Letter references"},
+      "label": {
+        "isPageHeading": True,
+        "classes": "govuk-label--m govuk-!-margin-top-3"
+      },
       "attributes": {
         "data-notify-module": "enhanced-textbox",
         "data-highlight-placeholders": "false"

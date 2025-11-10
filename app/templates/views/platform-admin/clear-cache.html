@@ -8,12 +8,19 @@
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-medium">
-    Clear cache
-  </h1>
-
   {% call form_wrapper() %}
-    {{ form.model_type }}
+    {{ form.model_type(
+      param_extensions={
+        "hint": {"text": "What do you want to clear today?"},
+        "formGroup": {"classes": "govuk-!-margin-top-3"},
+        "fieldset": {
+          "legend": {
+            "isPageHeading": True,
+            "classes": "govuk-fieldset__legend--m"
+          }
+        }
+      }
+    ) }}
     {{ page_footer('Clear') }}
   {% endcall %}
 

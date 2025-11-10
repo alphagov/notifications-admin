@@ -3444,7 +3444,13 @@ def test_get_service_set_letter_branding_add_to_branding_pool_step_protects_agai
         branding_id="234",
     )
     form = page.select_one("form")
-    for hint in form.select(".govuk-hint"):
+
+    hint_text = form.select(".govuk-hint")
+    assert normalize_spaces(hint_text[0]) == (
+        "Should other teams in organisation one have the option to use this branding?"
+    )
+
+    for hint in hint_text[1:]:
         assert not hint.select("script")
         assert "apply this branding to ‘<script>evil</script>’" in normalize_spaces(hint.text).lower()
 
@@ -3556,7 +3562,7 @@ def test_should_show_page_to_set_sms_allowance(client_request, platform_admin_us
     client_request.login(platform_admin_user)
     page = client_request.get("main.set_free_sms_allowance", service_id=SERVICE_ONE_ID)
 
-    assert normalize_spaces(page.select_one("label").text) == "Numbers of text message fragments per year"
+    assert normalize_spaces(page.select_one("label").text) == "Free text message allowance"
     mock_get_free_sms_fragment_limit.assert_called_once_with(SERVICE_ONE_ID)
 
 
@@ -3654,7 +3660,7 @@ def test_should_show_page_to_set_per_minute_rate_limit(
 ):
     client_request.login(platform_admin_user)
     page = client_request.get("main.set_per_minute_rate_limit", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("label").text) == (
+    assert normalize_spaces(page.select_one(".govuk-hint").text) == (
         "Number of messages the service can send in a rolling 60 second window"
     )
     assert normalize_spaces(page.select_one("input[type=text]")["value"]) == "3,000"
@@ -5137,7 +5143,8 @@ def test_show_sms_prefixing_setting_page(
     mock_update_service,
 ):
     page = client_request.get("main.service_set_sms_prefix", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one("legend").text) == "Start all text messages with ‘service one:’"
+    assert normalize_spaces(page.select_one("h1")) == "Start text messages with service name"
+    assert normalize_spaces(page.select_one(".govuk-hint").text) == "Start all text messages with ‘service one:’"
     radios = page.select("input[type=radio]")
     assert len(radios) == 2
     assert radios[0]["value"] == "True"
@@ -5460,8 +5467,7 @@ def test_view_edit_service_notes(
         "main.edit_service_notes",
         service_id=SERVICE_ONE_ID,
     )
-    assert page.select_one("h1").text == "Edit service notes"
-    assert page.select_one(".govuk-label").text.strip() == "Notes"
+    assert normalize_spaces(page.select_one("h1").text) == "Edit service notes"
     assert page.select_one("textarea").attrs["name"] == "notes"
 
 

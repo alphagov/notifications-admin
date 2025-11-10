@@ -943,7 +943,7 @@ def filter_by_permissions(valuelist, permissions):
 
 class AuthTypeForm(StripWhitespaceForm):
     auth_type = GovukRadiosField(
-        "Sign-in method",
+        "",
         choices=[
             ("sms_auth", format_auth_type("sms_auth")),
             ("email_auth", format_auth_type("email_auth")),
@@ -1037,7 +1037,6 @@ class JoinServiceRequestApproveForm(StripWhitespaceForm):
             (SERVICE_JOIN_REQUEST_REJECTED, "No"),
         ],
         thing="an option",
-        param_extensions={"fieldset": {"legend": {"classes": ""}}},
         default=SERVICE_JOIN_REQUEST_APPROVED,
     )
 
@@ -1161,7 +1160,7 @@ class RenameServiceForm(StripWhitespaceForm):
 
 class RenameOrganisationForm(StripWhitespaceForm):
     name = GovukTextInputField(
-        "Organisation name",
+        "Change organisation name",
         validators=[
             NotifyDataRequired(thing="your organisation name"),
             MustContainAlphanumericCharacters(thing="organisation name"),
@@ -1238,7 +1237,7 @@ class OrganisationCrownStatusForm(StripWhitespaceForm):
 
 class OrganisationAgreementSignedForm(StripWhitespaceForm):
     agreement_signed = GovukRadiosField(
-        "Has this organisation signed the agreement?",
+        "Has this organisation signed the data processing and financial agreement?",
         choices=[
             ("yes", "Yes"),
             ("no", "No"),
@@ -1328,7 +1327,7 @@ class AdminNewOrganisationForm(
 
 class AdminServiceSMSAllowanceForm(StripWhitespaceForm):
     free_sms_allowance = GovukIntegerField(
-        "Numbers of text message fragments per year",
+        "Free text message allowance",
         things="the number of text message fragments",
         validators=[
             NotifyInputRequired(thing="a number of text messages"),
@@ -1357,7 +1356,7 @@ class AdminServiceMessageLimitForm(StripWhitespaceForm):
 
 class AdminServiceRateLimitForm(StripWhitespaceForm):
     rate_limit = GovukIntegerField(
-        "Number of messages the service can send in a rolling 60 second window",
+        "Rate limit",
         things="the number of messages",
         validators=[
             NotifyDataRequired(thing="a number of messages"),
@@ -1524,7 +1523,7 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
     ]
 
     postage = GovukRadiosField(
-        "Choose the postage for this letter template",
+        "Change postage",
         choices=choices,
         thing="first class, second class or economy mail",
         validators=[DataRequired()],
@@ -1533,7 +1532,7 @@ class LetterTemplatePostageForm(StripWhitespaceForm):
 
 class LetterTemplateLanguagesForm(StripWhitespaceForm):
     languages = GovukRadiosField(
-        "This will change the language used for the date and page numbers of your letter template.",
+        "Change language",
         choices=[
             (LetterLanguageOptions.english.value, "English only"),
             (LetterLanguageOptions.welsh_then_english.value, "Welsh followed by English"),
@@ -1697,7 +1696,7 @@ class SupportProblemTypeForm(StripWhitespaceForm):
                 ("something-else", "Something else"),
             ]
 
-    problem_type = GovukRadiosField("")
+    problem_type = GovukRadiosField("Report a problem")
 
 
 class SupportSignInIssuesForm(StripWhitespaceForm):
@@ -1935,7 +1934,7 @@ class ServiceEditInboundNumberForm(StripWhitespaceForm):
 
 
 class AdminNotesForm(StripWhitespaceForm):
-    notes = GovukTextareaField("Notes", validators=[])
+    notes = GovukTextareaField(validators=[])
 
 
 class AdminBillingDetailsForm(StripWhitespaceForm):
@@ -2169,15 +2168,6 @@ class AdminSetBrandingAddToBrandingPoolStepForm(StripWhitespaceForm):
     add_to_pool = GovukRadiosField(
         choices=[("yes", "Yes"), ("no", "No")],
         thing="yes or no",
-        param_extensions={
-            "fieldset": {
-                "legend": {
-                    # This removes the `govuk-fieldset__legend--s` class, thereby
-                    # making the form label font regular weight, not bold
-                    "classes": "",
-                },
-            }
-        },
     )
 
 
@@ -2405,7 +2395,7 @@ class CallbackForm(StripWhitespaceForm):
 
 
 class SMSPrefixForm(StripWhitespaceForm):
-    enabled = OnOffField("")  # label is assigned on instantiation
+    enabled = OnOffField("Start text messages with service name")
 
 
 def get_placeholder_form_instance(
@@ -2619,7 +2609,6 @@ class AdminServiceAddDataRetentionForm(StripWhitespaceForm):
 
 class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
     days_of_retention = GovukIntegerField(
-        label="Days of retention",
         things="a number of days",
         validators=[validators.NumberRange(min=3, max=90, message="The number of days must be between 3 and 90")],
     )
@@ -2627,7 +2616,7 @@ class AdminServiceEditDataRetentionForm(StripWhitespaceForm):
 
 class AdminReturnedLettersForm(StripWhitespaceForm):
     references = GovukTextareaField(
-        "Letter references",
+        "Submit returned letters",
         validators=[
             NotifyDataRequired(thing="the returned letter references"),
         ],
@@ -2780,7 +2769,7 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
 
 
 class AdminClearCacheForm(StripWhitespaceForm):
-    model_type = GovukCheckboxesField("What do you want to clear today")
+    model_type = GovukCheckboxesField("Clear cache")
 
     def validate_model_type(self, field):
         if not field.data:
@@ -2863,7 +2852,6 @@ class AcceptAgreementForm(StripWhitespaceForm):
 
 class ChangeSecurityKeyNameForm(StripWhitespaceForm):
     security_key_name = GovukTextInputField(
-        "Name of key",
         validators=[
             DataRequired(message="Enter a name for this key"),
             MustContainAlphanumericCharacters(thing="the name of the key"),

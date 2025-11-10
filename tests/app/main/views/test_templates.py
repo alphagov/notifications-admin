@@ -3054,7 +3054,7 @@ def test_should_show_page_to_rename_template(
     assert "action" not in form
 
     assert form.select_one("input[name=name]")
-    assert normalize_spaces(form.select_one("label[for=name]").text) == "Template name"
+    assert normalize_spaces(form.select_one("label[for=name]").text) == "Rename template"
 
 
 def test_should_show_rename_template(
