@@ -314,7 +314,7 @@ def test_support_no_security_code_account_details_submits_zendesk_ticket(client_
     mock_create_ticket.assert_called_once_with(
         ANY,
         subject="[env: test] Security code not received",
-        message="User did not receive a security code\n\nMobile number: 07000000000",
+        message=ANY,
         ticket_type="incident",
         user_name="User",
         user_email="test@gov.uk",
@@ -325,6 +325,9 @@ def test_support_no_security_code_account_details_submits_zendesk_ticket(client_
             {"id": ZendeskTopicId.accessing_notify_1, "value": "notify_accessing_account"},
         ],
     )
+    ticket_message = mock_create_ticket.call_args[0][0].message
+    assert ticket_message.startswith("The user did not receive a security code")
+    assert "Mobile number: 07000000000" in ticket_message
 
 
 def test_support_mobile_number_changed_account_details_shows_form(client_request):
@@ -434,7 +437,7 @@ def test_support_no_email_link_account_details_submits_zendesk_ticket(client_req
     mock_create_ticket.assert_called_once_with(
         ANY,
         subject="[env: test] Email link not received",
-        message="User did not receive an email link\n\nEmail address: test@gov.uk",
+        message=ANY,
         ticket_type="incident",
         user_name="User",
         user_email="test@gov.uk",
@@ -445,6 +448,9 @@ def test_support_no_email_link_account_details_submits_zendesk_ticket(client_req
             {"id": ZendeskTopicId.accessing_notify_1, "value": "notify_accessing_account"},
         ],
     )
+    ticket_message = mock_create_ticket.call_args[0][0].message
+    assert ticket_message.startswith("The user did not receive an email link")
+    assert "Email address: test@gov.uk" in ticket_message
 
 
 def test_support_email_address_changed_account_details_shows_form(client_request):
