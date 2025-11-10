@@ -376,7 +376,7 @@ def test_support_mobile_number_changed_account_details_submits_zendesk_ticket(cl
     mock_create_ticket.assert_called_once_with(
         ANY,
         subject="[env: test] Mobile number has changed",
-        message="Old mobile number: 07000000000\n\nNew mobile number: 07000000001",
+        message=ANY,
         ticket_type="incident",
         user_name="User",
         user_email="test@gov.uk",
@@ -389,6 +389,9 @@ def test_support_mobile_number_changed_account_details_submits_zendesk_ticket(cl
             {"id": ZendeskTopicId.accessing_notify_2, "value": "notify_accessing_service_2"},
         ],
     )
+    ticket_message = mock_create_ticket.call_args[0][0].message
+    assert ticket_message.startswith("The user’s mobile number has changed")
+    assert "Old mobile number: 07000000000\n\nNew mobile number: 07000000001" in ticket_message
 
 
 def test_support_no_email_link_account_details_shows_form(client_request):
@@ -490,7 +493,7 @@ def test_support_email_address_account_details_submits_zendesk_ticket(client_req
     mock_create_ticket.assert_called_once_with(
         ANY,
         subject="[env: test] Email address has changed",
-        message=("Old email address: old_address@gov.uk\n\nNew email address: new_address@gov.uk"),
+        message=ANY,
         ticket_type="incident",
         user_name="User",
         user_email="new_address@gov.uk",
@@ -503,7 +506,9 @@ def test_support_email_address_account_details_submits_zendesk_ticket(client_req
             {"id": ZendeskTopicId.accessing_notify_2, "value": "notify_accessing_service_2"},
         ],
     )
-
+    ticket_message = mock_create_ticket.call_args[0][0].message
+    assert ticket_message.startswith("The user’s email address has changed")
+    assert "Old email address: old_address@gov.uk\n\nNew email address: new_address@gov.uk" in ticket_message
 
 @pytest.mark.parametrize(
     "endpoint",
