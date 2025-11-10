@@ -490,9 +490,7 @@ def test_support_email_address_account_details_submits_zendesk_ticket(client_req
     mock_create_ticket.assert_called_once_with(
         ANY,
         subject="[env: test] Email address has changed",
-        message=(
-            "Old email address: old_address@gov.uk\n\nNew email address: new_address@gov.uk"
-        ),
+        message=("Old email address: old_address@gov.uk\n\nNew email address: new_address@gov.uk"),
         ticket_type="incident",
         user_name="User",
         user_email="new_address@gov.uk",
