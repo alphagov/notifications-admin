@@ -516,6 +516,7 @@ def test_support_email_address_account_details_submits_zendesk_ticket(client_req
     assert ticket_message.startswith("The user’s email address has changed")
     assert "Old email address: old_address@gov.uk\n\nNew email address: new_address@gov.uk" in ticket_message
 
+
 @pytest.mark.parametrize(
     "endpoint",
     [
