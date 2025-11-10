@@ -41,7 +41,7 @@
 ) %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-one-quarter">
-      <h2 class="{{heading_classes}}">
+      <h2 {% if heading_classes %}class="{{heading_classes}}"{% endif %}>
         {{heading}}
       </h2>
     </div>
