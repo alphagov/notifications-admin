@@ -238,7 +238,7 @@ def support_mobile_number_changed_account_details():
             new_mobile_number=form.new_mobile_number.data,
         )
         create_sign_in_issues_zendesk_ticket(
-            subject="Change mobile number",
+            subject="Mobile number has changed",
             message=feedback_msg,
             name=form.name.data,
             email=form.email_address.data,
@@ -295,7 +295,7 @@ def support_email_address_changed_account_details():
             new_email_address=form.new_email_address.data,
         )
         create_sign_in_issues_zendesk_ticket(
-            subject="Change email address",
+            subject="Email address has changed",
             message=feedback_msg,
             name=form.name.data,
             email=form.new_email_address.data,

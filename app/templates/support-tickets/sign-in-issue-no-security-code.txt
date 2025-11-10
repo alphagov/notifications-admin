@@ -1,3 +1,7 @@
-User did not receive a security code
+The user did not receive a security code
+---
+
+1. Open the [GOV.UK Notify support manual](https://docs.google.com/document/d/1F41AxZdwjebI4yCIhUQvs72ozHfG2aqCnhelSYu_Wi0/edit?usp=sharing).
+2. Search for ‘I did not receive a text message with a security code’.
 
 Mobile number: {{ user_mobile }}
