@@ -398,7 +398,6 @@ def test_validation_of_gps_creating_organisations(
     expected_error,
 ):
     service_one["organisation_type"] = "nhs_gp"
-    expected_page_header = "Accept our data processing and financial agreement"
     page = client_request.post(
         ".add_organisation_from_gp_service",
         service_id=SERVICE_ONE_ID,
@@ -406,7 +405,7 @@ def test_validation_of_gps_creating_organisations(
         _expected_status=200,
     )
     assert expected_error in page.select_one(".govuk-error-message").text
-    assert normalize_spaces(page.select_one("h1[id=page-header]").text) == expected_page_header
+    assert normalize_spaces(page.select_one("h1").text) == f"Is your GP surgery called ‘{service_one['name']}’?"
     assert normalize_spaces(page.select_one("label[for=same_as_service_name-0]")) == "Yes"
     assert normalize_spaces(page.select_one("label[for=same_as_service_name-1]")) == "No"
 
