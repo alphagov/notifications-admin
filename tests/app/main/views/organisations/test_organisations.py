@@ -276,9 +276,7 @@ def test_nhs_local_can_create_own_organisations(
     if expected_status == 403:
         return
 
-    assert normalize_spaces(page.select_one("main p").text) == (
-        "Which NHS Trust or Integrated Care Board do you work for?"
-    )
+    assert normalize_spaces(page.select_one("h1").text) == "Which NHS Trust or Integrated Care Board do you work for?"
     assert page.select_one("[data-notify-module=live-search]")["data-targets"] == ".govuk-radios__item"
     assert [
         (normalize_spaces(radio.select_one("label").text), radio.select_one("input")["value"])
