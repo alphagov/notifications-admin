@@ -1175,10 +1175,13 @@ class AddGPOrganisationForm(StripWhitespaceForm):
         self.same_as_service_name.label.text = f"Is your GP surgery called ‘{service_name}’?"
         self.service_name = service_name
         self.same_as_service_name.param_extensions = {
+            "fieldset": {
+                "legend": {"isPageHeading": True, "classes": "govuk-fieldset__legend--l"},
+            },
             "items": [
                 {},
                 {"conditional": {"html": self.name}},
-            ]
+            ],
         }
 
     def get_organisation_name(self):
