@@ -15,8 +15,8 @@ def test_should_render_email_verification_resend_show_email_address_and_resend_v
         session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
     page = client_request.get("main.resend_email_verification")
 
-    assert page.select_one("h1").string == "Check your email"
-    expected = f"A new confirmation email has been sent to {api_user_active['email_address']}"
+    assert page.select_one("h1").string == "Check your inbox"
+    expected = f"We’ve sent a new confirmation email to {api_user_active['email_address']}"
 
     message = page.select("main p")[0].text
     assert message == expected
