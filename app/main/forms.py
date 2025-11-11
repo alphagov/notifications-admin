@@ -1613,7 +1613,7 @@ class ChangeEmailForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
 
     email_address = make_email_address_field(
-        label="Change your email address",
+        label="Enter the new email address",
         thing="an email address",
         gov_user=True,
     )
@@ -1635,7 +1635,7 @@ class ChangeNonGovEmailForm(ChangeEmailForm):
 
 
 class ChangeMobileNumberForm(StripWhitespaceForm):
-    mobile_number = valid_phone_number(label="Change your mobile number", international=True)
+    mobile_number = valid_phone_number(label="Change the mobile number", international=True)
 
 
 class ChooseTimeForm(StripWhitespaceForm):

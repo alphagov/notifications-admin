@@ -139,7 +139,7 @@ def test_should_show_email_page(
     client_request,
 ):
     page = client_request.get("main.your_account_email")
-    assert page.select_one("h1").text.strip() == "Change your email address"
+    assert page.select_one("h1").text.strip() == "Enter your new email address"
     # template is shared with "Change your mobile number" but we don't want to show Delete mobile number link
     assert "Delete your number" not in page.text
 
