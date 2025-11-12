@@ -2804,7 +2804,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
         )
 
     version = GovukTextInputField(
-        "Which version of the agreement do you want to accept?",
+        "Enter the version number of the agreement you want to accept",
         validators=[NotifyDataRequired(thing="a version number")],
     )
 
