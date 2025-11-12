@@ -247,6 +247,7 @@ class MainNavigation(Navigation):
             "view_template_version",
             "view_template_versions",
             "rename_template",
+            "email_template_files_upload",
         },
         "uploads": {
             "upload_contact_list",

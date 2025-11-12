@@ -41,6 +41,7 @@ from app.main.views import (  # noqa
     sign_in,
     sign_out,
     templates,
+    template_email_files,
     tour,
     two_factor,
     uploads,
