@@ -45,10 +45,13 @@ help:
 generate-version-file: ## Generates the app version file
 	@echo -e "__git_commit__ = \"${GIT_COMMIT}\"\n__time__ = \"${DATE}\"" > ${APP_VERSION_FILE}
 
-.PHONY: test
-test: ## Run tests
+.PHONY: lint
+lint: ## Run tests
 	ruff check .
 	ruff format --check .
+
+.PHONY: test
+test: lint ## Run tests
 	npm test
 	py.test -n auto --maxfail=10 tests/
 
