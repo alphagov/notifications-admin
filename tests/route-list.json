@@ -124,7 +124,6 @@
     "/services",
     "/services-or-dashboard",
     "/services/<uuid:service_id>",
-    "/services/<uuid:service_id>/",
     "/services/<uuid:service_id>/<uuid:template_id>/check.<letter_file_extension:filetype>",
     "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>",
     "/services/<uuid:service_id>/<uuid:template_id>/check/<uuid:upload_id>.<letter_file_extension:filetype>",
