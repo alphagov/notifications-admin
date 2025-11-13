@@ -76,6 +76,7 @@ PLATFORM_ADMIN_SERVICE_PERMISSIONS = {
     "inbound_sms": {"title": "Receive inbound SMS", "requires": "sms", "endpoint": ".service_set_inbound_number"},
     "email_auth": {"title": "Email authentication"},
     "sms_to_uk_landlines": {"title": "Sending SMS to UK landlines"},
+    "send_files_via_ui": {"title": "Send files via email using admin ui"},
 }
 
 THANKS_FOR_BRANDING_REQUEST_MESSAGE = (
