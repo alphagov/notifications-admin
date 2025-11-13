@@ -4,10 +4,8 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = "Enter your text message code" %}
-
 {% block per_page_title %}
-  {{ page_title }}
+  Enter your text message code – Change your mobile number
 {% endblock %}
 
 {% block backLink %}
@@ -16,7 +14,7 @@
 
 {% block maincolumn_content %}
   <span class="govuk-caption-xl">Change your mobile number</span>
-  {{ page_header(page_title, classes='govuk-!-margin-top-0') }}
+  {{ page_header("Enter your text message code", classes='govuk-!-margin-top-0') }}
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
