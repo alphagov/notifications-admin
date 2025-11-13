@@ -238,6 +238,7 @@ def test_should_render_change_email_continue_after_authenticate_email(
         _data={"password": "12345"},
         _expected_status=200,
     )
+    client_request.test_page_title(page, url_for("main.your_account_email_authenticate"))
     assert "Click the link in the email to confirm the change to your email address." in page.text
 
 
