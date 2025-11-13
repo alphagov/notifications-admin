@@ -46,7 +46,7 @@ generate-version-file: ## Generates the app version file
 	@echo -e "__git_commit__ = \"${GIT_COMMIT}\"\n__time__ = \"${DATE}\"" > ${APP_VERSION_FILE}
 
 .PHONY: lint
-lint: ## Run tests
+lint: ## Run static analysis
 	ruff check .
 	ruff format --check .
 
