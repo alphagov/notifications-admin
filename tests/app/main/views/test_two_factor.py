@@ -19,7 +19,7 @@ def mock_email_validated_recently(mocker):
 
 @pytest.mark.parametrize("request_url", ["two_factor_email_sent", "revalidate_email_sent"])
 @pytest.mark.parametrize("redirect_url", [None, f"/services/{SERVICE_ONE_ID}/templates"])
-@pytest.mark.parametrize("email_resent, page_title", [(None, "Check your email"), (True, "Email resent")])
+@pytest.mark.parametrize("email_resent, page_title", [(None, "Check your inbox"), (True, "Email resent")])
 def test_two_factor_email_sent_page(client_request, email_resent, page_title, redirect_url, request_url):
     client_request.logout()
     page = client_request.get(

@@ -533,3 +533,17 @@ def test_register_from_invite_form_doesnt_show_mobile_number_field_if_email_auth
 
     assert page.select_one("input[name=auth_type]")["value"] == "email_auth"
     assert page.select_one("input[name=mobile_number]") is None
+
+
+def test_registration_continue_page(client_request, fake_uuid):
+    with client_request.session_transaction() as session:
+        session["user_details"] = {"email": "user@gov.uk", "id": fake_uuid}
+
+    page = client_request.get("main.registration_continue")
+
+    assert normalize_spaces(page.select_one("h1").text) == "Check your inbox"
+    assert "We’ve sent an email to user@gov.uk" in page.text
+
+
+def test_registration_continue_without_user_details_in_session_redirects(client_request):
+    client_request.get("main.registration_continue", _expected_redirect=url_for("main.show_accounts_or_dashboard"))

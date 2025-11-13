@@ -4,7 +4,7 @@ from notifications_python_client.errors import HTTPError
 
 import app
 from tests import user_json
-from tests.conftest import SERVICE_ONE_ID
+from tests.conftest import SERVICE_ONE_ID, normalize_spaces
 
 
 def test_should_render_forgot_password(client_request):
@@ -27,6 +27,7 @@ def test_should_redirect_to_password_reset_sent_for_valid_email(
         _data={"email_address": sample_user["email_address"]},
         _expected_status=200,
     )
+    assert normalize_spaces(page.select_one("h1").text) == "Check your inbox"
     assert "Click the link in the email to reset your password." in page.text
     app.user_api_client.send_reset_password_url.assert_called_once_with(sample_user["email_address"], next_string=None)
 
