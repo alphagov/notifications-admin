@@ -227,11 +227,15 @@ def test_gps_can_create_own_organisations(
         ".add_organisation_from_gp_service",
         service_id=SERVICE_ONE_ID,
         _expected_status=expected_status,
+        _test_page_title=False,
     )
 
     if expected_status == 403:
         return
 
+    assert normalize_spaces(page.select_one("title")).startswith(
+        "Is your GP surgery called ‘service one’? – Accept our data processing and financial agreement"
+    )
     assert page.select_one("input[type=text]")["name"] == "name"
     assert normalize_spaces(page.select_one("label[for=name]").text) == "What’s your GP surgery called?"
 
@@ -271,11 +275,15 @@ def test_nhs_local_can_create_own_organisations(
         ".add_organisation_from_nhs_local_service",
         service_id=SERVICE_ONE_ID,
         _expected_status=expected_status,
+        _test_page_title=False,
     )
 
     if expected_status == 403:
         return
 
+    assert normalize_spaces(page.select_one("title").text).startswith(
+        "Which NHS Trust or Integrated Care Board do you work for? – Accept our data processing and financial agreement"
+    )
     assert normalize_spaces(page.select_one("h1").text) == "Which NHS Trust or Integrated Care Board do you work for?"
     assert page.select_one("[data-notify-module=live-search]")["data-targets"] == ".govuk-radios__item"
     assert [
