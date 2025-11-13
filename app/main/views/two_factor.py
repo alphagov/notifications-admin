@@ -24,7 +24,7 @@ from app.utils.login import (
 
 @main.route("/two-factor-email-sent", methods=["GET"])
 def two_factor_email_sent():
-    title = "Email resent" if request.args.get("email_resent") else "Check your email"
+    title = "Email resent" if request.args.get("email_resent") else "Check your inbox"
     return render_template("views/two-factor-email.html", title=title, redirect_url=request.args.get("next"))
 
 
@@ -100,6 +100,6 @@ def two_factor_webauthn():
 
 @main.route("/re-validate-email", methods=["GET"])
 def revalidate_email_sent():
-    title = "Email resent" if request.args.get("email_resent") else "Check your email"
+    title = "Email resent" if request.args.get("email_resent") else "Check your inbox"
     redirect_url = request.args.get("next")
     return render_template("views/re-validate-email-sent.html", title=title, redirect_url=redirect_url)
