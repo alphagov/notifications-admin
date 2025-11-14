@@ -14,7 +14,7 @@ class JSONModelMeta(SerialisedModelMeta, ABCMeta):
 
 
 @total_ordering
-class JSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
+class StrictJSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
     @property
     @abstractmethod
     def __sort_attribute__(self):
@@ -43,6 +43,14 @@ class JSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
     def __hash__(self):
         return hash(self.id)
 
+    def _get_by_id(self, things, id):
+        try:
+            return next(thing for thing in things if thing["id"] == str(id))
+        except StopIteration:
+            abort(404)
+
+
+class JSONModel(StrictJSONModel):
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}
@@ -53,12 +61,6 @@ class JSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
 
     def __bool__(self):
         return self._dict != {}
-
-    def _get_by_id(self, things, id):
-        try:
-            return next(thing for thing in things if thing["id"] == str(id))
-        except StopIteration:
-            abort(404)
 
 
 class ModelList(SerialisedModelCollection):

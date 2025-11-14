@@ -13,7 +13,7 @@ from app.constants import (
     SIGN_IN_METHOD_TEXT,
     SIGN_IN_METHOD_TEXT_OR_EMAIL,
 )
-from app.models import JSONModel
+from app.models import JSONModel, StrictJSONModel
 from app.models.api_key import APIKeys
 from app.models.branding import EmailBranding, LetterBranding
 from app.models.contact_list import ContactLists
@@ -680,7 +680,7 @@ class Services(SerialisedModelCollection):
     model = Service
 
 
-class ServiceJoinRequest(JSONModel):
+class ServiceJoinRequest(StrictJSONModel):
     id: Any
     requester: Any
     service_id: Any
@@ -690,8 +690,6 @@ class ServiceJoinRequest(JSONModel):
     reason: str
     status: str
     contacted_service_users: list[str]
-    requested_service: Any
-    permissions: list[str]
 
     __sort_attribute__ = "id"
 
