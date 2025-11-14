@@ -198,7 +198,7 @@ def your_account_mobile_number_confirm():
         current_user.update(mobile_number=mobile_number)
         return redirect(url_for(".your_account"))
 
-    return render_template("views/your-account/confirm.html", form_field=form.sms_code, thing="mobile number")
+    return render_template("views/your-account/confirm.html", form_field=form.sms_code)
 
 
 @main.route("/your-account/password", methods=["GET", "POST"])

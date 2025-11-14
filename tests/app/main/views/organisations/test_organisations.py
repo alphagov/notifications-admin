@@ -227,11 +227,15 @@ def test_gps_can_create_own_organisations(
         ".add_organisation_from_gp_service",
         service_id=SERVICE_ONE_ID,
         _expected_status=expected_status,
+        _test_page_title=False,
     )
 
     if expected_status == 403:
         return
 
+    assert normalize_spaces(page.select_one("title")).startswith(
+        "Is your GP surgery called ‘service one’? – Accept our data processing and financial agreement"
+    )
     assert page.select_one("input[type=text]")["name"] == "name"
     assert normalize_spaces(page.select_one("label[for=name]").text) == "What’s your GP surgery called?"
 
@@ -271,14 +275,16 @@ def test_nhs_local_can_create_own_organisations(
         ".add_organisation_from_nhs_local_service",
         service_id=SERVICE_ONE_ID,
         _expected_status=expected_status,
+        _test_page_title=False,
     )
 
     if expected_status == 403:
         return
 
-    assert normalize_spaces(page.select_one("main p").text) == (
-        "Which NHS Trust or Integrated Care Board do you work for?"
+    assert normalize_spaces(page.select_one("title").text).startswith(
+        "Which NHS Trust or Integrated Care Board do you work for? – Accept our data processing and financial agreement"
     )
+    assert normalize_spaces(page.select_one("h1").text) == "Which NHS Trust or Integrated Care Board do you work for?"
     assert page.select_one("[data-notify-module=live-search]")["data-targets"] == ".govuk-radios__item"
     assert [
         (normalize_spaces(radio.select_one("label").text), radio.select_one("input")["value"])
@@ -398,7 +404,6 @@ def test_validation_of_gps_creating_organisations(
     expected_error,
 ):
     service_one["organisation_type"] = "nhs_gp"
-    expected_page_header = "Accept our data processing and financial agreement"
     page = client_request.post(
         ".add_organisation_from_gp_service",
         service_id=SERVICE_ONE_ID,
@@ -406,7 +411,7 @@ def test_validation_of_gps_creating_organisations(
         _expected_status=200,
     )
     assert expected_error in page.select_one(".govuk-error-message").text
-    assert normalize_spaces(page.select_one("h1[id=page-header]").text) == expected_page_header
+    assert normalize_spaces(page.select_one("h1").text) == f"Is your GP surgery called ‘{service_one['name']}’?"
     assert normalize_spaces(page.select_one("label[for=same_as_service_name-0]")) == "Yes"
     assert normalize_spaces(page.select_one("label[for=same_as_service_name-1]")) == "No"
 
