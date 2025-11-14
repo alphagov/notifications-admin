@@ -73,6 +73,7 @@ from app.main.validators import (
     CharactersNotAllowed,
     CommonlyUsedPassword,
     CsvFileValidator,
+    DocumentDownloadFileValidator,
     DoesNotStartWithDoubleZero,
     FileIsVirusFree,
     IsAUKMobileNumberOrShortCode,
@@ -81,6 +82,7 @@ from app.main.validators import (
     IsNotLikeNHSNoReply,
     Length,
     MustContainAlphanumericCharacters,
+    NoBracketsInFileName,
     NoCommasInPlaceHolders,
     NoEmbeddedImagesInSVG,
     NoTextInSVG,
@@ -3104,3 +3106,35 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
 
         if field.data and self.report_completed:
             raise ValidationError("There is a problem. You have already marked the report as Completed")
+
+
+class TemplateEmailFilesUploadForm(StripWhitespaceForm):
+    allowed_file_formats = {
+        "CSV": ("csv",),
+        "image": (
+            "jpeg",
+            "jpg",
+            "png",
+        ),
+        "Microsoft Excel Spreadsheet": ("xlsx",),
+        "Microsoft Word Document": (
+            "doc",
+            "docx",
+        ),
+        "PDF": ("pdf",),
+        "text": ("json", "odt", "rtf", "txt"),
+    }
+    allowed_file_extensions = tuple(chain(*allowed_file_formats.values()))
+
+    file = VirusScannedFileField(
+        "Add a file",
+        validators=[
+            DataRequired(message="You need to upload a file to submit"),
+            DocumentDownloadFileValidator(),
+            FileSize(
+                max_size=2 * 1_024 * 1_024,
+                message="The file must be smaller than 2MB",
+            ),
+            NoBracketsInFileName(),
+        ],
+    )
