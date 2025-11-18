@@ -1,7 +1,7 @@
 The user’s mobile number has changed
----
+====================================
 
-1. Open the [GOV.UK Notify support manual](https://docs.google.com/document/d/1F41AxZdwjebI4yCIhUQvs72ozHfG2aqCnhelSYu_Wi0/edit?usp=sharing).
+1. Open the GOV.UK Notify support manual: https://docs.google.com/document/d/1F41AxZdwjebI4yCIhUQvs72ozHfG2aqCnhelSYu_Wi0/edit?usp=sharing.
 2. Search for ‘User’s mobile number has changed’
 
 Old mobile number: {{ old_mobile_number }}
