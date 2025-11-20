@@ -4465,3 +4465,59 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
     else:
         template_preview_mock_valid.assert_called_once_with("pdf_file", page_requested)
         assert template_preview_mock_invalid.called is False
+
+
+@pytest.mark.parametrize(
+    "extra_permissions, template_type, expected_button_text, expected_button_endpoint, expected_hint",
+    (
+        ([], "email", None, None, None),
+        ([], "sms", None, None, None),
+        ([], "letter", "Attach pages", "main.letter_template_attach_pages", None),
+        (["send_files_via_ui"], "email", "Attach files", "main.email_template_files_upload", "No files"),
+        (["send_files_via_ui"], "sms", None, None, None),
+        (["send_files_via_ui"], "letter", "Attach pages", "main.letter_template_attach_pages", None),
+    ),
+)
+def test_attach_files_buttom(
+    client_request,
+    service_one,
+    mock_get_template_folders,
+    mock_get_page_counts_for_letter,
+    single_letter_contact_block,
+    fake_uuid,
+    extra_permissions,
+    template_type,
+    expected_button_text,
+    expected_button_endpoint,
+    expected_hint,
+    mocker,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type=template_type,
+            )
+        },
+    )
+    service_one["permissions"] += extra_permissions
+    page = client_request.get(
+        "main.view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    button = page.select_one(".js-stick-at-bottom-when-scrolling .govuk-button--secondary")
+    hint = page.select_one(".js-stick-at-bottom-when-scrolling .email-files-selected-counter")
+
+    if expected_button_text or expected_button_endpoint:
+        assert button["href"] == url_for(expected_button_endpoint, service_id=SERVICE_ONE_ID, template_id=fake_uuid)
+        assert normalize_spaces(button.text) == expected_button_text
+    else:
+        assert button is None
+
+    if expected_hint:
+        assert normalize_spaces(hint.text) == expected_hint
+    else:
+        assert hint is None

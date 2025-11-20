@@ -16,3 +16,25 @@
 </div>
 
 {{ template|string }}
+
+{% if template.template_type == "email" and current_service.has_permission("send_files_via_ui") %}
+
+  <div class="govuk-!-margin-bottom-2">
+    <div class="js-stick-at-bottom-when-scrolling">
+      <span class="email-files-selected-counter">
+        No files
+      </span>
+
+        {{ govukButton({
+          "text": "Attach files",
+          "href": url_for(
+            '.email_template_files_upload',
+            service_id=current_service.id,
+            template_id=template.id
+          ),
+          "classes": "govuk-button--secondary attach-files__button",
+        }) }}
+      </div>
+    </div>
+
+  {% endif %}

@@ -73,6 +73,7 @@ class Service(JSONModel):
         "inbound_sms",
         "international_letters",
         "international_sms",
+        "send_files_via_ui",
         "sms_to_uk_landlines",
         "send_files_via_ui",
     )
@@ -238,9 +239,15 @@ class Service(JSONModel):
 
         return template_folder
 
-    def get_template_with_user_permission_or_403(self, template_id, user, **kwargs):
+    def get_template_with_user_permission_or_403(self, template_id, user, must_be_of_type=None, **kwargs):
         template = self.get_template(template_id, **kwargs)
         self.get_template_folder_with_user_permission_or_403(template.get_raw("folder"), user)
+
+        if must_be_of_type not in {None} | set(self.TEMPLATE_TYPES):
+            raise ValueError(f"{must_be_of_type} is not a valid template type")
+
+        if must_be_of_type and template.template_type != must_be_of_type:
+            abort(404)
 
         return template
 
