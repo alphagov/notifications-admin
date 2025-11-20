@@ -907,6 +907,44 @@ def test_upload_csv_file_with_missing_columns_shows_error(
     assert normalize_spaces(page.select(".banner-dangerous")[0].text) == expected_error
 
 
+def test_upload_csv_file_limits_number_of_columns_displayed_when_error(
+    client_request,
+    mocker,
+    mock_get_service_template_with_placeholders,
+    mock_s3_set_metadata,
+    mock_s3_get_metadata,
+    mock_s3_upload,
+    mock_get_users_by_service,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+):
+    mocker.patch(
+        "app.main.views.send.s3download",
+        return_value=(
+            f"""
+            {"phone number," * 10_000}
+            +447700900111
+            +447700900222
+            """
+        ),
+    )
+
+    page = client_request.post(
+        "main.send_messages",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"file": (BytesIO(b""), "example.csv")},
+        _follow_redirects=True,
+    )
+
+    assert "We found more than one column called ‘phone number’" in normalize_spaces(
+        page.select_one(".banner-dangerous").text
+    )
+    assert len(page.select("table th.table-field-heading")) == 512
+    assert len(page.select("table td")) == 1_024  # 512 × 2 rows of data
+
+
 def test_upload_csv_invalid_extension(
     client_request,
     service_one,

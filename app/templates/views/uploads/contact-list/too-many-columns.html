@@ -45,7 +45,7 @@
           It needs to have 1 column, called ‘email address’ or ‘phone number’.
         </p>
         <p class="govuk-body">
-          Right now it has {{ recipients._raw_column_headers|length }} columns called {{ recipients._raw_column_headers | formatted_list }}.
+          Right now it has {{ recipients._raw_column_headers|length }} columns called {{ recipients._raw_column_headers[:512] | formatted_list }}.
         </p>
 
       {% endif %}
@@ -65,7 +65,7 @@
     <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
   </div>
 
-    {% set column_headers = recipients._raw_column_headers if recipients.duplicate_recipient_column_headers else recipients.column_headers %}
+    {% set column_headers = recipients._raw_column_headers[:512] if recipients.duplicate_recipient_column_headers else recipients.column_headers %}
 
     <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
 
@@ -76,7 +76,7 @@
         caption_visible=False,
         field_headings=[
           '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true">1</span>'|safe
-        ] + recipients._raw_column_headers
+        ] + recipients._raw_column_headers[:512]
       ) %}
         {% call row_heading() %}
         {{ item.index + 2 }}

@@ -152,7 +152,7 @@
 
   {% if not request.args.from_test %}
 
-    {% set column_headers = recipients._raw_column_headers if recipients.duplicate_recipient_column_headers else recipients.column_headers %}
+    {% set column_headers = recipients._raw_column_headers[:512] if recipients.duplicate_recipient_column_headers else recipients.column_headers %}
 
     <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
 
