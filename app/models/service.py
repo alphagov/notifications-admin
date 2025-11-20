@@ -75,7 +75,6 @@ class Service(JSONModel):
         "international_sms",
         "send_files_via_ui",
         "sms_to_uk_landlines",
-        "send_files_via_ui",
     )
 
     @classmethod
