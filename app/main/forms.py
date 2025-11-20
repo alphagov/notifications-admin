@@ -1177,10 +1177,13 @@ class AddGPOrganisationForm(StripWhitespaceForm):
         self.same_as_service_name.label.text = f"Is your GP surgery called ‘{service_name}’?"
         self.service_name = service_name
         self.same_as_service_name.param_extensions = {
+            "fieldset": {
+                "legend": {"isPageHeading": True, "classes": "govuk-fieldset__legend--l"},
+            },
             "items": [
                 {},
                 {"conditional": {"html": self.name}},
-            ]
+            ],
         }
 
     def get_organisation_name(self):
@@ -1615,7 +1618,7 @@ class ChangeEmailForm(StripWhitespaceForm):
         super().__init__(*args, **kwargs)
 
     email_address = make_email_address_field(
-        label="Change your email address",
+        label="Enter the new email address",
         thing="an email address",
         gov_user=True,
     )
@@ -1637,7 +1640,7 @@ class ChangeNonGovEmailForm(ChangeEmailForm):
 
 
 class ChangeMobileNumberForm(StripWhitespaceForm):
-    mobile_number = valid_phone_number(label="Change your mobile number", international=True)
+    mobile_number = valid_phone_number(label="Change the mobile number", international=True)
 
 
 class ChooseTimeForm(StripWhitespaceForm):
@@ -2803,7 +2806,7 @@ class AcceptAgreementForm(StripWhitespaceForm):
         )
 
     version = GovukTextInputField(
-        "Which version of the agreement do you want to accept?",
+        "Enter the version number of the agreement you want to accept",
         validators=[NotifyDataRequired(thing="a version number")],
     )
 

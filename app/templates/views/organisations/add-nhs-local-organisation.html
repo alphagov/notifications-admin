@@ -5,10 +5,8 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set page_title = "Accept our data processing and financial agreement" %}
-
 {% block per_page_title %}
-  {{ page_title }}
+  {{ form.organisations.label.text }} – Accept our data processing and financial agreement
 {% endblock %}
 
 {% block backLink %}
@@ -16,11 +14,9 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header(page_title) }}
+  <span class="govuk-caption-xl">Accept our data processing and financial agreement</span>
+  {{ page_header(form.organisations.label.text) }}
   {% call form_wrapper() %}
-    <p class="govuk-body">
-      {{ form.organisations.label.text }}
-    </p>
     {{ live_search(
       target_selector='.govuk-radios__item',
       show=True,

@@ -4,7 +4,11 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Change your {{ thing }}
+  {% if thing == 'email address' or thing == 'mobile number' %}
+    Enter your new {{ thing }} – Change your {{ thing }}
+  {% else %}
+    Change your name
+  {% endif %}
 {% endblock %}
 
 {% block backLink %}
@@ -15,13 +19,17 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
+      {% if thing == 'email address' or thing == 'mobile number' %}
+        <span class="govuk-caption-xl">Change your {{thing}}</span>
+      {% endif %}
+
       {% call form_wrapper() %}
           {%  if thing == "email address" %}
-              {{ form.email_address(param_extensions={"label": {"isPageHeading": True, "classes": "govuk-label--l"}}, error_message_with_html=True) }}
+              {{ form.email_address(param_extensions={"label": {"text": "Enter your new email address", "isPageHeading": True, "classes": "govuk-label--l"}}, error_message_with_html=True) }}
           {%  elif thing == "name" %}
               {{ form.new_name(param_extensions={"label": {"isPageHeading": True, "classes": "govuk-label--l"}}) }}
           {%  elif thing == "mobile number" %}
-              {{ form.mobile_number(param_extensions={"label": {"isPageHeading": True, "classes": "govuk-label--l"}, "classes": "govuk-input--extra-letter-spacing govuk-input--width-10"}) }}
+              {{ form.mobile_number(param_extensions={"label": {"text": "Enter your new mobile number", "isPageHeading": True, "classes": "govuk-label--l"}, "classes": "govuk-input--extra-letter-spacing govuk-input--width-10"}) }}
            {%  endif %}
         {% if current_user.auth_type == 'email_auth' and (current_user.mobile_number and thing == "mobile number") %}
           {{ page_footer(

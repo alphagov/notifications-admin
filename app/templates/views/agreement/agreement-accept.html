@@ -1,13 +1,12 @@
 {% extends "withnav_template.html" %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/fieldset/macro.html" import govukFieldset %}
 
 
 {% block per_page_title %}
-  Accept our data processing and financial agreement
+  Who are you accepting the agreement for? – Accept our data processing and financial agreement
 {% endblock %}
 
 {% block backLink %}
@@ -18,8 +17,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-five-sixths">
-
-    {{ page_header('Accept our data processing and financial agreement') }}
+    <span class="govuk-caption-xl govuk-!-margin-bottom-0">Accept our data processing and financial agreement</span>
 
     {%  set contentHtml%}
             {% call govukFieldset({
@@ -30,8 +28,11 @@
        {% endcall %}
     {% endset -%}
 
-    {% call form_wrapper(class='top-gutter') %}
+    {% call form_wrapper(class='top-gutter govuk-!-margin-top-0') %}
         {{ form.who(param_extensions={
+          "fieldset": {
+            "legend": {"isPageHeading": True, "classes": "govuk-fieldset__legend--l"},
+          },
           "items": [{}, {"conditional": {"html": contentHtml}
           }]})
         }}

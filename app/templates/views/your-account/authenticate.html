@@ -1,11 +1,10 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
-  Change your {{ thing }}
+  {{ form.password.label.text }} – Change your {{ thing }}
 {% endblock %}
 
 {% block backLink %}
@@ -14,13 +13,12 @@
 
 {% block maincolumn_content %}
 
-  {{ govuk_page_header("Change your " + thing)  }}
-
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
+    <span class="govuk-caption-xl">Change your {{thing}}</span>
 
     {% call form_wrapper(autocomplete=True) %}
-      {{ form.password(param_extensions={"autocomplete": "current-password"}) }}
+      {{ form.password(param_extensions={"autocomplete": "current-password", "label": {"isPageHeading": True, "classes": "govuk-label--l"}}) }}
       {{ page_footer('Confirm') }}
     {% endcall %}
     </div>
