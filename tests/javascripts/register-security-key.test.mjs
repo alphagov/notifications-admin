@@ -86,7 +86,7 @@ describe('Register security key', () => {
     // mock fetch auth
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      arrayBuffer: jest.fn().mockResolvedValue(mockWebauthnOptions),
+      arrayBuffer: jest.fn(() => Promise.resolve(mockWebauthnOptions)),
     });
 
     // mock createCredential
@@ -95,7 +95,7 @@ describe('Register security key', () => {
     // mock postCredential
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      arrayBuffer: jest.fn().mockResolvedValue({ ok: true }),
+      arrayBuffer: jest.fn(() => Promise.resolve({ ok: true }))
     });
 
     await registerKeyInstance.registerKey(mockClickEvent);
@@ -142,7 +142,7 @@ describe('Register security key', () => {
     // mock fetch auth
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      arrayBuffer: jest.fn().mockResolvedValue(mockWebauthnOptions),
+      arrayBuffer: jest.fn(() => Promise.resolve(mockWebauthnOptions)),
     });
 
     // mock createCredential
@@ -171,7 +171,7 @@ describe('Register security key', () => {
     // mock fetch auth
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      arrayBuffer: jest.fn().mockResolvedValue(mockWebauthnOptions),
+      arrayBuffer: jest.fn(() => Promise.resolve(mockWebauthnOptions)),
     });
 
     // mock createCredential
