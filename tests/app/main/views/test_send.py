@@ -444,7 +444,7 @@ def test_shows_error_if_parsing_exception(
     expected_error_message,
     fake_uuid,
 ):
-    def _raise_exception_or_partial_exception(file_content, filename):
+    def _raise_exception_or_partial_exception(*args, **kwargs):
         raise exception()
 
     mocker.patch("app.main.views.send.Spreadsheet.from_file", side_effect=_raise_exception_or_partial_exception)
