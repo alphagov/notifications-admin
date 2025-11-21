@@ -130,3 +130,7 @@ def test_get_consistent_data_retention_period(
     )
 
     assert Service(service_one).get_consistent_data_retention_period() == expected_value
+
+
+def test_no_duplicate_service_permissions():
+    assert len(set(Service.ALL_PERMISSIONS)) == len(Service.ALL_PERMISSIONS), "Duplicate permissions"
