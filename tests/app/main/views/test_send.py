@@ -43,7 +43,8 @@ template_types = ["email", "sms"]
 unchanging_fake_uuid = uuid.uuid4()
 
 # The * ignores hidden files, eg .DS_Store
-test_spreadsheet_files = glob(path.join("tests", "spreadsheet_files", "*"))
+test_spreadsheet_files = glob(path.join("tests", "spreadsheet_files", "*.*"))
+test_spreadsheet_files_surplus_columns = glob(path.join("tests", "spreadsheet_files", "ragged_surplus_columns", "*"))
 test_non_spreadsheet_files = glob(path.join("tests", "non_spreadsheet_files", "*"))
 
 
@@ -272,6 +273,7 @@ def test_set_sender_shows_expected_back_link(
 
 def test_that_test_files_exist():
     assert len(test_spreadsheet_files) == 8
+    assert len(test_spreadsheet_files_surplus_columns) == 2
     assert len(test_non_spreadsheet_files) == 6
 
 
@@ -347,13 +349,58 @@ def test_example_spreadsheet_for_letters(
 
 
 @pytest.mark.parametrize(
-    "filename, acceptable_file, expected_status",
-    list(zip(test_spreadsheet_files, repeat(True), repeat(302), strict=False))
-    + list(zip(test_non_spreadsheet_files, repeat(False), repeat(200), strict=False)),
+    "filename, reduce_min_col_limit, reduce_abs_col_limit, acceptable_file, expect_equal, expected_status",
+    list(
+        zip(
+            test_spreadsheet_files + test_spreadsheet_files_surplus_columns,
+            repeat(True),
+            repeat(False),
+            repeat(True),
+            repeat(True),
+            repeat(302),
+            strict=False,
+        )
+    )
+    + list(
+        zip(
+            test_spreadsheet_files_surplus_columns,
+            repeat(False),
+            repeat(False),
+            repeat(True),
+            repeat(False),
+            repeat(302),
+            strict=False,
+        )
+    )
+    + list(
+        zip(
+            test_spreadsheet_files + test_spreadsheet_files_surplus_columns,
+            repeat(True),
+            repeat(True),
+            repeat(True),
+            repeat(True),
+            repeat(302),
+            strict=False,
+        )
+    )
+    + list(
+        zip(
+            test_non_spreadsheet_files,
+            repeat(True),
+            repeat(False),
+            repeat(False),
+            repeat(True),
+            repeat(200),
+            strict=False,
+        )
+    ),
 )
 def test_upload_files_in_different_formats(
     filename,
+    reduce_min_col_limit,
+    reduce_abs_col_limit,
     acceptable_file,
+    expect_equal,
     expected_status,
     client_request,
     service_one,
@@ -362,7 +409,14 @@ def test_upload_files_in_different_formats(
     mock_s3_upload,
     fake_uuid,
     caplog,
+    mocker,
 ):
+    if reduce_min_col_limit:
+        # trim surplus columns in all our examples
+        mocker.patch("app.models.spreadsheet.Spreadsheet.MIN_COLUMN_LIMIT_DEFAULT_ARG", new=2)
+    if reduce_abs_col_limit:
+        mocker.patch("app.models.spreadsheet.Spreadsheet.ABSOLUTE_COLUMN_LIMIT_DEFAULT_ARG", new=4)
+
     with open(filename, "rb") as uploaded, caplog.at_level("INFO", "app"):
         page = client_request.post(
             "main.send_messages",
@@ -377,12 +431,15 @@ def test_upload_files_in_different_formats(
     assert f"User 6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 uploaded {filename}" in log_messages
 
     if acceptable_file:
-        assert mock_s3_upload.call_args[0][1]["data"].strip() == (
-            "phone number,name,favourite colour,fruit\r\n"
-            "07739 468 050,Pete,Coral,tomato\r\n"
-            "07527 125 974,Not Pete,Magenta,Avacado\r\n"
-            "07512 058 823,Still Not Pete,Crimson,Pear"
-        )
+        assert (
+            mock_s3_upload.call_args[0][1]["data"].strip()
+            == (
+                "phone number,name,favourite colour,fruit\r\n"
+                "07739 468 050,Pete,Coral,tomato\r\n"
+                "07527 125 974,Not Pete,Magenta,Avacado\r\n"
+                "07512 058 823,Still Not Pete,Crimson,Pear"
+            )
+        ) is expect_equal
         mock_s3_set_metadata.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, original_file_name=filename)
         assert f"{filename} persisted in S3 as {sample_uuid()}" in [r.message for r in caplog.records]
         assert f"Could not read {filename}" not in [r.message for r in caplog.records]
