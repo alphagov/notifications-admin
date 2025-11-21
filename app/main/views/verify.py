@@ -1,5 +1,6 @@
 from flask import abort, current_app, flash, redirect, render_template, session, url_for
 from itsdangerous import SignatureExpired
+from markupsafe import Markup
 from notifications_utils.url_safe_token import check_token
 
 from app import user_api_client
@@ -87,6 +88,17 @@ def activate_user(user_id):
         return redirect(url_for("main.organisation_dashboard", org_id=organisation_id))
 
     if user.default_organisation.can_ask_to_join_a_service:
+        message = Markup(
+            """
+            <h2 class="banner-title">You have created a GOV.UK Notify account</h2>
+            <p class="govuk-body">Now add or join a service to start sending messages.</p>
+            <p class="govuk-body">To update your sign-in details, go to
+                <a href={} class="govuk-link govuk-link--no-visited-state">your account</a>.
+            </p>
+            """.format(url_for("main.your_account"))
+        )
+
+        flash(message=message, category="default")
         return redirect(url_for("main.your_services"))
 
     return redirect(url_for("main.add_service"))

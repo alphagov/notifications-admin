@@ -459,3 +459,34 @@ def test_should_show_your_services_navigation_link_if_user_belongs_to_service(
     )
 
     assert normalize_spaces(page.select_one(".govuk-service-navigation__list a:first-child").text) == "Your services"
+
+
+def test_should_show_notification_banner_when_newly_activated_user(
+    client_request,
+    mocker,
+    mock_get_orgs_and_services,
+    api_user_active,
+):
+    api_user_active["current_session_id"] = str(uuid.UUID(int=1))
+    mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+    mock_get_orgs_and_services.return_value = {"organisations": [], "services": []}
+    mocker.patch(
+        "app.organisations_client.get_organisation_by_domain",
+        return_value=organisation_json(can_ask_to_join_a_service=True),
+    )
+
+    with client_request.session_transaction() as session:
+        session["user_details"] = {"email_address": api_user_active["email_address"], "id": api_user_active["id"]}
+        # user's only just created their account so no session in the cookie
+        session.pop("current_session_id", None)
+
+    page = client_request.post(
+        "main.verify",
+        _data={"sms_code": "12345"},
+        _follow_redirects=True,
+    )
+    banner = page.select(".banner-default")
+    banner_title = page.select_one(".banner-title")
+
+    assert len(banner) == 1
+    assert normalize_spaces(banner_title.text) == "You have created a GOV.UK Notify account"
