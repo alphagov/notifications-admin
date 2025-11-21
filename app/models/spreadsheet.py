@@ -75,7 +75,6 @@ class Spreadsheet:
             return instance
 
         instance = cls.from_rows(pyexcel.iget_array(file_type=extension, file_stream=file_content), filename)
-        pyexcel.free_resources()
         return instance
 
     @classmethod
