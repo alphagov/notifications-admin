@@ -1,3 +1,4 @@
+import gzip
 import uuid
 from functools import partial
 from glob import glob
@@ -45,6 +46,7 @@ unchanging_fake_uuid = uuid.uuid4()
 # The * ignores hidden files, eg .DS_Store
 test_spreadsheet_files = glob(path.join("tests", "spreadsheet_files", "*.*"))
 test_spreadsheet_files_surplus_columns = glob(path.join("tests", "spreadsheet_files", "ragged_surplus_columns", "*"))
+test_spreadsheet_files_surplus_header = glob(path.join("tests", "spreadsheet_files", "surplus_header_columns", "*"))
 test_non_spreadsheet_files = glob(path.join("tests", "non_spreadsheet_files", "*"))
 
 
@@ -274,6 +276,7 @@ def test_set_sender_shows_expected_back_link(
 def test_that_test_files_exist():
     assert len(test_spreadsheet_files) == 8
     assert len(test_spreadsheet_files_surplus_columns) == 2
+    assert len(test_spreadsheet_files_surplus_header) == 2
     assert len(test_non_spreadsheet_files) == 6
 
 
@@ -444,12 +447,83 @@ def test_upload_files_in_different_formats(
         assert f"{filename} persisted in S3 as {sample_uuid()}" in [r.message for r in caplog.records]
         assert f"Could not read {filename}" not in [r.message for r in caplog.records]
     else:
-        assert not mock_s3_upload.called
+        assert mock_s3_upload.mock_calls == []
         assert normalize_spaces(page.select_one(".govuk-error-summary__body").text) == (
             "Notify cannot read this file - try using a different file type"
         )
         assert f"{filename} persisted in S3 as {sample_uuid()}" not in [r.message for r in caplog.records]
         assert f"Could not read {filename}" in [r.message for r in caplog.records]
+
+
+@pytest.mark.parametrize("filename", test_spreadsheet_files_surplus_header)
+def test_upload_files_with_excessive_header_columns(
+    filename,
+    client_request,
+    service_one,
+    mock_get_service_template,
+    mock_s3_set_metadata,
+    mock_s3_upload,
+    fake_uuid,
+    caplog,
+    mocker,
+):
+    # our example files aren't that "excessive", we're just reducing the app's threshold for them
+    mocker.patch("app.models.spreadsheet.Spreadsheet.ABSOLUTE_COLUMN_LIMIT_DEFAULT_ARG", new=6)
+
+    with open(filename, "rb") as uploaded, caplog.at_level("INFO", "app"):
+        page = client_request.post(
+            "main.send_messages",
+            service_id=service_one["id"],
+            template_id=fake_uuid,
+            _data={"file": (BytesIO(uploaded.read()), filename)},
+            _content_type="multipart/form-data",
+            _expected_status=200,
+        )
+
+    log_messages = {r.message for r in caplog.records}
+    assert f"User 6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 uploaded {filename}" in log_messages
+
+    assert mock_s3_upload.mock_calls == []
+    assert normalize_spaces(page.select_one(".govuk-error-summary__body").text) == (
+        "Your file has too many columns (Notify can process up to 1,000 columns)"
+    )
+    assert f"{filename} persisted in S3 as {sample_uuid()}" not in [r.message for r in caplog.records]
+    assert f"Abandoned parsing {filename}" in [r.message for r in caplog.records]
+
+
+def test_upload_file_with_excessive_rows(
+    client_request,
+    service_one,
+    mock_get_service_template,
+    mock_s3_set_metadata,
+    mock_s3_upload,
+    fake_uuid,
+    caplog,
+    mocker,
+):
+    filename = "400k rows tab separated.tsv"
+    with (
+        gzip.open("tests/spreadsheet_files/excessive/400k rows tab separated.tsv.gz", "r") as uploaded,
+        caplog.at_level("INFO", "app"),
+    ):
+        page = client_request.post(
+            "main.send_messages",
+            service_id=service_one["id"],
+            template_id=fake_uuid,
+            _data={"file": (BytesIO(uploaded.read()), filename)},
+            _content_type="multipart/form-data",
+            _expected_status=200,
+        )
+
+    log_messages = {r.message for r in caplog.records}
+    assert f"User 6ce466d0-fd6a-11e5-82f5-e0accb9d11a6 uploaded {filename}" in log_messages
+
+    assert mock_s3_upload.mock_calls == []
+    assert normalize_spaces(page.select_one(".govuk-error-summary__body").text) == (
+        "Your file has too many rows (Notify can process up to 100,000 rows at once)"
+    )
+    assert f"{filename} persisted in S3 as {sample_uuid()}" not in [r.message for r in caplog.records]
+    assert f"Abandoned parsing {filename}" in [r.message for r in caplog.records]
 
 
 def test_send_messages_sanitises_and_truncates_file_name_for_metadata(
