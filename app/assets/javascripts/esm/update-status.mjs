@@ -56,7 +56,7 @@ class UpdateStatus {
       `${ariaDescribedby}${ariaDescribedby ? ' ' : ''}${id}`
     );
 
-    this.$textbox.addEventListener('input', this.throttle(this.update.bind(this), 150));
+    this.$textbox.addEventListener('input', this.throttle(this.update.bind(this), 150).bind(this));
     this.$textbox.dispatchEvent(new Event('input'));
   }
 

@@ -44,6 +44,7 @@ describe('Update content', () => {
 
     // Instantiate the class
     updateStatus = new UpdateStatus($module);
+    jest.spyOn(updateStatus, 'update');
 
   });
 
@@ -58,7 +59,12 @@ describe('Update content', () => {
 
   });
 
-  test("It should add attributes to the elements", () => {
+  test("It should add attributes to the elements", async () => {
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({'html': 'Updated content'})
+    });
 
     updateStatus.init();
 
@@ -74,9 +80,17 @@ describe('Update content', () => {
       "example-hint-text update-status"
     );
 
+    // make sure all async code in updateStatus.update call completes before finishing
+    await updateStatus.update.mock.results[0].value;
+
   });
 
-  test("It should handle a textarea without an aria-describedby attribute", () => {
+  test("It should handle a textarea without an aria-describedby attribute", async () => {
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({'html': 'Updated content'})
+    });
 
     document.getElementById('template_content').removeAttribute('aria-describedby');
 
@@ -88,16 +102,19 @@ describe('Update content', () => {
       "update-status"
     );
 
+    // make sure all async code in updateStatus.update call completes before finishing
+    await updateStatus.update.mock.results[0].value;
+
   });
 
   test("It should make requests to the URL specified in the data-updates-url attribute", async () => {
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve()
+      json: () => Promise.resolve({'html': 'Updated content'})
     });
 
-    await updateStatus.init();
+    updateStatus.init();
 
     expect(mockFetch).toHaveBeenCalledWith(updatesURL, {
       method: 'POST',
@@ -106,6 +123,9 @@ describe('Update content', () => {
       },
       body: "csrf_token=abc123&template_content=Content+of+message",
     });
+
+    // make sure all async code in updateStatus.update call completes before finishing
+    await updateStatus.update.mock.results[0].value;
 
   });
 
@@ -122,7 +142,10 @@ describe('Update content', () => {
       "Initial content"
     );
 
-    await updateStatus.update();
+    updateStatus.init();
+
+    // make sure all async code in updateStatus.update call completes before checking for content updates
+    await updateStatus.update.mock.results[0].value;
 
     expect(
       document.querySelectorAll('[data-notify-module=update-status]')[0].textContent.trim()
@@ -132,43 +155,55 @@ describe('Update content', () => {
 
   });
 
-  test("It should fire when the content of the textarea changes", () => {
+  test("It should fire when the content of the textarea changes", async () => {
 
-    jest.spyOn(updateStatus, 'update');
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({'html': 'Updated content'})
+    });
 
     let textarea = document.getElementById('template_content');
 
-    // Initial update triggered
+    // initial update triggered
     updateStatus.init();
 
-    expect(updateStatus.update).toHaveBeenCalledTimes(1);
-
-    // 150ms of inactivity
+    // 150ms of inactivity should mean we're no longer blocking updates fired by changes
     jest.advanceTimersByTime(150);
+
     helpers.triggerEvent(textarea, 'input');
 
     expect(updateStatus.update).toHaveBeenCalledTimes(2);
 
+    // make sure all async code started by updateStatus.update calls completes
+    await updateStatus.update.mock.results[0].value;
+
   });
 
-  test("It should fire only after 150ms of inactivity", () => {
+  test("It should fire only after 150ms of inactivity", async () => {
 
-    jest.spyOn(updateStatus, 'update');
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({'html': 'Updated content'})
+    });
 
     let textarea = document.getElementById('template_content');
 
     // Initial update triggered
     updateStatus.init();
+
     expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
+    // updates triggered less than 150ms after the initial update should be delayed by 150ms
     helpers.triggerEvent(textarea, 'input');
     jest.advanceTimersByTime(149);
     expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
+    // subsequent events will clear any existing, delayed, updates and replace them with their own, delayed, one
     helpers.triggerEvent(textarea, 'input');
     jest.advanceTimersByTime(149);
     expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
+    // this should be the case however many times updates are triggered, if within the 150ms delay period
     helpers.triggerEvent(textarea, 'input');
     jest.advanceTimersByTime(149);
     expect(updateStatus.update).toHaveBeenCalledTimes(1);
@@ -177,14 +212,21 @@ describe('Update content', () => {
     jest.advanceTimersByTime(1);
     expect(updateStatus.update).toHaveBeenCalledTimes(2);
 
+    // make sure all async code started by updateStatus.update calls completes
+    await updateStatus.update.mock.results[0].value;
+
   });
 
   test('It should throw an error if the request fetch initiated fails', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Fetch error'));
+
     // Spy on console.error
     console.error = jest.fn();
 
-    await updateStatus.update();
+    updateStatus.init();
+
+    // make sure the request fetch rejection completes
+    await updateStatus.update.mock.results[0].value;
 
     expect(console.error).toHaveBeenCalledWith(
       'Failed to update status:',
@@ -196,10 +238,13 @@ describe('Update content', () => {
     mockFetch.mockResolvedValueOnce({
       ok: false
     });
-    // spy on getRenderer
+
     jest.spyOn(updateStatus, 'getRenderer');
 
-    await updateStatus.update();
+    updateStatus.init();
+
+    // make sure the request fetch resolution completes
+    await updateStatus.update.mock.results[0].value;
 
     expect(updateStatus.getRenderer).not.toHaveBeenCalled();
   });
