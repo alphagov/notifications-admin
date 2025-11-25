@@ -81,14 +81,12 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-lml==0.1.0
+lml==0.2.0
     # via
     #   pyexcel
     #   pyexcel-io
 lxml==5.3.1
-    # via
-    #   pyexcel-ezodf
-    #   pyexcel-ods3
+    # via pyexcel-odsr
 markupsafe==2.1.1
     # via
     #   flask
@@ -118,20 +116,18 @@ prometheus-client==0.15.0
     #   gds-metrics
 pycparser==2.21
     # via cffi
-pyexcel==0.7.1
+pyexcel==0.7.4
     # via -r requirements.in
-pyexcel-ezodf==0.3.4
-    # via pyexcel-ods3
 pyexcel-io==0.6.7
     # via
     #   -r requirements.in
     #   pyexcel
-    #   pyexcel-ods3
+    #   pyexcel-odsr
     #   pyexcel-xls
     #   pyexcel-xlsx
-pyexcel-ods3==0.6.1
+pyexcel-odsr==0.6.0
     # via -r requirements.in
-pyexcel-xls==0.7.0
+pyexcel-xls==0.7.1
     # via -r requirements.in
 pyexcel-xlsx==0.6.1
     # via -r requirements.in
