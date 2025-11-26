@@ -62,7 +62,7 @@ class UpdateStatus {
 
   async update() {
     const url = this.$module.dataset.updatesUrl;
-    const formData = new URLSearchParams(new FormData(this.getParent(this.$textbox, 'form'))).toString();
+    const formData = new URLSearchParams(new FormData(this.$textbox.closest('form'))).toString();
 
     try {
       const response = await fetch(url, {
@@ -80,16 +80,6 @@ class UpdateStatus {
     } catch (error) {
       console.error('Failed to update status:', error);
     }
-  }
-
-  // instead of doing just document.querySelector
-  // we use this to look up from the $module
-  getParent(el, selector) {
-    const parents= [];
-    while ((el = el.parentNode) && el !== document) {
-      if (!selector || el.matches(selector)) parents.push(el);
-    }
-    return parents[0];
   }
 }
 
