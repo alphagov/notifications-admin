@@ -49,6 +49,7 @@ class UpdateStatus {
   init() {
     const id = 'update-status';
     this.$module.setAttribute('id', id);
+    this.$module.parentNode.removeAttribute('hidden');
     const ariaDescribedby = this.$textbox.getAttribute('aria-describedby') || '';
 
     this.$textbox.setAttribute(
