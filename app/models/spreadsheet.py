@@ -125,7 +125,7 @@ class Spreadsheet:
             header = next(pyexcel.iget_array(file_type=extension, file_stream=file_content, row_limit=1), ())
             file_content.seek(original_offset)
 
-            last_nonempty_column = next((i for i, x in reversed(tuple(enumerate(header))) if x.strip()), None)
+            last_nonempty_column = next((i for i, x in reversed(tuple(enumerate(header))) if str(x).strip()), None)
             if last_nonempty_column is not None:
                 if last_nonempty_column >= absolute_column_limit:
                     raise cls.TooManyColumnsError(
