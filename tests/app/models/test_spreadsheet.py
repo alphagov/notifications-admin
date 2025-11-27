@@ -10,7 +10,7 @@ conversion_original_files = tuple(
 
 
 def test_can_create_spreadsheet_from_large_excel_file():
-    with open(str(Path.cwd() / "tests" / "spreadsheet_files" / "excel 2007.xlsx"), "rb") as xl:
+    with open(str(Path.cwd() / "tests" / "spreadsheet_files" / "equivalents" / "excel 2007.xlsx"), "rb") as xl:
         ret = Spreadsheet.from_file(xl, filename="xl.xlsx")
     assert ret.as_csv_data
 
