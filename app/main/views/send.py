@@ -163,6 +163,22 @@ def send_messages(service_id, template_id):
                 extra={"file_name": form.file.data.filename},
             )
             form.file.errors = ["Notify cannot read this file - try saving it as a CSV instead"]
+        except Spreadsheet.TooManyColumnsError:
+            current_app.logger.warning(
+                "Abandoned parsing %s",
+                form.file.data.filename,
+                exc_info=True,
+                extra={"file_name": form.file.data.filename},
+            )
+            form.file.errors = ["Your file has too many columns (Notify can process up to 1,000 columns)"]
+        except Spreadsheet.TooManyRowsError:
+            current_app.logger.warning(
+                "Abandoned parsing %s",
+                form.file.data.filename,
+                exc_info=True,
+                extra={"file_name": form.file.data.filename},
+            )
+            form.file.errors = ["Your file has too many rows (Notify can process up to 100,000 rows at once)"]
     elif form.errors:
         # just show the first error, as we don't expect the form to have more
         # than one, since it only has one field

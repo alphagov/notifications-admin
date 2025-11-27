@@ -362,6 +362,10 @@ def upload_contact_list(service_id):
             form.file.errors = ["Notify cannot read this file - try using a different file type"]
         except XLDateError:
             form.file.errors = ["Notify cannot read this file - try saving it as a CSV instead"]
+        except Spreadsheet.TooManyColumnsError:
+            form.file.errors = ["Your file has too many columns (Notify can process up to 1,000 columns)"]
+        except Spreadsheet.TooManyRowsError:
+            form.file.errors = ["Your file has too many rows (Notify can process up to 100,000 rows at once)"]
     elif form.errors:
         # just show the first error, as we don't expect the form to have more
         # than one, since it only has one field
