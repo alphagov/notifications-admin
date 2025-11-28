@@ -1,4 +1,5 @@
 import { isSupported } from 'govuk-frontend';
+import ErrorBanner from './error-banner.mjs';
 
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
 // that uses ES 015 Classes -
@@ -23,9 +24,6 @@ class AuthenticateSecurityKey {
 
   async authenticateKey(e) {
     e.preventDefault();
-
-    // hide any existing error prompt
-    window.GOVUK.ErrorBanner.hideBanner();
 
     try {
       const options = await this.handleFetch();
@@ -96,7 +94,7 @@ class AuthenticateSecurityKey {
     console.error(error);
     // some browsers will show an error dialogue for some errors;
     // to be safe we always display an error message on the page.
-    window.GOVUK.ErrorBanner.showBanner();
+    new ErrorBanner('.webauthn__error').showBanner();
   }
 }
 

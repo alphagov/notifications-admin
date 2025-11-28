@@ -1,4 +1,5 @@
 import RegisterSecurityKey from '../../app/assets/javascripts/esm/register-security-key.mjs';
+import ErrorBanner from '../../app/assets/javascripts/esm/error-banner.mjs';
 import { jest } from '@jest/globals';
 import * as helpers from './support/helpers';
 
@@ -15,6 +16,7 @@ describe('Register security key', () => {
   let mockFetch;
   let mockWebauthnOptions;
   let registerKeyInstance;
+  let errorBannerShowBannerSpy;
 
   const mockBrowserCredentials = {
     create: jest.fn(),
@@ -51,6 +53,10 @@ describe('Register security key', () => {
     // create a mock event for the click handler
     mockClickEvent = { preventDefault: jest.fn() };
 
+    // spy on the showBanner method of ErroBanner class
+    // and mock its implementation, allowing us to assert whether it was called
+    errorBannerShowBannerSpy = jest.spyOn(ErrorBanner.prototype, 'showBanner').mockImplementation(() => {});
+
     // mock the window fetch function
     mockFetch = jest.fn();
     window.fetch = mockFetch;
@@ -63,12 +69,6 @@ describe('Register security key', () => {
     window.location = mockWindowLocation;
     mockWindowLocation.reload = jest.fn();
 
-    // mock error banner js
-    window.GOVUK.ErrorBanner = {
-      showBanner: jest.fn(),
-      hideBanner: jest.fn(),
-    };
-
     mockWebauthnOptions = window.CBOR.encode('options');
     // instantiate class
     registerKeyInstance = new RegisterSecurityKey(button);
@@ -76,6 +76,7 @@ describe('Register security key', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
+    jest.resetModules();
     mockFetch.mockClear();
     delete window.fetch;
     delete window.navigator.credentials;
@@ -110,7 +111,7 @@ describe('Register security key', () => {
  
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockWindowLocation.reload).toHaveBeenCalledWith();
-    expect(window.GOVUK.ErrorBanner.showBanner).not.toHaveBeenCalled();
+    expect(ErrorBanner.prototype.showBanner).not.toHaveBeenCalled();
   });
 
   test.each([
@@ -131,7 +132,7 @@ describe('Register security key', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockWindowLocation.reload).not.toHaveBeenCalled();
-    expect(window.GOVUK.ErrorBanner.showBanner).toHaveBeenCalled();
+    expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 
   test.each([
@@ -162,7 +163,7 @@ describe('Register security key', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockWindowLocation.reload).not.toHaveBeenCalled();
-    expect(window.GOVUK.ErrorBanner.showBanner).toHaveBeenCalled();
+    expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 
   it('errors if comms with the authenticator fails', async() => {
@@ -180,6 +181,6 @@ describe('Register security key', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockWindowLocation.reload).not.toHaveBeenCalled();
-    expect(window.GOVUK.ErrorBanner.showBanner).toHaveBeenCalled();
+    expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   })
 });

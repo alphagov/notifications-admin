@@ -1,4 +1,5 @@
 import { isSupported } from 'govuk-frontend';
+import ErrorBanner from './error-banner.mjs';
 
 class RegisterSecurityKey {
   constructor($module) {
@@ -13,9 +14,6 @@ class RegisterSecurityKey {
 
   async registerKey(e) {
     e.preventDefault();
-
-    // hide any existing error prompt
-    window.GOVUK.ErrorBanner.hideBanner();
 
     try {
       const options = await this.handleFetch();
@@ -65,7 +63,7 @@ class RegisterSecurityKey {
     console.error(error);
     // some browsers will show an error dialogue for some errors;
     // to be safe we always display an error message on the page.
-    window.GOVUK.ErrorBanner.showBanner();
+    new ErrorBanner('.webauthn__error').showBanner();
   }
 }
 
