@@ -3,8 +3,6 @@ import ErrorBanner from '../../app/assets/javascripts/esm/error-banner.mjs';
 import * as helpers from './support/helpers.js';
 import { jest } from '@jest/globals';
 
-jest.mock('../../app/assets/javascripts/esm/error-banner.mjs');
-
 beforeAll( async() => {
   const CBOR = await import('../../node_modules/cbor-js/cbor.js');
   window.CBOR = CBOR.default || CBOR;
@@ -19,6 +17,7 @@ describe('Authenticate with security key', () => {
   let mockWebauthnOptions;
   let mockLoginResponse;
   let authenticateKeyInstance;
+  let errorBannerShowBannerSpy;
   
 
   const mockBrowserCredentials = {
@@ -58,6 +57,10 @@ describe('Authenticate with security key', () => {
     // create a mock event for the click handler
     mockClickEvent = { preventDefault: jest.fn() };
 
+    // spy on the showBanner method of ErroBanner class
+    // and mock its implementation, allowing us to assert whether it was called
+    errorBannerShowBannerSpy = jest.spyOn(ErrorBanner.prototype, 'showBanner').mockImplementation(() => {});
+
     // mock the window fetch function
     mockFetch = jest.fn();
     window.fetch = mockFetch;
@@ -74,11 +77,11 @@ describe('Authenticate with security key', () => {
     mockLoginResponse = window.CBOR.encode({ redirect_url: '/foo' });
     // instantiate class
     authenticateKeyInstance = new AuthenticateSecurityKey(button);
+    
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
-    jest.resetModules();
     mockFetch.mockClear();
     delete window.fetch;
     delete window.navigator.credentials;
