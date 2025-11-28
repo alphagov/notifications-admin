@@ -3,8 +3,6 @@ import ErrorBanner from '../../app/assets/javascripts/esm/error-banner.mjs';
 import { jest } from '@jest/globals';
 import * as helpers from './support/helpers';
 
-jest.mock('../../app/assets/javascripts/esm/error-banner.mjs');
-
 beforeAll( async() => {
   const CBOR = await import('../../node_modules/cbor-js/cbor.js');
   window.CBOR = CBOR.default || CBOR;
@@ -18,6 +16,7 @@ describe('Register security key', () => {
   let mockFetch;
   let mockWebauthnOptions;
   let registerKeyInstance;
+  let errorBannerShowBannerSpy;
 
   const mockBrowserCredentials = {
     create: jest.fn(),
@@ -53,6 +52,10 @@ describe('Register security key', () => {
     button = document.querySelector('[data-notify-module="register-security-key"]');
     // create a mock event for the click handler
     mockClickEvent = { preventDefault: jest.fn() };
+
+    // spy on the showBanner method of ErroBanner class
+    // and mock its implementation, allowing us to assert whether it was called
+    errorBannerShowBannerSpy = jest.spyOn(ErrorBanner.prototype, 'showBanner').mockImplementation(() => {});
 
     // mock the window fetch function
     mockFetch = jest.fn();
