@@ -44,7 +44,7 @@ template_types = ["email", "sms"]
 unchanging_fake_uuid = uuid.uuid4()
 
 # The * ignores hidden files, eg .DS_Store
-test_spreadsheet_files = glob(path.join("tests", "spreadsheet_files", "*.*"))
+test_spreadsheet_files = glob(path.join("tests", "spreadsheet_files", "equivalents", "*"))
 test_spreadsheet_files_surplus_columns = glob(path.join("tests", "spreadsheet_files", "ragged_surplus_columns", "*"))
 test_spreadsheet_files_surplus_header = glob(path.join("tests", "spreadsheet_files", "surplus_header_columns", "*"))
 test_non_spreadsheet_files = glob(path.join("tests", "non_spreadsheet_files", "*"))

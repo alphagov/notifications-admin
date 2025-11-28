@@ -100,8 +100,8 @@ def test_upload_file_page_requires_file(
     "test_file, expected_error_message",
     (
         ("tests/test_pdf_files/one_page_pdf.pdf", None),
-        ("tests/spreadsheet_files/excel 2007.xlsx", None),
-        ("tests/spreadsheet_files/EXCEL_95.XLS", ".XLS is not an allowed file format"),
+        ("tests/spreadsheet_files/equivalents/excel 2007.xlsx", None),
+        ("tests/spreadsheet_files/equivalents/EXCEL_95.XLS", ".XLS is not an allowed file format"),
         ("tests/test_img_files/small-but-perfectly-formed.png", None),
         ("tests/test_pdf_files/big.pdf", "The file must be smaller than 2MB"),
         ("tests/text_files/without brackets.txt", None),
