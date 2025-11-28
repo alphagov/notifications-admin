@@ -64,6 +64,9 @@
     "navigation": header_navigation.visible_header_nav(),
     "classes": "govuk-service-navigation--inverse" if request.endpoint == "main.index" else ""
   }) }}
+  {{ current_user.name }}
+  {{ current_user.mobile_number }}
+  {{ current_user.email_address }}
 {% endblock %}
 
 {% block footer %}

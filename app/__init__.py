@@ -562,6 +562,7 @@ def setup_blueprints(application):
 
 
 def on_user_logged_in(_sender, user):
+    current_app.logger.info("** User logged in with name %s and id %s", user.name, user.id)
     Events.sucessful_login(user_id=user.id)
 
 
