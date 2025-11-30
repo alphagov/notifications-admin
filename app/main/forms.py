@@ -1306,7 +1306,7 @@ class CreateServiceForm(StripWhitespaceForm):
 class CreateNhsServiceForm(CreateServiceForm):
     organisation_type = OrganisationTypeField(
         "Who runs this service?",
-        include_only={"nhs_central", "nhs_local", "nhs_gp"},
+        include_only={"nhs_central", "nhs_local", "nhs_gp", "pharmacy_local"},
     )
 
 

@@ -21,6 +21,7 @@ class Organisation(JSONModel):
     TYPE_NHS_CENTRAL = "nhs_central"
     TYPE_NHS_LOCAL = "nhs_local"
     TYPE_NHS_GP = "nhs_gp"
+    TYPE_PHRAMACY_LOCAL = "pharmacy_local"
     TYPE_EMERGENCY_SERVICE = "emergency_service"
     TYPE_SCHOOL_OR_COLLEGE = "school_or_college"
     TYPE_OTHER = "other"
@@ -29,6 +30,7 @@ class Organisation(JSONModel):
         TYPE_NHS_CENTRAL,
         TYPE_NHS_LOCAL,
         TYPE_NHS_GP,
+        TYPE_PHRAMACY_LOCAL,
     )
 
     TYPE_LABELS = {
@@ -39,8 +41,14 @@ class Organisation(JSONModel):
         TYPE_NHS_GP: "GP surgery",
         TYPE_EMERGENCY_SERVICE: "Emergency service",
         TYPE_SCHOOL_OR_COLLEGE: "School or college",
+        TYPE_PHRAMACY_LOCAL: "Pharmacy local",
         TYPE_OTHER: "Other",
     }
+
+    ZERO_TEXT_LIMIT_ORGANISATION_TYPES = (
+        TYPE_NHS_GP,
+        TYPE_PHRAMACY_LOCAL,
+    )
 
     id: Any
     name: str
