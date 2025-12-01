@@ -5,6 +5,7 @@ from time import sleep
 from typing import Final, Literal, Self
 
 import pyexcel
+import pyexcel_xlsx
 
 
 class Spreadsheet:
@@ -82,7 +83,7 @@ class Spreadsheet:
         )
 
     @classmethod
-    def from_file(
+    def from_file(  # noqa: C901 is bunk
         cls,
         file_content,
         filename="",
@@ -107,6 +108,16 @@ class Spreadsheet:
 
         if extension == "tsv":
             file_content = StringIO(Spreadsheet.normalise_newlines(file_content))
+
+        if extension == "xlsm":
+            file_data = pyexcel_xlsx.get_data(file_content)
+            instance = cls.from_rows(
+                # Get the first sheet from the workbook
+                list(file_data.values())[0],
+                filename,
+                row_limit=row_limit,
+            )
+            return instance
 
         column_limit = -1
         if column_limit_from_header:
