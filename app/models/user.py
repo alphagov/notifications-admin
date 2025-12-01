@@ -679,6 +679,18 @@ class AnonymousUser(AnonymousUserMixin):
 
     created_at = None
 
+    @property
+    def name(self):
+        return "User logged out"
+
+    @property
+    def email_address(self):
+        return None
+
+    @property
+    def mobile_number(self):
+        return None
+
     def logged_in_elsewhere(self):
         return False
 
