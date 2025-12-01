@@ -4,7 +4,13 @@ from os import path
 from time import sleep
 from typing import Final, Literal, Self
 
+import openpyxl.reader.excel
 import pyexcel
+
+from app.utils.interruptible_io import InterruptibleIOZipFile
+
+# monkeypatch the reference openpyxl will use for ZipFile
+openpyxl.reader.excel.ZipFile = InterruptibleIOZipFile
 
 
 class Spreadsheet:

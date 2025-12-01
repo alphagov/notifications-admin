@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from app.models.spreadsheet import Spreadsheet
+from app.utils.interruptible_io import InterruptibleIOZipFile
 
 conversion_original_files = tuple(
     (Path.cwd() / "tests" / "spreadsheet_files" / "conversions" / "originals").glob("[!.]*.*")
@@ -10,7 +11,7 @@ conversion_original_files = tuple(
 
 
 def test_can_create_spreadsheet_from_large_excel_file():
-    with open(str(Path.cwd() / "tests" / "spreadsheet_files" / "equivalents" / "excel 2007.xlsx"), "rb") as xl:
+    with (Path.cwd() / "tests" / "spreadsheet_files" / "equivalents" / "excel 2007.xlsx").open("rb") as xl:
         ret = Spreadsheet.from_file(xl, filename="xl.xlsx")
     assert ret.as_csv_data
 
@@ -41,3 +42,13 @@ def test_conversion(original_file):
     with original_file.open("rb") as f_orig, expected_file.open("rb") as f_exp:
         # comparison done in binary mode to avoid universal newlines complicating things
         assert Spreadsheet.from_file(f_orig, filename=original_file.name).as_csv_data.encode("utf-8") == f_exp.read()
+
+
+def test_openpyxl_zipfile_monkeypatch(mocker):
+    open_method_mock = mocker.patch.object(
+        InterruptibleIOZipFile, "open", autospec=True, wraps=InterruptibleIOZipFile.open
+    )
+    with (Path.cwd() / "tests" / "spreadsheet_files" / "equivalents" / "excel 2007.xlsx").open("rb") as xl:
+        assert Spreadsheet.from_file(xl, filename=xl.name).as_csv_data
+
+    assert mocker.call(mocker.ANY, "xl/worksheets/sheet1.xml") in open_method_mock.mock_calls
