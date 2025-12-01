@@ -4,7 +4,13 @@ from os import path
 from time import sleep
 from typing import Final, Literal, Self
 
+import openpyxl.reader.excel
 import pyexcel
+
+from app.utils.interruptible_io import InterruptibleIOZipFile, InterruptibleRawIOWrapper
+
+# monkeypatch the reference openpyxl will use for ZipFile
+openpyxl.reader.excel.ZipFile = InterruptibleIOZipFile
 
 
 class Spreadsheet:
@@ -125,7 +131,9 @@ class Spreadsheet:
                 column_limit = max(last_nonempty_column + 1, min_column_limit)
 
         return cls.from_rows(
-            pyexcel.iget_array(file_type=extension, file_stream=file_content, column_limit=column_limit),
+            pyexcel.iget_array(
+                file_type=extension, file_stream=InterruptibleRawIOWrapper(file_content), column_limit=column_limit
+            ),
             filename,
             row_limit=row_limit,
         )
