@@ -4,7 +4,6 @@ import json
 import uuid
 from functools import partial
 from io import BytesIO
-from zipfile import BadZipFile
 
 from flask import (
     abort,
@@ -23,8 +22,6 @@ from notifications_utils.recipients import RecipientCSV
 from notifications_utils.sanitise_text import SanitiseASCII
 from pypdf.errors import PdfReadError
 from requests import RequestException
-from xlrd.biffh import XLRDError
-from xlrd.xldate import XLDateError
 
 from app import (
     current_service,
@@ -344,28 +341,19 @@ def upload_contact_list(service_id):
     form = CsvUploadForm()
 
     if form.validate_on_submit():
-        try:
-            upload_id = ContactList.upload(
-                current_service.id,
-                Spreadsheet.from_file_form(form).as_dict,
+        upload_id = ContactList.upload(
+            current_service.id,
+            form.as_spreadsheet_data,
+        )
+        file_name_metadata = unicode_truncate(SanitiseASCII.encode(form.file.data.filename), 1600)
+        ContactList.set_metadata(current_service.id, upload_id, original_file_name=file_name_metadata)
+        return redirect(
+            url_for(
+                ".check_contact_list",
+                service_id=service_id,
+                upload_id=upload_id,
             )
-            file_name_metadata = unicode_truncate(SanitiseASCII.encode(form.file.data.filename), 1600)
-            ContactList.set_metadata(current_service.id, upload_id, original_file_name=file_name_metadata)
-            return redirect(
-                url_for(
-                    ".check_contact_list",
-                    service_id=service_id,
-                    upload_id=upload_id,
-                )
-            )
-        except (UnicodeDecodeError, BadZipFile, XLRDError):
-            form.file.errors = ["Notify cannot read this file - try using a different file type"]
-        except XLDateError:
-            form.file.errors = ["Notify cannot read this file - try saving it as a CSV instead"]
-        except Spreadsheet.TooManyColumnsError:
-            form.file.errors = ["Your file has too many columns (Notify can process up to 1,000 columns)"]
-        except Spreadsheet.TooManyRowsError:
-            form.file.errors = ["Your file has too many rows (Notify can process up to 100,000 rows at once)"]
+        )
     elif form.errors:
         # just show the first error, as we don't expect the form to have more
         # than one, since it only has one field
