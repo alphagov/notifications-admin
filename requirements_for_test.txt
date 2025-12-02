@@ -134,7 +134,7 @@ jmespath==1.0.1
     #   -r requirements.txt
     #   boto3
     #   botocore
-lml==0.1.0
+lml==0.2.0
     # via
     #   -r requirements.txt
     #   pyexcel
@@ -142,8 +142,7 @@ lml==0.1.0
 lxml==5.3.1
     # via
     #   -r requirements.txt
-    #   pyexcel-ezodf
-    #   pyexcel-ods3
+    #   pyexcel-odsr
 markupsafe==2.1.1
     # via
     #   -r requirements.txt
@@ -190,22 +189,18 @@ pycparser==2.21
     # via
     #   -r requirements.txt
     #   cffi
-pyexcel==0.7.1
+pyexcel==0.7.4
     # via -r requirements.txt
-pyexcel-ezodf==0.3.4
-    # via
-    #   -r requirements.txt
-    #   pyexcel-ods3
 pyexcel-io==0.6.7
     # via
     #   -r requirements.txt
     #   pyexcel
-    #   pyexcel-ods3
+    #   pyexcel-odsr
     #   pyexcel-xls
     #   pyexcel-xlsx
-pyexcel-ods3==0.6.1
+pyexcel-odsr==0.6.0
     # via -r requirements.txt
-pyexcel-xls==0.7.0
+pyexcel-xls==0.7.1
     # via -r requirements.txt
 pyexcel-xlsx==0.6.1
     # via -r requirements.txt
