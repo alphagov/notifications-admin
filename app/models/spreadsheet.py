@@ -36,10 +36,6 @@ class Spreadsheet:
         self._row_limit = row_limit
 
     @property
-    def as_dict(self):
-        return {"file_name": self.filename, "data": self.as_csv_data}
-
-    @property
     def as_csv_data(self) -> str:
         if not self._csv_data:
             with StringIO() as converted:

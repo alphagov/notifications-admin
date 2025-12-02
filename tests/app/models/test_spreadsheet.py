@@ -27,10 +27,6 @@ def test_can_create_spreadsheet_from_dict():
     )
 
 
-def test_can_create_spreadsheet_from_dict_with_filename():
-    assert Spreadsheet.from_dict({}, filename="empty.csv").as_dict["file_name"] == "empty.csv"
-
-
 @pytest.mark.parametrize(
     "args, kwargs",
     (
