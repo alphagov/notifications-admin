@@ -4,7 +4,7 @@ from os import path
 from time import sleep
 from typing import Final, Literal, Self
 
-import pyexcel
+from pyexcel_io.io import load_data as pyexcel_load_data
 
 
 class Spreadsheet:
@@ -108,13 +108,27 @@ class Spreadsheet:
         if extension == "tsv":
             file_content = StringIO(Spreadsheet.normalise_newlines(file_content))
 
-        column_limit = -1
-        if column_limit_from_header and extension not in ("xlsx", "xlsm"):
+        # why not just use pyexcel.iget_array? this allows us to reuse the same reader
+        # from the initial header read for the data reading, which should save some
+        # startup cost
+        row_iter_dict, reader = pyexcel_load_data(
+            file_stream=file_content,
+            file_type=extension,
+            streaming=True,
+            row_limit=(1 if column_limit_from_header else -1),
+        )
+        row_iter = next(iter(row_iter_dict.values()), iter(()))
+
+        if column_limit_from_header:
             original_offset = file_content.tell()
-            header = next(pyexcel.iget_array(file_type=extension, file_stream=file_content, row_limit=1), ())
+            last_nonempty_column = next(
+                (i for i, x in reversed(tuple(enumerate(next(row_iter, ())))) if str(x).strip()), None
+            )
+
+            # some plugins just read things directly from the file each time, so we need to reset
+            # the offset for them to have them read from the beginning again
             file_content.seek(original_offset)
 
-            last_nonempty_column = next((i for i, x in reversed(tuple(enumerate(header))) if str(x).strip()), None)
             if last_nonempty_column is not None:
                 if last_nonempty_column >= absolute_column_limit:
                     raise cls.TooManyColumnsError(
@@ -122,13 +136,11 @@ class Spreadsheet:
                         f"is beyond absolute limit of {absolute_column_limit}"
                     )
 
-                column_limit = max(last_nonempty_column + 1, min_column_limit)
+                reader.keywords["column_limit"] = max(last_nonempty_column + 1, min_column_limit)
+                reader.keywords["row_limit"] = -1
+                row_iter = next(iter(reader.read_sheet_by_index(0).values()))
 
-        return cls.from_rows(
-            pyexcel.iget_array(file_type=extension, file_stream=file_content, column_limit=column_limit),
-            filename,
-            row_limit=row_limit,
-        )
+        return cls.from_rows(row_iter, filename, row_limit=row_limit)
 
     @classmethod
     def from_file_form(
