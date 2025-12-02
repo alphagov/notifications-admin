@@ -109,7 +109,7 @@ class Spreadsheet:
             file_content = StringIO(Spreadsheet.normalise_newlines(file_content))
 
         column_limit = -1
-        if column_limit_from_header:
+        if column_limit_from_header and extension not in ("xlsx", "xlsm"):
             original_offset = file_content.tell()
             header = next(pyexcel.iget_array(file_type=extension, file_stream=file_content, row_limit=1), ())
             file_content.seek(original_offset)
