@@ -22,6 +22,7 @@ from notifications_utils.recipient_validation.errors import InvalidEmailError, I
 from notifications_utils.recipient_validation.phone_number import PhoneNumber as PhoneNumberUtils
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
+from notifications_utils.sanitise_text import SanitiseASCII
 from notifications_utils.timezones import local_timezone, utc_string_to_aware_gmt_datetime
 from ordered_set import OrderedSet
 from werkzeug.utils import cached_property
@@ -105,7 +106,7 @@ from app.models.branding import (
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.models.spreadsheet import Spreadsheet
-from app.utils import branding
+from app.utils import branding, unicode_truncate
 from app.utils.govuk_frontend_field import (
     GovukFrontendWidgetMixin,
     render_govuk_frontend_macro,
@@ -1606,6 +1607,10 @@ class CsvUploadForm(StripWhitespaceForm):
             FileSize(max_size=10 * 1024 * 1024, message="The file must be smaller than 10MB"),
         ],
     )
+
+    @property
+    def safe_filename(self):
+        return unicode_truncate(SanitiseASCII.encode(self.file.data.filename), 1600)
 
     def validate_file(self, field):
         from flask import current_app

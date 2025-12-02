@@ -16,7 +16,6 @@ from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 from notifications_utils.recipient_validation.postal_address import PostalAddress, address_lines_1_to_7_keys
 from notifications_utils.recipients import RecipientCSV, first_column_headings
-from notifications_utils.sanitise_text import SanitiseASCII
 
 from app import (
     current_service,
@@ -42,7 +41,7 @@ from app.s3_client.s3_csv_client import (
     s3upload,
     set_metadata_on_csv_upload,
 )
-from app.utils import PermanentRedirect, should_skip_template_page, unicode_truncate
+from app.utils import PermanentRedirect, should_skip_template_page
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.user import user_has_permissions
 
@@ -126,8 +125,7 @@ def send_messages(service_id, template_id):
             extra=extra,
         )
 
-        file_name_metadata = unicode_truncate(SanitiseASCII.encode(form.file.data.filename), 1600)
-        set_metadata_on_csv_upload(service_id, upload_id, original_file_name=file_name_metadata)
+        set_metadata_on_csv_upload(service_id, upload_id, original_file_name=form.safe_filename)
         return redirect(
             url_for(
                 ".check_messages",

@@ -19,7 +19,6 @@ from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
-from notifications_utils.sanitise_text import SanitiseASCII
 from pypdf.errors import PdfReadError
 from requests import RequestException
 
@@ -40,7 +39,6 @@ from app.s3_client.s3_letter_upload_client import (
     get_transient_letter_file_location,
     upload_letter_to_s3,
 )
-from app.utils import unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.letters import (
     get_letter_printing_statement,
@@ -345,8 +343,7 @@ def upload_contact_list(service_id):
             current_service.id,
             form.as_spreadsheet_data,
         )
-        file_name_metadata = unicode_truncate(SanitiseASCII.encode(form.file.data.filename), 1600)
-        ContactList.set_metadata(current_service.id, upload_id, original_file_name=file_name_metadata)
+        ContactList.set_metadata(current_service.id, upload_id, original_file_name=form.safe_filename)
         return redirect(
             url_for(
                 ".check_contact_list",
