@@ -145,7 +145,6 @@ def send_messages(service_id, template_id):
         column_headings=list(ascii_uppercase[: len(column_headings)]),
         example=[column_headings, get_example_csv_rows(template)],
         form=form,
-        allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
         error_summary_enabled=True,
     )
 

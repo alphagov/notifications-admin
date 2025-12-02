@@ -358,7 +358,6 @@ def upload_contact_list(service_id):
     return render_template(
         "views/uploads/contact-list/upload.html",
         form=form,
-        allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
         error_summary_enabled=True,
     )
 

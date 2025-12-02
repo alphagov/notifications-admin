@@ -1596,6 +1596,8 @@ class ChangePasswordForm(StripWhitespaceForm):
 
 
 class CsvUploadForm(StripWhitespaceForm):
+    ALLOWED_FILE_EXTENSIONS = Spreadsheet.ALLOWED_FILE_EXTENSIONS
+
     file = FileField(
         "Add recipients",
         validators=[
