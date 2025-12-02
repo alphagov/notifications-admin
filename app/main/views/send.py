@@ -136,11 +136,6 @@ def send_messages(service_id, template_id):
                 template_id=template.id,
             )
         )
-    elif form.errors:
-        # just show the first error, as we don't expect the form to have more
-        # than one, since it only has one field
-        first_field_errors = list(form.errors.values())[0]
-        form.file.errors.append(first_field_errors[0])
 
     column_headings = get_spreadsheet_column_headings_from_template(template)
 

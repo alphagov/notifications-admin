@@ -354,11 +354,6 @@ def upload_contact_list(service_id):
                 upload_id=upload_id,
             )
         )
-    elif form.errors:
-        # just show the first error, as we don't expect the form to have more
-        # than one, since it only has one field
-        first_field_errors = list(form.errors.values())[0]
-        form.file.errors.append(first_field_errors[0])
 
     return render_template(
         "views/uploads/contact-list/upload.html",
