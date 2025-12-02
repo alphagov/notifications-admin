@@ -70,14 +70,6 @@ class Spreadsheet:
         return cls(rows=rows, filename=filename, row_limit=row_limit)
 
     @classmethod
-    def from_dict(cls, dictionary, filename="", row_limit: int | None = None) -> Self:
-        return cls.from_rows(
-            zip(*sorted(dictionary.items(), key=lambda pair: pair[0]), strict=True),
-            filename=filename,
-            row_limit=row_limit,
-        )
-
-    @classmethod
     def from_file(
         cls,
         file_content,
