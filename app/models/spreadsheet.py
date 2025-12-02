@@ -129,21 +129,3 @@ class Spreadsheet:
             filename,
             row_limit=row_limit,
         )
-
-    @classmethod
-    def from_file_form(
-        cls,
-        form,
-        row_limit: int | Literal[DEFAULT_ARG] = DEFAULT_ARG,
-        column_limit_from_header: bool | Literal[DEFAULT_ARG] = DEFAULT_ARG,
-        absolute_column_limit: int | Literal[DEFAULT_ARG] = DEFAULT_ARG,
-        min_column_limit: int | Literal[DEFAULT_ARG] = DEFAULT_ARG,
-    ) -> Self:
-        return cls.from_file(
-            form.file.data,
-            filename=form.file.data.filename,
-            row_limit=row_limit,
-            column_limit_from_header=column_limit_from_header,
-            absolute_column_limit=absolute_column_limit,
-            min_column_limit=min_column_limit,
-        )

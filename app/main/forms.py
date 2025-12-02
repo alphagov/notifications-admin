@@ -1620,7 +1620,7 @@ class CsvUploadForm(StripWhitespaceForm):
         )
 
         try:
-            self.as_spreadsheet_data = Spreadsheet.from_file_form(self).as_dict
+            self.as_spreadsheet_data = Spreadsheet.from_file(field.data, filename=field.data.filename).as_dict
         except (UnicodeDecodeError, BadZipFile, XLRDError) as e:
             current_app.logger.warning(
                 "Could not read %s",
