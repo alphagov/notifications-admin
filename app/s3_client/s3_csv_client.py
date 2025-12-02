@@ -24,7 +24,7 @@ def s3upload(service_id, filedata, region, bucket=None):
     upload_id = str(uuid.uuid4())
     bucket_name, file_location = get_csv_location(service_id, upload_id, bucket)
     utils_s3upload(
-        filedata=filedata["data"],
+        filedata=filedata,
         region=region,
         bucket_name=bucket_name,
         file_location=file_location,

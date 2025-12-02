@@ -435,7 +435,7 @@ def test_upload_files_in_different_formats(
 
     if acceptable_file:
         assert (
-            mock_s3_upload.call_args[0][1]["data"].strip()
+            mock_s3_upload.call_args[0][1].strip()
             == (
                 "phone number,name,favourite colour,fruit\r\n"
                 "07739 468 050,Pete,Coral,tomato\r\n"
