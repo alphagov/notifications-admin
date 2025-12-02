@@ -116,7 +116,7 @@ def send_messages(service_id, template_id):
 
     form = CsvUploadForm()
     if form.validate_on_submit():
-        upload_id = s3upload(service_id, form.as_spreadsheet_data, current_app.config["AWS_REGION"])
+        upload_id = s3upload(service_id, form.as_csv_data, current_app.config["AWS_REGION"])
 
         extra = {"file_name": form.file.data.filename, "upload_id": upload_id}
         current_app.logger.info(

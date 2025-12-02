@@ -341,7 +341,7 @@ def upload_contact_list(service_id):
     if form.validate_on_submit():
         upload_id = ContactList.upload(
             current_service.id,
-            form.as_spreadsheet_data,
+            form.as_csv_data,
         )
         ContactList.set_metadata(current_service.id, upload_id, original_file_name=form.safe_filename)
         return redirect(
