@@ -137,7 +137,6 @@ jmespath==1.0.1
 lml==0.2.0
     # via
     #   -r requirements.txt
-    #   pyexcel
     #   pyexcel-io
 lxml==5.3.1
     # via
@@ -189,12 +188,9 @@ pycparser==2.21
     # via
     #   -r requirements.txt
     #   cffi
-pyexcel==0.7.4
-    # via -r requirements.txt
 pyexcel-io==0.6.7
     # via
     #   -r requirements.txt
-    #   pyexcel
     #   pyexcel-odsr
     #   pyexcel-xls
     #   pyexcel-xlsx
@@ -287,10 +283,6 @@ statsd==4.0.1
     # via
     #   -r requirements.txt
     #   notifications-utils
-texttable==1.6.4
-    # via
-    #   -r requirements.txt
-    #   pyexcel
 urllib3==1.26.19
     # via
     #   -r requirements.txt
