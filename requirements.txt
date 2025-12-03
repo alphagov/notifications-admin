@@ -82,9 +82,7 @@ jmespath==1.0.1
     #   boto3
     #   botocore
 lml==0.2.0
-    # via
-    #   pyexcel
-    #   pyexcel-io
+    # via pyexcel-io
 lxml==5.3.1
     # via pyexcel-odsr
 markupsafe==2.1.1
@@ -116,12 +114,9 @@ prometheus-client==0.15.0
     #   gds-metrics
 pycparser==2.21
     # via cffi
-pyexcel==0.7.4
-    # via -r requirements.in
 pyexcel-io==0.6.7
     # via
     #   -r requirements.in
-    #   pyexcel
     #   pyexcel-odsr
     #   pyexcel-xls
     #   pyexcel-xlsx
@@ -162,8 +157,6 @@ smartypants==2.0.1
     # via notifications-utils
 statsd==4.0.1
     # via notifications-utils
-texttable==1.6.4
-    # via pyexcel
 urllib3==1.26.19
     # via
     #   botocore
