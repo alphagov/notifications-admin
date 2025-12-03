@@ -56,8 +56,8 @@
   {% endset %}
 
   {{ govukErrorSummary({
-    "classes": "govuk-!-display-none",
-    "attributes": { "aria-live": "polite", "tabindex":"-1" },
+    "classes": "webauthn__error",
+    "attributes": { "aria-live": "polite", "tabindex":"-1", "hidden":"hidden" },
     "titleText": "There’s a problem with your security keys",
     "descriptionHtml": keyProblemDescription,
     "errorList": [],

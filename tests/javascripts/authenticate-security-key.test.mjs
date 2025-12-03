@@ -1,7 +1,7 @@
 import AuthenticateSecurityKey from '../../app/assets/javascripts/esm/authenticate-security-key.mjs';
+import ErrorBanner from '../../app/assets/javascripts/esm/error-banner.mjs';
 import * as helpers from './support/helpers.js';
 import { jest } from '@jest/globals';
-
 
 beforeAll( async() => {
   const CBOR = await import('../../node_modules/cbor-js/cbor.js');
@@ -17,6 +17,7 @@ describe('Authenticate with security key', () => {
   let mockWebauthnOptions;
   let mockLoginResponse;
   let authenticateKeyInstance;
+  let errorBannerShowBannerSpy;
   
 
   const mockBrowserCredentials = {
@@ -56,6 +57,10 @@ describe('Authenticate with security key', () => {
     // create a mock event for the click handler
     mockClickEvent = { preventDefault: jest.fn() };
 
+    // spy on the showBanner method of ErroBanner class
+    // and mock its implementation, allowing us to assert whether it was called
+    errorBannerShowBannerSpy = jest.spyOn(ErrorBanner.prototype, 'showBanner').mockImplementation(() => {});
+
     // mock the window fetch function
     mockFetch = jest.fn();
     window.fetch = mockFetch;
@@ -68,20 +73,15 @@ describe('Authenticate with security key', () => {
     window.location = mockWindowLocation;
     mockWindowLocation.assign = jest.fn();
 
-    // mock error banner js
-    window.GOVUK.ErrorBanner = {
-      showBanner: jest.fn(),
-      hideBanner: jest.fn(),
-    };
-
     mockWebauthnOptions = window.CBOR.encode('someArbitraryOptions');
     mockLoginResponse = window.CBOR.encode({ redirect_url: '/foo' });
     // instantiate class
     authenticateKeyInstance = new AuthenticateSecurityKey(button);
+    
   });
 
   afterEach(() => {
-    jest.restoreAllMocks()
+    jest.restoreAllMocks();
     mockFetch.mockClear();
     delete window.fetch;
     delete window.navigator.credentials;
@@ -120,7 +120,7 @@ describe('Authenticate with security key', () => {
  
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockWindowLocation.assign).toHaveBeenCalledWith('/foo');
-    expect(window.GOVUK.ErrorBanner.showBanner).not.toHaveBeenCalled();
+    expect(ErrorBanner.prototype.showBanner).not.toHaveBeenCalled();
   });
 
   it('authenticates and passes a redirect url through to the authenticate admin endpoint', async() => {
@@ -155,7 +155,7 @@ describe('Authenticate with security key', () => {
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockBrowserCredentials.get.mock.calls[0][0]).toEqual('someArbitraryOptions');
     expect(mockWindowLocation.assign).toHaveBeenCalledWith('/foo');
-    expect(window.GOVUK.ErrorBanner.showBanner).not.toHaveBeenCalled();
+    expect(ErrorBanner.prototype.showBanner).not.toHaveBeenCalled();
     expect(mockFetch.mock.calls[1][0].toString()).toEqual(
       'https://www.notifications.service.gov.uk/webauthn/authenticate?next=%2Ffoo%3Fbar%3Dbaz'
     );
@@ -179,7 +179,7 @@ describe('Authenticate with security key', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockWindowLocation.assign).not.toHaveBeenCalled();
-    expect(window.GOVUK.ErrorBanner.showBanner).toHaveBeenCalled();
+    expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 
   it('errors if comms with the authenticator fails', async() => {
@@ -196,7 +196,7 @@ describe('Authenticate with security key', () => {
     await authenticateKeyInstance.authenticateKey(mockClickEvent);
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(window.GOVUK.ErrorBanner.showBanner).toHaveBeenCalled();
+    expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 
   test.each([
@@ -222,7 +222,7 @@ describe('Authenticate with security key', () => {
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockBrowserCredentials.get.mock.calls[0][0]).toEqual('someArbitraryOptions');
     expect(mockWindowLocation.assign).not.toHaveBeenCalled();
-    expect(window.GOVUK.ErrorBanner.showBanner).toHaveBeenCalled();
+    expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 
   it('reloads page if POSTing WebAuthn credentials returns 403', async() => {
@@ -247,6 +247,6 @@ describe('Authenticate with security key', () => {
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockBrowserCredentials.get.mock.calls[0][0]).toEqual('someArbitraryOptions');
     expect(mockWindowLocation.assign).not.toHaveBeenCalledWith();
-    expect(window.GOVUK.ErrorBanner.showBanner).toHaveBeenCalled();
+    expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 });
