@@ -111,9 +111,7 @@ phonenumbers==9.0.21
 pillow==11.3.0
     # via -r requirements.in
 prometheus-client==0.15.0
-    # via
-    #   -r requirements.in
-    #   gds-metrics
+    # via gds-metrics
 pycparser==2.23
     # via cffi
 pyexcel==0.7.4
