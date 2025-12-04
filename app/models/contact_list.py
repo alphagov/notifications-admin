@@ -88,7 +88,7 @@ class ContactList(JSONModel):
         metadata = self.get_metadata(self.service_id, self.id)
         new_upload_id = s3upload(
             self.service_id,
-            {"data": self.contents},
+            self.contents,
             current_app.config["AWS_REGION"],
         )
         set_metadata_on_csv_upload(
