@@ -1,28 +1,28 @@
 # Run `make freeze-requirements` to update requirements.txt
 # with package version changes made in requirements.in
 
-ago==0.0.95
-humanize==4.4.0
-Flask-WTF==1.2.1
-Flask-Login==0.6.3
+ago
+humanize
+Flask-WTF
+Flask-Login
 
-Pillow==11.3.0
+Pillow
 
-pyexcel==0.7.4
-pyexcel-io==0.6.7
-pyexcel-xls==0.7.1
-pyexcel-xlsx==0.6.1
-pyexcel-odsr==0.6.0
-notifications-python-client==10.0.0
-fido2==1.1.3
+pyexcel
+pyexcel-io
+pyexcel-xls
+pyexcel-xlsx
+pyexcel-odsr
+notifications-python-client
+fido2
 
 # Run `make bump-utils` to update to the latest version
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@104.0.1
 
-govuk-frontend-jinja==3.6.0
+govuk-frontend-jinja
 
 # gds-metrics requires prometheseus 0.2.0, override that requirement as later versions bring significant performance gains
-prometheus-client==0.15.0
+prometheus-client
 git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
 
-sentry-sdk[flask]==1.45.1
+sentry-sdk[flask]
