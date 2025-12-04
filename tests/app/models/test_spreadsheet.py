@@ -15,6 +15,22 @@ def test_can_create_spreadsheet_from_large_excel_file():
     assert ret.as_csv_data
 
 
+def test_can_create_spreadsheet_from_dict():
+    assert (
+        Spreadsheet.from_dict(
+            {
+                "foo": "bar",
+                "name": "Jane",
+            }
+        ).as_csv_data
+        == "foo,name\r\nbar,Jane\r\n"
+    )
+
+
+def test_can_create_spreadsheet_from_dict_with_filename():
+    assert Spreadsheet.from_dict({}, filename="empty.csv").as_dict["file_name"] == "empty.csv"
+
+
 @pytest.mark.parametrize(
     "args, kwargs",
     (

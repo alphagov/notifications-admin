@@ -36,6 +36,10 @@ class Spreadsheet:
         self._row_limit = row_limit
 
     @property
+    def as_dict(self):
+        return {"file_name": self.filename, "data": self.as_csv_data}
+
+    @property
     def as_csv_data(self) -> str:
         if not self._csv_data:
             with StringIO() as converted:
@@ -68,6 +72,14 @@ class Spreadsheet:
     @classmethod
     def from_rows(cls, rows, filename="", row_limit: int | None = None) -> Self:
         return cls(rows=rows, filename=filename, row_limit=row_limit)
+
+    @classmethod
+    def from_dict(cls, dictionary, filename="", row_limit: int | None = None) -> Self:
+        return cls.from_rows(
+            zip(*sorted(dictionary.items(), key=lambda pair: pair[0]), strict=True),
+            filename=filename,
+            row_limit=row_limit,
+        )
 
     @classmethod
     def from_file(
@@ -116,4 +128,22 @@ class Spreadsheet:
             pyexcel.iget_array(file_type=extension, file_stream=file_content, column_limit=column_limit),
             filename,
             row_limit=row_limit,
+        )
+
+    @classmethod
+    def from_file_form(
+        cls,
+        form,
+        row_limit: int | Literal[DEFAULT_ARG] = DEFAULT_ARG,
+        column_limit_from_header: bool | Literal[DEFAULT_ARG] = DEFAULT_ARG,
+        absolute_column_limit: int | Literal[DEFAULT_ARG] = DEFAULT_ARG,
+        min_column_limit: int | Literal[DEFAULT_ARG] = DEFAULT_ARG,
+    ) -> Self:
+        return cls.from_file(
+            form.file.data,
+            filename=form.file.data.filename,
+            row_limit=row_limit,
+            column_limit_from_header=column_limit_from_header,
+            absolute_column_limit=absolute_column_limit,
+            min_column_limit=min_column_limit,
         )

@@ -1,5 +1,6 @@
 import itertools
 from string import ascii_uppercase
+from zipfile import BadZipFile
 
 from flask import (
     abort,
@@ -16,6 +17,9 @@ from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 from notifications_utils.recipient_validation.postal_address import PostalAddress, address_lines_1_to_7_keys
 from notifications_utils.recipients import RecipientCSV, first_column_headings
+from notifications_utils.sanitise_text import SanitiseASCII
+from xlrd.biffh import XLRDError
+from xlrd.xldate import XLDateError
 
 from app import (
     current_service,
@@ -41,7 +45,7 @@ from app.s3_client.s3_csv_client import (
     s3upload,
     set_metadata_on_csv_upload,
 )
-from app.utils import PermanentRedirect, should_skip_template_page
+from app.utils import PermanentRedirect, should_skip_template_page, unicode_truncate
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.user import user_has_permissions
 
@@ -116,24 +120,70 @@ def send_messages(service_id, template_id):
 
     form = CsvUploadForm()
     if form.validate_on_submit():
-        upload_id = s3upload(service_id, form.as_csv_data, current_app.config["AWS_REGION"])
-
-        extra = {"file_name": form.file.data.filename, "upload_id": upload_id}
-        current_app.logger.info(
-            "%(file_name)s persisted in S3 as %(upload_id)s",
-            extra,
-            extra=extra,
-        )
-
-        set_metadata_on_csv_upload(service_id, upload_id, original_file_name=form.safe_filename)
-        return redirect(
-            url_for(
-                ".check_messages",
-                service_id=service_id,
-                upload_id=upload_id,
-                template_id=template.id,
+        try:
+            extra = {"user_id": current_user.id, "file_name": form.file.data.filename}
+            current_app.logger.info(
+                "User %(user_id)s uploaded %(file_name)s",
+                extra,
+                extra=extra,
             )
-        )
+
+            upload_id = s3upload(service_id, Spreadsheet.from_file_form(form).as_dict, current_app.config["AWS_REGION"])
+
+            extra = {"file_name": form.file.data.filename, "upload_id": upload_id}
+            current_app.logger.info(
+                "%(file_name)s persisted in S3 as %(upload_id)s",
+                extra,
+                extra=extra,
+            )
+
+            file_name_metadata = unicode_truncate(SanitiseASCII.encode(form.file.data.filename), 1600)
+            set_metadata_on_csv_upload(service_id, upload_id, original_file_name=file_name_metadata)
+            return redirect(
+                url_for(
+                    ".check_messages",
+                    service_id=service_id,
+                    upload_id=upload_id,
+                    template_id=template.id,
+                )
+            )
+        except (UnicodeDecodeError, BadZipFile, XLRDError):
+            current_app.logger.warning(
+                "Could not read %s",
+                form.file.data.filename,
+                exc_info=True,
+                extra={"file_name": form.file.data.filename},
+            )
+            form.file.errors = ["Notify cannot read this file - try using a different file type"]
+        except XLDateError:
+            current_app.logger.warning(
+                "Could not parse numbers/dates in %s",
+                form.file.data.filename,
+                exc_info=True,
+                extra={"file_name": form.file.data.filename},
+            )
+            form.file.errors = ["Notify cannot read this file - try saving it as a CSV instead"]
+        except Spreadsheet.TooManyColumnsError:
+            current_app.logger.warning(
+                "Abandoned parsing %s",
+                form.file.data.filename,
+                exc_info=True,
+                extra={"file_name": form.file.data.filename},
+            )
+            form.file.errors = ["Your file has too many columns (Notify can process up to 1,000 columns)"]
+        except Spreadsheet.TooManyRowsError:
+            current_app.logger.warning(
+                "Abandoned parsing %s",
+                form.file.data.filename,
+                exc_info=True,
+                extra={"file_name": form.file.data.filename},
+            )
+            form.file.errors = ["Your file has too many rows (Notify can process up to 100,000 rows at once)"]
+    elif form.errors:
+        # just show the first error, as we don't expect the form to have more
+        # than one, since it only has one field
+        first_field_errors = list(form.errors.values())[0]
+        form.file.errors.append(first_field_errors[0])
 
     column_headings = get_spreadsheet_column_headings_from_template(template)
 
@@ -143,6 +193,7 @@ def send_messages(service_id, template_id):
         column_headings=list(ascii_uppercase[: len(column_headings)]),
         example=[column_headings, get_example_csv_rows(template)],
         form=form,
+        allowed_file_extensions=Spreadsheet.ALLOWED_FILE_EXTENSIONS,
         error_summary_enabled=True,
     )
 

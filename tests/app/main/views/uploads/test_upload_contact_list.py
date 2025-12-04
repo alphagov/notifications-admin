@@ -180,7 +180,7 @@ def test_upload_csv_file_shows_error_banner(
     )
     mock_upload.assert_called_once_with(
         SERVICE_ONE_ID,
-        "",
+        {"data": "", "file_name": "invalid.csv"},
         ANY,
         bucket="test-contact-list",
     )

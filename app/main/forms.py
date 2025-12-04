@@ -6,7 +6,6 @@ from functools import partial
 from itertools import chain
 from math import ceil
 from numbers import Number
-from zipfile import BadZipFile
 
 from flask import request
 from flask_login import current_user
@@ -22,7 +21,6 @@ from notifications_utils.recipient_validation.errors import InvalidEmailError, I
 from notifications_utils.recipient_validation.phone_number import PhoneNumber as PhoneNumberUtils
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
-from notifications_utils.sanitise_text import SanitiseASCII
 from notifications_utils.timezones import local_timezone, utc_string_to_aware_gmt_datetime
 from ordered_set import OrderedSet
 from werkzeug.utils import cached_property
@@ -52,8 +50,6 @@ from wtforms.validators import (
     Regexp,
     StopValidation,
 )
-from xlrd.biffh import XLRDError
-from xlrd.xldate import XLDateError
 
 from app import asset_fingerprinter, current_organisation
 from app.constants import (
@@ -105,8 +101,7 @@ from app.models.branding import (
 )
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
-from app.models.spreadsheet import Spreadsheet
-from app.utils import branding, unicode_truncate
+from app.utils import branding
 from app.utils.govuk_frontend_field import (
     GovukFrontendWidgetMixin,
     render_govuk_frontend_macro,
@@ -1597,8 +1592,6 @@ class ChangePasswordForm(StripWhitespaceForm):
 
 
 class CsvUploadForm(StripWhitespaceForm):
-    ALLOWED_FILE_EXTENSIONS = Spreadsheet.ALLOWED_FILE_EXTENSIONS
-
     file = FileField(
         "Add recipients",
         validators=[
@@ -1607,59 +1600,6 @@ class CsvUploadForm(StripWhitespaceForm):
             FileSize(max_size=10 * 1024 * 1024, message="The file must be smaller than 10MB"),
         ],
     )
-
-    @property
-    def safe_filename(self):
-        return unicode_truncate(SanitiseASCII.encode(self.file.data.filename), 1600)
-
-    def validate_file(self, field):
-        from flask import current_app
-
-        if field.errors:
-            return
-
-        extra = {"user_id": current_user.id, "file_name": field.data.filename}
-
-        current_app.logger.info(
-            "User %(user_id)s uploaded %(file_name)s",
-            extra,
-            extra=extra,
-        )
-
-        try:
-            self.as_csv_data = Spreadsheet.from_file(field.data, filename=field.data.filename).as_csv_data
-        except (UnicodeDecodeError, BadZipFile, XLRDError) as e:
-            current_app.logger.warning(
-                "Could not read %s",
-                field.data.filename,
-                exc_info=True,
-                extra={"file_name": field.data.filename},
-            )
-            raise ValidationError("Notify cannot read this file - try using a different file type") from e
-        except XLDateError as e:
-            current_app.logger.warning(
-                "Could not parse numbers/dates in %s",
-                field.data.filename,
-                exc_info=True,
-                extra={"file_name": field.data.filename},
-            )
-            raise ValidationError("Notify cannot read this file - try saving it as a CSV instead") from e
-        except Spreadsheet.TooManyColumnsError as e:
-            current_app.logger.warning(
-                "Abandoned parsing %s",
-                field.data.filename,
-                exc_info=True,
-                extra={"file_name": field.data.filename},
-            )
-            raise ValidationError("Your file has too many columns (Notify can process up to 1,000 columns)") from e
-        except Spreadsheet.TooManyRowsError as e:
-            current_app.logger.warning(
-                "Abandoned parsing %s",
-                field.data.filename,
-                exc_info=True,
-                extra={"file_name": field.data.filename},
-            )
-            raise ValidationError("Your file has too many rows (Notify can process up to 100,000 rows at once)") from e
 
 
 class ChangeNameForm(StripWhitespaceForm):
