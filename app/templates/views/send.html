@@ -20,7 +20,7 @@
   <div class="page-footer bottom-gutter">
     {{file_upload(
       form.file,
-      allowed_file_extensions=allowed_file_extensions,
+      allowed_file_extensions=form.ALLOWED_FILE_EXTENSIONS,
       button_text='Choose a file',
     )}}
   </div>
