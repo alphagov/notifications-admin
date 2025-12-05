@@ -4681,7 +4681,7 @@ def test_send_from_contact_list(
     )
     mock_download.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, bucket="test-contact-list")
     mock_get_metadata.assert_called_once_with(SERVICE_ONE_ID, fake_uuid, bucket="test-contact-list")
-    mock_upload.assert_called_once_with(SERVICE_ONE_ID, {"data": "contents"}, ANY)
+    mock_upload.assert_called_once_with(SERVICE_ONE_ID, "contents", ANY)
     mock_set_metadata.assert_called_once_with(SERVICE_ONE_ID, new_uuid, example_key="example value")
 
 
