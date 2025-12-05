@@ -121,6 +121,7 @@ def test_upload_file_page_validates_extentions(
     mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
     mock_post = mocker.patch("app.template_email_file_client.post")
+    mock_template_update = mocker.patch("app.service_api_client.update_service_template")
     service_one["permissions"] += ["send_files_via_ui"]
     if not expected_error_message:
         with open(test_file, "rb") as file:
@@ -131,8 +132,9 @@ def test_upload_file_page_validates_extentions(
                 _data={"file": file},
                 _expected_status=302,  # if the form validates we should redirect
             )
-        assert mock_s3.called
-        assert mock_post.called
+        assert mock_s3.called is True
+        assert mock_post.called is True
+        assert mock_template_update.called is True
     else:
         with open(test_file, "rb") as file:
             page = client_request.post(
@@ -156,37 +158,75 @@ def test_upload_file_page_validates_extentions(
         assert not error_message
 
 
-def test_upload_file_redirects_to_template_view(
+def test_file_upload_calls_template_update(
     client_request,
     fake_uuid,
     service_one,
-    mock_get_service_email_template,
     mocker,
 ):
-    pass
-    # mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-    # service_one["permissions"] += ["send_files_via_ui"]
-    # with open(test_file, "rb") as file:
-    #     page = client_request.post(
-    #         "main.email_template_files_upload",
-    #         service_id=SERVICE_ONE_ID,
-    #         template_id=fake_uuid,
-    #         _data={"file": file},
-    #         _expected_status=200,
-    #     )
+    service_one["permissions"] += ["send_files_via_ui"]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                content="This is a file with a file placeholder",
+            )
+        },
+    )
+    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
+    mock_post = mocker.patch("app.template_email_file_client.post")
+    mock_template_update = mocker.patch("app.service_api_client.update_service_template")
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        client_request.post(
+            "main.email_template_files_upload",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _data={"file": file},
+            _expected_status=302,
+        )
+    assert mock_antivirus.called
+    mock_template_update.assert_called_once_with(
+        template_id=fake_uuid,
+        service_id=SERVICE_ONE_ID,
+        content="This is a file with a file placeholder\n\n((tests/test_pdf_files/one_page_pdf.pdf))",
+    )
+    assert mock_s3.called
+    assert mock_post.called
 
-    # assert mock_antivirus.called is True
 
-    # error_message = page.select_one("form label .govuk-error-message")
-
-    # if expected_error_message:
-    #     assert normalize_spaces(error_message.text) == expected_error_message
-    # else:
-    #     assert not error_message
-
-
-# def test_upload_file_calls_template_email_files_client():
-#     pass
-
-# def test_upload_calls_upload_to_s3():
-#     pass
+def test_upload_duplicate_file_does_not_upload_new_file(
+    client_request,
+    fake_uuid,
+    service_one,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                content="This is a file with a file placeholder ((tests/test_pdf_files/one_page_pdf.pdf))",
+            )
+        },
+    )
+    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
+    mock_post = mocker.patch("app.template_email_file_client.post")
+    mock_template_update = mocker.patch("app.service_api_client.update_service_template")
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        client_request.post(
+            "main.email_template_files_upload",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _data={"file": file},
+            _expected_status=302,
+        )
+    assert mock_antivirus.called
+    assert not mock_template_update.called
+    assert not mock_s3.called
+    assert not mock_post.called
