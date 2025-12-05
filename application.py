@@ -14,7 +14,9 @@ application = Flask("app")
 create_app(application)
 
 if using_eventlet:
+    http_serve_timeout_seconds = int(os.getenv("HTTP_SERVE_TIMEOUT_SECONDS", 30))
     application.wsgi_app = EventletTimeoutMiddleware(
         application.wsgi_app,
-        timeout_seconds=int(os.getenv("HTTP_SERVE_TIMEOUT_SECONDS", 30)),
+        timeout_seconds=http_serve_timeout_seconds,
+        soft_timeout_seconds=http_serve_timeout_seconds - 1,
     )

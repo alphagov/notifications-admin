@@ -15,6 +15,7 @@ from flask_wtf.file import FileAllowed, FileSize
 from flask_wtf.file import FileField as FileField_wtf
 from markupsafe import Markup
 from notifications_utils.countries.data import Postage
+from notifications_utils.eventlet import SoftEventletTimeout
 from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 from notifications_utils.recipient_validation.email_address import validate_email_address
@@ -1628,7 +1629,7 @@ class CsvUploadForm(StripWhitespaceForm):
 
         try:
             self.as_csv_data = Spreadsheet.from_file(field.data, filename=field.data.filename).as_csv_data
-        except (UnicodeDecodeError, BadZipFile, XLRDError) as e:
+        except (UnicodeDecodeError, BadZipFile, XLRDError, SoftEventletTimeout) as e:
             current_app.logger.warning(
                 "Could not read %s",
                 field.data.filename,
