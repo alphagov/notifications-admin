@@ -15,6 +15,7 @@ from flask_wtf.file import FileAllowed, FileSize
 from flask_wtf.file import FileField as FileField_wtf
 from markupsafe import Markup
 from notifications_utils.countries.data import Postage
+from notifications_utils.eventlet import SoftEventletTimeout
 from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 from notifications_utils.recipient_validation.email_address import validate_email_address
@@ -1636,6 +1637,17 @@ class CsvUploadForm(StripWhitespaceForm):
                 extra={"file_name": field.data.filename},
             )
             raise ValidationError("Notify cannot read this file - try using a different file type") from e
+        except SoftEventletTimeout as e:
+            current_app.logger.warning(
+                "Timed out reading %s",
+                field.data.filename,
+                exc_info=True,
+                extra={"file_name": field.data.filename},
+            )
+            raise ValidationError(
+                "Your file took too long to process – try again, or remove any sheets, columns or "
+                "rows that are not needed"
+            ) from e
         except XLDateError as e:
             current_app.logger.warning(
                 "Could not parse numbers/dates in %s",
