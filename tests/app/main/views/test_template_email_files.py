@@ -119,21 +119,74 @@ def test_upload_file_page_validates_extentions(
     mocker,
 ):
     mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
+    mock_post = mocker.patch("app.template_email_file_client.post")
     service_one["permissions"] += ["send_files_via_ui"]
-    with open(test_file, "rb") as file:
-        page = client_request.post(
-            "main.email_template_files_upload",
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-            _data={"file": file},
-            _expected_status=200,
-        )
+    if not expected_error_message:
+        with open(test_file, "rb") as file:
+            page = client_request.post(
+                "main.email_template_files_upload",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+                _data={"file": file},
+                _expected_status=302,  # if the form validates we should redirect
+            )
+        assert mock_s3.called
+        assert mock_post.called
+    else:
+        with open(test_file, "rb") as file:
+            page = client_request.post(
+                "main.email_template_files_upload",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+                _data={"file": file},
+                _expected_status=200,  # if the form fails to validate we should return upload view with msg
+            )
 
-    assert mock_antivirus.called is True
-
+    assert mock_antivirus.called
     error_message = page.select_one("form label .govuk-error-message")
 
     if expected_error_message:
         assert normalize_spaces(error_message.text) == expected_error_message
     else:
+        assert normalize_spaces(page.select_one("h1").text) == "Redirecting..."
+        redirect_message = normalize_spaces(page.select_one("p").text)
+        assert "You should be redirected automatically to the target URL" in redirect_message
+        assert f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}" in redirect_message
         assert not error_message
+
+
+def test_upload_file_redirects_to_template_view(
+    client_request,
+    fake_uuid,
+    service_one,
+    mock_get_service_email_template,
+    mocker,
+):
+    pass
+    # mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    # service_one["permissions"] += ["send_files_via_ui"]
+    # with open(test_file, "rb") as file:
+    #     page = client_request.post(
+    #         "main.email_template_files_upload",
+    #         service_id=SERVICE_ONE_ID,
+    #         template_id=fake_uuid,
+    #         _data={"file": file},
+    #         _expected_status=200,
+    #     )
+
+    # assert mock_antivirus.called is True
+
+    # error_message = page.select_one("form label .govuk-error-message")
+
+    # if expected_error_message:
+    #     assert normalize_spaces(error_message.text) == expected_error_message
+    # else:
+    #     assert not error_message
+
+
+# def test_upload_file_calls_template_email_files_client():
+#     pass
+
+# def test_upload_calls_upload_to_s3():
+#     pass
