@@ -7,14 +7,20 @@ init_performance_monitoring()
 from flask import Flask  # noqa
 from app import create_app  # noqa
 
-from notifications_utils.eventlet import EventletTimeoutMiddleware, using_eventlet  # noqa
+import notifications_utils.eventlet as utils_eventlet  # noqa
 
 application = Flask("app")
 
 create_app(application)
 
-if using_eventlet:
-    application.wsgi_app = EventletTimeoutMiddleware(
+if utils_eventlet.using_eventlet:
+    application.wsgi_app = utils_eventlet.EventletTimeoutMiddleware(
         application.wsgi_app,
         timeout_seconds=int(os.getenv("HTTP_SERVE_TIMEOUT_SECONDS", 30)),
     )
+
+    if application.config["NOTIFY_EVENTLET_STATS"]:
+        import greenlet
+
+        greenlet.settrace(utils_eventlet.account_greenlet_times)
+        application._server_greenlet = greenlet.getcurrent()
