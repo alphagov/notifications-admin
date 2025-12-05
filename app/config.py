@@ -80,6 +80,9 @@ class Config:
     S3_BUCKET_REPORT_REQUESTS_DOWNLOAD = os.environ.get(
         "S3_BUCKET_REPORT_REQUESTS_DOWNLOAD", "local-report-requests-download"
     )
+    S3_BUCKET_DOCUMENT_DOWNLOAD_LONG_TERM_FILE_STORAGE = os.environ.get(
+        "S3_BUCKET_DOCUMENT_DOWNLOAD_LONG_TERM_FILE_STORAGE", "local-template-email-files"
+    )
     LOGO_CDN_DOMAIN = os.environ.get("LOGO_CDN_DOMAIN", "static-logos.notify.tools")
     ANTIVIRUS_ENABLED = True
 
