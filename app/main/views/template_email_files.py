@@ -1,10 +1,17 @@
-from flask import render_template
+import uuid
 
-from app import current_service, current_user
+from flask import redirect, render_template, url_for
+
+from app import current_service, current_user, service_api_client, template_email_file_client
 from app.main import main
 from app.main.forms import TemplateEmailFilesUploadForm
+from app.s3_client.s3_template_email_file_upload_client import upload_template_email_file_to_s3
 from app.utils import service_has_permission
 from app.utils.user import user_has_permissions
+
+
+def _get_file_location_from_upload_id(file_id: uuid, service_id: uuid, template_id: uuid) -> str:
+    return f"service-{service_id}/template-{template_id}/{file_id}"
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files/upload", methods=["GET", "POST"])
@@ -18,7 +25,28 @@ def email_template_files_upload(template_id, service_id):
     )
     form = TemplateEmailFilesUploadForm()
     if form.validate_on_submit():
-        pass
+        filename = form.file.data.filename
+        if filename.lower() not in template.placeholders:
+            file_id = uuid.uuid4()
+            file_bytes = form.file.data.read()
+            file_location = _get_file_location_from_upload_id(file_id, service_id, template_id)
+            upload_template_email_file_to_s3(data=file_bytes, file_location=file_location)
+            template_email_file_client.create_file(file_id, service_id, template_id, filename, current_user.id)
+            new_content = template.content + f"\n\n(({filename.lower()}))"
+            service_api_client.update_service_template(
+                service_id=service_id,
+                template_id=template_id,
+                content=new_content,
+            )
+
+        return redirect(
+            url_for(
+                "main.view_template",
+                service_id=service_id,
+                template_id=template_id,
+            )
+        )
+
     return render_template(
         "views/templates/email-template-files/upload.html",
         template=template,

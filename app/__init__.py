@@ -130,6 +130,7 @@ from app.notify_client.report_request_api_client import report_request_api_clien
 from app.notify_client.service_api_client import service_api_client  # noqa
 from app.notify_client.sms_rate_client import sms_rate_api_client  # noqa
 from app.notify_client.status_api_client import status_api_client  # noqa
+from app.notify_client.template_email_file_client import template_email_file_client  # noqa
 from app.notify_client.template_folder_api_client import template_folder_api_client  # noqa
 from app.notify_client.template_statistics_api_client import template_statistics_client  # noqa
 from app.notify_client.unsubscribe_api_client import unsubscribe_api_client  # noqa
