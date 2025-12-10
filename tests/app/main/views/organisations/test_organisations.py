@@ -46,8 +46,8 @@ def test_organisation_page_shows_all_organisations(client_request, platform_admi
     ]
 
     archived = page.select_one(".table-field-status-default.heading-medium")
-    assert normalize_spaces(archived.text) == "- archived"
-    assert normalize_spaces(archived.parent.text) == "Test 2 - archived 2 live services"
+    assert normalize_spaces(archived.text) == "– archived"
+    assert normalize_spaces(archived.parent.text) == "Test 2 – archived 2 live services"
 
     assert normalize_spaces(page.select_one("a.govuk-button--secondary").text) == "New organisation"
     get_organisations.assert_called_once_with()

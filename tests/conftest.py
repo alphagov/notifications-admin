@@ -1,6 +1,7 @@
 import copy
 import json
 import os
+import re
 from contextlib import contextmanager
 from datetime import UTC, date, datetime, timedelta
 from unittest import mock
@@ -3043,6 +3044,8 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
             if _test_for_non_smart_quotes:
                 ClientRequest.test_for_non_smart_quotes(page)
 
+            ClientRequest.test_for_missing_en_dashes(page)
+
             if _test_for_script_csp_nonce:
                 ClientRequest.test_for_script_csp_nonce(page)
 
@@ -3188,6 +3191,23 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
             for el in page.select(ELEMENTS_TO_CHECK_FOR_PUNCTUATION):
                 assert not ("'" in el.text or '"' in el.text), (
                     f"Non-smart quote or apostrophe found in <{el.name}>: {normalize_spaces(el.text)}"
+                )
+
+        @staticmethod
+        def test_for_missing_en_dashes(page):
+            for el in page.select(ELEMENTS_TO_CHECK_FOR_PUNCTUATION):
+                assert " - " not in normalize_spaces(el.text), (
+                    f"Hyphen used as clause separator in <{el.name}> (use an en dash instead): "
+                    f"{normalize_spaces(el.text)}"
+                )
+                assert not re.match(r"[^\s]–[^\s]", el.text), (
+                    f"En dash used as range separator in <{el.name}> (use ‘to’ instead): {normalize_spaces(el.text)}"
+                )
+                assert not re.match(r"\d-\d", el.text), (
+                    f"Hyphen used as range separator in <{el.name}> (use ‘to’ instead): {normalize_spaces(el.text)}"
+                )
+                assert "—" not in el.text, (
+                    f"Em dash in <{el.name}> (use an en dash instead): {normalize_spaces(el.text)}"
                 )
 
         @staticmethod
