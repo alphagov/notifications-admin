@@ -130,7 +130,7 @@ def service_email_sender_change(service_id):
     if form.validate_on_submit():
         new_sender = form.custom_email_sender_name.data if form.use_custom_email_sender_name.data else None
 
-        current_service.update(custom_email_sender_name=new_sender)
+        current_service.update(custom_email_sender_name=new_sender, confirmed_email_sender_name=True)
 
         return redirect(url_for(".service_settings", service_id=service_id))
 

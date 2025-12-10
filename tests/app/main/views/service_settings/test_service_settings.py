@@ -5741,6 +5741,7 @@ class TestServiceEmailSenderChange:
         mock_update_service.assert_called_once_with(
             SERVICE_ONE_ID,
             custom_email_sender_name=custom_email_sender_name,
+            confirmed_email_sender_name=True,
         )
 
     # email sender change page preview contains html so instead of repeatably
@@ -5832,5 +5833,7 @@ class TestServiceEmailSenderChange:
         )
 
         mock_update_service.assert_called_once_with(
-            SERVICE_ONE_ID, custom_email_sender_name=expected_custom_email_sender_name
+            SERVICE_ONE_ID,
+            custom_email_sender_name=expected_custom_email_sender_name,
+            confirmed_email_sender_name=True,
         )
