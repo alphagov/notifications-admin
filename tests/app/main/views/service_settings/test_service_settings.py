@@ -5703,7 +5703,7 @@ class TestServiceEmailSenderChange:
         page = client_request.post(
             "main.service_email_sender_change",
             service_id=SERVICE_ONE_ID,
-            _data={"use_custom_email_sender_name": "True", "custom_email_sender_name": custom_email_sender_name},
+            _data={"use_custom_email_sender_name": True, "custom_email_sender_name": custom_email_sender_name},
             _expected_status=200,
         )
         assert not mock_update_service.called
@@ -5730,7 +5730,7 @@ class TestServiceEmailSenderChange:
             "main.service_email_sender_change",
             service_id=SERVICE_ONE_ID,
             _data={
-                "use_custom_email_sender_name": "True",
+                "use_custom_email_sender_name": True,
                 "custom_email_sender_name": custom_email_sender_name,
             },
             _expected_redirect=url_for(
@@ -5780,7 +5780,7 @@ class TestServiceEmailSenderChange:
         response = client_request.post_response(
             "main.service_email_sender_preview",
             service_id=SERVICE_ONE_ID,
-            _data={"use_custom_email_sender_name": "True", "custom_email_sender_name": custom_email_sender_name},
+            _data={"use_custom_email_sender_name": True, "custom_email_sender_name": custom_email_sender_name},
             _expected_status=200,
         )
         assert normalize_spaces(response.get_json()["html"]) == normalize_spaces(expected_preview)
@@ -5795,7 +5795,7 @@ class TestServiceEmailSenderChange:
         response = client_request.post_response(
             "main.service_email_sender_preview",
             service_id=SERVICE_ONE_ID,
-            _data={"use_custom_email_sender_name": "False"},
+            _data={"use_custom_email_sender_name": False},
             _expected_status=200,
         )
         assert normalize_spaces(response.get_json()["html"]) == normalize_spaces(expected_preview)
@@ -5803,10 +5803,10 @@ class TestServiceEmailSenderChange:
     @pytest.mark.parametrize(
         "use_custom_email_sender_name, custom_email_sender_name, expected_custom_email_sender_name",
         [
-            ("False", "", None),
+            (False, "", None),
             # don't validate sender name if the use flag is false
-            ("False", "GOV.UK Ειδοποίηση", None),
-            ("True", "GOV.UK Notify", "GOV.UK Notify"),
+            (False, "GOV.UK Ειδοποίηση", None),
+            (True, "GOV.UK Notify", "GOV.UK Notify"),
         ],
     )
     def test_service_email_sender_change_should_redirect_on_success(
