@@ -287,16 +287,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         endpoint = f"/service/{service_id}/template?detailed=False"
         return self.get(endpoint)
 
-    # This doesn’t need caching because it calls through to a method which is cached
-    def count_service_templates(self, service_id, template_type=None):
-        return len(
-            [
-                template
-                for template in self.get_service_templates(service_id)["data"]
-                if (not template_type or template["template_type"] == template_type)
-            ]
-        )
-
     @cache.delete("service-{service_id}-templates")
     @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
     def delete_service_template(self, service_id, template_id):

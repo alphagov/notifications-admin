@@ -111,57 +111,6 @@ def test_get_precompiled_template(mocker):
 
 
 @pytest.mark.parametrize(
-    "template_data, extra_args, expected_count",
-    (
-        (
-            [],
-            {},
-            0,
-        ),
-        (
-            [],
-            {"template_type": "email"},
-            0,
-        ),
-        (
-            [
-                {"template_type": "email"},
-                {"template_type": "sms"},
-            ],
-            {},
-            2,
-        ),
-        (
-            [
-                {"template_type": "email"},
-                {"template_type": "sms"},
-            ],
-            {"template_type": "email"},
-            1,
-        ),
-        (
-            [
-                {"template_type": "email"},
-                {"template_type": "sms"},
-            ],
-            {"template_type": "letter"},
-            0,
-        ),
-    ),
-)
-def test_client_returns_count_of_service_templates(
-    notify_admin,
-    mocker,
-    template_data,
-    extra_args,
-    expected_count,
-):
-    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": template_data})
-
-    assert service_api_client.count_service_templates(SERVICE_ONE_ID, **extra_args) == expected_count
-
-
-@pytest.mark.parametrize(
     (
         "method,"
         "extra_args,"
