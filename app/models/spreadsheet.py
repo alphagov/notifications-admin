@@ -4,7 +4,13 @@ from os import path
 from time import sleep
 from typing import Final, Literal, Self
 
+import openpyxl.reader.excel
 import pyexcel
+
+from app.utils.interruptible_io import InterruptibleIOZipFile
+
+# monkeypatch the reference openpyxl will use for ZipFile
+openpyxl.reader.excel.ZipFile = InterruptibleIOZipFile
 
 
 class Spreadsheet:
@@ -14,7 +20,7 @@ class Spreadsheet:
     class TooManyRowsError(ValueError):
         pass
 
-    AS_CSV_YIELD_LOOP_EVERY: int = 128
+    AS_CSV_LOOP_INTERRUPTIBLE_EVERY: int = 32
     ALLOWED_FILE_EXTENSIONS = ("csv", "xlsx", "xls", "ods", "xlsm", "tsv")
 
     # a sentinel for use as a kwarg default to avoid early-binding issues that inhibit mocking
@@ -44,7 +50,7 @@ class Spreadsheet:
                     if self._row_limit is not None and i > self._row_limit:
                         raise self.TooManyRowsError(f"Exceeded row limit of {self._row_limit}")
 
-                    if not (i + 1) % self.AS_CSV_YIELD_LOOP_EVERY:
+                    if not (i + 1) % self.AS_CSV_LOOP_INTERRUPTIBLE_EVERY:
                         # all green thread libraries will monkeypatch this to yield to the event loop
                         # and the real implementation should at least drop the GIL
                         sleep(0)
