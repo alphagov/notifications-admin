@@ -1,5 +1,6 @@
 {% from "components/service-link.html" import service_link %}
 {% from "components/table.html" import mapping_table, row, text_field %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% extends "content_template.html" %}
 
@@ -36,25 +37,36 @@
   <p class="govuk-body">Estimated delivery times are based on the date a letter is dispatched.</p>
 
 <div class="bottom-gutter-3-2">
-    {% call mapping_table(
-      caption='Estimated delivery times for letters',
-      field_headings=['Postage', 'Estimated delivery time'],
-      field_headings_visible=True,
-      caption_visible=False
-    ) %}
-      {% for column_heading, description in [
-        ('First class', '1 to 2 days (Monday to Saturday)'),
-        ('Second class', '3 to 4 working days'),
-        ('Economy mail', 'Up to 6 working days'),
-        ('International (Europe)', '3 to 5 working days'),
-        ('International (rest of the world)', '6 to 7 working days'),
-        ] %}
-        {% call row() %}
-          {{ text_field(column_heading) }}
-          {{ text_field(description) }}
-        {% endcall %}
-      {% endfor %}
-    {% endcall %}
+  {{ govukTable ({
+    "caption": "Estimated delivery times for letters",
+    "captionClasses": "govuk-visually-hidden",
+    "head": [
+      { "text": "Postage" },
+      { "text": "Estimated delivery time" }
+    ],
+    "rows": [
+      [
+        { "text": 'First class' },
+        { "text": '1 to 2 days (Monday to Saturday)'}
+      ],
+      [
+        { "text": 'Second class' },
+        { "text": '3 to 4 working days'}
+      ],
+      [
+        { "text": 'Economy mail' },
+        { "text": 'Up to 6 working days' }
+      ],
+      [
+        { "text": 'International (Europe)' },
+        { "text": '3 to 5 working days' }
+      ],
+      [
+        { "text": 'International (rest of the world)' },
+        { "text": '6 to 7 working days' }
+      ]
+    ]
+  }) }}
   </div>
 
   <p class="govuk-body">See a list of <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_letters') }}">postage prices</a>.</p>
