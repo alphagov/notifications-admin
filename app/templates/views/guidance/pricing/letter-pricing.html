@@ -34,13 +34,50 @@
      <li>C5 size envelopes with an address window</li>
   </ul>
 
-<p class="govuk-body">Letters must be 10 pages or less (5 double-sided sheets of paper).</p>
+  <p class="govuk-body">Letters must be 10 pages or less (5 double-sided sheets of paper).</p>
 
-<p class="govuk-body">Prices do not include VAT.</p>
+  <h2 class="heading-medium">UK postage</h2>
+
+  <p class="govuk-body">Choose from the following Royal Mail delivery services:</p>
+  <ul class="govuk-list govuk-list--bullet">
+     <li>first class</li>
+     <li>second class</li>
+     <li>economy mail</li>
+  </ul>
+
+  <p class="govuk-body">GOV.UK Notify does not offer a tracked delivery service.</p>
+
+  <p class="govuk-body">Prices do not include VAT.</p>
 
   <div>
     {% call mapping_table(
-      caption='Letter pricing. Prices do not include VAT.',
+      caption='UK letter pricing. Prices do not include VAT.',
+      field_headings=['Paper'] + letter_rates.post_classes.values()|list,
+      field_headings_visible=True,
+      caption_visible=False
+    ) %}
+      {% for sheets in letter_rates.sheet_counts %}
+        {% call row() %}
+          {% call row_heading() %} {{ sheets }} sheet{{ 's' if sheets > 1 else '' }} {% endcall %}
+          {% for post_class in letter_rates.post_classes.keys() %}
+            {{ text_field(letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False)) }}
+          {% endfor %}
+        {% endcall %}
+      {% endfor %}
+    {% endcall %}
+  </div>
+
+<p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_delivery_times', _anchor='letters') }}">delivery times</a>.</p>
+
+  <h2 class="heading-medium">International letters</h2>
+
+  <p class="govuk-body">Notify checks for international addresses and will automatically charge you the correct postage.</p>
+
+  <p class="govuk-body">Prices do not include VAT.</p>
+
+  <div>
+    {% call mapping_table(
+      caption='International letter pricing. Prices do not include VAT.',
       field_headings=['Paper'] + letter_rates.post_classes.values()|list,
       field_headings_visible=True,
       caption_visible=False
