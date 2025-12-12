@@ -284,7 +284,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         Retrieve all templates for service.
         """
-        endpoint = f"/service/{service_id}/template?detailed=False"
+        endpoint = f"/service/{service_id}/template"
         return self.get(endpoint)
 
     # This doesn’t need caching because it calls through to a method which is cached

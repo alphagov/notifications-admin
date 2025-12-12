@@ -262,7 +262,7 @@ def test_client_returns_count_of_service_templates(
             [SERVICE_ONE_ID],
             [call(f"service-{SERVICE_ONE_ID}-templates")],
             None,
-            [call(f"/service/{SERVICE_ONE_ID}/template?detailed=False")],
+            [call(f"/service/{SERVICE_ONE_ID}/template")],
             [
                 call(
                     f"service-{SERVICE_ONE_ID}-templates",
