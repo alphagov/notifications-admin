@@ -1,8 +1,10 @@
-from unittest.mock import Mock
+from unittest.mock import ANY, Mock, call
 
 import pytest
 from notifications_python_client.errors import HTTPError
+from notifications_utils.testing.comparisons import AnyStringMatching
 
+from tests import UUID4_REGEX_PATTERN
 from tests.conftest import (
     SERVICE_ONE_ID,
     create_template,
@@ -197,7 +199,7 @@ def test_file_upload_calls_template_update(
     assert mock_post.called
 
 
-def test_upload_duplicate_file_does_not_upload_new_file(
+def test_upload_file_does_not_update_template_when_placeholder_already_exists(
     client_request,
     fake_uuid,
     service_one,
@@ -226,10 +228,29 @@ def test_upload_duplicate_file_does_not_upload_new_file(
             _data={"file": file},
             _expected_status=302,
         )
-    assert mock_antivirus.called
-    assert not mock_template_update.called
-    assert not mock_s3.called
-    assert not mock_post.called
+    assert mock_antivirus.called is True
+    assert mock_template_update.call_args_list == []
+    assert mock_s3.call_args_list == [
+        call(
+            filedata=ANY,
+            region="eu-west-1",
+            bucket_name="local-template-email-files",
+            file_location=AnyStringMatching(rf"service-{SERVICE_ONE_ID}/template-{fake_uuid}/{UUID4_REGEX_PATTERN}"),
+            metadata={},
+        ),
+    ]
+    assert mock_post.call_args_list == [
+        call(
+            f"/service/{SERVICE_ONE_ID}/templates/{fake_uuid}/template_email_files",
+            data={
+                "id": AnyStringMatching(UUID4_REGEX_PATTERN),
+                "filename": "tests/test_pdf_files/one_page_pdf.pdf",
+                "created_by_id": AnyStringMatching(UUID4_REGEX_PATTERN),
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+        ),
+    ]
 
 
 @pytest.mark.parametrize(

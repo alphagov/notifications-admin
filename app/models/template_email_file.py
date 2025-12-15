@@ -28,7 +28,13 @@ class TemplateEmailFile(JSONModel):
         file_bytes = file_contents.read()
         file_location = _get_file_location(file_id, current_service.id, template_id)
         upload_template_email_file_to_s3(data=file_bytes, file_location=file_location)
-        template_email_file_client.create_file(file_id, current_service.id, template_id, filename, current_user)
+        template_email_file_client.create_file(
+            file_id=file_id,
+            service_id=current_service.id,
+            template_id=template_id,
+            filename=filename,
+            created_by_id=current_user.id,
+        )
 
 
 class TemplateEmailFiles(SerialisedModelCollection):

@@ -13,6 +13,8 @@ from flask_login import login_user
 
 from app.models.user import User
 
+UUID4_REGEX_PATTERN = r"[0-9a-f]{8}\-[0-9a-f]{4}\-[0-9a-f]{4}\-[89ab][0-9a-f]{3}\-[0-9a-f]{12}"
+
 
 class TestClient(FlaskClient):
     def login(self, user, mocker=None, service=None, request=None):
