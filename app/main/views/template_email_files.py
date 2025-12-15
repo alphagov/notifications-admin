@@ -17,7 +17,7 @@ def email_template_files_upload(template_id, service_id):
         current_user,
         must_be_of_type="email",
     )
-    form = TemplateEmailFilesUploadForm()
+    form = TemplateEmailFilesUploadForm(existing_files=template.email_files)
     if form.validate_on_submit():
         filename = form.file.data.filename
         if filename.lower() not in template.placeholders:

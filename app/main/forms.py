@@ -3184,6 +3184,10 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
 
 
 class TemplateEmailFilesUploadForm(StripWhitespaceForm):
+    def __init__(self, *args, existing_files, **kwargs):
+        self.existing_file_names = InsensitiveSet(file.filename for file in existing_files)
+        super().__init__(*args, **kwargs)
+
     allowed_file_formats = {
         "CSV": ("csv",),
         "image": (
@@ -3213,3 +3217,10 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
             NoBracketsInFileName(),
         ],
     )
+
+    def validate_file(self, field):
+        if field.errors:
+            return
+
+        if field.data.filename in self.existing_file_names:
+            raise ValidationError(f"Your template already has a file called ‘{field.data.filename}’")
