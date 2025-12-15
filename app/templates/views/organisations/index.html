@@ -18,7 +18,7 @@
         <li class="browse-list-item">
           <a href="{{ url_for('main.organisation_dashboard', org_id=org.id) }}" class="govuk-link govuk-link--no-visited-state">{{ org.name }}</a>
           {% if not org.active %}
-            <span class="table-field-status-default heading-medium">- archived</span>
+            <span class="table-field-status-default heading-medium">– archived</span>
           {% endif %}
           <p class="browse-list-hint">
             {{ org.count_of_live_services }}

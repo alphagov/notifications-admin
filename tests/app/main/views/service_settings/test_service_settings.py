@@ -521,7 +521,7 @@ def test_escapes_letter_contact_block(
             "local",
             [
                 "Your service name should tell the recipient what your message is about, as well as who it’s from. For example",  # noqa
-                "School admissions - Test Organisation",
+                "School admissions – Test Organisation",
             ],
         ),
         ("nhs", ["Your service name should tell the recipient what your message is about, as well as who it’s from."]),
@@ -559,7 +559,7 @@ def test_should_show_service_org_in_hint_on_change_service_name_page_for_local_s
     service_one["organisation"] = "1234"
     page = client_request.get("main.service_name_change", service_id=SERVICE_ONE_ID)
     # when there is organisation on the service object, it is used for hint text instead of user default org
-    assert "School admissions - Local Authority" in page.select_one("ul.govuk-list.govuk-list--bullet").text
+    assert "School admissions – Local Authority" in page.select_one("ul.govuk-list.govuk-list--bullet").text
 
 
 def test_should_show_service_name_with_no_prefixing(
