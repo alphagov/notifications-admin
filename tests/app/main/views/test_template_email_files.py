@@ -199,11 +199,19 @@ def test_file_upload_calls_template_update(
     assert mock_post.called
 
 
+@pytest.mark.parametrize(
+    "template_content",
+    (
+        "This is a file with a file placeholder ((tests/test_pdf_files/one_page_pdf.pdf))",
+        "This is a file with a file placeholder ((tests/test_pdf_files/ONE-PAGE PDF.PDF))",
+    ),
+)
 def test_upload_file_does_not_update_template_when_placeholder_already_exists(
     client_request,
     fake_uuid,
     service_one,
     mocker,
+    template_content,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
     mocker.patch(
@@ -212,7 +220,7 @@ def test_upload_file_does_not_update_template_when_placeholder_already_exists(
             "data": create_template(
                 template_id=fake_uuid,
                 template_type="email",
-                content="This is a file with a file placeholder ((tests/test_pdf_files/one_page_pdf.pdf))",
+                content=template_content,
             )
         },
     )

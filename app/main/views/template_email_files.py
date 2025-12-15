@@ -1,4 +1,5 @@
 from flask import redirect, render_template, url_for
+from notifications_utils.insensitive_dict import InsensitiveSet
 
 from app import current_service, current_user, service_api_client
 from app.main import main
@@ -19,14 +20,13 @@ def email_template_files_upload(template_id, service_id):
     )
     form = TemplateEmailFilesUploadForm(existing_files=template.email_files)
     if form.validate_on_submit():
-        filename = form.file.data.filename
         TemplateEmailFile.create(
             filename=form.file.data.filename,
             file_contents=form.file.data,
             template_id=template.id,
         )
 
-        if filename.lower() not in template.placeholders:
+        if form.file.data.filename not in InsensitiveSet(template.placeholders):
             new_content = template.content + f"\n\n(({form.file.data.filename}))"
             service_api_client.update_service_template(
                 service_id=service_id,
