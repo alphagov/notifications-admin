@@ -352,6 +352,7 @@ def template_json(
         "letter_welsh_subject": letter_welsh_subject,
         "letter_welsh_content": letter_welsh_content,
         "has_unsubscribe_link": has_unsubscribe_link,
+        "email_files": email_files or [],
     }
     if content is None:
         template["content"] = "template content"
@@ -361,8 +362,6 @@ def template_json(
         template["subject"] = subject
     if redact_personalisation is not None:
         template["redact_personalisation"] = redact_personalisation
-    if email_files is not None:
-        template["email_files"] = email_files
     return template
 
 

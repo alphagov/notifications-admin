@@ -280,7 +280,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     @property
     def email_files(self):
-        return TemplateEmailFiles(self._template.get("email_files", []))
+        return TemplateEmailFiles(self._template["email_files"])
 
 
 class LetterAttachment(JSONModel):
