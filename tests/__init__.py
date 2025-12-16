@@ -328,6 +328,7 @@ def template_json(
     letter_welsh_content=None,
     updated_at=None,
     has_unsubscribe_link=None,
+    email_files=None,
 ):
     template = {
         "id": id_,
@@ -358,6 +359,8 @@ def template_json(
         template["subject"] = subject
     if redact_personalisation is not None:
         template["redact_personalisation"] = redact_personalisation
+    if email_files is not None:
+        template["email_files"] = email_files
     return template
 
 

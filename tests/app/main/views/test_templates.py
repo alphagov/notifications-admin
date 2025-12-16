@@ -4468,14 +4468,23 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
 
 
 @pytest.mark.parametrize(
-    "extra_permissions, template_type, expected_button_text, expected_button_endpoint, expected_hint",
+    "extra_permissions, template_type, email_files, expected_button_text, expected_button_endpoint, expected_hint",
     (
-        ([], "email", None, None, None),
-        ([], "sms", None, None, None),
-        ([], "letter", "Attach pages", "main.letter_template_attach_pages", None),
-        (["send_files_via_ui"], "email", "Attach files", "main.email_template_files_upload", "No files"),
-        (["send_files_via_ui"], "sms", None, None, None),
-        (["send_files_via_ui"], "letter", "Attach pages", "main.letter_template_attach_pages", None),
+        ([], "email", None, None, None, None),
+        ([], "sms", None, None, None, None),
+        ([], "letter", None, "Attach pages", "main.letter_template_attach_pages", None),
+        (["send_files_via_ui"], "email", None, "Attach files", "main.email_template_files_upload", "No files"),
+        (["send_files_via_ui"], "email", ["example.pdf"], "Attach files", "main.email_template_files_upload", "1 file"),
+        (
+            ["send_files_via_ui"],
+            "email",
+            ["example.pdf", "picture.png"],
+            "Attach files",
+            "main.email_template_files_upload",
+            "2 files",
+        ),
+        (["send_files_via_ui"], "sms", None, None, None, None),
+        (["send_files_via_ui"], "letter", None, "Attach pages", "main.letter_template_attach_pages", None),
     ),
 )
 def test_attach_files_buttom(
@@ -4487,6 +4496,7 @@ def test_attach_files_buttom(
     fake_uuid,
     extra_permissions,
     template_type,
+    email_files,
     expected_button_text,
     expected_button_endpoint,
     expected_hint,
@@ -4498,6 +4508,7 @@ def test_attach_files_buttom(
             "data": create_template(
                 template_id=fake_uuid,
                 template_type=template_type,
+                email_files=email_files,
             )
         },
     )

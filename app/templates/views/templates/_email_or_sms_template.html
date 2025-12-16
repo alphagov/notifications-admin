@@ -22,7 +22,14 @@
   <div class="govuk-!-margin-bottom-2">
     <div class="js-stick-at-bottom-when-scrolling">
       <span class="email-files-selected-counter">
+      {% if template.email_files | length == 0 %}
         No files
+      {% elif template.email_files | length == 1 %}
+        1 file
+      {% else %}
+        {{ template.email_files | length }} files
+      {% endif %}
+
       </span>
 
         {{ govukButton({
