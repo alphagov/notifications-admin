@@ -21,8 +21,14 @@ def test_upload_contact_list_page(client_request):
     assert page.select_one("form input")["type"] == "file"
     assert page.select_one("form input")["accept"] == ".csv,.xlsx,.xls,.ods,.xlsm,.tsv"
 
-    assert normalize_spaces(page.select(".spreadsheet")[0].text) == "Example A 1 email address 2 test@example.gov.uk"
-    assert normalize_spaces(page.select(".spreadsheet")[1].text) == "Example A 1 phone number 2 07700 900123"
+    assert (
+        normalize_spaces(page.select(".spreadsheet")[0].text)
+        == "Example list of staff email addresses A 1 email address 2 test@example.gov.uk"
+    )
+    assert (
+        normalize_spaces(page.select(".spreadsheet")[1].text)
+        == "Example list of staff phone numbers A 1 phone number 2 07700 900123"
+    )
 
 
 @pytest.mark.parametrize(
