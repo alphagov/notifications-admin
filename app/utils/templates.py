@@ -243,6 +243,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
         self.show_recipient = show_recipient
         if template.get("has_unsubscribe_link"):
             self.unsubscribe_link = url_for("main.unsubscribe_example", _external=True)
+        self.email_files = template.get("email_files", [])
 
     def __str__(self):
         return Markup(
