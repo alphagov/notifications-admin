@@ -1450,6 +1450,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
         "confirmed_unique,"
         "expected_readyness,"
         "agreement_signed,"
+        "confirmed_email_sender_name,"
     ),
     (
         (  # Just sending email
@@ -1463,6 +1464,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             1,
             0,
             0,
+            True,
             True,
             True,
             True,
@@ -1481,6 +1483,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             False,
             True,
+            True,
         ),
         (  # Just sending SMS
             True,
@@ -1496,6 +1499,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             True,
+            False,
         ),
         (  # Needs to change SMS sender
             True,
@@ -1511,6 +1515,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             False,
             True,
+            False,
         ),
         (  # Needs team members
             False,
@@ -1525,6 +1530,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             0,
             True,
             False,
+            True,
             True,
         ),
         (  # Needs templates
@@ -1541,6 +1547,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             False,
             True,
+            True,
         ),
         (  # Just confirm unique service
             True,
@@ -1556,6 +1563,23 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             False,
             False,
             True,
+            True,
+        ),
+        (  # Needs from name to be confirmed
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            1,
+            0,
+            0,
+            True,
+            False,
+            True,
+            False,
         ),
         (  # Not done anything yet
             False,
@@ -1568,6 +1592,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             None,
             None,
             None,
+            False,
             False,
             False,
             False,
@@ -1591,6 +1616,7 @@ def test_ready_to_go_live(
     confirmed_unique,
     expected_readyness,
     agreement_signed,
+    confirmed_email_sender_name,
 ):
     mocker.patch(
         "app.organisations_client.get_organisation", return_value=organisation_json(agreement_signed=agreement_signed)
@@ -1619,7 +1645,13 @@ def test_ready_to_go_live(
             return_value=volume,
         )
 
-    service = app.models.service.Service({"id": SERVICE_ONE_ID, "confirmed_unique": confirmed_unique})
+    service = app.models.service.Service(
+        {
+            "id": SERVICE_ONE_ID,
+            "confirmed_unique": confirmed_unique,
+            "confirmed_email_sender_name": confirmed_email_sender_name,
+        }
+    )
 
     assert service.go_live_checklist_completed is expected_readyness
 

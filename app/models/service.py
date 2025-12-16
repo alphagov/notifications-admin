@@ -321,6 +321,10 @@ class Service(JSONModel):
         return service_api_client.get_reply_to_email_address(self.id, id)
 
     @property
+    def needs_to_confirm_email_sender_name(self):
+        return self.intending_to_send_email and not self.confirmed_email_sender_name
+
+    @property
     def needs_to_add_email_reply_to_address(self):
         return self.intending_to_send_email and not self.has_email_reply_to_address
 
@@ -420,6 +424,7 @@ class Service(JSONModel):
                 any(self.volumes_by_channel.values()),
                 self.has_team_members_with_manage_service_permission,
                 self.has_templates,
+                not self.needs_to_confirm_email_sender_name,
                 not self.needs_to_add_email_reply_to_address,
                 not self.needs_to_change_sms_sender,
                 self.confirmed_unique,

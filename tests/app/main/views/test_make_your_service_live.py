@@ -219,10 +219,69 @@ def test_should_check_for_reply_to_on_go_live(
     assert page.select_one("h1").text == "Make your service live"
 
     checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
-    assert normalize_spaces(checklist_items[4].text) == expected_reply_to_checklist_item
+    assert normalize_spaces(checklist_items[5].text) == expected_reply_to_checklist_item
 
     if count_of_email_templates:
         mock_get_reply_to_email_addresses.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    "volume_email,count_of_email_templates,confirmed_email_sender_name,expected_from_name_checklist_item",
+    [
+        pytest.param(None, 0, None, "", marks=pytest.mark.xfail(raises=IndexError)),
+        pytest.param(0, 0, None, "", marks=pytest.mark.xfail(raises=IndexError)),
+        (None, 1, None, "Choose a ‘from’ name Incomplete"),
+        (None, 1, False, "Choose a ‘from’ name Incomplete"),
+        (None, 1, True, "Choose a ‘from’ name Completed"),
+        (1, 1, None, "Choose a ‘from’ name Incomplete"),
+        (1, 1, False, "Choose a ‘from’ name Incomplete"),
+        (1, 1, True, "Choose a ‘from’ name Completed"),
+        (1, 0, None, "Choose a ‘from’ name Incomplete"),
+        (1, 1, False, "Choose a ‘from’ name Incomplete"),
+        (1, 1, True, "Choose a ‘from’ name Completed"),
+    ],
+)
+def test_should_check_for_email_from_name_on_go_live(
+    client_request,
+    service_one,
+    single_sms_sender,
+    volume_email,
+    count_of_email_templates,
+    confirmed_email_sender_name,
+    expected_from_name_checklist_item,
+    mock_get_invites_for_service,
+    mock_get_users_by_service,
+    mocker,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_templates",
+        return_value={"data": [create_template(template_type="email") for _ in range(count_of_email_templates)]},
+    )
+    mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=[])
+
+    mocker.patch(
+        "app.models.service.Service.confirmed_email_sender_name",
+        create=True,
+        new_callable=PropertyMock,
+        return_value=confirmed_email_sender_name,
+    )
+
+    for channel, volume in (("email", volume_email), ("sms", 0), ("letter", 1)):
+        mocker.patch(
+            f"app.models.service.Service.volume_{channel}",
+            create=True,
+            new_callable=PropertyMock,
+            return_value=volume,
+        )
+
+    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+    assert page.select_one("h1").text == "Make your service live"
+
+    checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
+    assert normalize_spaces(checklist_items[4].text) == expected_from_name_checklist_item
+
+    # check the other email specific task item is still visible
+    assert normalize_spaces(checklist_items[5].text) == "Add a reply-to email address Incomplete"
 
 
 @pytest.mark.parametrize(
