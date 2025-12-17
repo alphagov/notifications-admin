@@ -256,6 +256,17 @@ a {
   }
 }
 
+.email-files-selected-counter {
+  color: $govuk-secondary-text-colour;
+  margin: govuk-spacing(3) 0;
+
+  @include govuk-media-query($from: desktop) {
+    position: absolute;
+    top: govuk-spacing(6) - 1px;
+    margin: 0;
+  }
+}
+
 .email-files-uploaded-counter {
   color: $govuk-secondary-text-colour;
   margin: govuk-spacing(3) 0;

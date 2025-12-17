@@ -23,11 +23,11 @@
     <div class="js-stick-at-bottom-when-scrolling">
       <span class="email-files-selected-counter">
       {% if template.email_files | length == 0 %}
-        No files
+        No files added
       {% elif template.email_files | length == 1 %}
-        1 file
+        1 file added
       {% else %}
-        {{ template.email_files | length }} files
+        {{ template.email_files | length }} files added
       {% endif %}
 
       </span>
