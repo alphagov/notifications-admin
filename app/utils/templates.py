@@ -16,6 +16,7 @@ from notifications_utils.template import (
 
 from app.extensions import redis_client
 from app.models import JSONModel
+from app.models.template_email_file import TemplateEmailFiles
 from app.notify_client import cache
 
 
@@ -243,7 +244,6 @@ class EmailPreviewTemplate(BaseEmailTemplate):
         self.show_recipient = show_recipient
         if template.get("has_unsubscribe_link"):
             self.unsubscribe_link = url_for("main.unsubscribe_example", _external=True)
-        self.email_files = template.get("email_files", [])
 
     def __str__(self):
         return Markup(
@@ -277,6 +277,10 @@ class EmailPreviewTemplate(BaseEmailTemplate):
             .then(do_nice_typography)
             .then(normalise_whitespace)
         )
+
+    @property
+    def email_files(self):
+        return TemplateEmailFiles(self._template["email_files"])
 
 
 class LetterAttachment(JSONModel):

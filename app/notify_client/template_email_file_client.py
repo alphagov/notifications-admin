@@ -10,12 +10,20 @@ from app.notify_client import NotifyAdminAPIClient
 
 class TemplateEmailFileClient(NotifyAdminAPIClient):
     def create_file(
-        self, file_id, service_id, template_id, filename, created_by, retention_period=90, validate_users_email=None
+        self,
+        *,
+        file_id,
+        service_id,
+        template_id,
+        filename,
+        created_by_id,
+        retention_period=90,
+        validate_users_email=None,
     ):
         data = {
             "id": str(file_id),
             "filename": filename,
-            "created_by_id": created_by,
+            "created_by_id": created_by_id,
             "retention_period": retention_period,
             "validate_users_email": bool(validate_users_email),
         }
