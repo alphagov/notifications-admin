@@ -98,7 +98,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==10.0.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@5820cbfbbb7cab5c9e679acd21d3654377bb2f03
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@0d0304a4ec04358a11286c246fdbb9f587681248
     # via -r requirements.in
 openpyxl==3.1.5
     # via pyexcel-xlsx
@@ -145,7 +145,7 @@ pyyaml==6.0.2
     # via notifications-utils
 redis==4.5.4
     # via flask-redis
-requests==2.32.3
+requests==2.32.5
     # via
     #   govuk-bank-holidays
     #   notifications-python-client
