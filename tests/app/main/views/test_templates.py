@@ -3301,9 +3301,17 @@ def test_should_show_interstitial_when_making_breaking_change_to_sms_template(
                 "Before you send any messages, make sure your API calls include first name, middle name and last name.",
             ],
         ),
+        (
+            "here is your invite: ((invite.pdf))",
+            "We will send your invite separately.",
+            [
+                "You removed the ((invite.pdf)) file.",
+                "Are you sure you want to remove this file?",
+            ],
+        ),
     ],
 )
-def test_should_show_interstitial_when_making_breaking_change(
+def test_should_show_interstitial_when_making_breaking_change_email(
     client_request,
     service_one,
     mock_get_api_keys,
@@ -3318,7 +3326,19 @@ def test_should_show_interstitial_when_making_breaking_change(
     service_one["permissions"] += [template_type]
 
     email_template = create_template(
-        template_id=fake_uuid, template_type=template_type, subject="Your ((thing)) is due soon", content=old_content
+        template_id=fake_uuid,
+        template_type=template_type,
+        subject="Your ((thing)) is due soon",
+        content=old_content,
+        email_files=[
+            {
+                "id": "123",
+                "filename": "invite.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+        ],
     )
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
 
