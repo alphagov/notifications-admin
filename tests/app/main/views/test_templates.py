@@ -3301,14 +3301,6 @@ def test_should_show_interstitial_when_making_breaking_change_to_sms_template(
                 "Before you send any messages, make sure your API calls include first name, middle name and last name.",
             ],
         ),
-        (
-            "here is your invite: ((invite.pdf))",
-            "We will send your invite separately.",
-            [
-                "You removed the ((invite.pdf)) file.",
-                "Are you sure you want to remove this file?",
-            ],
-        ),
     ],
 )
 def test_should_show_interstitial_when_making_breaking_change_email(
@@ -3373,6 +3365,88 @@ def test_should_show_interstitial_when_making_breaking_change_email(
             "confirm": "true",
         }
         | additional_data
+    ).items():
+        assert page.select_one(f"input[name={key}]")["value"] == value
+
+    # BeautifulSoup returns the value attribute as unencoded, let’s make
+    # sure that it is properly encoded in the HTML
+    assert str(page.select_one("input[name=subject]")) == (
+        """<input name="subject" type="hidden" value="reminder '&quot; &lt;span&gt; &amp; ((thing))"/>"""
+    )
+
+
+@pytest.mark.parametrize(
+    "old_content, new_content, expected_paragraphs",
+    [
+        (
+            "here is your invite: ((invite.pdf))",
+            "We will send your invite separately.",
+            [
+                "You removed the following files: ((invite.pdf))",
+                "Are you sure you want to remove these files?",
+            ],
+        ),
+    ],
+)
+def test_edit_service_template_asks_confirmation_when_removing_email_files(
+    client_request,
+    service_one,
+    mock_get_api_keys,
+    fake_uuid,
+    mocker,
+    new_content,
+    old_content,
+    expected_paragraphs,
+):
+    service_one["permissions"] += ["email"]
+
+    email_template = create_template(
+        template_id=fake_uuid,
+        template_type="email",
+        subject="Your ((thing)) is due soon",
+        content=old_content,
+        email_files=[
+            {
+                "id": "123",
+                "filename": "invite.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+        ],
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+
+    data = {
+        "id": fake_uuid,
+        "template_content": new_content,
+        "template_type": "email",
+        "subject": "reminder '\" <span> & ((thing))",
+        "service": SERVICE_ONE_ID,
+    }
+
+    page = client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data=data,
+        _expected_status=200,
+    )
+
+    assert page.select_one("h1").string.strip() == "Confirm changes"
+    assert page.select_one("a.govuk-back-link")["href"] == url_for(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert [normalize_spaces(paragraph.text) for paragraph in page.select("main p")] == expected_paragraphs
+
+    for key, value in (
+        {
+            "subject": "reminder '\" <span> & ((thing))",
+            "template_content": new_content,
+            "confirm": "true",
+        }
     ).items():
         assert page.select_one(f"input[name={key}]")["value"] == value
 

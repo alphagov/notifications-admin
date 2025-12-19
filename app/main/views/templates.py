@@ -740,7 +740,6 @@ def edit_service_template(service_id, template_id, language=None):
             current_service,
         )
         template_change = template.compare_to(new_template)
-
         if template_change.is_breaking_change and not request.form.get("confirm") and current_service.api_keys:
             return render_template(
                 "views/templates/breaking-change.html",
