@@ -242,7 +242,7 @@ def test_upload_file_does_not_update_template_when_placeholder_already_exists(
         call(
             filedata=ANY,
             region="eu-west-1",
-            bucket_name="local-template-email-files",
+            bucket_name="test-template-email-files",
             file_location=AnyStringMatching(rf"service-{SERVICE_ONE_ID}/template-{fake_uuid}/{UUID4_REGEX_PATTERN}"),
             metadata={},
         ),

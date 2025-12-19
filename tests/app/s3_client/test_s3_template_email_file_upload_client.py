@@ -11,7 +11,7 @@ def test_upload_template_email_file_to_s3(mocker, notify_admin):
     file_location = f"service-{service_id}/template-{template_id}/{file_id}"
     upload_template_email_file_to_s3("file_data", file_location)
     kwargs = {
-        "bucket_name": "local-template-email-files",
+        "bucket_name": "test-template-email-files",
         "file_location": file_location,
         "filedata": "file_data",
         "metadata": {},

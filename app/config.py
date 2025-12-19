@@ -121,6 +121,7 @@ class Development(Config):
     S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "development-letters-precompiled-originals-backup"
     S3_BUCKET_LETTER_ATTACHMENTS = "development-letter-attachments"
     S3_BUCKET_REPORT_REQUESTS_DOWNLOAD = "development-report-requests-download"
+    S3_BUCKET_DOCUMENT_DOWNLOAD_LONG_TERM_FILE_STORAGE = "development-template-email-files"
 
     LOGO_CDN_DOMAIN = "static-logos.notify.tools"
 
@@ -150,6 +151,7 @@ class Test(Development):
     S3_BUCKET_PRECOMPILED_ORIGINALS_BACKUP_LETTERS = "test-letters-precompiled-originals-backup"
     S3_BUCKET_LETTER_ATTACHMENTS = "test-letter-attachments"
     S3_BUCKET_REPORT_REQUESTS_DOWNLOAD = "test-report-requests-download"
+    S3_BUCKET_DOCUMENT_DOWNLOAD_LONG_TERM_FILE_STORAGE = "test-template-email-files"
     LOGO_CDN_DOMAIN = "static-logos.test.com"
     NOTIFY_ENVIRONMENT = "test"
     API_HOST_NAME = "http://you-forgot-to-mock-an-api-call-to"
