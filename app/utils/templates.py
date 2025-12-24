@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Any
 
 from flask import current_app, render_template, url_for
@@ -244,6 +245,11 @@ class EmailPreviewTemplate(BaseEmailTemplate):
         self.show_recipient = show_recipient
         if template.get("has_unsubscribe_link"):
             self.unsubscribe_link = url_for("main.unsubscribe_example", _external=True)
+        self.email_files = template.get("email_files", [])
+        # if self.email_files:
+        #     for file in self.email_files:
+        #         if not file.get("link_text"):
+        #             self.content = re.sub(f"\(\({file["filename"]}\)\)", "Hello", self.content,)
 
     def __str__(self):
         return Markup(
@@ -281,6 +287,16 @@ class EmailPreviewTemplate(BaseEmailTemplate):
     @property
     def email_files(self):
         return TemplateEmailFiles(self._template["email_files"])
+
+    def render_file_link_text_if_exists(self):
+        if self.email_files:
+            for file in self.email_files:
+                if not file.get("link_text"):
+                    self.content = re.sub(
+                        rf"\(\({file['filename']}\)\)",
+                        "Hello",
+                        self.content,
+                    )
 
 
 class LetterAttachment(JSONModel):

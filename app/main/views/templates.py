@@ -123,8 +123,10 @@ def view_template(service_id, template_id):
     if should_skip_template_page(template):
         return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
-    content_count_message = _get_fragment_count_message_for_template(template)
+    if template.template_type == "email":
+        template.render_file_link_text_if_exists()
 
+    content_count_message = _get_fragment_count_message_for_template(template)
     return render_template(
         "views/templates/template.html",
         template=template,
