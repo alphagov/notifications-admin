@@ -1242,6 +1242,30 @@ def test_TemplateChange_email_files_removed(old_template, new_template, email_fi
     assert template_change.is_breaking_change is is_breaking_change
 
 
+def test_TemplateChange_email_files_and_placeholders_removed():
+    old_template = EmailPreviewTemplate(
+        {
+            "content": "((1)) ((2.pdf)) ((3))",
+            "subject": "Henlo",
+            "template_type": "email",
+            "email_files": [{"filename": "2.pdf", "retention_period": 26}],
+        }
+    )
+    new_template = EmailPreviewTemplate(
+        {
+            "content": "((1))",
+            "subject": "Henlo",
+            "template_type": "email",
+            "email_files": [{"filename": "2.pdf", "retention_period": 26}],
+        }
+    )
+    template_change = TemplateChange(old_template, new_template)
+    assert template_change.email_files_removed == {"2.pdf"}
+    assert template_change.is_breaking_change is True
+
+    assert template_change.placeholders_removed == {"3"}
+
+
 def test_TemplateChange_ordering_of_placeholders_is_preserved():
     before = ConcreteTemplate({"content": "((dog)) ((cat)) ((rat))"})
     after = ConcreteTemplate({"content": "((platypus)) ((echidna)) ((quokka))"})
