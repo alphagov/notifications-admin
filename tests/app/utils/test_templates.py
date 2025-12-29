@@ -1,4 +1,3 @@
-from collections import namedtuple
 from unittest import mock
 
 import pytest
@@ -10,7 +9,7 @@ from ordered_set import OrderedSet
 
 from app import load_service_before_request
 from app.utils.templates import EmailPreviewTemplate, TemplateChange, TemplatedLetterImageTemplate, get_sample_template
-from tests import ConcreteEmailPreviewTemplate, ConcreteTemplate, template_json
+from tests import ConcreteTemplate, template_json
 from tests.conftest import SERVICE_ONE_ID, do_mock_get_page_counts_for_letter
 
 
@@ -1163,24 +1162,25 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
     assert TemplateChange(old_template, new_template).placeholders_removed == placeholders_removed
 
 
-TemplateEmailFile = namedtuple("TemplateEmailFile", ["filename", "retention_period"])
-
-
 @pytest.mark.parametrize(
     "old_template, new_template, email_files_removed, is_breaking_change",
     [
         # no change
         (
-            ConcreteTemplate(
+            EmailPreviewTemplate(
                 {
                     "content": "((1.pdf)) ((2)) ((3))",
-                    "email_files": [TemplateEmailFile(filename="1.pdf", retention_period=26)],
+                    "subject": "Henlo",
+                    "template_type": "email",
+                    "email_files": [{"filename": "1.pdf", "retention_period": 26}],
                 }
             ),
-            ConcreteTemplate(
+            EmailPreviewTemplate(
                 {
                     "content": "((1.pdf)) ((2)) ((3))",
-                    "email_files": [TemplateEmailFile(filename="1.pdf", retention_period=26)],
+                    "subject": "Henlo",
+                    "template_type": "email",
+                    "email_files": [{"filename": "1.pdf", "retention_period": 26}],
                 }
             ),
             set(),
@@ -1188,20 +1188,20 @@ TemplateEmailFile = namedtuple("TemplateEmailFile", ["filename", "retention_peri
         ),
         # 2.pdf gets removed
         (
-            ConcreteEmailPreviewTemplate(
+            EmailPreviewTemplate(
                 {
                     "content": "((1)) ((2.pdf)) ((3))",
-                    "email_files": [
-                        TemplateEmailFile(filename="2.pdf", retention_period=26),
-                    ],
+                    "subject": "Henlo",
+                    "template_type": "email",
+                    "email_files": [{"filename": "2.pdf", "retention_period": 26}],
                 }
             ),
-            ConcreteEmailPreviewTemplate(
+            EmailPreviewTemplate(
                 {
                     "content": "((1)) ((3))",
-                    "email_files": [
-                        TemplateEmailFile(filename="2.pdf", retention_period=26),
-                    ],
+                    "subject": "Henlo",
+                    "template_type": "email",
+                    "email_files": [{"filename": "2.pdf", "retention_period": 26}],
                 }
             ),
             {"2.pdf"},
@@ -1209,21 +1209,25 @@ TemplateEmailFile = namedtuple("TemplateEmailFile", ["filename", "retention_peri
         ),
         # 2.pdf and 3.pdf get removed, 4.pdf gets added
         (
-            ConcreteEmailPreviewTemplate(
+            EmailPreviewTemplate(
                 {
                     "content": "((1)) ((2.pdf)) ((3.pdf))",
+                    "subject": "Henlo",
+                    "template_type": "email",
                     "email_files": [
-                        TemplateEmailFile(filename="2.pdf", retention_period=26),
-                        TemplateEmailFile(filename="3.pdf", retention_period=26),
+                        {"filename": "2.pdf", "retention_period": 26},
+                        {"filename": "3.pdf", "retention_period": 26},
                     ],
                 }
             ),
-            ConcreteEmailPreviewTemplate(
+            EmailPreviewTemplate(
                 {
                     "content": "((1)) ((4.pdf))",
+                    "subject": "Henlo",
+                    "template_type": "email",
                     "email_files": [
-                        TemplateEmailFile(filename="2.pdf", retention_period=26),
-                        TemplateEmailFile(filename="3.pdf", retention_period=26),
+                        {"filename": "2.pdf", "retention_period": 26},
+                        {"filename": "3.pdf", "retention_period": 26},
                     ],
                 }
             ),
