@@ -12,7 +12,7 @@ from app.utils.user import user_has_permissions
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files/upload", methods=["GET", "POST"])
 @service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
-def email_template_files_upload(template_id, service_id):
+def upload_template_email_files(template_id, service_id):
     template = current_service.get_template_with_user_permission_or_403(
         template_id,
         current_user,
