@@ -21,7 +21,7 @@
       {% set confirm_button = "Save changes to template" %}
 
       <!-- Only regular placeholders got added (placeholders being removed only is not a breaking change) -->
-      {% if template_change.placeholders_added and not template_change.email_files_removed %}
+      {% if template_change.placeholders_added and not template_change.email_filenames_removed %}
 
         {% if template_change.placeholders_removed %}
           <p class="govuk-body">
@@ -37,23 +37,23 @@
         </p>
 
       <!-- Only email files got removed -->
-      {% elif template_change.email_files_removed and not template_change.placeholders_added %}
+      {% elif template_change.email_filenames_removed and not template_change.placeholders_added %}
         {% set confirm_button = "Yes, remove" %}
 
         <p class="govuk-body">
-          You removed the following files: {{ list_of_placeholders(template_change.email_files_removed) }}
+          You removed the following files: {{ list_of_placeholders(template_change.email_filenames_removed) }}
         </p>
         <p class="govuk-body">
           Are you sure you want to remove these files?
         </p>
 
       <!-- Both regular placeholders added and email files removed -->
-      {% elif template_change.email_files_removed and template_change.placeholders_added %}
+      {% elif template_change.email_filenames_removed and template_change.placeholders_added %}
 
         {% set confirm_button = "Confirm changes to template" %}
 
         <p class="govuk-body">
-          You removed the following files: {{ list_of_placeholders(template_change.email_files_removed) }}
+          You removed the following files: {{ list_of_placeholders(template_change.email_filenames_removed) }}
         </p>
 
         {% if template_change.placeholders_removed %}

@@ -8,6 +8,7 @@ from notifications_utils.template import SubjectMixin, Template
 from ordered_set import OrderedSet
 
 from app import load_service_before_request
+from app.models.template_email_file import TemplateEmailFile
 from app.utils.templates import EmailPreviewTemplate, TemplateChange, TemplatedLetterImageTemplate, get_sample_template
 from tests import ConcreteTemplate, template_json
 from tests.conftest import SERVICE_ONE_ID, do_mock_get_page_counts_for_letter
@@ -1172,7 +1173,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "content": "((1.pdf)) ((2)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "1.pdf", "retention_period": 26}],
+                    "email_files": [{"filename": "1.pdf", "retention_period": 26, "id": "123"}],
                 }
             ),
             EmailPreviewTemplate(
@@ -1180,7 +1181,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "content": "((1.pdf)) ((2)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "1.pdf", "retention_period": 26}],
+                    "email_files": [{"filename": "1.pdf", "retention_period": 26, "id": "123"}],
                 }
             ),
             set(),
@@ -1193,7 +1194,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "content": "((1)) ((2.pdf)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "2.pdf", "retention_period": 26}],
+                    "email_files": [{"filename": "2.pdf", "retention_period": 26, "id": "123"}],
                 }
             ),
             EmailPreviewTemplate(
@@ -1201,7 +1202,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "content": "((1)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "2.pdf", "retention_period": 26}],
+                    "email_files": [{"filename": "2.pdf", "retention_period": 26, "id": "123"}],
                 }
             ),
             {"2.pdf"},
@@ -1215,8 +1216,8 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "subject": "Henlo",
                     "template_type": "email",
                     "email_files": [
-                        {"filename": "2.pdf", "retention_period": 26},
-                        {"filename": "3.pdf", "retention_period": 26},
+                        {"filename": "2.pdf", "retention_period": 26, "id": "123"},
+                        {"filename": "3.pdf", "retention_period": 26, "id": "456"},
                     ],
                 }
             ),
@@ -1226,8 +1227,8 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "subject": "Henlo",
                     "template_type": "email",
                     "email_files": [
-                        {"filename": "2.pdf", "retention_period": 26},
-                        {"filename": "3.pdf", "retention_period": 26},
+                        {"filename": "2.pdf", "retention_period": 26, "id": "123"},
+                        {"filename": "3.pdf", "retention_period": 26, "id": "456"},
                     ],
                 }
             ),
@@ -1238,17 +1239,18 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
 )
 def test_TemplateChange_email_files_removed(old_template, new_template, email_files_removed, is_breaking_change):
     template_change = TemplateChange(old_template, new_template)
-    assert template_change.email_files_removed == email_files_removed
+    assert template_change.email_filenames_removed == email_files_removed
     assert template_change.is_breaking_change is is_breaking_change
 
 
 def test_TemplateChange_email_files_and_placeholders_removed():
+    email_file_data = {"filename": "2.pdf", "retention_period": 26, "id": "123"}
     old_template = EmailPreviewTemplate(
         {
             "content": "((1)) ((2.pdf)) ((3))",
             "subject": "Henlo",
             "template_type": "email",
-            "email_files": [{"filename": "2.pdf", "retention_period": 26}],
+            "email_files": [email_file_data],
         }
     )
     new_template = EmailPreviewTemplate(
@@ -1256,11 +1258,12 @@ def test_TemplateChange_email_files_and_placeholders_removed():
             "content": "((1))",
             "subject": "Henlo",
             "template_type": "email",
-            "email_files": [{"filename": "2.pdf", "retention_period": 26}],
+            "email_files": [email_file_data],
         }
     )
     template_change = TemplateChange(old_template, new_template)
-    assert template_change.email_files_removed == {"2.pdf"}
+    assert template_change.email_files_removed == {TemplateEmailFile(email_file_data)}
+    assert template_change.email_filenames_removed == {"2.pdf"}
     assert template_change.is_breaking_change is True
 
     assert template_change.placeholders_removed == {"3"}

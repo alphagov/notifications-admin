@@ -350,11 +350,8 @@ class TemplateChange:
     def __init__(self, old_template, new_template):
         self.old_placeholders = InsensitiveDict.from_keys(old_template.placeholders)
         self.new_placeholders = InsensitiveDict.from_keys(new_template.placeholders)
-        self.email_files_names = (
-            [email_file.filename for email_file in old_template.email_files]
-            if hasattr(old_template, "email_files")
-            else []
-        )
+
+        self.email_files = old_template.email_files if hasattr(old_template, "email_files") else []
 
     @property
     def has_different_placeholders(self):
@@ -368,7 +365,7 @@ class TemplateChange:
 
     @property
     def placeholders_removed(self):
-        return self.placeholders_and_email_files_removed - self.email_files_removed
+        return self.placeholders_and_email_files_removed - self.email_filenames_removed
 
     @property
     def placeholders_and_email_files_removed(self):
@@ -379,8 +376,12 @@ class TemplateChange:
     @property
     def email_files_removed(self):
         return OrderedSet(
-            [filename for filename in self.email_files_names if filename in self.placeholders_and_email_files_removed]
+            [file for file in self.email_files if file.filename in self.placeholders_and_email_files_removed]
         )
+
+    @property
+    def email_filenames_removed(self):
+        return OrderedSet([file.filename for file in self.email_files_removed])
 
     @property
     def is_breaking_change(self):

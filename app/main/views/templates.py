@@ -747,11 +747,15 @@ def edit_service_template(service_id, template_id, language=None):
                 new_template=new_template,
                 form=form,
             )
+
+        update_data = form.new_template_data
+        if template_change.email_files_removed:
+            update_data["archive_email_file_ids"] = [file.id for file in template_change.email_files_removed]
         try:
             service_api_client.update_service_template(
                 service_id=service_id,
                 template_id=template_id,
-                **form.new_template_data,
+                **update_data,
             )
         except HTTPError as e:
             if e.status_code == 400:

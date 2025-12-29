@@ -3720,6 +3720,75 @@ def test_should_redirect_when_saving_a_template_email(
     )
 
 
+def test_edit_service_template_archives_email_files(client_request, fake_uuid, mocker):
+    # mock out template with email files
+    email_template = create_template(
+        template_id=fake_uuid,
+        template_type="email",
+        subject="Your ((thing)) is due soon",
+        content="For the appointment, you will need: ((invite.pdf)), ((form.pdf)), ((map.pdf))",
+        email_files=[
+            {
+                "id": "123",
+                "filename": "invite.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+            {
+                "id": "456",
+                "filename": "form.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+            {
+                "id": "789",
+                "filename": "map.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+        ],
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+
+    new_content = "For the appointment, you will just need ((map.pdf))"
+
+    mock_update_service_template = mocker.patch("notifications_python_client.base.BaseAPIClient.request")
+
+    client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "id": fake_uuid,
+            "template_content": new_content,
+            "template_type": "email",
+            "service": SERVICE_ONE_ID,
+            "confirm": True,
+        },
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_update_service_template.assert_called_with(
+        "POST",
+        "/service/596364a0-858e-42c8-9062-a8fe822260eb/template/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6",
+        data={
+            "created_by": "6ce466d0-fd6a-11e5-82f5-e0accb9d11a6",
+            "content": "For the appointment, you will just need ((map.pdf))",
+            "subject": "Your ((thing)) is due soon",
+            "name": "sample template",
+            "has_unsubscribe_link": False,
+            "archive_email_file_ids": ["123", "456"],
+        },
+    )
+
+
 def test_should_redirect_when_saving_a_template_letter(
     client_request,
     mock_get_service_letter_template,

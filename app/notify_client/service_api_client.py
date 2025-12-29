@@ -21,6 +21,7 @@ ALLOWED_TEMPLATE_ATTRIBUTES = {
     "letter_welsh_subject",
     "letter_welsh_content",
     "has_unsubscribe_link",
+    "archive_email_file_ids",
 }
 
 
