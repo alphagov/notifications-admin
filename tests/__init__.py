@@ -10,6 +10,7 @@ from flask import session as flask_session
 from flask import url_for
 from flask.testing import FlaskClient
 from flask_login import login_user
+from notifications_utils.template import Template
 
 from app.models.user import User
 
@@ -742,3 +743,26 @@ def contact_list_json(
         "has_jobs": has_jobs,
         "template_type": template_type,
     }
+
+
+class ConcreteImplementation:
+    template_type = None
+
+    # Can’t instantiate and test templates unless they implement __str__
+    def __str__(self):
+        pass
+
+
+class ConcreteTemplate(ConcreteImplementation, Template):
+    pass
+
+
+class ConcreteEmailPreviewTemplate(ConcreteImplementation, Template):
+    def __init__(
+        self,
+        template,
+        values=None,
+        redact_missing_personalisation=False,
+    ):
+        self.email_files = template.get("email_files", [])
+        super().__init__(template, values, redact_missing_personalisation)
