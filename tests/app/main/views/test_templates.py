@@ -3757,7 +3757,7 @@ def test_edit_service_template_archives_email_files(client_request, fake_uuid, m
 
     mock_update_service_template = mocker.patch("notifications_python_client.base.BaseAPIClient.request")
 
-    client_request.post(
+    page = client_request.post(
         ".edit_service_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
@@ -3768,12 +3768,7 @@ def test_edit_service_template_archives_email_files(client_request, fake_uuid, m
             "service": SERVICE_ONE_ID,
             "confirm": True,
         },
-        _expected_status=302,
-        _expected_redirect=url_for(
-            "main.view_template",
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-        ),
+        _follow_redirects=True,
     )
     mock_update_service_template.assert_called_with(
         "POST",
@@ -3786,6 +3781,11 @@ def test_edit_service_template_archives_email_files(client_request, fake_uuid, m
             "has_unsubscribe_link": False,
             "archive_email_file_ids": ["123", "456"],
         },
+    )
+
+    assert (
+        normalize_spaces(page.select(".banner-default-with-tick")[0].text)
+        == "Files for ‘invite.pdf’ and ‘form.pdf’ have been removed from the template."
     )
 
 

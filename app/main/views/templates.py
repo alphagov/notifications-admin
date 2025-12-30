@@ -19,6 +19,7 @@ from flask import (
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
+from notifications_utils.formatters import formatted_list
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.s3 import s3download
 from notifications_utils.template import Template
@@ -716,7 +717,7 @@ def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: str | 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=["GET", "POST"])
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit/<string:language>", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-def edit_service_template(service_id, template_id, language=None):
+def edit_service_template(service_id, template_id, language=None):  # noqa
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if template.template_type not in current_service.available_template_types:
@@ -773,6 +774,11 @@ def edit_service_template(service_id, template_id, language=None):
             editing_english_content_in_bilingual_letter = (
                 template.template_type == "letter" and template.welsh_page_count and language != "welsh"
             )
+            if template_change.email_files_removed:
+                flash(
+                    f"Files for {formatted_list(template_change.email_filenames_removed)} have been removed from the template.",  # noqa
+                    "default_with_tick",
+                )
             return redirect(
                 url_for(
                     "main.view_template",
