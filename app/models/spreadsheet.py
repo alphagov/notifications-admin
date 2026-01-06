@@ -1,8 +1,8 @@
 import csv
-from io import StringIO
+from io import RawIOBase, StringIO
 from os import path
 from time import sleep
-from typing import Final, Literal, Self
+from typing import Self, final
 
 import openpyxl.reader.excel
 import pyexcel
@@ -11,6 +11,12 @@ from app.utils.interruptible_io import InterruptibleIOZipFile
 
 # monkeypatch the reference openpyxl will use for ZipFile
 openpyxl.reader.excel.ZipFile = InterruptibleIOZipFile
+
+
+# a sentinel argument, defined as a class so we can make typing happy
+@final
+class DEFAULT_ARG:
+    pass
 
 
 class Spreadsheet:
@@ -22,9 +28,6 @@ class Spreadsheet:
 
     AS_CSV_LOOP_INTERRUPTIBLE_EVERY: int = 32
     ALLOWED_FILE_EXTENSIONS = ("csv", "xlsx", "xls", "ods", "xlsm", "tsv")
-
-    # a sentinel for use as a kwarg default to avoid early-binding issues that inhibit mocking
-    DEFAULT_ARG: Final[object] = object()
 
     FROM_FILE_ROW_LIMIT_DEFAULT_ARG: int | None = 200_000
     COLUMN_LIMIT_FROM_HEADER_DEFAULT_ARG: bool = True
@@ -78,20 +81,20 @@ class Spreadsheet:
     @classmethod
     def from_file(
         cls,
-        file_content,
-        filename="",
-        row_limit: int | None | Literal[DEFAULT_ARG] = DEFAULT_ARG,
-        column_limit_from_header: bool | Literal[DEFAULT_ARG] = DEFAULT_ARG,
-        absolute_column_limit: int | Literal[DEFAULT_ARG] = DEFAULT_ARG,
-        min_column_limit: int | Literal[DEFAULT_ARG] = DEFAULT_ARG,
+        file_content: RawIOBase,
+        filename: str = "",
+        row_limit: int | None | type[DEFAULT_ARG] = DEFAULT_ARG,
+        column_limit_from_header: bool | type[DEFAULT_ARG] = DEFAULT_ARG,
+        absolute_column_limit: int | type[DEFAULT_ARG] = DEFAULT_ARG,
+        min_column_limit: int | type[DEFAULT_ARG] = DEFAULT_ARG,
     ) -> Self:
-        if row_limit is cls.DEFAULT_ARG:
+        if row_limit is DEFAULT_ARG:
             row_limit = cls.FROM_FILE_ROW_LIMIT_DEFAULT_ARG
-        if column_limit_from_header is cls.DEFAULT_ARG:
+        if column_limit_from_header is DEFAULT_ARG:
             column_limit_from_header = cls.COLUMN_LIMIT_FROM_HEADER_DEFAULT_ARG
-        if absolute_column_limit is cls.DEFAULT_ARG:
+        if absolute_column_limit is DEFAULT_ARG:
             absolute_column_limit = cls.ABSOLUTE_COLUMN_LIMIT_DEFAULT_ARG
-        if min_column_limit is cls.DEFAULT_ARG:
+        if min_column_limit is DEFAULT_ARG:
             min_column_limit = cls.MIN_COLUMN_LIMIT_DEFAULT_ARG
 
         extension = cls.get_extension(filename)
