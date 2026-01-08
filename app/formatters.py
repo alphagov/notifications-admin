@@ -478,3 +478,7 @@ def format_provider(provider):
         return provider.title()
 
     return provider.upper()
+
+
+def wrap_values_in_dict_with_key(_list, key):
+    return [dict(zip([key], [value], strict=False)) for value in _list]

@@ -2,6 +2,7 @@
 
 {% from "components/content-metadata.html" import content_metadata %}
 {% from "components/table.html" import mapping_table, row, text_field, row_heading %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Pricing information' %}
@@ -39,21 +40,28 @@
 <p class="govuk-body">Prices do not include VAT.</p>
 
   <div>
-    {% call mapping_table(
-      caption='Letter pricing. Prices do not include VAT.',
-      field_headings=['Paper'] + letter_rates.post_classes.values()|list,
-      field_headings_visible=True,
-      caption_visible=False
-    ) %}
-      {% for sheets in letter_rates.sheet_counts %}
-        {% call row() %}
-          {% call row_heading() %} {{ sheets }} sheet{{ 's' if sheets > 1 else '' }} {% endcall %}
-          {% for post_class in letter_rates.post_classes.keys() %}
-            {{ text_field(letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False)) }}
-          {% endfor %}
-        {% endcall %}
-      {% endfor %}
-    {% endcall %}
+    {%- set rows = [] -%}
+
+    {%- for sheets in letter_rates.sheet_counts -%}
+      {%- set row_heading = [{
+        "text": sheets|string + ' sheet' + 's' if sheets > 1 else '1 sheet'
+      }] -%}
+      {%- set row = [] -%}
+      {%- for post_class in letter_rates.post_classes.keys() -%}
+        {%- do row.append({
+          "text": letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False)
+        }) -%}
+      {%- endfor -%}
+      {%- do rows.append(row_heading + row) -%}
+    {%- endfor -%}
+
+    {{ govukTable ({
+      "caption": "Letter pricing. Prices do not include VAT.",
+      "captionClasses": "govuk-visually-hidden",
+      "firstCellIsHeader": True,
+      "head": [{ "text": "Paper" }] + letter_rates.post_classes.values()|list|wrap_values_in_dict_with_key("text"),
+      "rows": rows
+    }) }}
   </div>
 
 <p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_delivery_times', _anchor='letters') }}">delivery times</a>.</p>

@@ -92,6 +92,7 @@ from app.formatters import (
     redact_mobile_number,
     sentence_case,
     valid_phone_number,
+    wrap_values_in_dict_with_key,
 )
 from app.models.organisation import Organisation
 from app.models.service import Service
@@ -620,6 +621,7 @@ def add_template_filters(application):
         make_string_safe_for_email_local_part,
         extract_path_from_url,
         sentence_case,
+        wrap_values_in_dict_with_key,
     ]:
         application.add_template_filter(fn)
 
