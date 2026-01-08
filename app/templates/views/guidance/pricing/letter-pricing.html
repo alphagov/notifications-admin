@@ -40,27 +40,25 @@
 <p class="govuk-body">Prices do not include VAT.</p>
 
   <div>
-    {%- set rows = [] -%}
+    {%- set tableData = GovukTableData() -%}
+
+    {%- do tableData.add_columns(['Paper'] + letter_rates.post_classes.values()|list) -%}
 
     {%- for sheets in letter_rates.sheet_counts -%}
-      {%- set row_heading = [{
-        "text": sheets|string + ' sheet' + 's' if sheets > 1 else '1 sheet'
-      }] -%}
+      {%- set row_heading = [ sheets|string + ' sheet' + 's' if sheets > 1 else '1 sheet' ] -%}
       {%- set row = [] -%}
       {%- for post_class in letter_rates.post_classes.keys() -%}
-        {%- do row.append({
-          "text": letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False)
-        }) -%}
+        {%- do row.append(letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False)) -%}
       {%- endfor -%}
-      {%- do rows.append(row_heading + row) -%}
+      {%- do tableData.add_row(row_heading + row) -%}
     {%- endfor -%}
 
     {{ govukTable ({
       "caption": "Letter pricing. Prices do not include VAT.",
       "captionClasses": "govuk-visually-hidden",
       "firstCellIsHeader": True,
-      "head": [{ "text": "Paper" }] + letter_rates.post_classes.values()|list|wrap_values_in_dict_with_key("text"),
-      "rows": rows
+      "head": tableData.columns,
+      "rows": tableData.rows
     }) }}
   </div>
 

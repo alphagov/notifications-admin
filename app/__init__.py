@@ -50,6 +50,7 @@ from app.config import Config, configs
 from app.event_handlers import Events
 from app.extensions import antivirus_client, redis_client, zendesk_client  # noqa
 from app.formatters import (
+    GovukTableData,
     convert_to_boolean,
     extract_path_from_url,
     format_auth_type,
@@ -640,6 +641,7 @@ def init_jinja(application):
     )
     application.jinja_env.add_extension("jinja2.ext.do")
     application.jinja_env.undefined = NotifyJinjaUndefined
+    application.jinja_env.globals["GovukTableData"] = GovukTableData
 
 
 class NotifyJinjaUndefined(jinja2.Undefined):

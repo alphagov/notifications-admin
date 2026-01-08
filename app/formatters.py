@@ -482,3 +482,25 @@ def format_provider(provider):
 
 def wrap_values_in_dict_with_key(_list, key):
     return [dict(zip([key], [value], strict=False)) for value in _list]
+
+
+class GovukTableData:
+    def __init__(self):
+        self._columns = []
+        self._rows = []
+        self._col_format = "text"
+        self._row_format = "text"
+
+    def add_columns(self, col_list):
+        self._columns = col_list
+
+    def add_row(self, row_list):
+        self._rows.append(row_list)
+
+    @property
+    def columns(self):
+        return [dict(zip([self._col_format], [value], strict=False)) for value in self._columns]
+
+    @property
+    def rows(self):
+        return [[dict(zip([self._row_format], [value], strict=False)) for value in row] for row in self._rows]
