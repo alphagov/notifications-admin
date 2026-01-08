@@ -15,20 +15,66 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header('Confirm changes') }}
+  {{ page_header("Confirm changes") }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {% if template_change.placeholders_removed %}
+      {% set confirm_button = "Save changes to template" %}
+
+      <!-- Only regular placeholders got added (placeholders being removed only is not a breaking change) -->
+      {% if template_change.placeholders_added and not template_change.email_filenames_removed %}
+
+        {% if template_change.placeholders_removed %}
+          <p class="govuk-body">
+            You removed {{ list_of_placeholders(template_change.placeholders_removed) }}
+          </p>
+        {% endif %}
+
         <p class="govuk-body">
-          You removed {{ list_of_placeholders(template_change.placeholders_removed) }}
+          You added {{ list_of_placeholders(template_change.placeholders_added) }}
         </p>
+        <p class="govuk-body">
+          Before you send any messages, make sure your API calls include {{ list_of_code_snippets(template_change.placeholders_added) }}.
+        </p>
+
+      <!-- Only email files got removed -->
+      {% elif template_change.email_filenames_removed and not template_change.placeholders_added %}
+        {% set confirm_button = "Yes, remove" %}
+
+        <p class="govuk-body">
+          You removed the following files: {{ list_of_placeholders(template_change.email_filenames_removed) }}
+        </p>
+        <p class="govuk-body">
+          Are you sure you want to remove these files?
+        </p>
+
+      <!-- Both regular placeholders added and email files removed -->
+      {% elif template_change.email_filenames_removed and template_change.placeholders_added %}
+
+        {% set confirm_button = "Confirm changes to template" %}
+
+        <p class="govuk-body">
+          You removed the following files: {{ list_of_placeholders(template_change.email_filenames_removed) }}
+        </p>
+
+        {% if template_change.placeholders_removed %}
+        <p class="govuk-body">
+          You removed the following placeholders: {{ list_of_placeholders(template_change.placeholders_removed) }}
+        </p>
+        {% endif %}
+
+        <p class="govuk-body">
+          You added the following placeholders: {{ list_of_placeholders(template_change.placeholders_added) }}
+        </p>
+
+        <p class="govuk-body">
+          Confirm that:
+          <ul class="govuk-list govuk-list--bullet">
+          <li>you want to remove these files.
+          <li>you will modify any API calls for this template to include {{
+          list_of_placeholders(template_change.placeholders_added) }} before sending any messages.
+          </ul>
       {% endif %}
-      <p class="govuk-body">
-        You added {{ list_of_placeholders(template_change.placeholders_added) }}
-      </p>
-      <p class="govuk-body">
-        Before you send any messages, make sure your API calls include {{ list_of_code_snippets(template_change.placeholders_added) }}.
-      </p>
+
     </div>
   </div>
 
@@ -41,7 +87,7 @@
     <input type="hidden" name="template_id" value="{{ new_template.id }}" />
 
     <input type="hidden" name="confirm" value="true" />
-    {{ page_footer('Save changes to template') }}
+    {{ page_footer(confirm_button) }}
   {% endcall %}
 
 {% endblock %}

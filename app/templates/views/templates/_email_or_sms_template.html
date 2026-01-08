@@ -35,7 +35,7 @@
         {{ govukButton({
           "text": "Attach files",
           "href": url_for(
-            '.email_template_files_upload',
+            '.upload_template_email_files',
             service_id=current_service.id,
             template_id=template.id
           ),

@@ -8,8 +8,9 @@ from notifications_utils.template import SubjectMixin, Template
 from ordered_set import OrderedSet
 
 from app import load_service_before_request
-from app.utils.templates import EmailPreviewTemplate, TemplatedLetterImageTemplate, get_sample_template
-from tests import template_json
+from app.models.template_email_file import TemplateEmailFile
+from app.utils.templates import EmailPreviewTemplate, TemplateChange, TemplatedLetterImageTemplate, get_sample_template
+from tests import ConcreteTemplate, template_json
 from tests.conftest import SERVICE_ONE_ID, do_mock_get_page_counts_for_letter
 
 
@@ -1097,3 +1098,180 @@ def test_email_preview_template_doesnt_error_on_empty_subject(
 
     assert subject_field.text.strip() == expected_subject
     assert subject_field["class"] == expected_classes
+
+
+@pytest.mark.parametrize(
+    "old_template, new_template, should_differ",
+    [
+        (ConcreteTemplate({"content": "((1)) ((2)) ((3))"}), ConcreteTemplate({"content": "((1)) ((2)) ((3))"}), False),
+        (ConcreteTemplate({"content": "((1)) ((2)) ((3))"}), ConcreteTemplate({"content": "((3)) ((2)) ((1))"}), False),
+        (
+            ConcreteTemplate({"content": "((1)) ((2)) ((3))"}),
+            ConcreteTemplate({"content": "((1)) ((1)) ((2)) ((2)) ((3)) ((3))"}),
+            False,
+        ),
+        (ConcreteTemplate({"content": "((1))"}), ConcreteTemplate({"content": "((1)) ((2))"}), True),
+        (ConcreteTemplate({"content": "((1)) ((2))"}), ConcreteTemplate({"content": "((1))"}), True),
+        (ConcreteTemplate({"content": "((a)) ((b))"}), ConcreteTemplate({"content": "((A)) (( B_ ))"}), False),
+    ],
+)
+def test_checking_for_difference_between_templates(old_template, new_template, should_differ):
+    assert TemplateChange(old_template, new_template).has_different_placeholders == should_differ
+
+
+@pytest.mark.parametrize(
+    "old_template, new_template, placeholders_added, is_breaking_change",
+    [
+        (
+            ConcreteTemplate({"content": "((1)) ((2)) ((3))"}),
+            ConcreteTemplate({"content": "((1)) ((2)) ((3))"}),
+            set(),
+            False,
+        ),
+        (
+            ConcreteTemplate({"content": "((1)) ((2)) ((3))"}),
+            ConcreteTemplate({"content": "((1)) ((1)) ((2)) ((2)) ((3)) ((3))"}),
+            set(),
+            False,
+        ),
+        (ConcreteTemplate({"content": "((1)) ((2)) ((3))"}), ConcreteTemplate({"content": "((1))"}), set(), False),
+        (ConcreteTemplate({"content": "((1))"}), ConcreteTemplate({"content": "((1)) ((2)) ((3))"}), {"2", "3"}, True),
+        (ConcreteTemplate({"content": "((a))"}), ConcreteTemplate({"content": "((A)) ((B)) ((C))"}), {"B", "C"}, True),
+    ],
+)
+def test_TemplateChange_placeholders_added(old_template, new_template, placeholders_added, is_breaking_change):
+    template_change = TemplateChange(old_template, new_template)
+    assert template_change.placeholders_added == placeholders_added
+    assert template_change.is_breaking_change is is_breaking_change
+
+
+@pytest.mark.parametrize(
+    "old_template, new_template, placeholders_removed",
+    [
+        (ConcreteTemplate({"content": "((1)) ((2)) ((3))"}), ConcreteTemplate({"content": "((1)) ((2)) ((3))"}), set()),
+        (
+            ConcreteTemplate({"content": "((1)) ((2)) ((3))"}),
+            ConcreteTemplate({"content": "((1)) ((1)) ((2)) ((2)) ((3)) ((3))"}),
+            set(),
+        ),
+        (ConcreteTemplate({"content": "((1))"}), ConcreteTemplate({"content": "((1)) ((2)) ((3))"}), set()),
+        (ConcreteTemplate({"content": "((1)) ((2)) ((3))"}), ConcreteTemplate({"content": "((1))"}), {"2", "3"}),
+        (ConcreteTemplate({"content": "((a)) ((b)) ((c))"}), ConcreteTemplate({"content": "((A))"}), {"b", "c"}),
+    ],
+)
+def test_TemplateChange_placeholders_removed(old_template, new_template, placeholders_removed):
+    assert TemplateChange(old_template, new_template).placeholders_removed == placeholders_removed
+
+
+@pytest.mark.parametrize(
+    "old_template, new_template, email_files_removed, is_breaking_change",
+    [
+        # no change
+        (
+            EmailPreviewTemplate(
+                {
+                    "content": "((1.pdf)) ((2)) ((3))",
+                    "subject": "Henlo",
+                    "template_type": "email",
+                    "email_files": [{"filename": "1.pdf", "retention_period": 26, "id": "123"}],
+                }
+            ),
+            EmailPreviewTemplate(
+                {
+                    "content": "((1.pdf)) ((2)) ((3))",
+                    "subject": "Henlo",
+                    "template_type": "email",
+                    "email_files": [{"filename": "1.pdf", "retention_period": 26, "id": "123"}],
+                }
+            ),
+            set(),
+            False,
+        ),
+        # 2.pdf gets removed
+        (
+            EmailPreviewTemplate(
+                {
+                    "content": "((1)) ((2.pdf)) ((3))",
+                    "subject": "Henlo",
+                    "template_type": "email",
+                    "email_files": [{"filename": "2.pdf", "retention_period": 26, "id": "123"}],
+                }
+            ),
+            EmailPreviewTemplate(
+                {
+                    "content": "((1)) ((3))",
+                    "subject": "Henlo",
+                    "template_type": "email",
+                    "email_files": [{"filename": "2.pdf", "retention_period": 26, "id": "123"}],
+                }
+            ),
+            {"2.pdf"},
+            True,
+        ),
+        # 2.pdf and 3.pdf get removed, 4.pdf gets added
+        (
+            EmailPreviewTemplate(
+                {
+                    "content": "((1)) ((2.pdf)) ((3.pdf))",
+                    "subject": "Henlo",
+                    "template_type": "email",
+                    "email_files": [
+                        {"filename": "2.pdf", "retention_period": 26, "id": "123"},
+                        {"filename": "3.pdf", "retention_period": 26, "id": "456"},
+                    ],
+                }
+            ),
+            EmailPreviewTemplate(
+                {
+                    "content": "((1)) ((4.pdf))",
+                    "subject": "Henlo",
+                    "template_type": "email",
+                    "email_files": [
+                        {"filename": "2.pdf", "retention_period": 26, "id": "123"},
+                        {"filename": "3.pdf", "retention_period": 26, "id": "456"},
+                    ],
+                }
+            ),
+            {"2.pdf", "3.pdf"},
+            True,
+        ),
+    ],
+)
+def test_TemplateChange_email_files_removed(old_template, new_template, email_files_removed, is_breaking_change):
+    template_change = TemplateChange(old_template, new_template)
+    assert template_change.email_filenames_removed == email_files_removed
+    assert template_change.is_breaking_change is is_breaking_change
+
+
+def test_TemplateChange_email_files_and_placeholders_removed():
+    email_file_data = {"filename": "2.pdf", "retention_period": 26, "id": "123"}
+    old_template = EmailPreviewTemplate(
+        {
+            "content": "((1)) ((2.pdf)) ((3))",
+            "subject": "Henlo",
+            "template_type": "email",
+            "email_files": [email_file_data],
+        }
+    )
+    new_template = EmailPreviewTemplate(
+        {
+            "content": "((1))",
+            "subject": "Henlo",
+            "template_type": "email",
+            "email_files": [email_file_data],
+        }
+    )
+    template_change = TemplateChange(old_template, new_template)
+    assert template_change.email_files_removed == {TemplateEmailFile(email_file_data)}
+    assert template_change.email_filenames_removed == {"2.pdf"}
+    assert template_change.is_breaking_change is True
+
+    assert template_change.placeholders_removed == {"3"}
+
+
+def test_TemplateChange_ordering_of_placeholders_is_preserved():
+    before = ConcreteTemplate({"content": "((dog)) ((cat)) ((rat))"})
+    after = ConcreteTemplate({"content": "((platypus)) ((echidna)) ((quokka))"})
+    change = TemplateChange(before, after)
+    assert change.placeholders_removed == ["dog", "cat", "rat"] == before.placeholders
+    assert change.placeholders_added == ["platypus", "echidna", "quokka"] == after.placeholders

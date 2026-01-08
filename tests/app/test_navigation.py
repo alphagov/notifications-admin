@@ -118,7 +118,7 @@ EXCLUDED_ENDPOINTS = set(
             "email_branding",
             "email_not_received",
             "email_template",
-            "email_template_files_upload",
+            "upload_template_email_files",
             "error",
             "estimate_usage",
             "feedback",

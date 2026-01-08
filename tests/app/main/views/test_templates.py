@@ -3318,7 +3318,19 @@ def test_should_show_interstitial_when_making_breaking_change(
     service_one["permissions"] += [template_type]
 
     email_template = create_template(
-        template_id=fake_uuid, template_type=template_type, subject="Your ((thing)) is due soon", content=old_content
+        template_id=fake_uuid,
+        template_type=template_type,
+        subject="Your ((thing)) is due soon",
+        content=old_content,
+        email_files=[
+            {
+                "id": "123",
+                "filename": "invite.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+        ],
     )
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
 
@@ -3353,6 +3365,145 @@ def test_should_show_interstitial_when_making_breaking_change(
             "confirm": "true",
         }
         | additional_data
+    ).items():
+        assert page.select_one(f"input[name={key}]")["value"] == value
+
+    # BeautifulSoup returns the value attribute as unencoded, let’s make
+    # sure that it is properly encoded in the HTML
+    assert str(page.select_one("input[name=subject]")) == (
+        """<input name="subject" type="hidden" value="reminder '&quot; &lt;span&gt; &amp; ((thing))"/>"""
+    )
+
+
+@pytest.mark.parametrize(
+    "old_content, new_content, extra_email_file, expected_paragraphs",
+    [
+        # remove an email file placeholder
+        (
+            "here is your invite: ((invite.pdf))",
+            "We will send your invite separately.",
+            [],
+            [
+                "You removed the following files: ((invite.pdf))",
+                "Are you sure you want to remove these files?",
+            ],
+        ),
+        # remove an email file placeholder and remove a regular placeholder
+        (
+            "Dear ((name)), here is your invite: ((invite.pdf))",
+            "We will send your invite separately.",
+            [],
+            [
+                "You removed the following files: ((invite.pdf))",
+                "Are you sure you want to remove these files?",
+            ],
+        ),
+        # remove an email file placeholder and add a regular placeholder
+        (
+            "Dear ((name)), here is your invite: ((invite.pdf))",
+            "((greeting)), We will send your invite separately.",
+            [],
+            [
+                "You removed the following files: ((invite.pdf))",
+                "You removed the following placeholders: ((name))",
+                "You added the following placeholders: ((greeting))",
+                (
+                    "Confirm that: "
+                    "you want to remove these files. "
+                    "you will modify any API calls for this template to include ((greeting)) "
+                    "before sending any messages."
+                ),
+            ],
+        ),
+        # remove two email files, remove a regular placeholder and add two regular placeholders
+        (
+            "Dear ((name)), here is your invite: ((invite.pdf)) and map: ((map.jpeg))",
+            "((greeting)), We will send your invite separately. ((footer))",
+            [
+                {
+                    "id": "456",
+                    "filename": "map.jpeg",
+                    "link_text": None,
+                    "retention_period": 90,
+                    "validate_users_email": False,
+                }
+            ],
+            [
+                "You removed the following files: ((invite.pdf)) and ((map.jpeg))",
+                "You removed the following placeholders: ((name))",
+                "You added the following placeholders: ((greeting)) and ((footer))",
+                (
+                    "Confirm that: "
+                    "you want to remove these files. "
+                    "you will modify any API calls for this template to include ((greeting)) and ((footer))"
+                    " before sending any messages."
+                ),
+            ],
+        ),
+    ],
+)
+def test_edit_service_template_asks_confirmation_when_removing_email_files(
+    client_request,
+    service_one,
+    mock_get_api_keys,
+    fake_uuid,
+    mocker,
+    new_content,
+    old_content,
+    extra_email_file,
+    expected_paragraphs,
+):
+    service_one["permissions"] += ["email"]
+
+    # mock out template with email files
+    email_template = create_template(
+        template_id=fake_uuid,
+        template_type="email",
+        subject="Your ((thing)) is due soon",
+        content=old_content,
+        email_files=[
+            {
+                "id": "123",
+                "filename": "invite.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+        ]
+        + extra_email_file,
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+
+    edit_request_data = {
+        "id": fake_uuid,
+        "template_content": new_content,
+        "template_type": "email",
+        "subject": "reminder '\" <span> & ((thing))",
+        "service": SERVICE_ONE_ID,
+    }
+
+    page = client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data=edit_request_data,
+        _expected_status=200,
+    )
+
+    assert page.select_one("h1").string.strip() == "Confirm changes"
+    assert page.select_one("a.govuk-back-link")["href"] == url_for(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert [normalize_spaces(paragraph.text) for paragraph in page.select("main p")] == expected_paragraphs
+
+    for key, value in (
+        {
+            "subject": "reminder '\" <span> & ((thing))",
+            "template_content": new_content,
+            "confirm": "true",
+        }
     ).items():
         assert page.select_one(f"input[name={key}]")["value"] == value
 
@@ -3566,6 +3717,75 @@ def test_should_redirect_when_saving_a_template_email(
         content=content,
         subject=subject,
         has_unsubscribe_link=False,
+    )
+
+
+def test_edit_service_template_archives_email_files(client_request, fake_uuid, mocker):
+    # mock out template with email files
+    email_template = create_template(
+        template_id=fake_uuid,
+        template_type="email",
+        subject="Your ((thing)) is due soon",
+        content="For the appointment, you will need: ((invite.pdf)), ((form.pdf)), ((map.pdf))",
+        email_files=[
+            {
+                "id": "123",
+                "filename": "invite.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+            {
+                "id": "456",
+                "filename": "form.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+            {
+                "id": "789",
+                "filename": "map.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+        ],
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+
+    new_content = "For the appointment, you will just need ((map.pdf))"
+
+    mock_update_service_template = mocker.patch("notifications_python_client.base.BaseAPIClient.request")
+
+    page = client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "id": fake_uuid,
+            "template_content": new_content,
+            "template_type": "email",
+            "service": SERVICE_ONE_ID,
+            "confirm": True,
+        },
+        _follow_redirects=True,
+    )
+    mock_update_service_template.assert_called_with(
+        "POST",
+        "/service/596364a0-858e-42c8-9062-a8fe822260eb/template/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6",
+        data={
+            "created_by": "6ce466d0-fd6a-11e5-82f5-e0accb9d11a6",
+            "content": "For the appointment, you will just need ((map.pdf))",
+            "subject": "Your ((thing)) is due soon",
+            "name": "sample template",
+            "has_unsubscribe_link": False,
+            "archive_email_file_ids": ["123", "456"],
+        },
+    )
+
+    assert (
+        normalize_spaces(page.select(".banner-default-with-tick")[0].text)
+        == "Files for ‘invite.pdf’ and ‘form.pdf’ have been removed from the template."
     )
 
 
@@ -4473,13 +4693,13 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
         ([], "email", None, None, None, None),
         ([], "sms", None, None, None, None),
         ([], "letter", None, "Attach pages", "main.letter_template_attach_pages", None),
-        (["send_files_via_ui"], "email", None, "Attach files", "main.email_template_files_upload", "No files added"),
+        (["send_files_via_ui"], "email", None, "Attach files", "main.upload_template_email_files", "No files added"),
         (
             ["send_files_via_ui"],
             "email",
             ["example.pdf"],
             "Attach files",
-            "main.email_template_files_upload",
+            "main.upload_template_email_files",
             "1 file added",
         ),
         (
@@ -4487,7 +4707,7 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
             "email",
             ["example.pdf", "picture.png"],
             "Attach files",
-            "main.email_template_files_upload",
+            "main.upload_template_email_files",
             "2 files added",
         ),
         (["send_files_via_ui"], "sms", None, None, None, None),

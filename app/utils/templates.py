@@ -6,6 +6,7 @@ from markupsafe import Markup
 from notifications_utils.countries import Postage
 from notifications_utils.field import Field
 from notifications_utils.formatters import escape_html, formatted_list, normalise_whitespace
+from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.take import Take
 from notifications_utils.template import (
     BaseEmailTemplate,
@@ -13,6 +14,7 @@ from notifications_utils.template import (
     SMSPreviewTemplate,
     do_nice_typography,
 )
+from ordered_set import OrderedSet
 
 from app.extensions import redis_client
 from app.models import JSONModel
@@ -342,3 +344,45 @@ def get_template(
             contact_block=template["reply_to_text"],
             include_letter_edit_ui_overlay=include_letter_edit_ui_overlay,
         )
+
+
+class TemplateChange:
+    def __init__(self, old_template, new_template):
+        self.old_placeholders = InsensitiveDict.from_keys(old_template.placeholders)
+        self.new_placeholders = InsensitiveDict.from_keys(new_template.placeholders)
+
+        self.email_files = old_template.email_files if hasattr(old_template, "email_files") else []
+
+    @property
+    def has_different_placeholders(self):
+        return bool(self.new_placeholders.keys() ^ self.old_placeholders.keys())
+
+    @property
+    def placeholders_added(self):
+        return OrderedSet(
+            [self.new_placeholders.get(key) for key in self.new_placeholders.keys() - self.old_placeholders.keys()]
+        )
+
+    @property
+    def placeholders_removed(self):
+        return self.placeholders_and_email_files_removed - self.email_filenames_removed
+
+    @property
+    def placeholders_and_email_files_removed(self):
+        return OrderedSet(
+            [self.old_placeholders.get(key) for key in self.old_placeholders.keys() - self.new_placeholders.keys()]
+        )
+
+    @property
+    def email_files_removed(self):
+        return OrderedSet(
+            [file for file in self.email_files if file.filename in self.placeholders_and_email_files_removed]
+        )
+
+    @property
+    def email_filenames_removed(self):
+        return OrderedSet([file.filename for file in self.email_files_removed])
+
+    @property
+    def is_breaking_change(self):
+        return bool(self.placeholders_added or self.email_files_removed)

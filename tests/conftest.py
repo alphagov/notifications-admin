@@ -1005,6 +1005,7 @@ def mock_update_service_template(notify_admin, mocker):
         letter_welsh_subject=None,
         letter_welsh_content=None,
         has_unsubscribe_link=False,
+        archive_email_file_ids=None,
     ):
         template = template_json(
             service_id=service_id,

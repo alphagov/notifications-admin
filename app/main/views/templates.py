@@ -19,6 +19,7 @@ from flask import (
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
+from notifications_utils.formatters import formatted_list
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.s3 import s3download
 from notifications_utils.template import Template
@@ -73,7 +74,7 @@ from app.utils.letters import (
     get_letter_validation_error,
 )
 from app.utils.pagination import generate_optional_previous_and_next_dicts, get_page_from_request
-from app.utils.templates import TemplatedLetterImageTemplate, get_template
+from app.utils.templates import TemplateChange, TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
 
 
@@ -716,7 +717,7 @@ def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: str | 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=["GET", "POST"])
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit/<string:language>", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-def edit_service_template(service_id, template_id, language=None):
+def edit_service_template(service_id, template_id, language=None):  # noqa
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if template.template_type not in current_service.available_template_types:
@@ -739,20 +740,23 @@ def edit_service_template(service_id, template_id, language=None):
             template._template | form.new_template_data,
             current_service,
         )
-        template_change = template.compare_to(new_template)
-
-        if template_change.placeholders_added and not request.form.get("confirm") and current_service.api_keys:
+        template_change = TemplateChange(template, new_template)
+        if template_change.is_breaking_change and not request.form.get("confirm") and current_service.api_keys:
             return render_template(
                 "views/templates/breaking-change.html",
                 template_change=template_change,
                 new_template=new_template,
                 form=form,
             )
+
+        update_data = form.new_template_data
+        if template_change.email_files_removed:
+            update_data["archive_email_file_ids"] = [file.id for file in template_change.email_files_removed]
         try:
             service_api_client.update_service_template(
                 service_id=service_id,
                 template_id=template_id,
-                **form.new_template_data,
+                **update_data,
             )
         except HTTPError as e:
             if e.status_code == 400:
@@ -770,6 +774,11 @@ def edit_service_template(service_id, template_id, language=None):
             editing_english_content_in_bilingual_letter = (
                 template.template_type == "letter" and template.welsh_page_count and language != "welsh"
             )
+            if template_change.email_files_removed:
+                flash(
+                    f"Files for {formatted_list(template_change.email_filenames_removed)} have been removed from the template.",  # noqa
+                    "default_with_tick",
+                )
             return redirect(
                 url_for(
                     "main.view_template",

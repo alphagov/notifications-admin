@@ -43,7 +43,7 @@ def test_get_upload_file_page(
     )
     service_one["permissions"] += extra_permissions
     page = client_request.get(
-        "main.email_template_files_upload",
+        "main.upload_template_email_files",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _expected_status=expected_status,
@@ -75,7 +75,7 @@ def test_get_upload_file_page_404s_if_invalid_template_id(client_request, servic
         side_effect=HTTPError(response=Mock(status_code=404)),
     )
     client_request.get(
-        "main.email_template_files_upload",
+        "main.upload_template_email_files",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _expected_status=404,
@@ -90,7 +90,7 @@ def test_upload_file_page_requires_file(
 ):
     service_one["permissions"] += ["send_files_via_ui"]
     page = client_request.post(
-        "main.email_template_files_upload",
+        "main.upload_template_email_files",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _expected_status=200,
@@ -128,7 +128,7 @@ def test_upload_file_page_validates_extentions(
     if not expected_error_message:
         with open(test_file, "rb") as file:
             page = client_request.post(
-                "main.email_template_files_upload",
+                "main.upload_template_email_files",
                 service_id=SERVICE_ONE_ID,
                 template_id=fake_uuid,
                 _data={"file": file},
@@ -140,7 +140,7 @@ def test_upload_file_page_validates_extentions(
     else:
         with open(test_file, "rb") as file:
             page = client_request.post(
-                "main.email_template_files_upload",
+                "main.upload_template_email_files",
                 service_id=SERVICE_ONE_ID,
                 template_id=fake_uuid,
                 _data={"file": file},
@@ -183,7 +183,7 @@ def test_file_upload_calls_template_update(
     mock_template_update = mocker.patch("app.service_api_client.update_service_template")
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         client_request.post(
-            "main.email_template_files_upload",
+            "main.upload_template_email_files",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             _data={"file": file},
@@ -230,7 +230,7 @@ def test_upload_file_does_not_update_template_when_placeholder_already_exists(
     mock_template_update = mocker.patch("app.service_api_client.update_service_template")
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         client_request.post(
-            "main.email_template_files_upload",
+            "main.upload_template_email_files",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             _data={"file": file},
@@ -300,7 +300,7 @@ def test_upload_file_returns_error_if_file_with_same_name_exists(
     mock_template_update = mocker.patch("app.service_api_client.update_service_template")
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         page = client_request.post(
-            "main.email_template_files_upload",
+            "main.upload_template_email_files",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
             _data={"file": file},

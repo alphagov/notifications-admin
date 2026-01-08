@@ -8,7 +8,7 @@ def upload_template_email_file_to_s3(data, file_location):
     utils_s3upload(
         filedata=data,
         region=current_app.config["AWS_REGION"],
-        bucket_name=current_app.config["S3_BUCKET_DOCUMENT_DOWNLOAD_LONG_TERM_FILE_STORAGE"],
+        bucket_name=current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
         file_location=file_location,
         metadata=metadata,
     )
