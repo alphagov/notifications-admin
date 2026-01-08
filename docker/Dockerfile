@@ -20,7 +20,7 @@ WORKDIR /home/vcap/app
 ##### Frontend Build Image ###################################################
 ARG NOTIFY_ENVIRONMENT=development
 
-FROM --platform=linux/amd64 node:22-bookworm-slim AS frontend_build
+FROM --platform=linux/amd64 node:24-bookworm-slim AS frontend_build
 
 SHELL ["/bin/bash", "-c"]
 
@@ -78,7 +78,7 @@ ENTRYPOINT [ "/home/vcap/app/entrypoint.sh" ]
 CMD [ "web" ]
 
 ##### Test Image ##############################################################
-FROM production as test
+FROM production AS test
 
 USER root
 
