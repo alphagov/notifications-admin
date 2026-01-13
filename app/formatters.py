@@ -419,6 +419,12 @@ def character_count(count):
     return f"{format_thousands(count)} characters"
 
 
+def format_pluralise(files):
+    if len(files) == 1:
+        return ""
+    return "s"
+
+
 def format_billions(count):
     return humanize.intword(count)
 
