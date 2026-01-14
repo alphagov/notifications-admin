@@ -39,6 +39,11 @@ class TemplateEmailFile(JSONModel):
 
 class TemplateEmailFiles(SerialisedModelCollection):
     model = TemplateEmailFile
+
+    @property
+    def all(self):
+        return [self[i] for i in range(len(self))]
+
     @property
     def as_personalisation(self):
         personalistion = {}
