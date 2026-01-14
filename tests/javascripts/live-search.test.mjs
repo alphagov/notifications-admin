@@ -545,7 +545,7 @@ describe('Live search', () => {
         },
         {
           "label": "Team member",
-          "email": "team-member@nhs.uk",
+          "email": "email-address-different-from-name@nhs.uk",
           "permissions" : ["Send messages", "Add and edit templates"]
         },
         {
@@ -595,6 +595,24 @@ describe('Live search', () => {
       test("If there is a single word search term, only the results that match should show", () => {
 
         searchTextbox.value = 'admin';
+
+        // start the module
+        new LiveSearch(document.querySelector('[data-notify-module="live-search"]'));
+
+        const listItems = list.querySelectorAll('.user-list-item');
+        const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
+
+        expect(listItemsShowing.length).toEqual(1);
+        expect(searchTextbox.hasAttribute('aria-label')).toBe(true);
+        expect(searchTextbox.getAttribute('aria-label')).toEqual(`${searchLabelText}, ${liveRegionResults(1)}`);
+
+      });
+
+      test("If there are multiple live-search-relevant classes, all are searched", () => {
+
+        // Both the name and email address are different but have the live-search-relevant class. This searches for the
+        // second class, the email address
+        searchTextbox.value = 'email-address-different-from-name';
 
         // start the module
         new LiveSearch(document.querySelector('[data-notify-module="live-search"]'));
@@ -672,6 +690,27 @@ describe('Live search', () => {
 
         // simulate input of new search text
         searchTextbox.value = 'Administrator';
+        helpers.triggerEvent(searchTextbox, 'input');
+
+        const listItems = list.querySelectorAll('.user-list-item');
+        const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
+
+        expect(listItemsShowing.length).toEqual(1);
+        expect(liveRegion.textContent.trim()).toEqual(liveRegionResults(1));
+
+      });
+
+      test("If there are multiple live-search-relevant classes, all are searched", () => {
+
+        searchTextbox.value = 'Admin';
+
+        // start the module
+        new LiveSearch(document.querySelector('[data-notify-module="live-search"]'));
+
+        // simulate input of new search text
+        // Both the name and email address are different but have the live-search-relevant class. This searches for the
+        // second class, the email address
+        searchTextbox.value = 'email-address-different-from-name';
         helpers.triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.user-list-item');
