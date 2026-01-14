@@ -501,11 +501,18 @@ describe('Live search', () => {
 
       users.forEach(user => result += `
         <div class="user-list-item">
-          <h3 title="${user.email}">
+          <h2 class="user-list-item-heading" title="${user.email}">
+            <span class="heading-small live-search-relevant">
+
+              <a class="govuk-link govuk-link--text-colour" href="/users/c943487c-63ff-4a56-bcdd-b2c06e0ea3e7">
+                ${user.label}
+              </a>
+
+            </span>&ensp;
             <span class="hint">
-              <span class="live-search-relevant">${user.label} (${user.email})</span> (invited)
+              <span class="live-search-relevant">${user.email}</span> (invited)
             </span>
-          </h3>
+          </h2>
           <ul class="tick-cross-list govuk-grid-row">
             <div class="tick-cross-list-permissions govuk-grid-column-three-quarters">
               ${getPermissionsHTML(user.permissions)}
@@ -603,7 +610,7 @@ describe('Live search', () => {
 
       test("If there is a search term made of several words, only the results that match should show", () => {
 
-        searchTextbox.value = 'Administrator (admin@nhs.uk)';
+        searchTextbox.value = 'Team member';
 
         // start the module
         new LiveSearch(document.querySelector('[data-notify-module="live-search"]'));
@@ -683,7 +690,7 @@ describe('Live search', () => {
         new LiveSearch(document.querySelector('[data-notify-module="live-search"]'));
 
         // simulate input of new search text
-        searchTextbox.value = 'Administrator (admin@nhs.uk)';
+        searchTextbox.value = 'Team member';
         helpers.triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.user-list-item');
