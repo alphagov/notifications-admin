@@ -126,12 +126,8 @@
               }
             ] if current_user.has_permissions('manage_service') else []
           }
-        }
-      ]%}
-
-      {% if current_service.has_permission("email") %}
-        {% set restricted_email_settings_rows = [
-          {
+        },
+        {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
               "text": "Email ‘from’ name"
@@ -170,7 +166,11 @@
                 }
               ]
             }
-          },
+          }
+      ]%}
+
+      {% if current_service.has_permission("email") %}
+        {% set restricted_email_settings_rows = [
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
