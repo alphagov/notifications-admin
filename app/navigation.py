@@ -248,6 +248,7 @@ class MainNavigation(Navigation):
             "view_template_versions",
             "rename_template",
             "upload_template_email_files",
+            "template_email_files",
         },
         "uploads": {
             "upload_contact_list",

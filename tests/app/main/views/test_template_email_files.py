@@ -12,6 +12,109 @@ from tests.conftest import (
 )
 
 
+def test_template_email_files_manage_files_page_displays_the_right_files(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    data = [
+        {
+            "filename": "test_file_1.csv",
+            "id": "e9ecb3f2-8674-4436-b233-d2c16ad135e7",
+            "link_text": None,
+            "retention_period": 90,
+            "validate_users_email": False,
+        },
+        {
+            "filename": "test_file_2.png",
+            "id": "bd3376c2-7b80-4a53-80f0-8de21db25b1a",
+            "link_text": None,
+            "retention_period": 90,
+            "validate_users_email": False,
+        },
+    ]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                email_files=data,
+            )
+        },
+    )
+    page = client_request.get(
+        "main.template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert page.select_one("h1").string.strip() == "Manage files"
+    assert [normalize_spaces(row.text) for row in page.select("dt")] == [
+        f"{data[0]['filename']}",
+        f"{data[1]['filename']}",
+    ]
+
+    assert (
+        normalize_spaces(page.select_one('a[role="button"][data-module="govuk-button"]').get_text())
+        == "Attach another file"
+    )
+
+
+def test_template_email_files_manage_files_page_raises_an_error_for_invalid_template_ids(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        side_effect=HTTPError(response=Mock(status_code=404)),
+    )
+
+    client_request.get(
+        "main.template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=404,
+    )
+
+
+def test_template_email_files_manage_files_page_when_there_are_no_files_to_display(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+            )
+        },
+    )
+    page = client_request.get(
+        "main.template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert page.select_one("h1").string.strip() == "Manage files"
+    assert [normalize_spaces(row.text) for row in page.select("dt")] == [
+        "Attached files will show here",
+    ]
+    assert (
+        normalize_spaces(page.select_one('a[role="button"][data-module="govuk-button"]').get_text()) == "Attach files"
+    )
+
+
 @pytest.mark.parametrize(
     "extra_permissions, template_type, expected_status",
     (

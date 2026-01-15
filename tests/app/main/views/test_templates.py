@@ -4698,23 +4698,23 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
             ["send_files_via_ui"],
             "email",
             ["example.pdf"],
-            "Attach files",
-            "main.upload_template_email_files",
+            "Manage files",
+            "main.template_email_files",
             "1 file added",
         ),
         (
             ["send_files_via_ui"],
             "email",
             ["example.pdf", "picture.png"],
-            "Attach files",
-            "main.upload_template_email_files",
+            "Manage files",
+            "main.template_email_files",
             "2 files added",
         ),
         (["send_files_via_ui"], "sms", None, None, None, None),
         (["send_files_via_ui"], "letter", None, "Attach pages", "main.letter_template_attach_pages", None),
     ),
 )
-def test_attach_files_buttom(
+def test_button_for_attaching_files(
     client_request,
     service_one,
     mock_get_template_folders,
