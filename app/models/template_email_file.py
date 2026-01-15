@@ -39,3 +39,6 @@ class TemplateEmailFile(JSONModel):
 
 class TemplateEmailFiles(SerialisedModelCollection):
     model = TemplateEmailFile
+
+    def is_empty(self):
+        return self.items == []

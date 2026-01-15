@@ -39,7 +39,7 @@
 
 </div>
     {{ govukButton({
-          "text": "Attach files",
+          "text": "Attach files" if template.email_files.is_empty() else "Attach another file",
           "href": url_for(
             '.upload_template_email_files',
             service_id=current_service.id,
