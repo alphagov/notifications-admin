@@ -286,7 +286,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         """
         Retrieve all templates for service.
         """
-        endpoint = f"/service/{service_id}/template?detailed=False"
+        endpoint = f"/service/{service_id}/template"
         return self.get(endpoint)
 
     @cache.delete("service-{service_id}-templates")

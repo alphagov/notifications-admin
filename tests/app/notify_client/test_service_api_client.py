@@ -211,7 +211,7 @@ def test_get_precompiled_template(mocker):
             [SERVICE_ONE_ID],
             [call(f"service-{SERVICE_ONE_ID}-templates")],
             None,
-            [call(f"/service/{SERVICE_ONE_ID}/template?detailed=False")],
+            [call(f"/service/{SERVICE_ONE_ID}/template")],
             [
                 call(
                     f"service-{SERVICE_ONE_ID}-templates",
