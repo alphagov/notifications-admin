@@ -1,0 +1,73 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+
+
+{% set title = "Manage files" %}
+{% block service_page_title %}
+  {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+  {{ page_header(title) }}
+
+   {% set files = [] %}
+    {%  if template.email_files %}
+    {% for item in template.email_files %}
+      {% do files.append(
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": item.filename
+          },
+          "value": {
+            "text": ""
+          },
+          "actions": {
+            "items": [
+              {
+                "href": "#",
+                "text": "Manage",
+                "visuallyHiddenText": item.filename,
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        }
+      ) %}
+    {% endfor %}
+     {% else %}
+       {% do files.append(
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Attached files will show here"
+          },
+          "value": {
+            "text": ""
+          },
+        }
+       ) %}
+    {%  endif %}
+    {{ govukSummaryList({
+      "classes": "notify-summary-list",
+      "rows": files
+    }) }}
+    {{ govukButton({
+          "text": "Attach another file" if template.email_files else "Attach files",
+          "href": url_for(
+            '.upload_template_email_files',
+            service_id=current_service.id,
+            template_id=template.id
+          ),
+          "classes": "govuk-button--secondary",
+        }) }}
+
+{% endblock %}

@@ -9,6 +9,20 @@ from app.utils import service_has_permission
 from app.utils.user import user_has_permissions
 
 
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files", methods=["GET"])
+@service_has_permission("send_files_via_ui")
+@user_has_permissions("manage_templates")
+def template_email_files(template_id, service_id):
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
+        must_be_of_type="email",
+    )
+    return render_template(
+        "views/templates/email-template-files/files-list.html", template=template, data=template.email_files
+    )
+
+
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files/upload", methods=["GET", "POST"])
 @service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")

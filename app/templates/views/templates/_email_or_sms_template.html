@@ -33,9 +33,9 @@
       </span>
 
         {{ govukButton({
-          "text": "Attach files",
+          "text": "Manage files" if template.email_files else "Attach files",
           "href": url_for(
-            '.upload_template_email_files',
+            '.template_email_files' if template.email_files else '.upload_template_email_files',
             service_id=current_service.id,
             template_id=template.id
           ),
