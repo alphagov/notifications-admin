@@ -282,12 +282,9 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     @property
     def email_files(self):
-        try:
-            if self._template.get("email_files"):
-                return TemplateEmailFiles(self._template["email_files"])
-            return []
-        except AttributeError:
-            return []
+        if hasattr(self, "_template") and self._template.get("email_files"):
+            return TemplateEmailFiles(self._template["email_files"])
+        return []
 
     @property
     def values(self):
