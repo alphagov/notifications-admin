@@ -308,6 +308,9 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     @property
     def all_placeholders(self):
+        """
+        Returns normal placeholders and file placeholders
+        """
         return super().placeholders
 
     @property
