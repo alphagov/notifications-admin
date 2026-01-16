@@ -46,17 +46,19 @@ class TemplateEmailFiles(SerialisedModelCollection):
 
     @property
     def as_personalisation(self):
-        personalistion = {}
+        personalisation = {}
         for template_email_file in self.all:
             if hasattr(template_email_file, "link_text"):
                 if template_email_file.link_text is not None:
-                    personalistion[template_email_file.filename] = (
+                    personalisation[template_email_file.filename] = (
                         f"[{template_email_file.link_text}](https://example.com/)"
                     )
                 else:
-                    personalistion[template_email_file.filename] = (
+                    personalisation[template_email_file.filename] = (
                         f"[{template_email_file.filename}](https://example.com/)"
                     )
             else:
-                personalistion[template_email_file.filename] = f"[{template_email_file.filename}](https://example.com/)"
-        return personalistion
+                personalisation[template_email_file.filename] = (
+                    f"[{template_email_file.filename}](https://example.com/)"
+                )
+        return personalisation
