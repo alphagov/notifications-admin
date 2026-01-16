@@ -3201,24 +3201,26 @@ def test_should_not_allow_template_edits_without_correct_permission(
 
 
 @pytest.mark.parametrize(
-    "old_content, new_content, expected_paragraphs",
+    "old_content, new_content, expected_paragraphs, expected_placeholders",
     [
         (
             "my favourite colour is blue",
             "my favourite colour is ((colour))",
             [
-                "You added ((colour))",
+                "You added the placeholder ((colour)).",
                 "Before you send any messages, make sure your API calls include colour.",
             ],
+            ["((colour))"],
         ),
         (
             "hello ((name))",
             "hello ((first name)) ((middle name)) ((last name))",
             [
-                "You removed ((name))",
-                "You added ((first name)) ((middle name)) and ((last name))",
+                "You removed the placeholder ((name)).",
+                "You added the placeholders:",
                 "Before you send any messages, make sure your API calls include first name, middle name and last name.",
             ],
+            ["((name))", "((first name))", "((middle name))", "((last name))"],
         ),
     ],
 )
@@ -3232,6 +3234,7 @@ def test_should_show_interstitial_when_making_breaking_change_to_sms_template(
     new_content,
     old_content,
     expected_paragraphs,
+    expected_placeholders,
 ):
     service_one["permissions"] += ["sms"]
 
@@ -3264,6 +3267,10 @@ def test_should_show_interstitial_when_making_breaking_change_to_sms_template(
     )
     assert [normalize_spaces(paragraph.text) for paragraph in page.select("main p")] == expected_paragraphs
 
+    assert [
+        normalize_spaces(placeholder.text) for placeholder in page.select("span.placeholder")
+    ] == expected_placeholders
+
     for key, value in (
         {
             "name": "my new template name",
@@ -3282,28 +3289,30 @@ def test_should_show_interstitial_when_making_breaking_change_to_sms_template(
     ),
 )
 @pytest.mark.parametrize(
-    "old_content, new_content, expected_paragraphs",
+    "old_content, new_content, expected_paragraphs, expected_placeholders",
     [
         (
             "my favourite colour is blue",
             "my favourite colour is ((colour))",
             [
-                "You added ((colour))",
+                "You added the placeholder ((colour)).",
                 "Before you send any messages, make sure your API calls include colour.",
             ],
+            ["((colour))"],
         ),
         (
             "hello ((name))",
             "hello ((first name)) ((middle name)) ((last name))",
             [
-                "You removed ((name))",
-                "You added ((first name)) ((middle name)) and ((last name))",
+                "You removed the placeholder ((name)).",
+                "You added the placeholders:",
                 "Before you send any messages, make sure your API calls include first name, middle name and last name.",
             ],
+            ["((name))", "((first name))", "((middle name))", "((last name))"],
         ),
     ],
 )
-def test_should_show_interstitial_when_making_breaking_change(
+def test_edit_service_template_should_show_interstitial_when_making_breaking_change(
     client_request,
     service_one,
     mock_get_api_keys,
@@ -3312,6 +3321,7 @@ def test_should_show_interstitial_when_making_breaking_change(
     new_content,
     old_content,
     expected_paragraphs,
+    expected_placeholders,
     template_type,
     additional_data,
 ):
@@ -3358,6 +3368,10 @@ def test_should_show_interstitial_when_making_breaking_change(
     )
     assert [normalize_spaces(paragraph.text) for paragraph in page.select("main p")] == expected_paragraphs
 
+    assert [
+        normalize_spaces(placeholder.text) for placeholder in page.select("span.placeholder")
+    ] == expected_placeholders
+
     for key, value in (
         {
             "subject": "reminder '\" <span> & ((thing))",
@@ -3376,7 +3390,7 @@ def test_should_show_interstitial_when_making_breaking_change(
 
 
 @pytest.mark.parametrize(
-    "old_content, new_content, extra_email_file, expected_paragraphs",
+    "old_content, new_content, extra_email_file, expected_paragraphs, expected_placeholders",
     [
         # remove an email file placeholder
         (
@@ -3384,9 +3398,10 @@ def test_should_show_interstitial_when_making_breaking_change(
             "We will send your invite separately.",
             [],
             [
-                "You removed the following files: ((invite.pdf))",
-                "Are you sure you want to remove these files?",
+                "You removed the file ((invite.pdf)).",
+                "Are you sure you want to remove this file?",
             ],
+            ["((invite.pdf))"],
         ),
         # remove an email file placeholder and remove a regular placeholder
         (
@@ -3394,9 +3409,10 @@ def test_should_show_interstitial_when_making_breaking_change(
             "We will send your invite separately.",
             [],
             [
-                "You removed the following files: ((invite.pdf))",
-                "Are you sure you want to remove these files?",
+                "You removed the file ((invite.pdf)).",
+                "Are you sure you want to remove this file?",
             ],
+            ["((invite.pdf))"],
         ),
         # remove an email file placeholder and add a regular placeholder
         (
@@ -3404,16 +3420,17 @@ def test_should_show_interstitial_when_making_breaking_change(
             "((greeting)), We will send your invite separately.",
             [],
             [
-                "You removed the following files: ((invite.pdf))",
-                "You removed the following placeholders: ((name))",
-                "You added the following placeholders: ((greeting))",
+                "You removed the file ((invite.pdf)).",
+                "You removed the placeholder ((name)).",
+                "You added the placeholder ((greeting)).",
                 (
-                    "Confirm that: "
-                    "you want to remove these files. "
-                    "you will modify any API calls for this template to include ((greeting)) "
+                    "Confirm that you: "
+                    "want to remove this file. "
+                    "will modify any API calls for this template to include greeting "
                     "before sending any messages."
                 ),
             ],
+            ["((invite.pdf))", "((name))", "((greeting))"],
         ),
         # remove two email files, remove a regular placeholder and add two regular placeholders
         (
@@ -3429,16 +3446,17 @@ def test_should_show_interstitial_when_making_breaking_change(
                 }
             ],
             [
-                "You removed the following files: ((invite.pdf)) and ((map.jpeg))",
-                "You removed the following placeholders: ((name))",
-                "You added the following placeholders: ((greeting)) and ((footer))",
+                "You removed the files:",
+                "You removed the placeholder ((name)).",
+                "You added the placeholders:",
                 (
-                    "Confirm that: "
-                    "you want to remove these files. "
-                    "you will modify any API calls for this template to include ((greeting)) and ((footer))"
+                    "Confirm that you: "
+                    "want to remove these files. "
+                    "will modify any API calls for this template to include greeting and footer"
                     " before sending any messages."
                 ),
             ],
+            ["((invite.pdf))", "((map.jpeg))", "((name))", "((greeting))", "((footer))"],
         ),
     ],
 )
@@ -3452,6 +3470,7 @@ def test_edit_service_template_asks_confirmation_when_removing_email_files(
     old_content,
     extra_email_file,
     expected_paragraphs,
+    expected_placeholders,
 ):
     service_one["permissions"] += ["email"]
 
@@ -3497,6 +3516,10 @@ def test_edit_service_template_asks_confirmation_when_removing_email_files(
         template_id=fake_uuid,
     )
     assert [normalize_spaces(paragraph.text) for paragraph in page.select("main p")] == expected_paragraphs
+
+    assert [
+        normalize_spaces(placeholder.text) for placeholder in page.select("span.placeholder")
+    ] == expected_placeholders
 
     for key, value in (
         {

@@ -1,8 +1,11 @@
 {% extends "withnav_template.html" %}
+
+{% from "components/confirm-breaking-change.html" import confirm_breaking_change %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/list.html" import list_of_code_snippets %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/list.html" import list_of_placeholders, list_of_code_snippets %}
-{% from "components/form.html" import form_wrapper %}
+
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
@@ -13,6 +16,8 @@
   {{ govukBackLink({ "href": url_for(".edit_service_template", service_id=current_service.id, template_id=new_template.id) }) }}
 {% endblock %}
 
+{% set email_files_removed = template_change.email_filenames_removed %}
+
 {% block maincolumn_content %}
 
   {{ page_header("Confirm changes") }}
@@ -21,57 +26,72 @@
       {% set confirm_button = "Save changes to template" %}
 
       <!-- Only regular placeholders got added (placeholders being removed only is not a breaking change) -->
-      {% if template_change.placeholders_added and not template_change.email_filenames_removed %}
+      {% if template_change.placeholders_added and not email_files_removed %}
 
         {% if template_change.placeholders_removed %}
-          <p class="govuk-body">
-            You removed {{ list_of_placeholders(template_change.placeholders_removed) }}
-          </p>
+          {{ confirm_breaking_change(
+            name="placeholder",
+            list_of_changes=template_change.placeholders_removed,
+            with_confirm_step=False
+          ) }}
         {% endif %}
 
-        <p class="govuk-body">
-          You added {{ list_of_placeholders(template_change.placeholders_added) }}
-        </p>
+        {{ confirm_breaking_change(
+          name="placeholder",
+          list_of_changes=template_change.placeholders_added,
+          with_confirm_step=False,
+          action={"present": "add", "past": "added"}
+        ) }}
+
         <p class="govuk-body">
           Before you send any messages, make sure your API calls include {{ list_of_code_snippets(template_change.placeholders_added) }}.
         </p>
 
       <!-- Only email files got removed -->
-      {% elif template_change.email_filenames_removed and not template_change.placeholders_added %}
+      {% elif email_files_removed and not template_change.placeholders_added %}
         {% set confirm_button = "Yes, remove" %}
 
-        <p class="govuk-body">
-          You removed the following files: {{ list_of_placeholders(template_change.email_filenames_removed) }}
-        </p>
-        <p class="govuk-body">
-          Are you sure you want to remove these files?
-        </p>
+        {{ confirm_breaking_change(
+          name="file",
+          list_of_changes=email_files_removed,
+          with_confirm_step=True
+        ) }}
 
       <!-- Both regular placeholders added and email files removed -->
-      {% elif template_change.email_filenames_removed and template_change.placeholders_added %}
+      {% elif email_files_removed and template_change.placeholders_added %}
 
         {% set confirm_button = "Confirm changes to template" %}
 
-        <p class="govuk-body">
-          You removed the following files: {{ list_of_placeholders(template_change.email_filenames_removed) }}
-        </p>
+        <h2 class="heading-medium">Remove file{{ email_files_removed|format_pluralise }}</h2>
+          {{ confirm_breaking_change(
+            name="file",
+            list_of_changes=email_files_removed,
+            with_confirm_step=False
+          ) }}
 
         {% if template_change.placeholders_removed %}
-        <p class="govuk-body">
-          You removed the following placeholders: {{ list_of_placeholders(template_change.placeholders_removed) }}
-        </p>
+          <h2 class="heading-medium">Remove placeholder{{ template_change.placeholders_removed|format_pluralise }}</h2>
+            {{ confirm_breaking_change(
+              name="placeholder",
+              list_of_changes=template_change.placeholders_removed,
+              with_confirm_step=False
+            ) }}
         {% endif %}
 
-        <p class="govuk-body">
-          You added the following placeholders: {{ list_of_placeholders(template_change.placeholders_added) }}
-        </p>
+        <h2 class="heading-medium">Add placeholder{{ template_change.placeholders_added|format_pluralise }}</h2>
+        {{ confirm_breaking_change(
+          name="placeholder",
+          list_of_changes=template_change.placeholders_added,
+          with_confirm_step=False,
+          action={"present": "add", "past": "added"}
+        ) }}
 
         <p class="govuk-body">
-          Confirm that:
+          Confirm that you:
           <ul class="govuk-list govuk-list--bullet">
-          <li>you want to remove these files.
-          <li>you will modify any API calls for this template to include {{
-          list_of_placeholders(template_change.placeholders_added) }} before sending any messages.
+          <li>want to remove {% if email_files_removed|length == 1 %} this file. {% else %} these files. {% endif %}
+          <li>will modify any API calls for this template to include {{
+          list_of_code_snippets(template_change.placeholders_added) }} before sending any messages.
           </ul>
       {% endif %}
 
