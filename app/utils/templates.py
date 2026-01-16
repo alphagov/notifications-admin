@@ -296,7 +296,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
     def values(self, value):
         # Assigning to super().values doesn’t work here. We need to get
         # the property object instead, which has the special method
-        # fset, which invokes the setter it as if we were
+        # fset, which invokes the setter as if we were
         # assigning to it outside this class.
         super(EmailPreviewTemplate, type(self)).values.fset(self, value)
 
