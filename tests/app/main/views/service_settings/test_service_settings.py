@@ -3933,7 +3933,7 @@ def test_unknown_channel_404s(
             "True",
             ["sms"],
         ),
-        (
+        pytest.param(
             "email",
             "It’s free to send emails through GOV.UK Notify.",
             "Send emails",
@@ -3941,6 +3941,7 @@ def test_unknown_channel_404s(
             "False",
             "True",
             ["email"],
+            marks=pytest.mark.xfail(raises=AssertionError),  # in this case there is no paragraph
         ),
         (
             "email",
@@ -3995,6 +3996,150 @@ def test_switch_service_channels_on_and_off(
     )
     assert set(mocked_fn.call_args[1]["permissions"]) == set(expected_updated_permissions)
     assert mocked_fn.call_args[0][0] == service_one["id"]
+
+
+@pytest.mark.parametrize(
+    ("initial_permissions,expected_html_element,confirmed_email_sender_name,has_email_reply_to_address,"),
+    [
+        (["email", "sms"], ".govuk-radios", None, None),
+        (["sms"], ".govuk-task-list", False, False),
+        (["sms"], ".govuk-task-list", True, False),
+        (["sms"], ".govuk-task-list", False, True),
+        (["sms"], ".govuk-task-list", True, True),
+    ],
+)
+def test_set_email_page_markup(
+    client_request,
+    service_one,
+    mocker,
+    single_sms_sender,
+    api_user_active,
+    mock_get_free_sms_fragment_limit,
+    mock_get_letter_rates,
+    mock_get_sms_rate,
+    initial_permissions,
+    expected_html_element,
+    confirmed_email_sender_name,
+    has_email_reply_to_address,
+):
+    if has_email_reply_to_address:
+        mocker.patch(
+            "app.service_api_client.get_reply_to_email_addresses",
+            return_value=[create_reply_to_email_address(is_default=True)],
+        )
+    else:
+        mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=[])
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+
+    service_one["permissions"] = initial_permissions
+    service_one["confirmed_email_sender_name"] = confirmed_email_sender_name
+
+    page = client_request.get(
+        "main.service_set_channel",
+        service_id=service_one["id"],
+        channel="email",
+    )
+
+    if not confirmed_email_sender_name and "email" not in initial_permissions:
+        assert (
+            normalize_spaces(
+                find_element_by_tag_and_partial_text(
+                    page, tag=".govuk-task-list__item", string="Choose a ‘from’ name"
+                ).text
+            )
+            == "Choose a ‘from’ name Incomplete"
+        )
+    if not has_email_reply_to_address and "email" not in initial_permissions:
+        assert (
+            normalize_spaces(
+                find_element_by_tag_and_partial_text(
+                    page, tag=".govuk-task-list__item", string="Add a reply-to email address"
+                ).text
+            )
+            == "Add a reply-to email address Incomplete"
+        )
+    if has_email_reply_to_address and confirmed_email_sender_name:
+        assert (
+            normalize_spaces(
+                find_element_by_tag_and_partial_text(
+                    page, tag=".govuk-task-list__item", string="Add a reply-to email address"
+                ).text
+            )
+            == "Add a reply-to email address Completed"
+        )
+        assert (
+            normalize_spaces(
+                find_element_by_tag_and_partial_text(
+                    page, tag=".govuk-task-list__item", string="Choose a ‘from’ name"
+                ).text
+            )
+            == "Choose a ‘from’ name Completed"
+        )
+
+    assert len(page.select(expected_html_element)) == 1
+
+
+@pytest.mark.parametrize(
+    (
+        "initial_permissions,"
+        "confirmed_email_sender_name,"
+        "has_email_reply_to_address,"
+        "expected_updated_permissions,"
+        "expected_page_title"
+    ),
+    [
+        (["sms"], False, False, ["sms"], "Send emails"),
+        (["sms"], True, False, ["sms"], "Send emails"),
+        (["sms"], False, True, ["sms"], "Send emails"),
+        (["sms"], True, True, ["sms", "email"], "Settings"),
+    ],
+)
+def test_switch_email_on_from_tasklist_form(
+    client_request,
+    service_one,
+    mocker,
+    single_sms_sender,
+    api_user_active,
+    mock_get_free_sms_fragment_limit,
+    mock_get_letter_rates,
+    mock_get_sms_rate,
+    mock_get_service_settings_page_common,
+    initial_permissions,
+    has_email_reply_to_address,
+    confirmed_email_sender_name,
+    expected_updated_permissions,
+    expected_page_title,
+):
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    if has_email_reply_to_address:
+        mocker.patch(
+            "app.service_api_client.get_reply_to_email_addresses",
+            return_value=[create_reply_to_email_address(is_default=True)],
+        )
+    else:
+        mocker.patch(
+            "app.service_api_client.get_reply_to_email_addresses",
+            return_value=[],
+        )
+
+    service_one["permissions"] = initial_permissions
+    service_one["confirmed_email_sender_name"] = confirmed_email_sender_name
+
+    mock_update_service = mocker.patch("app.service_api_client.update_service", return_value=service_one)
+
+    page = client_request.post("main.enable_email_channel", service_id=service_one["id"], _follow_redirects=True)
+
+    if not confirmed_email_sender_name or not has_email_reply_to_address:
+        assert normalize_spaces(page.select_one(".banner-dangerous h2").text) == ("There is a problem")
+        assert normalize_spaces(page.select_one(".banner-dangerous p").text) == (
+            "Some of the tasks on this page are incomplete"
+        )
+    if has_email_reply_to_address and confirmed_email_sender_name:
+        assert set(mock_update_service.call_args[1]["permissions"]) == set(expected_updated_permissions)
+    else:
+        assert not mock_update_service.called
+
+    assert normalize_spaces(page.select_one("h1").text) == expected_page_title
 
 
 @pytest.mark.parametrize(
