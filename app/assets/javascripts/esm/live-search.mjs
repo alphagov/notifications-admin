@@ -30,8 +30,15 @@ class LiveSearch {
 
     $targets.forEach(($node) => {
 
-      let content = $node.querySelector('.live-search-relevant') ? $node.querySelector('.live-search-relevant').textContent : $node.textContent;
-      let isMatch = this.normalize(content).includes(this.normalize(query));
+      let contents = $node.querySelectorAll('.live-search-relevant').length ? $node.querySelectorAll('.live-search-relevant') : [$node];
+      let isMatch = false;
+
+      contents.forEach((content_item) => {
+        if (this.normalize(content_item.textContent).includes(this.normalize(query))) {
+          isMatch = true;
+        }
+      });
+
       // if there is a child node with checked state
       if ($node.querySelectorAll(':checked').length > 0) {
         if ($node.hasAttribute('hidden')) {
@@ -74,7 +81,7 @@ class LiveSearch {
       };
 
       if (isMatch) {
-        results++; 
+        results++;
       }
 
     });
