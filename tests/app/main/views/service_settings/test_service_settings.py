@@ -1791,6 +1791,43 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
 
 
 @pytest.mark.parametrize(
+    "confirmed_email_sender_name, custom_email_sender_name, expected_from_name",
+    [
+        (None, None, "service one service.one@notifications.service.gov.uk"),
+        (False, None, "Not set"),
+        (True, None, "service one service.one@notifications.service.gov.uk"),
+        (True, "Custom Service", "Custom Service custom.service@notifications.service.gov.uk"),
+    ],
+)
+def test_email_from_name_has_the_right_value(
+    client_request,
+    service_one,
+    mocker,
+    api_user_active,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    confirmed_email_sender_name,
+    custom_email_sender_name,
+    expected_from_name,
+    mock_get_service_settings_page_common,
+):
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    service_one["confirmed_email_sender_name"] = confirmed_email_sender_name
+    service_one["custom_email_sender_name"] = custom_email_sender_name
+
+    client_request.login(create_active_user_with_permissions(), service_one)
+    page = client_request.get("main.service_settings", service_id=service_one["id"])
+
+    assert (
+        normalize_spaces(
+            find_element_by_tag_and_partial_text(page, tag=".govuk-summary-list__row", string="Email ‘from’ name").text
+        )
+        == f"Email ‘from’ name {expected_from_name} Change email ‘from’ name"
+    )
+
+
+@pytest.mark.parametrize(
     "sender_list_page, index, expected_output",
     [
         ("main.service_email_reply_to", 0, "test@example.com (default) Change test@example.com"),
