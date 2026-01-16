@@ -86,10 +86,16 @@
 
     {% set service_email_settings %}
       {% set email_sender_html %}
-        {% with email_sender_name = current_service.custom_email_sender_name or current_service.name %}
-          {% include "partials/preview-email-sender-name.html" %}
-        {% endwith %}
+        {% if current_service.confirmed_email_sender_name == False %}
+        <span class="govuk-hint">Not set</span>
+        {% else %}
+          {% with email_sender_name = current_service.custom_email_sender_name or current_service.name %}
+            {% include "partials/preview-email-sender-name.html" %}
+          {% endwith %}
+        {% endif %}
       {% endset %}
+
+      {% set email_sender_classes = "govuk-summary-list__value--truncate govuk-summary-list__value--default" if current_service.confirmed_email_sender_name == False else "govuk-summary-list__value--truncate" %}
 
       {% set reply_to_email_addresses_html %}
         {{ current_service.default_email_reply_to_address or 'Not set' }}
@@ -134,7 +140,7 @@
             },
             "value": {
               "html": email_sender_html,
-              "classes": "govuk-summary-list__value--truncate"
+              "classes": email_sender_classes
             },
             "actions": {
               "items": [
