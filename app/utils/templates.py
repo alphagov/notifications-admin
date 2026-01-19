@@ -284,6 +284,13 @@ class EmailPreviewTemplate(BaseEmailTemplate):
     def email_files(self):
         return TemplateEmailFiles(self._template["email_files"])
 
+    def get_email_file_data(self, template_email_file_id):
+        if self.email_files:
+            email_files = self.email_files.items
+            for row in email_files:
+                if row["id"] == template_email_file_id:
+                    return row
+
 
 class LetterAttachment(JSONModel):
     id: Any
