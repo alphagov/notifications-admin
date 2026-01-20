@@ -802,6 +802,28 @@ def service_set_channel(service_id, channel):
     )
 
 
+@main.route("/services/<uuid:service_id>/service-settings/set-email/on", methods=["POST"])
+@user_has_permissions("manage_service")
+def enable_email_channel(service_id):
+    channel = "email"
+
+    if current_service.has_email_reply_to_address and current_service.confirmed_email_sender_name:
+        current_service.force_permission(channel, on=True)
+        return redirect(url_for(".service_settings", service_id=service_id))
+    else:
+        flash(
+            Markup(
+                """
+                    <h2 class='govuk-heading-m'>There is a problem</h2>
+                    <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
+                        Some of the tasks on this page are incomplete
+                    </p>
+                """
+            )
+        )
+        return redirect(url_for(".service_set_channel", service_id=service_id, channel=channel))
+
+
 @main.route("/services/<uuid:service_id>/service-settings/set-auth-type", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_set_auth_type(service_id):
