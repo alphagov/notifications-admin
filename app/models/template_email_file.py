@@ -48,7 +48,4 @@ class TemplateEmailFiles(SerialisedModelCollection):
 
     @property
     def as_personalisation(self):
-        personalisation = {}
-        for template_email_file in self:
-            personalisation[template_email_file.filename] = template_email_file.link_as_markdown
-        return personalisation
+        return {template_email_file.filename: template_email_file.link_as_markdown for template_email_file in self}
