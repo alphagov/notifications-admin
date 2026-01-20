@@ -40,7 +40,7 @@ class TemplateEmailFile(JSONModel):
     def link_as_markdown(self):
         if self.link_text:
             return f"[{self.link_text}](https://example.com/)"
-        return f"[{self.filename}](https://example.com/)"
+        return "https://example.com/"
 
 
 class TemplateEmailFiles(SerialisedModelCollection):
