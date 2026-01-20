@@ -4728,7 +4728,7 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
         (
             ["send_files_via_ui"],
             "email",
-            [{"filename": "example.pdf", "retention_period": 26, "id": "123"}],
+            [{"filename": "example.pdf", "retention_period": 26, "id": "123", "link_text": None}],
             "Manage files",
             "main.template_email_files",
             "1 file added",
@@ -4737,8 +4737,8 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
             ["send_files_via_ui"],
             "email",
             [
-                {"filename": "example.pdf", "retention_period": 26, "id": "123"},
-                {"filename": "picture.png", "retention_period": 90, "id": "456"},
+                {"filename": "example.pdf", "retention_period": 26, "id": "123", "link_text": None},
+                {"filename": "picture.png", "retention_period": 90, "id": "456", "link_text": None},
             ],
             "Manage files",
             "main.template_email_files",

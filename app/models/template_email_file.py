@@ -38,7 +38,7 @@ class TemplateEmailFile(JSONModel):
 
     @property
     def link_as_markdown(self):
-        if hasattr(self, "link_text") and self.link_text is not None:
+        if self.link_text:
             return f"[{self.link_text}](https://example.com/)"
         return f"[{self.filename}](https://example.com/)"
 
