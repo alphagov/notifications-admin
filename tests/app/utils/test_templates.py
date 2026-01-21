@@ -1209,7 +1209,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "content": "((1.pdf)) ((2)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "1.pdf", "retention_period": 26, "id": "123"}],
+                    "email_files": [{"filename": "1.pdf", "retention_period": 26, "id": "123", "link_text": None}],
                 }
             ),
             EmailPreviewTemplate(
@@ -1217,7 +1217,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "content": "((1.pdf)) ((2)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "1.pdf", "retention_period": 26, "id": "123"}],
+                    "email_files": [{"filename": "1.pdf", "retention_period": 26, "id": "123", "link_text": None}],
                 }
             ),
             set(),
@@ -1230,7 +1230,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "content": "((1)) ((2.pdf)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "2.pdf", "retention_period": 26, "id": "123"}],
+                    "email_files": [{"filename": "2.pdf", "retention_period": 26, "id": "123", "link_text": None}],
                 }
             ),
             EmailPreviewTemplate(
@@ -1238,7 +1238,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "content": "((1)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "2.pdf", "retention_period": 26, "id": "123"}],
+                    "email_files": [{"filename": "2.pdf", "retention_period": 26, "id": "123", "link_text": None}],
                 }
             ),
             {"2.pdf"},
@@ -1252,8 +1252,8 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "subject": "Henlo",
                     "template_type": "email",
                     "email_files": [
-                        {"filename": "2.pdf", "retention_period": 26, "id": "123"},
-                        {"filename": "3.pdf", "retention_period": 26, "id": "456"},
+                        {"filename": "2.pdf", "retention_period": 26, "id": "123", "link_text": None},
+                        {"filename": "3.pdf", "retention_period": 26, "id": "456", "link_text": None},
                     ],
                 }
             ),
@@ -1263,8 +1263,8 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                     "subject": "Henlo",
                     "template_type": "email",
                     "email_files": [
-                        {"filename": "2.pdf", "retention_period": 26, "id": "123"},
-                        {"filename": "3.pdf", "retention_period": 26, "id": "456"},
+                        {"filename": "2.pdf", "retention_period": 26, "id": "123", "link_text": None},
+                        {"filename": "3.pdf", "retention_period": 26, "id": "456", "link_text": None},
                     ],
                 }
             ),
@@ -1284,7 +1284,7 @@ def test_TemplateChange_email_files_removed(
 
 @pytest.mark.parametrize("service_has_api_keys", (True, False))
 def test_TemplateChange_email_files_and_placeholders_removed(service_has_api_keys):
-    email_file_data = {"filename": "2.pdf", "retention_period": 26, "id": "123"}
+    email_file_data = {"filename": "2.pdf", "retention_period": 26, "id": "123", "link_text": None}
     old_template = EmailPreviewTemplate(
         {
             "content": "((1)) ((2.pdf)) ((3))",
