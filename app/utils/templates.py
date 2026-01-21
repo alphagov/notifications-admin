@@ -315,7 +315,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     @property
     def placeholders(self):
-        return {placeholder for placeholder in self.all_placeholders if placeholder not in self.filenames}
+        return OrderedSet([placeholder for placeholder in self.all_placeholders if placeholder not in self.filenames])
 
 
 class LetterAttachment(JSONModel):

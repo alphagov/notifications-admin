@@ -166,7 +166,6 @@ def get_example_csv(service_id, template_id):
 def _should_show_set_sender_page(service_id, template) -> bool:
     if template.template_type == "letter":
         return False
-
     sender_details = get_sender_details(service_id, template.template_type)
 
     if len(sender_details) <= 1:
@@ -399,7 +398,6 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
     # If step_index is 0, the message was not sent from the inbound SMS flow, which starts at step_index 1.
     if step_index == 0:
         session.pop("from_inbound_sms_details", None)
-
     template = current_service.get_template_with_user_permission_or_403(
         template_id,
         current_user,
@@ -411,7 +409,6 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
             filetype="png",
         ),
     )
-
     if template.template_type == "email":
         template.reply_to = get_email_reply_to_address_from_session()
     elif template.template_type == "sms":
@@ -463,7 +460,6 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
     )
 
     template.values = template_values
-
     if form.validate_on_submit():
         # if it's the first input (phone/email), we store against `recipient` as well, for easier extraction.
         # Only if it's not a letter.

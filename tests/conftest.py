@@ -872,6 +872,23 @@ def mock_get_service_email_template_without_placeholders(notify_admin, mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_get_email_template_with_multiple_placeholders(notify_admin, mocker):
+    def _get(service_id, template_id, version=None):
+        template = template_json(
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="email",
+            content="((one)) ((two)) ((three))",
+            subject="Your thing is due soon",
+            redact_personalisation=False,
+        )
+        return {"data": template}
+
+    return mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
+
+
+@pytest.fixture(scope="function")
 def mock_get_service_letter_template(notify_admin, mocker):
     def _get(service_id, template_id, version=None, postage="second"):
         template = template_json(
