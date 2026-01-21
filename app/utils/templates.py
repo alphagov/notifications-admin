@@ -6,7 +6,7 @@ from markupsafe import Markup
 from notifications_utils.countries import Postage
 from notifications_utils.field import Field
 from notifications_utils.formatters import escape_html, formatted_list, normalise_whitespace
-from notifications_utils.insensitive_dict import InsensitiveDict
+from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 from notifications_utils.take import Take
 from notifications_utils.template import (
     BaseEmailTemplate,
@@ -282,7 +282,40 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     @property
     def email_files(self):
-        return TemplateEmailFiles(self._template["email_files"])
+        if hasattr(self, "_template") and self._template.get("email_files"):
+            return TemplateEmailFiles(self._template["email_files"])
+        return []
+
+    @property
+    def values(self):
+        if self.email_files:
+            return super().values | self.email_files.as_personalisation
+        return super().values
+
+    @values.setter
+    def values(self, value):
+        # Assigning to super().values doesn’t work here. We need to get
+        # the property object instead, which has the special method
+        # fset, which invokes the setter as if we were
+        # assigning to it outside this class.
+        super(EmailPreviewTemplate, type(self)).values.fset(self, value)
+
+    @property
+    def filenames(self):
+        if self.email_files:
+            return InsensitiveSet(self.email_files.as_personalisation.keys())
+        return InsensitiveSet({})
+
+    @property
+    def all_placeholders(self):
+        """
+        Returns normal placeholders and file placeholders
+        """
+        return super().placeholders
+
+    @property
+    def placeholders(self):
+        return {placeholder for placeholder in self.all_placeholders if placeholder not in self.filenames}
 
 
 class LetterAttachment(JSONModel):
@@ -348,9 +381,16 @@ def get_template(
 
 class TemplateChange:
     def __init__(self, old_template, new_template):
-        self.old_placeholders = InsensitiveDict.from_keys(old_template.placeholders)
-        self.new_placeholders = InsensitiveDict.from_keys(new_template.placeholders)
-
+        self.old_placeholders = (
+            InsensitiveDict.from_keys(old_template.all_placeholders)
+            if hasattr(old_template, "email_files")
+            else InsensitiveDict.from_keys(old_template.placeholders)
+        )
+        self.new_placeholders = (
+            InsensitiveDict.from_keys(new_template.all_placeholders)
+            if hasattr(new_template, "email_files")
+            else InsensitiveDict.from_keys(new_template.placeholders)
+        )
         self.email_files = old_template.email_files if hasattr(old_template, "email_files") else []
 
     @property
