@@ -33,7 +33,9 @@
           "actions": {
             "items": [
               {
-                "href": "#",
+                "href": url_for("main.manage_a_template_email_file", service_id=current_service.id,
+                template_id=template.id,
+                template_email_file_id=item.id),
                 "text": "Manage",
                 "visuallyHiddenText": item.filename,
                 "classes": "govuk-link--no-visited-state"

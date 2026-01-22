@@ -115,6 +115,82 @@ def test_template_email_files_manage_files_page_when_there_are_no_files_to_displ
     )
 
 
+def test_manage_a_template_email_file(
+    service_one,
+    fake_uuid,
+    client_request,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    template_email_files_data = [
+        {
+            "filename": "test_file_1.csv",
+            "id": "e9ecb3f2-8674-4436-b233-d2c16ad135e7",
+            "link_text": None,
+            "retention_period": 90,
+            "validate_users_email": False,
+        },
+        {
+            "filename": "test_file_2.png",
+            "id": "bd3376c2-7b80-4a53-80f0-8de21db25b1a",
+            "link_text": None,
+            "retention_period": 90,
+            "validate_users_email": False,
+        },
+    ]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                email_files=template_email_files_data,
+            )
+        },
+    )
+    page = client_request.get(
+        "main.manage_a_template_email_file",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        template_email_file_id="e9ecb3f2-8674-4436-b233-d2c16ad135e7",
+    )
+
+    assert page.select_one("h1").string.strip() == template_email_files_data[0]["filename"]
+
+    rows = page.select("dl .govuk-summary-list__row:not(.govuk-visually-hidden)")
+    assert [normalize_spaces(row.get_text(separator=" ", strip=True)) for row in rows] == [
+        "Link text None Change",
+        "Available for 90 days after sending Change",
+        "Ask recipient for email address False Change",
+    ]
+
+
+def test_manage_a_template_email_file_raises_404_for_invalid_template_email_file_id(
+    service_one,
+    fake_uuid,
+    client_request,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                email_files=[],
+            )
+        },
+    )
+    client_request.get(
+        "main.manage_a_template_email_file",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        template_email_file_id="e9ecb3f2-8674-4436-b233-d2c16ad135e7",
+        _expected_status=404,
+    )
+
+
 @pytest.mark.parametrize(
     "extra_permissions, template_type, expected_status",
     (
