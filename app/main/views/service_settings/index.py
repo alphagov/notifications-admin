@@ -228,6 +228,8 @@ def service_switch_live(service_id):
 
     if form.validate_on_submit():
         current_service.update_status(live=form.enabled.data)
+        if not current_service.has_email_templates and not bool(current_service.volume_email):
+            current_service.force_permission("email", on=False)
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
@@ -1402,3 +1404,9 @@ def handle_reply_to_email_address_http_error(raised_exception, form):
 
     else:
         raise raised_exception
+
+
+def service_uses_email_notifications(service):
+    email_templates = [template for template in current_service.all_templates if template["template_type"] == "email"]
+    any_expected_email_volumes = bool(current_service.volume_email and current_service.volume_email > 0)
+    return bool(len(email_templates)) or any_expected_email_volumes
