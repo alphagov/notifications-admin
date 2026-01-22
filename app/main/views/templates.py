@@ -740,8 +740,8 @@ def edit_service_template(service_id, template_id, language=None):  # noqa
             template._template | form.new_template_data,
             current_service,
         )
-        template_change = TemplateChange(template, new_template)
-        if template_change.is_breaking_change and not request.form.get("confirm") and current_service.api_keys:
+        template_change = TemplateChange(template, new_template, service_has_api_keys=current_service.api_keys)
+        if template_change.is_breaking_change and not request.form.get("confirm"):
             return render_template(
                 "views/templates/breaking-change.html",
                 template_change=template_change,

@@ -561,6 +561,7 @@ def test_edit_email_template_should_update_unsubscribe(
     client_request,
     platform_admin_user,
     mock_update_service_template,
+    mock_get_no_api_keys,
     post_data,
     expected_unsubscribeable,
     fake_uuid,
@@ -3614,6 +3615,7 @@ def test_removing_placeholders_is_not_a_breaking_change(
     client_request,
     mock_get_service_email_template,
     mock_update_service_template,
+    mock_get_no_api_keys,
     fake_uuid,
 ):
     existing_template = mock_get_service_email_template(0, 0)["data"]
@@ -3659,6 +3661,7 @@ def test_should_not_update_too_big_template(
     client_request,
     mock_get_service_template,
     mock_update_service_template_400_content_too_big,
+    mock_get_no_api_keys,
     fake_uuid,
 ):
     page = client_request.post(
@@ -3681,6 +3684,7 @@ def test_should_not_edit_letter_template_with_too_big_qr_code(
     client_request,
     mock_get_service_template,
     mock_update_service_template_400_qr_code_too_big,
+    mock_get_no_api_keys,
     fake_uuid,
     service_one,
 ):
@@ -3709,6 +3713,7 @@ def test_should_redirect_when_saving_a_template_email(
     client_request,
     mock_get_service_email_template,
     mock_update_service_template,
+    mock_get_no_api_keys,
     fake_uuid,
 ):
     name = "new name"
@@ -3817,6 +3822,7 @@ def test_should_redirect_when_saving_a_template_letter(
     mock_get_service_letter_template,
     mock_get_page_counts_for_letter,
     mock_update_service_template,
+    mock_get_no_api_keys,
     fake_uuid,
     service_one,
 ):
@@ -3887,6 +3893,7 @@ def test_update_template_for_welsh_language_content(
     client_request,
     mock_update_service_template,
     mock_get_page_counts_for_letter,
+    mock_get_no_api_keys,
     fake_uuid,
     service_one,
     language,
@@ -3929,6 +3936,7 @@ def test_update_template_for_english_content_in_welsh_letter(
     client_request,
     mock_update_service_template,
     mock_get_service_letter_template_welsh_language,
+    mock_get_no_api_keys,
     fake_uuid,
     service_one,
     mocker,
