@@ -1404,9 +1404,3 @@ def handle_reply_to_email_address_http_error(raised_exception, form):
 
     else:
         raise raised_exception
-
-
-def service_uses_email_notifications(service):
-    email_templates = [template for template in current_service.all_templates if template["template_type"] == "email"]
-    any_expected_email_volumes = bool(current_service.volume_email and current_service.volume_email > 0)
-    return bool(len(email_templates)) or any_expected_email_volumes
