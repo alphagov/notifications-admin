@@ -36,6 +36,17 @@ class TemplateEmailFile(JSONModel):
             created_by_id=current_user.id,
         )
 
+    @staticmethod
+    def update(template_email_file_id, template_id, data):
+        from app import current_service, template_email_file_client
+
+        return template_email_file_client.update_file(
+            service_id=current_service.id,
+            template_id=template_id,
+            template_email_file_id=template_email_file_id,
+            data=data,
+        )
+
     @property
     def link_as_markdown(self):
         if self.link_text:
