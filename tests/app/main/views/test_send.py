@@ -1054,7 +1054,7 @@ def test_upload_csv_file_limits_number_of_columns_displayed_when_error(
         "app.main.views.send.s3download",
         return_value=(
             f"""
-            {"phone number," * 10_000}
+            {"phone number," * 678}
             +447700900111
             +447700900222
             """
