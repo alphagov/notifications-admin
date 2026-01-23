@@ -1275,3 +1275,46 @@ def test_TemplateChange_ordering_of_placeholders_is_preserved():
     change = TemplateChange(before, after)
     assert change.placeholders_removed == ["dog", "cat", "rat"] == before.placeholders
     assert change.placeholders_added == ["platypus", "echidna", "quokka"] == after.placeholders
+
+
+@pytest.mark.parametrize(
+    "content, email_files, subject, expected_all_placeholders, expected_placeholders",
+    [
+        (
+            "((one)) ((example.pdf)) ((two)) ((three))",
+            [
+                {
+                    "id": "123",
+                    "filename": "example.pdf",
+                    "link_text": None,
+                    "retention_period": 90,
+                    "validate_users_email": False,
+                },
+            ],
+            "Your ((thing)) is due soon",
+            OrderedSet(["thing", "one", "example.pdf", "two", "three"]),
+            OrderedSet(["thing", "one", "two", "three"]),
+        ),
+        (
+            "((one)) ((two)) ((three))",
+            [],
+            "Your ((thing)) is due soon",
+            OrderedSet(["thing", "one", "two", "three"]),
+            OrderedSet(["thing", "one", "two", "three"]),
+        ),
+    ],
+)
+def test_template_placeholders_attribute_is_correctly_ordered_set_for_email_templates(
+    client_request, fake_uuid, mocker, content, email_files, subject, expected_all_placeholders, expected_placeholders
+):
+    template = EmailPreviewTemplate(
+        {
+            "content": content,
+            "subject": subject,
+            "template_type": "email",
+            "email_files": email_files,
+        },
+    )
+
+    assert template.all_placeholders == expected_all_placeholders
+    assert template.placeholders == expected_placeholders

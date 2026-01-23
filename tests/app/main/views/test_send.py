@@ -1508,22 +1508,66 @@ def test_send_one_off_has_correct_page_title(
 
 
 @pytest.mark.parametrize(
-    "step_index, prefilled, expected_field_label",
+    "notification_type, step_index, prefilled, expected_field_label, template_email_files, content",
     [
         (
+            "sms",
             0,
             {},
             "phone number",
+            None,
+            "((one)) ((two)) ((three))",
         ),
         (
+            "sms",
             1,
             {"phone number": "07900900123"},
             "one",
+            None,
+            "((one)) ((two)) ((three))",
         ),
         (
+            "sms",
             2,
             {"phone number": "07900900123", "one": "one"},
             "two",
+            None,
+            "((one)) ((two)) ((three))",
+        ),
+        (
+            "email",
+            0,
+            {},
+            "email address",
+            [],
+            "((one)) ((two)) ((three))",
+        ),
+        (
+            "email",
+            1,
+            {"email address": "notify@digital.cabinet-office.gov.uk"},
+            "one",
+            [],
+            "((one)) ((two)) ((three))",
+        ),
+        (
+            "email",
+            2,
+            {"email address": "notify@digital.cabinet-office.gov.uk", "one": "one"},
+            "two",
+            [],
+            "((one)) ((two)) ((three))",
+        ),
+        (
+            "email",
+            2,
+            {"email address": "notify@digital.cabinet-office.gov.uk", "one": "one"},
+            "two",
+            [
+                {"filename": "example.pdf", "retention_period": 26, "id": "123"},
+                {"filename": "picture.png", "retention_period": 90, "id": "456"},
+            ],
+            "((one)) ((example.pdf)) ((two)) ((picture.png))",
         ),
     ],
 )
@@ -1532,12 +1576,44 @@ def test_send_one_off_shows_placeholders_in_correct_order(
     fake_uuid,
     mock_has_no_jobs,
     mock_get_no_contact_lists,
-    mock_get_service_template_with_multiple_placeholders,
+    mocker,
     multiple_sms_senders,
+    multiple_reply_to_email_addresses,
+    notification_type,
     step_index,
     prefilled,
     expected_field_label,
+    template_email_files,
+    content,
 ):
+    if notification_type == "sms":
+
+        def _get(service_id, template_id, version=None):
+            template = template_json(
+                service_id=service_id,
+                id_=template_id,
+                name="Two week reminder",
+                type_="sms",
+                content=content,
+            )
+            return {"data": template}
+
+    if notification_type == "email":
+
+        def _get(service_id, template_id, version=None):
+            template = template_json(
+                service_id=service_id,
+                id_=template_id,
+                name="Two week reminder",
+                type_="email",
+                content=content,
+                subject="Your thing is due soon",
+                redact_personalisation=False,
+                email_files=template_email_files,
+            )
+            return {"data": template}
+
+    mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
     with client_request.session_transaction() as session:
         session["recipient"] = None
         session["placeholders"] = prefilled
