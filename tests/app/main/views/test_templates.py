@@ -4697,24 +4697,27 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
         (
             ["send_files_via_ui"],
             "email",
-            ["example.pdf"],
-            "Manage files",
-            "main.template_email_files",
+            [{"filename": "example.pdf", "retention_period": 26, "id": "123"}],
+            "Attach files",
+            "main.upload_template_email_files",
             "1 file added",
         ),
         (
             ["send_files_via_ui"],
             "email",
-            ["example.pdf", "picture.png"],
-            "Manage files",
-            "main.template_email_files",
+            [
+                {"filename": "example.pdf", "retention_period": 26, "id": "123"},
+                {"filename": "picture.png", "retention_period": 90, "id": "456"},
+            ],
+            "Attach files",
+            "main.upload_template_email_files",
             "2 files added",
         ),
         (["send_files_via_ui"], "sms", None, None, None, None),
         (["send_files_via_ui"], "letter", None, "Attach pages", "main.letter_template_attach_pages", None),
     ),
 )
-def test_button_for_attaching_files(
+def test_attach_files_button(
     client_request,
     service_one,
     mock_get_template_folders,
@@ -4759,3 +4762,87 @@ def test_button_for_attaching_files(
         assert normalize_spaces(hint.text) == expected_hint
     else:
         assert hint is None
+
+
+@pytest.mark.parametrize(
+    "raw_content, email_files, view_template_content, rendered_links",
+    [
+        (
+            "For the appointment, you will need: ((invite.pdf)), ((form.pdf))",
+            [
+                {
+                    "id": "123",
+                    "filename": "invite.pdf",
+                    "link_text": None,
+                    "retention_period": 90,
+                    "validate_users_email": False,
+                },
+                {
+                    "id": "456",
+                    "filename": "form.pdf",
+                    "link_text": "This is a link",
+                    "retention_period": 90,
+                    "validate_users_email": False,
+                },
+            ],
+            "For the appointment, you will need: invite.pdf, This is a link",
+            [
+                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">invite.pdf</a>',
+                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">This is a link</a>',
+            ],
+        ),
+        (
+            "This template only contains normal placeholders. The current date is: ((current_date))",
+            None,
+            "This template only contains normal placeholders. The current date is: ((current_date))",
+            [],
+        ),
+        (
+            "This template contains a mixture of normal placeholders, and file placeholders: ((current_date)), ((invite.pdf)), ((form.pdf))",  # noqa: E501
+            [
+                {
+                    "id": "123",
+                    "filename": "invite.pdf",
+                    "link_text": None,
+                    "retention_period": 90,
+                    "validate_users_email": False,
+                },
+                {
+                    "id": "456",
+                    "filename": "form.pdf",
+                    "link_text": "This is a link",
+                    "retention_period": 90,
+                    "validate_users_email": False,
+                },
+            ],
+            "This template contains a mixture of normal placeholders, and file placeholders: ((current_date)), invite.pdf, This is a link",  # noqa: E501
+            [
+                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">invite.pdf</a>',
+                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">This is a link</a>',
+            ],
+        ),
+    ],
+)
+def test_template_email_file_with_linktext_renders_markdown_link(
+    client_request, fake_uuid, mocker, raw_content, email_files, view_template_content, rendered_links
+):
+    # mock out template with email files
+    email_template = create_template(
+        template_id=fake_uuid,
+        template_type="email",
+        subject="Your ((thing)) is due soon",
+        content=raw_content,
+        email_files=email_files,
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+
+    page = client_request.get(
+        ".view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _test_page_title=False,
+    )
+    email_body = page.select_one(".email-message-body")
+    assert normalize_spaces(email_body) == view_template_content
+    for rendered_link in rendered_links:
+        assert rendered_link in str(email_body)
