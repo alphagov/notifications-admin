@@ -46,9 +46,9 @@
           "actions": {
             "items": [
               {
-                "href": "#",
+                "href": url_for("main.change_data_retention_period", service_id=current_service.id,
+                template_id=template_id,template_email_file_id=template_email_file_id),
                 "text": "Change",
-                "classes": "govuk-link--no-visited-state"
               }
             ]
           }

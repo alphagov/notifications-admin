@@ -239,6 +239,34 @@ def test_change_link_text_page_posts_the_right_data(
     assert mock_post.call_args_list == [call(expected_url, data=update_data,)]
 
 
+def test_change_retention_period_page(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                email_files=template_email_files_data,
+            )
+        },
+    )
+    page = client_request.get(
+        "main.change_data_retention_period",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        template_email_file_id=template_email_files_data[0]["id"],
+    )
+    assert page.select_one("h1").string.strip() == "How long should the file be available for"
+    assert page.select_one("label").string.strip() == "Number of weeks available to recipients"
+    assert page.select_one("button[type=submit]").string.strip() == "Continue"
+
+
 @pytest.mark.parametrize(
     "extra_permissions, template_type, expected_status",
     (

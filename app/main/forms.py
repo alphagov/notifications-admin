@@ -3228,3 +3228,15 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
 
 class TemplateEmailFileLinkTextForm(StripWhitespaceForm):
     link_text = GovukTextInputField("Link text (optional)")
+
+
+class TemplateEmailFileRetentionPeriodForm(StripWhitespaceForm):
+    retention_period = GovukIntegerField(
+        label="Number of weeks available to recipients",
+        things="the number of weeks",
+        validators=[
+            NotifyDataRequired(thing="a number of weeks"),
+            validators.NumberRange(min=1, max=90, message="The number of weeks must be between 1 and 90"),
+        ],
+        param_extensions={"hint": {"text": "Must be between 1 and 90 weeks"}},
+    )
