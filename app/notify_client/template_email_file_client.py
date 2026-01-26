@@ -37,8 +37,8 @@ class TemplateEmailFileClient(NotifyAdminAPIClient):
         data,
     ):
         return self.post(
-            f"/service/{service_id}/templates/{template_id}/template_email_files/{template_email_file_id}",
-            data=data)
+            f"/service/{service_id}/templates/{template_id}/template_email_files/{template_email_file_id}", data=data
+        )
 
 
 _template_email_file_api_client_context_var: ContextVar[TemplateEmailFileClient] = ContextVar(

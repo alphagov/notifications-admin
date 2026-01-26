@@ -1,3 +1,4 @@
+import copy
 from unittest.mock import ANY, Mock, call
 
 import pytest
@@ -11,6 +12,23 @@ from tests.conftest import (
     normalize_spaces,
 )
 
+template_email_files_data = [
+    {
+        "filename": "test_file_1.csv",
+        "id": "e9ecb3f2-8674-4436-b233-d2c16ad135e7",
+        "link_text": None,
+        "retention_period": 90,
+        "validate_users_email": False,
+    },
+    {
+        "filename": "test_file_2.png",
+        "id": "bd3376c2-7b80-4a53-80f0-8de21db25b1a",
+        "link_text": None,
+        "retention_period": 90,
+        "validate_users_email": False,
+    },
+]
+
 
 def test_template_email_files_manage_files_page_displays_the_right_files(
     client_request,
@@ -19,29 +37,13 @@ def test_template_email_files_manage_files_page_displays_the_right_files(
     mocker,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
-    data = [
-        {
-            "filename": "test_file_1.csv",
-            "id": "e9ecb3f2-8674-4436-b233-d2c16ad135e7",
-            "link_text": None,
-            "retention_period": 90,
-            "validate_users_email": False,
-        },
-        {
-            "filename": "test_file_2.png",
-            "id": "bd3376c2-7b80-4a53-80f0-8de21db25b1a",
-            "link_text": None,
-            "retention_period": 90,
-            "validate_users_email": False,
-        },
-    ]
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={
             "data": create_template(
                 template_id=fake_uuid,
                 template_type="email",
-                email_files=data,
+                email_files=template_email_files_data,
             )
         },
     )
@@ -53,8 +55,8 @@ def test_template_email_files_manage_files_page_displays_the_right_files(
 
     assert page.select_one("h1").string.strip() == "Manage files"
     assert [normalize_spaces(row.text) for row in page.select("dt")] == [
-        f"{data[0]['filename']}",
-        f"{data[1]['filename']}",
+        f"{template_email_files_data[0]['filename']}",
+        f"{template_email_files_data[1]['filename']}",
     ]
 
     assert (
@@ -122,22 +124,7 @@ def test_manage_a_template_email_file(
     mocker,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
-    template_email_files_data = [
-        {
-            "filename": "test_file_1.csv",
-            "id": "e9ecb3f2-8674-4436-b233-d2c16ad135e7",
-            "link_text": None,
-            "retention_period": 90,
-            "validate_users_email": False,
-        },
-        {
-            "filename": "test_file_2.png",
-            "id": "bd3376c2-7b80-4a53-80f0-8de21db25b1a",
-            "link_text": None,
-            "retention_period": 90,
-            "validate_users_email": False,
-        },
-    ]
+
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={
@@ -160,7 +147,7 @@ def test_manage_a_template_email_file(
     rows = page.select("dl .govuk-summary-list__row:not(.govuk-visually-hidden)")
     assert [normalize_spaces(row.get_text(separator=" ", strip=True)) for row in rows] == [
         "Link text None Change",
-        "Available for 90 days after sending Change",
+        "Available for 90 weeks after sending Change",
         "Ask recipient for email address False Change",
     ]
 
@@ -189,6 +176,67 @@ def test_manage_a_template_email_file_raises_404_for_invalid_template_email_file
         template_email_file_id="e9ecb3f2-8674-4436-b233-d2c16ad135e7",
         _expected_status=404,
     )
+
+
+def test_change_link_text_page(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                email_files=template_email_files_data,
+            )
+        },
+    )
+    page = client_request.get(
+        "main.change_link_text",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        template_email_file_id=template_email_files_data[0]["id"],
+    )
+    assert page.select_one("h1").string.strip() == "Link text"
+    assert page.select_one("label").string.strip() == "Link text (optional)"
+    assert page.select_one("button[type=submit]").string.strip() == "Continue"
+
+
+def test_change_link_text_page_posts_the_right_data(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                email_files=template_email_files_data,
+            )
+        },
+    )
+    mock_post = mocker.patch("app.template_email_file_client.post")
+    update_data = copy.copy(template_email_files_data[0])
+    update_data["link_text"] = "new link text"
+    client_request.post(
+        "main.change_link_text",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        template_email_file_id=template_email_files_data[0]["id"],
+        _data=update_data,
+        _expected_status=302,
+    )
+    expected_url = \
+        f"/service/{SERVICE_ONE_ID}/templates/{fake_uuid}/template_email_files/{template_email_files_data[0]['id']}"
+    assert mock_post.call_args_list == [call(expected_url, data=update_data,)]
 
 
 @pytest.mark.parametrize(

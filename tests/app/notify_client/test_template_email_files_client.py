@@ -49,16 +49,19 @@ def test_update_file_calls_endpoint_with_correct_data(mocker):
     template_email_file_id = str(uuid.uuid4())
     mock_post = mocker.patch("app.notify_client.template_email_file_client.TemplateEmailFileClient.update_file")
     client = TemplateEmailFileClient(mocker.MagicMock())
-    client.update_file(service_id=service_id, template_id=template_id, template_email_file_id=template_email_file_id,
-                       data=update_data)
+    client.update_file(
+        service_id=service_id, template_id=template_id, template_email_file_id=template_email_file_id, data=update_data
+    )
     assert mock_post.call_args_list == [
-        call(service_id=service_id,
-             template_id=template_id,
-             template_email_file_id=template_email_file_id,
-             data={
-                 'filename': 'new_example.pdf',
-                 'link_text': 'click this new link!',
-                 'retention_period': 30,
-                 'validate_users_email': False}
-             )
+        call(
+            service_id=service_id,
+            template_id=template_id,
+            template_email_file_id=template_email_file_id,
+            data={
+                "filename": "new_example.pdf",
+                "link_text": "click this new link!",
+                "retention_period": 30,
+                "validate_users_email": False,
+            },
+        )
     ]

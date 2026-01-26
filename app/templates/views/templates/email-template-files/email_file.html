@@ -1,0 +1,81 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+
+{%  set title = email_file_data.filename %}
+{% block service_page_title %}
+   {{ title }}
+{% endblock %}
+
+{% block backLink %}
+  {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template_id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+    {{ page_header(title) }}
+
+    {%  set file_data = [
+            {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Link text"
+          },
+          "value": {
+            "text": email_file_data.link_text or "None"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": url_for("main.change_link_text", service_id=current_service.id,
+                template_id=template_id,
+                template_email_file_id=template_email_file_id),
+                "text": "Change",
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Available for"
+          },
+          "value": {
+            "text": email_file_data.retention_period | string + " weeks after sending"
+          },
+          "actions": {
+            "items": [
+              {
+                "href": "#",
+                "text": "Change",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          }
+        },
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+            "text": "Ask recipient for email address"
+          },
+          "value": {
+            "text": email_file_data.validate_users_email
+          },
+          "actions": {
+            "items": [
+              {
+                "href": "#",
+                "text": "Change",
+                "classes": "govuk-link--no-visited-state"
+              }
+            ]
+          },
+        }
+         ]%}
+
+    {{ govukSummaryList({
+      "classes": "notify-summary-list",
+      "rows": file_data
+         })
+    }}
+{% endblock %}

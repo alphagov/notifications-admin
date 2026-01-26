@@ -3224,3 +3224,7 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
 
         if field.data.filename in self.existing_file_names:
             raise ValidationError(f"Your template already has a file called ‘{field.data.filename}’")
+
+
+class TemplateEmailFileLinkTextForm(StripWhitespaceForm):
+    link_text = GovukTextInputField("Link text (optional)")
