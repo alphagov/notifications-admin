@@ -1115,8 +1115,16 @@ def test_email_preview_template_doesnt_error_on_empty_subject(
         (ConcreteTemplate({"content": "((a)) ((b))"}), ConcreteTemplate({"content": "((A)) (( B_ ))"}), False),
     ],
 )
-def test_checking_for_difference_between_templates(old_template, new_template, should_differ):
-    assert TemplateChange(old_template, new_template).has_different_placeholders == should_differ
+@pytest.mark.parametrize("service_has_api_keys", (True, False))
+def test_checking_for_difference_between_templates(old_template, new_template, service_has_api_keys, should_differ):
+    assert (
+        TemplateChange(
+            old_template,
+            new_template,
+            service_has_api_keys=service_has_api_keys,
+        ).has_different_placeholders
+        is should_differ
+    )
 
 
 @pytest.mark.parametrize(
@@ -1140,9 +1148,29 @@ def test_checking_for_difference_between_templates(old_template, new_template, s
     ],
 )
 def test_TemplateChange_placeholders_added(old_template, new_template, placeholders_added, is_breaking_change):
-    template_change = TemplateChange(old_template, new_template)
+    template_change = TemplateChange(old_template, new_template, service_has_api_keys=True)
     assert template_change.placeholders_added == placeholders_added
     assert template_change.is_breaking_change is is_breaking_change
+
+
+@pytest.mark.parametrize(
+    "service_has_api_keys, is_breaking_change",
+    (
+        (True, True),
+        (False, False),
+    ),
+)
+def test_TemplateChange_placeholders_added_not_breaking_change_without_api_keys(
+    service_has_api_keys, is_breaking_change
+):
+    assert (
+        TemplateChange(
+            ConcreteTemplate({"content": "((1))"}),
+            ConcreteTemplate({"content": "((1)) ((2)) ((3))"}),
+            service_has_api_keys=service_has_api_keys,
+        ).is_breaking_change
+        is is_breaking_change
+    )
 
 
 @pytest.mark.parametrize(
@@ -1159,8 +1187,16 @@ def test_TemplateChange_placeholders_added(old_template, new_template, placehold
         (ConcreteTemplate({"content": "((a)) ((b)) ((c))"}), ConcreteTemplate({"content": "((A))"}), {"b", "c"}),
     ],
 )
-def test_TemplateChange_placeholders_removed(old_template, new_template, placeholders_removed):
-    assert TemplateChange(old_template, new_template).placeholders_removed == placeholders_removed
+@pytest.mark.parametrize("service_has_api_keys", (True, False))
+def test_TemplateChange_placeholders_removed(old_template, new_template, placeholders_removed, service_has_api_keys):
+    assert (
+        TemplateChange(
+            old_template,
+            new_template,
+            service_has_api_keys=service_has_api_keys,
+        ).placeholders_removed
+        == placeholders_removed
+    )
 
 
 @pytest.mark.parametrize(
@@ -1237,13 +1273,17 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
         ),
     ],
 )
-def test_TemplateChange_email_files_removed(old_template, new_template, email_files_removed, is_breaking_change):
-    template_change = TemplateChange(old_template, new_template)
+@pytest.mark.parametrize("service_has_api_keys", (True, False))
+def test_TemplateChange_email_files_removed(
+    old_template, new_template, email_files_removed, service_has_api_keys, is_breaking_change
+):
+    template_change = TemplateChange(old_template, new_template, service_has_api_keys=service_has_api_keys)
     assert template_change.email_filenames_removed == email_files_removed
     assert template_change.is_breaking_change is is_breaking_change
 
 
-def test_TemplateChange_email_files_and_placeholders_removed():
+@pytest.mark.parametrize("service_has_api_keys", (True, False))
+def test_TemplateChange_email_files_and_placeholders_removed(service_has_api_keys):
     email_file_data = {"filename": "2.pdf", "retention_period": 26, "id": "123"}
     old_template = EmailPreviewTemplate(
         {
@@ -1261,7 +1301,7 @@ def test_TemplateChange_email_files_and_placeholders_removed():
             "email_files": [email_file_data],
         }
     )
-    template_change = TemplateChange(old_template, new_template)
+    template_change = TemplateChange(old_template, new_template, service_has_api_keys=service_has_api_keys)
     assert template_change.email_files_removed == {TemplateEmailFile(email_file_data)}
     assert template_change.email_filenames_removed == {"2.pdf"}
     assert template_change.is_breaking_change is True
@@ -1272,7 +1312,7 @@ def test_TemplateChange_email_files_and_placeholders_removed():
 def test_TemplateChange_ordering_of_placeholders_is_preserved():
     before = ConcreteTemplate({"content": "((dog)) ((cat)) ((rat))"})
     after = ConcreteTemplate({"content": "((platypus)) ((echidna)) ((quokka))"})
-    change = TemplateChange(before, after)
+    change = TemplateChange(before, after, service_has_api_keys=True)
     assert change.placeholders_removed == ["dog", "cat", "rat"] == before.placeholders
     assert change.placeholders_added == ["platypus", "echidna", "quokka"] == after.placeholders
 

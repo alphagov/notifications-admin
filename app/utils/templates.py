@@ -380,7 +380,7 @@ def get_template(
 
 
 class TemplateChange:
-    def __init__(self, old_template, new_template):
+    def __init__(self, old_template, new_template, *, service_has_api_keys):
         self.old_placeholders = (
             InsensitiveDict.from_keys(old_template.all_placeholders)
             if hasattr(old_template, "email_files")
@@ -392,6 +392,7 @@ class TemplateChange:
             else InsensitiveDict.from_keys(new_template.placeholders)
         )
         self.email_files = old_template.email_files if hasattr(old_template, "email_files") else []
+        self.service_has_api_keys = service_has_api_keys
 
     @property
     def has_different_placeholders(self):
@@ -425,4 +426,6 @@ class TemplateChange:
 
     @property
     def is_breaking_change(self):
-        return bool(self.placeholders_added or self.email_files_removed)
+        if self.email_files_removed:
+            return True
+        return bool(self.placeholders_added and self.service_has_api_keys)
