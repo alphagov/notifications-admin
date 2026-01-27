@@ -36,20 +36,16 @@ class TemplateEmailFile(JSONModel):
             created_by_id=current_user.id,
         )
 
+    @property
+    def link_as_markdown(self):
+        if self.link_text:
+            return f"[{self.link_text}](https://example.com/)"
+        return "https://example.com/"
+
 
 class TemplateEmailFiles(SerialisedModelCollection):
     model = TemplateEmailFile
 
     @property
     def as_personalisation(self):
-        personalisation = {}
-        for template_email_file in self:
-            if hasattr(template_email_file, "link_text") and template_email_file.link_text is not None:
-                personalisation[template_email_file.filename] = (
-                    f"[{template_email_file.link_text}](https://example.com/)"
-                )
-            else:
-                personalisation[template_email_file.filename] = (
-                    f"[{template_email_file.filename}](https://example.com/)"
-                )
-        return personalisation
+        return {template_email_file.filename: template_email_file.link_as_markdown for template_email_file in self}

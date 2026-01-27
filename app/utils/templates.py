@@ -282,9 +282,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     @property
     def email_files(self):
-        if hasattr(self, "_template") and self._template.get("email_files"):
-            return TemplateEmailFiles(self._template["email_files"])
-        return []
+        return TemplateEmailFiles(self._template.get("email_files", []))
 
     @property
     def values(self):
@@ -302,9 +300,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     @property
     def filenames(self):
-        if self.email_files:
-            return InsensitiveSet(self.email_files.as_personalisation.keys())
-        return InsensitiveSet({})
+        return InsensitiveSet(self.email_files.as_personalisation.keys())
 
     @property
     def all_placeholders(self):
@@ -381,17 +377,13 @@ def get_template(
 
 class TemplateChange:
     def __init__(self, old_template, new_template, *, service_has_api_keys):
-        self.old_placeholders = (
-            InsensitiveDict.from_keys(old_template.all_placeholders)
-            if hasattr(old_template, "email_files")
-            else InsensitiveDict.from_keys(old_template.placeholders)
+        self.old_placeholders = InsensitiveDict.from_keys(
+            getattr(old_template, "all_placeholders", old_template.placeholders)
         )
-        self.new_placeholders = (
-            InsensitiveDict.from_keys(new_template.all_placeholders)
-            if hasattr(new_template, "email_files")
-            else InsensitiveDict.from_keys(new_template.placeholders)
+        self.new_placeholders = InsensitiveDict.from_keys(
+            getattr(new_template, "all_placeholders", new_template.placeholders)
         )
-        self.email_files = old_template.email_files if hasattr(old_template, "email_files") else []
+        self.email_files = getattr(old_template, "email_files", [])
         self.service_has_api_keys = service_has_api_keys
 
     @property

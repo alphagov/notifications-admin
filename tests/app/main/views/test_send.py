@@ -1564,8 +1564,8 @@ def test_send_one_off_has_correct_page_title(
             {"email address": "notify@digital.cabinet-office.gov.uk", "one": "one"},
             "two",
             [
-                {"filename": "example.pdf", "retention_period": 26, "id": "123"},
-                {"filename": "picture.png", "retention_period": 90, "id": "456"},
+                {"filename": "example.pdf", "retention_period": 26, "id": "123", "link_text": None},
+                {"filename": "picture.png", "retention_period": 90, "id": "456", "link_text": None},
             ],
             "((one)) ((example.pdf)) ((two)) ((picture.png))",
         ),

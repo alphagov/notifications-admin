@@ -4728,7 +4728,7 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
         (
             ["send_files_via_ui"],
             "email",
-            [{"filename": "example.pdf", "retention_period": 26, "id": "123"}],
+            [{"filename": "example.pdf", "retention_period": 26, "id": "123", "link_text": None}],
             "Manage files",
             "main.template_email_files",
             "1 file added",
@@ -4737,8 +4737,8 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
             ["send_files_via_ui"],
             "email",
             [
-                {"filename": "example.pdf", "retention_period": 26, "id": "123"},
-                {"filename": "picture.png", "retention_period": 90, "id": "456"},
+                {"filename": "example.pdf", "retention_period": 26, "id": "123", "link_text": None},
+                {"filename": "picture.png", "retention_period": 90, "id": "456", "link_text": None},
             ],
             "Manage files",
             "main.template_email_files",
@@ -4816,9 +4816,9 @@ def test_attach_files_button(
                     "validate_users_email": False,
                 },
             ],
-            "For the appointment, you will need: invite.pdf, This is a link",
+            "For the appointment, you will need: https://example.com/, This is a link",
             [
-                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">invite.pdf</a>',
+                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">https://example.com/</a>',
                 '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">This is a link</a>',
             ],
         ),
@@ -4846,9 +4846,9 @@ def test_attach_files_button(
                     "validate_users_email": False,
                 },
             ],
-            "This template contains a mixture of normal placeholders, and file placeholders: ((current_date)), invite.pdf, This is a link",  # noqa: E501
+            "This template contains a mixture of normal placeholders, and file placeholders: ((current_date)), https://example.com/, This is a link",  # noqa: E501
             [
-                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">invite.pdf</a>',
+                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">https://example.com/</a>',
                 '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">This is a link</a>',
             ],
         ),
