@@ -356,6 +356,8 @@ def make_nonce_before_request():
 def useful_headers_after_request(response):
     response.headers.add("X-Content-Type-Options", "nosniff")
     response.headers.add("X-XSS-Protection", "1; mode=block")
+    response.headers.add("X-Frame-Options", "SAMEORIGIN")
+    response.headers.add("X-Permitted-Cross-Domain-Policies", "none")
     response.headers.add(
         "Content-Security-Policy",
         (
@@ -388,7 +390,7 @@ def useful_headers_after_request(response):
     response.headers.add("Cache-Control", "no-store, no-cache, private, must-revalidate")
     for key, value in response.headers:
         response.headers[key] = SanitiseASCII.encode(value)
-    response.headers.add("Strict-Transport-Security", "max-age=31536000; preload")
+    response.headers.add("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
     response.headers.add("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.add(
         "Cross-Origin-Embedder-Policy",
