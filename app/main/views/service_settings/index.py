@@ -228,6 +228,8 @@ def service_switch_live(service_id):
 
     if form.validate_on_submit():
         current_service.update_status(live=form.enabled.data)
+        if not current_service.has_email_templates and not bool(current_service.volume_email):
+            current_service.force_permission("email", on=False)
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(

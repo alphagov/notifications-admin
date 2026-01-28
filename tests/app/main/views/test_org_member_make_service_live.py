@@ -4,10 +4,12 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
+import app
 from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from tests.conftest import (
     ORGANISATION_ID,
     SERVICE_ONE_ID,
+    _template,
     create_user,
     normalize_spaces,
     sample_uuid,
@@ -653,6 +655,14 @@ def test_post_org_member_make_service_live_decision(
 ):
     service_one["has_active_go_live_request"] = True
     service_one["organisation"] = ORGANISATION_ID
+    service_one["permissions"] = ["sms", "email", "letter"]
+    service_one["volume_email"] = 2000
+
+    templates = [
+        _template(template_type, f"Template {index}") for index, template_type in enumerate(["sms", "email", "letter"])
+    ]
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": templates})
+
     mock_notify = mocker.patch("app.organisations_client.notify_service_member_of_rejected_go_live_request")
 
     client_request.login(platform_admin_user)
@@ -665,7 +675,7 @@ def test_post_org_member_make_service_live_decision(
         _expected_redirect=url_for("main.organisation_dashboard", org_id=ORGANISATION_ID),
     )
 
-    mock_update_service.assert_called_once_with(
+    mock_update_service.assert_any_call(  # update_service can be called more than once if emails aren't used
         SERVICE_ONE_ID,
         **expected_arguments_to_update_service,
     )
@@ -682,3 +692,95 @@ def test_post_org_member_make_service_live_decision(
                 organisation_team_member_email="platform@admin.gov.uk",
             )
         ]
+
+
+@pytest.mark.parametrize(
+    "query_args, post_data, email_volume, template_types, expect_email_to_be_turned_off",
+    (
+        (
+            {"name": "ok", "unique": "yes"},
+            {"enabled": True},
+            2000,
+            ["email", "email", "sms", "letter"],
+            False,
+        ),
+        (
+            {"name": "ok", "unique": "yes"},
+            {"enabled": True},
+            2000,
+            ["sms", "letter"],
+            False,
+        ),
+        (
+            {"name": "ok", "unique": "yes"},
+            {"enabled": True},
+            0,
+            ["email", "email", "sms", "letter"],
+            False,
+        ),
+        (
+            {"name": "ok", "unique": "yes"},
+            {"enabled": True},
+            0,
+            ["sms", "letter"],
+            True,
+        ),
+        (
+            {"name": "ok", "unique": "yes"},
+            {"enabled": True},
+            None,
+            ["email", "email", "sms", "letter"],
+            False,
+        ),
+        (
+            {"name": "ok", "unique": "yes"},
+            {"enabled": True},
+            None,
+            ["sms", "letter"],
+            True,
+        ),
+    ),
+)
+@freeze_time("2022-12-22 12:12:12")
+def test_post_org_member_make_service_live_turns_email_off_if_no_expected_volumes_and_no_email_templates(
+    client_request,
+    platform_admin_user,
+    service_one,
+    mock_get_organisation,
+    mock_update_service,
+    query_args,
+    post_data,
+    email_volume,
+    template_types,
+    expect_email_to_be_turned_off,
+    mocker,
+):
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["permissions"] = ["sms", "email", "letter"]
+    service_one["volume_email"] = email_volume
+
+    templates = [_template(template_type, f"Template {index}") for index, template_type in enumerate(template_types)]
+
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": templates})
+    mocker.patch("app.organisations_client.notify_service_member_of_rejected_go_live_request")
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        "main.org_member_make_service_live_decision",
+        service_id=SERVICE_ONE_ID,
+        **query_args,
+        _data=post_data,
+        _expected_redirect=url_for("main.organisation_dashboard", org_id=ORGANISATION_ID),
+    )
+
+    # update_service should always be called to make the service live
+    # if emails aren't being used it's called again, to remove the 'emails' service permission
+    update_service_kwargs = app.service_api_client.update_service.call_args.kwargs
+    if expect_email_to_be_turned_off:
+        assert app.service_api_client.update_service.call_count == 2
+        assert "permissions" in update_service_kwargs and set(update_service_kwargs["permissions"]) == {"sms", "letter"}
+    else:
+        assert app.service_api_client.update_service.call_count == 1
+        assert "permissions" not in update_service_kwargs

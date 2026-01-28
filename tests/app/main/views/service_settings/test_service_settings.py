@@ -27,6 +27,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     TEMPLATE_ONE_ID,
     USER_ONE_ID,
+    _template,
     create_active_user_no_settings_permission,
     create_active_user_with_permissions,
     create_letter_contact_block,
@@ -657,6 +658,11 @@ def test_switch_service_to_live(
         "app.organisations_client.get_organisation",
         return_value=organisation_json(agreement_signed=agreement_signed),
     )
+    mix_of_all_template_types = [
+        _template(template_type, f"Template {index}")
+        for index, template_type in enumerate(["email", "email", "sms", "letter"])
+    ]
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": mix_of_all_template_types})
     client_request.login(platform_admin_user)
     client_request.post(
         "main.service_switch_live",
@@ -728,6 +734,58 @@ def test_switch_archived_service_to_live(
     )
 
 
+@pytest.mark.parametrize(
+    "email_volume, template_types, expect_emails_to_be_turned_off",
+    (
+        (20000, ["email", "email", "sms", "letter"], False),
+        (None, ["email", "email", "sms", "letter"], False),
+        (None, ["sms", "sms", "sms"], True),
+        (0, ["email", "email", "sms", "letter"], False),
+        (0, ["letter"], True),
+    ),
+)
+def test_switch_service_to_live_turns_email_off_if_no_expected_volumes_and_no_email_templates(
+    client_request,
+    service_one,
+    platform_admin_user,
+    mock_get_service_organisation,
+    mocker,
+    email_volume,
+    template_types,
+    expect_emails_to_be_turned_off,
+):
+    service_one["permissions"] = ["sms", "email", "letter"]
+    service_one["volume_email"] = email_volume
+    templates = [_template(template_type, f"Template {index}") for index, template_type in enumerate(template_types)]
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": templates})
+    mocker.patch("app.service_api_client.update_service")
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(agreement_signed=True),
+    )
+    client_request.login(platform_admin_user)
+    client_request.post(
+        "main.service_switch_live",
+        service_id=SERVICE_ONE_ID,
+        _data={"enabled": "True"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.service_settings",
+            service_id=SERVICE_ONE_ID,
+        ),
+    )
+
+    # update_service should always be called to make the service live
+    # if emails aren't being used it's called again, to remove the 'emails' service permission
+    update_service_kwargs = app.service_api_client.update_service.call_args.kwargs
+    if expect_emails_to_be_turned_off:
+        assert app.service_api_client.update_service.call_count == 2
+        assert "permissions" in update_service_kwargs and set(update_service_kwargs["permissions"]) == {"sms", "letter"}
+    else:
+        assert app.service_api_client.update_service.call_count == 1
+        assert "permissions" not in update_service_kwargs
+
+
 def test_show_live_service(
     client_request,
     mock_get_live_service,
@@ -750,7 +808,13 @@ def test_switch_service_to_restricted(
     mock_get_live_service,
     mock_update_service,
     mock_get_inbound_number_for_service,
+    mocker,
 ):
+    mix_of_all_template_types = [
+        _template(template_type, f"Template {index}")
+        for index, template_type in enumerate(["email", "email", "sms", "letter"])
+    ]
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": mix_of_all_template_types})
     client_request.login(platform_admin_user)
     client_request.post(
         "main.service_switch_live",
