@@ -3,6 +3,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/task-list/macro.html" import govukTaskList %}
 
 {% block service_page_title %}
   Send emails
@@ -14,16 +15,52 @@
 
 {% block maincolumn_content %}
 
+  {# as options objects are different for completed vs incomplete #}
+  {# we set them here to reuse them later #}
+  {% set completed_status = {"text": "Completed"} %}
+  {% set incomplete_status = {"tag": {"text": "Incomplete"}} %}
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       {{ page_header('Send emails') }}
-      <p class="govuk-body">
-        It’s free to send emails through GOV.UK Notify.
-      </p>
-      {% call form_wrapper() %}
-        {{ form.enabled }}
-        {{ page_footer('Save') }}
-      {% endcall %}
+      {% if current_service.has_permission("email") %}
+        <p class="govuk-body">
+          It’s free to send emails through GOV.UK Notify.
+        </p>
+        {% call form_wrapper() %}
+          {{ form.enabled }}
+          {{ page_footer('Save') }}
+        {% endcall %}
+      {% else %}
+        <h2 class="govuk-heading-m">Set up your service</h2>
+        {{ govukTaskList({
+          "items": [
+          {
+            "title": {
+              "text": "Choose a ‘from’ name",
+              "classes": "govuk-link--no-visited-state",
+            },
+            "href": url_for('main.service_email_sender_change', service_id=current_service.id),
+            "status": completed_status if current_service.confirmed_email_sender_name else incomplete_status,
+          },
+          {
+            "title": {
+              "text": "Add a reply-to email address",
+              "classes": "govuk-link--no-visited-state",
+            },
+            "href": url_for('main.service_email_reply_to', service_id=current_service.id),
+            "status": completed_status if current_service.has_email_reply_to_address else incomplete_status,
+          },
+          
+          ]
+        }) }}
+        <p class="govuk-body">
+          You must complete all the tasks before you can send emails.
+        </p>
+        {% call form_wrapper(action=url_for('.enable_email_channel', service_id=current_service.id)) %}
+          {{ page_footer('Start sending emails') }}
+        {% endcall %}
+      {% endif %}
     </div>
   </div>
 
