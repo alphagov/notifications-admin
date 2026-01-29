@@ -251,6 +251,8 @@ class MainNavigation(Navigation):
             "template_email_files",
             "manage_a_template_email_file",
             "change_link_text",
+            "change_data_retention_period",
+            "change_email_validation",
         },
         "uploads": {
             "upload_contact_list",
