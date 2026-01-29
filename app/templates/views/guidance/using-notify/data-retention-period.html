@@ -12,16 +12,26 @@
 
   <h1 class="heading-large">Data retention period</h1>
 
-  <p class="govuk-body">GOV.UK Notify keeps a temporary record of:</p>
+  <p class="govuk-body">For security, GOV.UK Notify only keeps a temporary record of:</p>
 
   <ul class="govuk-list govuk-list--bullet">
     <li>the content of the emails, text messages and letters you send</li>
     <li>recipient email addresses, mobile numbers and addresses</li>
   </ul>
 
-  <p class="govuk-body">By default, this data is only held for 7 days.</p>
+  <p class="govuk-body">By default, we delete this data after 7 days.</p>
 
-  <p class="govuk-body">Once your service is live, you can choose the number of days you want Notify to keep details of the messages you send.</p>
+  <p class="govuk-body">Once the data has been deleted, we cannot retrieve it.</p>
+
+  <h2 class="heading-medium">How to download a report of your sent messages</h2>
+    
+  <ol class="govuk-list govuk-list--bullet">
+    <li>Go to the dashboard.</li>
+    <li>Select <b class="govuk-!-font-weight-bold">emails sent</b>, <b class="govuk-!-font-weight-bold">text messages sent</b> or <b class="govuk-!-font-weight-bold">letters sent</b>.</li>
+    <li>Select <b class="govuk-!-font-weight-bold">Download this report (CSV)</b>.</li>
+  </ol>
+
+  <p class="govuk-body">We strongly recommend that you do this on a regular basis.</p>
 
   <h2 class="heading-medium">How to change your data retention period</h2>
 
@@ -29,5 +39,8 @@
     <li>Go to the {{ service_link(current_service, 'main.service_settings', 'Settings') }} page.</li>
     <li>Select <b class="govuk-!-font-weight-bold">Change</b> on the <b class="govuk-!-font-weight-bold">Data retention period</b> row.</li>
   </ol>
+
+  <p class="govuk-body">You can choose anything between 3 and 90 days.</p>
+
 
 {% endblock %}
