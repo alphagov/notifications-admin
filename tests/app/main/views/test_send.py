@@ -469,6 +469,7 @@ def test_upload_files_with_excessive_header_columns(
 ):
     # our example files aren't that "excessive", we're just reducing the app's threshold for them
     mocker.patch("app.models.spreadsheet.Spreadsheet.ABSOLUTE_COLUMN_LIMIT_DEFAULT_ARG", new=6)
+    mocker.patch("app.models.spreadsheet.Spreadsheet.MIN_COLUMN_LIMIT_DEFAULT_ARG", new=3)
 
     with open(filename, "rb") as uploaded, caplog.at_level("INFO", "app"):
         page = client_request.post(

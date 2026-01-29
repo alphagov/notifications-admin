@@ -11,8 +11,8 @@ Pillow==11.3.0
 pyexcel==0.7.4
 pyexcel-io==0.6.7
 pyexcel-xls==0.7.1
-pyexcel-xlsx==0.6.1
 pyexcel-odsr==0.6.0
+openpyxl~=3.1
 notifications-python-client==10.0.0
 fido2==1.1.3
 
