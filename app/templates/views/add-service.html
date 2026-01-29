@@ -3,6 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
 {% set heading = 'Your service will start in trial mode' %}
 {% set defaultMainClasses = True %}
@@ -30,6 +31,23 @@
       {{ govukButton({
         "text": "Continue",
         "href": url_for('main.name_service')
+      }) }}
+
+      {% set how_to_make_service_live_html %}  
+        <p class="govuk-body">When you have finished testing your service:</p>
+        <ol class="govuk-list govuk-list--number">
+          <li>Go to the <strong>Make your service live</strong> page.</li>
+          <li>Complete the tasks.</li>
+          <li>Select <strong>Send a request to go live</strong>.</li>
+        </ol>
+        <p class="govuk-body">It can take up to one working day to make your service live.</p>
+        <p class="govuk-body">This is so we can check that you’ve met our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}" target="_blank">terms of use (opens in new tab)</a>.</p></p>
+      {% endset %} 
+
+      {{ govukDetails({
+        "summaryText": "Who can see my service name?",
+        "html": how_to_make_service_live_html,
+        "classes": "govuk-!-margin-top-3"
       }) }}
     </div>
   </div>
