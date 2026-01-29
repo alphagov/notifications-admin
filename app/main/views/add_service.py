@@ -45,11 +45,16 @@ def _create_example_template(service_id):
     )
     return example_sms_template
 
-
-@main.route("/add-service", methods=["GET", "POST"])
+@main.route("/add-service", methods=["GET"])
 @user_is_logged_in
 @user_is_gov_user
-def add_service():
+def add_service_guidance_page():
+    return render_template("views/add-service.html")
+
+@main.route("/add-service/name-service", methods=["GET", "POST"])
+@user_is_logged_in
+@user_is_gov_user
+def name_service():
     default_organisation_type = current_user.default_organisation_type
     if default_organisation_type == "nhs":
         form = CreateNhsServiceForm()
@@ -99,7 +104,7 @@ def add_service():
 
 def _render_add_service_page(form, default_organisation_type):
     return render_template(
-        "views/add-service.html",
+        "views/name-service.html",
         form=form,
         default_organisation_type=default_organisation_type,
         error_summary_enabled=True,
