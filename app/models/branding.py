@@ -1,4 +1,5 @@
 from datetime import datetime
+from inspect import get_annotations
 from pathlib import Path
 from typing import Any, TypedDict
 
@@ -36,7 +37,7 @@ class Branding(JSONModel):
 
     @classmethod
     def with_default_values(cls, **kwargs):
-        return cls(dict.fromkeys(cls.__annotations__) | kwargs)
+        return cls(dict.fromkeys(get_annotations(cls)) | kwargs)
 
     def name_like(self, name):
         return make_string_safe(name, whitespace="") == make_string_safe(self.name, whitespace="")
