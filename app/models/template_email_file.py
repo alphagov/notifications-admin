@@ -1,6 +1,8 @@
 import uuid
 from typing import Any
 
+from flask import abort, url_for
+from notifications_utils.base64_uuid import uuid_to_base64
 from notifications_utils.serialised_model import SerialisedModelCollection
 
 from app.models import JSONModel
@@ -13,6 +15,8 @@ def _get_file_location(file_id: uuid, service_id: uuid) -> str:
 
 class TemplateEmailFile(JSONModel):
     id: Any
+    service_id: Any
+    template_id: Any
     filename: str
     link_text: str
     retention_period: int
@@ -38,14 +42,37 @@ class TemplateEmailFile(JSONModel):
 
     @property
     def link_as_markdown(self):
+        link = url_for(
+            "main.document_download_index",
+            service_id=self.service_id,
+            document_id=self.id,
+            key=uuid_to_base64(self.template_id),
+            _external=True,
+        )
         if self.link_text:
-            return f"[{self.link_text}](https://example.com/)"
-        return "https://example.com/"
+            return f"[{self.link_text}]({link})"
+        return link
 
 
 class TemplateEmailFiles(SerialisedModelCollection):
     model = TemplateEmailFile
 
+    def __init__(self, items, *, template_id):
+        from app import current_service
+
+        self.service_id = current_service.id
+        self.template_id = template_id
+        super().__init__(items)
+
+    def __getitem__(self, index):
+        return self.model(self.items[index] | {"service_id": self.service_id, "template_id": self.template_id})
+
     @property
     def as_personalisation(self):
         return {template_email_file.filename: template_email_file.link_as_markdown for template_email_file in self}
+
+    def by_id(self, template_email_file_id):
+        for row in self:
+            if row.id == str(template_email_file_id):
+                return row
+        abort(404)

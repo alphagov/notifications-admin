@@ -103,6 +103,17 @@ class Service(JSONModel):
         else:
             return None
 
+    @property
+    def contact_details_type(self):
+        if not self.contact_link:
+            return None
+        if self.contact_link.startswith(("http:", "https:")):
+            return "url"
+        elif "@" in self.contact_link:
+            return "email_address"
+        elif self.contact_link:
+            return "phone_number"
+
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
 
