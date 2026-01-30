@@ -4564,3 +4564,28 @@ def mock_get_service_settings_page_common(
     mock_get_organisation,
 ):
     return
+
+
+@pytest.fixture()
+def test_template_email_files_data():
+    return [
+        {
+            "filename": "test_file_1.csv",
+            "id": "e9ecb3f2-8674-4436-b233-d2c16ad135e7",
+            "link_text": None,
+            "retention_period": 90,
+            "validate_users_email": False,
+        },
+        {
+            "filename": "test_file_2.png",
+            "id": "bd3376c2-7b80-4a53-80f0-8de21db25b1a",
+            "link_text": None,
+            "retention_period": 90,
+            "validate_users_email": False,
+        },
+    ]
+
+
+@pytest.fixture()
+def test_data_for_a_template_email_file(test_template_email_files_data):
+    return copy.copy(test_template_email_files_data[0])
