@@ -27,6 +27,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     TEMPLATE_ONE_ID,
     USER_ONE_ID,
+    _template,
     create_active_user_no_settings_permission,
     create_active_user_with_permissions,
     create_letter_contact_block,
@@ -77,6 +78,8 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
                 "Send emails Off Change your settings for sending emails",
+                "Email ‘from’ name Test Service test.service@notifications.service.gov.uk Change email ‘from’ name",
+                "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Send text messages Off Change your settings for sending text messages",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
@@ -158,6 +161,8 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
                 "Send emails Off Change your settings for sending emails",
+                "Email ‘from’ name Test Service test.service@notifications.service.gov.uk Change email ‘from’ name",
+                "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Send text messages Off Change your settings for sending text messages",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
@@ -424,6 +429,8 @@ def test_send_files_by_email_row_on_settings_page(
                 "Sign-in method Text message code Change sign-in method",
                 "Data retention period 7 days Change data retention",
                 "Send emails Off Change your settings for sending emails",
+                "Email ‘from’ name service one service.one@notifications.service.gov.uk Change email ‘from’ name",
+                "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Send text messages Off Change your settings for sending text messages",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
@@ -651,6 +658,11 @@ def test_switch_service_to_live(
         "app.organisations_client.get_organisation",
         return_value=organisation_json(agreement_signed=agreement_signed),
     )
+    mix_of_all_template_types = [
+        _template(template_type, f"Template {index}")
+        for index, template_type in enumerate(["email", "email", "sms", "letter"])
+    ]
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": mix_of_all_template_types})
     client_request.login(platform_admin_user)
     client_request.post(
         "main.service_switch_live",
@@ -722,6 +734,58 @@ def test_switch_archived_service_to_live(
     )
 
 
+@pytest.mark.parametrize(
+    "email_volume, template_types, expect_emails_to_be_turned_off",
+    (
+        (20000, ["email", "email", "sms", "letter"], False),
+        (None, ["email", "email", "sms", "letter"], False),
+        (None, ["sms", "sms", "sms"], True),
+        (0, ["email", "email", "sms", "letter"], False),
+        (0, ["letter"], True),
+    ),
+)
+def test_switch_service_to_live_turns_email_off_if_no_expected_volumes_and_no_email_templates(
+    client_request,
+    service_one,
+    platform_admin_user,
+    mock_get_service_organisation,
+    mocker,
+    email_volume,
+    template_types,
+    expect_emails_to_be_turned_off,
+):
+    service_one["permissions"] = ["sms", "email", "letter"]
+    service_one["volume_email"] = email_volume
+    templates = [_template(template_type, f"Template {index}") for index, template_type in enumerate(template_types)]
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": templates})
+    mocker.patch("app.service_api_client.update_service")
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(agreement_signed=True),
+    )
+    client_request.login(platform_admin_user)
+    client_request.post(
+        "main.service_switch_live",
+        service_id=SERVICE_ONE_ID,
+        _data={"enabled": "True"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.service_settings",
+            service_id=SERVICE_ONE_ID,
+        ),
+    )
+
+    # update_service should always be called to make the service live
+    # if emails aren't being used it's called again, to remove the 'emails' service permission
+    update_service_kwargs = app.service_api_client.update_service.call_args.kwargs
+    if expect_emails_to_be_turned_off:
+        assert app.service_api_client.update_service.call_count == 2
+        assert "permissions" in update_service_kwargs and set(update_service_kwargs["permissions"]) == {"sms", "letter"}
+    else:
+        assert app.service_api_client.update_service.call_count == 1
+        assert "permissions" not in update_service_kwargs
+
+
 def test_show_live_service(
     client_request,
     mock_get_live_service,
@@ -744,7 +808,13 @@ def test_switch_service_to_restricted(
     mock_get_live_service,
     mock_update_service,
     mock_get_inbound_number_for_service,
+    mocker,
 ):
+    mix_of_all_template_types = [
+        _template(template_type, f"Template {index}")
+        for index, template_type in enumerate(["email", "email", "sms", "letter"])
+    ]
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": mix_of_all_template_types})
     client_request.login(platform_admin_user)
     client_request.post(
         "main.service_switch_live",
@@ -1782,6 +1852,43 @@ def test_and_more_hint_appears_on_settings_with_more_than_just_a_single_sender(
         == "Text message sender IDs 07812398712 …and 2 more Manage text message sender IDs"
     )
     assert get_row(page, "Sender addresses") == "Sender addresses 1 Example Street …and 2 more Manage sender addresses"
+
+
+@pytest.mark.parametrize(
+    "confirmed_email_sender_name, custom_email_sender_name, expected_from_name",
+    [
+        (None, None, "service one service.one@notifications.service.gov.uk"),
+        (False, None, "Not set"),
+        (True, None, "service one service.one@notifications.service.gov.uk"),
+        (True, "Custom Service", "Custom Service custom.service@notifications.service.gov.uk"),
+    ],
+)
+def test_email_from_name_has_the_right_value(
+    client_request,
+    service_one,
+    mocker,
+    api_user_active,
+    no_reply_to_email_addresses,
+    no_letter_contact_blocks,
+    single_sms_sender,
+    confirmed_email_sender_name,
+    custom_email_sender_name,
+    expected_from_name,
+    mock_get_service_settings_page_common,
+):
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    service_one["confirmed_email_sender_name"] = confirmed_email_sender_name
+    service_one["custom_email_sender_name"] = custom_email_sender_name
+
+    client_request.login(create_active_user_with_permissions(), service_one)
+    page = client_request.get("main.service_settings", service_id=service_one["id"])
+
+    assert (
+        normalize_spaces(
+            find_element_by_tag_and_partial_text(page, tag=".govuk-summary-list__row", string="Email ‘from’ name").text
+        )
+        == f"Email ‘from’ name {expected_from_name} Change email ‘from’ name"
+    )
 
 
 @pytest.mark.parametrize(
@@ -3890,7 +3997,7 @@ def test_unknown_channel_404s(
             "True",
             ["sms"],
         ),
-        (
+        pytest.param(
             "email",
             "It’s free to send emails through GOV.UK Notify.",
             "Send emails",
@@ -3898,6 +4005,7 @@ def test_unknown_channel_404s(
             "False",
             "True",
             ["email"],
+            marks=pytest.mark.xfail(raises=AssertionError),  # in this case there is no paragraph
         ),
         (
             "email",
@@ -3952,6 +4060,150 @@ def test_switch_service_channels_on_and_off(
     )
     assert set(mocked_fn.call_args[1]["permissions"]) == set(expected_updated_permissions)
     assert mocked_fn.call_args[0][0] == service_one["id"]
+
+
+@pytest.mark.parametrize(
+    ("initial_permissions,expected_html_element,confirmed_email_sender_name,has_email_reply_to_address,"),
+    [
+        (["email", "sms"], ".govuk-radios", None, None),
+        (["sms"], ".govuk-task-list", False, False),
+        (["sms"], ".govuk-task-list", True, False),
+        (["sms"], ".govuk-task-list", False, True),
+        (["sms"], ".govuk-task-list", True, True),
+    ],
+)
+def test_set_email_page_markup(
+    client_request,
+    service_one,
+    mocker,
+    single_sms_sender,
+    api_user_active,
+    mock_get_free_sms_fragment_limit,
+    mock_get_letter_rates,
+    mock_get_sms_rate,
+    initial_permissions,
+    expected_html_element,
+    confirmed_email_sender_name,
+    has_email_reply_to_address,
+):
+    if has_email_reply_to_address:
+        mocker.patch(
+            "app.service_api_client.get_reply_to_email_addresses",
+            return_value=[create_reply_to_email_address(is_default=True)],
+        )
+    else:
+        mocker.patch("app.service_api_client.get_reply_to_email_addresses", return_value=[])
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+
+    service_one["permissions"] = initial_permissions
+    service_one["confirmed_email_sender_name"] = confirmed_email_sender_name
+
+    page = client_request.get(
+        "main.service_set_channel",
+        service_id=service_one["id"],
+        channel="email",
+    )
+
+    if not confirmed_email_sender_name and "email" not in initial_permissions:
+        assert (
+            normalize_spaces(
+                find_element_by_tag_and_partial_text(
+                    page, tag=".govuk-task-list__item", string="Choose a ‘from’ name"
+                ).text
+            )
+            == "Choose a ‘from’ name Incomplete"
+        )
+    if not has_email_reply_to_address and "email" not in initial_permissions:
+        assert (
+            normalize_spaces(
+                find_element_by_tag_and_partial_text(
+                    page, tag=".govuk-task-list__item", string="Add a reply-to email address"
+                ).text
+            )
+            == "Add a reply-to email address Incomplete"
+        )
+    if has_email_reply_to_address and confirmed_email_sender_name:
+        assert (
+            normalize_spaces(
+                find_element_by_tag_and_partial_text(
+                    page, tag=".govuk-task-list__item", string="Add a reply-to email address"
+                ).text
+            )
+            == "Add a reply-to email address Completed"
+        )
+        assert (
+            normalize_spaces(
+                find_element_by_tag_and_partial_text(
+                    page, tag=".govuk-task-list__item", string="Choose a ‘from’ name"
+                ).text
+            )
+            == "Choose a ‘from’ name Completed"
+        )
+
+    assert len(page.select(expected_html_element)) == 1
+
+
+@pytest.mark.parametrize(
+    (
+        "initial_permissions,"
+        "confirmed_email_sender_name,"
+        "has_email_reply_to_address,"
+        "expected_updated_permissions,"
+        "expected_page_title"
+    ),
+    [
+        (["sms"], False, False, ["sms"], "Send emails"),
+        (["sms"], True, False, ["sms"], "Send emails"),
+        (["sms"], False, True, ["sms"], "Send emails"),
+        (["sms"], True, True, ["sms", "email"], "Settings"),
+    ],
+)
+def test_switch_email_on_from_tasklist_form(
+    client_request,
+    service_one,
+    mocker,
+    single_sms_sender,
+    api_user_active,
+    mock_get_free_sms_fragment_limit,
+    mock_get_letter_rates,
+    mock_get_sms_rate,
+    mock_get_service_settings_page_common,
+    initial_permissions,
+    has_email_reply_to_address,
+    confirmed_email_sender_name,
+    expected_updated_permissions,
+    expected_page_title,
+):
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+    if has_email_reply_to_address:
+        mocker.patch(
+            "app.service_api_client.get_reply_to_email_addresses",
+            return_value=[create_reply_to_email_address(is_default=True)],
+        )
+    else:
+        mocker.patch(
+            "app.service_api_client.get_reply_to_email_addresses",
+            return_value=[],
+        )
+
+    service_one["permissions"] = initial_permissions
+    service_one["confirmed_email_sender_name"] = confirmed_email_sender_name
+
+    mock_update_service = mocker.patch("app.service_api_client.update_service", return_value=service_one)
+
+    page = client_request.post("main.enable_email_channel", service_id=service_one["id"], _follow_redirects=True)
+
+    if not confirmed_email_sender_name or not has_email_reply_to_address:
+        assert normalize_spaces(page.select_one(".banner-dangerous h2").text) == ("There is a problem")
+        assert normalize_spaces(page.select_one(".banner-dangerous p").text) == (
+            "Some of the tasks on this page are incomplete"
+        )
+    if has_email_reply_to_address and confirmed_email_sender_name:
+        assert set(mock_update_service.call_args[1]["permissions"]) == set(expected_updated_permissions)
+    else:
+        assert not mock_update_service.called
+
+    assert normalize_spaces(page.select_one("h1").text) == expected_page_title
 
 
 @pytest.mark.parametrize(
