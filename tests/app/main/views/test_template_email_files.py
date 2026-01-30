@@ -165,13 +165,14 @@ def test_manage_a_template_email_file_raises_404_for_invalid_template_email_file
 
 
 @pytest.mark.parametrize(
-    "endpoint, page_title, form_label",
+    "endpoint, page_title, form_label, path_segment",
     [
-        ("main.change_link_text", "Link text", "Link text (optional)"),
+        ("main.change_link_text", "Link text", "Link text (optional)", "change_link_text"),
         (
             "main.change_data_retention_period",
             "How long should the file be available for",
             "Number of weeks available to recipients",
+            "change_data_retention",
         ),
     ],
 )
@@ -183,28 +184,35 @@ def test_file_settings_pages_for_link_text_and_retention_period(
     page_title,
     form_label,
     test_template_email_files_data,
+    path_segment,
     mocker,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
+    template_id = fake_uuid
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={
             "data": create_template(
-                template_id=fake_uuid,
+                template_id=template_id,
                 template_type="email",
                 email_files=test_template_email_files_data,
             )
         },
     )
+    template_email_file_id = test_template_email_files_data[0]["id"]
     page = client_request.get(
         endpoint,
         service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-        template_email_file_id=test_template_email_files_data[0]["id"],
+        template_id=template_id,
+        template_email_file_id=template_email_file_id,
     )
     assert page.select_one("h1").string.strip() == page_title
     assert page.select_one("label").string.strip() == form_label
-    assert page.select_one("button[type=submit]").string.strip() == "Continue"
+    form = page.select_one("form[method='post']")
+    button = form.select_one(".govuk-button")
+    expected_url = f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{template_email_file_id}/{path_segment}"
+    assert button.text.strip() == "Continue"
+    assert form["action"] == expected_url
 
 
 def test_file_settings_pages_for_email_validation(
@@ -215,28 +223,37 @@ def test_file_settings_pages_for_email_validation(
     mocker,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
+    template_id = fake_uuid
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={
             "data": create_template(
-                template_id=fake_uuid,
+                template_id=template_id,
                 template_type="email",
                 email_files=test_template_email_files_data,
             )
         },
     )
+    template_email_file_id = test_template_email_files_data[0]["id"]
     page = client_request.get(
         "main.change_email_validation",
         service_id=SERVICE_ONE_ID,
-        template_id=fake_uuid,
-        template_email_file_id=test_template_email_files_data[0]["id"],
+        template_id=template_id,
+        template_email_file_id=template_email_file_id,
     )
     assert page.select_one("h1").string.strip() == "Ask recipient for their email address"
     assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
         "Yes",
         "No",
     ]
-    assert page.select_one("button[type=submit]").string.strip() == "Continue"
+
+    form = page.select_one("form[method='post']")
+    button = form.select_one(".govuk-button")
+    expected_url = (
+        f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{template_email_file_id}/change_email_validation"
+    )
+    assert button.text.strip() == "Continue"
+    assert form["action"] == expected_url
 
 
 @pytest.mark.parametrize(
@@ -280,12 +297,10 @@ def test_file_settings_page_post_the_right_data_for_retention_period_and_link_te
         _expected_status=302,
     )
     expected_url = f"/service/{SERVICE_ONE_ID}/templates/{fake_uuid}/template_email_files/{update_data['id']}"
-    assert mock_post.call_args_list == [
-        call(
-            expected_url,
-            data=update_data,
-        )
-    ]
+    args, kwargs = mock_post.call_args
+
+    assert args[0] == expected_url
+    assert kwargs["data"][file_setting] == update_data[file_setting]
 
 
 def test_file_settings_page_post_the_right_data_for_email_validation(
@@ -310,6 +325,7 @@ def test_file_settings_page_post_the_right_data_for_email_validation(
     mock_post = mocker.patch("app.template_email_file_client.post")
     update_data = test_data_for_a_template_email_file
     update_data["validate_users_email"] = True
+    # add "enabled" key to update_data in order for the test to work with the OnOffSettingForm
     update_data["enabled"] = True
     client_request.post(
         "main.change_email_validation",
@@ -321,12 +337,9 @@ def test_file_settings_page_post_the_right_data_for_email_validation(
     )
     del update_data["enabled"]
     expected_url = f"/service/{SERVICE_ONE_ID}/templates/{fake_uuid}/template_email_files/{update_data['id']}"
-    assert mock_post.call_args_list == [
-        call(
-            expected_url,
-            data=update_data,
-        )
-    ]
+    args, kwargs = mock_post.call_args
+    assert args[0] == expected_url
+    assert kwargs["data"]["validate_users_email"] is True
 
 
 def test_change_retention_period_page(

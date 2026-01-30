@@ -36,15 +36,19 @@ class TemplateEmailFile(JSONModel):
             created_by_id=current_user.id,
         )
 
-    @staticmethod
-    def update(template_email_file_id, template_id, data):
+    def update(self, template_id):
         from app import current_service, template_email_file_client
 
         return template_email_file_client.update_file(
             service_id=current_service.id,
             template_id=template_id,
-            template_email_file_id=template_email_file_id,
-            data=data,
+            template_email_file_id=self.id,
+            data={
+                "filename": self.filename,
+                "link_text": self.link_text,
+                "retention_period": self.retention_period,
+                "validate_users_email": self.validate_users_email,
+            },
         )
 
     @property
