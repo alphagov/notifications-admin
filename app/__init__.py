@@ -142,6 +142,7 @@ from app.s3_client.logo_client import logo_client
 from app.template_previews import template_preview_client  # noqa
 from app.url_converters import (
     AgreementTypeConverter,
+    Base64UUIDConverter,
     BrandingTypeConverter,
     DailyLimitTypeConverter,
     LetterFileExtensionConverter,
@@ -278,6 +279,7 @@ def init_app(application):
     application.url_map.converters["ticket_type"] = TicketTypeConverter
     application.url_map.converters["letter_file_extension"] = LetterFileExtensionConverter
     application.url_map.converters["simple_date"] = SimpleDateTypeConverter
+    application.url_map.converters["base64_uuid"] = Base64UUIDConverter
 
     # you can specify a default arg in a route decorator, that says "when you hit this route, populate the endpoint with
     # the following kwargs". However, if the `redirect_defaults` flag is set to its default value of true, we also

@@ -314,16 +314,13 @@ def archive_service(service_id):
 @user_has_permissions("manage_service")
 def send_files_by_email_contact_details(service_id):
     form = ServiceContactDetailsForm()
-    contact_details = None
 
     if request.method == "GET":
-        contact_details = current_service.contact_link
-        if contact_details:
-            contact_type = check_contact_details_type(contact_details)
-            field_to_update = getattr(form, contact_type)
+        if current_service.contact_details_type:
+            field_to_update = getattr(form, current_service.contact_details_type)
 
-            form.contact_details_type.data = contact_type
-            field_to_update.data = contact_details
+            form.contact_details_type.data = current_service.contact_details_type
+            field_to_update.data = current_service.contact_link
 
     if form.validate_on_submit():
         contact_type = form.contact_details_type.data
@@ -334,7 +331,6 @@ def send_files_by_email_contact_details(service_id):
     return render_template(
         "views/service-settings/send-files-by-email.html",
         form=form,
-        contact_details=contact_details,
         error_summary_enabled=True,
     )
 
@@ -1362,15 +1358,6 @@ def edit_service_billing_details(service_id):
 
 def convert_dictionary_to_wtforms_choices_format(dictionary, value, label):
     return [(item[value], item[label]) for item in dictionary]
-
-
-def check_contact_details_type(contact_details):
-    if contact_details.startswith("http"):
-        return "url"
-    elif "@" in contact_details:
-        return "email_address"
-    else:
-        return "phone_number"
 
 
 def handle_reply_to_email_address_http_error(raised_exception, form):

@@ -13,6 +13,7 @@ from app.main.views import (  # noqa
     code_not_received,
     conversation,
     dashboard,
+    document_download,
     email_branding,
     feedback,
     find_users,
