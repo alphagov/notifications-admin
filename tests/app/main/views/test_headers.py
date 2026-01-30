@@ -12,7 +12,8 @@ def test_owasp_useful_headers_set(
     response = client_request.get_response(".index")
 
     assert response.headers["X-Content-Type-Options"] == "nosniff"
-    assert response.headers["X-XSS-Protection"] == "1; mode=block"
+    assert response.headers["X-Frame-Options"] == "SAMEORIGIN"
+    assert response.headers["X-Permitted-Cross-Domain-Policies"] == "none"
     assert response.headers["Content-Security-Policy"] == (
         "default-src 'self' static.example.com 'unsafe-inline';"
         "script-src 'self' static.example.com 'nonce-TESTs5Vr8v3jgRYLoQuVwA';"
@@ -29,7 +30,9 @@ def test_owasp_useful_headers_set(
     assert response.headers["Link"] == (
         "<https://static.example.com>; rel=dns-prefetch, <https://static.example.com>; rel=preconnect"
     )
-    assert response.headers["Strict-Transport-Security"] == "max-age=31536000; preload"
+    assert response.headers["Cache-Control"] == "no-store, no-cache, private, must-revalidate"
+    assert response.headers["Pragma"] == "no-cache"
+    assert response.headers["Strict-Transport-Security"] == "max-age=31536000; includeSubDomains; preload"
     assert response.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
     assert response.headers["Cross-Origin-Embedder-Policy"] == "require-corp static.example.com;"
     assert response.headers["Cross-Origin-Opener-Policy"] == "same-origin static.example.com;"
