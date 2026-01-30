@@ -376,6 +376,7 @@ def test_should_not_show_go_live_button_if_service_already_has_go_live_request(
     mock_get_service_organisation,
     mock_get_invites_for_service,
     single_sms_sender,
+    single_reply_to_email_address,
     has_active_go_live_request,
     expected_button,
 ):
