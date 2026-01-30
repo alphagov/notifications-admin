@@ -280,12 +280,13 @@ def test_file_settings_page_post_the_right_data_for_retention_period_and_link_te
         _expected_status=302,
     )
     expected_url = f"/service/{SERVICE_ONE_ID}/templates/{fake_uuid}/template_email_files/{update_data['id']}"
-    assert mock_post.call_args_list == [
-        call(
-            expected_url,
-            data=update_data,
-        )
-    ]
+    args, kwargs = mock_post.call_args
+
+    assert args[0] == expected_url
+    assert kwargs["data"]["filename"] == update_data["filename"]
+    assert kwargs["data"]["link_text"] == update_data["link_text"]
+    assert kwargs["data"]["retention_period"] == update_data["retention_period"]
+    assert kwargs["data"]["validate_users_email"] == update_data["validate_users_email"]
 
 
 def test_file_settings_page_post_the_right_data_for_email_validation(
@@ -310,6 +311,7 @@ def test_file_settings_page_post_the_right_data_for_email_validation(
     mock_post = mocker.patch("app.template_email_file_client.post")
     update_data = test_data_for_a_template_email_file
     update_data["validate_users_email"] = True
+    # add "enabled" key to update_data in order for the test to work with the OnOffSettingForm
     update_data["enabled"] = True
     client_request.post(
         "main.change_email_validation",
@@ -321,12 +323,12 @@ def test_file_settings_page_post_the_right_data_for_email_validation(
     )
     del update_data["enabled"]
     expected_url = f"/service/{SERVICE_ONE_ID}/templates/{fake_uuid}/template_email_files/{update_data['id']}"
-    assert mock_post.call_args_list == [
-        call(
-            expected_url,
-            data=update_data,
-        )
-    ]
+    args, kwargs = mock_post.call_args
+    assert args[0] == expected_url
+    assert kwargs["data"]["filename"] == update_data["filename"]
+    assert kwargs["data"]["link_text"] == update_data["link_text"]
+    assert kwargs["data"]["retention_period"] == update_data["retention_period"]
+    assert kwargs["data"]["validate_users_email"] == update_data["validate_users_email"]
 
 
 def test_change_retention_period_page(

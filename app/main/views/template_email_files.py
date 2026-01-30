@@ -107,7 +107,8 @@ def change_link_text(service_id, template_id, template_email_file_id):
 
     if form.validate_on_submit():
         email_file_data["link_text"] = form.link_text.data
-        TemplateEmailFile.update(template_email_file_id, template_id, data=email_file_data)
+        template_email_file = TemplateEmailFile(email_file_data)
+        template_email_file.update(template_id)
         return redirect(
             url_for(
                 "main.manage_a_template_email_file",
@@ -142,7 +143,8 @@ def change_data_retention_period(service_id, template_id, template_email_file_id
 
     if form.validate_on_submit():
         email_file_data["retention_period"] = form.retention_period.data
-        TemplateEmailFile.update(template_email_file_id, template_id, data=email_file_data)
+        template_email_file = TemplateEmailFile(email_file_data)
+        template_email_file.update(template_id)
         return redirect(
             url_for(
                 "main.manage_a_template_email_file",
@@ -182,7 +184,8 @@ def change_email_validation(service_id, template_id, template_email_file_id):
 
     if form.validate_on_submit():
         email_file_data["validate_users_email"] = form.enabled.data
-        TemplateEmailFile.update(template_email_file_id, template_id, data=email_file_data)
+        template_email_file = TemplateEmailFile(email_file_data)
+        template_email_file.update(template_id)
         return redirect(
             url_for(
                 "main.manage_a_template_email_file",
