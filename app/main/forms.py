@@ -18,7 +18,7 @@ from notifications_utils.countries.data import Postage
 from notifications_utils.eventlet import SoftEventletTimeout
 from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
-from notifications_utils.recipient_validation.email_address import validate_email_address
+from notifications_utils.recipient_validation.email_address import format_email_address, validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
 from notifications_utils.recipient_validation.phone_number import PhoneNumber as PhoneNumberUtils
 from notifications_utils.recipient_validation.postal_address import PostalAddress
@@ -3224,3 +3224,32 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
 
         if field.data.filename in self.existing_file_names:
             raise ValidationError(f"Your template already has a file called ‘{field.data.filename}’")
+
+
+class DocumentDownloadConfirmEmailAddressForm(StripWhitespaceForm):
+    def __init__(self, *args, current_user_email_address, service_name, **kwargs):
+        self.current_user_email_address = current_user_email_address
+        self.service_name = service_name
+        super().__init__(*args, **kwargs)
+
+    email_address = GovukEmailField(
+        "Email address",
+        validators=[
+            NotifyDataRequired(thing="email address"),
+        ],
+    )
+
+    def validate_email_address(self, field):
+        try:
+            validate_email_address(self.email_address.data)
+        except InvalidEmailError as e:
+            raise ValidationError("Not a valid email address") from e
+
+        if format_email_address(self.email_address.data) != format_email_address(self.current_user_email_address):
+            raise ValidationError(
+                Markup(
+                    "This is not the email address the file was sent to.<br><br>"
+                    f"To confirm the file was meant for you, enter the email address "
+                    f"{self.service_name} sent the file to."
+                )
+            )
