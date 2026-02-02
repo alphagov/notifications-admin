@@ -111,8 +111,7 @@ class Service(JSONModel):
             return "url"
         elif "@" in self.contact_link:
             return "email_address"
-        elif self.contact_link:
-            return "phone_number"
+        return "phone_number"
 
     def update(self, **kwargs):
         return service_api_client.update_service(self.id, **kwargs)
