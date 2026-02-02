@@ -501,10 +501,10 @@ def test_view_jobs_for_contact_list(
         "Template Status",
         "Template Y Sending tomorrow at 11:09pm 1 text message waiting to send",
         "Template Z Sending tomorrow at 11:09am 1 text message waiting to send",
-        "Template A Sent today at 4:51pm 1 sending 0 delivered 0 failed",
-        "Template B Sent today at 4:51pm 1 sending 0 delivered 0 failed",
-        "Template C Sent today at 4:51pm 1 sending 0 delivered 0 failed",
-        "Template D Sent today at 4:51pm 1 sending 0 delivered 0 failed",
+        "Template A Sent today at 4:51pm 1 delivering 0 delivered 0 failed",
+        "Template B Sent today at 4:51pm 1 delivering 0 delivered 0 failed",
+        "Template C Sent today at 4:51pm 1 delivering 0 delivered 0 failed",
+        "Template D Sent today at 4:51pm 1 delivering 0 delivered 0 failed",
     ]
     assert page.select_one("table a")["href"] == url_for(
         "main.view_job",
