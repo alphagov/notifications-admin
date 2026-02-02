@@ -1,4 +1,5 @@
 from unittest import mock
+from uuid import UUID
 
 import pytest
 from bs4 import BeautifulSoup
@@ -497,6 +498,7 @@ def test_subject_line_gets_replaced(
     template_class,
     template_type,
     extra_args,
+    fake_uuid,
 ):
     template = template_class(
         {"service": SERVICE_ONE_ID, "content": "", "template_type": template_type, "subject": "((name))"},
@@ -565,6 +567,7 @@ def test_templates_handle_html_and_redacting(
     template_type,
     extra_args,
     expected_field_calls,
+    fake_uuid,
 ):
     assert str(
         template_class(
@@ -1206,18 +1209,34 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
         (
             EmailPreviewTemplate(
                 {
+                    "id": str(UUID(int=1, version=4)),
                     "content": "((1.pdf)) ((2)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "1.pdf", "retention_period": 26, "id": "123", "link_text": None}],
+                    "email_files": [
+                        {
+                            "filename": "1.pdf",
+                            "retention_period": 26,
+                            "id": str(UUID(int=1, version=4)),
+                            "link_text": None,
+                        }
+                    ],
                 }
             ),
             EmailPreviewTemplate(
                 {
+                    "id": str(UUID(int=1, version=4)),
                     "content": "((1.pdf)) ((2)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "1.pdf", "retention_period": 26, "id": "123", "link_text": None}],
+                    "email_files": [
+                        {
+                            "filename": "1.pdf",
+                            "retention_period": 26,
+                            "id": str(UUID(int=1, version=4)),
+                            "link_text": None,
+                        }
+                    ],
                 }
             ),
             set(),
@@ -1227,18 +1246,34 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
         (
             EmailPreviewTemplate(
                 {
+                    "id": str(UUID(int=1, version=4)),
                     "content": "((1)) ((2.pdf)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "2.pdf", "retention_period": 26, "id": "123", "link_text": None}],
+                    "email_files": [
+                        {
+                            "filename": "2.pdf",
+                            "retention_period": 26,
+                            "id": str(UUID(int=1, version=4)),
+                            "link_text": None,
+                        }
+                    ],
                 }
             ),
             EmailPreviewTemplate(
                 {
+                    "id": str(UUID(int=1, version=4)),
                     "content": "((1)) ((3))",
                     "subject": "Henlo",
                     "template_type": "email",
-                    "email_files": [{"filename": "2.pdf", "retention_period": 26, "id": "123", "link_text": None}],
+                    "email_files": [
+                        {
+                            "filename": "2.pdf",
+                            "retention_period": 26,
+                            "id": str(UUID(int=1, version=4)),
+                            "link_text": None,
+                        }
+                    ],
                 }
             ),
             {"2.pdf"},
@@ -1248,23 +1283,45 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
         (
             EmailPreviewTemplate(
                 {
+                    "id": str(UUID(int=1, version=4)),
                     "content": "((1)) ((2.pdf)) ((3.pdf))",
                     "subject": "Henlo",
                     "template_type": "email",
                     "email_files": [
-                        {"filename": "2.pdf", "retention_period": 26, "id": "123", "link_text": None},
-                        {"filename": "3.pdf", "retention_period": 26, "id": "456", "link_text": None},
+                        {
+                            "filename": "2.pdf",
+                            "retention_period": 26,
+                            "id": str(UUID(int=1, version=4)),
+                            "link_text": None,
+                        },
+                        {
+                            "filename": "3.pdf",
+                            "retention_period": 26,
+                            "id": str(UUID(int=2, version=4)),
+                            "link_text": None,
+                        },
                     ],
                 }
             ),
             EmailPreviewTemplate(
                 {
+                    "id": str(UUID(int=1, version=4)),
                     "content": "((1)) ((4.pdf))",
                     "subject": "Henlo",
                     "template_type": "email",
                     "email_files": [
-                        {"filename": "2.pdf", "retention_period": 26, "id": "123", "link_text": None},
-                        {"filename": "3.pdf", "retention_period": 26, "id": "456", "link_text": None},
+                        {
+                            "filename": "2.pdf",
+                            "retention_period": 26,
+                            "id": str(UUID(int=1, version=4)),
+                            "link_text": None,
+                        },
+                        {
+                            "filename": "3.pdf",
+                            "retention_period": 26,
+                            "id": str(UUID(int=2, version=4)),
+                            "link_text": None,
+                        },
                     ],
                 }
             ),
@@ -1283,10 +1340,11 @@ def test_TemplateChange_email_files_removed(
 
 
 @pytest.mark.parametrize("service_has_api_keys", (True, False))
-def test_TemplateChange_email_files_and_placeholders_removed(service_has_api_keys):
-    email_file_data = {"filename": "2.pdf", "retention_period": 26, "id": "123", "link_text": None}
+def test_TemplateChange_email_files_and_placeholders_removed(service_has_api_keys, fake_uuid):
+    email_file_data = {"filename": "2.pdf", "retention_period": 26, "id": fake_uuid, "link_text": None}
     old_template = EmailPreviewTemplate(
         {
+            "id": fake_uuid,
             "content": "((1)) ((2.pdf)) ((3))",
             "subject": "Henlo",
             "template_type": "email",
@@ -1295,6 +1353,7 @@ def test_TemplateChange_email_files_and_placeholders_removed(service_has_api_key
     )
     new_template = EmailPreviewTemplate(
         {
+            "id": fake_uuid,
             "content": "((1))",
             "subject": "Henlo",
             "template_type": "email",
@@ -1324,7 +1383,7 @@ def test_TemplateChange_ordering_of_placeholders_is_preserved():
             "((one)) ((example.pdf)) ((two)) ((three))",
             [
                 {
-                    "id": "123",
+                    "id": str(UUID(int=1, version=4)),
                     "filename": "example.pdf",
                     "link_text": None,
                     "retention_period": 90,
@@ -1353,6 +1412,7 @@ def test_template_placeholders_attribute_is_correctly_ordered_set_for_email_temp
             "subject": subject,
             "template_type": "email",
             "email_files": email_files,
+            "id": fake_uuid,
         },
     )
 
