@@ -3062,6 +3062,8 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
             if _test_for_non_smart_quotes:
                 ClientRequest.test_for_non_smart_quotes(page)
 
+            ClientRequest.test_for_visited_links(page)
+
             ClientRequest.test_for_missing_en_dashes(page)
 
             if _test_for_script_csp_nonce:
@@ -3194,6 +3196,25 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
             if page.select("h1.heading-large"):
                 assert "govuk-!-padding-top-0" in page.select_one("main")["class"], (
                     "Use govuk-heading-l or set error_summary_enabled=False"
+                )
+
+        @staticmethod
+        def test_for_visited_links(page):
+            for element in page.select("a.govuk-link"):
+                if set(element["class"]).intersection(
+                    {
+                        # Link modifiers which already override the visited state
+                        "govuk-link--destructive",
+                        "govuk-link--inverse",
+                        "govuk-link--text-colour",
+                    }
+                ):
+                    continue
+                assert "govuk-link--no-visited-state" in element["class"], (
+                    f"Found an <a> element with a visited link state:\n"
+                    f"    {element}\n"
+                    f"\n"
+                    f'(you probably want to add govuk-link--no-visited-state to the class attribute")'
                 )
 
         @staticmethod

@@ -17,9 +17,9 @@
     <p class="govuk-body">
       If you have any questions,
       {% if current_service.contact_details_type == "url" %}
-        <a href="{{ current_service.contact_link }}" class="govuk-link" rel="noreferrer"> contact {{ current_service.name }}</a>.
+        <a href="{{ current_service.contact_link }}" class="govuk-link govuk-link--no-visited-state" rel="noreferrer"> contact {{ current_service.name }}</a>.
       {% elif current_service.contact_details_type == "email_address" %}
-        email <a href="mailto:{{ current_service.contact_link }}" class="govuk-link">{{ current_service.contact_link }}</a>.
+        email <a href="mailto:{{ current_service.contact_link }}" class="govuk-link govuk-link--no-visited-state">{{ current_service.contact_link }}</a>.
       {% else %}
         call {{ current_service.contact_link }}.
       {% endif %}

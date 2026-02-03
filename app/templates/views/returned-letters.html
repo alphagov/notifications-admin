@@ -23,7 +23,7 @@
 {% endif %}
 
 <p class="bottom-gutter">
-  <a download href="{{ url_for('main.returned_letters_report', service_id=current_service.id, reported_at=reported_at) }}" class="govuk-link heading-small">Download this report (<abbr title="Comma separated values">CSV</abbr>)</a>
+  <a download href="{{ url_for('main.returned_letters_report', service_id=current_service.id, reported_at=reported_at) }}" class="govuk-link govuk-link--no-visited-state heading-small">Download this report (<abbr title="Comma separated values">CSV</abbr>)</a>
 </p>
 
 <div class="dashboard-table">
