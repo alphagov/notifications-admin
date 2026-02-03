@@ -3335,7 +3335,7 @@ def test_edit_service_template_should_show_interstitial_when_making_breaking_cha
         content=old_content,
         email_files=[
             {
-                "id": "123",
+                "id": fake_uuid,
                 "filename": "invite.pdf",
                 "link_text": None,
                 "retention_period": 90,
@@ -3439,7 +3439,7 @@ def test_edit_service_template_should_show_interstitial_when_making_breaking_cha
             "((greeting)), We will send your invite separately. ((footer))",
             [
                 {
-                    "id": "456",
+                    "id": str(uuid.UUID(int=1, version=4)),
                     "filename": "map.jpeg",
                     "link_text": None,
                     "retention_period": 90,
@@ -3483,7 +3483,7 @@ def test_edit_service_template_asks_confirmation_when_removing_email_files(
         content=old_content,
         email_files=[
             {
-                "id": "123",
+                "id": fake_uuid,
                 "filename": "invite.pdf",
                 "link_text": None,
                 "retention_period": 90,
@@ -3757,21 +3757,21 @@ def test_edit_service_template_archives_email_files(client_request, fake_uuid, m
         content="For the appointment, you will need: ((invite.pdf)), ((form.pdf)), ((map.pdf))",
         email_files=[
             {
-                "id": "123",
+                "id": str(uuid.UUID(int=1, version=4)),
                 "filename": "invite.pdf",
                 "link_text": None,
                 "retention_period": 90,
                 "validate_users_email": False,
             },
             {
-                "id": "456",
+                "id": str(uuid.UUID(int=2, version=4)),
                 "filename": "form.pdf",
                 "link_text": None,
                 "retention_period": 90,
                 "validate_users_email": False,
             },
             {
-                "id": "789",
+                "id": str(uuid.UUID(int=3, version=4)),
                 "filename": "map.pdf",
                 "link_text": None,
                 "retention_period": 90,
@@ -3807,7 +3807,10 @@ def test_edit_service_template_archives_email_files(client_request, fake_uuid, m
             "subject": "Your ((thing)) is due soon",
             "name": "sample template",
             "has_unsubscribe_link": False,
-            "archive_email_file_ids": ["123", "456"],
+            "archive_email_file_ids": [
+                "00000000-0000-4000-8000-000000000001",
+                "00000000-0000-4000-8000-000000000002",
+            ],
         },
     )
 
@@ -4728,7 +4731,14 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
         (
             ["send_files_via_ui"],
             "email",
-            [{"filename": "example.pdf", "retention_period": 26, "id": "123", "link_text": None}],
+            [
+                {
+                    "filename": "example.pdf",
+                    "retention_period": 26,
+                    "id": str(uuid.UUID(int=1, version=4)),
+                    "link_text": None,
+                }
+            ],
             "Manage files",
             "main.template_email_files",
             "1 file added",
@@ -4737,8 +4747,18 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
             ["send_files_via_ui"],
             "email",
             [
-                {"filename": "example.pdf", "retention_period": 26, "id": "123", "link_text": None},
-                {"filename": "picture.png", "retention_period": 90, "id": "456", "link_text": None},
+                {
+                    "filename": "example.pdf",
+                    "retention_period": 26,
+                    "id": str(uuid.UUID(int=1, version=4)),
+                    "link_text": None,
+                },
+                {
+                    "filename": "picture.png",
+                    "retention_period": 90,
+                    "id": str(uuid.UUID(int=2, version=4)),
+                    "link_text": None,
+                },
             ],
             "Manage files",
             "main.template_email_files",
@@ -4802,24 +4822,41 @@ def test_attach_files_button(
             "For the appointment, you will need: ((invite.pdf)), ((form.pdf))",
             [
                 {
-                    "id": "123",
+                    "id": str(uuid.UUID(int=1, version=4)),
                     "filename": "invite.pdf",
                     "link_text": None,
                     "retention_period": 90,
                     "validate_users_email": False,
                 },
                 {
-                    "id": "456",
+                    "id": str(uuid.UUID(int=2, version=4)),
                     "filename": "form.pdf",
                     "link_text": "This is a link",
                     "retention_period": 90,
                     "validate_users_email": False,
                 },
             ],
-            "For the appointment, you will need: https://example.com/, This is a link",
+            (
+                "For the appointment, you will need: "
+                "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg, "
+                "This is a link"
+            ),
             [
-                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">https://example.com/</a>',
-                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">This is a link</a>',
+                (
+                    "<a"
+                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg"'
+                    ' style="word-wrap: break-word; color: #1D70B8;"'
+                    ">"
+                    "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg"
+                    "</a>"
+                ),
+                (
+                    "<a"
+                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAg?key=bORm0P1qEeWC9eCsy50Rpg"'
+                    ' style="word-wrap: break-word; color: #1D70B8;">'
+                    "This is a link"
+                    "</a>"
+                ),
             ],
         ),
         (
@@ -4832,24 +4869,43 @@ def test_attach_files_button(
             "This template contains a mixture of normal placeholders, and file placeholders: ((current_date)), ((invite.pdf)), ((form.pdf))",  # noqa: E501
             [
                 {
-                    "id": "123",
+                    "id": str(uuid.UUID(int=1, version=4)),
                     "filename": "invite.pdf",
                     "link_text": None,
                     "retention_period": 90,
                     "validate_users_email": False,
                 },
                 {
-                    "id": "456",
+                    "id": str(uuid.UUID(int=2, version=4)),
                     "filename": "form.pdf",
                     "link_text": "This is a link",
                     "retention_period": 90,
                     "validate_users_email": False,
                 },
             ],
-            "This template contains a mixture of normal placeholders, and file placeholders: ((current_date)), https://example.com/, This is a link",  # noqa: E501
+            (
+                "This template contains a mixture of normal placeholders, and file placeholders: "
+                "((current_date)), "
+                "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg, "
+                "This is a link"
+            ),
             [
-                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">https://example.com/</a>',
-                '<a href="https://example.com/" style="word-wrap: break-word; color: #1D70B8;">This is a link</a>',
+                (
+                    "<a"
+                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg"'
+                    ' style="word-wrap: break-word; color: #1D70B8;"'
+                    ">"
+                    "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg"
+                    "</a>"
+                ),
+                (
+                    "<a"
+                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAg?key=bORm0P1qEeWC9eCsy50Rpg"'
+                    ' style="word-wrap: break-word; color: #1D70B8;"'
+                    ">"
+                    "This is a link"
+                    "</a>"
+                ),
             ],
         ),
     ],
