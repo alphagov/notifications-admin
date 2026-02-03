@@ -32,5 +32,5 @@ def test_create_file_calls_endpoint_with_correct_data(mocker, data):
     client.create_file(**data, service_id=service_id, template_id=template_id)
     data["id"] = data.pop("file_id")
     if "validate_users_email" not in data.keys():
-        data["validate_users_email"] = False
+        data["validate_users_email"] = True
     mock_post.assert_called_once_with(expected_url, data=data)
