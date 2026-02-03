@@ -3,6 +3,7 @@ import uuid
 import pytest
 
 from app.notify_client.template_email_file_client import TemplateEmailFileClient
+from tests.utils import RedisClientMock
 
 
 @pytest.mark.parametrize(

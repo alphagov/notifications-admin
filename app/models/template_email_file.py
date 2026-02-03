@@ -48,10 +48,9 @@ class TemplateEmailFile(JSONModel):
             template_id=template_id,
             file_id=self.id,
             data={
-                "filename": self.filename,
-                "link_text": self.link_text,
+                "link_text": self.link_text if self.link_text else "",
                 "retention_period": self.retention_period,
-                "validate_users_email": self.validate_users_email,
+                "validate_users_email": bool(self.validate_users_email),
             },
         )
 
