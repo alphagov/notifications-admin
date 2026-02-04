@@ -35,8 +35,16 @@ class TemplateEmailFileClient(NotifyAdminAPIClient):
         file_id,
         service_id,
         template_id,
-        data,
+        *,
+        link_text,
+        retention_period,
+        validate_users_email,
     ):
+        data = {
+            "link_text": link_text,
+            "retention_period": retention_period,
+            "validate_users_email": validate_users_email,
+        }
         return self.post(f"/service/{service_id}/templates/{template_id}/template_email_files/{file_id}", data=data)
 
 
