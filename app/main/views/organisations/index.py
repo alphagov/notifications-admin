@@ -79,7 +79,9 @@ def add_organisation():
 @main.route("/services/<uuid:service_id>/add-gp-organisation", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def add_organisation_from_gp_service(service_id):
-    if (not current_service.organisation_type == Organisation.TYPE_NHS_GP) or current_service.organisation:
+    if (
+        current_service.organisation_type not in Organisation.ZERO_TEXT_LIMIT_ORGANISATION_TYPES
+    ) or current_service.organisation:
         abort(403)
 
     form = AddGPOrganisationForm(service_name=current_service.name)

@@ -70,8 +70,8 @@ def add_service():
 
         new_service = Service.from_id(service_id)
 
-        # GPs have a zero message limit (to prevent them sending messages while in trial mode)
-        if form.organisation_type.data == Organisation.TYPE_NHS_GP:
+        # GPs and private pharmacies have a zero message limit (to prevent them sending messages while in trial mode)
+        if form.organisation_type.data in Organisation.ZERO_TEXT_LIMIT_ORGANISATION_TYPES:
             new_service.update(sms_message_limit=0)
 
         # show the tour if the user doesn't have any other services. Never show for NHS GPs
