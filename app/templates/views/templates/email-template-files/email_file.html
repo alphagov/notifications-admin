@@ -22,7 +22,8 @@
             "text": "Link text"
           },
           "value": {
-            "text": template_email_file_data.link_text or "None"
+            "text": template_email_file_data.link_text or "Not set",
+            "classes": "govuk-summary-list__value--default" if not template_email_file_data.link_text else "govuk-summary-list__value--truncate",
           },
           "actions": {
             "items": [
@@ -61,7 +62,7 @@
             "text": "Ask recipient for email address"
           },
           "value": {
-            "text": template_email_file_data.validate_users_email
+            "text": template_email_file_data.validate_users_email | format_yes_no,
           },
           "actions": {
             "items": [
