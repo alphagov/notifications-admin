@@ -1,6 +1,6 @@
 import uuid
 from io import BytesIO
-from unittest.mock import ANY
+from unittest.mock import ANY, PropertyMock
 
 import pytest
 from flask import url_for
@@ -221,9 +221,14 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
     mocker.patch("app.models.contact_list.s3upload", return_value=fake_uuid)
     mocker.patch("app.models.contact_list.set_metadata_on_csv_upload")
     mocker.patch(
-        "app.models.contact_list.s3download", return_value="\n".join(["phone number"] + (["07700900986"] * 100_001))
+        "app.models.contact_list.s3download", return_value="\n".join(["phone number"] + (["07700900986"] * 4_567))
     )
     mocker.patch("app.models.contact_list.get_csv_metadata", return_value={"original_file_name": "invalid.csv"})
+    mocker.patch(
+        "app.main.views.uploads.RecipientCSV.max_rows",
+        new_callable=PropertyMock,
+        return_value=1_234,
+    )
 
     page = client_request.post(
         "main.upload_contact_list",
@@ -233,7 +238,7 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "Your file has too many rows Notify can store files up to 100,000 rows in size. Your file has 100,001 rows."
+        "Your file has too many rows Notify can store files up to 1,234 rows in size. Your file has 4,567 rows."
     )
     assert len(page.select("tbody tr")) == 50
     assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 rows"
