@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
-{%  set title = template_email_file_data.filename %}
+{%  set title = template_email_file.filename %}
 {% block service_page_title %}
    {{ title }}
 {% endblock %}
@@ -22,15 +22,15 @@
             "text": "Link text"
           },
           "value": {
-            "text": template_email_file_data.link_text or "Not set",
-            "classes": "govuk-summary-list__value--default" if not template_email_file_data.link_text else "govuk-summary-list__value--truncate",
+            "text": template_email_file.link_text or "Not set",
+            "classes": "govuk-summary-list__value--default" if not template_email_file.link_text else "govuk-summary-list__value--truncate",
           },
           "actions": {
             "items": [
               {
                 "href": url_for("main.change_link_text", service_id=current_service.id,
                 template_id=template_id,
-                template_email_file_id=template_email_file_data.id),
+                template_email_file_id=template_email_file.id),
                 "text": "Change",
                 "classes": "govuk-link--no-visited-state",
               }
@@ -43,13 +43,13 @@
             "text": "Available for"
           },
           "value": {
-            "text": template_email_file_data.retention_period | string + " weeks after sending"
+            "text": template_email_file.retention_period | string + " weeks after sending"
           },
           "actions": {
             "items": [
               {
                 "href": url_for("main.change_data_retention_period", service_id=current_service.id,
-                template_id=template_id,template_email_file_id=template_email_file_data.id),
+                template_id=template_id,template_email_file_id=template_email_file.id),
                 "text": "Change",
                 "classes": "govuk-link--no-visited-state",
               }
@@ -62,13 +62,13 @@
             "text": "Ask recipient for email address"
           },
           "value": {
-            "text": template_email_file_data.validate_users_email | format_yes_no,
+            "text": template_email_file.validate_users_email | format_yes_no,
           },
           "actions": {
             "items": [
               {
                 "href": url_for("main.change_email_validation", service_id=current_service.id,
-                template_id=template_id,template_email_file_id=template_email_file_data.id),
+                template_id=template_id,template_email_file_id=template_email_file.id),
                 "text": "Change",
                 "classes": "govuk-link--no-visited-state",
               }
