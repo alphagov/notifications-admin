@@ -40,14 +40,14 @@ class TemplateEmailFile(JSONModel):
             created_by_id=current_user.id,
         )
 
-    def update(self):
+    def update(self, **kwargs):
         from app import template_email_file_client
 
         data = {
             "link_text": self.link_text or "",
             "retention_period": self.retention_period,
             "validate_users_email": self.validate_users_email,
-        }
+        } | kwargs
 
         return template_email_file_client.update_file(
             service_id=self.service_id, template_id=self.template_id, file_id=self.id, **data
