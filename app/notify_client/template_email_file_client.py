@@ -18,7 +18,7 @@ class TemplateEmailFileClient(NotifyAdminAPIClient):
         filename,
         created_by_id,
         retention_period=90,
-        validate_users_email=None,
+        validate_users_email=True,
     ):
         data = {
             "id": str(file_id),

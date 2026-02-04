@@ -614,7 +614,7 @@ def test_upload_file_does_not_update_template_when_placeholder_already_exists(
                 "filename": "tests/test_pdf_files/one_page_pdf.pdf",
                 "created_by_id": AnyStringMatching(UUID4_REGEX_PATTERN),
                 "retention_period": 90,
-                "validate_users_email": False,
+                "validate_users_email": True,
             },
         ),
     ]
