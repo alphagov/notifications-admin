@@ -31,14 +31,12 @@ class TemplateEmailFileClient(NotifyAdminAPIClient):
 
     def update_file(
         self,
-        template_email_file_id,
+        file_id,
         service_id,
         template_id,
         data,
     ):
-        return self.post(
-            f"/service/{service_id}/templates/{template_id}/template_email_files/{template_email_file_id}", data=data
-        )
+        return self.post(f"/service/{service_id}/templates/{template_id}/template_email_files/{file_id}", data=data)
 
 
 _template_email_file_api_client_context_var: ContextVar[TemplateEmailFileClient] = ContextVar(
