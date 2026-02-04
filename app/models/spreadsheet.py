@@ -235,8 +235,7 @@ class Spreadsheet:
                     ),
                     first_visible_row,
                 )
-                # test for containment before attempting access to avoid unnecessary defaultdict allocation
-                if row_index not in sheet.row_dimensions or sheet.row_dimensions[row_index].hidden is False
+                if cls._openpyxl_dimension_visible(sheet.row_dimensions, row_index)
             ),
             filename,
             row_limit=row_limit,
