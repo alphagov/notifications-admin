@@ -46,12 +46,11 @@ class TemplateEmailFile(JSONModel):
         return template_email_file_client.update_file(
             service_id=current_service.id,
             template_id=template_id,
-            template_email_file_id=self.id,
+            file_id=self.id,
             data={
-                "filename": self.filename,
-                "link_text": self.link_text,
+                "link_text": self.link_text if self.link_text else "",
                 "retention_period": self.retention_period,
-                "validate_users_email": self.validate_users_email,
+                "validate_users_email": bool(self.validate_users_email),
             },
         )
 

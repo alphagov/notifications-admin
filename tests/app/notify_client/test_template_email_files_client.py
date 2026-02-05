@@ -3,6 +3,7 @@ import uuid
 import pytest
 
 from app.notify_client.template_email_file_client import TemplateEmailFileClient
+from tests.utils import RedisClientMock
 
 
 @pytest.mark.parametrize(
@@ -34,3 +35,19 @@ def test_create_file_calls_endpoint_with_correct_data(mocker, data):
     if "validate_users_email" not in data.keys():
         data["validate_users_email"] = True
     mock_post.assert_called_once_with(expected_url, data=data)
+
+
+def test_update_file_calls_endpoint_with_correct_data(mocker):
+    template_id = str(uuid.uuid4())
+    service_id = str(uuid.uuid4())
+    file_id = str(uuid.uuid4())
+    data = {"retention_period": 90, "validate_users_email": True}
+    expected_url = f"/service/{service_id}/templates/{template_id}/template_email_files/{file_id}"
+    mock_post = mocker.patch("app.notify_client.template_email_file_client.TemplateEmailFileClient.post")
+    mock_redis_delete_by_pattern = mocker.patch(
+        "app.extensions.RedisClient.delete_by_pattern", new_callable=RedisClientMock
+    )
+    client = TemplateEmailFileClient(mocker.MagicMock())
+    client.update_file(service_id=service_id, template_id=template_id, file_id=file_id, data=data)
+    mock_post.assert_called_once_with(expected_url, data=data)
+    mock_redis_delete_by_pattern.assert_called_with_args(f"service-{service_id}-template-{template_id}*")

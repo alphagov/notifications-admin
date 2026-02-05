@@ -5,7 +5,7 @@ from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
 from app import memo_resetters
-from app.notify_client import NotifyAdminAPIClient
+from app.notify_client import NotifyAdminAPIClient, cache
 
 
 class TemplateEmailFileClient(NotifyAdminAPIClient):
@@ -29,16 +29,15 @@ class TemplateEmailFileClient(NotifyAdminAPIClient):
         }
         return self.post(f"/service/{service_id}/templates/{template_id}/template_email_files", data=data)
 
+    @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
     def update_file(
         self,
-        template_email_file_id,
+        file_id,
         service_id,
         template_id,
         data,
     ):
-        return self.post(
-            f"/service/{service_id}/templates/{template_id}/template_email_files/{template_email_file_id}", data=data
-        )
+        return self.post(f"/service/{service_id}/templates/{template_id}/template_email_files/{file_id}", data=data)
 
 
 _template_email_file_api_client_context_var: ContextVar[TemplateEmailFileClient] = ContextVar(
