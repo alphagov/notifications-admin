@@ -17,7 +17,7 @@ class InterruptibleRawIOWrapper(RawIOBase):
     "memory efficient" way.
     """
 
-    def __init__(self, wrapped, read_limit=8_192):
+    def __init__(self, wrapped, read_limit=4_096):
         self._wrapped = wrapped
         self._read_limit = read_limit
 
@@ -100,4 +100,4 @@ class InterruptibleIOZipFile(ZipFile):
     """
 
     def open(self, *args, **kwargs) -> RawIOBase:
-        return InterruptibleRawIOWrapper(super().open(*args, **kwargs), read_limit=16_384)
+        return InterruptibleRawIOWrapper(super().open(*args, **kwargs), read_limit=8_192)
