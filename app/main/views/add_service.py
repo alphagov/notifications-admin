@@ -46,6 +46,15 @@ def _create_example_template(service_id):
     return example_sms_template
 
 
+@main.route("/add-service", methods=["GET"])
+@user_is_logged_in
+@user_is_gov_user
+def add_service():
+    return render_template(
+        "views/add-a-service/index.html",
+    )
+
+
 @main.route("/add-service/name-your-service", methods=["GET", "POST"])
 @user_is_logged_in
 @user_is_gov_user
