@@ -247,7 +247,7 @@ def test_post_org_member_make_service_live_service_name_error_summary(
 
     error_summary = page.select_one(".govuk-error-summary")
     assert "There is a problem" in error_summary.text
-    assert "Select ‘yes’ if recipients will understand the service name" in error_summary.text
+    assert "Select ‘yes’ if GOV.UK Notify will understand the service name" in error_summary.text
 
 
 @pytest.mark.parametrize(
