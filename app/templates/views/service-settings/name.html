@@ -16,28 +16,13 @@
 
 {% block maincolumn_content %}
   {{ page_header(heading) }}
-  <p class="govuk-body">This is the name your emails will come from.</p>
-  <p class="govuk-body">You can also display it at the start of every text message you send.</p>
-
-  {% if organisation_type == 'central' or organisation_type == 'local'  %}
-    <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
-
-    <ul class="govuk-list govuk-list--bullet">
-    {% if organisation_type == 'central' %}
-      <li>Register to vote</li>
-      <li>Renew your Passport</li>
-      <li>Check your state pension</li>
-    {% elif organisation_type == 'local' %}
-      <li>School admissions – {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
-      <li>Electoral services – {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
-      <li>Blue Badge – {{ current_service.organisation.name or current_user.default_organisation.name }}</li>
-    {% endif %}
-    </ul>
-  {% else %}
-    <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from.</p>
-  {% endif %}
-
-  <p class="govuk-body">Do not use an acronym or initialism unless your users are already familiar with it.</p>
+  <p class="govuk-body">Choose a name that you think the GOV.UK Notify team will understand.</p>
+  <p class="govuk-body">We use the service name to check that you’ve met our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a>.</p>
+  <p class="govuk-body">Do not include:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>acronyms, initialisms or abbreviations</li>
+    <li>your own name or the name of someone on your team</li>
+  </ul>
 
   {% call form_wrapper() %}
     {{ form.name }}

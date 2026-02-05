@@ -1299,19 +1299,18 @@ class AdminOrganisationDomainsForm(StripWhitespaceForm):
 
 class CreateServiceForm(StripWhitespaceForm):
     name = GovukTextInputField(
-        "Service name",
+        "Enter a service name",
         validators=[
             DataRequired(message="Enter a service name"),
             MustContainAlphanumericCharacters(),
             Length(max=255, thing="service name"),
         ],
     )
-    organisation_type = OrganisationTypeField("Who runs this service?")
+    organisation_type = OrganisationTypeField()
 
 
 class CreateNhsServiceForm(CreateServiceForm):
     organisation_type = OrganisationTypeField(
-        "Who runs this service?",
         include_only={"nhs_central", "nhs_local", "nhs_gp"},
     )
 

@@ -22,15 +22,11 @@
         <div class="govuk-grid-column-five-sixths">
 
             <p class="govuk-body">
-                Your service must be the only one of its kind in your organisation.
+                Our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a> say that your service must be the only one of its kind in your organisation.
             </p>
 
             <p class="govuk-body">
-                Before you send a request to go live, check that your service name describes what your messages are about, as well as who they’re from.
-            </p>
-
-            <p class="govuk-body">
-                This will help us to understand if your service is unique.
+                To help us check this, choose a service name that’s easy to understand.
             </p>
 
             <p class="govuk-body">
@@ -38,11 +34,14 @@
             </p>
 
             <ul class="govuk-list govuk-list--bullet">
-                <li>acronyms, initialisms or abbreviations unless your recipients are familiar with them</li>
-                <li>your own name or the name of an individual</li>
-                <li>the name of a web application or back office system</li>
+                <li>acronyms, initialisms or abbreviations</li>
+                <li>your own name or the name of someone on your team</li>
             </ul>
 
+            <p class="govuk-body">
+                If we cannot confirm that your service is unique, we may refuse your request to go live.
+            </p>
+            
             {% call form_wrapper() %}
                 {{ form.name }}
                 {{ page_footer('Confirm') }}

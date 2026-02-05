@@ -3,8 +3,9 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 
-{% set heading = 'Enter a service name' %}
+{% set heading = 'Name your service' %}
 
 {% block backLink %}
   {% if request.args.get("back") == "your_services" %}
@@ -20,37 +21,56 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
        {{ govuk_page_header(heading) }}
-      <p class="govuk-body">This is the name your emails will come from.</p>
-      <p class="govuk-body">You can also display it at the start of every text message you send.</p>
-
-    {% if default_organisation_type == 'central' or default_organisation_type == 'local'  %}
-      <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from. For example:</p>
-
+      <p class="govuk-body">Choose a name that you think the GOV.UK Notify team will understand.</p>
+      <p class="govuk-body">Later, when you make your service live, we’ll use the name to check that you’ve met our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}" target="_blank">terms of use (opens in new tab)</a>.</p>
+      <p class="govuk-body">Do not include:</p>
       <ul class="govuk-list govuk-list--bullet">
-        {% if default_organisation_type == 'central' %}
-          <li>Register to vote</li>
-          <li>Renew your Passport</li>
-          <li>Check your state pension</li>
-        {% elif default_organisation_type == 'local' %}
-          <li>School admissions – {{ current_user.default_organisation.name }}</li>
-          <li>Electoral services – {{ current_user.default_organisation.name }}</li>
-          <li>Blue Badge – {{ current_user.default_organisation.name }}</li>
-        {% endif %}
+        <li>acronyms, initialisms or abbreviations</li>
+        <li>your own name or the name of someone on your team</li>
       </ul>
-    {% else %}
-      <p class="govuk-body">Your service name should tell the recipient what your message is about, as well as who it’s from.</p>
-    {% endif %}
-
-    <p class="govuk-body">Do not use an acronym, initialism or abbreviation unless your recipients are already familiar with it.</p>
-
+    
     {% call form_wrapper() %}
-      {{ form.name(param_extensions={"hint": {"text": "You can change this later"} }) }}
+      {{ form.name(
+        param_extensions={
+          "label":{
+            "classes": "govuk-!-font-weight-bold"
+          },
+          "hint": {
+            "text": "You can change this before you make your service live",
+          } 
+        }) 
+      }}
 
       {% if not default_organisation_type %}
-        {{ form.organisation_type }}
+        {{ form.organisation_type(
+          param_extensions={
+              "fieldset": {
+                "legend": {
+                  "text": "Who runs this service?",
+                  "classes": "govuk-fieldset__legend--m"
+                }
+              }
+            }
+        ) }}
       {% endif %}
 
-      {{ page_footer('Add service') }}
+      {% set who_can_see_my_service_name_html %}  
+        <p class="govuk-body">The only people that can see your service name are:</p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>you</li>
+          <li>the Notify team</li>
+          <li>anyone in your organisation who uses Notify</li>
+        </ul>
+        <p class="govuk-body">Your recipients will not see your service name unless you choose to share it with them.</p>
+      {% endset %} 
+
+      {{ govukDetails({
+        "summaryText": "Who can see my service name?",
+        "html": who_can_see_my_service_name_html
+      }) }}
+
+      {{ page_footer('Save and continue') }}
+
     {% endcall %}
 
     </div>
