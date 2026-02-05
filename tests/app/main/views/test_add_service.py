@@ -21,6 +21,32 @@ def test_non_gov_user_cannot_see_add_service_button(
     assert "Add a new service" not in page.text
 
 
+def test_gov_user_can_see_trial_mode_guidance_page(
+    client_request,
+    api_user_active,
+    mock_get_organisations,
+    mock_get_organisations_and_services_for_user,
+):
+    client_request.login(api_user_active)
+    page = client_request.get("main.add_service")
+    continue_button = page.select_one("main a.govuk-button")
+    assert page.select_one("h1").text.strip() == "Your service will start in trial mode"
+    assert continue_button["href"] == url_for(".name_service")
+
+
+def test_nongov_user_cannot_see_trial_mode_guidance_page(
+    client_request,
+    login_non_govuser,
+    api_nongov_user_active,
+    mock_get_organisations,
+):
+    assert is_gov_user(current_user.email_address) is False
+    client_request.get(
+        "main.add_service",
+        _expected_status=403,
+    )
+
+
 @pytest.mark.parametrize(
     "org_json",
     (
