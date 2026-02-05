@@ -7,6 +7,7 @@
     "/accounts",
     "/accounts-or-dashboard",
     "/add-service",
+    "/add-service/name-service",
     "/agreement/<agreement_type:variant>",
     "/agreement/<agreement_type:variant>.pdf",
     "/callbacks",
