@@ -301,9 +301,10 @@ class Service(JSONModel):
 
     @property
     def intending_to_send_email(self):
-        if self.volume_email is None:
-            return self.has_email_templates
-        return self.volume_email > 0
+        if self.has_email_templates:
+            return True
+        else:
+            return self.volume_email is not None and self.volume_email > 0
 
     @property
     def intending_to_send_sms(self):
