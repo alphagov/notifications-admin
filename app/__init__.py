@@ -355,7 +355,6 @@ def make_nonce_before_request():
 #  https://www.owasp.org/index.php/List_of_useful_HTTP_headers
 def useful_headers_after_request(response):
     response.headers.add("X-Content-Type-Options", "nosniff")
-    response.headers.add("X-XSS-Protection", "1; mode=block")
     response.headers.add("X-Frame-Options", "SAMEORIGIN")
     response.headers.add("X-Permitted-Cross-Domain-Policies", "none")
     response.headers.add(
