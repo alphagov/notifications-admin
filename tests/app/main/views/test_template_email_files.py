@@ -22,6 +22,7 @@ def test_template_email_files_manage_files_page_displays_the_right_files(
     mocker,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "https://example.gov.uk"
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={
@@ -70,6 +71,35 @@ def test_template_email_files_manage_files_page_raises_an_error_for_invalid_temp
     )
 
 
+def test_template_email_files_manage_files_page_if_service_has_no_contact_link(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+            )
+        },
+    )
+    client_request.get(
+        "main.template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_redirect=url_for(
+            "main.setup_template_email_files",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+
+
 def test_template_email_files_manage_files_page_when_there_are_no_files_to_display(
     client_request,
     service_one,
@@ -77,6 +107,7 @@ def test_template_email_files_manage_files_page_when_there_are_no_files_to_displ
     mocker,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "https://example.gov.uk"
 
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -367,6 +398,21 @@ def test_change_retention_period_page(
     assert page.select_one("h1").string.strip() == "How long should the file be available for"
     assert page.select_one("label").string.strip() == "Number of weeks available to recipients"
     assert page.select_one("button[type=submit]").string.strip() == "Continue"
+
+
+def test_setup_template_email_files_page(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_email_template,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    page = client_request.get(
+        "main.setup_template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
 
 
 @pytest.mark.parametrize(

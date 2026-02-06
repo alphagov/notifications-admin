@@ -309,6 +309,7 @@
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change_data_retention",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change_email_validation",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change_link_text",
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/setup",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/upload",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/redact",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/rename",

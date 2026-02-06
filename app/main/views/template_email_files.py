@@ -23,6 +23,14 @@ def template_email_files(template_id, service_id):
         current_user,
         must_be_of_type="email",
     )
+    if not current_service.contact_link:
+        return redirect(
+            url_for(
+                "main.setup_template_email_files",
+                service_id=current_service.id,
+                template_id=template.id,
+            )
+        )
     if not template.email_files:
         return redirect(
             url_for(
@@ -34,6 +42,18 @@ def template_email_files(template_id, service_id):
     return render_template(
         "views/templates/email-template-files/files-list.html", template=template, data=template.email_files
     )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files/setup", methods=["GET"])
+@service_has_permission("send_files_via_ui")
+@user_has_permissions("manage_templates")
+def setup_template_email_files(template_id, service_id):
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
+        must_be_of_type="email",
+    )
+    return render_template("views/templates/email-template-files/setup.html", template=template)
 
 
 @main.route(
