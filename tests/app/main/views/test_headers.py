@@ -18,7 +18,7 @@ def test_owasp_useful_headers_set(
     assert response.headers["Content-Security-Policy"] == (
         "default-src 'self' static.example.com 'unsafe-inline';"
         "script-src 'self' static.example.com 'nonce-TESTs5Vr8v3jgRYLoQuVwA';"
-        "connect-src 'self';"
+        "connect-src 'self' static.example.com;"
         "object-src 'self';"
         "font-src 'self' static.example.com data:;"
         "img-src "
@@ -66,7 +66,7 @@ def test_headers_non_ascii_characters_are_replaced(
     assert response.headers["Content-Security-Policy"] == (
         "default-src 'self' static.example.com 'unsafe-inline';"
         "script-src 'self' static.example.com 'nonce-TESTs5Vr8v3jgRYLoQuVwA';"
-        "connect-src 'self';"
+        "connect-src 'self' static.example.com;"
         "object-src 'self';"
         "font-src 'self' static.example.com data:;"
         "img-src"
