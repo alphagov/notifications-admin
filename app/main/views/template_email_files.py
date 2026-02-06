@@ -87,6 +87,8 @@ def upload_template_email_files(template_id, service_id):
         current_user,
         must_be_of_type="email",
     )
+    if not current_service.contact_link:
+        abort(403)
     form = TemplateEmailFilesUploadForm(existing_files=template.email_files)
     if form.validate_on_submit():
         TemplateEmailFile.create(
