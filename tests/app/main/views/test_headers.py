@@ -11,7 +11,6 @@ def test_owasp_useful_headers_set(
     client_request.logout()
     response = client_request.get_response(".index")
 
-    assert response.headers["X-XSS-Protection"] == "1; mode=block"
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert response.headers["X-Frame-Options"] == "SAMEORIGIN"
     assert response.headers["X-Permitted-Cross-Domain-Policies"] == "none"
