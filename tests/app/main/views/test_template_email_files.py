@@ -132,9 +132,9 @@ def test_manage_a_template_email_file(
 
     rows = page.select("dl .govuk-summary-list__row:not(.govuk-visually-hidden)")
     assert [normalize_spaces(row.get_text(separator=" ", strip=True)) for row in rows] == [
-        "Link text Not set Change",
-        "Available for 90 weeks after sending Change",
-        "Ask recipient for email address No Change",
+        "Link text Not set Change link text for the file",
+        "Available for 90 weeks after sending Change how long the file should be available once it's sent",
+        "Ask recipient for email address No Change if recipient should be asked for email address",
     ]
 
 

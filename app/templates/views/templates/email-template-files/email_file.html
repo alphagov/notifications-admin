@@ -32,6 +32,7 @@
                 template_id=template_id,
                 template_email_file_id=template_email_file_data.id),
                 "text": "Change",
+                "visuallyHiddenText": "link text for the file",
                 "classes": "govuk-link--no-visited-state",
               }
             ]
@@ -51,6 +52,7 @@
                 "href": url_for("main.change_data_retention_period", service_id=current_service.id,
                 template_id=template_id,template_email_file_id=template_email_file_data.id),
                 "text": "Change",
+                "visuallyHiddenText": "how long the file should be available once it's sent",
                 "classes": "govuk-link--no-visited-state",
               }
             ]
@@ -70,6 +72,7 @@
                 "href": url_for("main.change_email_validation", service_id=current_service.id,
                 template_id=template_id,template_email_file_id=template_email_file_data.id),
                 "text": "Change",
+              "visuallyHiddenText": "if recipient should be asked for email address",
                 "classes": "govuk-link--no-visited-state",
               }
             ]
