@@ -1,6 +1,7 @@
 from unittest.mock import ANY, Mock, call
 
 import pytest
+from flask import url_for
 from notifications_python_client.errors import HTTPError
 from notifications_utils.testing.comparisons import AnyStringMatching
 
@@ -126,6 +127,10 @@ def test_manage_a_template_email_file(
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         template_email_file_id=test_data_for_a_template_email_file["id"],
+    )
+
+    assert page.select_one(".govuk-back-link")["href"] == url_for(
+        "main.template_email_files", service_id=SERVICE_ONE_ID, template_id=fake_uuid
     )
 
     assert page.select_one("h1").string.strip() == test_data_for_a_template_email_file["filename"]
