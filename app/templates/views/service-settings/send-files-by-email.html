@@ -30,8 +30,8 @@
 
         {{ form.contact_details_type(param_extensions={
           "items": [
-            { "conditional": { "html": form.url(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } },
-            { "conditional": { "html": form.email_address(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } },
+            { "conditional": { "html": form.url(param_extensions={ "label": { "classes": "govuk-visually-hidden" }, "classes": "govuk-!-width-full" }) } },
+            { "conditional": { "html": form.email_address(param_extensions={ "label": { "classes": "govuk-visually-hidden" }, "classes": "govuk-!-width-full" }) } },
             { "conditional": { "html": form.phone_number(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } }
           ]
         }) }}
