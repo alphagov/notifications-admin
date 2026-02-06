@@ -1,4 +1,4 @@
-from flask import abort, redirect, render_template, url_for
+from flask import redirect, render_template, url_for
 from notifications_utils.insensitive_dict import InsensitiveSet
 
 from app import current_service, current_user, service_api_client
@@ -39,15 +39,13 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
         current_user,
         must_be_of_type="email",
     )
+    template_email_file = template.email_files.by_id(template_email_file_id)
 
-    if template_email_file_data := template.get_email_file_data(template_email_file_id):
-        return render_template(
-            "views/templates/email-template-files/email_file.html",
-            template_email_file_data=template_email_file_data,
-            template_id=template_id,
-        )
-    else:
-        raise abort(404, f"Invalid template_email_file_id: {template_email_file_id}")
+    return render_template(
+        "views/templates/email-template-files/email_file.html",
+        template_email_file=template_email_file,
+        template_id=template_id,
+    )
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files/upload", methods=["GET", "POST"])
@@ -102,13 +100,11 @@ def change_link_text(service_id, template_id, template_email_file_id):
         current_user,
         must_be_of_type="email",
     )
-    email_file_data = template.get_email_file_data(template_email_file_id)
-    form = TemplateEmailFileLinkTextForm(link_text=email_file_data["link_text"])
+    template_email_file = template.email_files.by_id(template_email_file_id)
+    form = TemplateEmailFileLinkTextForm(link_text=template_email_file.link_text)
 
     if form.validate_on_submit():
-        email_file_data["link_text"] = form.link_text.data
-        template_email_file = TemplateEmailFile(email_file_data)
-        template_email_file.update(template_id)
+        template_email_file.update(link_text=form.link_text.data)
         return redirect(
             url_for(
                 "main.manage_a_template_email_file",
@@ -138,13 +134,11 @@ def change_data_retention_period(service_id, template_id, template_email_file_id
         current_user,
         must_be_of_type="email",
     )
-    email_file_data = template.get_email_file_data(template_email_file_id)
-    form = TemplateEmailFileRetentionPeriodForm(retention_period=email_file_data["retention_period"])
+    template_email_file = template.email_files.by_id(template_email_file_id)
+    form = TemplateEmailFileRetentionPeriodForm(retention_period=template_email_file.retention_period)
 
     if form.validate_on_submit():
-        email_file_data["retention_period"] = form.retention_period.data
-        template_email_file = TemplateEmailFile(email_file_data)
-        template_email_file.update(template_id)
+        template_email_file.update(retention_period=form.retention_period.data)
         return redirect(
             url_for(
                 "main.manage_a_template_email_file",
@@ -174,18 +168,16 @@ def change_email_validation(service_id, template_id, template_email_file_id):
         current_user,
         must_be_of_type="email",
     )
-    email_file_data = template.get_email_file_data(template_email_file_id)
+    template_email_file = template.email_files.by_id(template_email_file_id)
     form = OnOffSettingForm(
         "Ask recipient for their email address",
         truthy="Yes",
         falsey="No",
-        enabled=email_file_data["validate_users_email"],
+        enabled=template_email_file.validate_users_email,
     )
 
     if form.validate_on_submit():
-        email_file_data["validate_users_email"] = form.enabled.data
-        template_email_file = TemplateEmailFile(email_file_data)
-        template_email_file.update(template_id)
+        template_email_file.update(validate_users_email=form.enabled.data)
         return redirect(
             url_for(
                 "main.manage_a_template_email_file",
