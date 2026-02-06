@@ -23,6 +23,14 @@ def template_email_files(template_id, service_id):
         current_user,
         must_be_of_type="email",
     )
+    if not template.email_files:
+        return redirect(
+            url_for(
+                "main.upload_template_email_files",
+                service_id=current_service.id,
+                template_id=template.id,
+            )
+        )
     return render_template(
         "views/templates/email-template-files/files-list.html", template=template, data=template.email_files
     )

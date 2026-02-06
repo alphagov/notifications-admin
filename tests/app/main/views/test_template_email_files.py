@@ -1,6 +1,7 @@
 from unittest.mock import ANY, Mock, call
 
 import pytest
+from flask import url_for
 from notifications_python_client.errors import HTTPError
 from notifications_utils.testing.comparisons import AnyStringMatching
 
@@ -86,18 +87,15 @@ def test_template_email_files_manage_files_page_when_there_are_no_files_to_displ
             )
         },
     )
-    page = client_request.get(
+    client_request.get(
         "main.template_email_files",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
-    )
-
-    assert page.select_one("h1").string.strip() == "Manage files"
-    assert [normalize_spaces(row.text) for row in page.select("dt")] == [
-        "Attached files will show here",
-    ]
-    assert (
-        normalize_spaces(page.select_one('a[role="button"][data-module="govuk-button"]').get_text()) == "Attach files"
+        _expected_redirect=url_for(
+            "main.upload_template_email_files",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
     )
 
 
