@@ -5,6 +5,7 @@ from app import current_service, current_user, service_api_client
 from app.main import main
 from app.main.forms import (
     OnOffSettingForm,
+    ServiceContactDetailsForm,
     TemplateEmailFileLinkTextForm,
     TemplateEmailFileRetentionPeriodForm,
     TemplateEmailFilesUploadForm,
@@ -23,8 +24,46 @@ def template_email_files(template_id, service_id):
         current_user,
         must_be_of_type="email",
     )
+    if not current_service.contact_link:
+        return redirect(
+            url_for(
+                "main.setup_template_email_files",
+                service_id=current_service.id,
+                template_id=template.id,
+            )
+        )
+    if not template.email_files:
+        return redirect(
+            url_for(
+                "main.upload_template_email_files",
+                service_id=current_service.id,
+                template_id=template.id,
+            )
+        )
     return render_template(
         "views/templates/email-template-files/files-list.html", template=template, data=template.email_files
+    )
+
+
+@main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files/setup", methods=["GET", "POST"])
+@service_has_permission("send_files_via_ui")
+@user_has_permissions("manage_templates")
+def setup_template_email_files(template_id, service_id):
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
+        must_be_of_type="email",
+    )
+    form = ServiceContactDetailsForm(service=current_service)
+
+    if current_user.has_permissions("manage_service") and form.validate_on_submit():
+        current_service.update(contact_link=form.chosen_contact_type)
+        return redirect(url_for(".template_email_files", service_id=current_service.id, template_id=template.id))
+
+    return render_template(
+        "views/templates/email-template-files/setup.html",
+        template=template,
+        form=form,
     )
 
 
@@ -57,6 +96,8 @@ def upload_template_email_files(template_id, service_id):
         current_user,
         must_be_of_type="email",
     )
+    if not current_service.contact_link:
+        abort(403)
     form = TemplateEmailFilesUploadForm(existing_files=template.email_files)
     if form.validate_on_submit():
         TemplateEmailFile.create(

@@ -1,6 +1,7 @@
 from unittest.mock import ANY, Mock, call
 
 import pytest
+from flask import url_for
 from notifications_python_client.errors import HTTPError
 from notifications_utils.testing.comparisons import AnyStringMatching
 
@@ -21,6 +22,7 @@ def test_template_email_files_manage_files_page_displays_the_right_files(
     mocker,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "https://example.gov.uk"
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={
@@ -69,7 +71,7 @@ def test_template_email_files_manage_files_page_raises_an_error_for_invalid_temp
     )
 
 
-def test_template_email_files_manage_files_page_when_there_are_no_files_to_display(
+def test_template_email_files_manage_files_page_if_service_has_no_contact_link(
     client_request,
     service_one,
     fake_uuid,
@@ -86,18 +88,45 @@ def test_template_email_files_manage_files_page_when_there_are_no_files_to_displ
             )
         },
     )
-    page = client_request.get(
+    client_request.get(
         "main.template_email_files",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+        _expected_redirect=url_for(
+            "main.setup_template_email_files",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
     )
 
-    assert page.select_one("h1").string.strip() == "Manage files"
-    assert [normalize_spaces(row.text) for row in page.select("dt")] == [
-        "Attached files will show here",
-    ]
-    assert (
-        normalize_spaces(page.select_one('a[role="button"][data-module="govuk-button"]').get_text()) == "Attach files"
+
+def test_template_email_files_manage_files_page_when_there_are_no_files_to_display(
+    client_request,
+    service_one,
+    fake_uuid,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "https://example.gov.uk"
+
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+            )
+        },
+    )
+    client_request.get(
+        "main.template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_redirect=url_for(
+            "main.upload_template_email_files",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
     )
 
 
@@ -371,15 +400,82 @@ def test_change_retention_period_page(
     assert page.select_one("button[type=submit]").string.strip() == "Continue"
 
 
+def test_setup_template_email_files_page(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_email_template,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    page = client_request.get(
+        "main.setup_template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
+    # Note that the rest of the tests for the form are in test_service_settings.py
+    assert page.select_one("main form")
+    assert [normalize_spaces(p.text) for p in page.select("main p.govuk-body")] == [
+        "Upload a file, then send your recipients an email with a link to download it.",
+        "You need to include contact details for your service so your users can get in touch if there’s a problem. "
+        "For example, if the link to download the file you sent them has expired.",
+    ]
+
+
+def test_setup_template_email_files_page_without_manage_service_permission(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_email_template,
+    active_user_with_permissions,
+    mock_update_service,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    active_user_with_permissions["permissions"][SERVICE_ONE_ID] = ["view_activity", "manage_templates"]
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        "main.setup_template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
+    assert not page.select_one("main form")
+    assert [normalize_spaces(p.text) for p in page.select("main p.govuk-body")] == [
+        "Upload a file, then send your recipients an email with a link to download it.",
+        "You need to include contact details for your service so your users can get in touch if there’s a problem. "
+        "For example, if the link to download the file you sent them has expired.",
+        "Someone on your team with the ‘Manage settings, team and usage’ permission can set this up for you.",
+    ]
+
+    client_request.post(
+        "main.setup_template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "contact_details_type": "url",
+            "url": "http://example.com",
+        },
+        _expected_status=200,
+    )
+    assert mock_update_service.call_args_list == []
+
+
 @pytest.mark.parametrize(
-    "extra_permissions, template_type, expected_status",
+    "extra_permissions, template_type, contact_link, expected_status",
     (
-        ([], "email", 403),
-        ([], "sms", 403),
-        ([], "letter", 403),
-        (["send_files_via_ui"], "email", 200),
-        (["send_files_via_ui"], "sms", 404),
-        (["send_files_via_ui"], "letter", 404),
+        # Without correct permission
+        ([], "email", "", 403),
+        ([], "sms", "", 403),
+        ([], "letter", "", 403),
+        ([], "email", "http://example.com", 403),
+        ([], "sms", "http://example.com", 403),
+        ([], "letter", "http://example.com", 403),
+        # With permission but missing contact link
+        (["send_files_via_ui"], "email", "", 403),
+        # With permission but different template types
+        (["send_files_via_ui"], "email", "http://example.com", 200),
+        (["send_files_via_ui"], "sms", "http://example.com", 404),
+        (["send_files_via_ui"], "letter", "http://example.com", 404),
     ),
 )
 def test_get_upload_file_page(
@@ -388,6 +484,7 @@ def test_get_upload_file_page(
     fake_uuid,
     extra_permissions,
     template_type,
+    contact_link,
     expected_status,
     mocker,
 ):
@@ -401,6 +498,7 @@ def test_get_upload_file_page(
         },
     )
     service_one["permissions"] += extra_permissions
+    service_one["contact_link"] = contact_link
     page = client_request.get(
         "main.upload_template_email_files",
         service_id=SERVICE_ONE_ID,
@@ -448,6 +546,7 @@ def test_upload_file_page_requires_file(
     mock_get_service_email_template,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "https://example.com"
     page = client_request.post(
         "main.upload_template_email_files",
         service_id=SERVICE_ONE_ID,
@@ -484,6 +583,7 @@ def test_upload_file_page_validates_extentions(
     mock_post = mocker.patch("app.template_email_file_client.post")
     mock_template_update = mocker.patch("app.service_api_client.update_service_template")
     service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "https://example.com"
     if not expected_error_message:
         with open(test_file, "rb") as file:
             page = client_request.post(
@@ -526,6 +626,7 @@ def test_file_upload_calls_template_update(
     mocker,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "https://example.com"
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={
@@ -573,6 +674,7 @@ def test_upload_file_does_not_update_template_when_placeholder_already_exists(
     template_content,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "https://example.com"
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={
@@ -635,6 +737,7 @@ def test_upload_file_returns_error_if_file_with_same_name_exists(
     existing_filename,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "https://example.com"
     mocker.patch(
         "app.service_api_client.get_service_template",
         return_value={

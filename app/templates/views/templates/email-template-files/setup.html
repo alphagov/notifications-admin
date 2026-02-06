@@ -4,40 +4,52 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
+
+{% set title = "Send files by email" %}
 {% block service_page_title %}
-  Send files by email
+  {{ title }}
 {% endblock %}
 
 {% block backLink %}
-  {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+  {{ govukBackLink({ "href": url_for('main.view_template', service_id=current_service.id, template_id=template.id) }) }}
 {% endblock %}
 
 {% block maincolumn_content %}
+
+  {{ page_header(title) }}
+
+  <p class="govuk-body">
+    Upload a file, then send your recipients an email with a link to download it.
+  </p>
+
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      {{ page_header('Send files by email') }}
-      <p class="govuk-body">
-        This is an API-only feature.
-      </p>
-      <p class="govuk-body">
-        To send a file by email, follow the instructions in our <a class="govuk-link govuk-link--no-visited-state" href={{ url_for('main.guidance_api_documentation') }}>API documentation</a>.
-      </p>
-      <h2 class="heading-medium">{% if current_service.contact_link %}Change contact details for{% else %}Add contact details to{% endif %} the file download page</h2>
+      <h2 class="heading-medium">
+        Before you can send files by email
+      </h2>
       <p class="govuk-body">
         You need to include contact details for your service so your users can get in touch if there’s a problem. For example, if the link to download the file you sent them has expired.
       </p>
-      {% call form_wrapper() %}
+      {% if current_user.has_permissions("manage_service") %}
+        {% call form_wrapper() %}
 
-        {{ form.contact_details_type(param_extensions={
-          "items": [
+          {{ form.contact_details_type(param_extensions={
+            "items": [
             { "conditional": { "html": form.url(param_extensions={ "label": { "classes": "govuk-visually-hidden" }, "classes": "govuk-!-width-full" }) } },
             { "conditional": { "html": form.email_address(param_extensions={ "label": { "classes": "govuk-visually-hidden" }, "classes": "govuk-!-width-full" }) } },
             { "conditional": { "html": form.phone_number(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } }
-          ]
-        }) }}
+            ]
+          }) }}
 
-        {{ page_footer('Save') }}
-      {% endcall %}
+          {{ page_footer('Save') }}
+        {% endcall %}
+      {% else %}
+        <p class="govuk-body">
+          Someone on your team with the ‘Manage settings, team and usage’ permission can set this up for you.
+        </p>
+      {% endif %}
     </div>
   </div>
+
+
 {% endblock %}

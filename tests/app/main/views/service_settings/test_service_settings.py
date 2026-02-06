@@ -4427,6 +4427,13 @@ def test_cant_archive_inactive_service(
 
 
 @pytest.mark.parametrize(
+    "endpoint, extra_permissions, extra_args",
+    (
+        ("main.send_files_by_email_contact_details", [], {}),
+        ("main.setup_template_email_files", ["send_files_via_ui"], {"template_id": sample_uuid()}),
+    ),
+)
+@pytest.mark.parametrize(
     "contact_details_type, contact_details_value",
     [
         ("url", "http://example.com/"),
@@ -4437,16 +4444,38 @@ def test_cant_archive_inactive_service(
 def test_send_files_by_email_contact_details_prefills_the_form_with_the_existing_contact_details(
     client_request,
     service_one,
+    mock_get_service_email_template,
     contact_details_type,
     contact_details_value,
+    endpoint,
+    extra_permissions,
+    extra_args,
 ):
     service_one["contact_link"] = contact_details_value
+    service_one["permissions"] += extra_permissions
 
-    page = client_request.get("main.send_files_by_email_contact_details", service_id=SERVICE_ONE_ID)
+    page = client_request.get(endpoint, service_id=SERVICE_ONE_ID, **extra_args)
     assert page.select_one(f"input[name=contact_details_type][value={contact_details_type}]").has_attr("checked")
     assert page.select_one(f"input#{contact_details_type}")["value"] == contact_details_value
 
 
+@pytest.mark.parametrize(
+    "endpoint, extra_permissions, extra_args, expected_redirect_endpoint",
+    (
+        (
+            "main.send_files_by_email_contact_details",
+            [],
+            {},
+            "main.service_settings",
+        ),
+        (
+            "main.setup_template_email_files",
+            ["send_files_via_ui"],
+            {"template_id": sample_uuid()},
+            "main.template_email_files",
+        ),
+    ),
+)
 @pytest.mark.parametrize(
     "contact_details_type, old_value, new_value",
     [
@@ -4460,42 +4489,70 @@ def test_send_files_by_email_contact_details_updates_contact_details_and_redirec
     service_one,
     mock_update_service,
     mock_get_service_settings_page_common,
+    mock_get_service_email_template,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
     contact_details_type,
     old_value,
     new_value,
+    endpoint,
+    extra_permissions,
+    extra_args,
+    expected_redirect_endpoint,
 ):
     service_one["contact_link"] = old_value
+    service_one["permissions"] += extra_permissions
 
-    page = client_request.post(
-        "main.send_files_by_email_contact_details",
+    client_request.post(
+        endpoint,
         service_id=SERVICE_ONE_ID,
         _data={
             "contact_details_type": contact_details_type,
             contact_details_type: new_value,
         },
-        _follow_redirects=True,
+        _expected_redirect=url_for(expected_redirect_endpoint, service_id=SERVICE_ONE_ID, **extra_args),
+        **extra_args,
     )
-
-    assert page.select_one("h1").text == "Settings"
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link=new_value)
 
 
+@pytest.mark.parametrize(
+    "endpoint, extra_permissions, extra_args, expected_redirect_endpoint",
+    (
+        (
+            "main.send_files_by_email_contact_details",
+            [],
+            {},
+            "main.service_settings",
+        ),
+        (
+            "main.setup_template_email_files",
+            ["send_files_via_ui"],
+            {"template_id": sample_uuid()},
+            "main.template_email_files",
+        ),
+    ),
+)
 def test_send_files_by_email_contact_details_uses_the_selected_field_when_multiple_textboxes_contain_data(
     client_request,
     service_one,
     mock_update_service,
     mock_get_service_settings_page_common,
+    mock_get_service_email_template,
     no_reply_to_email_addresses,
     no_letter_contact_blocks,
     single_sms_sender,
+    endpoint,
+    extra_permissions,
+    extra_args,
+    expected_redirect_endpoint,
 ):
     service_one["contact_link"] = "http://www.old-url.com"
+    service_one["permissions"] += extra_permissions
 
-    page = client_request.post(
-        "main.send_files_by_email_contact_details",
+    client_request.post(
+        endpoint,
         service_id=SERVICE_ONE_ID,
         _data={
             "contact_details_type": "url",
@@ -4503,10 +4560,10 @@ def test_send_files_by_email_contact_details_uses_the_selected_field_when_multip
             "email_address": "me@example.com",
             "phone_number": "0207 123 4567",
         },
-        _follow_redirects=True,
+        _expected_redirect=url_for(expected_redirect_endpoint, service_id=SERVICE_ONE_ID, **extra_args),
+        **extra_args,
     )
 
-    assert page.select_one("h1").text == "Settings"
     mock_update_service.assert_called_once_with(SERVICE_ONE_ID, contact_link="http://www.new-url.com")
 
 
@@ -4522,18 +4579,34 @@ def test_send_files_by_email_contact_details_page(
 ):
     service_one["contact_link"] = contact_link
     page = client_request.get("main.send_files_by_email_contact_details", service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
     assert normalize_spaces(page.select("h2")[0].text) == subheader
+
     if button_selected:
         assert "checked" in page.select_one("input[name=contact_details_type][value=email_address]").attrs
     else:
         assert "checked" not in page.select_one("input[name=contact_details_type][value=email_address]").attrs
 
 
+@pytest.mark.parametrize(
+    "endpoint, extra_permissions, extra_args",
+    (
+        ("main.send_files_by_email_contact_details", [], {}),
+        ("main.setup_template_email_files", ["send_files_via_ui"], {"template_id": sample_uuid()}),
+    ),
+)
 def test_send_files_by_email_contact_details_displays_error_message_when_no_radio_button_selected(
-    client_request, service_one
+    client_request,
+    service_one,
+    mock_get_service_email_template,
+    endpoint,
+    extra_permissions,
+    extra_args,
 ):
+    service_one["permissions"] += extra_permissions
     page = client_request.post(
-        "main.send_files_by_email_contact_details",
+        endpoint,
         service_id=SERVICE_ONE_ID,
         _data={
             "contact_details_type": None,
@@ -4541,12 +4614,19 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
             "email_address": "",
             "phone_number": "",
         },
-        _follow_redirects=True,
+        _expected_status=200,
+        **extra_args,
     )
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select an option"
-    assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
 
 
+@pytest.mark.parametrize(
+    "endpoint, extra_permissions, extra_args",
+    (
+        ("main.send_files_by_email_contact_details", [], {}),
+        ("main.setup_template_email_files", ["send_files_via_ui"], {"template_id": sample_uuid()}),
+    ),
+)
 @pytest.mark.parametrize(
     "contact_details_type, invalid_value, error",
     [
@@ -4558,25 +4638,30 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
 def test_send_files_by_email_contact_details_does_not_update_invalid_contact_details(
     client_request,
     service_one,
+    mock_get_service_email_template,
     contact_details_type,
     invalid_value,
     error,
+    endpoint,
+    extra_permissions,
+    extra_args,
     mocker,
 ):
     service_one["contact_link"] = "http://example.com/"
+    service_one["permissions"] += extra_permissions
 
     page = client_request.post(
-        "main.send_files_by_email_contact_details",
+        endpoint,
         service_id=SERVICE_ONE_ID,
         _data={
             "contact_details_type": contact_details_type,
             contact_details_type: invalid_value,
         },
-        _follow_redirects=True,
+        _expected_status=200,
+        **extra_args,
     )
 
     assert error in page.select_one(".govuk-error-message").text
-    assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
 
 
 class TestSetAuthType:

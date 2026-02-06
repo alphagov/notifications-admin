@@ -4727,7 +4727,7 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
         ([], "email", None, None, None, None),
         ([], "sms", None, None, None, None),
         ([], "letter", None, "Attach pages", "main.letter_template_attach_pages", None),
-        (["send_files_via_ui"], "email", None, "Attach files", "main.upload_template_email_files", "No files added"),
+        (["send_files_via_ui"], "email", None, "Attach files", "main.template_email_files", "No files added"),
         (
             ["send_files_via_ui"],
             "email",
