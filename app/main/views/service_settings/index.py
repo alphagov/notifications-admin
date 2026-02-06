@@ -315,14 +315,7 @@ def archive_service(service_id):
 @main.route("/services/<uuid:service_id>/service-settings/send-files-by-email", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def send_files_by_email_contact_details(service_id):
-    form = ServiceContactDetailsForm()
-
-    if request.method == "GET":
-        if current_service.contact_details_type:
-            field_to_update = getattr(form, current_service.contact_details_type)
-
-            form.contact_details_type.data = current_service.contact_details_type
-            field_to_update.data = current_service.contact_link
+    form = ServiceContactDetailsForm(service=current_service)
 
     if form.validate_on_submit():
         current_service.update(contact_link=form.chosen_contact_type)

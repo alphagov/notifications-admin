@@ -1921,6 +1921,17 @@ class AdminProviderRatioForm(OrderableFieldsForm):
 
 
 class ServiceContactDetailsForm(StripWhitespaceForm):
+    def __init__(self, *args, service=None, **kwargs):
+        if service and service.contact_details_type:
+            super().__init__(
+                *args,
+                contact_details_type=service.contact_details_type,
+                **{service.contact_details_type: service.contact_link},
+                **kwargs,
+            )
+        else:
+            super().__init__(*args, **kwargs)
+
     contact_details_type = GovukRadiosField(
         "Type of contact details",
         choices=[
