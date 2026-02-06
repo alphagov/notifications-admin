@@ -363,7 +363,7 @@ def useful_headers_after_request(response):
         (
             "default-src 'self' {asset_domain} 'unsafe-inline';"
             "script-src 'self' {asset_domain} 'nonce-{csp_nonce}';"
-            "connect-src 'self';"
+            "connect-src 'self' {asset_domain};"
             "object-src 'self';"
             "font-src 'self' {asset_domain} data:;"
             "img-src 'self' {asset_domain}"
