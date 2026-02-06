@@ -325,9 +325,7 @@ def send_files_by_email_contact_details(service_id):
             field_to_update.data = current_service.contact_link
 
     if form.validate_on_submit():
-        contact_type = form.contact_details_type.data
-
-        current_service.update(contact_link=form.data[contact_type])
+        current_service.update(contact_link=form.chosen_contact_type)
         return redirect(url_for(".service_settings", service_id=current_service.id))
 
     return render_template(

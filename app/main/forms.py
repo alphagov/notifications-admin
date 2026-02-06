@@ -1975,6 +1975,10 @@ class ServiceContactDetailsForm(StripWhitespaceForm):
 
         return super().validate(*args, **kwargs)
 
+    @property
+    def chosen_contact_type(self):
+        return self.data[self.contact_details_type.data]
+
 
 class ServiceReplyToEmailForm(StripWhitespaceForm):
     email_address = make_email_address_field(label="Reply-to email address", thing="an email address", gov_user=False)
