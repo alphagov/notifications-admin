@@ -413,6 +413,51 @@ def test_setup_template_email_files_page(
         template_id=fake_uuid,
     )
     assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
+    # Note that the rest of the tests for the form are in test_service_settings.py
+    assert page.select_one("main form")
+    assert [normalize_spaces(p.text) for p in page.select("main p.govuk-body")] == [
+        "Upload a file, then send your recipients an email with a link to download it.",
+        "You need to include contact details for your service so your users can get in touch if there’s a problem. "
+        "For example, if the link to download the file you sent them has expired.",
+    ]
+
+
+def test_setup_template_email_files_page_without_manage_service_permission(
+    client_request,
+    service_one,
+    fake_uuid,
+    mock_get_service_email_template,
+    active_user_with_permissions,
+    mock_update_service,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    active_user_with_permissions["permissions"][SERVICE_ONE_ID] = ["view_activity", "manage_templates"]
+    client_request.login(active_user_with_permissions)
+    page = client_request.get(
+        "main.setup_template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Send files by email"
+    assert not page.select_one("main form")
+    assert [normalize_spaces(p.text) for p in page.select("main p.govuk-body")] == [
+        "Upload a file, then send your recipients an email with a link to download it.",
+        "You need to include contact details for your service so your users can get in touch if there’s a problem. "
+        "For example, if the link to download the file you sent them has expired.",
+        "Someone on your team with the ‘Manage settings, team and usage’ permission can set this up for you.",
+    ]
+
+    client_request.post(
+        "main.setup_template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "contact_details_type": "url",
+            "url": "http://example.com",
+        },
+        _expected_status=200,
+    )
+    assert mock_update_service.call_args_list == []
 
 
 @pytest.mark.parametrize(

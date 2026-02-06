@@ -56,7 +56,7 @@ def setup_template_email_files(template_id, service_id):
     )
     form = ServiceContactDetailsForm(service=current_service)
 
-    if form.validate_on_submit():
+    if current_user.has_permissions("manage_service") and form.validate_on_submit():
         current_service.update(contact_link=form.chosen_contact_type)
         return redirect(url_for(".template_email_files", service_id=current_service.id, template_id=template.id))
 

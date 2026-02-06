@@ -30,18 +30,24 @@
       <p class="govuk-body">
         You need to include contact details for your service so your users can get in touch if there’s a problem. For example, if the link to download the file you sent them has expired.
       </p>
-      {% call form_wrapper() %}
+      {% if current_user.has_permissions("manage_service") %}
+        {% call form_wrapper() %}
 
-        {{ form.contact_details_type(param_extensions={
-          "items": [
-            { "conditional": { "html": form.url(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } },
-            { "conditional": { "html": form.email_address(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } },
-            { "conditional": { "html": form.phone_number(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } }
-          ]
-        }) }}
+          {{ form.contact_details_type(param_extensions={
+            "items": [
+              { "conditional": { "html": form.url(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } },
+              { "conditional": { "html": form.email_address(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } },
+              { "conditional": { "html": form.phone_number(param_extensions={ "label": { "classes": "govuk-visually-hidden" } }) } }
+            ]
+          }) }}
 
-        {{ page_footer('Save') }}
-      {% endcall %}
+          {{ page_footer('Save') }}
+        {% endcall %}
+      {% else %}
+        <p class="govuk-body">
+          Someone on your team with the ‘Manage settings, team and usage’ permission can set this up for you.
+        </p>
+      {% endif %}
     </div>
   </div>
 
