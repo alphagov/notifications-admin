@@ -1,4 +1,4 @@
-from flask import redirect, render_template, url_for
+from flask import abort, redirect, render_template, url_for
 from notifications_utils.insensitive_dict import InsensitiveSet
 
 from app import current_service, current_user, service_api_client
