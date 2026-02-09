@@ -55,3 +55,18 @@ def document_download_confirm_email_address(service_id, document_id):
         form=form,
         template=template,
     )
+
+
+@main.route("/d/<base64_uuid:service_id>/<base64_uuid:document_id>/download", methods=["GET", "POST"])
+@user_has_permissions()
+def document_download_page(service_id, document_id):
+    return render_template(
+        "views/document-download/download.html",
+        download_link="https://www.example.com",
+        file_size="2mb",
+        file_type="csv",
+        service_name="A service",
+        service_contact_info="test@user.gov.uk",
+        contact_info_type="email",
+        file_expiry_date="09-02-2026",
+    )

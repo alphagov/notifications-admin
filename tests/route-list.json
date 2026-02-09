@@ -14,6 +14,7 @@
     "/cookies",
     "/d/<base64_uuid:service_id>/<base64_uuid:document_id>",
     "/d/<base64_uuid:service_id>/<base64_uuid:document_id>/confirm-email-address",
+    "/d/<base64_uuid:service_id>/<base64_uuid:document_id>/download",
     "/delivery-and-failure",
     "/design-patterns-content-guidance",
     "/docs/notify-pdf-letter-spec-latest.pdf",

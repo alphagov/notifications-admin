@@ -1,0 +1,26 @@
+{% extends "document-download-template.html" %}
+
+{% block per_page_title %}
+  Download your file
+{% endblock %}
+
+{% block main_content %}
+  <p class="govuk-body">
+    Save your file somewhere you can find it. You may need to print it or show it to someone later.
+  </p>
+
+  <p class="govuk-body">
+    <a href="{{download_link}}" download class="govuk-link--no-visited-state" rel="noreferrer">Download this {{ file_type }} ({{ file_size }}) to your device</a>
+  </p>
+
+  <p class="govuk-body">
+    If you have any questions,
+    {% if contact_info_type == "link" %}
+      <a href="{{ service_contact_info }}" class="govuk-link" rel="noreferrer"> contact {{ service_name }}</a>.
+    {% elif contact_info_type == "email" %}
+      email <a href="mailto:{{ service_contact_info }}" class="govuk-link--no-visited-state">{{service_contact_info}}</a>.
+    {% else %}
+      call {{ service_contact_info }}.
+    {% endif %}
+  </p>
+{% endblock %}

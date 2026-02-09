@@ -490,7 +490,14 @@ def test_confirm_email_page_redirects_for_correct_email(
                 "To continue, enter the email address you use to sign in to Notify."
             ),
         ),
-        # TODO: Add test case for the download endpoint once built
+        (
+            ".document_download_page",
+            (
+                "Preview "
+                "This is a preview of the page your recipients will see "
+                "To change or remove the file, edit the email template."
+            ),
+        ),
     ),
 )
 def test_banner_on_all_pages(
@@ -526,4 +533,41 @@ def test_banner_on_all_pages(
         "main.view_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
+    )
+
+
+def test_document_download_page(
+    client_request,
+    fake_uuid,
+    mocker,
+):
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_json(SERVICE_ONE_ID, contact_link="test@user.gov.uk")},
+    )
+    email_template = create_template(
+        template_id=fake_uuid,
+        template_type="email",
+        email_files=[
+            {
+                "id": fake_uuid,
+                "filename": "relevant_info.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": True,
+            },
+        ],
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+    page = client_request.get(
+        ".document_download_page",
+        service_id=SERVICE_ONE_ID,
+        document_id=fake_uuid,
+        key=uuid_to_base64(fake_uuid),
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "Download your file"
+    assert (
+        normalize_spaces(page.select_one("a.govuk-link--no-visited-state").text)
+        == "Download this csv (2mb) to your device"
     )
