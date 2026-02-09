@@ -1109,18 +1109,13 @@ def create_service_templates(service_id, number_of_templates=6):
         template_type = template_types[(_ % 6) - 1]
 
         service_templates.append(
-            template_json(
-                service_id=service_id,
-                id_=TEMPLATE_ONE_ID if _ == 1 else str(generate_uuid()),
-                name=f"{template_type}_template_{template_number}",
-                type_=template_type,
-                content=f"{template_type} template {template_number} content",
-                subject=(
-                    f"{template_type} template {template_number} subject"
-                    if template_type in ["email", "letter"]
-                    else None
-                ),
-            )
+            {
+                "id": TEMPLATE_ONE_ID if _ == 1 else str(generate_uuid()),
+                "name": f"{template_type}_template_{template_number}",
+                "template_type": template_type,
+                "folder": None,
+                "is_precompiled_letter": False,
+            }
         )
 
     return {"data": service_templates}
@@ -1163,17 +1158,7 @@ def mock_get_service_templates_when_no_templates_exist(notify_admin, mocker):
 @pytest.fixture(scope="function")
 def mock_get_service_templates_with_only_one_template(notify_admin, mocker):
     def _get(service_id):
-        return {
-            "data": [
-                template_json(
-                    service_id=service_id,
-                    id_=generate_uuid(),
-                    name="sms_template_one",
-                    type_="sms",
-                    content="sms template one content",
-                )
-            ]
-        }
+        return create_service_templates(service_id, number_of_templates=1)
 
     return mocker.patch("app.service_api_client.get_service_templates", side_effect=_get)
 
