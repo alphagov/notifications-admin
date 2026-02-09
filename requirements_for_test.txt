@@ -13,12 +13,12 @@ blinker==1.9.0
     #   -r requirements.txt
     #   flask
     #   gds-metrics
-boto3==1.42.18
+boto3==1.42.44
     # via
     #   -r requirements.txt
     #   moto
     #   notifications-utils
-botocore==1.42.18
+botocore==1.42.44
     # via
     #   -r requirements.txt
     #   boto3
@@ -28,7 +28,7 @@ cachetools==6.2.4
     # via
     #   -r requirements.txt
     #   notifications-utils
-certifi==2025.11.12
+certifi==2026.1.4
     # via
     #   -r requirements.txt
     #   requests
@@ -45,7 +45,7 @@ click==8.3.1
     # via
     #   -r requirements.txt
     #   flask
-coverage==7.13.1
+coverage==7.13.3
     # via pytest-testmon
 cryptography==44.0.3
     # via
@@ -98,7 +98,7 @@ govuk-bank-holidays==0.18
     #   notifications-utils
 govuk-frontend-jinja==3.6.0
     # via -r requirements.txt
-greenlet==3.3.0
+greenlet==3.3.1
     # via
     #   -r requirements.txt
     #   eventlet
@@ -129,7 +129,7 @@ jinja2==3.1.6
     #   govuk-frontend-jinja
     #   moto
     #   notifications-utils
-jmespath==1.0.1
+jmespath==1.1.0
     # via
     #   -r requirements.txt
     #   boto3
@@ -166,7 +166,7 @@ ordered-set==4.1.0
     # via
     #   -r requirements.txt
     #   notifications-utils
-packaging==25.0
+packaging==26.0
     # via
     #   -r requirements.txt
     #   gunicorn
@@ -199,11 +199,11 @@ pyexcel-odsr==0.6.0
     # via -r requirements.txt
 pyexcel-xls==0.7.1
     # via -r requirements.txt
-pyjwt==2.10.1
+pyjwt==2.11.0
     # via
     #   -r requirements.txt
     #   notifications-python-client
-pypdf==6.5.0
+pypdf==6.7.0
     # via
     #   -r requirements.txt
     #   notifications-utils
@@ -276,7 +276,7 @@ smartypants==2.0.2
     # via
     #   -r requirements.txt
     #   notifications-utils
-soupsieve==2.8.1
+soupsieve==2.8.3
     # via beautifulsoup4
 statsd==4.0.1
     # via
@@ -286,7 +286,7 @@ texttable==1.7.0
     # via
     #   -r requirements.txt
     #   pyexcel
-urllib3==2.6.2
+urllib3==2.6.3
     # via
     #   -r requirements.txt
     #   botocore
@@ -295,7 +295,7 @@ urllib3==2.6.2
     #   sentry-sdk
 webencodings==0.5.1
     # via html5lib
-werkzeug==3.1.4
+werkzeug==3.1.5
     # via
     #   -r requirements.txt
     #   flask
