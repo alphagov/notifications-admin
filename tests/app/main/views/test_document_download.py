@@ -20,6 +20,7 @@ from tests.conftest import (
     (
         ".document_download_index",
         ".document_download_confirm_email_address",
+        ".document_download_page",
     ),
 )
 def test_redirect_if_user_not_signed_in(client_request, fake_uuid, endpoint):
@@ -273,12 +274,15 @@ def test_confirm_email_page_redirects_if_confirmation_not_required(
         ],
     )
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+    key = uuid_to_base64(fake_uuid)
+    bae64_service_id = uuid_to_base64(SERVICE_ONE_ID)
+    expected_url = f"/d/{bae64_service_id}/{key}/download?key={key}"
     client_request.get(
         ".document_download_confirm_email_address",
         service_id=SERVICE_ONE_ID,
         document_id=fake_uuid,
         key=uuid_to_base64(fake_uuid),
-        _expected_redirect="https://www.example.com",
+        _expected_redirect=expected_url,
     )
 
 
@@ -458,15 +462,18 @@ def test_confirm_email_page_redirects_for_correct_email(
         ],
     )
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+    key = uuid_to_base64(fake_uuid)
+    bae64_service_id = uuid_to_base64(SERVICE_ONE_ID)
+    expected_url = f"/d/{bae64_service_id}/{key}/download?key={key}"
     client_request.post(
         ".document_download_confirm_email_address",
         service_id=SERVICE_ONE_ID,
         document_id=fake_uuid,
-        key=uuid_to_base64(fake_uuid),
+        key=key,
         _data={
             "email_address": email_address,
         },
-        _expected_redirect="https://www.example.com",
+        _expected_redirect=expected_url,
     )
 
 

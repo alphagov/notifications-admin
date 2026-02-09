@@ -48,7 +48,14 @@ def document_download_confirm_email_address(service_id, document_id):
     )
 
     if not template_email_file.validate_users_email or form.validate_on_submit():
-        return redirect("https://www.example.com")
+        return redirect(
+            url_for(
+                "main.document_download_page",
+                service_id=current_service.id,
+                document_id=template_email_file.id,
+                key=uuid_to_base64(template.id),
+            )
+        )
 
     return render_template(
         "views/document-download/confirm-email-address.html",
@@ -57,7 +64,7 @@ def document_download_confirm_email_address(service_id, document_id):
     )
 
 
-@main.route("/d/<base64_uuid:service_id>/<base64_uuid:document_id>/download", methods=["GET", "POST"])
+@main.route("/d/<base64_uuid:service_id>/<base64_uuid:document_id>/download", methods=["GET"])
 @user_has_permissions()
 def document_download_page(service_id, document_id):
     return render_template(
