@@ -421,7 +421,7 @@ def test_setup_template_email_files_page(
     assert page.select_one("main form")
     assert [normalize_spaces(p.text) for p in page.select("main p.govuk-body")] == [
         "Upload a file, then send your recipients an email with a link to download it.",
-        "You need to include contact details for your service so your users can get in touch if there’s a problem. "
+        "Add contact details for your service so your recipients can get in touch if there’s a problem. "
         "For example, if the link to download the file you sent them has expired.",
     ]
 
@@ -446,7 +446,7 @@ def test_setup_template_email_files_page_without_manage_service_permission(
     assert not page.select_one("main form")
     assert [normalize_spaces(p.text) for p in page.select("main p.govuk-body")] == [
         "Upload a file, then send your recipients an email with a link to download it.",
-        "You need to include contact details for your service so your users can get in touch if there’s a problem. "
+        "Add contact details for your service so your recipients can get in touch if there’s a problem. "
         "For example, if the link to download the file you sent them has expired.",
         "Someone on your team with the ‘Manage settings, team and usage’ permission can set this up for you.",
     ]
