@@ -4427,6 +4427,41 @@ def test_cant_archive_inactive_service(
 
 
 @pytest.mark.parametrize(
+    "extra_permissions, expected_paragraphs",
+    (
+        (
+            [],
+            [
+                "This is an API-only feature.",
+                "To send a file by email, follow the instructions in our API documentation.",
+                "You need to include contact details for your service so your users can get in touch if "
+                "there’s a problem. For example, if the link to download the file you sent them has expired.",
+            ],
+        ),
+        (
+            ["send_files_via_ui"],
+            [
+                "To send a file by email, either:",
+                "choose a template and select ‘Attach files’",
+                "or follow the instructions in our API documentation",
+                "You need to include contact details for your service so your users can get in touch if "
+                "there’s a problem. For example, if the link to download the file you sent them has expired.",
+            ],
+        ),
+    ),
+)
+def test_send_files_by_email_in_page_guidance(
+    client_request,
+    service_one,
+    extra_permissions,
+    expected_paragraphs,
+):
+    service_one["permissions"] += extra_permissions
+    page = client_request.get("main.send_files_by_email_contact_details", service_id=SERVICE_ONE_ID)
+    assert [normalize_spaces(p.text) for p in page.select("main p, main li")] == expected_paragraphs
+
+
+@pytest.mark.parametrize(
     "endpoint, extra_permissions, extra_args",
     (
         ("main.send_files_by_email_contact_details", [], {}),
