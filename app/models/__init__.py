@@ -1,7 +1,6 @@
 from abc import ABC, ABCMeta, abstractmethod
 from functools import total_ordering
 
-from flask import abort
 from notifications_utils.serialised_model import (
     SerialisedModel,
     SerialisedModelCollection,
@@ -53,12 +52,6 @@ class JSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
 
     def __bool__(self):
         return self._dict != {}
-
-    def _get_by_id(self, things, id):
-        try:
-            return next(thing for thing in things if thing["id"] == str(id))
-        except StopIteration:
-            abort(404)
 
 
 class ModelList(SerialisedModelCollection):

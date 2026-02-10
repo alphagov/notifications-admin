@@ -553,7 +553,10 @@ class Service(JSONModel):
                 "name": "Templates",
                 "parent_id": None,
             }
-        return self._get_by_id(self.all_template_folders, folder_id)
+        for folder in self.all_template_folders:
+            if folder["id"] == str(folder_id):
+                return folder
+        abort(404)
 
     def get_template_folder_path(self, template_folder_id):
         folder = self.get_template_folder(template_folder_id)
