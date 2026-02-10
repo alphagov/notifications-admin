@@ -5,7 +5,7 @@ from flask import abort, url_for
 from notifications_utils.base64_uuid import uuid_to_base64
 from notifications_utils.serialised_model import SerialisedModelCollection
 
-from app.models import JSONModel
+from app.models import StrictJSONModel
 from app.s3_client.s3_template_email_file_upload_client import upload_template_email_file_to_s3
 
 
@@ -13,7 +13,7 @@ def _get_file_location(file_id: uuid, service_id: uuid) -> str:
     return f"{service_id}/{file_id}"
 
 
-class TemplateEmailFile(JSONModel):
+class TemplateEmailFile(StrictJSONModel):
     id: Any
     service_id: Any
     template_id: Any

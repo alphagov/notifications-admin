@@ -1219,6 +1219,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                             "retention_period": 26,
                             "id": str(UUID(int=1, version=4)),
                             "link_text": None,
+                            "validate_users_email": True,
                         }
                     ],
                 }
@@ -1235,6 +1236,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                             "retention_period": 26,
                             "id": str(UUID(int=1, version=4)),
                             "link_text": None,
+                            "validate_users_email": True,
                         }
                     ],
                 }
@@ -1256,6 +1258,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                             "retention_period": 26,
                             "id": str(UUID(int=1, version=4)),
                             "link_text": None,
+                            "validate_users_email": True,
                         }
                     ],
                 }
@@ -1272,6 +1275,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                             "retention_period": 26,
                             "id": str(UUID(int=1, version=4)),
                             "link_text": None,
+                            "validate_users_email": True,
                         }
                     ],
                 }
@@ -1293,12 +1297,14 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                             "retention_period": 26,
                             "id": str(UUID(int=1, version=4)),
                             "link_text": None,
+                            "validate_users_email": True,
                         },
                         {
                             "filename": "3.pdf",
                             "retention_period": 26,
                             "id": str(UUID(int=2, version=4)),
                             "link_text": None,
+                            "validate_users_email": True,
                         },
                     ],
                 }
@@ -1315,12 +1321,14 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                             "retention_period": 26,
                             "id": str(UUID(int=1, version=4)),
                             "link_text": None,
+                            "validate_users_email": True,
                         },
                         {
                             "filename": "3.pdf",
                             "retention_period": 26,
                             "id": str(UUID(int=2, version=4)),
                             "link_text": None,
+                            "validate_users_email": True,
                         },
                     ],
                 }
@@ -1341,7 +1349,15 @@ def test_TemplateChange_email_files_removed(
 
 @pytest.mark.parametrize("service_has_api_keys", (True, False))
 def test_TemplateChange_email_files_and_placeholders_removed(service_has_api_keys, fake_uuid):
-    email_file_data = {"filename": "2.pdf", "retention_period": 26, "id": fake_uuid, "link_text": None}
+    email_file_data = {
+        "filename": "2.pdf",
+        "retention_period": 26,
+        "id": fake_uuid,
+        "link_text": None,
+        "validate_users_email": True,
+        "service_id": fake_uuid,
+        "template_id": fake_uuid,
+    }
     old_template = EmailPreviewTemplate(
         {
             "id": fake_uuid,
