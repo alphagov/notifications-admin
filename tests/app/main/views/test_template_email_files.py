@@ -353,7 +353,8 @@ def test_file_settings_pages_for_email_validation(
     "endpoint, file_setting, updated_value",
     [
         ("main.change_link_text", "link_text", "link text"),
-        ("main.change_data_retention_period", "retention_period", 50),
+        ("main.change_data_retention_period", "retention_period", 1),
+        ("main.change_data_retention_period", "retention_period", 78),
     ],
 )
 def test_file_settings_page_post_the_right_data_for_retention_period_and_link_text(
@@ -394,6 +395,46 @@ def test_file_settings_page_post_the_right_data_for_retention_period_and_link_te
 
     assert args[0] == expected_url
     assert kwargs["data"][file_setting] == update_data[file_setting]
+
+
+@pytest.mark.parametrize(
+    "retention_period, expected_error_message",
+    (
+        ("", "Error: Enter a number of weeks"),
+        ("hello", "Error: Enter the number of weeks in digits"),
+        ("0", "Error: Enter a number of weeks"),
+        ("79", "Error: The number of weeks must be between 1 and 78"),
+    ),
+)
+def test_validate_retention_period(
+    client_request,
+    service_one,
+    fake_uuid,
+    test_template_email_files_data,
+    retention_period,
+    expected_error_message,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                email_files=test_template_email_files_data,
+            )
+        },
+    )
+    page = client_request.post(
+        "main.change_data_retention_period",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        template_email_file_id=test_template_email_files_data[0]["id"],
+        _data={"retention_period": retention_period},
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == expected_error_message
 
 
 def test_file_settings_page_post_the_right_data_for_email_validation(
@@ -779,7 +820,7 @@ def test_upload_file_does_not_update_template_when_placeholder_already_exists(
                 "id": AnyStringMatching(UUID4_REGEX_PATTERN),
                 "filename": "tests/test_pdf_files/one_page_pdf.pdf",
                 "created_by_id": AnyStringMatching(UUID4_REGEX_PATTERN),
-                "retention_period": 90,
+                "retention_period": 78,
                 "validate_users_email": True,
             },
         ),
