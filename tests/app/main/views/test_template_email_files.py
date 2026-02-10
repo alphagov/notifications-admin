@@ -508,7 +508,7 @@ def test_setup_template_email_files_page_without_manage_service_permission(
         "Upload a file, then send your recipients an email with a link to download it.",
         "Add contact details for your service so your recipients can get in touch if there’s a problem. "
         "For example, if the link to download the file you sent them has expired.",
-        "Someone on your team with the ‘Manage settings, team and usage’ permission can set this up for you.",
+        "Ask a team member with the ‘Manage settings, team and usage’ permission to set this up for you.",
     ]
 
     client_request.post(
