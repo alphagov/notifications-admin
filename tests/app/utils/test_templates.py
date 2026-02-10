@@ -651,7 +651,7 @@ def test_letter_image_template_marks_first_page_of_attachment(mocker, fake_uuid)
                     "content": "Content",
                     "subject": "Subject",
                     "template_type": "letter",
-                    "letter_attachment": {"id": fake_uuid, "page_count": 3},
+                    "letter_attachment": {"id": fake_uuid, "page_count": 3, "original_filename": "example.pdf"},
                 },
                 image_url="http://example.com/endpoint.png",
             )
