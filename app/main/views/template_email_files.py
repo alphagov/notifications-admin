@@ -1,4 +1,5 @@
-from flask import abort, redirect, render_template, url_for
+from flask import abort, redirect, render_template, request, url_for
+from notifications_utils.field import PlainTextField
 from notifications_utils.insensitive_dict import InsensitiveSet
 
 from app import current_service, current_user, service_api_client
@@ -68,7 +69,8 @@ def setup_template_email_files(template_id, service_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>", methods=["GET"]
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>",
+    methods=["GET", "POST"],
 )
 @service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
@@ -78,12 +80,29 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
         current_user,
         must_be_of_type="email",
     )
+    delete = bool(request.args.get("delete"))
     template_email_file = template.email_files.by_id(template_email_file_id)
+    if request.method == "POST":
+        if delete:
+            new_content = PlainTextField(
+                template.content,
+                {template_email_file.filename: ""},
+                html="passthrough",
+            )
+            service_api_client.update_service_template(
+                service_id=service_id,
+                template_id=template_id,
+                content=str(new_content).strip(),
+                archive_email_file_ids=[template_email_file.id],
+            )
+            return redirect(url_for("main.view_template", service_id=current_service.id, template_id=template.id))
 
     return render_template(
         "views/templates/email-template-files/email_file.html",
         template_email_file=template_email_file,
+        service_id=service_id,
         template_id=template_id,
+        delete=delete,
     )
 
 

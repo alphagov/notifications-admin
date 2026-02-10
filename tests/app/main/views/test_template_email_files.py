@@ -169,6 +169,66 @@ def test_manage_a_template_email_file(
         "Available for 90 weeks after sending Change how long the file should be available once it's sent",
         "Ask recipient for email address No Change if recipient should be asked for email address",
     ]
+    delete_link = page.select_one("a.govuk-link.govuk-link--destructive")
+    assert normalize_spaces(delete_link) == "Remove this file"
+    assert (
+        delete_link["href"]
+        == f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{test_data_for_a_template_email_file['id']}?delete=true"  # noqa: E501
+    )
+    assert not page.select_one("div.banner-dangerous")
+    page = client_request.get(
+        "main.manage_a_template_email_file",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        template_email_file_id=test_data_for_a_template_email_file["id"],
+        delete=True,
+    )
+    banner = page.select_one("div.banner-dangerous")
+    assert (normalize_spaces(banner)) == "Are you sure you want to remove this file? Yes, remove"
+    assert (
+        banner.select_one("form")["action"]
+        == f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{test_data_for_a_template_email_file['id']}?delete=true"  # noqa: E501
+    )
+    assert banner.select_one("form")["method"] == "post"
+
+
+def test_post_delete_to_manage_a_template_email_file_updates_and_redirects(
+    service_one,
+    fake_uuid,
+    client_request,
+    test_template_email_files_data,
+    test_data_for_a_template_email_file,
+    mocker,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                email_files=test_template_email_files_data,
+                content="This template contains an email file ((test_file_1.csv))",
+            )
+        },
+    )
+    mock_update_service_template = mocker.patch(
+        "app.notify_client.service_api_client.ServiceAPIClient.update_service_template"
+    )
+    client_request.post(
+        "main.manage_a_template_email_file",
+        service_id=service_one["id"],
+        template_id=fake_uuid,
+        template_email_file_id=test_data_for_a_template_email_file["id"],
+        delete=True,
+        _expected_redirect=url_for("main.view_template", service_id=service_one["id"], template_id=fake_uuid),
+    )
+    mock_update_service_template.assert_called_once_with(
+        service_id=service_one["id"],
+        template_id=fake_uuid,
+        content="This template contains an email file",
+        archive_email_file_ids=[test_data_for_a_template_email_file["id"]],
+    )
 
 
 def test_manage_a_template_email_file_raises_404_for_invalid_template_email_file_id(

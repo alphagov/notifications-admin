@@ -2,6 +2,8 @@
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+{% from "components/page-footer.html" import page_footer %}
+{% from "components/banner.html" import banner %}
 
 {%  set title = template_email_file.filename %}
 {% block service_page_title %}
@@ -14,6 +16,17 @@
 
 {% block maincolumn_content %}
     {{ page_header(title) }}
+
+    {% if delete %}
+    <div class="govuk-!-margin-bottom-6">
+      {{ banner(
+        'Are you sure you want to remove this file?',
+        type='dangerous',
+        delete_button='Yes, remove',
+        action=url_for('main.manage_a_template_email_file', service_id = service_id, template_id = template_id, template_email_file_id=template_email_file.id, delete = "true")
+      ) }}
+    </div>
+    {% endif %}
 
     {%  set file_data = [
             {
@@ -85,4 +98,8 @@
       "rows": file_data
          })
     }}
+  {{ page_footer(
+      delete_link_text="Remove this file",
+      delete_link=url_for('main.manage_a_template_email_file', service_id = service_id, template_id = template_id, template_email_file_id=template_email_file.id, delete = "true"),
+    )}}
 {% endblock %}
