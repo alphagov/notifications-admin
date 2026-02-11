@@ -17,7 +17,7 @@ class TemplateEmailFileClient(NotifyAdminAPIClient):
         template_id,
         filename,
         created_by_id,
-        retention_period=90,
+        retention_period=78,
         validate_users_email=True,
     ):
         data = {
