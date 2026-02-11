@@ -1,3 +1,5 @@
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
+
 {% extends "govuk_frontend_jinja/template.html"%}
 
 {% set cspNonce = request.csp_nonce %}
@@ -53,6 +55,17 @@
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
+      {% call govukNotificationBanner({
+        "titleText": "Preview"
+      }) %}
+        <p class="govuk-notification-banner__heading">
+          This is a preview of the page your recipients will see
+        </p>
+        <p class="govuk-body">
+          To change or remove the file, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.view_template", service_id=current_service.id, template_id=template.id) }}">edit the email template</a>.
+        </p>
+        {% block extra_banner_content %}{% endblock %}
+      {% endcall %}
       <h1 class="govuk-heading-l">{{ _per_page_title }}</h1>
       {% block main_content %}{% endblock %}
     </div>

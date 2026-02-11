@@ -21,6 +21,7 @@ def document_download_index(service_id, document_id):
 
     return render_template(
         "views/document-download/index.html",
+        template=template,
         next_page=url_for(
             "main.document_download_confirm_email_address",
             service_id=current_service.id,
@@ -52,4 +53,5 @@ def document_download_confirm_email_address(service_id, document_id):
     return render_template(
         "views/document-download/confirm-email-address.html",
         form=form,
+        template=template,
     )

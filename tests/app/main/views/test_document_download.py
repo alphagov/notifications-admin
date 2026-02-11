@@ -236,7 +236,9 @@ def test_landing_page(
         key=uuid_to_base64(fake_uuid),
     )
     assert normalize_spaces(page.select_one("main h1")) == "You have a file to download"
-    assert [normalize_spaces(p.text) for p in page.select("main p.govuk-body")] == expected_paragraphs
+    assert [
+        normalize_spaces(p.text) for p in page.select(".govuk-grid-column-two-thirds > p.govuk-body")
+    ] == expected_paragraphs
 
     button = page.select_one("a.govuk-button")
     assert button["href"] == url_for(
@@ -247,7 +249,7 @@ def test_landing_page(
     )
     assert normalize_spaces(button.text) == "Continue"
 
-    link = page.select_one("main p.govuk-body a.govuk-link")
+    link = page.select_one(".govuk-grid-column-two-thirds > p.govuk-body a.govuk-link")
     assert not expected_url or link["href"] == expected_url
     assert normalize_spaces(link) == expected_link_text
 
@@ -370,9 +372,11 @@ def test_confirm_email_page_shows_form_if_confirmation_required(
     assert "value" not in form.select_one("input[type=email][name=email_address]")
     assert normalize_spaces(form.select_one("button.govuk-button").text) == "Continue"
 
-    assert [normalize_spaces(p.text) for p in page.select("main p.govuk-body")] == expected_paragraphs
+    assert [
+        normalize_spaces(p.text) for p in page.select(".govuk-grid-column-two-thirds > p.govuk-body")
+    ] == expected_paragraphs
 
-    link = page.select_one("main p.govuk-body a.govuk-link")
+    link = page.select_one(".govuk-grid-column-two-thirds > p.govuk-body a.govuk-link")
     assert not expected_url or link["href"] == expected_url
     assert normalize_spaces(link) == expected_link_text
 
@@ -463,4 +467,63 @@ def test_confirm_email_page_redirects_for_correct_email(
             "email_address": email_address,
         },
         _expected_redirect="https://www.example.com",
+    )
+
+
+@pytest.mark.parametrize(
+    "endpoint, expected_banner_text",
+    (
+        (
+            ".document_download_index",
+            (
+                "Preview "
+                "This is a preview of the page your recipients will see "
+                "To change or remove the file, edit the email template."
+            ),
+        ),
+        (
+            ".document_download_confirm_email_address",
+            (
+                "Preview "
+                "This is a preview of the page your recipients will see "
+                "To change or remove the file, edit the email template. "
+                "To continue, enter the email address you use to sign in to Notify."
+            ),
+        ),
+        # TODO: Add test case for the download endpoint once built
+    ),
+)
+def test_banner_on_all_pages(
+    client_request,
+    fake_uuid,
+    mocker,
+    endpoint,
+    expected_banner_text,
+):
+    email_template = create_template(
+        template_id=fake_uuid,
+        template_type="email",
+        email_files=[
+            {
+                "id": fake_uuid,
+                "filename": "invite.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": True,
+            },
+        ],
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+    page = client_request.get(
+        endpoint,
+        service_id=SERVICE_ONE_ID,
+        document_id=fake_uuid,
+        key=uuid_to_base64(fake_uuid),
+    )
+    banner = page.select_one(".govuk-notification-banner")
+    assert normalize_spaces(banner.text) == expected_banner_text
+    assert banner.select_one("a")["href"] == url_for(
+        "main.view_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
     )

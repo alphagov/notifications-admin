@@ -7,6 +7,12 @@
   Confirm your email address
 {% endblock %}
 
+{% block extra_banner_content %}
+  <p class="govuk-body">
+    To continue, enter the email address you use to sign in to Notify.
+  </p>
+{% endblock %}
+
 {% block main_content %}
 
   {{ errorSummary(form) }}
