@@ -24,9 +24,7 @@ import RemoveInPresenceOf from './remove-in-presence-of.mjs';
 import AuthenticateSecurityKey from './authenticate-security-key.mjs';
 import RegisterSecurityKey from './register-security-key.mjs';
 import UpdateStatus from './update-status.mjs';
-
-// Modules from 3rd party vendors
-import morphdom from 'morphdom';
+import UpdateContent from './update-content.mjs';
 
 createAll(Button, 
   { preventDoubleClick: true }
@@ -144,13 +142,11 @@ if ($updateStatus) {
   new UpdateStatus($updateStatus).init();
 }
 
+const $updateContentBlocks = document.querySelectorAll('[data-notify-module="update-content"]');
+if ($updateContentBlocks.length > 0) {
+  $updateContentBlocks.forEach(updateBlockComponent => {
+    new UpdateContent(updateBlockComponent); 
+  });
+};
+
 const focusBanner = new FocusBanner();
-
-// ES modules do not export to global so in order to
-// reuse some of teh import here in our other
-// global functions, we need to explicitly attach them to window
-// this will be removed when we migrate out files
-// to ES modules
-
-// for UpdateContent.js
-window.Morphdom = morphdom;
