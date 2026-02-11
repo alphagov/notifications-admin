@@ -1,5 +1,6 @@
 from abc import ABC, ABCMeta, abstractmethod
 from functools import total_ordering
+from inspect import get_annotations
 
 from notifications_utils.serialised_model import (
     SerialisedModel,
@@ -45,7 +46,7 @@ class JSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}
-        for property, type_ in self.__annotations__.items():
+        for property, type_ in get_annotations(type(self)).items():
             if property in self._dict:
                 value = self.coerce_value_to_type(self._dict[property], type_)
                 setattr(self, property, value)
