@@ -1,6 +1,6 @@
-$product-page-blue: #1D70B8;
+$product-page-blue: #F54927;
 $product-page-underline-colour: rgb(govuk-colour("white"), 0.25);
-// See https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/button/_button.scss#L24
+/// See https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/button/_button.scss#L24
 $button-shadow-size: $govuk-border-width-form-element;
 
 .product-page {
@@ -92,5 +92,3 @@ $button-shadow-size: $govuk-border-width-form-element;
   box-shadow: 0 $button-shadow-size 0 govuk-shade($colour: $product-page-blue, $percentage: 15%);
 
 }
-
-
