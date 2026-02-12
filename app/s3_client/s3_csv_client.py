@@ -2,6 +2,8 @@ import uuid
 
 import botocore
 from flask import current_app
+from notifications_utils.eventlet import EventletTimeout
+from notifications_utils.exception_handling import extract_reraise_chained_exception
 from notifications_utils.s3 import s3upload as utils_s3upload
 
 from app.s3_client import get_s3_object
@@ -36,7 +38,8 @@ def s3download(service_id, upload_id, bucket=None):
     contents = ""
     try:
         key = get_csv_upload(service_id, upload_id, bucket)
-        contents = key.get()["Body"].read().decode("utf-8")
+        with extract_reraise_chained_exception(EventletTimeout):
+            contents = key.get()["Body"].read().decode("utf-8")
     except botocore.exceptions.ClientError as e:
         extra = {
             "upload_id": upload_id,
@@ -59,7 +62,8 @@ def set_metadata_on_csv_upload(service_id, upload_id, bucket=None, **kwargs):
 def get_csv_metadata(service_id, upload_id, bucket=None):
     try:
         key = get_csv_upload(service_id, upload_id, bucket)
-        return key.get()["Metadata"]
+        with extract_reraise_chained_exception(EventletTimeout):
+            return key.get()["Metadata"]
     except botocore.exceptions.ClientError as e:
         extra = {
             "upload_id": upload_id,
