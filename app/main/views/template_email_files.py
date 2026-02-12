@@ -149,7 +149,7 @@ def upload_template_email_files(template_id, service_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change_link_text",
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change-link-text",
     methods=["GET", "POST"],
 )
 @service_has_permission("send_files_via_ui")
@@ -183,7 +183,7 @@ def change_link_text(service_id, template_id, template_email_file_id):
 
 
 @main.route(
-    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change_data_retention",
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change-data-retention",
     methods=["GET", "POST"],
 )
 @service_has_permission("send_files_via_ui")
@@ -217,7 +217,7 @@ def change_data_retention_period(service_id, template_id, template_email_file_id
 
 
 @main.route(
-    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change_email_validation",
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change-email-validation",
     methods=["GET", "POST"],
 )
 @service_has_permission("send_files_via_ui")

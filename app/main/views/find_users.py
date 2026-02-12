@@ -58,7 +58,7 @@ def archive_user(user_id):
         return user_information(user_id)
 
 
-@main.route("/users/<uuid:user_id>/change_auth", methods=["GET", "POST"])
+@main.route("/users/<uuid:user_id>/change-auth", methods=["GET", "POST"])
 @user_is_platform_admin
 def change_user_auth(user_id):
     user = User.from_id(user_id)
