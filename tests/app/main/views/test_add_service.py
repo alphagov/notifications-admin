@@ -21,32 +21,6 @@ def test_non_gov_user_cannot_see_add_service_button(
     assert "Add a new service" not in page.text
 
 
-def test_gov_user_can_see_trial_mode_guidance_page(
-    client_request,
-    api_user_active,
-    mock_get_organisations,
-    mock_get_organisations_and_services_for_user,
-):
-    client_request.login(api_user_active)
-    page = client_request.get("main.add_service")
-    continue_button = page.select_one("main a.govuk-button")
-    assert page.select_one("h1").text.strip() == "Your service will start in trial mode"
-    assert continue_button["href"] == url_for(".name_service")
-
-
-def test_nongov_user_cannot_see_trial_mode_guidance_page(
-    client_request,
-    login_non_govuser,
-    api_nongov_user_active,
-    mock_get_organisations,
-):
-    assert is_gov_user(current_user.email_address) is False
-    client_request.get(
-        "main.add_service",
-        _expected_status=403,
-    )
-
-
 @pytest.mark.parametrize(
     "org_json",
     (
@@ -63,7 +37,7 @@ def test_get_should_render_add_service_template(
         "app.organisations_client.get_organisation_by_domain",
         return_value=org_json,
     )
-    page = client_request.get("main.name_service")
+    page = client_request.get("main.add_service")
     assert page.select_one("h1").text.strip() == "Name your service"
     assert page.select_one("input[name=name]").get("value") is None
     assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
@@ -96,7 +70,7 @@ def test_get_should_not_render_radios_if_org_type_known(
         "app.organisations_client.get_organisation_by_domain",
         return_value=organisation_json(organisation_type="central"),
     )
-    page = client_request.get("main.name_service")
+    page = client_request.get("main.add_service")
     assert page.select_one("h1").text.strip() == "Name your service"
     assert page.select_one("input[name=name]").get("value") is None
 
@@ -163,7 +137,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
     )
 
     client_request.post(
-        "main.name_service",
+        "main.add_service",
         _data={
             "name": "testing the post",
             "organisation_type": posted,
@@ -216,7 +190,7 @@ def test_add_service_has_to_choose_org_type(
         return_value=None,
     )
     page = client_request.post(
-        "main.name_service",
+        "main.add_service",
         _data={
             "name": "testing the post",
         },
@@ -248,7 +222,7 @@ def test_get_should_only_show_nhs_org_types_radios_if_user_has_nhs_email(
         "app.organisations_client.get_organisation_by_domain",
         return_value=None,
     )
-    page = client_request.get("main.name_service")
+    page = client_request.get("main.add_service")
     assert page.select_one("h1").text.strip() == "Name your service"
     assert page.select_one("input[name=name]").get("value") is None
     assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
@@ -288,7 +262,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     organisation_type,
 ):
     client_request.post(
-        "main.name_service",
+        "main.add_service",
         _data={
             "name": "testing the post",
             "organisation_type": organisation_type,
@@ -324,7 +298,7 @@ def test_add_service_sets_nhs_gp_daily_sms_limit_to_zero_when_user_already_has_s
     mock_get_services,
 ):
     client_request.post(
-        "main.name_service",
+        "main.add_service",
         _data={"name": "testing the post", "organisation_type": "nhs_gp"},
         _expected_status=302,
         _expected_redirect=url_for(
@@ -349,7 +323,7 @@ def test_add_service_sets_nhs_gp_daily_sms_limit_to_zero_when_user_has_no_other_
     mock_get_services_with_no_services,
 ):
     client_request.post(
-        "main.name_service",
+        "main.add_service",
         _data={"name": "testing the post", "organisation_type": "nhs_gp"},
         _expected_status=302,
         _expected_redirect=url_for(
@@ -380,7 +354,7 @@ def test_add_service_fails_if_service_name_fails_validation(
     error_message,
 ):
     page = client_request.post(
-        "main.name_service",
+        "main.add_service",
         _data={"name": name},
         _expected_status=200,
     )
@@ -401,7 +375,7 @@ def test_should_return_form_errors_with_duplicate_service_name_regardless_of_cas
     mocker.patch("app.service_api_client.create_service", side_effect=_create)
 
     page = client_request.post(
-        "main.name_service",
+        "main.add_service",
         _data={
             "name": "SERVICE ONE",
             "organisation_type": "central",
@@ -419,7 +393,7 @@ def test_non_government_user_cannot_access_create_service_page(
 ):
     assert is_gov_user(current_user.email_address) is False
     client_request.get(
-        "main.name_service",
+        "main.add_service",
         _expected_status=403,
     )
 
@@ -432,7 +406,7 @@ def test_non_government_user_cannot_create_service(
 ):
     assert is_gov_user(current_user.email_address) is False
     client_request.post(
-        "main.name_service",
+        "main.add_service",
         _data={"name": "SERVICE TWO"},
         _expected_status=403,
     )
@@ -448,7 +422,7 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
 ):
     client_request.login(api_user_active_email_auth, service=None)
     client_request.post(
-        "main.name_service",
+        "main.add_service",
         _data={
             "name": "service name",
             "organisation_type": "central",

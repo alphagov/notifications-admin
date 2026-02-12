@@ -216,7 +216,6 @@ EXCLUDED_ENDPOINTS = set(
             "manage_template_folder",
             "manage_users",
             "monthly",
-            "name_service",
             "new_terms_of_use",
             "new_password",
             "no_cookie.check_messages_preview",
