@@ -9,9 +9,9 @@ blinker==1.9.0
     #   flask
     #   gds-metrics
     #   sentry-sdk
-boto3==1.42.44
+boto3[crt]==1.42.44
     # via notifications-utils
-botocore==1.42.44
+botocore[crt]==1.42.44
     # via
     #   boto3
     #   s3transfer
@@ -61,7 +61,7 @@ govuk-frontend-jinja==3.6.0
     # via -r requirements.in
 greenlet==3.3.1
     # via eventlet
-gunicorn==23.0.0
+gunicorn[eventlet]==23.0.0
     # via notifications-utils
 humanize==4.4.0
     # via -r requirements.in
@@ -98,7 +98,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==10.0.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@b4aeb958de2b08c85c6dfabde792cfc939f3c551
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@107.0.2
     # via -r requirements.in
 openpyxl==3.1.5
     # via -r requirements.in
@@ -108,7 +108,7 @@ packaging==26.0
     # via gunicorn
 phonenumbers==9.0.21
     # via notifications-utils
-pillow==11.3.0
+pillow==12.1.1
     # via -r requirements.in
 prometheus-client==0.15.0
     # via gds-metrics
@@ -149,7 +149,7 @@ s3transfer==0.16.0
     # via boto3
 segno==1.6.6
     # via notifications-utils
-sentry-sdk==1.45.1
+sentry-sdk[flask]==1.45.1
     # via -r requirements.in
 six==1.17.0
     # via python-dateutil
