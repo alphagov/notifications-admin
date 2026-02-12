@@ -244,7 +244,7 @@ def guidance_letter_branding():
     )
 
 
-@main.route("/using-notify/links-and-URLs")
+@main.route("/using-notify/links-and-urls")
 def guidance_links_and_URLs():
     return render_template(
         "views/guidance/using-notify/links-and-URLs.html",
@@ -494,6 +494,7 @@ REDIRECTS = {
     "/user-profile/security-keys": "main.your_account_security_keys",
     "/user-profile/security-keys/<uuid:key_id>/manage": "main.your_account_manage_security_key",
     "/user-profile/take-part-in-user-research": "main.your_account_take_part_in_user_research",
+    "/using-notify/links-and-URLs": "main.guidance_links_and_URLs",
 }
 
 for old_url, new_endpoint in REDIRECTS.items():
