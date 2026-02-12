@@ -6,6 +6,7 @@ import pytest
 from flask import current_app
 from notifications_utils.formatters import formatted_list
 
+from app.main.views.index import REDIRECTS
 from tests import sample_uuid, service_json
 from tests.conftest import (
     ORGANISATION_ID,
@@ -354,3 +355,14 @@ def test_routes_require_types(client_request):
                         f"{formatted_list(required_types, conjunction='or', before_each='<', after_each=f':{param}>')} "
                         f"in {rule.rule}"
                     )
+
+
+def test_url_paths_are_kebab_case(client_request):
+    for rule in current_app.url_map.iter_rules():
+        if rule.rule in REDIRECTS:
+            continue
+        for part in rule._parts:
+            if not part.static:
+                continue
+            if "_" in part.content[1:]:
+                pytest.fail(f"URL path not kebab-case:\n    {rule.rule}\n\n    (remove underscore in {part.content})")
