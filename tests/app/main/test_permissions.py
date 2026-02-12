@@ -364,5 +364,9 @@ def test_url_paths_are_kebab_case(client_request):
         for part in rule._parts:
             if not part.static:
                 continue
-            if "_" in part.content[1:]:
+            if "_" in part.content[1:]:  # Allow underscore-prefixed paths like /_email
                 pytest.fail(f"URL path not kebab-case:\n    {rule.rule}\n\n    (remove underscore in {part.content})")
+            if any(c.isupper() for c in part.content):
+                pytest.fail(
+                    f"URL path not all lowercase:\n    {rule.rule}\n\n    (remove capitalisation in {part.content})"
+                )
