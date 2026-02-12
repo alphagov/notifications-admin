@@ -1,8 +1,11 @@
+from uuid import uuid4
+
 import pytest
 from werkzeug.datastructures import MultiDict
 
 from app.main.forms import CreateKeyForm
 from app.models.api_key import APIKeys
+from tests import api_key_json
 
 
 @pytest.mark.parametrize(
@@ -22,14 +25,16 @@ def test_return_validation_error_when_key_name_exists(
         "app.models.api_key.api_key_api_client.get_api_keys",
         return_value={
             "apiKeys": [
-                {
-                    "name": "some key",
-                    "expiry_date": expiry_date,
-                },
-                {
-                    "name": "another key",
-                    "expiry_date": None,
-                },
+                api_key_json(
+                    id_=str(uuid4()),
+                    name="some key",
+                    expiry_date=expiry_date,
+                ),
+                api_key_json(
+                    id_=str(uuid4()),
+                    name="another key",
+                    expiry_date=None,
+                ),
             ]
         },
     )

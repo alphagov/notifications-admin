@@ -4,12 +4,12 @@ from typing import Any
 from flask import abort
 
 from app.formatters import format_date_human, format_time, get_human_day
-from app.models import JSONModel, ModelList
+from app.models import ModelList, StrictJSONModel
 from app.notify_client.service_api_client import service_api_client
 from app.utils.time import to_utc_string
 
 
-class UnsubscribeRequestsReport(JSONModel):
+class UnsubscribeRequestsReport(StrictJSONModel):
     service_id: Any
     count: int
     batch_id: Any

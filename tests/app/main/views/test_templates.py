@@ -4737,6 +4737,7 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
                     "retention_period": 26,
                     "id": str(uuid.UUID(int=1, version=4)),
                     "link_text": None,
+                    "validate_users_email": True,
                 }
             ],
             "Manage files",
@@ -4752,12 +4753,14 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
                     "retention_period": 26,
                     "id": str(uuid.UUID(int=1, version=4)),
                     "link_text": None,
+                    "validate_users_email": True,
                 },
                 {
                     "filename": "picture.png",
                     "retention_period": 90,
                     "id": str(uuid.UUID(int=2, version=4)),
                     "link_text": None,
+                    "validate_users_email": True,
                 },
             ],
             "Manage files",
