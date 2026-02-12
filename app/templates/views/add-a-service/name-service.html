@@ -8,9 +8,7 @@
 {% set heading = 'Name your service' %}
 
 {% block backLink %}
-  {% if request.args.get("back") == "your_services" %}
-    {{ govukBackLink({ "href": url_for('main.your_services') }) }}
-  {% endif %}
+  {{ govukBackLink({ "href": url_for('main.add_service') }) }}
 {% endblock %}
 
 {% block per_page_title %}
