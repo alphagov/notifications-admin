@@ -260,12 +260,12 @@ def test_manage_a_template_email_file_raises_404_for_invalid_template_email_file
 @pytest.mark.parametrize(
     "endpoint, page_title, form_label, path_segment",
     [
-        ("main.change_link_text", "Link text", "Link text (optional)", "change_link_text"),
+        ("main.change_link_text", "Link text", "Link text (optional)", "change-link-text"),
         (
             "main.change_data_retention_period",
             "How long should the file be available for",
             "Number of weeks available to recipients",
-            "change_data_retention",
+            "change-data-retention",
         ),
     ],
 )
@@ -343,7 +343,7 @@ def test_file_settings_pages_for_email_validation(
     form = page.select_one("form[method='post']")
     button = form.select_one(".govuk-button")
     expected_url = (
-        f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{template_email_file_id}/change_email_validation"
+        f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{template_email_file_id}/change-email-validation"
     )
     assert button.text.strip() == "Continue"
     assert form["action"] == expected_url
