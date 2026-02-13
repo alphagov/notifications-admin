@@ -358,13 +358,14 @@ def make_nonce_before_request():
 #  https://www.owasp.org/index.php/List_of_useful_HTTP_headers
 def useful_headers_after_request(response):
     response.headers.add("X-Content-Type-Options", "nosniff")
-    response.headers.add("X-XSS-Protection", "1; mode=block")
+    response.headers.add("X-Frame-Options", "SAMEORIGIN")
+    response.headers.add("X-Permitted-Cross-Domain-Policies", "none")
     response.headers.add(
         "Content-Security-Policy",
         (
             "default-src 'self' {asset_domain} 'unsafe-inline';"
             "script-src 'self' {asset_domain} 'nonce-{csp_nonce}';"
-            "connect-src 'self';"
+            "connect-src 'self' {asset_domain};"
             "object-src 'self';"
             "font-src 'self' {asset_domain} data:;"
             "img-src 'self' {asset_domain}"
@@ -389,9 +390,10 @@ def useful_headers_after_request(response):
     if "Cache-Control" in response.headers:
         del response.headers["Cache-Control"]
     response.headers.add("Cache-Control", "no-store, no-cache, private, must-revalidate")
+    response.headers.add("Pragma", "no-cache")
     for key, value in response.headers:
         response.headers[key] = SanitiseASCII.encode(value)
-    response.headers.add("Strict-Transport-Security", "max-age=31536000; preload")
+    response.headers.add("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
     response.headers.add("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.add(
         "Cross-Origin-Embedder-Policy",
