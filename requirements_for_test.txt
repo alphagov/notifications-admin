@@ -158,7 +158,7 @@ moto==5.1.0
     # via -r requirements_for_test.in
 notifications-python-client==10.0.0
     # via -r requirements.txt
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@b4aeb958de2b08c85c6dfabde792cfc939f3c551
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@5f885285e6f5f0b5ece4695c7008f57ffe099510
     # via -r requirements.txt
 openpyxl==3.1.5
     # via -r requirements.txt
