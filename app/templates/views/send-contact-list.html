@@ -33,7 +33,7 @@
   {% elif contact_lists %}
     <div class='dashboard-table ajax-block-container'>
       {% call(item, row_number) list_table(
-        contact_lists,
+        contact_lists|sort,
         caption="Emergency contact lists",
         caption_visible=False,
         empty_message=(

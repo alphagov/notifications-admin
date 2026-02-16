@@ -33,7 +33,7 @@ from app.main.forms import (
     SetSenderForm,
     get_placeholder_form_instance,
 )
-from app.models.contact_list import ContactList, ContactListsAlphabetical
+from app.models.contact_list import ContactList, ContactLists
 from app.models.user import Users
 from app.s3_client.s3_csv_client import (
     get_csv_metadata,
@@ -538,7 +538,7 @@ def choose_from_contact_list(service_id, template_id):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
     return render_template(
         "views/send-contact-list.html",
-        contact_lists=ContactListsAlphabetical(
+        contact_lists=ContactLists(
             current_service.id,
             template_type=template.template_type,
         ),

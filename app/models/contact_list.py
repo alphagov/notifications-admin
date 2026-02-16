@@ -1,5 +1,4 @@
 from datetime import datetime
-from functools import partial
 from os import path
 from typing import Any
 
@@ -150,11 +149,6 @@ class ContactList(JSONModel):
 
 class ContactLists(ModelList):
     model = ContactList
-    sort_function = partial(
-        sorted,
-        key=lambda item: item["created_at"],
-        reverse=True,
-    )
 
     @staticmethod
     def _get_items(*args, **kwargs):
@@ -162,11 +156,8 @@ class ContactLists(ModelList):
 
     def __init__(self, service_id, template_type=None):
         super().__init__(service_id)
-        self.items = self.sort_function([item for item in self.items if template_type in {item["template_type"], None}])
-
-
-class ContactListsAlphabetical(ContactLists):
-    sort_function = partial(
-        sorted,
-        key=lambda item: item["original_file_name"].lower(),
-    )
+        self.items = sorted(
+            [item for item in self.items if template_type in {item["template_type"], None}],
+            key=lambda item: item["created_at"],
+            reverse=True,
+        )
