@@ -108,7 +108,7 @@ packaging==26.0
     # via gunicorn
 phonenumbers==9.0.21
     # via notifications-utils
-pillow==11.3.0
+pillow==12.1.1
     # via -r requirements.in
 prometheus-client==0.15.0
     # via gds-metrics
