@@ -1,12 +1,14 @@
 import uuid
 from typing import Any
 
-from flask import abort, url_for
+from flask import abort, current_app, url_for
 from notifications_utils.base64_uuid import uuid_to_base64
 from notifications_utils.serialised_model import SerialisedModelCollection
 
 from app.models import JSONModel
+from app.s3_client.s3_preview_document_download_client import preview_document_download_client
 from app.s3_client.s3_template_email_file_upload_client import upload_template_email_file_to_s3
+from app.utils import bytes_to_pretty_file_size, split_filename
 
 
 def _get_file_location(file_id: uuid, service_id: uuid) -> str:
@@ -65,6 +67,21 @@ class TemplateEmailFile(JSONModel):
         if self.link_text:
             return f"[{self.link_text}]({link})"
         return link
+
+    def get_file_metadata(self):
+        file_name = f"{self.service_id}/{self.id}"
+        bucket_name = current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"]
+        file_metadata = preview_document_download_client.get_file_metadata_from_s3(bucket_name, file_name)
+        file_size = file_metadata.get("ContentLength", 0)
+        extension = split_filename(self.filename, dotted=False)[1]
+        file_type = current_app.config["FILE_EXTENSION_TO_PRETTY_FILE_TYPE"][extension]
+        processed_metadata = {
+            "confirm_email": self.validate_users_email,
+            "file_size": bytes_to_pretty_file_size(file_size),
+            "file_type": file_type,
+            "filename": self.filename,
+        }
+        return processed_metadata
 
 
 class TemplateEmailFiles(SerialisedModelCollection):

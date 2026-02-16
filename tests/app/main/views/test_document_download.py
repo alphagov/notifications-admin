@@ -42,6 +42,7 @@ def test_redirect_if_user_not_signed_in(client_request, fake_uuid, endpoint):
     (
         ".document_download_index",
         ".document_download_confirm_email_address",
+        ".document_download_page",
     ),
 )
 def test_403_if_user_does_not_have_permission_to_see_template(client_request, fake_uuid, mocker, endpoint):
@@ -74,6 +75,7 @@ def test_403_if_user_does_not_have_permission_to_see_template(client_request, fa
     (
         ".document_download_index",
         ".document_download_confirm_email_address",
+        ".document_download_page",
     ),
 )
 def test_404_if_bad_template_id(
@@ -98,6 +100,7 @@ def test_404_if_bad_template_id(
     (
         ".document_download_index",
         ".document_download_confirm_email_address",
+        ".document_download_page",
     ),
 )
 def test_404_if_not_email_template(
@@ -135,6 +138,7 @@ def test_404_if_not_email_template(
     (
         ".document_download_index",
         ".document_download_confirm_email_address",
+        ".document_download_page",
     ),
 )
 def test_404_if_document_not_found(
@@ -543,14 +547,38 @@ def test_banner_on_all_pages(
     )
 
 
-def test_document_download_page(
+@pytest.mark.parametrize(
+    "file_name, file_type, service_contact_link, file_content_length, expected_file_size, contact_content",
+    [
+        ("test_file_1.pdf", "PDF", "me@example.com", 15728640, "15MB", "email me@example.com"),
+        ("test_file_2.csv", "CSV file", "https://example.com/", 51200, "5KB", "contact Test Service"),
+        ("test_file_3.png", "PNG file", "0207 123 4567", 1057000, "1MB", "call 0207 123 4567"),
+        ("test_file_4.txt", "text file", "me@example.com", 102, "0.1KB", "email me@example.com"),
+        ("test_file_5.png", "PNG file", "0207 123 4567", 10, "0.1KB", "call 0207 123 4567"),
+        (
+            "test_file_6.xlsx",
+            "Microsoft Excel spreadsheet",
+            "https://example.com/",
+            56473898653,
+            "53857.7MB",
+            "contact Test Service",
+        ),
+    ],
+)
+def test_document_download_page_displays_the_right_file_metadata(
     client_request,
     fake_uuid,
+    file_name,
+    file_type,
+    service_contact_link,
+    file_content_length,
+    expected_file_size,
+    contact_content,
     mocker,
 ):
     mocker.patch(
         "app.service_api_client.get_service",
-        return_value={"data": service_json(SERVICE_ONE_ID, contact_link="test@user.gov.uk")},
+        return_value={"data": service_json(SERVICE_ONE_ID, contact_link=service_contact_link)},
     )
     email_template = create_template(
         template_id=fake_uuid,
@@ -558,14 +586,20 @@ def test_document_download_page(
         email_files=[
             {
                 "id": fake_uuid,
-                "filename": "relevant_info.pdf",
+                "filename": file_name,
                 "link_text": None,
                 "retention_period": 90,
                 "validate_users_email": True,
             },
         ],
     )
+
+    metadata_from_s3 = {"ContentLength": file_content_length}
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+    mock_s3 = mocker.patch(
+        "app.models.template_email_file.preview_document_download_client.get_file_metadata_from_s3",
+        return_value=metadata_from_s3,
+    )
     page = client_request.get(
         ".document_download_page",
         service_id=SERVICE_ONE_ID,
@@ -574,7 +608,9 @@ def test_document_download_page(
     )
 
     assert normalize_spaces(page.select_one("h1").text) == "Download your file"
-    assert (
-        normalize_spaces(page.select_one("a.govuk-link--no-visited-state").text)
-        == "Download this csv (2mb) to your device"
-    )
+    mock_s3.assert_called_with("test-template-email-files", f"{SERVICE_ONE_ID}/{fake_uuid}")
+
+    rows = [normalize_spaces(row.text) for row in page.select("p.govuk-body")]
+    assert rows[0] == "Save your file somewhere you can find it. You may need to print it or show it to someone later."
+    assert rows[1] == f"Download this {file_type} ({expected_file_size}) to your device"
+    assert rows[2] == f"If you have any questions, {contact_content}."

@@ -105,6 +105,21 @@ class Config:
 
     FEEDBACK_ZENDESK_SUBJECT_PREFIX_ENABLED = os.environ.get("FEEDBACK_ZENDESK_SUBJECT_PREFIX_ENABLED", "1") == "1"
 
+    FILE_EXTENSION_TO_PRETTY_FILE_TYPE = {
+        "csv": "CSV file",
+        "doc": "Microsoft Word document",
+        "docx": "Microsoft Word document",
+        "odt": "text file",
+        "pdf": "PDF",
+        "png": "PNG file",
+        "rtf": "text file",
+        "txt": "text file",
+        "jpg": "JPEG file",
+        "jpeg": "JPEG file",
+        "json": "JSON file",
+        "xlsx": "Microsoft Excel spreadsheet",
+    }
+
 
 class Development(Config):
     SERVER_NAME = os.getenv("SERVER_NAME")

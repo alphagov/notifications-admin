@@ -16,7 +16,7 @@
   <p class="govuk-body">
     If you have any questions,
     {% if contact_info_type == "link" %}
-      <a href="{{ service_contact_info }}" class="govuk-link" rel="noreferrer"> contact {{ service_name }}</a>.
+      <a href="{{ service_contact_info }}" class="govuk-link--no-visited-state" rel="noreferrer"> contact {{ service_name }}</a>.
     {% elif contact_info_type == "email" %}
       email <a href="mailto:{{ service_contact_info }}" class="govuk-link--no-visited-state">{{service_contact_info}}</a>.
     {% else %}

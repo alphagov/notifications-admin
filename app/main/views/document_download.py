@@ -5,6 +5,7 @@ from app import current_service, current_user
 from app.main import main
 from app.main.forms import DocumentDownloadConfirmEmailAddressForm
 from app.url_converters import base64_to_uuid_or_404
+from app.utils import assess_contact_type
 from app.utils.user import user_has_permissions
 
 
@@ -67,13 +68,23 @@ def document_download_confirm_email_address(service_id, document_id):
 @main.route("/d/<base64_uuid:service_id>/<base64_uuid:document_id>/download", methods=["GET"])
 @user_has_permissions()
 def document_download_page(service_id, document_id):
+    template_id = base64_to_uuid_or_404(request.args.get("key"))
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
+        must_be_of_type="email",
+    )
+    template_email_file = template.email_files.by_id(document_id)
+    s3_file_metadata = template_email_file.get_file_metadata()
+    service_contact_info = current_service.contact_link
+    contact_info_type = assess_contact_type(current_service.contact_link)
     return render_template(
         "views/document-download/download.html",
+        template=template,
         download_link="https://www.example.com",
-        file_size="2mb",
-        file_type="csv",
-        service_name="A service",
-        service_contact_info="test@user.gov.uk",
-        contact_info_type="email",
-        file_expiry_date="09-02-2026",
+        file_size=s3_file_metadata["file_size"],
+        file_type=s3_file_metadata["file_type"],
+        service_name=current_service.name,
+        service_contact_info=service_contact_info,
+        contact_info_type=contact_info_type,
     )

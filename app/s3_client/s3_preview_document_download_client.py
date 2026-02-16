@@ -1,6 +1,5 @@
 import boto3
 from botocore.exceptions import ClientError
-from notifications_utils.s3 import S3ObjectNotFound, s3download
 
 
 class PreviewDocumentDownloadError(Exception):
