@@ -4,6 +4,8 @@ import typing
 import uuid
 
 from boto3 import resource
+from notifications_utils.eventlet import EventletTimeout
+from notifications_utils.exception_handling import extract_reraise_chained_exception
 from notifications_utils.s3 import s3upload as utils_s3upload
 from werkzeug.datastructures import FileStorage
 
@@ -33,6 +35,7 @@ class LogoClient:
         self.bucket_name = application.config["S3_BUCKET_LOGO_UPLOAD"]
         self.client = resource("s3")
 
+    @extract_reraise_chained_exception(EventletTimeout)
     def _get_object(self, key_):
         return self.client.Object(self.bucket_name, key_)
 
@@ -93,6 +96,7 @@ class LogoClient:
         )
         return temporary_logo_key
 
+    @extract_reraise_chained_exception(EventletTimeout)
     def save_permanent_logo(
         self, temporary_logo_key: str, logo_type: LOGO_TYPES, logo_key_extra: str | None = None
     ) -> str:
