@@ -193,9 +193,3 @@ def assess_contact_type(service_contact_info):
         return "link"
     else:
         return "other"
-
-
-def split_filename(filename: str, *, dotted: bool) -> tuple[str, str]:
-    *parts, ext = filename.split(".")
-    name = ".".join(parts)
-    return name, f".{ext}" if dotted else ext

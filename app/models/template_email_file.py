@@ -8,7 +8,7 @@ from notifications_utils.serialised_model import SerialisedModelCollection
 from app.models import JSONModel
 from app.s3_client.s3_preview_document_download_client import preview_document_download_client
 from app.s3_client.s3_template_email_file_upload_client import upload_template_email_file_to_s3
-from app.utils import bytes_to_pretty_file_size, split_filename
+from app.utils import bytes_to_pretty_file_size
 
 
 def _get_file_location(file_id: uuid, service_id: uuid) -> str:
@@ -78,7 +78,7 @@ class TemplateEmailFile(JSONModel):
 
     @property
     def extension(self):
-        return split_filename(self.filename, dotted=False)[1]
+        return self.filename.split(".")[-1]
 
     @property
     def mimetype(self):
