@@ -1,4 +1,6 @@
-from flask import redirect, render_template, request, url_for
+import io
+
+from flask import redirect, render_template, request, send_file, url_for
 from notifications_utils.base64_uuid import uuid_to_base64
 
 from app import current_service, current_user
@@ -75,13 +77,28 @@ def document_download_page(service_id, document_id):
         must_be_of_type="email",
     )
     template_email_file = template.email_files.by_id(document_id)
+
+    # If the download link has been activated, the file content is then retrieved
+    if request.args.get("download") and request.args.get("mimetype"):
+        data = template_email_file.get_file_content_for_download()
+        mimetype = request.args.get("mimetype")
+        return send_file(
+            io.BytesIO(data), mimetype=mimetype, as_attachment=True, download_name=template_email_file.filename
+        )
     s3_file_metadata = template_email_file.get_file_metadata()
     service_contact_info = current_service.contact_link
     contact_info_type = assess_contact_type(current_service.contact_link)
     return render_template(
         "views/document-download/download.html",
         template=template,
-        download_link="https://www.example.com",
+        download_link=url_for(
+            "main.document_download_page",
+            service_id=current_service.id,
+            document_id=template_email_file.id,
+            key=uuid_to_base64(template.id),
+            download=True,
+            mimetype=s3_file_metadata["mimetype"],
+        ),
         file_size=s3_file_metadata["file_size"],
         file_type=s3_file_metadata["file_type"],
         mimetype=s3_file_metadata["mimetype"],

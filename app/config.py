@@ -135,6 +135,7 @@ class Config:
         "png": "PNG file",
         "rtf": "text file",
         "txt": "text file",
+        "jpg": "JPEG file",
         "jpeg": "JPEG file",
         "json": "JSON file",
         "xlsx": "Microsoft Excel spreadsheet",

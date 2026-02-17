@@ -85,7 +85,7 @@ class TemplateEmailFile(JSONModel):
         }
         return processed_metadata
 
-    def get_file_content(self):
+    def get_file_content_for_download(self):
         filename = f"{self.service_id}/{self.id}"
         bucket_name = current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"]
         file_object_body = preview_document_download_client.get_file_object_body_from_s3(bucket_name, filename)

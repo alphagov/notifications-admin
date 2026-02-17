@@ -614,3 +614,47 @@ def test_document_download_page_displays_the_right_file_metadata(
     assert rows[0] == "Save your file somewhere you can find it. You may need to print it or show it to someone later."
     assert rows[1] == f"Download this {file_type} ({expected_file_size}) to your device"
     assert rows[2] == f"If you have any questions, {contact_content}."
+
+
+def test_document_download_page_enables_download(
+    client_request,
+    fake_uuid,
+    mocker,
+):
+    mocker.patch(
+        "app.service_api_client.get_service",
+        return_value={"data": service_json(SERVICE_ONE_ID)},
+    )
+    template_id = "2877a484-ec09-4bf9-9232-3e1b92187602"
+    email_template = create_template(
+        template_id=template_id,
+        template_type="email",
+        email_files=[
+            {
+                "id": fake_uuid,
+                "filename": "test_file_1.pdf",
+                "link_text": "file link",
+                "retention_period": 90,
+                "validate_users_email": True,
+            },
+        ],
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+    expected_content = b"awesome pdf binary content"
+    mock_get_content = mocker.patch(
+        "app.models.template_email_file.TemplateEmailFile.get_file_content_for_download", return_value=expected_content
+    )
+    response = client_request.get_response(
+        ".document_download_page",
+        service_id=SERVICE_ONE_ID,
+        document_id=fake_uuid,
+        key=uuid_to_base64(fake_uuid),
+        download="True",
+        mimetype="application/pdf",
+    )
+    assert response.status_code == 200
+    assert response.data == expected_content
+    assert response.headers["Content-Type"] == "application/pdf"
+    # Ensure that the file is made available for download only and not displayed in the browser
+    assert response.headers["Content-Disposition"] == "attachment; filename=test_file_1.pdf"
+    mock_get_content.assert_called_once()
