@@ -1,5 +1,4 @@
 import hashlib
-import re
 from datetime import timedelta
 from functools import wraps
 from itertools import chain
@@ -7,7 +6,6 @@ from itertools import chain
 from flask import abort, g, make_response, request
 from flask_login import current_user
 from notifications_utils.field import Field
-from notifications_utils.recipient_validation.email_address import EMAIL_REGEX_PATTERN
 from ordered_set import OrderedSet
 from werkzeug.datastructures import MultiDict
 from werkzeug.routing import RequestRedirect
@@ -184,12 +182,3 @@ def bytes_to_pretty_file_size(bytes):
     else:
         mb_to_1dp = round(bytes / (1024**2), 1)
         return str(mb_to_1dp).rstrip(".0") + "MB"
-
-
-def assess_contact_type(service_contact_info):
-    if re.search(EMAIL_REGEX_PATTERN, service_contact_info):
-        return "email"
-    if service_contact_info.startswith("http"):
-        return "link"
-    else:
-        return "other"

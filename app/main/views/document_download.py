@@ -7,7 +7,6 @@ from app import current_service, current_user
 from app.main import main
 from app.main.forms import DocumentDownloadConfirmEmailAddressForm
 from app.url_converters import base64_to_uuid_or_404
-from app.utils import assess_contact_type
 from app.utils.user import user_has_permissions
 
 
@@ -87,8 +86,6 @@ def document_download_page(service_id, document_id):
             download_name=template_email_file.filename,
         )
 
-    service_contact_info = current_service.contact_link
-    contact_info_type = assess_contact_type(current_service.contact_link)
     return render_template(
         "views/document-download/download.html",
         template=template,
@@ -100,7 +97,4 @@ def document_download_page(service_id, document_id):
             download=True,
         ),
         template_email_file=template_email_file,
-        service_name=current_service.name,
-        service_contact_info=service_contact_info,
-        contact_info_type=contact_info_type,
     )
