@@ -3,6 +3,7 @@ from typing import Any
 
 from flask import abort, current_app, url_for
 from notifications_utils.base64_uuid import uuid_to_base64
+from notifications_utils.s3 import s3download
 from notifications_utils.serialised_model import SerialisedModelCollection
 
 from app.models import JSONModel
@@ -90,10 +91,10 @@ class TemplateEmailFile(JSONModel):
 
     @property
     def file_contents(self):
-        filename = f"{self.service_id}/{self.id}"
-        bucket_name = current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"]
-        file_object_body = preview_document_download_client.get_file_object_body_from_s3(bucket_name, filename)
-        return file_object_body.read()
+        return s3download(
+            current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
+            f"{self.service_id}/{self.id}",
+        ).read()
 
 
 class TemplateEmailFiles(SerialisedModelCollection):
