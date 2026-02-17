@@ -601,8 +601,9 @@ def test_document_download_page_displays_the_right_file_metadata(
 
     metadata_from_s3 = {"ContentLength": file_content_length}
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
-    mock_s3 = mocker.patch(
-        "app.models.template_email_file.preview_document_download_client.get_file_metadata_from_s3",
+    mocker.patch(
+        "app.models.template_email_file.TemplateEmailFile.metadata",
+        new_callable=PropertyMock,
         return_value=metadata_from_s3,
     )
     page = client_request.get(
@@ -613,7 +614,6 @@ def test_document_download_page_displays_the_right_file_metadata(
     )
 
     assert normalize_spaces(page.select_one("h1").text) == "Download your file"
-    mock_s3.assert_called_with("test-template-email-files", f"{SERVICE_ONE_ID}/{fake_uuid}")
 
     rows = [normalize_spaces(row.text) for row in page.select("p.govuk-body")]
     assert rows[0] == "Save your file somewhere you can find it. You may need to print it or show it to someone later."

@@ -1,13 +1,14 @@
 import uuid
 from typing import Any
 
+import boto3
 from flask import abort, current_app, url_for
 from notifications_utils.base64_uuid import uuid_to_base64
 from notifications_utils.s3 import s3download
 from notifications_utils.serialised_model import SerialisedModelCollection
+from werkzeug.utils import cached_property
 
 from app.models import JSONModel
-from app.s3_client.s3_preview_document_download_client import preview_document_download_client
 from app.s3_client.s3_template_email_file_upload_client import upload_template_email_file_to_s3
 from app.utils import bytes_to_pretty_file_size
 
@@ -69,13 +70,17 @@ class TemplateEmailFile(JSONModel):
             return f"[{self.link_text}]({link})"
         return link
 
+    @cached_property
+    def metadata(self):
+        client = boto3.client("s3")
+        return client.head_object(
+            Bucket=current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
+            Key=f"{self.service_id}/{self.id}",
+        )
+
     @property
     def size(self):
-        metadata = preview_document_download_client.get_file_metadata_from_s3(
-            current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
-            f"{self.service_id}/{self.id}",
-        )
-        return bytes_to_pretty_file_size(metadata.get("ContentLength", 0))
+        return bytes_to_pretty_file_size(self.metadata.get("ContentLength", 0))
 
     @property
     def extension(self):
