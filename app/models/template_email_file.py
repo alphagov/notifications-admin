@@ -1,4 +1,5 @@
 import uuid
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import boto3
@@ -69,6 +70,10 @@ class TemplateEmailFile(JSONModel):
         if self.link_text:
             return f"[{self.link_text}]({link})"
         return link
+
+    @property
+    def expiry_date(self):
+        return datetime.now(UTC) + timedelta(weeks=self.retention_period)
 
     @cached_property
     def metadata(self):

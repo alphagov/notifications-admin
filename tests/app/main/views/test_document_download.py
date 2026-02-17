@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from flask import abort, url_for
+from freezegun import freeze_time
 from notifications_utils.base64_uuid import uuid_to_base64
 from notifications_utils.testing.comparisons import RestrictedAny
 
@@ -571,6 +572,7 @@ def test_banner_on_all_pages(
         ),
     ],
 )
+@freeze_time("2026-01-01")
 def test_document_download_page_displays_the_right_file_metadata(
     client_request,
     fake_uuid,
@@ -616,10 +618,12 @@ def test_document_download_page_displays_the_right_file_metadata(
 
     assert normalize_spaces(page.select_one("h1").text) == "Download your file"
 
-    rows = [normalize_spaces(row.text) for row in page.select("p.govuk-body")]
-    assert rows[0] == "Save your file somewhere you can find it. You may need to print it or show it to someone later."
-    assert rows[1] == f"Download this {file_type} ({expected_file_size}) to your device"
-    assert rows[2] == f"If you have any questions, {contact_content}."
+    assert [normalize_spaces(row.text) for row in page.select(".govuk-grid-column-two-thirds > p.govuk-body")] == [
+        "This file is available to download until 23 September 2027.",
+        "Make sure you save your file somewhere you can find it.",
+        f"Download this {file_type} ({expected_file_size}) to your device",
+        f"If you have any questions, {contact_content}.",
+    ]
 
 
 def test_document_download_page_enables_download(

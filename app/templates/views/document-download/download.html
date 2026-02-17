@@ -5,6 +5,11 @@
 {% endblock %}
 
 {% block main_content %}
+
+  <p class="govuk-body">
+    This file is available to download until {{ template_email_file.expiry_date|format_date_normal }}.
+  </p>
+
   <p class="govuk-body">
     Make sure you save your file somewhere you can find it.
   </p>
