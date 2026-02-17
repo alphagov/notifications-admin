@@ -166,19 +166,3 @@ def merge_jsonlike(source, destination):  # noqa: C901
 
 def get_sha512_hashed(str):
     return hashlib.sha512(str.encode()).hexdigest()
-
-
-# These methods can be moved to notifications_utils as they are also used in document-document-api
-def bytes_to_pretty_file_size(bytes):
-    if bytes < 1024 / 20:
-        # File less than 0.05KB (one twentieth of a KB) don't round to 0.1KB at 1 d.p.
-        # We will force them up to 0.1KB ourselves as we don't want to show users 0.0KB or bytes
-        return "0.1KB"
-    elif bytes < (1024**2) / 20:
-        # File less than 0.05MB to be represented in KB
-        # Anything bigger will round at 1dp to at least 0.1MB
-        kb_to_1dp = round(bytes / 1024, 1)
-        return str(kb_to_1dp).rstrip(".0") + "KB"
-    else:
-        mb_to_1dp = round(bytes / (1024**2), 1)
-        return str(mb_to_1dp).rstrip(".0") + "MB"

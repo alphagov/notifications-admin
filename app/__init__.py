@@ -28,6 +28,7 @@ from notifications_utils import request_helper
 from notifications_utils.asset_fingerprinter import asset_fingerprinter
 from notifications_utils.eventlet import EventletTimeout
 from notifications_utils.formatters import (
+    format_file_size,
     formatted_list,
     get_lines_with_normalised_whitespace,
 )
@@ -596,6 +597,7 @@ def add_template_filters(application):
         format_day_of_week,
         format_delta,
         format_delta_days,
+        format_file_size,
         format_notification_status,
         format_notification_type,
         format_notification_status_as_time,

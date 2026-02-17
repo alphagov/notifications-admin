@@ -11,7 +11,6 @@ from werkzeug.utils import cached_property
 
 from app.models import JSONModel
 from app.s3_client.s3_template_email_file_upload_client import upload_template_email_file_to_s3
-from app.utils import bytes_to_pretty_file_size
 
 
 def _get_file_location(file_id: uuid, service_id: uuid) -> str:
@@ -85,7 +84,7 @@ class TemplateEmailFile(JSONModel):
 
     @property
     def size(self):
-        return bytes_to_pretty_file_size(self.metadata.get("ContentLength", 0))
+        return self.metadata.get("ContentLength", 0)
 
     @property
     def extension(self):
