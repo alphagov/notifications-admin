@@ -68,22 +68,25 @@ class TemplateEmailFile(JSONModel):
             return f"[{self.link_text}]({link})"
         return link
 
-    def get_file_metadata(self):
-        file_name = f"{self.service_id}/{self.id}"
-        bucket_name = current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"]
-        file_metadata = preview_document_download_client.get_file_metadata_from_s3(bucket_name, file_name)
-        file_size = file_metadata.get("ContentLength", 0)
-        extension = split_filename(self.filename, dotted=False)[1]
-        mimetype = current_app.config["FILE_EXTENSIONS_TO_MIMETYPES"][extension]
-        file_type = current_app.config["FILE_EXTENSION_TO_PRETTY_FILE_TYPE"][extension]
-        processed_metadata = {
-            "confirm_email": self.validate_users_email,
-            "file_size": bytes_to_pretty_file_size(file_size),
-            "file_type": file_type,
-            "filename": self.filename,
-            "mimetype": mimetype,
-        }
-        return processed_metadata
+    @property
+    def size(self):
+        metadata = preview_document_download_client.get_file_metadata_from_s3(
+            current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
+            f"{self.service_id}/{self.id}",
+        )
+        return bytes_to_pretty_file_size(metadata.get("ContentLength", 0))
+
+    @property
+    def extension(self):
+        return split_filename(self.filename, dotted=False)[1]
+
+    @property
+    def mimetype(self):
+        return current_app.config["FILE_EXTENSIONS_TO_MIMETYPES"][self.extension]
+
+    @property
+    def file_type(self):
+        return current_app.config["FILE_EXTENSION_TO_PRETTY_FILE_TYPE"][self.extension]
 
     def get_file_content_for_download(self):
         filename = f"{self.service_id}/{self.id}"

@@ -1,4 +1,4 @@
-from unittest.mock import call
+from unittest.mock import PropertyMock, call
 from uuid import UUID, uuid4
 
 import pytest
@@ -532,6 +532,11 @@ def test_banner_on_all_pages(
         ],
     )
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+    mocker.patch(
+        "app.models.template_email_file.TemplateEmailFile.size",
+        new_callable=PropertyMock,
+        return_value=123,
+    )
     page = client_request.get(
         endpoint,
         service_id=SERVICE_ONE_ID,

@@ -85,7 +85,6 @@ def document_download_page(service_id, document_id):
         return send_file(
             io.BytesIO(data), mimetype=mimetype, as_attachment=True, download_name=template_email_file.filename
         )
-    s3_file_metadata = template_email_file.get_file_metadata()
     service_contact_info = current_service.contact_link
     contact_info_type = assess_contact_type(current_service.contact_link)
     return render_template(
@@ -97,11 +96,9 @@ def document_download_page(service_id, document_id):
             document_id=template_email_file.id,
             key=uuid_to_base64(template.id),
             download=True,
-            mimetype=s3_file_metadata["mimetype"],
+            mimetype=template_email_file.mimetype,
         ),
-        file_size=s3_file_metadata["file_size"],
-        file_type=s3_file_metadata["file_type"],
-        mimetype=s3_file_metadata["mimetype"],
+        template_email_file=template_email_file,
         service_name=current_service.name,
         service_contact_info=service_contact_info,
         contact_info_type=contact_info_type,
