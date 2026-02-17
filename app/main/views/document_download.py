@@ -84,6 +84,7 @@ def document_download_page(service_id, document_id):
         download_link="https://www.example.com",
         file_size=s3_file_metadata["file_size"],
         file_type=s3_file_metadata["file_type"],
+        mimetype=s3_file_metadata["mimetype"],
         service_name=current_service.name,
         service_contact_info=service_contact_info,
         contact_info_type=contact_info_type,

@@ -74,14 +74,23 @@ class TemplateEmailFile(JSONModel):
         file_metadata = preview_document_download_client.get_file_metadata_from_s3(bucket_name, file_name)
         file_size = file_metadata.get("ContentLength", 0)
         extension = split_filename(self.filename, dotted=False)[1]
+        mimetype = current_app.config["FILE_EXTENSIONS_TO_MIMETYPES"][extension]
         file_type = current_app.config["FILE_EXTENSION_TO_PRETTY_FILE_TYPE"][extension]
         processed_metadata = {
             "confirm_email": self.validate_users_email,
             "file_size": bytes_to_pretty_file_size(file_size),
             "file_type": file_type,
             "filename": self.filename,
+            "mimetype": mimetype,
         }
         return processed_metadata
+
+    def get_file_content(self):
+        filename = f"{self.service_id}/{self.id}"
+        bucket_name = current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"]
+        file_object_body = preview_document_download_client.get_file_object_body_from_s3(bucket_name, filename)
+        file_data = file_object_body.read()
+        return file_data
 
 
 class TemplateEmailFiles(SerialisedModelCollection):
