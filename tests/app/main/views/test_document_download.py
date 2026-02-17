@@ -647,7 +647,9 @@ def test_document_download_page_enables_download(
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
     expected_content = b"awesome pdf binary content"
     mock_get_content = mocker.patch(
-        "app.models.template_email_file.TemplateEmailFile.get_file_content_for_download", return_value=expected_content
+        "app.models.template_email_file.TemplateEmailFile.file_contents",
+        new_callable=PropertyMock,
+        return_value=expected_content,
     )
     response = client_request.get_response(
         ".document_download_page",

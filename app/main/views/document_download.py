@@ -80,13 +80,13 @@ def document_download_page(service_id, document_id):
 
     # If the download link has been activated, the file content is then retrieved
     if request.args.get("download"):
-        data = template_email_file.get_file_content_for_download()
         return send_file(
-            io.BytesIO(data),
+            io.BytesIO(template_email_file.file_contents),
             mimetype=template_email_file.mimetype,
             as_attachment=True,
             download_name=template_email_file.filename,
         )
+
     service_contact_info = current_service.contact_link
     contact_info_type = assess_contact_type(current_service.contact_link)
     return render_template(
