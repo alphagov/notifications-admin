@@ -79,11 +79,13 @@ def document_download_page(service_id, document_id):
     template_email_file = template.email_files.by_id(document_id)
 
     # If the download link has been activated, the file content is then retrieved
-    if request.args.get("download") and request.args.get("mimetype"):
+    if request.args.get("download"):
         data = template_email_file.get_file_content_for_download()
-        mimetype = request.args.get("mimetype")
         return send_file(
-            io.BytesIO(data), mimetype=mimetype, as_attachment=True, download_name=template_email_file.filename
+            io.BytesIO(data),
+            mimetype=template_email_file.mimetype,
+            as_attachment=True,
+            download_name=template_email_file.filename,
         )
     service_contact_info = current_service.contact_link
     contact_info_type = assess_contact_type(current_service.contact_link)
@@ -96,7 +98,6 @@ def document_download_page(service_id, document_id):
             document_id=template_email_file.id,
             key=uuid_to_base64(template.id),
             download=True,
-            mimetype=template_email_file.mimetype,
         ),
         template_email_file=template_email_file,
         service_name=current_service.name,
