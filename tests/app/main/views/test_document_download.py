@@ -601,13 +601,11 @@ def test_document_download_page_displays_the_right_file_metadata(
             },
         ],
     )
-
-    metadata_from_s3 = {"ContentLength": file_content_length}
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
     mocker.patch(
-        "app.models.template_email_file.TemplateEmailFile.metadata",
+        "app.models.template_email_file.TemplateEmailFile.size",
         new_callable=PropertyMock,
-        return_value=metadata_from_s3,
+        return_value=file_content_length,
     )
     page = client_request.get(
         ".document_download_page",

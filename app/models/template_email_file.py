@@ -7,7 +7,6 @@ from flask import abort, current_app, url_for
 from notifications_utils.base64_uuid import uuid_to_base64
 from notifications_utils.s3 import s3download
 from notifications_utils.serialised_model import SerialisedModelCollection
-from werkzeug.utils import cached_property
 
 from app.models import JSONModel
 from app.s3_client.s3_template_email_file_upload_client import upload_template_email_file_to_s3
@@ -74,17 +73,13 @@ class TemplateEmailFile(JSONModel):
     def expiry_date(self):
         return datetime.now(UTC) + timedelta(weeks=self.retention_period)
 
-    @cached_property
-    def metadata(self):
-        client = boto3.client("s3")
-        return client.head_object(
+    @property
+    def size(self):
+        metadata = boto3.client("s3").head_object(
             Bucket=current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
             Key=f"{self.service_id}/{self.id}",
         )
-
-    @property
-    def size(self):
-        return self.metadata.get("ContentLength", 0)
+        return metadata.get("ContentLength", 0)
 
     @property
     def extension(self):
