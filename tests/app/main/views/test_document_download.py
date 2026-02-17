@@ -1,3 +1,4 @@
+from io import BytesIO
 from unittest.mock import PropertyMock, call
 from uuid import UUID, uuid4
 
@@ -649,7 +650,7 @@ def test_document_download_page_enables_download(
     mock_get_content = mocker.patch(
         "app.models.template_email_file.TemplateEmailFile.file_contents",
         new_callable=PropertyMock,
-        return_value=expected_content,
+        return_value=BytesIO(expected_content),
     )
     response = client_request.get_response(
         ".document_download_page",

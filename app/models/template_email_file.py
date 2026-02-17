@@ -99,7 +99,7 @@ class TemplateEmailFile(JSONModel):
         return s3download(
             current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
             f"{self.service_id}/{self.id}",
-        ).read()
+        )
 
 
 class TemplateEmailFiles(SerialisedModelCollection):

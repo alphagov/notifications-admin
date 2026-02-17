@@ -1,5 +1,3 @@
-import io
-
 from flask import redirect, render_template, request, send_file, url_for
 from notifications_utils.base64_uuid import uuid_to_base64
 
@@ -80,7 +78,7 @@ def document_download_page(service_id, document_id):
     # If the download link has been activated, the file content is then retrieved
     if request.args.get("download"):
         return send_file(
-            io.BytesIO(template_email_file.file_contents),
+            template_email_file.file_contents,
             mimetype=template_email_file.mimetype,
             as_attachment=True,
             download_name=template_email_file.filename,
