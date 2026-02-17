@@ -75,7 +75,6 @@ def document_download_page(service_id, document_id):
     )
     template_email_file = template.email_files.by_id(document_id)
 
-    # If the download link has been activated, the file content is then retrieved
     if request.args.get("download"):
         return send_file(
             template_email_file.file_contents,
