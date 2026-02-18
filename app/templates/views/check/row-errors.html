@@ -73,6 +73,8 @@
                   No content for this message
                 {% elif item.message_too_long %}
                   Message is too long
+                {% elif not item.as_postal_address.has_alphanumeric_character_in_address_lines_1_and_2 %}
+                  The first 2 lines of the address must both include at least one alphanumeric character
                 {% elif item.as_postal_address.has_invalid_country_for_bfpo_address %}
                   The last line of a BFPO address must not be a country.
                 {% elif not item.as_postal_address.has_enough_lines %}
