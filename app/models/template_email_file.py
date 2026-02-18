@@ -1,8 +1,11 @@
 import uuid
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from flask import abort, url_for
+import boto3
+from flask import abort, current_app, url_for
 from notifications_utils.base64_uuid import uuid_to_base64
+from notifications_utils.s3 import s3download
 from notifications_utils.serialised_model import SerialisedModelCollection
 
 from app.models import JSONModel
@@ -65,6 +68,37 @@ class TemplateEmailFile(JSONModel):
         if self.link_text:
             return f"[{self.link_text}]({link})"
         return link
+
+    @property
+    def expiry_date(self):
+        return datetime.now(UTC) + timedelta(weeks=self.retention_period)
+
+    @property
+    def size(self):
+        metadata = boto3.client("s3").head_object(
+            Bucket=current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
+            Key=f"{self.service_id}/{self.id}",
+        )
+        return metadata.get("ContentLength", 0)
+
+    @property
+    def extension(self):
+        return self.filename.split(".")[-1]
+
+    @property
+    def mimetype(self):
+        return current_app.config["FILE_EXTENSIONS_TO_MIMETYPES"][self.extension]
+
+    @property
+    def file_type(self):
+        return current_app.config["FILE_EXTENSION_TO_PRETTY_FILE_TYPE"][self.extension]
+
+    @property
+    def file_contents(self):
+        return s3download(
+            current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
+            f"{self.service_id}/{self.id}",
+        )
 
 
 class TemplateEmailFiles(SerialisedModelCollection):

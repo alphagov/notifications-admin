@@ -1,4 +1,4 @@
-from flask import redirect, render_template, request, url_for
+from flask import redirect, render_template, request, send_file, url_for
 from notifications_utils.base64_uuid import uuid_to_base64
 
 from app import current_service, current_user
@@ -48,10 +48,50 @@ def document_download_confirm_email_address(service_id, document_id):
     )
 
     if not template_email_file.validate_users_email or form.validate_on_submit():
-        return redirect("https://www.example.com")
+        return redirect(
+            url_for(
+                "main.document_download_page",
+                service_id=current_service.id,
+                document_id=template_email_file.id,
+                key=uuid_to_base64(template.id),
+            )
+        )
 
     return render_template(
         "views/document-download/confirm-email-address.html",
         form=form,
         template=template,
+    )
+
+
+@main.route("/d/<base64_uuid:service_id>/<base64_uuid:document_id>/download", methods=["GET"])
+@user_has_permissions()
+def document_download_page(service_id, document_id):
+    template_id = base64_to_uuid_or_404(request.args.get("key"))
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
+        must_be_of_type="email",
+    )
+    template_email_file = template.email_files.by_id(document_id)
+
+    if request.args.get("download"):
+        return send_file(
+            template_email_file.file_contents,
+            mimetype=template_email_file.mimetype,
+            as_attachment=True,
+            download_name=template_email_file.filename,
+        )
+
+    return render_template(
+        "views/document-download/download.html",
+        template=template,
+        download_link=url_for(
+            "main.document_download_page",
+            service_id=current_service.id,
+            document_id=template_email_file.id,
+            key=uuid_to_base64(template.id),
+            download=True,
+        ),
+        template_email_file=template_email_file,
     )

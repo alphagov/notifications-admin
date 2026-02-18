@@ -253,6 +253,7 @@ class MainNavigation(Navigation):
             "change_link_text",
             "change_data_retention_period",
             "change_email_validation",
+            "document_download_page",
         },
         "uploads": {
             "upload_contact_list",

@@ -82,6 +82,7 @@ EXCLUDED_ENDPOINTS = set(
             "delivery_status_callback",
             "design_content",
             "document_download_confirm_email_address",
+            "document_download_page",
             "document_download_index",
             "download_contact_list",
             "download_notifications_csv",
