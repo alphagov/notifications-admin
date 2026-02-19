@@ -15,7 +15,7 @@
   </p>
 
   <p class="govuk-body">
-    <a href="{{download_link}}" download class="govuk-link govuk-link--no-visited-state" rel="noreferrer">Download this {{ template_email_file.file_type }} ({{ template_email_file.size|format_file_size }}) to your device</a>
+    <a href="{{download_link}}" download class="govuk-link govuk-link--no-visited-state" rel="noreferrer">Download this {{ template_email_file.extension|format_file_type }} ({{ template_email_file.size|format_file_size }}) to your device</a>
   </p>
 
 {% endblock %}

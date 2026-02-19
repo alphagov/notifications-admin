@@ -27,6 +27,7 @@ from notifications_python_client.errors import HTTPError
 from notifications_utils import request_helper
 from notifications_utils.asset_fingerprinter import asset_fingerprinter
 from notifications_utils.eventlet import EventletTimeout
+from notifications_utils.file_types import format_file_type
 from notifications_utils.formatters import (
     format_file_size,
     formatted_list,
@@ -598,6 +599,7 @@ def add_template_filters(application):
         format_delta,
         format_delta_days,
         format_file_size,
+        format_file_type,
         format_notification_status,
         format_notification_type,
         format_notification_status_as_time,

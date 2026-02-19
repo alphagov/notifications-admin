@@ -91,10 +91,6 @@ class TemplateEmailFile(JSONModel):
         return mimetypes.types_map[f".{self.extension}"]
 
     @property
-    def file_type(self):
-        return current_app.config["FILE_EXTENSION_TO_PRETTY_FILE_TYPE"][self.extension]
-
-    @property
     def file_contents(self):
         return s3download(
             current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
