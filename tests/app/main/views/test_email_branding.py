@@ -819,29 +819,29 @@ def test_create_email_branding_government_identity_logo_form(client_request, pla
         (
             "Department for Business & Trade",
             "https://static.example.com/images/branding/insignia/"
-            "Department for Business & Trade.png?ec972edf4b61fe0a0064da65b0e2564b",
+            "Department for Business & Trade.png?037794106095c182ff58655a47fe3bca",
         ),
         (
             "Foreign, Commonwealth & Development Office",
             "https://static.example.com/images/branding/insignia/"
-            "Foreign, Commonwealth & Development Office.png?5f774527e45c4f03ca4a1167acdc0826",
+            "Foreign, Commonwealth & Development Office.png?890210781ce4936bb44462036e150b50",
         ),
         (
             "HM Coastguard",
-            "https://static.example.com/images/branding/insignia/HM Coastguard.png?75bec666533897525a3545570d04e3d4",
+            "https://static.example.com/images/branding/insignia/HM Coastguard.png?537cf92fcce79f185084b70bf04cf93c",
         ),
         (
             "HM Government",
-            "https://static.example.com/images/branding/insignia/HM Government.png?9e4dcaacf920fab30add8dcb87bda726",
+            "https://static.example.com/images/branding/insignia/HM Government.png?5bbdca1f88c78d6157a9ed4395b25a1d",
         ),
         (
             "HM Revenue & Customs",
             "https://static.example.com/images/branding/insignia/"
-            "HM Revenue & Customs.png?6378474ceb33424b4e508a32ca4b6315",
+            "HM Revenue & Customs.png?306230d3421662dacc0c2e185bc6a57b",
         ),
         (
             "Home Office",
-            "https://static.example.com/images/branding/insignia/Home Office.png?cc928b18d70992c0b85e01c6af30dcc2",
+            "https://static.example.com/images/branding/insignia/Home Office.png?884afa68c8f5c63a505fdcb9dd206663",
         ),
         (
             "Ministry of Defence",
@@ -850,11 +850,11 @@ def test_create_email_branding_government_identity_logo_form(client_request, pla
         ),
         (
             "Scotland Office",
-            "https://static.example.com/images/branding/insignia/Scotland Office.png?9da8a4c042f1b0f0631bb4ff98330dde",
+            "https://static.example.com/images/branding/insignia/Scotland Office.png?533396a821d92cd7841183c66861539d",
         ),
         (
             "Wales Office",
-            "https://static.example.com/images/branding/insignia/Wales Office.png?82e7cde43c4448c6f0ddaa481fa7bb2a",
+            "https://static.example.com/images/branding/insignia/Wales Office.png?b40fcf5cd279e5fd6349513df1bc0384",
         ),
     ]
 
@@ -924,7 +924,7 @@ def test_create_email_branding_government_identity_colour(client_request, platfo
             "background: " + input["value"] + ";"
         )
         assert page.select_one("label[for=" + input["id"] + "] img")["src"] == (
-            "https://static.example.com/images/branding/insignia/HM Government.png?9e4dcaacf920fab30add8dcb87bda726"
+            "https://static.example.com/images/branding/insignia/HM Government.png?5bbdca1f88c78d6157a9ed4395b25a1d"
         )
 
 
