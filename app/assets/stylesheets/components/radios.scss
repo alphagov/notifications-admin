@@ -158,6 +158,6 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
 .govuk-radios__input:disabled + .govuk-radios__label {
   &:before {
     border-color: govuk-functional-colour(secondary-text);
-    background-color: govuk-colour("light-grey");
+    background-color: govuk-colour('black', $variant: "tint-95");
   }
 }

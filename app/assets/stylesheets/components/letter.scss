@@ -11,7 +11,7 @@ $iso-paper-ratio: 141.42135624%;
   padding: $iso-paper-ratio 0 0 0;
   margin: 0 0 govuk-spacing(6) 0;
   position: relative;
-  background: govuk-colour("light-grey");
+  background: govuk-colour('black', $variant: "tint-95");
 
   &:before {
     position: absolute;
@@ -19,7 +19,7 @@ $iso-paper-ratio: 141.42135624%;
     left: 50%;
     margin-left: -0.5em;
     font-size: 96px;
-    color: govuk-colour("mid-grey");
+    color: govuk-colour('black', $variant: "tint-80");
     overflow: hidden;
     display: block;
     vertical-align: bottom;
@@ -64,7 +64,7 @@ $iso-paper-ratio: 141.42135624%;
     width: $fold-height * ($art-width / $art-height);
     height: $fold-height;
     margin: 0;
-    background-color: mix($envelope-colour,govuk-colour("dark-grey"));
+    background-color: mix($envelope-colour,govuk-colour('black', $variant: "tint-25"));
     background-size: auto $fold-height;
     background-position: right 0;
     background-repeat: no-repeat;
