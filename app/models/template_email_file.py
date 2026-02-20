@@ -59,7 +59,7 @@ class TemplateEmailFile(JSONModel):
     @property
     def link_as_markdown(self):
         link = url_for(
-            "main.document_download_index",
+            "main.document_download_landing",
             service_id=self.service_id,
             document_id=self.id,
             key=uuid_to_base64(self.template_id),

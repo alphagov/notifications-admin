@@ -10,7 +10,7 @@ from app.utils.user import user_has_permissions
 
 @main.route("/d/<base64_uuid:service_id>/<base64_uuid:document_id>")
 @user_has_permissions()
-def document_download_index(service_id, document_id):
+def document_download_landing(service_id, document_id):
     template_id = base64_to_uuid_or_404(request.args.get("key"))
     template = current_service.get_template_with_user_permission_or_403(
         template_id,
@@ -50,7 +50,7 @@ def document_download_confirm_email_address(service_id, document_id):
     if not template_email_file.validate_users_email or form.validate_on_submit():
         return redirect(
             url_for(
-                "main.document_download_page",
+                "main.document_download_download_document",
                 service_id=current_service.id,
                 document_id=template_email_file.id,
                 key=uuid_to_base64(template.id),
@@ -66,7 +66,7 @@ def document_download_confirm_email_address(service_id, document_id):
 
 @main.route("/d/<base64_uuid:service_id>/<base64_uuid:document_id>/download", methods=["GET"])
 @user_has_permissions()
-def document_download_page(service_id, document_id):
+def document_download_download_document(service_id, document_id):
     template_id = base64_to_uuid_or_404(request.args.get("key"))
     template = current_service.get_template_with_user_permission_or_403(
         template_id,
@@ -87,7 +87,7 @@ def document_download_page(service_id, document_id):
         "views/document-download/download.html",
         template=template,
         download_link=url_for(
-            "main.document_download_page",
+            "main.document_download_download_document",
             service_id=current_service.id,
             document_id=template_email_file.id,
             key=uuid_to_base64(template.id),
