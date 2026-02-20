@@ -1,3 +1,4 @@
+import mimetypes
 import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -87,11 +88,7 @@ class TemplateEmailFile(JSONModel):
 
     @property
     def mimetype(self):
-        return current_app.config["FILE_EXTENSIONS_TO_MIMETYPES"][self.extension]
-
-    @property
-    def file_type(self):
-        return current_app.config["FILE_EXTENSION_TO_PRETTY_FILE_TYPE"][self.extension]
+        return mimetypes.types_map[f".{self.extension}"]
 
     @property
     def file_contents(self):
