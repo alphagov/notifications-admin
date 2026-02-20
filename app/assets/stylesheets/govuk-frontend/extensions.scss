@@ -22,7 +22,7 @@ $govuk-destructive-link-active-colour: $govuk-text-colour;
 }
 
 // Extends footer column styles to allow 4 columns
-@include mq ($from: desktop) {
+ @media #{govuk-from-breakpoint(desktop)} {
   .govuk-footer__list--columns-4 {
     // TODO: Move support for legacy properties to something like Post-CSS's auto-prefixer
     -webkit-column-count: 4;
