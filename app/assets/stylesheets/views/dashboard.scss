@@ -11,7 +11,7 @@
 }
 
 .keyline-block {
-  border-top: 1px solid $govuk-border-colour;
+  border-top: 1px solid govuk-functional-colour(border);
   padding-top: govuk-spacing(3);
 }
 
@@ -23,7 +23,7 @@
   width: 100%;
   margin-bottom: govuk-spacing(3);
   height: govuk-spacing(3);
-  color: $govuk-text-colour;
+  color: govuk-functional-colour(text);
   text-align: left;
 
   &-bar {
@@ -32,7 +32,7 @@
     display: inline-block;
     overflow: visible;
     background: govuk-shade(govuk-colour("light-grey"), 7%);
-    color: $govuk-text-colour;
+    color: govuk-functional-colour(text);
     padding: 10px 6px 8px 0;
     text-indent: 12px;
     text-align: right;
@@ -131,7 +131,7 @@
   &-hint {
     @include govuk-font(16);
     display: block;
-    color: $govuk-secondary-text-colour;
+    color: govuk-functional-colour(secondary-text);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -141,7 +141,7 @@
   &-hint-large {
     @include govuk-font(19);
     display: block;
-    color: $govuk-secondary-text-colour;
+    color: govuk-functional-colour(secondary-text);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -165,24 +165,24 @@
   &.file-list-filename,
   &.file-list-filename-large {
     /* override box-shadow to push underline down a bit */
-    box-shadow: 0 -2px $govuk-focus-colour, 0 5px $govuk-focus-text-colour;
+    box-shadow: 0 -2px govuk-functional-colour(focus), 0 5px govuk-functional-colour(focus-text);
 
     // File-list items contained by keyline-blocks have more spacing at the top so adapt to cover it
     .keyline-block > .file-list & {
-      box-shadow: 0 -5px $govuk-focus-colour, 0 5px $govuk-focus-text-colour;
+      box-shadow: 0 -5px govuk-functional-colour(focus), 0 5px govuk-functional-colour(focus-text);
     }
   }
 
   & + .file-list-hint,
   & + .file-list-hint-large {
-    color: $govuk-focus-text-colour;
+    color: govuk-functional-colour(focus-text);
   }
 
 }
 
 .failure-highlight {
   @include govuk-font(19, $weight: bold);
-  color: $govuk-error-colour;
+  color: govuk-functional-colour(error);
 }
 
 .align-with-message-body {

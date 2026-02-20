@@ -6,7 +6,7 @@ $notify-secondary-button-hover-colour: govuk-shade(govuk-colour("light-grey"), 1
 // adjusted link colour on grey to satisfy WCAG criterion
 // on govuk-shade(govuk-colour("light-grey"), 7%) this
 // now has a contrast ratio of 5.67
-// this HEX is lighter than $govuk-link-hover-colour
+// this HEX is lighter than govuk-functional-colour(link-hover)
 $link-colour-on-grey-background: #1852ab;
 
 // Additional padding-bottom override, following the GOV.UK Frontend spacing scale:
@@ -65,7 +65,7 @@ $link-colour-on-grey-background: #1852ab;
   }
 
   &:focus:before {
-    box-shadow: inset 0px -4px $govuk-focus-text-colour, inset 0px 15px $govuk-focus-colour, inset 15px 0px $govuk-focus-colour, inset 0px -11px $govuk-focus-colour;
+    box-shadow: inset 0px -4px govuk-functional-colour(focus-text), inset 0px 15px govuk-functional-colour(focus), inset 15px 0px govuk-functional-colour(focus), inset 0px -11px govuk-functional-colour(focus);
   }
 }
 

@@ -42,7 +42,7 @@
 
 .responsive-embed--bordered {
   padding: 5px;
-  outline: 1px solid $govuk-border-colour;
+  outline: 1px solid govuk-functional-colour(border);
 }
 
 // Modifier class for 16:9 aspect ratio

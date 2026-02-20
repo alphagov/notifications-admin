@@ -32,7 +32,7 @@
   box-sizing: border-box;
   margin-bottom: govuk-spacing(4);
   padding: govuk-spacing(1);
-  border: 1px solid $govuk-border-colour;
+  border: 1px solid govuk-functional-colour(border);
 }
 
 .notify-radios-with-images__radio {

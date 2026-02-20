@@ -58,7 +58,7 @@ $button-shadow-size: $govuk-border-width-form-element;
     }
 
     .with-keyline {
-      border-top: 1px solid $govuk-border-colour;
+      border-top: 1px solid govuk-functional-colour(border);
       padding: govuk-spacing(6) * 1.5 0 0 0;
     }
 
