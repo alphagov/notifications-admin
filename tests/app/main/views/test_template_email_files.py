@@ -662,6 +662,10 @@ def test_upload_file_page_requires_file(
         template_id=fake_uuid,
         _expected_status=200,
     )
+
+    assert normalize_spaces(page.select_one("form label .govuk-error-message")) == (
+        "There is a problem You need to upload a file to submit"
+    )
     assert normalize_spaces(page.select_one("form label .govuk-error-message")) == "You need to upload a file to submit"
 
 

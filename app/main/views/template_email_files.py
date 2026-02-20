@@ -145,6 +145,7 @@ def upload_template_email_files(template_id, service_id):
         "views/templates/email-template-files/upload.html",
         template=template,
         form=form,
+        error_summary_enabled=True,
     )
 
 
