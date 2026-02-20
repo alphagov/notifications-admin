@@ -400,10 +400,10 @@ def test_file_settings_page_post_the_right_data_for_retention_period_and_link_te
 @pytest.mark.parametrize(
     "retention_period, expected_error_message",
     (
-        ("", "Error: Enter a number of weeks"),
-        ("hello", "Error: Enter the number of weeks in digits"),
-        ("0", "Error: Enter a number of weeks"),
-        ("79", "Error: The number of weeks must be between 1 and 78"),
+        ("", "Enter a number of weeks"),
+        ("hello", "Enter the number of weeks in digits"),
+        ("0", "Enter a number of weeks"),
+        ("79", "The number of weeks must be between 1 and 78"),
     ),
 )
 def test_validate_retention_period(
@@ -434,7 +434,11 @@ def test_validate_retention_period(
         _data={"retention_period": retention_period},
         _expected_status=200,
     )
-    assert normalize_spaces(page.select_one(".govuk-error-message").text) == expected_error_message
+
+    assert normalize_spaces(page.select_one(".govuk-error-summary").text) == (
+        f"There is a problem {expected_error_message}"
+    )
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == f"Error: {expected_error_message}"
 
 
 def test_file_settings_page_post_the_right_data_for_email_validation(
