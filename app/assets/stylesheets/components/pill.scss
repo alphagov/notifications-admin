@@ -68,7 +68,7 @@
     }
 
     &:hover {
-      color: govuk-tint(govuk-functional-colour(text), 25%);
+      color: govuk-colour('black', $variant: 'tint-25');
     }
 
     // give :active links the :focus style

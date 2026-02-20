@@ -11,7 +11,7 @@
   }
 
   &:hover {
-    color: govuk-tint( govuk-functional-colour(error), 25% );
+    color: govuk-colour('red', $variant: 'tint-25');
   }
 
   &:active {
@@ -35,7 +35,7 @@
   }
 
   &:hover {
-    color: govuk-tint( govuk-functional-colour(error), 25% );
+    color: govuk-colour('red', $variant: 'tint-25');
   }
 
   &:active {
