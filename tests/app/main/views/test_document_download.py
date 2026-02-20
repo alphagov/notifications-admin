@@ -20,9 +20,9 @@ from tests.conftest import (
 @pytest.mark.parametrize(
     "endpoint",
     (
-        ".document_download_index",
+        ".document_download_landing",
         ".document_download_confirm_email_address",
-        ".document_download_page",
+        ".document_download_download_document",
     ),
 )
 def test_redirect_if_user_not_signed_in(client_request, fake_uuid, endpoint):
@@ -42,9 +42,9 @@ def test_redirect_if_user_not_signed_in(client_request, fake_uuid, endpoint):
 @pytest.mark.parametrize(
     "endpoint",
     (
-        ".document_download_index",
+        ".document_download_landing",
         ".document_download_confirm_email_address",
-        ".document_download_page",
+        ".document_download_download_document",
     ),
 )
 def test_403_if_user_does_not_have_permission_to_see_template(client_request, fake_uuid, mocker, endpoint):
@@ -75,9 +75,9 @@ def test_403_if_user_does_not_have_permission_to_see_template(client_request, fa
 @pytest.mark.parametrize(
     "endpoint",
     (
-        ".document_download_index",
+        ".document_download_landing",
         ".document_download_confirm_email_address",
-        ".document_download_page",
+        ".document_download_download_document",
     ),
 )
 def test_404_if_bad_template_id(
@@ -100,9 +100,9 @@ def test_404_if_bad_template_id(
 @pytest.mark.parametrize(
     "endpoint",
     (
-        ".document_download_index",
+        ".document_download_landing",
         ".document_download_confirm_email_address",
-        ".document_download_page",
+        ".document_download_download_document",
     ),
 )
 def test_404_if_not_email_template(
@@ -138,9 +138,9 @@ def test_404_if_not_email_template(
 @pytest.mark.parametrize(
     "endpoint",
     (
-        ".document_download_index",
+        ".document_download_landing",
         ".document_download_confirm_email_address",
-        ".document_download_page",
+        ".document_download_download_document",
     ),
 )
 def test_404_if_document_not_found(
@@ -237,7 +237,7 @@ def test_landing_page(
         return_value={"data": service_json(SERVICE_ONE_ID, contact_link=contact_link_value)},
     )
     page = client_request.get(
-        ".document_download_index",
+        ".document_download_landing",
         service_id=SERVICE_ONE_ID,
         document_id=fake_uuid,
         key=uuid_to_base64(fake_uuid),
@@ -487,7 +487,7 @@ def test_confirm_email_page_redirects_for_correct_email(
     "endpoint, expected_banner_text",
     (
         (
-            ".document_download_index",
+            ".document_download_landing",
             (
                 "Preview "
                 "This is a preview of the page your recipients will see "
@@ -504,7 +504,7 @@ def test_confirm_email_page_redirects_for_correct_email(
             ),
         ),
         (
-            ".document_download_page",
+            ".document_download_download_document",
             (
                 "Preview "
                 "This is a preview of the page your recipients will see "
@@ -573,7 +573,7 @@ def test_banner_on_all_pages(
     ],
 )
 @freeze_time("2026-01-01")
-def test_document_download_page_displays_the_right_file_metadata(
+def test_document_download_download_document_displays_the_right_file_metadata(
     client_request,
     fake_uuid,
     file_name,
@@ -608,7 +608,7 @@ def test_document_download_page_displays_the_right_file_metadata(
         return_value=file_content_length,
     )
     page = client_request.get(
-        ".document_download_page",
+        ".document_download_download_document",
         service_id=SERVICE_ONE_ID,
         document_id=fake_uuid,
         key=uuid_to_base64(fake_uuid),
@@ -624,7 +624,7 @@ def test_document_download_page_displays_the_right_file_metadata(
     ]
 
 
-def test_document_download_page_enables_download(
+def test_document_download_download_document_enables_download(
     client_request,
     fake_uuid,
     mocker,
@@ -655,7 +655,7 @@ def test_document_download_page_enables_download(
         return_value=BytesIO(expected_content),
     )
     response = client_request.get_response(
-        ".document_download_page",
+        ".document_download_download_document",
         service_id=SERVICE_ONE_ID,
         document_id=fake_uuid,
         key=uuid_to_base64(fake_uuid),
