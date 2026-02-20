@@ -20,7 +20,7 @@ def document_download_landing(service_id, document_id):
     template_email_file = template.email_files.by_id(document_id)
 
     return render_template(
-        "views/document-download/index.html",
+        "views/document-download/landing.html",
         template=template,
         next_page=url_for(
             "main.document_download_confirm_email_address",
