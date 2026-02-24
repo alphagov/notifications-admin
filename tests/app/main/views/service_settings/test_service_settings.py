@@ -4652,6 +4652,7 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
         _expected_status=200,
         **extra_args,
     )
+    assert normalize_spaces(page.select_one(".govuk-error-summary").text) == "There is a problem Select an option"
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == "Error: Select an option"
 
 
@@ -4696,6 +4697,7 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
         **extra_args,
     )
 
+    assert normalize_spaces(page.select_one(".govuk-error-summary").text) == f"There is a problem {error}"
     assert error in page.select_one(".govuk-error-message").text
 
 

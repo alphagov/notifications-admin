@@ -801,6 +801,7 @@ def edit_service_template(service_id, template_id, language=None):  # noqa
         letter_languages=template.get_raw("letter_languages"),
         language_options=LetterLanguageOptions,
         back_link=url_for("main.view_template", service_id=current_service.id, template_id=template.id),
+        error_summary_enabled=True,
     )
 
 

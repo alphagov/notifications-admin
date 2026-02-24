@@ -3703,9 +3703,12 @@ def test_should_not_edit_letter_template_with_too_big_qr_code(
         },
         _expected_status=200,
     )
-    assert (
-        normalize_spaces(page.select_one(".govuk-error-message").text)
-        == "Error: Cannot create a usable QR code - the link you entered is too long"
+
+    assert normalize_spaces(page.select_one(".govuk-error-summary").text) == (
+        "There is a problem Cannot create a usable QR code - the link you entered is too long"
+    )
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
+        "Error: Cannot create a usable QR code - the link you entered is too long"
     )
 
 

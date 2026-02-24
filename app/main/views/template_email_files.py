@@ -56,7 +56,6 @@ def setup_template_email_files(template_id, service_id):
         must_be_of_type="email",
     )
     form = ServiceContactDetailsForm(service=current_service)
-
     if current_user.has_permissions("manage_service") and form.validate_on_submit():
         current_service.update(contact_link=form.chosen_contact_type)
         return redirect(url_for(".template_email_files", service_id=current_service.id, template_id=template.id))
@@ -65,6 +64,7 @@ def setup_template_email_files(template_id, service_id):
         "views/templates/email-template-files/setup.html",
         template=template,
         form=form,
+        error_summary_enabled=True,
     )
 
 
@@ -145,6 +145,7 @@ def upload_template_email_files(template_id, service_id):
         "views/templates/email-template-files/upload.html",
         template=template,
         form=form,
+        error_summary_enabled=True,
     )
 
 
@@ -213,6 +214,7 @@ def change_data_retention_period(service_id, template_id, template_email_file_id
         template=template,
         form=form,
         template_email_file_id=template_email_file_id,
+        error_summary_enabled=True,
     )
 
 
