@@ -254,6 +254,7 @@ class MainNavigation(Navigation):
             "change_data_retention_period",
             "change_email_validation",
             "document_download_download_document",
+            "make_file_live",
         },
         "uploads": {
             "upload_contact_list",

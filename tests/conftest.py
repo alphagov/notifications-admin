@@ -4582,6 +4582,7 @@ def test_template_email_files_data():
             "link_text": None,
             "retention_period": 90,
             "validate_users_email": False,
+            "pending": False,
         },
         {
             "filename": "test_file_2.png",
@@ -4589,6 +4590,7 @@ def test_template_email_files_data():
             "link_text": None,
             "retention_period": 90,
             "validate_users_email": False,
+            "pending": False,
         },
     ]
 

@@ -1,3 +1,4 @@
+import uuid
 from unittest.mock import ANY, Mock, call
 
 import pytest
@@ -150,6 +151,10 @@ def test_manage_a_template_email_file(
             )
         },
     )
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={"data": test_template_email_files_data[0]},
+    )
     page = client_request.get(
         "main.manage_a_template_email_file",
         service_id=SERVICE_ONE_ID,
@@ -212,6 +217,10 @@ def test_post_delete_to_manage_a_template_email_file_updates_and_redirects(
             )
         },
     )
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={"data": test_template_email_files_data[0]},
+    )
     mock_update_service_template = mocker.patch(
         "app.notify_client.service_api_client.ServiceAPIClient.update_service_template"
     )
@@ -248,6 +257,11 @@ def test_manage_a_template_email_file_raises_404_for_invalid_template_email_file
             )
         },
     )
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        side_effect=HTTPError(response=Mock(status_code=404)),
+    )
+
     client_request.get(
         "main.manage_a_template_email_file",
         service_id=SERVICE_ONE_ID,
@@ -297,6 +311,10 @@ def test_file_settings_pages_for_link_text_and_retention_period(
             )
         },
     )
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={"data": test_template_email_files_data[0]},
+    )
     template_email_file_id = test_template_email_files_data[0]["id"]
     page = client_request.get(
         endpoint,
@@ -331,6 +349,10 @@ def test_file_settings_pages_for_email_validation(
                 email_files=test_template_email_files_data,
             )
         },
+    )
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={"data": test_template_email_files_data[0]},
     )
     template_email_file_id = test_template_email_files_data[0]["id"]
     page = client_request.get(
@@ -390,6 +412,11 @@ def test_file_settings_page_post_the_right_data_for_retention_period_and_link_te
             )
         },
     )
+    test_template_email_files_data[0]["template_id"] = fake_uuid
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={"data": test_template_email_files_data[0]},
+    )
     mock_post = mocker.patch("app.template_email_file_client.post")
     update_data = test_data_for_a_template_email_file
     update_data[file_setting] = updated_value
@@ -437,6 +464,11 @@ def test_validate_retention_period(
             )
         },
     )
+    test_template_email_files_data[0]["template_id"] = fake_uuid
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={"data": test_template_email_files_data[0]},
+    )
     page = client_request.post(
         "main.change_data_retention_period",
         service_id=SERVICE_ONE_ID,
@@ -471,6 +503,11 @@ def test_file_settings_page_post_the_right_data_for_email_validation(
             )
         },
     )
+    test_template_email_files_data[0]["template_id"] = fake_uuid
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={"data": test_template_email_files_data[0]},
+    )
     mock_post = mocker.patch("app.template_email_file_client.post")
     update_data = test_data_for_a_template_email_file
     update_data["validate_users_email"] = True
@@ -491,13 +528,119 @@ def test_file_settings_page_post_the_right_data_for_email_validation(
     assert kwargs["data"]["validate_users_email"] is True
 
 
+def test_create_file_redirects_to_manage_files_page(
+    client_request,
+    service_one,
+    fake_uuid,
+    test_template_email_files_data,
+    mocker,
+    active_user_with_permissions,
+    mock_update_service,
+    mock_get_service_email_template,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "htttps://example.gov.uk"
+    active_user_with_permissions["permissions"][SERVICE_ONE_ID] = ["view_activity", "manage_templates"]
+    client_request.login(active_user_with_permissions)
+    file_id = uuid.uuid4()
+    mock_create_file = mocker.patch("app.models.template_email_file.TemplateEmailFile.create", return_value=file_id)
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={
+            "data": {
+                "filename": "tests/test_pdf_files/one_page_pdf.pdf",
+                "id": str(file_id),
+                "link_text": None,
+                "retention_period": 78,
+                "validate_users_email": False,
+                "pending": True,
+            }
+        },
+    )
+    mocker.patch(
+        "app.extensions.antivirus_client.scan",
+        return_value=True,
+    )
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        page = client_request.post(
+            "main.upload_template_email_files",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _data={"file": file},
+            _follow_redirects=True,
+        )
+        assert mock_create_file.call_args[1]["pending"]  # check the created file is set to pending
+    assert normalize_spaces(page.select_one(".govuk-button")) == "Add to template"
+    assert (
+        page.select_one(".govuk-button").get("href")
+        == f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{file_id}/make-live"
+    )
+
+
+def test_make_live_endpoint_calls_update_with_correct_args(
+    client_request,
+    service_one,
+    fake_uuid,
+    test_template_email_files_data,
+    mocker,
+    active_user_with_permissions,
+    mock_update_service,
+    mock_get_service_email_template,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+            )
+        },
+    )
+    file_data = {
+        "filename": "test_file_1.csv",
+        "id": "e9ecb3f2-8674-4436-b233-d2c16ad135e7",
+        "link_text": None,
+        "retention_period": 90,
+        "validate_users_email": False,
+        "pending": True,
+        "template_id": fake_uuid,
+    }
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={"data": file_data},
+    )
+    mock_template_update = mocker.patch("app.service_api_client.update_service_template")
+    mock_template_email_file_update = mocker.patch("app.models.template_email_file.TemplateEmailFile.update")
+    client_request.get(
+        "main.make_file_live",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        template_email_file_id=file_data["id"],
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.view_template",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+        ),
+    )
+    mock_template_update.assert_called_once_with(
+        template_id=fake_uuid, service_id=SERVICE_ONE_ID, content=f"Template content\n\n(({file_data['filename']}))"
+    )
+    mock_template_email_file_update.assert_called_once_with(pending=False)
+
+
+@pytest.mark.parametrize("pending", [True, False])
 def test_change_retention_period_page(
     client_request,
     service_one,
     fake_uuid,
     test_template_email_files_data,
     mocker,
+    pending,
 ):
+    test_template_email_files_data[0]["pending"] = pending
+    test_template_email_files_data[1]["pending"] = pending
     service_one["permissions"] += ["send_files_via_ui"]
     mocker.patch(
         "app.service_api_client.get_service_template",
@@ -509,6 +652,12 @@ def test_change_retention_period_page(
             )
         },
     )
+    test_template_email_files_data[0]["template_id"] = fake_uuid
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={"data": test_template_email_files_data[0]},
+    )
+
     page = client_request.get(
         "main.change_data_retention_period",
         service_id=SERVICE_ONE_ID,
@@ -722,7 +871,7 @@ def test_upload_file_page_validates_extentions(
             )
         assert mock_s3.called is True
         assert mock_post.called is True
-        assert mock_template_update.called is True
+        assert mock_template_update.called is False  # upload page shouldnt mutate the template
     else:
         with open(test_file, "rb") as file:
             page = client_request.post(
@@ -767,7 +916,6 @@ def test_file_upload_calls_template_update(
     mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
     mock_post = mocker.patch("app.template_email_file_client.post")
-    mock_template_update = mocker.patch("app.service_api_client.update_service_template")
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         client_request.post(
             "main.upload_template_email_files",
@@ -777,11 +925,6 @@ def test_file_upload_calls_template_update(
             _expected_status=302,
         )
     assert mock_antivirus.called
-    mock_template_update.assert_called_once_with(
-        template_id=fake_uuid,
-        service_id=SERVICE_ONE_ID,
-        content="This is a file with a file placeholder\n\n((tests/test_pdf_files/one_page_pdf.pdf))",
-    )
     assert mock_s3.called
     assert mock_post.called
 
@@ -844,6 +987,7 @@ def test_upload_file_does_not_update_template_when_placeholder_already_exists(
                 "created_by_id": AnyStringMatching(UUID4_REGEX_PATTERN),
                 "retention_period": 78,
                 "validate_users_email": True,
+                "pending": True,
             },
         ),
     ]

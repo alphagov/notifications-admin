@@ -311,6 +311,7 @@
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change-data-retention",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change-email-validation",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change-link-text",
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/make-live",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/setup",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/upload",
     "/services/<uuid:service_id>/templates/<uuid:template_id>/redact",

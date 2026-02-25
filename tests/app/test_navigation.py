@@ -125,6 +125,7 @@ EXCLUDED_ENDPOINTS = set(
             "setup_template_email_files",
             "upload_template_email_files",
             "template_email_files",
+            "make_file_live",
             "change_link_text",
             "change_data_retention_period",
             "change_email_validation",
