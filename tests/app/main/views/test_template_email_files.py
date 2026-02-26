@@ -339,8 +339,11 @@ def test_file_settings_pages_for_email_validation(
         template_id=template_id,
         template_email_file_id=template_email_file_id,
     )
-    assert page.select_one("h1").string.strip() == "Ask recipient for their email address"
-    assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
+    assert normalize_spaces(page.select_one("h1").text) == "Ask recipient for their email address"
+    assert normalize_spaces(page.select_one("h1 + p").text) == (
+        "The recipient must enter their email address before they can download ‘test_file_1.csv’."
+    )
+    assert [normalize_spaces(label.text) for label in page.select(".govuk-radios__item label")] == [
         "Yes",
         "No",
     ]
@@ -350,7 +353,7 @@ def test_file_settings_pages_for_email_validation(
     expected_url = (
         f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{template_email_file_id}/change-email-validation"
     )
-    assert button.text.strip() == "Continue"
+    assert normalize_spaces(button.text) == "Continue"
     assert form["action"] == expected_url
 
 
