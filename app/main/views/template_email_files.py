@@ -213,7 +213,7 @@ def change_data_retention_period(service_id, template_id, template_email_file_id
         "views/templates/email-template-files/change_retention_period.html",
         template=template,
         form=form,
-        template_email_file_id=template_email_file_id,
+        template_email_file=template_email_file,
         error_summary_enabled=True,
     )
 
