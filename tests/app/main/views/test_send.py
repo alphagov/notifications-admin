@@ -758,6 +758,8 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         "app.main.views.send.s3download",
         return_value="""
             address line 1,     address line 3,  address line 6,
+            ..?????, 123 Example St., SW1A 1AA
+            Firstname Lastname, ..????, SW1A 1AA
             Firstname Lastname, 123 Example St., SW1A 1AA
             Firstname Lastname, 123 Example St., SW!A !AA
             Firstname Lastname, 123 Example St., France
@@ -778,20 +780,24 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
     )
 
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
-        "There’s a problem with example.csv You need to fix 6 addresses."
+        "There’s a problem with example.csv You need to fix 8 addresses."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "3 Last line of the address must be a real UK postcode",
+        "2 The first 2 lines of the address must both include at least one alphanumeric character",
+        "..????? 123 Example St. SW1A 1AA",
+        "3 The first 2 lines of the address must both include at least one alphanumeric character",
+        "Firstname Lastname ..???? SW1A 1AA",
+        "5 Last line of the address must be a real UK postcode",
         "Firstname Lastname 123 Example St. SW!A !AA",
-        "4 You do not have permission to send letters to other countries",
+        "6 You do not have permission to send letters to other countries",
         "Firstname Lastname 123 Example St. France",
-        "5 Address must be at least 3 lines long",
+        "7 Address must be at least 3 lines long",
         "123 Example St. SW!A !AA",
-        "6 Address must be no more than 7 lines long",
+        "8 Address must be no more than 7 lines long",
         "1 2 3 4 5 6 7 8",
-        '7 Address lines must not start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~',
+        '9 Address lines must not start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~',
         "=Firstname Lastname 123 Example St. SW1A 1AA",
-        "8 This is not a real address",
+        "10 This is not a real address",
         "Firstname Lastname NFA SW1A 1AA",
     ]
 
@@ -2825,6 +2831,16 @@ def test_send_one_off_letter_address_populates_address_fields_in_session(
             "a\nNo fixed address\nSW1A 1AA",
             [],
             "Error: Enter a real address",
+        ),
+        (
+            ".\n123 Street Name\nTown\nSW1A 1AA",
+            [],
+            "Error: The first 2 lines of the address must both include at least one alphanumeric character",
+        ),
+        (
+            "Mr Recipient\n?\nTown\nSW1A 1AA",
+            [],
+            "Error: The first 2 lines of the address must both include at least one alphanumeric character",
         ),
     ],
 )

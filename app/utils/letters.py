@@ -167,6 +167,13 @@ LETTER_VALIDATION_MESSAGES = {
         "detail": "Enter a real address.",
         "summary": "Validation failed because this is not a real address.",
     },
+    "invalid-address-line-1-or-2": {
+        "title": "There’s a problem with the address for this letter",
+        "detail": "The first 2 lines must both include at least one alphanumeric character.",
+        "summary": (
+            "Validation failed because there is not an alphanumeric character in lines 1 and 2 of the address."
+        ),
+    },
 }
 
 

@@ -209,6 +209,13 @@ def test_get_letter_validation_error_for_unknown_error():
             "Enter a real address.",
             "Validation failed because this is not a real address.",
         ),
+        (
+            "invalid-address-line-1-or-2",
+            [1],
+            "There’s a problem with the address for this letter",
+            "The first 2 lines must both include at least one alphanumeric character.",
+            "Validation failed because there is not an alphanumeric character in lines 1 and 2 of the address.",
+        ),
     ],
 )
 def test_get_letter_validation_error_for_known_errors(

@@ -1451,6 +1451,11 @@ class LetterAddressForm(StripWhitespaceForm):
         if address.has_too_many_lines:
             raise ValidationError(f"Address must be no more than {PostalAddress.MAX_LINES} lines long")
 
+        if not address.has_alphanumeric_character_in_address_lines_1_and_2:
+            raise ValidationError(
+                "The first 2 lines of the address must both include at least one alphanumeric character"
+            )
+
         if address.has_invalid_country_for_bfpo_address:
             raise ValidationError(
                 "The last line of a British Forces Post Office (BFPO) address cannot be the name of a country"
