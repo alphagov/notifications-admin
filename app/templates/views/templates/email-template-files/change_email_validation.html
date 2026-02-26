@@ -25,6 +25,15 @@
       <p class="govuk-body">
         This is for added security.
       </p>
+
+      <p class="govuk-body">
+          You should choose ‘Yes’ if you send files that contain:
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>personally identifiable information</li>
+          <li>commercially sensitive information</li>
+          <li>information classified as ‘OFFICIAL’ or ‘OFFICIAL-SENSITIVE’ under the <a href="https://www.gov.uk/government/publications/government-security-classifications" class="govuk-link govuk-link--no-visited-state">Government Security Classifications</a> policy</li>
+        </ul>
       {% call form_wrapper() %}
         {{ form.enabled(
           param_extensions={
@@ -37,14 +46,7 @@
           }
         ) }}
         {{ page_footer('Continue') }}
-        <p class="govuk-body">
-          You should choose ‘Yes’ if you send files that contain:
-        </p>
-        <ul class="govuk-list govuk-list--bullet">
-          <li>personally identifiable information</li>
-          <li>commercially sensitive information</li>
-          <li>information classified as ‘OFFICIAL’ or ‘OFFICIAL-SENSITIVE’ under the <a href="https://www.gov.uk/government/publications/government-security-classifications" class="govuk-link govuk-link--no-visited-state">Government Security Classifications</a> policy</li>
-        </ul>
+
       {% endcall %}
     </div>
   </div>
