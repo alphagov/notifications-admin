@@ -23,7 +23,6 @@
       "label": {"text": "Link text (optional) for ‘{}’".format(template_email_file.filename)},
       "classes": "govuk-!-width-full"
     }) }}
-    {{ page_footer('Continue') }}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-five-sixths">
         <p class="govuk-body">
@@ -40,5 +39,7 @@
         </p>
       </div>
     </div>
+    {{ page_footer('Continue') }}
+
   {% endcall %}
 {% endblock %}
