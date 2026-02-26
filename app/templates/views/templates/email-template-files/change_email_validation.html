@@ -11,7 +11,7 @@
 {% block backLink %}
   {{ govukBackLink({ "href":url_for("main.manage_a_template_email_file", service_id=current_service.id,
                 template_id=template.id,
-                template_email_file_id=template_email_file_id)})
+                template_email_file_id=template_email_file.id)})
           }}
 {% endblock %}
 
@@ -20,7 +20,10 @@
     <div class="govuk-grid-column-five-sixths">
       {{ page_header(title) }}
       <p class="govuk-body">
-        The recipient must enter their email address before they can download the file. This is for added security.
+        The recipient must enter their email address before they can download ‘{{ template_email_file.filename }}’.
+      </p>
+      <p class="govuk-body">
+        This is for added security.
       </p>
       {% call form_wrapper() %}
         {{ form.enabled(

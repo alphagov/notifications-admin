@@ -4,7 +4,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 
-{% set title = 'Link text' %}
+{% set title = 'Add link text' %}
 {% block service_page_title %}
   {{ title }}
 {% endblock %}
@@ -12,14 +12,17 @@
 {% block backLink %}
   {{ govukBackLink({ "href":url_for("main.manage_a_template_email_file", service_id=current_service.id,
                 template_id=template.id,
-                template_email_file_id=template_email_file_id)})
+                template_email_file_id=template_email_file.id)})
           }}
 {% endblock %}
 
 {% block maincolumn_content %}
   {{ page_header(title) }}
   {% call form_wrapper(class='top-gutter') %}
-    {{ form.link_text() }}
+    {{ form.link_text(param_extensions={
+      "label": {"text": "Link text (optional) for ‘{}’".format(template_email_file.filename)},
+      "classes": "govuk-!-width-full"
+    }) }}
     {{ page_footer('Continue') }}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-five-sixths">

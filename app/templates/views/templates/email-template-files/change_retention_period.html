@@ -3,7 +3,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
-{% set title = 'How long should the file be available for' %}
+{% set title = 'How long the file is available' %}
 {% block service_page_title %}
   {{ title }}
 {% endblock %}
@@ -11,7 +11,7 @@
 {% block backLink %}
   {{ govukBackLink({ "href":url_for("main.manage_a_template_email_file", service_id=current_service.id,
                 template_id=template.id,
-                template_email_file_id=template_email_file_id)})
+                template_email_file_id=template_email_file.id)})
           }}
 {% endblock %}
 
@@ -19,6 +19,7 @@
   {{ page_header(title) }}
   {% call form_wrapper(class='top-gutter') %}
     {{ form.retention_period(param_extensions={
+      "label": {"text": "Number of weeks recipients can access ‘{}’".format(template_email_file.filename)},
       "classes": "govuk-input--width-2"
     }) }}
     {{ page_footer('Continue') }}

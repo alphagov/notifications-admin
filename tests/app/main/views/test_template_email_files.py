@@ -260,11 +260,16 @@ def test_manage_a_template_email_file_raises_404_for_invalid_template_email_file
 @pytest.mark.parametrize(
     "endpoint, page_title, form_label, path_segment",
     [
-        ("main.change_link_text", "Link text", "Link text (optional)", "change-link-text"),
+        (
+            "main.change_link_text",
+            "Add link text",
+            "Link text (optional) for ‘test_file_1.csv’",
+            "change-link-text",
+        ),
         (
             "main.change_data_retention_period",
-            "How long should the file be available for",
-            "Number of weeks available to recipients",
+            "How long the file is available",
+            "Number of weeks recipients can access ‘test_file_1.csv’",
             "change-data-retention",
         ),
     ],
@@ -334,8 +339,11 @@ def test_file_settings_pages_for_email_validation(
         template_id=template_id,
         template_email_file_id=template_email_file_id,
     )
-    assert page.select_one("h1").string.strip() == "Ask recipient for their email address"
-    assert [label.text.strip() for label in page.select(".govuk-radios__item label")] == [
+    assert normalize_spaces(page.select_one("h1").text) == "Ask recipient for their email address"
+    assert normalize_spaces(page.select_one("h1 + p").text) == (
+        "The recipient must enter their email address before they can download ‘test_file_1.csv’."
+    )
+    assert [normalize_spaces(label.text) for label in page.select(".govuk-radios__item label")] == [
         "Yes",
         "No",
     ]
@@ -345,7 +353,7 @@ def test_file_settings_pages_for_email_validation(
     expected_url = (
         f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{template_email_file_id}/change-email-validation"
     )
-    assert button.text.strip() == "Continue"
+    assert normalize_spaces(button.text) == "Continue"
     assert form["action"] == expected_url
 
 
@@ -504,8 +512,8 @@ def test_change_retention_period_page(
         template_id=fake_uuid,
         template_email_file_id=test_template_email_files_data[0]["id"],
     )
-    assert page.select_one("h1").string.strip() == "How long should the file be available for"
-    assert page.select_one("label").string.strip() == "Number of weeks available to recipients"
+    assert page.select_one("h1").string.strip() == "How long the file is available"
+    assert page.select_one("label").string.strip() == "Number of weeks recipients can access ‘test_file_1.csv’"
     assert page.select_one("button[type=submit]").string.strip() == "Continue"
 
 
