@@ -179,7 +179,7 @@ def change_link_text(service_id, template_id, template_email_file_id):
         "views/templates/email-template-files/change_link_text.html",
         template=template,
         form=form,
-        template_email_file_id=template_email_file_id,
+        template_email_file=template_email_file,
     )
 
 

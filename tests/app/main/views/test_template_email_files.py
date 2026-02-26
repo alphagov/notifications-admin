@@ -260,7 +260,12 @@ def test_manage_a_template_email_file_raises_404_for_invalid_template_email_file
 @pytest.mark.parametrize(
     "endpoint, page_title, form_label, path_segment",
     [
-        ("main.change_link_text", "Add link text", "Link text (optional)", "change-link-text"),
+        (
+            "main.change_link_text",
+            "Add link text",
+            "Link text (optional) for ‘test_file_1.csv’",
+            "change-link-text",
+        ),
         (
             "main.change_data_retention_period",
             "How long should the file be available for",
