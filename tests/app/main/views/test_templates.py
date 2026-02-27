@@ -4809,6 +4809,8 @@ def test_attach_files_button(
     if expected_button_text or expected_button_endpoint:
         assert button["href"] == url_for(expected_button_endpoint, service_id=SERVICE_ONE_ID, template_id=fake_uuid)
         assert normalize_spaces(button.text) == expected_button_text
+        if template_type == "email" and extra_permissions:
+            assert normalize_spaces(page.select_one("h2[class='govuk-visually-hidden']").text) == "Added Files"
     else:
         assert button is None
 
