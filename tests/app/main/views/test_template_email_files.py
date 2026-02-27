@@ -343,6 +343,7 @@ def test_file_settings_pages_for_email_validation(
     assert normalize_spaces(page.select_one("h1 + p").text) == (
         "The recipient must enter their email address before they can download ‘test_file_1.csv’."
     )
+    assert normalize_spaces(page.select_one("legend").text) == "Ask recipient to confirm their email address"
     assert [normalize_spaces(label.text) for label in page.select(".govuk-radios__item label")] == [
         "Yes",
         "No",
