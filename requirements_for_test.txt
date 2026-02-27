@@ -175,7 +175,7 @@ phonenumbers==9.0.24
     # via
     #   -r requirements.txt
     #   notifications-utils
-pillow==11.3.0
+pillow==12.1.1
     # via -r requirements.txt
 pluggy==1.6.0
     # via pytest
