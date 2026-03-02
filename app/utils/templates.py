@@ -17,7 +17,7 @@ from notifications_utils.template import (
 from ordered_set import OrderedSet
 
 from app.extensions import redis_client
-from app.models import JSONModel
+from app.models import StrictJSONModel
 from app.models.template_email_file import TemplateEmailFiles
 from app.notify_client import cache
 
@@ -317,7 +317,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
         return OrderedSet([placeholder for placeholder in self.all_placeholders if placeholder not in self.filenames])
 
 
-class LetterAttachment(JSONModel):
+class LetterAttachment(StrictJSONModel):
     id: Any
     original_filename: Any
     page_count: Any
