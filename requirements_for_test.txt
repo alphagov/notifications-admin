@@ -6,7 +6,7 @@ awscrt==0.31.2
     # via
     #   -r requirements.txt
     #   botocore
-beautifulsoup4==4.12.3
+beautifulsoup4==4.14.3
     # via -r requirements_for_test_common.in
 blinker==1.9.0
     # via
@@ -88,7 +88,7 @@ flask-redis==0.4.0
     #   notifications-utils
 flask-wtf==1.2.1
     # via -r requirements.txt
-freezegun==1.5.1
+freezegun==1.5.5
     # via -r requirements_for_test_common.in
 gds-metrics @ git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
     # via -r requirements.txt
@@ -158,7 +158,7 @@ moto==5.1.0
     # via -r requirements_for_test.in
 notifications-python-client==10.0.0
     # via -r requirements.txt
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@0fc47126305fa1930b427b21d413b363cb3b702b
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@e4fd0f03f2475329250dac85d1fb778a4fc053b4
     # via -r requirements.txt
 openpyxl==3.1.5
     # via -r requirements.txt
@@ -199,6 +199,8 @@ pyexcel-odsr==0.6.0
     # via -r requirements.txt
 pyexcel-xls==0.7.1
     # via -r requirements.txt
+pygments==2.19.2
+    # via pytest
 pyjwt==2.11.0
     # via
     #   -r requirements.txt
@@ -207,20 +209,20 @@ pypdf==6.7.2
     # via
     #   -r requirements.txt
     #   notifications-utils
-pytest==8.3.4
+pytest==9.0.2
     # via
     #   -r requirements_for_test_common.in
     #   pytest-env
     #   pytest-mock
     #   pytest-testmon
     #   pytest-xdist
-pytest-env==1.1.5
+pytest-env==1.5.0
     # via -r requirements_for_test_common.in
-pytest-mock==3.14.0
+pytest-mock==3.15.1
     # via -r requirements_for_test_common.in
-pytest-testmon==2.1.1
+pytest-testmon==2.2.0
     # via -r requirements_for_test_common.in
-pytest-xdist==3.6.1
+pytest-xdist==3.8.0
     # via -r requirements_for_test_common.in
 python-dateutil==2.9.0.post0
     # via
@@ -229,6 +231,8 @@ python-dateutil==2.9.0.post0
     #   freezegun
     #   moto
     #   notifications-utils
+python-dotenv==1.2.1
+    # via pytest-env
 python-json-logger==4.0.0
     # via
     #   -r requirements.txt
@@ -255,7 +259,7 @@ requests-mock==1.12.1
     # via -r requirements_for_test_common.in
 responses==0.26.0
     # via moto
-ruff==0.11.4
+ruff==0.15.2
     # via -r requirements_for_test_common.in
 s3transfer==0.16.0
     # via
@@ -286,6 +290,8 @@ texttable==1.7.0
     # via
     #   -r requirements.txt
     #   pyexcel
+typing-extensions==4.15.0
+    # via beautifulsoup4
 urllib3==2.6.3
     # via
     #   -r requirements.txt

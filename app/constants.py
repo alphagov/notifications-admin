@@ -33,7 +33,7 @@ REPORT_REQUEST_MAX_NOTIFICATIONS = 800_000
 
 
 # Language options supported for bilingual letter templates
-class LetterLanguageOptions(str, enum.Enum):
+class LetterLanguageOptions(enum.StrEnum):
     english = "english"
     welsh_then_english = "welsh_then_english"
 
