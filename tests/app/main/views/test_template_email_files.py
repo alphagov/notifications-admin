@@ -263,7 +263,7 @@ def test_manage_a_template_email_file_raises_404_for_invalid_template_email_file
         (
             "main.change_link_text",
             "Add link text",
-            "Link text for ‘test_file_1.csv’ (optional)",
+            "Link text (optional)",
             "change-link-text",
         ),
         (
