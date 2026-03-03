@@ -554,7 +554,7 @@ def test_returned_letters_shows_count_of_recently_returned_letters(
         ("2020-01-26", 1, "1 returned letter latest report 7 days ago"),
         ("2020-01-25", 0, "0 returned letters latest report 8 days ago"),
         ("2020-01-01", 0, "0 returned letters latest report 1 month ago"),
-        ("2019-09-09", 0, "0 returned letters latest report 4 months ago"),
+        ("2019-09-09", 0, "0 returned letters latest report 5 months ago"),
         ("2010-10-10", 0, "0 returned letters latest report 9 years ago"),
     ),
 )
