@@ -343,7 +343,9 @@ def test_file_settings_pages_for_email_validation(
     assert normalize_spaces(page.select_one("h1 + p").text) == (
         "The recipient must enter their email address before they can download ‘test_file_1.csv’."
     )
-    assert normalize_spaces(page.select_one("legend").text) == "Ask recipient to confirm their email address"
+    assert normalize_spaces(page.select_one("legend").text) == (
+        "Do you want the recipient to confirm their email address?"
+    )
     assert [normalize_spaces(label.text) for label in page.select(".govuk-radios__item label")] == [
         "Yes",
         "No",
@@ -514,7 +516,9 @@ def test_change_retention_period_page(
         template_email_file_id=test_template_email_files_data[0]["id"],
     )
     assert page.select_one("h1").string.strip() == "How long the file is available"
-    assert normalize_spaces(page.select_one("p")) == "For ‘test_file_1.csv’"
+    assert normalize_spaces(page.select_one("p")) == (
+        "Choose the length of time recipients can access ‘test_file_1.csv’."
+    )
     assert page.select_one("label").string.strip() == "Number of weeks recipients can access the file"
     assert page.select_one("button[type=submit]").string.strip() == "Continue"
 
