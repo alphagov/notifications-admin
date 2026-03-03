@@ -1,7 +1,7 @@
 # Run `make freeze-requirements` to update requirements.txt
 # with package version changes made in requirements.in
 
-ago==0.0.95
+ago~=0.1
 humanize==4.4.0
 Flask-WTF==1.2.1
 Flask-Login==0.6.3
