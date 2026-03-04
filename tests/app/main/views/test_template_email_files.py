@@ -570,9 +570,10 @@ def test_create_file_redirects_to_manage_files_page(
             _follow_redirects=True,
         )
         assert mock_create_file.call_args[1]["pending"]  # check the created file is set to pending
-    assert normalize_spaces(page.select_one(".govuk-button")) == "Add to template"
+    assert normalize_spaces(page.select_one("form .govuk-button")) == "Add to template"
+    assert page.select_one("form").get("method") == "post"
     assert (
-        page.select_one(".govuk-button").get("href")
+        page.select_one("form").get("action")
         == f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{file_id}/make-live"
     )
 
