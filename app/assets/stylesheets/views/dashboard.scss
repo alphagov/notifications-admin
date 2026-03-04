@@ -31,7 +31,7 @@
     box-sizing: border-box;
     display: inline-block;
     overflow: visible;
-    background: govuk-shade(govuk-colour('black', $variant: "tint-95"), 7%);
+    background: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
     color: govuk-functional-colour(text);
     padding: 10px 6px 8px 0;
     text-indent: 12px;

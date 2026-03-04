@@ -22,9 +22,9 @@
     letter-spacing: 0.05em;
 
     &--suspended {
-      background: govuk-shade(govuk-colour('black', $variant: "tint-95"), 7%);
-      color: mix(govuk-colour('black', $variant: "tint-25"), govuk-functional-colour(text));
-      box-shadow: 0 -3px 0 0 govuk-shade(govuk-colour('black', $variant: "tint-95"), 7%);
+      background: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
+      color: mix(govuk-colour('black', $variant: "tint-25"), govuk-colour('black'));
+      box-shadow: 0 -3px 0 0 mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
     }
 
   }

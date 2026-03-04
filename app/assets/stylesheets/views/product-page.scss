@@ -89,6 +89,6 @@ $button-shadow-size: $govuk-border-width-form-element;
   // based on the govuk-button styles:
   // https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/button/_button.scss
   @include govuk-font($size: 24, $weight: bold);
-  box-shadow: 0 $button-shadow-size 0 govuk-shade($colour: $product-page-blue, $percentage: 15%);
+  box-shadow: 0 $button-shadow-size 0 mix(black, $product-page-blue, 15%);
 
 }
