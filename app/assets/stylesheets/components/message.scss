@@ -1,5 +1,4 @@
 $app-body-text-line-height-default: get-govuk-typography-style($size: 19, $breakpoint: null, $property: "line-height");
-$app-body-text-line-height-tablet: get-govuk-typography-style($size: 19, $breakpoint: tablet, $property: "line-height");
 
 @mixin separator {
   display: inline-block;
@@ -118,11 +117,6 @@ a {
           bottom: -1 * $app-body-text-line-height-default; /* extend link by line height of hint/meta so it covers it */
           width: 100%;
           height: $app-body-text-line-height-default;
-
-          @include govuk-media-query($from: tablet) {
-            bottom: -1 * $app-body-text-line-height-tablet - 5px;
-            height: $app-body-text-line-height-tablet + 5px;
-          }
         }
 
         &:focus {
