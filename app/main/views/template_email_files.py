@@ -110,7 +110,7 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
 
 @main.route(
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/make-live",
-    methods=["GET", "POST"],
+    methods=["POST"],
 )
 @service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
