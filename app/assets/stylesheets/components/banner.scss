@@ -94,7 +94,7 @@
   &-with-service-name {
     margin-top: -10px;
     padding-top: 0;
-    box-shadow: 0 -1px 0 0 darken(govuk-functional-colour(brand), 10%);
+    box-shadow: 0 -1px 0 0 mix(black, govuk-colour("blue"), 10%);
   }
 
   .heading-medium {
