@@ -18,7 +18,7 @@
 {{ template|string }}
 
 {% if template.template_type == "email" and current_service.has_permission("send_files_via_ui") %}
-
+  <h2 class="govuk-visually-hidden">Added Files</h2>
   <div class="govuk-!-margin-bottom-2">
     <div class="js-stick-at-bottom-when-scrolling">
       <span class="email-files-selected-counter">

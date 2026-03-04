@@ -15,8 +15,6 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-    {{ page_header(title) }}
-
     {% if delete %}
     <div class="govuk-!-margin-bottom-6">
       {{ banner(
@@ -28,6 +26,7 @@
     </div>
     {% endif %}
 
+    {{ page_header(title) }}
     {%  set file_data = [
             {
           "key": {

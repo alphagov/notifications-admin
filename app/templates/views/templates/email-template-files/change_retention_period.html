@@ -17,18 +17,17 @@
 
 {% block maincolumn_content %}
   {{ page_header(title) }}
+  <p class="govuk-body">Choose the length of time recipients can access ‘{{template_email_file.filename}}’.</p>
+    <p class="govuk-body"> You should think about:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>the need to protect the recipient’s personal information</li>
+    <li>whether the recipient will need to download the file again later</li>
+  </ul>
   {% call form_wrapper(class='top-gutter') %}
     {{ form.retention_period(param_extensions={
-      "label": {"text": "Number of weeks recipients can access ‘{}’".format(template_email_file.filename)},
+      "label": {"text": "Number of weeks recipients can access the file"},
       "classes": "govuk-input--width-2"
     }) }}
     {{ page_footer('Continue') }}
-    <p class="govuk-body">
-      When choosing the length of time the file is available, you should think about:
-    </p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>the need to protect the recipient’s personal information</li>
-      <li>whether the recipient will need to download the file again later</li>
-    </ul>
   {% endcall %}
 {% endblock %}

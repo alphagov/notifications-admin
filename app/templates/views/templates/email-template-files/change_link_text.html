@@ -18,27 +18,28 @@
 
 {% block maincolumn_content %}
   {{ page_header(title) }}
-  {% call form_wrapper(class='top-gutter') %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      <p class="govuk-body">
+        Leave this blank to display the full URL in the email for {{ template_email_file.filename }}.
+      </p>
+      <p class="govuk-body">
+        If the recipient is not expecting to receive an email from you, we recommend leaving this blank.
+      </p>
+      <p class="govuk-body">
+        Link text should tell the recipient what action they need to take and where the link goes.
+      </p>
+      <p class="govuk-body">
+        Never use ‘click here’, ‘click link’, ‘this link’ or ‘more’, as these do not make sense when read out of context.
+      </p>
+    </div>
+  </div>
+  {% call form_wrapper() %}
     {{ form.link_text(param_extensions={
-      "label": {"text": "Link text (optional) for ‘{}’".format(template_email_file.filename)},
+      "label": {"text": "Link text (optional)"},
       "classes": "govuk-!-width-full"
     }) }}
     {{ page_footer('Continue') }}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-five-sixths">
-        <p class="govuk-body">
-          Leave this blank to display the full URL in the email.
-        </p>
-        <p class="govuk-body">
-          If the recipient is not expecting to receive an email from you, we recommend leaving this blank.
-        </p>
-        <p class="govuk-body">
-          Link text should tell the recipient what action they need to take and where the link goes.
-        </p>
-        <p class="govuk-body">
-          Never use ‘click here’, ‘click link’, ‘this link’ or ‘more’, as these do not make sense when read out of context.
-        </p>
-      </div>
-    </div>
+
   {% endcall %}
 {% endblock %}

@@ -25,19 +25,8 @@
       <p class="govuk-body">
         This is for added security.
       </p>
-      {% call form_wrapper() %}
-        {{ form.enabled(
-          param_extensions={
-            'fieldset': {
-              'legend': {
-                'isPageHeading': False,
-                'classes': 'govuk-visually-hidden'
-              }
-            }
-          }
-        ) }}
-        {{ page_footer('Continue') }}
-        <p class="govuk-body">
+
+      <p class="govuk-body">
           You should choose ‘Yes’ if you send files that contain:
         </p>
         <ul class="govuk-list govuk-list--bullet">
@@ -45,6 +34,21 @@
           <li>commercially sensitive information</li>
           <li>information classified as ‘OFFICIAL’ or ‘OFFICIAL-SENSITIVE’ under the <a href="https://www.gov.uk/government/publications/government-security-classifications" class="govuk-link govuk-link--no-visited-state">Government Security Classifications</a> policy</li>
         </ul>
+      {% call form_wrapper() %}
+        {{ form.enabled(
+          param_extensions={
+            'fieldset': {
+
+              'legend': {
+                'isPageHeading': False,
+                'text': "Do you want the recipient to confirm their email address?",
+                'classes': "govuk-fieldset__legend--s"
+              }
+            }
+          }
+        ) }}
+        {{ page_footer('Continue') }}
+
       {% endcall %}
     </div>
   </div>
