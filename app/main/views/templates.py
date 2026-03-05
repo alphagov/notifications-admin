@@ -775,8 +775,10 @@ def edit_service_template(service_id, template_id, language=None):  # noqa
                 template.template_type == "letter" and template.welsh_page_count and language != "welsh"
             )
             if template_change.email_files_removed:
+                multiple_files_removed = len(template_change.email_filenames_removed) > 1
                 flash(
-                    f"Files for {formatted_list(template_change.email_filenames_removed)} have been removed from the template.",  # noqa
+                    f"{formatted_list(template_change.email_filenames_removed)} "
+                    f"{'have' if multiple_files_removed else 'has'} been removed",
                     "default_with_tick",
                 )
             return redirect(

@@ -3760,14 +3760,14 @@ def test_should_redirect_when_saving_a_template_email(
                 "00000000-0000-4000-8000-000000000001",
                 "00000000-0000-4000-8000-000000000002",
             ],
-            "Files for ‘invite.pdf’ and ‘form.pdf’ have been removed from the template.",
+            "‘invite.pdf’ and ‘form.pdf’ have been removed",
         ),
         (
             "For the appointment, you will just need ((form.pdf)) and ((map.pdf))",
             [
                 "00000000-0000-4000-8000-000000000001",
             ],
-            "Files for ‘invite.pdf’ have been removed from the template.",
+            "‘invite.pdf’ has been removed",
         ),
     ),
 )
