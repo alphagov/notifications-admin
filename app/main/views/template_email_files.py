@@ -81,7 +81,6 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
         must_be_of_type="email",
     )
     delete = bool(request.args.get("delete"))
-    pending = bool(request.args.get("pending", False))
     template_email_file = TemplateEmailFile.get_by_id(
         template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
     )
@@ -105,7 +104,6 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
         service_id=service_id,
         template_id=template_id,
         delete=delete,
-        pending=pending,
     )
 
 
