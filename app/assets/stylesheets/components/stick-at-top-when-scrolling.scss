@@ -96,7 +96,7 @@ $sticky-padding: govuk-spacing(4);
 .js-stick-at-top-when-scrolling.content-fixed__top {
 
   border-bottom: 1px solid govuk-functional-colour(border);
-  box-shadow: 0 2px 0 0 rgba(govuk-functional-colour(border), 0.2);
+  box-shadow: 0 2px 0 0 rgb(govuk-functional-colour(border), 0.2);
 
 }
 
@@ -117,7 +117,7 @@ $sticky-padding: govuk-spacing(4);
 .js-stick-at-bottom-when-scrolling.content-fixed__bottom {
 
   border-top: 1px solid govuk-functional-colour(border);
-  box-shadow: 0 -2px 0 0 rgba(govuk-functional-colour(border), 0.2);
+  box-shadow: 0 -2px 0 0 rgb(govuk-functional-colour(border), 0.2);
 
 }
 

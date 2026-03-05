@@ -72,7 +72,7 @@ $iso-paper-ratio: 141.42135624%;
     text-indent: -1000em;
     border-bottom: 1px solid govuk-functional-colour(border);
     border-left: 1px solid govuk-functional-colour(border);
-    box-shadow: 0 2px 0 0 rgba(govuk-functional-colour(border), 0.2);
+    box-shadow: 0 2px 0 0 rgb(govuk-functional-colour(border), 0.2);
 
     &-first {
       background-image: file-url('envelope-1st-class.svg');
