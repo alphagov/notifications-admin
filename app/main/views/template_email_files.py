@@ -81,7 +81,10 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
         must_be_of_type="email",
     )
     delete = bool(request.args.get("delete"))
-    template_email_file = template.email_files.by_id(template_email_file_id)
+    pending = bool(request.args.get("pending", False))
+    template_email_file = TemplateEmailFile.get_by_id(
+        template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
+    )
     if request.method == "POST":
         if delete:
             new_content = PlainTextField(
@@ -103,7 +106,34 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
         service_id=service_id,
         template_id=template_id,
         delete=delete,
+        pending=pending,
     )
+
+
+@main.route(
+    "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/make-live",
+    methods=["GET", "POST"],
+)
+@service_has_permission("send_files_via_ui")
+@user_has_permissions("manage_templates")
+def make_file_live(service_id, template_id, template_email_file_id):
+    template = current_service.get_template_with_user_permission_or_403(
+        template_id,
+        current_user,
+        must_be_of_type="email",
+    )
+    template_email_file = TemplateEmailFile.get_by_id(
+        template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
+    )
+    if template_email_file.filename not in InsensitiveSet(template.placeholders):
+        new_content = template.content + f"\n\n(({template_email_file.filename}))"
+        service_api_client.update_service_template(
+            service_id=service_id,
+            template_id=template_id,
+            content=new_content,
+        )
+    template_email_file.update(pending=False)
+    return redirect(url_for("main.view_template", service_id=current_service.id, template_id=template.id))
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files/upload", methods=["GET", "POST"])
@@ -119,25 +149,19 @@ def upload_template_email_files(template_id, service_id):
         abort(403)
     form = TemplateEmailFilesUploadForm(existing_files=template.email_files)
     if form.validate_on_submit():
-        TemplateEmailFile.create(
+        template_email_file_id = TemplateEmailFile.create(
             filename=form.file.data.filename,
             file_contents=form.file.data,
             template_id=template.id,
+            pending=True,
         )
-
-        if form.file.data.filename not in InsensitiveSet(template.placeholders):
-            new_content = template.content + f"\n\n(({form.file.data.filename}))"
-            service_api_client.update_service_template(
-                service_id=service_id,
-                template_id=template_id,
-                content=new_content,
-            )
 
         return redirect(
             url_for(
-                "main.view_template",
+                "main.manage_a_template_email_file",
                 service_id=service_id,
                 template_id=template_id,
+                template_email_file_id=template_email_file_id,
             )
         )
 
@@ -161,7 +185,9 @@ def change_link_text(service_id, template_id, template_email_file_id):
         current_user,
         must_be_of_type="email",
     )
-    template_email_file = template.email_files.by_id(template_email_file_id)
+    template_email_file = TemplateEmailFile.get_by_id(
+        template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
+    )
     form = TemplateEmailFileLinkTextForm(link_text=template_email_file.link_text)
 
     if form.validate_on_submit():
@@ -195,7 +221,9 @@ def change_data_retention_period(service_id, template_id, template_email_file_id
         current_user,
         must_be_of_type="email",
     )
-    template_email_file = template.email_files.by_id(template_email_file_id)
+    template_email_file = TemplateEmailFile.get_by_id(
+        template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
+    )
     form = TemplateEmailFileRetentionPeriodForm(retention_period=template_email_file.retention_period)
 
     if form.validate_on_submit():
@@ -230,7 +258,9 @@ def change_email_validation(service_id, template_id, template_email_file_id):
         current_user,
         must_be_of_type="email",
     )
-    template_email_file = template.email_files.by_id(template_email_file_id)
+    template_email_file = TemplateEmailFile.get_by_id(
+        template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
+    )
     form = OnOffSettingForm(
         "Ask recipient for their email address",
         truthy="Yes",

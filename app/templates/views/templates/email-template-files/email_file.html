@@ -4,6 +4,7 @@
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/banner.html" import banner %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 
 {%  set title = template_email_file.filename %}
 {% block service_page_title %}
@@ -97,8 +98,15 @@
       "rows": file_data
          })
     }}
+{% if template_email_file.pending %}
+  {{ govukButton({
+      "text": "Add to template",
+      "href": url_for('main.make_file_live',service_id=service_id,template_id=template_id,template_email_file_id=template_email_file.id,)
+    }) }}
+{% else %}
   {{ page_footer(
       delete_link_text="Remove this file",
       delete_link=url_for('main.manage_a_template_email_file', service_id = service_id, template_id = template_id, template_email_file_id=template_email_file.id, delete = "true"),
     )}}
+{% endif %}
 {% endblock %}

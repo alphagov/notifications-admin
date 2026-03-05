@@ -19,6 +19,7 @@ class TemplateEmailFileClient(NotifyAdminAPIClient):
         created_by_id,
         retention_period=78,
         validate_users_email=True,
+        pending=True,
     ):
         data = {
             "id": str(file_id),
@@ -26,24 +27,22 @@ class TemplateEmailFileClient(NotifyAdminAPIClient):
             "created_by_id": created_by_id,
             "retention_period": retention_period,
             "validate_users_email": bool(validate_users_email),
+            "pending": bool(pending),
         }
         return self.post(f"/service/{service_id}/templates/{template_id}/template_email_files", data=data)
 
+    def get_file_by_id(self, file_id, service_id, template_id):
+        return self.get(f"/service/{service_id}/templates/{template_id}/template_email_files/{file_id}")
+
     @cache.delete_by_pattern("service-{service_id}-template-{template_id}*")
     def update_file(
-        self,
-        file_id,
-        service_id,
-        template_id,
-        *,
-        link_text,
-        retention_period,
-        validate_users_email,
+        self, file_id, service_id, template_id, *, link_text, retention_period, validate_users_email, pending
     ):
         data = {
             "link_text": link_text,
             "retention_period": retention_period,
             "validate_users_email": validate_users_email,
+            "pending": pending,
         }
         return self.post(f"/service/{service_id}/templates/{template_id}/template_email_files/{file_id}", data=data)
 

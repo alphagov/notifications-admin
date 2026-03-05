@@ -25,11 +25,12 @@ class TemplateEmailFile(JSONModel):
     link_text: str
     retention_period: int
     validate_users_email: bool
+    pending: bool
 
     __sort_attribute__ = "filename"
 
     @staticmethod
-    def create(*, filename, file_contents, template_id):
+    def create(*, filename, file_contents, template_id, pending=True):
         from app import current_service, current_user, template_email_file_client
 
         file_id = uuid.uuid4()
@@ -43,6 +44,7 @@ class TemplateEmailFile(JSONModel):
             filename=filename,
             created_by_id=current_user.id,
         )
+        return file_id
 
     def update(self, **kwargs):
         from app import template_email_file_client
@@ -51,11 +53,20 @@ class TemplateEmailFile(JSONModel):
             "link_text": self.link_text or "",
             "retention_period": self.retention_period,
             "validate_users_email": self.validate_users_email,
+            "pending": self.pending,
         } | kwargs
 
         return template_email_file_client.update_file(
             service_id=self.service_id, template_id=self.template_id, file_id=self.id, **data
         )
+
+    @classmethod
+    def get_by_id(cls, template_email_file_id: str, service_id: str, template_id: str):
+        from app import template_email_file_client
+
+        template_email_file = template_email_file_client.get_file_by_id(template_email_file_id, service_id, template_id)
+        template_email_file["data"]["service_id"] = service_id
+        return cls(template_email_file.get("data"))
 
     @property
     def link_as_markdown(self):
