@@ -6,7 +6,7 @@
   {{ content_page_title }}
 {% endblock %}
 
-{% block main %}
+{% block container %}
   <div class="govuk-width-container">
     {% block beforeContent %}
       {% if current_service and current_service.active and current_user.is_authenticated and current_user.belongs_to_service(current_service.id) %}
