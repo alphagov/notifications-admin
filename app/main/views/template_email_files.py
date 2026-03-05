@@ -1,4 +1,4 @@
-from flask import abort, redirect, render_template, request, url_for
+from flask import abort, flash, redirect, render_template, request, url_for
 from notifications_utils.field import PlainTextField
 from notifications_utils.insensitive_dict import InsensitiveSet
 
@@ -96,6 +96,7 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
             content=str(new_content).strip(),
             archive_email_file_ids=[template_email_file.id],
         )
+        flash(f"‘{template_email_file.filename}’ has been removed", "default_with_tick")
         return redirect(url_for("main.view_template", service_id=current_service.id, template_id=template.id))
 
     return render_template(
