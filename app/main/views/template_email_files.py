@@ -131,6 +131,7 @@ def make_file_live(service_id, template_id, template_email_file_id):
             content=new_content,
         )
     template_email_file.update(pending=False)
+    flash(f"‘{template_email_file.filename}’ added to template", "default_with_tick")
     return redirect(url_for("main.view_template", service_id=current_service.id, template_id=template.id))
 
 

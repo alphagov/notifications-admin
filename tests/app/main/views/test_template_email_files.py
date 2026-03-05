@@ -648,20 +648,17 @@ def test_make_live_endpoint_calls_update_with_correct_args(
     )
     mock_template_update = mocker.patch("app.service_api_client.update_service_template")
     mock_template_email_file_update = mocker.patch("app.models.template_email_file.TemplateEmailFile.update")
-    client_request.post(
+    page = client_request.post(
         "main.make_file_live",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         template_email_file_id=file_data["id"],
-        _expected_status=302,
-        _expected_redirect=url_for(
-            "main.view_template",
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-        ),
+        _follow_redirects=True,
     )
     assert mock_template_update.call_args_list == expected_calls
     assert mock_template_email_file_update.call_args_list == [call(pending=False)]
+    assert normalize_spaces(page.select_one("h1.folder-heading")) == "sample template"
+    assert normalize_spaces(page.select_one(".banner-default-with-tick")) == "‘test_file_1.csv’ added to template"
 
 
 @pytest.mark.parametrize("pending", [True, False])
