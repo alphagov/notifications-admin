@@ -4,7 +4,7 @@
 
 {% set mainClasses = "govuk-!-padding-bottom-12" if defaultMainTopMarginClass or error_summary_enabled else "govuk-!-padding-top-0 govuk-!-padding-bottom-12" %}
 
-{% block beforeContent %}
+{% block containerStart %}
     {% if current_service and current_service.active and current_user.is_authenticated and current_user.belongs_to_service(current_service.id) %}
     <div class="navigation-service">
       <a href="{{ url_for('main.show_accounts_or_dashboard') }}" class="govuk-link govuk-link--no-visited-state govuk-link--no-underline navigation-service-back-to">Back to {{ current_service.name }}</a>
