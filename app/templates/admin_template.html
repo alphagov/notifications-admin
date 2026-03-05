@@ -40,7 +40,7 @@
   {% endblock %}
 {% endblock %}
 
-{% block header %}
+{% block govukHeader %}
   {{ govukHeader({
     "homepageUrl": url_for('main.show_accounts_or_dashboard'),
     "productName": "Notify",
@@ -55,7 +55,7 @@
   }) }}
 {% endblock %}
 
-{% block footer %}
+{% block govukFooter %}
   {% set meta_items = [
     {
       "href": url_for("main.privacy"),
