@@ -85,20 +85,19 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
     template_email_file = TemplateEmailFile.get_by_id(
         template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
     )
-    if request.method == "POST":
-        if delete:
-            new_content = PlainTextField(
-                template.content,
-                {template_email_file.filename: ""},
-                html="passthrough",
-            )
-            service_api_client.update_service_template(
-                service_id=service_id,
-                template_id=template_id,
-                content=str(new_content).strip(),
-                archive_email_file_ids=[template_email_file.id],
-            )
-            return redirect(url_for("main.view_template", service_id=current_service.id, template_id=template.id))
+    if request.method == "POST" and delete:
+        new_content = PlainTextField(
+            template.content,
+            {template_email_file.filename: ""},
+            html="passthrough",
+        )
+        service_api_client.update_service_template(
+            service_id=service_id,
+            template_id=template_id,
+            content=str(new_content).strip(),
+            archive_email_file_ids=[template_email_file.id],
+        )
+        return redirect(url_for("main.view_template", service_id=current_service.id, template_id=template.id))
 
     return render_template(
         "views/templates/email-template-files/email_file.html",
