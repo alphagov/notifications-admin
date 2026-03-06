@@ -107,7 +107,7 @@
 
     &:link,
     &:visited {
-      color: $govuk-link-colour;
+      color: govuk-functional-colour(link);
     }
 
   }
@@ -115,9 +115,9 @@
   .big-number-link {
 
     text-decoration: none;
-    background: $govuk-link-colour; // text colour is set in the HTML, with the govuk-link--inverse class
+    background: govuk-functional-colour(link); // text colour is set in the HTML, with the govuk-link--inverse class
     display: block;
-    border: 2px solid $govuk-link-colour;
+    border: 2px solid govuk-functional-colour(link);
     margin-bottom: 5px;
 
     &:hover {
@@ -130,16 +130,16 @@
 
     &:active,
     &:focus {
-      background: $govuk-focus-colour;
+      background: govuk-functional-colour(focus);
       border: none;
       padding: 2px; /* replace the spacing the border gave */
       /* override the default focus style to inset the underline */
-      box-shadow: inset 0 -4px $govuk-focus-text-colour;
+      box-shadow: inset 0 -4px govuk-functional-colour(focus-text);
 
       .big-number-number,
       .big-number-smaller,
       .big-number-label {
-        color: $govuk-focus-text-colour;
+        color: govuk-functional-colour(focus-text);
         text-decoration: none;
       }
     }
@@ -178,14 +178,14 @@
       // override the default focus style to inset the underline
       &:active,
       &:focus {
-        box-shadow: inset 0 -4px $govuk-focus-text-colour;
+        box-shadow: inset 0 -4px govuk-functional-colour(focus-text);
       }
 
       // For Safari, which doesn't fire :focus when :active
       &:active {
         text-decoration: none;
-        background-color: $govuk-focus-colour;
-        color: $govuk-focus-text-colour;
+        background-color: govuk-functional-colour(focus);
+        color: govuk-functional-colour(focus-text);
       }
 
     }
@@ -193,7 +193,7 @@
 
   .big-number-status-failing {
     @extend %big-number-status;
-    background: $govuk-error-colour;
+    background: govuk-functional-colour(error);
   }
 
 }

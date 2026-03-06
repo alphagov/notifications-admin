@@ -8,7 +8,7 @@ $item-top-padding: govuk-spacing(3);
   &-item {
 
     padding: govuk-spacing(3) 0px;
-    border-top: 1px solid $govuk-border-colour;
+    border-top: 1px solid govuk-functional-colour(border);
 
     &-heading {
 
@@ -17,13 +17,13 @@ $item-top-padding: govuk-spacing(3);
       overflow-wrap: break-word;
 
       .heading-small {
-        color: $govuk-text-colour;
+        color: govuk-functional-colour(text);
       }
 
     }
 
     &:last-child {
-      border-bottom: 1px solid $govuk-border-colour;
+      border-bottom: 1px solid govuk-functional-colour(border);
     }
 
     & :last-child {
@@ -74,13 +74,13 @@ $item-top-padding: govuk-spacing(3);
 
     &:active:before,
     &:focus:before {
-      box-shadow: inset 0px -4px $govuk-focus-text-colour, inset 0px 16px $govuk-focus-colour, inset 3px 0px $govuk-focus-colour, inset 0px -15px $govuk-focus-colour, inset -3px 0px $govuk-focus-colour;
+      box-shadow: inset 0px -4px govuk-functional-colour(focus-text), inset 0px 16px govuk-functional-colour(focus), inset 3px 0px govuk-functional-colour(focus), inset 0px -15px govuk-functional-colour(focus), inset -3px 0px govuk-functional-colour(focus);
       right: -3px;
       left: -3px;
 
       @include govuk-media-query($from: tablet) {
         border-width: 15px 3px 15px 15px;
-        box-shadow: inset 0px -4px $govuk-focus-text-colour, inset 0px 16px $govuk-focus-colour, inset 15px 0px $govuk-focus-colour, inset 0px -15px $govuk-focus-colour, inset -3px 0px $govuk-focus-colour;
+        box-shadow: inset 0px -4px govuk-functional-colour(focus-text), inset 0px 16px govuk-functional-colour(focus), inset 15px 0px govuk-functional-colour(focus), inset 0px -15px govuk-functional-colour(focus), inset -3px 0px govuk-functional-colour(focus);
         left: -15px;
       }
     }

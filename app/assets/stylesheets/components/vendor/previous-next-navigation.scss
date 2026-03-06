@@ -34,11 +34,11 @@
       text-decoration: none;
 
       &:hover {
-        background-color: govuk-colour("light-grey");
+        background-color: govuk-colour('black', $variant: "tint-95");
       }
 
       &:focus {
-        background-color: $govuk-focus-colour;
+        background-color: govuk-functional-colour(focus);
       }
 
       .pagination-part-title {

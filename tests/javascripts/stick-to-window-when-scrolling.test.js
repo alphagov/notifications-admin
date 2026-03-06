@@ -96,7 +96,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
             </form>
           </main>
         </div>
-        <footer class="js-footer"></footer>`;
+        <footer class="govuk-template__footer"><div class="govuk-footer js-footer"></div></footer>`;
 
       inputForm = document.querySelector('form > .govuk-grid-row');
       formFooter = document.querySelector('.page-footer');

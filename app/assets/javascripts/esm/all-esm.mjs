@@ -1,5 +1,5 @@
 // GOVUK Frontend modules
-import { createAll, Header, Button, Radios, ErrorSummary, SkipLink, Tabs, ServiceNavigation } from 'govuk-frontend';
+import { createAll, Button, Radios, ErrorSummary, SkipLink, Tabs, ServiceNavigation } from 'govuk-frontend';
 
 import CollapsibleCheckboxes from './collapsible-checkboxes.mjs';
 import FocusBanner from './focus-banner.mjs';
@@ -31,7 +31,6 @@ import morphdom from 'morphdom';
 createAll(Button, 
   { preventDoubleClick: true }
 );
-createAll(Header);
 createAll(Radios);
 createAll(ErrorSummary);
 createAll(SkipLink);

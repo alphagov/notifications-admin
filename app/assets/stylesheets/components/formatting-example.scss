@@ -4,7 +4,7 @@
   @include govuk-responsive-padding(3, "bottom");
   @include govuk-responsive-padding(5, "left");
   margin: govuk-spacing(3) 0 govuk-spacing(4) 0;
-  background: govuk-colour("light-grey");
+  background: govuk-colour('black', $variant: "tint-95");
   overflow-x: auto;
   white-space: pre-wrap;
 }
@@ -14,7 +14,7 @@ code.lang-md {
 }
 
 code.lang-py {
-    background: govuk-colour("light-grey");
+    background: govuk-colour('black', $variant: "tint-95");
     padding: 3px 5px;
     border-radius: 1px;
     font-family: monaco, Consolas, "Lucida Console", monospace;

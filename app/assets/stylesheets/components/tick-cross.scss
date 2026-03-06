@@ -10,7 +10,7 @@
 }
 
 .tick-cross__cross {
-  color: $govuk-secondary-text-colour; // text colour also changes for crossed items
+  color: govuk-functional-colour(secondary-text); // text colour also changes for crossed items
 }
 
 // set colour for the SVG icon to inherit via `currentColor`

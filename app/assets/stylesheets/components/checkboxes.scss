@@ -56,11 +56,11 @@
 .govuk-checkboxes__input:disabled+.govuk-checkboxes__label,
 .govuk-checkboxes__input:disabled~.govuk-hint {
   opacity: 1;
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
 }
 
 .govuk-checkboxes__input:disabled+.govuk-checkboxes__label:before {
-  background: govuk-colour("light-grey");
+  background: govuk-colour('black', $variant: "tint-95");
 }
 
 // collapsible checkboxes toggle button

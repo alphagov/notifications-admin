@@ -8,7 +8,7 @@
 
 .sender-email-preview {
   margin-bottom: govuk-spacing(6);
-  border: 1px solid $govuk-border-colour;
+  border: 1px solid govuk-functional-colour(border);
   padding: govuk-spacing(2) govuk-spacing(3);
 
   // Persist table view on smaller screens
@@ -30,7 +30,7 @@
   }
 
   .govuk-summary-list__key {
-    color: $govuk-secondary-text-colour;
+    color: govuk-functional-colour(secondary-text);
     font-weight: normal;
     padding-right: govuk-spacing(3);
     width: 1em * ((35 + 5) / 16);

@@ -3,11 +3,11 @@
   font-family: monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  border-bottom: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid govuk-functional-colour(border);
 
   &-item {
 
-    border-top: 1px solid $govuk-border-colour;
+    border-top: 1px solid govuk-functional-colour(border);
 
     // We can't assign classes to the summary.govuk-details__summary or div.govuk-details__text
     // elements so we have to target them as children of details.api-notifications-item
@@ -39,9 +39,9 @@
       }
       // stretch focus style to fill containing row
       &:focus {
-        background-color: $govuk-focus-colour;
-        box-shadow: inset 0 -4px 0 0 $govuk-focus-text-colour;
-        // box-shadow: 0 -10px $govuk-focus-colour, 0 11px $govuk-focus-colour, 0 15px $govuk-focus-text-colour;
+        background-color: govuk-functional-colour(focus);
+        box-shadow: inset 0 -4px 0 0 govuk-functional-colour(focus-text);
+        // box-shadow: 0 -10px govuk-functional-colour(focus), 0 11px govuk-functional-colour(focus), 0 15px govuk-functional-colour(focus-text);
         // don't show underline if focused
         @supports not (-ms-ime-align:auto) {
           .api-notifications-item__recipient {
@@ -64,12 +64,12 @@
     &__meta {
 
       display: block;
-      color: $govuk-secondary-text-colour;
+      color: govuk-functional-colour(secondary-text);
       text-decoration: none;
 
       &-key,
       &-time {
-        color: $govuk-secondary-text-colour;
+        color: govuk-functional-colour(secondary-text);
         display: inline-block;
         width: auto;
       }
@@ -100,11 +100,11 @@
     }
 
     &__data-name {
-      color: $govuk-secondary-text-colour;
+      color: govuk-functional-colour(secondary-text);
     }
 
     &__data-value {
-      color: $govuk-text-colour;
+      color: govuk-functional-colour(text);
       padding-bottom: 15px;
     }
 

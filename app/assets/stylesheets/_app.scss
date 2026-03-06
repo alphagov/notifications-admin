@@ -69,7 +69,7 @@ td {
 // TODO: refactor all this when GOVUK Elements typography is removed
 .heading-aside {
   @include govuk-font(16);
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
   margin: 0;
   width: 100%; // force wrapping
 
@@ -79,7 +79,7 @@ td {
 }
 
 .hint {
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
 }
 
 .spreadsheet {
@@ -92,7 +92,7 @@ td {
 
   th,
   tbody th.table-field {
-    background: govuk-colour("light-grey");
+    background: govuk-colour('black', $variant: "tint-95");
     font-weight: bold;
     text-align: center;
   }
@@ -105,7 +105,7 @@ td {
   th, td {
     padding-left: 10px;
     padding-right: 10px;
-    border: 1px solid $govuk-border-colour;
+    border: 1px solid govuk-functional-colour(border);
   }
 
   td,
@@ -128,7 +128,7 @@ td {
     z-index: 1000;
 
     .table-field-heading-first {
-      background: govuk-colour("light-grey");
+      background: govuk-colour('black', $variant: "tint-95");
     }
 
   }
@@ -188,7 +188,7 @@ details .arrow {
 
 .bordered-text-box {
   padding: 5px;
-  outline: 2px solid $govuk-input-border-colour;
+  outline: 2px solid govuk-functional-colour(input-border);
   max-width: 100%;
 }
 
