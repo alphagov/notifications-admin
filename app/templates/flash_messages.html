@@ -19,7 +19,12 @@
       {% else %}
         {% set delete_button_text = None %}
       {% endif %}
+      {% if extra_spacing_around_flash_messages is not defined %}
+        {% set extra_spacing_around_flash_messages = True %}
+      {% endif %}
+      {% if extra_spacing_around_flash_messages %}
       <div class="bottom-gutter">
+      {% endif %}
         {{ banner(
           message if message is string else message[0],
           'default' if ((category == 'default') or (category == 'default_with_tick')) else 'dangerous',
@@ -28,7 +33,9 @@
           context=message[1] if message is not string,
           thing=message[2] if message is not string and message[2]
         )}}
+      {% if extra_spacing_around_flash_messages %}
       </div>
+      {% endif %}
     {% endfor %}
   {% endif %}
 {% endwith %}

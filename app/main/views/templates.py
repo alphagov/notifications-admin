@@ -131,6 +131,7 @@ def view_template(service_id, template_id):
         template=template,
         user_has_template_permission=user_has_template_permission,
         content_count_message=content_count_message,
+        extra_spacing_around_flash_messages=False,
     )
 
 
