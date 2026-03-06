@@ -224,13 +224,13 @@ def test_post_delete_to_manage_a_template_email_file_updates_and_redirects(
     mock_update_service_template = mocker.patch(
         "app.notify_client.service_api_client.ServiceAPIClient.update_service_template"
     )
-    client_request.post(
+    page = client_request.post(
         "main.manage_a_template_email_file",
         service_id=service_one["id"],
         template_id=fake_uuid,
         template_email_file_id=test_data_for_a_template_email_file["id"],
         delete=True,
-        _expected_redirect=url_for("main.view_template", service_id=service_one["id"], template_id=fake_uuid),
+        _follow_redirects=True,
     )
     mock_update_service_template.assert_called_once_with(
         service_id=service_one["id"],
@@ -238,6 +238,8 @@ def test_post_delete_to_manage_a_template_email_file_updates_and_redirects(
         content="This template contains an email file",
         archive_email_file_ids=[test_data_for_a_template_email_file["id"]],
     )
+    assert normalize_spaces(page.select_one("h1.folder-heading")) == "sample template"
+    assert normalize_spaces(page.select_one(".banner-default-with-tick")) == "‘test_file_1.csv’ has been removed"
 
 
 def test_manage_a_template_email_file_raises_404_for_invalid_template_email_file_id(

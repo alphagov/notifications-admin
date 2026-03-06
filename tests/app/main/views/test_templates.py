@@ -3751,7 +3751,34 @@ def test_should_redirect_when_saving_a_template_email(
     )
 
 
-def test_edit_service_template_archives_email_files(client_request, fake_uuid, mocker):
+@pytest.mark.parametrize(
+    "new_content, expected_file_ids_to_archive, expected_banner_text",
+    (
+        (
+            "For the appointment, you will just need ((map.pdf))",
+            [
+                "00000000-0000-4000-8000-000000000001",
+                "00000000-0000-4000-8000-000000000002",
+            ],
+            "‘invite.pdf’ and ‘form.pdf’ have been removed",
+        ),
+        (
+            "For the appointment, you will just need ((form.pdf)) and ((map.pdf))",
+            [
+                "00000000-0000-4000-8000-000000000001",
+            ],
+            "‘invite.pdf’ has been removed",
+        ),
+    ),
+)
+def test_edit_service_template_archives_email_files(
+    client_request,
+    fake_uuid,
+    mocker,
+    new_content,
+    expected_file_ids_to_archive,
+    expected_banner_text,
+):
     # mock out template with email files
     email_template = create_template(
         template_id=fake_uuid,
@@ -3784,8 +3811,6 @@ def test_edit_service_template_archives_email_files(client_request, fake_uuid, m
     )
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
 
-    new_content = "For the appointment, you will just need ((map.pdf))"
-
     mock_update_service_template = mocker.patch("notifications_python_client.base.BaseAPIClient.request")
 
     page = client_request.post(
@@ -3806,21 +3831,15 @@ def test_edit_service_template_archives_email_files(client_request, fake_uuid, m
         "/service/596364a0-858e-42c8-9062-a8fe822260eb/template/6ce466d0-fd6a-11e5-82f5-e0accb9d11a6",
         data={
             "created_by": "6ce466d0-fd6a-11e5-82f5-e0accb9d11a6",
-            "content": "For the appointment, you will just need ((map.pdf))",
+            "content": new_content,
             "subject": "Your ((thing)) is due soon",
             "name": "sample template",
             "has_unsubscribe_link": False,
-            "archive_email_file_ids": [
-                "00000000-0000-4000-8000-000000000001",
-                "00000000-0000-4000-8000-000000000002",
-            ],
+            "archive_email_file_ids": expected_file_ids_to_archive,
         },
     )
 
-    assert (
-        normalize_spaces(page.select(".banner-default-with-tick")[0].text)
-        == "Files for ‘invite.pdf’ and ‘form.pdf’ have been removed from the template."
-    )
+    assert normalize_spaces(page.select(".banner-default-with-tick")[0].text) == expected_banner_text
 
 
 def test_should_redirect_when_saving_a_template_letter(
