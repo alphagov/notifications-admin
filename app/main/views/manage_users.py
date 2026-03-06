@@ -32,6 +32,7 @@ def manage_users(service_id):
         show_search_box=(len(current_service.team_members) > 7),
         form=SearchUsersForm(),
         permissions=permission_options,
+        extra_spacing_around_flash_messages=False,
     )
 
 
