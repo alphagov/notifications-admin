@@ -11,6 +11,7 @@ from tests.conftest import (
     SERVICE_ONE_ID,
     create_template,
     normalize_spaces,
+    sample_uuid,
 )
 
 
@@ -572,13 +573,43 @@ def test_create_file_redirects_to_manage_files_page(
             _follow_redirects=True,
         )
         assert mock_create_file.call_args[1]["pending"]  # check the created file is set to pending
-    assert normalize_spaces(page.select_one(".govuk-button")) == "Add to template"
+    assert normalize_spaces(page.select_one("form .govuk-button")) == "Add to template"
+    assert page.select_one("form").get("method") == "post"
     assert (
-        page.select_one(".govuk-button").get("href")
+        page.select_one("form").get("action")
         == f"/services/{SERVICE_ONE_ID}/templates/{fake_uuid}/files/{file_id}/make-live"
     )
 
 
+def test_make_live_is_post_only(client_request, service_one, fake_uuid):
+    service_one["permissions"] += ["send_files_via_ui"]
+    client_request.get(
+        "main.make_file_live",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        template_email_file_id=fake_uuid,
+        _expected_status=405,
+        _test_page_title=False,
+    )
+
+
+@pytest.mark.parametrize(
+    "template_content, expected_calls",
+    (
+        (
+            "Template content",
+            [
+                call(
+                    template_id=sample_uuid(),
+                    service_id=SERVICE_ONE_ID,
+                    content="Template content\n\n((test_file_1.csv))",
+                )
+            ],
+        ),
+        ("Already has placeholder ((test_file_1.csv))", []),
+        ("Already has placeholder in different case/whitespace ((TEST FILE 1.csv))", []),
+    ),
+)
 def test_make_live_endpoint_calls_update_with_correct_args(
     client_request,
     service_one,
@@ -588,6 +619,8 @@ def test_make_live_endpoint_calls_update_with_correct_args(
     active_user_with_permissions,
     mock_update_service,
     mock_get_service_email_template,
+    template_content,
+    expected_calls,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
     mocker.patch(
@@ -596,6 +629,7 @@ def test_make_live_endpoint_calls_update_with_correct_args(
             "data": create_template(
                 template_id=fake_uuid,
                 template_type="email",
+                content=template_content,
             )
         },
     )
@@ -614,22 +648,17 @@ def test_make_live_endpoint_calls_update_with_correct_args(
     )
     mock_template_update = mocker.patch("app.service_api_client.update_service_template")
     mock_template_email_file_update = mocker.patch("app.models.template_email_file.TemplateEmailFile.update")
-    client_request.get(
+    page = client_request.post(
         "main.make_file_live",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         template_email_file_id=file_data["id"],
-        _expected_status=302,
-        _expected_redirect=url_for(
-            "main.view_template",
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-        ),
+        _follow_redirects=True,
     )
-    mock_template_update.assert_called_once_with(
-        template_id=fake_uuid, service_id=SERVICE_ONE_ID, content=f"Template content\n\n(({file_data['filename']}))"
-    )
-    mock_template_email_file_update.assert_called_once_with(pending=False)
+    assert mock_template_update.call_args_list == expected_calls
+    assert mock_template_email_file_update.call_args_list == [call(pending=False)]
+    assert normalize_spaces(page.select_one("h1.folder-heading")) == "sample template"
+    assert normalize_spaces(page.select_one(".banner-default-with-tick")) == "‘test_file_1.csv’ added to template"
 
 
 @pytest.mark.parametrize("pending", [True, False])
@@ -897,48 +926,14 @@ def test_upload_file_page_validates_extentions(
         assert not error_message
 
 
-def test_file_upload_calls_template_update(
-    client_request,
-    fake_uuid,
-    service_one,
-    mocker,
-):
-    service_one["permissions"] += ["send_files_via_ui"]
-    service_one["contact_link"] = "https://example.com"
-    mocker.patch(
-        "app.service_api_client.get_service_template",
-        return_value={
-            "data": create_template(
-                template_id=fake_uuid,
-                template_type="email",
-                content="This is a file with a file placeholder",
-            )
-        },
-    )
-    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-    mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
-    mock_post = mocker.patch("app.template_email_file_client.post")
-    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
-        client_request.post(
-            "main.upload_template_email_files",
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-            _data={"file": file},
-            _expected_status=302,
-        )
-    assert mock_antivirus.called
-    assert mock_s3.called
-    assert mock_post.called
-
-
 @pytest.mark.parametrize(
     "template_content",
     (
+        "This is a file with a file placeholder",
         "This is a file with a file placeholder ((tests/test_pdf_files/one_page_pdf.pdf))",
-        "This is a file with a file placeholder ((tests/test_pdf_files/ONE-PAGE PDF.PDF))",
     ),
 )
-def test_upload_file_does_not_update_template_when_placeholder_already_exists(
+def test_upload_file_does_not_update_template_content(
     client_request,
     fake_uuid,
     service_one,
