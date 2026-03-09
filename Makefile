@@ -69,7 +69,7 @@ fix-imports: ## Fix imports using ruff
 
 .PHONY: refreeze-requirements
 refreeze-requirements: ## Update unpinned requirements
-	EXTRA_UV_PIP_COMPILE_FLAGS="--upgrade --exclude-newer 7d" make freeze-requirements
+	EXTRA_UV_PIP_COMPILE_FLAGS="--upgrade --exclude-newer 30d" make freeze-requirements
 
 .PHONY: freeze-requirements
 freeze-requirements: ## create static requirements.txt
