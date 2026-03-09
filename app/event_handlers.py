@@ -53,6 +53,8 @@ class Events(metaclass=EventsMeta):
 
 # This might not be totally correct depending on proxy setup
 def _get_remote_addr():
+    # If other headers are required (or this one no is longer needed) update the docs:
+    # https://github.com/alphagov/notifications-manuals/wiki/Request-headers-used
     if request.headers.getlist("X-Forwarded-For"):
         return request.headers.getlist("X-Forwarded-For")[0]
     return request.remote_addr
