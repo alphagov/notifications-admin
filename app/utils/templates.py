@@ -282,10 +282,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     @property
     def email_files(self):
-        return TemplateEmailFiles(
-            self._template.get("email_files", []),
-            template_id=self.id,
-        )
+        return TemplateEmailFiles(self)
 
     @property
     def values(self):
