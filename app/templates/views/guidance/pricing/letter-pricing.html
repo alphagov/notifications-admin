@@ -34,7 +34,7 @@
 
 <p class="govuk-body">Prices do not include VAT.</p>
 
-  <div>
+  <div class="fullscreen-content" data-notify-module="fullscreen-table">
     {% call mapping_table(
       caption='Letter pricing. Prices do not include VAT.',
       field_headings=['Paper'] + letter_rates.post_classes.values()|list,
