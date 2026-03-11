@@ -1,4 +1,6 @@
 import json
+import math
+from contextlib import suppress
 from typing import Any
 
 from flask import current_app, render_template, url_for
@@ -312,6 +314,11 @@ class EmailPreviewTemplate(BaseEmailTemplate):
     @property
     def placeholders(self):
         return OrderedSet([placeholder for placeholder in self.all_placeholders if placeholder not in self.filenames])
+
+    def index_of_placeholder(self, placeholder):
+        with suppress(KeyError):
+            return InsensitiveDict.from_keys(self.all_placeholders).keys().index(InsensitiveDict.make_key(placeholder))
+        return math.inf
 
 
 class LetterAttachment(JSONModel):

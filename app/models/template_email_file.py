@@ -117,7 +117,12 @@ class TemplateEmailFiles(SerialisedModelCollection):
 
         self.service_id = current_service.id
         self.template_id = template.id
-        super().__init__(template._template.get("email_files", []))
+
+        email_files = template._template.get("email_files", [])
+        super().__init__(email_files)
+
+        position_in_template = (template.index_of_placeholder(email_file.filename) for email_file in self)
+        self.items = sorted(email_files, key=lambda _: next(position_in_template))
 
     def __getitem__(self, index):
         return self.model(self.items[index] | {"service_id": self.service_id, "template_id": self.template_id})

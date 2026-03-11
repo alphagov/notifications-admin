@@ -15,13 +15,45 @@ from tests.conftest import (
 )
 
 
-def test_template_email_files_manage_files_page_displays_the_right_files(
+@pytest.mark.parametrize(
+    "template_content, expected_filenames_on_page",
+    [
+        (
+            # No template content
+            "",
+            ["test_file_1.csv", "test_file_2.png"],
+        ),
+        (
+            # Content order matches database order
+            "((test_file_1.csv)) ((test_file_2.png))",
+            ["test_file_1.csv", "test_file_2.png"],
+        ),
+        (
+            # Content order does not match database order
+            "((test_file_2.png)) ((test_file_1.csv))",
+            ["test_file_2.png", "test_file_1.csv"],
+        ),
+        (
+            # Content order does not match database order (case differs)
+            "((TEST FILE 2.PNG)) ((TEST FILE 1.CSV))",
+            ["test_file_2.png", "test_file_1.csv"],
+        ),
+        (
+            # Content order does not match database order (extra, non-file placeholders)
+            "((test_file_2.png)) ((first name)) ((last name)) ((test_file_1.csv))",
+            ["test_file_2.png", "test_file_1.csv"],
+        ),
+    ],
+)
+def test_template_email_files_manage_files_page_displays_the_right_files_in_the_right_order(
     client_request,
     service_one,
     fake_uuid,
     test_template_email_files_data,
     test_data_for_a_template_email_file,
     mocker,
+    template_content,
+    expected_filenames_on_page,
 ):
     service_one["permissions"] += ["send_files_via_ui"]
     service_one["contact_link"] = "https://example.gov.uk"
@@ -32,6 +64,7 @@ def test_template_email_files_manage_files_page_displays_the_right_files(
                 template_id=fake_uuid,
                 template_type="email",
                 email_files=test_template_email_files_data,
+                content=template_content,
             )
         },
     )
@@ -42,10 +75,7 @@ def test_template_email_files_manage_files_page_displays_the_right_files(
     )
 
     assert page.select_one("h1").string.strip() == "Manage files"
-    assert [normalize_spaces(row.text) for row in page.select("dt")] == [
-        f"{test_template_email_files_data[0]['filename']}",
-        f"{test_template_email_files_data[1]['filename']}",
-    ]
+    assert [normalize_spaces(row.text) for row in page.select("dt")] == expected_filenames_on_page
 
     assert (
         normalize_spaces(page.select_one('a[role="button"][data-module="govuk-button"]').get_text())
