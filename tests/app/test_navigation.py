@@ -623,7 +623,7 @@ def test_caseworkers_get_caseworking_navigation(
 ):
     client_request.login(active_caseworking_user)
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one(".govuk-service-navigation + .govuk-width-container nav").text) == (
+    assert normalize_spaces(page.select_one("body > .govuk-width-container nav").text) == (
         "Templates Sent messages Uploads Team members"
     )
 
@@ -638,7 +638,7 @@ def test_caseworkers_see_jobs_nav_if_jobs_exist(
 ):
     client_request.login(active_caseworking_user)
     page = client_request.get("main.choose_template", service_id=SERVICE_ONE_ID)
-    assert normalize_spaces(page.select_one(".govuk-service-navigation + .govuk-width-container nav").text) == (
+    assert normalize_spaces(page.select_one("body > .govuk-width-container nav").text) == (
         "Templates Sent messages Uploads Team members"
     )
 

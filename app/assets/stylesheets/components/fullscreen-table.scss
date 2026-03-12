@@ -9,7 +9,7 @@
     margin: 0 0 govuk-spacing(6) 0;
     padding: 0 0 0 0;
     overflow: hidden;
-    border-bottom: 1px solid $govuk-border-colour;
+    border-bottom: 1px solid govuk-functional-colour(border);
 
     .table {
 
@@ -46,7 +46,7 @@
         transition: box-shadow 0.6s ease-out;
       }
 
-      box-shadow: inset -1px 0 0 0 $govuk-border-colour, inset -3px 0 0 0 rgba($govuk-border-colour, 0.2);
+      box-shadow: inset -1px 0 0 0 govuk-functional-colour(border), inset -3px 0 0 0 rgb(govuk-functional-colour(border), 0.2);
 
     }
 
@@ -62,7 +62,7 @@
     tbody th.table-field {
       color: transparent;
       border-color: transparent;
-      border-right-color: $govuk-border-colour;
+      border-right-color: govuk-functional-colour(border);
       background: govuk-colour("white");
       box-sizing: border-box;
     }
@@ -132,7 +132,7 @@
     .table-field-heading-first,
     tbody th.table-field {
       transition: box-shadow 0.3s ease-in-out;
-      box-shadow: 1px 0 0 0 $govuk-border-colour, 3px 0 0 0 rgba($govuk-border-colour, 0.2);
+      box-shadow: 1px 0 0 0 govuk-functional-colour(border), 3px 0 0 0 rgb(govuk-functional-colour(border), 0.2);
     }
 
   }
@@ -154,8 +154,8 @@
 }
 
 .js-focus-style {
-  outline: 3px solid $govuk-focus-text-colour;
-  box-shadow: 0 0 0 7px $govuk-focus-colour;
+  outline: 3px solid govuk-functional-colour(focus-text);
+  box-shadow: 0 0 0 7px govuk-functional-colour(focus);
 
   *:focus {
     outline: none;

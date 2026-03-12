@@ -97,10 +97,10 @@
 
     &:focus {
 
-      color: $govuk-text-colour;
+      color: govuk-functional-colour(text);
 
       & + .template-statistics-table-hint {
-        color: $govuk-text-colour;
+        color: govuk-functional-colour(text);
       }
 
     }
@@ -109,7 +109,7 @@
 
   &-hint {
     @include govuk-font(19);
-    color: $govuk-secondary-text-colour;
+    color: govuk-functional-colour(secondary-text);
     pointer-events: none;
   }
 
@@ -199,13 +199,13 @@
 
   &-error {
 
-    border-left: 5px solid $govuk-error-colour;
+    border-left: 5px solid govuk-functional-colour(error);
     padding-left: 7px;
     display: block;
 
     &-label {
       display: block;
-      color: $govuk-error-colour;
+      color: govuk-functional-colour(error);
       font-weight: bold;
     }
 
@@ -220,18 +220,18 @@
   &-status {
 
     &-default {
-      color: $govuk-secondary-text-colour;
+      color: govuk-functional-colour(secondary-text);
     }
 
     &-error {
 
-      color: $govuk-error-colour;
+      color: govuk-functional-colour(error);
       font-weight: bold;
 
       .status-hint {
         display: block;
         font-weight: normal;
-        color: $govuk-error-colour;
+        color: govuk-functional-colour(error);
         margin-top: 5px;
       }
 
@@ -287,8 +287,8 @@
         box-shadow: none;
 
         &:before {
-          background: $govuk-focus-colour;
-          box-shadow: inset 0 -4px 0 0 $govuk-focus-text-colour;
+          background: govuk-functional-colour(focus);
+          box-shadow: inset 0 -4px 0 0 govuk-functional-colour(focus-text);
           z-index: -1;
         }
 
@@ -382,7 +382,7 @@
     }
 
     &:focus:before {
-      box-shadow: inset 0px -4px $govuk-focus-text-colour, inset 0px 15px $govuk-focus-colour, inset 15px 0px $govuk-focus-colour, inset 0px -11px $govuk-focus-colour;
+      box-shadow: inset 0px -4px govuk-functional-colour(focus-text), inset 0px 15px govuk-functional-colour(focus), inset 15px 0px govuk-functional-colour(focus), inset 0px -11px govuk-functional-colour(focus);
     }
 
   }
@@ -391,24 +391,24 @@
 
 
 .table-row-group {
-  border-top: 1px solid $govuk-border-colour;
-  border-bottom: 1px solid $govuk-border-colour;
+  border-top: 1px solid govuk-functional-colour(border);
+  border-bottom: 1px solid govuk-functional-colour(border);
 }
 
 .table-empty-message,
 td.table-empty-message {
   @include govuk-font(19);
-  color: $govuk-secondary-text-colour;
-  border-bottom: 1px solid $govuk-border-colour;
+  color: govuk-functional-colour(secondary-text);
+  border-bottom: 1px solid govuk-functional-colour(border);
   padding: 20px 0 20px 0;
 }
 
 .table-show-more-link {
 
   @include govuk-font(16);
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
   margin-bottom: govuk-spacing(7);
-  border-bottom: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid govuk-functional-colour(border);
   padding: 35px 0 10px 0;
   text-align: center;
 
@@ -419,16 +419,16 @@ td.table-empty-message {
 }
 
 a.table-show-more-link {
-  color: $govuk-link-colour;
+  color: govuk-functional-colour(link);
 }
 
 .table-no-data {
   @include govuk-font(16);
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
   margin-top: 10px;
   margin-bottom: govuk-spacing(7);
-  border-top: 1px solid $govuk-border-colour;
-  border-bottom: 1px solid $govuk-border-colour;
+  border-top: 1px solid govuk-functional-colour(border);
+  border-bottom: 1px solid govuk-functional-colour(border);
   padding: 0.75em 0 0.5625em 0;
 }
 

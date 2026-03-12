@@ -1,5 +1,4 @@
 $app-body-text-line-height-default: get-govuk-typography-style($size: 19, $breakpoint: null, $property: "line-height");
-$app-body-text-line-height-tablet: get-govuk-typography-style($size: 19, $breakpoint: tablet, $property: "line-height");
 
 @mixin separator {
   display: inline-block;
@@ -23,7 +22,7 @@ $app-body-text-line-height-tablet: get-govuk-typography-style($size: 19, $breakp
     transform: rotate(45deg);
     border: solid;
     border-width: 2px 2px 0 0;
-    border-color: $govuk-secondary-text-colour;
+    border-color: govuk-functional-colour(secondary-text);
   }
 }
 
@@ -36,7 +35,7 @@ $message-type-bottom-spacing: govuk-spacing(4);
 a {
 
   &:hover .message-name-separator:before {
-    border-color: $govuk-link-hover-colour;
+    border-color: govuk-functional-colour(link-hover);
   }
 
   .message-name-separator {
@@ -45,7 +44,7 @@ a {
     margin-left: -2px;
 
     &:before {
-      border-color: $govuk-link-colour;
+      border-color: govuk-functional-colour(link);
     }
   }
 
@@ -118,28 +117,23 @@ a {
           bottom: -1 * $app-body-text-line-height-default; /* extend link by line height of hint/meta so it covers it */
           width: 100%;
           height: $app-body-text-line-height-default;
-
-          @include govuk-media-query($from: tablet) {
-            bottom: -1 * $app-body-text-line-height-tablet - 5px;
-            height: $app-body-text-line-height-tablet + 5px;
-          }
         }
 
         &:focus {
 
           &,
           &::before {
-            background-color: $govuk-focus-colour;
+            background-color: govuk-functional-colour(focus);
           }
 
           &,
           & + .template-list-item-hint,
           .message-type {
-            color: $govuk-focus-text-colour;
+            color: govuk-functional-colour(focus-text);
           }
 
           &::before {
-            box-shadow: 0px -2px $govuk-focus-colour, 0px 4px $govuk-focus-text-colour;
+            box-shadow: 0px -2px govuk-functional-colour(focus), 0px 4px govuk-functional-colour(focus-text);
           }
 
         }
@@ -233,14 +227,14 @@ a {
   }
 
   &-empty {
-    color: $govuk-secondary-text-colour;
+    color: govuk-functional-colour(secondary-text);
     padding: govuk-spacing(3) 0 govuk-spacing(2) 0;
   }
 }
 
 .checkbox-list {
   &-selected-counter {
-    color: $govuk-secondary-text-colour;
+    color: govuk-functional-colour(secondary-text);
     margin: govuk-spacing(3) 0;
 
     @include govuk-media-query($from: desktop) {
@@ -257,7 +251,7 @@ a {
 }
 
 .email-files-selected-counter {
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
   margin: govuk-spacing(3) 0;
 
   @include govuk-media-query($from: desktop) {
@@ -268,7 +262,7 @@ a {
 }
 
 .email-files-uploaded-counter {
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
   margin: govuk-spacing(3) 0;
 
   @include govuk-media-query($from: desktop) {
@@ -373,7 +367,7 @@ a {
     }
 
     &:hover {
-      color: $govuk-link-hover-colour;
+      color: govuk-functional-colour(link-hover);
     }
 
   }

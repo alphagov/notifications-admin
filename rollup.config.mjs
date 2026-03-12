@@ -5,8 +5,6 @@ import copy from 'rollup-plugin-copy';
 import styles from "rollup-plugin-styler";
 import postCSSReplace from 'postcss-replace';
 
-// toggle to enable rebrand styles
-const enableRebrand = true;
 const paths = {
   src: 'app/assets/',
   dist: 'app/static/',
@@ -14,11 +12,10 @@ const paths = {
   govuk_frontend: 'node_modules/govuk-frontend/dist/'
 };
 
-// separate path config for govuk-frontend assets, so we can manage rebrand paths easily
 const govukFrontendAssetPaths = {
-  images: `${paths.govuk_frontend}govuk/assets/${enableRebrand ? 'rebrand/': ''}images/**/*`,
+  images: `${paths.govuk_frontend}govuk/assets/images/**/*`,
   fonts: `${paths.govuk_frontend}govuk/assets/fonts/**/*`,
-  manifest: `${paths.govuk_frontend}govuk/assets/${enableRebrand ? 'rebrand/': ''}manifest.json`,
+  manifest: `${paths.govuk_frontend}govuk/assets/manifest.json`,
 };
 
 const isDevelopment = Boolean(process.env.NOTIFY_ENVIRONMENT === 'development')

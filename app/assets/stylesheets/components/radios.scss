@@ -24,7 +24,7 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   width: 100%;
   box-sizing: border-box;
   padding: 6px 5px 6px;
-  border: solid 2px $govuk-input-border-colour;
+  border: solid 2px govuk-functional-colour(input-border);
   text-align: center;
 }
 
@@ -125,7 +125,7 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   left: $border-indent;
   width: $border-thickness;
   height: 100%;
-  background: $govuk-border-colour;
+  background: govuk-functional-colour(border);
 }
 
 .govuk-form-group--nested-radio .govuk-radios__label:before {
@@ -146,18 +146,18 @@ $border-indent: ($govuk-radios-size/ 2) - ($border-thickness / 2);
   top: $govuk-radios-size;
   left: $border-indent;
   width: $border-thickness;
-  background: $govuk-border-colour;
+  background: govuk-functional-colour(border);
 }
 
 .govuk-radios__input:disabled + .govuk-radios__label,
 .govuk-radios__input:disabled ~ .govuk-hint {
   opacity: 1;
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
 }
 
 .govuk-radios__input:disabled + .govuk-radios__label {
   &:before {
-    border-color: $govuk-secondary-text-colour;
-    background-color: govuk-colour("light-grey");
+    border-color: govuk-functional-colour(secondary-text);
+    background-color: govuk-colour('black', $variant: "tint-95");
   }
 }

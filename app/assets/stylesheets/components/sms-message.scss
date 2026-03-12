@@ -7,8 +7,8 @@ $tail-angle: 20deg;
   max-width: 464px;
   box-sizing: border-box;
   padding: govuk-spacing(3);
-  background: govuk-shade(govuk-colour("light-grey"), 7%);
-  border: 1px solid govuk-shade(govuk-colour("light-grey"), 7%);
+  background: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
+  border: 1px solid mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
   border-radius: 5px;
   white-space: normal;
   margin: 0 0 govuk-spacing(6) 0;
@@ -24,8 +24,8 @@ $tail-angle: 20deg;
     border: 10px solid transparent;
     border-left-width: 13px;
     border-right-width: 13px;
-    border-bottom-color: govuk-shade(govuk-colour("light-grey"), 7%);
-    border-left-color: govuk-shade(govuk-colour("light-grey"), 7%);
+    border-bottom-color: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
+    border-left-color: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
     transform: rotate($tail-angle);
   }
 
@@ -37,8 +37,8 @@ $tail-angle: 20deg;
 
     &:after {
       border-left-color: transparent;
-      border-bottom-color: govuk-shade(govuk-colour("light-grey"), 7%);
-      border-right-color: govuk-shade(govuk-colour("light-grey"), 7%);
+      border-bottom-color: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
+      border-right-color: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
       right: auto;
       left: -20px;
       transform: rotate(-$tail-angle);
@@ -54,19 +54,19 @@ $tail-angle: 20deg;
 
 .sms-message-sender {
   @extend %govuk-body-m;
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
   margin: 0 0 -10px 0;
 }
 
 .sms-message-recipient {
   @extend %govuk-body-m;
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
   margin: 10px 0 0 0;
 }
 
 .sms-message-status {
   @include govuk-font(16);
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
   margin: -20px govuk-spacing(3) 20px govuk-spacing(3);
   display: block;
 }

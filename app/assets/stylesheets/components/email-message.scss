@@ -6,7 +6,7 @@ $email-message-gutter-mobile: govuk-spacing(3);
 .email-message {
 
   margin-bottom: govuk-spacing(6);
-  border: 1px solid $govuk-border-colour;
+  border: 1px solid govuk-functional-colour(border);
 
   &-meta {
 
@@ -28,7 +28,7 @@ $email-message-gutter-mobile: govuk-spacing(3);
       }
 
       & > .govuk-summary-list__key {
-        color: $govuk-secondary-text-colour;
+        color: govuk-functional-colour(secondary-text);
         font-weight: normal;
         padding-right: govuk-spacing(3);
         // set to max width of content (currently 'Reply to'), sized by character, with padding

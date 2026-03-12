@@ -96,7 +96,7 @@ govuk-bank-holidays==0.18
     # via
     #   -r requirements.txt
     #   notifications-utils
-govuk-frontend-jinja==3.6.0
+govuk-frontend-jinja==4.0.0
     # via -r requirements.txt
 greenlet==3.3.2
     # via

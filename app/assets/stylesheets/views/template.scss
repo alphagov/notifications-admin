@@ -137,7 +137,7 @@
 
 .template-content-count {
   @include govuk-font(19, $tabular: true);
-  color: $govuk-secondary-text-colour;
+  color: govuk-functional-colour(secondary-text);
   padding: 0 0 govuk-spacing(6) 0;
 
   & .govuk-error-message {

@@ -3,17 +3,17 @@
 .banner-default {
 
   @include govuk-font(19, $weight: bold);
-  color: $govuk-success-colour;
+  color: govuk-functional-colour(success);
   display: block;
   padding: govuk-spacing(3);
   margin: govuk-spacing(3) 0 govuk-spacing(6) 0;
   text-align: left;
   position: relative;
   clear: both;
-  border: 5px solid $govuk-success-colour;
+  border: 5px solid govuk-functional-colour(success);
 
   &:focus {
-    outline: 3px solid $govuk-focus-colour;
+    outline: 3px solid govuk-functional-colour(focus);
   }
 
   &-title {
@@ -57,8 +57,8 @@
   @extend %banner;
   @include govuk-font(19, $weight: bold);
   background: govuk-colour("white");
-  color: $govuk-text-colour;
-  border: 5px solid $govuk-error-colour;
+  color: govuk-functional-colour(text);
+  border: 5px solid govuk-functional-colour(error);
   margin: 15px 0;
   text-align: left;
 
@@ -75,7 +75,7 @@
 .banner-tour {
 
   @extend %banner;
-  background: $govuk-brand-colour;
+  background: govuk-functional-colour(brand);
   color: govuk-colour("white");
   margin-top: 10px;
   margin-bottom: 0;
@@ -94,7 +94,7 @@
   &-with-service-name {
     margin-top: -10px;
     padding-top: 0;
-    box-shadow: 0 -1px 0 0 darken($govuk-brand-colour, 10%);
+    box-shadow: 0 -1px 0 0 mix(black, govuk-colour("blue"), 10%);
   }
 
   .heading-medium {
@@ -137,8 +137,8 @@
     margin: 0 0 govuk-spacing(6) 0;
 
     &:focus {
-      background-color: $govuk-focus-colour;
-      box-shadow: 0 0 0 10px $govuk-focus-colour, 0 4px 0 10px $govuk-focus-text-colour;
+      background-color: govuk-functional-colour(focus);
+      box-shadow: 0 0 0 10px govuk-functional-colour(focus), 0 4px 0 10px govuk-functional-colour(focus-text);
     }
 
   }
@@ -164,8 +164,8 @@
   align-items: baseline;
   flex-wrap: wrap;
   padding: (govuk-spacing(3) - 1px) 0 (govuk-spacing(3) + 1px) 0;
-  border-top: 1px solid $govuk-border-colour;
-  border-bottom: 1px solid $govuk-border-colour;
+  border-top: 1px solid govuk-functional-colour(border);
+  border-bottom: 1px solid govuk-functional-colour(border);
   margin-bottom: govuk-spacing(6);
   text-decoration: none;
 

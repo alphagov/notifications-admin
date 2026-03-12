@@ -22,9 +22,9 @@
     letter-spacing: 0.05em;
 
     &--suspended {
-      background: govuk-shade(govuk-colour("light-grey"), 7%);
-      color: mix(govuk-colour("dark-grey"), $govuk-text-colour);
-      box-shadow: 0 -3px 0 0 govuk-shade(govuk-colour("light-grey"), 7%);
+      background: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
+      color: mix(govuk-colour('black', $variant: "tint-25"), govuk-colour('black'));
+      box-shadow: 0 -3px 0 0 mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
     }
 
   }
@@ -35,7 +35,7 @@
     &:focus {
       text-decoration: none; // override the :hover style (the focus style has its own underline)
       // hack to make the focus style fit in the navigation bar
-      box-shadow: inset 0 -3px $govuk-focus-text-colour, 0 1px $govuk-focus-text-colour;
+      box-shadow: inset 0 -3px govuk-functional-colour(focus-text), 0 1px govuk-functional-colour(focus-text);
     }
 
   }
@@ -43,7 +43,7 @@
   &-service {
 
     @include govuk-font($size: 19);
-    border-bottom: 1px solid $govuk-border-colour;
+    border-bottom: 1px solid govuk-functional-colour(border);
     margin: 0 0 10px;
     position: relative;
     display: flex;
@@ -76,7 +76,7 @@
     margin-bottom: govuk-spacing(1);
     
     &:focus:before {
-      border-color: $govuk-focus-text-colour;
+      border-color: govuk-functional-colour(focus-text);
     }
 
   }
@@ -90,7 +90,7 @@
       content: "";
       display: block;
       position: absolute;
-      top:  6px;
+      top:  10px;
       left: -3px;
       width: 7px;
       height: 7px;
@@ -100,10 +100,7 @@
       transform: rotate(45deg);
       border: solid;
       border-width: 1px 1px 0 0;
-      border-color: $govuk-secondary-text-colour;
-      @include govuk-media-query($from: tablet) {
-        top: 10px;
-      }
+      border-color: govuk-functional-colour(secondary-text);
     }
   }
 
@@ -132,7 +129,7 @@
 
     &--with-separator {
       margin-top: govuk-spacing(3);
-      border-top: 1px solid $govuk-border-colour;
+      border-top: 1px solid govuk-functional-colour(border);
       padding-top: govuk-spacing(1);
     }
 
