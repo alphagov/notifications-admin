@@ -24,8 +24,13 @@ Text message pricing
       }
     ) }}
 
-  <p class="govuk-body">Each unique service you add has an annual allowance of free text messages.</p>
-  <p class="govuk-body">When a service has used its annual allowance, it costs {{ sms_rate }} (plus VAT) for each text message you send.</p>
+  <p class="govuk-body">A single, 160-character text message costs {{ sms_rate }} (plus VAT).</p>
+  <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href="#how-text-message-pricing-works">how text message pricing works</a>.</p>
+
+  <h2 class="heading-medium" id="free-text-message-allowance">Free text message allowance</h2>
+
+  <p class="govuk-body">Each eligible service you add will get an annual allowance of free text messages. The free allowance renews on 1 April.</p>
+  <p class="govuk-body">The size of the allowance depends on the organisation you work for.</p>
 
   <div class="bottom-gutter-3-2">
     
@@ -40,7 +45,7 @@ Text message pricing
       caption_visible=False
     ) %}
       {% for organisation_type, charge in [
-        (central_government_organisations_text, '30,000 free text message'),
+        (central_government_organisations_text, '30,000 free text messages'),
         ('Local authorities and regional organisations', '10,000 free text messages'),
         ('State-funded schools', '5,000 free text messages'),
         ('GP surgeries', 'No free allowance'),
@@ -54,7 +59,8 @@ Text message pricing
     {% endcall %}
   </div>
 
-  <p class="govuk-body">GOV.UK Notify covers the cost of the free allowance. We do this to help support those teams who need it most. If your service sends a very high volume of text messages in a single year, we may not renew your free allowance the following year.</p>
+  <p class="govuk-body">The free allowance is discretionary. We review it every year to make sure GOV.​UK Notify can still support those teams who need it the most.</p>
+  <p class="govuk-body">If your service sends a very high volume of text messages in a single financial year, we may not renew its free allowance.</p>
 
   <h2 class="heading-medium" id="how-text-message-pricing-works">How text message pricing works</h2>
 
