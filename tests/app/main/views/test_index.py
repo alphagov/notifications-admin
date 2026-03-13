@@ -378,11 +378,9 @@ def test_sms_price(
         == f"Text messages Up to 30,000 free text messages a year, then {expected_rate} pence per message"
     )
 
-    assert (
-        f"When a service has used its annual allowance, it costs "
-        f"{expected_rate} pence (plus VAT) for each text message you "
-        f"send."
-    ) in normalize_spaces(text_message_pricing_page.text)
+    assert f"A single, 160-character text message costs {expected_rate} pence (plus VAT)." in normalize_spaces(
+        text_message_pricing_page.text
+    )
 
 
 def test_guidance_daily_limits(client_request):

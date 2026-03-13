@@ -39,11 +39,8 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     (
         (
             0.0233,
-            "Each unique service you add has an annual allowance of free text messages.",
-            (
-                "When a service has used its annual allowance, it costs 2.33 pence (plus VAT) "
-                "for each text message you send."
-            ),
+            "A single, 160-character text message costs 2.33 pence (plus VAT).",
+            "Find out how text message pricing works.",
         ),
     ),
 )
