@@ -1295,7 +1295,7 @@ def test_TemplateChange_placeholders_removed(old_template, new_template, placeho
                             "link_text": None,
                         },
                         {
-                            "filename": "3.pdf",
+                            "filename": "3.PDF",  # Case doesn’t match placeholder
                             "retention_period": 26,
                             "id": str(UUID(int=2, version=4)),
                             "link_text": None,
