@@ -28,7 +28,7 @@ class TemplateEmailFile(JSONModel):
     validate_users_email: bool
     pending: bool
 
-    __sort_attribute__ = "filename"
+    __sort_attribute__ = "position_in_template"
 
     @staticmethod
     def create(*, filename, file_contents, template_id, pending=True):
@@ -110,6 +110,10 @@ class TemplateEmailFile(JSONModel):
             f"{self.service_id}/{self.id}",
         )
 
+    @property
+    def position_in_template(self):
+        return self.template.index_of_placeholder(self.filename)
+
 
 class TemplateEmailFiles(SerialisedModelCollection):
     model = TemplateEmailFile
@@ -122,9 +126,6 @@ class TemplateEmailFiles(SerialisedModelCollection):
 
         email_files = template._template.get("email_files", [])
         super().__init__(email_files)
-
-        position_in_template = (template.index_of_placeholder(email_file.filename) for email_file in self)
-        self.items = sorted(email_files, key=lambda _: next(position_in_template))
 
     def __getitem__(self, index):
         return self.model(self.items[index] | {"service_id": self.service_id, "template": self.template})
