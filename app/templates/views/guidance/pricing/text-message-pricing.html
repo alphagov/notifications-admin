@@ -24,6 +24,16 @@ Text message pricing
       }
     ) }}
 
+  {% if sms_rate != 2.33 %}
+   <div class="govuk-inset-text">
+     <p class="govuk-body">On 1 April 2026:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>the cost of sending a text message will go up to 2.4 pence (plus VAT)</li>
+    <li>we’re reducing the free allowance for central government departments and national organisations</li>
+  </ul>
+   </div>
+   {% endif %}
+
   <p class="govuk-body">A single, 160-character text message costs {{ sms_rate }} (plus VAT).</p>
   <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href="#how-text-message-pricing-works">how text message pricing works</a>.</p>
 
