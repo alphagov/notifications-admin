@@ -8,7 +8,7 @@ from markupsafe import Markup
 from notifications_utils.countries import Postage
 from notifications_utils.field import Field
 from notifications_utils.formatters import escape_html, formatted_list, normalise_whitespace
-from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
+from notifications_utils.insensitive_dict import InsensitiveSet
 from notifications_utils.take import Take
 from notifications_utils.template import (
     BaseEmailTemplate,
@@ -317,7 +317,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     def index_of_placeholder(self, placeholder):
         with suppress(KeyError):
-            return InsensitiveDict.from_keys(self.all_placeholders).keys().index(InsensitiveDict.make_key(placeholder))
+            return InsensitiveSet(self.all_placeholders).index(placeholder)
         return math.inf
 
 
