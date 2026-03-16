@@ -3215,8 +3215,8 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
 
 
 class TemplateEmailFilesUploadForm(StripWhitespaceForm):
-    def __init__(self, *args, existing_files, **kwargs):
-        self.existing_file_names = InsensitiveSet(file.filename for file in existing_files)
+    def __init__(self, *args, template, **kwargs):
+        self.existing_file_names = template.filenames
         super().__init__(*args, **kwargs)
 
     allowed_file_formats = {
