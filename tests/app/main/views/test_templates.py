@@ -3842,6 +3842,40 @@ def test_edit_service_template_archives_email_files(
     assert normalize_spaces(page.select(".banner-default-with-tick")[0].text) == expected_banner_text
 
 
+def test_edit_service_template_does_not_allow_email_file_in_subject(
+    client_request,
+    fake_uuid,
+    mocker,
+):
+    email_template = create_template(
+        template_type="email",
+        email_files=[
+            {
+                "id": str(uuid.UUID(int=1, version=4)),
+                "filename": "invite.pdf",
+                "link_text": None,
+                "retention_period": 90,
+                "validate_users_email": False,
+            },
+        ],
+    )
+    mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
+
+    page = client_request.post(
+        ".edit_service_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={
+            "name": email_template["name"],
+            "template_content": email_template["content"],
+            "subject": "Please download ((INVITE.PDF))",
+            "service": SERVICE_ONE_ID,
+        },
+        _expected_status=200,
+    )
+    assert normalize_spaces(page.select_one(".govuk-error-message")) == "Error: You cannot put a file in the subject"
+
+
 def test_should_redirect_when_saving_a_template_letter(
     client_request,
     mock_get_service_letter_template,

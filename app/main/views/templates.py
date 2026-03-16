@@ -78,9 +78,13 @@ from app.utils.templates import TemplateChange, TemplatedLetterImageTemplate, ge
 from app.utils.user import user_has_permissions
 
 
-def get_template_form(template_type: Literal["email", "sms", "letter"], language: Literal["welsh"] | None = None):
+def get_template_form(
+    template_type: Literal["email", "sms", "letter"],
+    email_file_filenames=None,
+    language: Literal["welsh"] | None = None,
+):
     if template_type == "email":
-        return EmailTemplateForm
+        return partial(EmailTemplateForm, email_file_filenames=email_file_filenames)
     elif template_type == "sms":
         return SMSTemplateForm
     else:
@@ -734,7 +738,11 @@ def edit_service_template(service_id, template_id, language=None):  # noqa
 
     abort_for_unauthorised_bilingual_letters_or_invalid_options(language, template)
 
-    form = get_template_form(template.template_type, language=language)(**template._template)
+    form = get_template_form(
+        template.template_type,
+        email_file_filenames=getattr(template, "filenames", None),
+        language=language,
+    )(**template._template)
 
     if form.validate_on_submit():
         new_template = get_template(

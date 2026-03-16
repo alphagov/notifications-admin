@@ -16,6 +16,7 @@ from flask_wtf.file import FileField as FileField_wtf
 from markupsafe import Markup
 from notifications_utils.countries.data import Postage
 from notifications_utils.eventlet import SoftEventletTimeout
+from notifications_utils.field import Field as UtilsField
 from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 from notifications_utils.recipient_validation.email_address import format_email_address, validate_email_address
@@ -1479,6 +1480,10 @@ class LetterAddressForm(StripWhitespaceForm):
 
 
 class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
+    def __init__(self, *args, email_file_filenames=None, **kwargs):
+        self.email_file_filenames = email_file_filenames or set()
+        super().__init__(*args, **kwargs)
+
     subject = GovukTextareaField("Subject", validators=[NotifyDataRequired(thing="the subject of the email")])
     has_unsubscribe_link = GovukCheckboxField(
         "Add an unsubscribe link",
@@ -1491,6 +1496,13 @@ class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
             ],
         },
     )
+
+    def validate_subject(self, field):
+        if field.errors:
+            return
+
+        if self.email_file_filenames & UtilsField(field.data).placeholders:
+            raise ValidationError("You cannot put a file in the subject")
 
 
 class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
