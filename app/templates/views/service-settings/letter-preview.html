@@ -5,11 +5,11 @@
 
     <title>{{ subject }}</title>
 
-    <style type="text/css">
-    body {
-      background-color: #dee0e2;
-      margin: 0;
-    }
+    <style type="text/css" nonce="{{ request.csp_nonce }}">
+      body {
+        background-color: #dee0e2;
+        margin: 0;
+      }
       img {
         display: block;
         background-color: #fff;
