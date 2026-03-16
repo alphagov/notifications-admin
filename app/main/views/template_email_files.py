@@ -82,7 +82,7 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
     )
     delete = bool(request.args.get("delete"))
     template_email_file = TemplateEmailFile.get_by_id(
-        template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
+        template_email_file_id=template_email_file_id, service_id=service_id, template=template
     )
     if request.method == "POST" and delete:
         new_content = PlainTextField(
@@ -121,7 +121,7 @@ def make_file_live(service_id, template_id, template_email_file_id):
         must_be_of_type="email",
     )
     template_email_file = TemplateEmailFile.get_by_id(
-        template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
+        template_email_file_id=template_email_file_id, service_id=service_id, template=template
     )
     if template_email_file.filename not in InsensitiveSet(template.placeholders):
         new_content = template.content + f"\n\n(({template_email_file.filename}))"
@@ -185,7 +185,7 @@ def change_link_text(service_id, template_id, template_email_file_id):
         must_be_of_type="email",
     )
     template_email_file = TemplateEmailFile.get_by_id(
-        template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
+        template_email_file_id=template_email_file_id, service_id=service_id, template=template
     )
     form = TemplateEmailFileLinkTextForm(link_text=template_email_file.link_text)
 
@@ -221,7 +221,7 @@ def change_data_retention_period(service_id, template_id, template_email_file_id
         must_be_of_type="email",
     )
     template_email_file = TemplateEmailFile.get_by_id(
-        template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
+        template_email_file_id=template_email_file_id, service_id=service_id, template=template
     )
     form = TemplateEmailFileRetentionPeriodForm(retention_period=template_email_file.retention_period)
 
@@ -258,7 +258,7 @@ def change_email_validation(service_id, template_id, template_email_file_id):
         must_be_of_type="email",
     )
     template_email_file = TemplateEmailFile.get_by_id(
-        template_email_file_id=template_email_file_id, service_id=service_id, template_id=template_id
+        template_email_file_id=template_email_file_id, service_id=service_id, template=template
     )
     form = OnOffSettingForm(
         "Ask recipient for their email address",
