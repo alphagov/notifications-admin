@@ -3217,6 +3217,7 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
 class TemplateEmailFilesUploadForm(StripWhitespaceForm):
     def __init__(self, *args, template, **kwargs):
         self.existing_file_names = template.filenames
+        self.placeholders_in_subject = UtilsField(template._subject).placeholders
         super().__init__(*args, **kwargs)
 
     allowed_file_formats = {
@@ -3255,6 +3256,12 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
 
         if field.data.filename in self.existing_file_names:
             raise ValidationError(f"Your template already has a file called ‘{field.data.filename}’")
+
+        if field.data.filename in self.placeholders_in_subject:
+            raise ValidationError(
+                f"You cannot put a file in the subject of a template "
+                f"– remove (({field.data.filename})) or rename your file"
+            )
 
 
 class TemplateEmailFileLinkTextForm(StripWhitespaceForm):
