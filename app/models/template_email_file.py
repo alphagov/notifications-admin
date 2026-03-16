@@ -124,8 +124,7 @@ class TemplateEmailFiles(SerialisedModelCollection):
         self.service_id = current_service.id
         self.template = template
 
-        email_files = template._template.get("email_files", [])
-        super().__init__(email_files)
+        super().__init__(template._template.get("email_files", []))
 
     def __getitem__(self, index):
         return self.model(self.items[index] | {"service_id": self.service_id, "template": self.template})
