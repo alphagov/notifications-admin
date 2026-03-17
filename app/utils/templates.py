@@ -8,7 +8,7 @@ from markupsafe import Markup
 from notifications_utils.countries import Postage
 from notifications_utils.field import Field
 from notifications_utils.formatters import escape_html, formatted_list, normalise_whitespace
-from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
+from notifications_utils.insensitive_dict import InsensitiveSet
 from notifications_utils.take import Take
 from notifications_utils.template import (
     BaseEmailTemplate,
@@ -317,7 +317,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     def index_of_placeholder(self, placeholder):
         with suppress(KeyError):
-            return InsensitiveDict.from_keys(self.all_placeholders).keys().index(InsensitiveDict.make_key(placeholder))
+            return InsensitiveSet(self.all_placeholders).index(placeholder)
         return math.inf
 
 
@@ -384,24 +384,18 @@ def get_template(
 
 class TemplateChange:
     def __init__(self, old_template, new_template, *, service_has_api_keys):
-        self.old_placeholders = InsensitiveDict.from_keys(
-            getattr(old_template, "all_placeholders", old_template.placeholders)
-        )
-        self.new_placeholders = InsensitiveDict.from_keys(
-            getattr(new_template, "all_placeholders", new_template.placeholders)
-        )
+        self.old_placeholders = InsensitiveSet(getattr(old_template, "all_placeholders", old_template.placeholders))
+        self.new_placeholders = InsensitiveSet(getattr(new_template, "all_placeholders", new_template.placeholders))
         self.email_files = getattr(old_template, "email_files", [])
         self.service_has_api_keys = service_has_api_keys
 
     @property
     def has_different_placeholders(self):
-        return bool(self.new_placeholders.keys() ^ self.old_placeholders.keys())
+        return self.new_placeholders != self.old_placeholders
 
     @property
     def placeholders_added(self):
-        return OrderedSet(
-            [self.new_placeholders.get(key) for key in self.new_placeholders.keys() - self.old_placeholders.keys()]
-        )
+        return self.new_placeholders - self.old_placeholders
 
     @property
     def placeholders_removed(self):
@@ -409,9 +403,7 @@ class TemplateChange:
 
     @property
     def placeholders_and_email_files_removed(self):
-        return OrderedSet(
-            [self.old_placeholders.get(key) for key in self.old_placeholders.keys() - self.new_placeholders.keys()]
-        )
+        return self.old_placeholders - self.new_placeholders
 
     @property
     def email_files_removed(self):
@@ -421,7 +413,7 @@ class TemplateChange:
 
     @property
     def email_filenames_removed(self):
-        return OrderedSet([file.filename for file in self.email_files_removed])
+        return InsensitiveSet(file.filename for file in self.email_files_removed)
 
     @property
     def is_breaking_change(self):
