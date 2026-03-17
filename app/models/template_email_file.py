@@ -1,5 +1,7 @@
+import math
 import mimetypes
 import uuid
+from contextlib import suppress
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -112,7 +114,9 @@ class TemplateEmailFile(JSONModel):
 
     @property
     def position_in_template(self):
-        return self.template.index_of_placeholder(self.filename)
+        with suppress(KeyError):
+            return self.template.all_placeholders.index(self.filename)
+        return math.inf
 
 
 class TemplateEmailFiles(SerialisedModelCollection):
