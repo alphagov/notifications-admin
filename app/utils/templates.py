@@ -317,7 +317,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     def index_of_placeholder(self, placeholder):
         with suppress(KeyError):
-            return InsensitiveSet(self.all_placeholders).index(placeholder)
+            return self.all_placeholders.index(placeholder)
         return math.inf
 
 
