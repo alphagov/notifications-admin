@@ -1073,3 +1073,51 @@ def test_upload_file_returns_error_if_file_with_same_name_exists(
     assert mock_template_update.call_args_list == []
     assert mock_s3.call_args_list == []
     assert mock_post.call_args_list == []
+
+
+@pytest.mark.parametrize(
+    "subject",
+    (
+        ("Please download ((tests/test_pdf_files/one_page_pdf.pdf))"),
+        ("Please download ((tests/test_pdf_files/ONE-PAGE PDF.PDF))"),
+    ),
+)
+def test_upload_file_returns_error_if_placeholder_exists_in_subject(
+    client_request,
+    fake_uuid,
+    service_one,
+    mocker,
+    subject,
+):
+    service_one["permissions"] += ["send_files_via_ui"]
+    service_one["contact_link"] = "https://example.com"
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                subject=subject,
+            )
+        },
+    )
+    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
+    mock_post = mocker.patch("app.template_email_file_client.post")
+    mock_template_update = mocker.patch("app.service_api_client.update_service_template")
+    with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
+        page = client_request.post(
+            "main.upload_template_email_files",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _data={"file": file},
+            _expected_status=200,
+        )
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
+        "You cannot put a file in the subject of a template – "
+        "remove ((tests/test_pdf_files/one_page_pdf.pdf)) or rename your file"
+    )
+    assert mock_antivirus.called is True
+    assert mock_template_update.call_args_list == []
+    assert mock_s3.call_args_list == []
+    assert mock_post.call_args_list == []
