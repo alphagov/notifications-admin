@@ -1,20 +1,12 @@
-from abc import ABC, ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from functools import total_ordering
 from inspect import get_annotations
 
-from notifications_utils.serialised_model import (
-    SerialisedModel,
-    SerialisedModelCollection,
-    SerialisedModelMeta,
-)
-
-
-class JSONModelMeta(SerialisedModelMeta, ABCMeta):
-    pass
+from notifications_utils.serialised_model import SerialisedModel, SerialisedModelCollection
 
 
 @total_ordering
-class JSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
+class JSONModel(SerialisedModel, ABC):
     @property
     @abstractmethod
     def __sort_attribute__(self):
