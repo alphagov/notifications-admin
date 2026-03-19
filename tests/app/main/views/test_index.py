@@ -399,3 +399,11 @@ def test_trial_mode_sending_limits(client_request):
     page = client_request.get("main.guidance_trial_mode")
 
     assert normalize_spaces("There’s a daily limit of 50 emails and 50 text messages.") in page.text
+
+
+def test_email_template_sets_correct_additional_header(client_request):
+    response = client_request.get_response("main.email_template")
+    csp = response.headers.get("Content-Security-Policy", "")
+
+    assert response.headers.get("X-Frame-Options") == "SAMEORIGIN"
+    assert "style-src-elem 'self' static.example.com 'unsafe-inline';" in csp

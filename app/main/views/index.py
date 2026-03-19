@@ -106,6 +106,15 @@ def email_template():
     )
 
     resp.headers["X-Frame-Options"] = "SAMEORIGIN"
+
+    # Allow the admin app to embed this preview in a same-origin iframe without weakening the default
+    # policy elsewhere; the preview HTML needs inline styles and access to the asset domain.
+    resp.headers["Content-Security-Policy"] = resp.headers.get("Content-Security-Policy", "") + (
+        "style-src-elem 'self' {asset_domain} 'unsafe-inline';"
+    ).format(
+        asset_domain=current_app.config["ASSET_DOMAIN"],
+    )
+
     return resp
 
 
