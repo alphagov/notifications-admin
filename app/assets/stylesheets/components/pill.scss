@@ -35,7 +35,7 @@
   }
 
   &-item {
-    $background: govuk-functional-colour(link);
+    $background: govuk-functional-colour(brand);
     background: $background; // text colour is set in the HTML by the govuk-link--inverse class
     border: 2px solid $background;
     position: relative;
@@ -121,7 +121,7 @@
   &-item {
 
     display: block;
-    background-color: govuk-functional-colour(link); // text colour is set in the HTML by govuk-link--inverse
+    background-color: govuk-functional-colour(brand); // text colour is set in the HTML by govuk-link--inverse
     padding: 9px (govuk-spacing(3) - 1);
     border: 1px solid transparent;
     text-align: center;

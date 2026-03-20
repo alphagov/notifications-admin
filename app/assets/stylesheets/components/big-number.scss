@@ -115,9 +115,9 @@
   .big-number-link {
 
     text-decoration: none;
-    background: govuk-functional-colour(link); // text colour is set in the HTML, with the govuk-link--inverse class
+    background: govuk-functional-colour(brand); // text colour is set in the HTML, with the govuk-link--inverse class
     display: block;
-    border: 2px solid govuk-functional-colour(link);
+    border: 2px solid govuk-functional-colour(brand);
     margin-bottom: 5px;
 
     &:hover {
