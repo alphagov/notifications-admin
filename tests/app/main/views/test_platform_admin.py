@@ -5,15 +5,7 @@ from unittest.mock import ANY, call
 import pytest
 from flask import url_for
 
-from app.main.views.platform_admin import (
-    build_live_service_permissions_for_users_list,
-    create_global_stats,
-    format_stats_by_service,
-    get_tech_failure_status_box_data,
-    is_over_threshold,
-    sum_service_usage,
-)
-from tests import service_json
+from app.main.views.platform_admin import build_live_service_permissions_for_users_list
 from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, create_user, normalize_spaces
 
 
@@ -27,103 +19,6 @@ def test_should_redirect_if_not_logged_in(client_request):
 
 def test_should_403_if_not_platform_admin(client_request):
     client_request.get("main.platform_admin_search", _expected_status=403)
-
-
-def test_create_global_stats_sets_failure_rates(fake_uuid):
-    services = [service_json(fake_uuid, "a", []), service_json(fake_uuid, "b", [])]
-    services[0]["statistics"] = create_stats(
-        emails_requested=1,
-        emails_delivered=1,
-        emails_failed=0,
-    )
-    services[1]["statistics"] = create_stats(
-        emails_requested=2,
-        emails_delivered=1,
-        emails_failed=1,
-    )
-
-    stats = create_global_stats(services)
-    assert stats == {
-        "email": {"delivered": 2, "failed": 1, "requested": 3, "failure_rate": "33.3"},
-        "sms": {"delivered": 0, "failed": 0, "requested": 0, "failure_rate": "0"},
-        "letter": {"delivered": 0, "failed": 0, "requested": 0, "failure_rate": "0"},
-    }
-
-
-def create_stats(
-    emails_requested=0,
-    emails_delivered=0,
-    emails_failed=0,
-    sms_requested=0,
-    sms_delivered=0,
-    sms_failed=0,
-    letters_requested=0,
-    letters_delivered=0,
-    letters_failed=0,
-):
-    return {
-        "sms": {
-            "requested": sms_requested,
-            "delivered": sms_delivered,
-            "failed": sms_failed,
-        },
-        "email": {
-            "requested": emails_requested,
-            "delivered": emails_delivered,
-            "failed": emails_failed,
-        },
-        "letter": {
-            "requested": letters_requested,
-            "delivered": letters_delivered,
-            "failed": letters_failed,
-        },
-    }
-
-
-def test_format_stats_by_service_returns_correct_values(fake_uuid):
-    services = [service_json(fake_uuid, "a", [])]
-    services[0]["statistics"] = create_stats(
-        emails_requested=10,
-        emails_delivered=3,
-        emails_failed=5,
-        sms_requested=50,
-        sms_delivered=7,
-        sms_failed=11,
-        letters_requested=40,
-        letters_delivered=20,
-        letters_failed=7,
-    )
-
-    ret = list(format_stats_by_service(services))
-    assert len(ret) == 1
-
-    assert ret[0]["stats"]["email"]["requested"] == 10
-    assert ret[0]["stats"]["email"]["delivered"] == 3
-    assert ret[0]["stats"]["email"]["failed"] == 5
-
-    assert ret[0]["stats"]["sms"]["requested"] == 50
-    assert ret[0]["stats"]["sms"]["delivered"] == 7
-    assert ret[0]["stats"]["sms"]["failed"] == 11
-
-    assert ret[0]["stats"]["letter"]["requested"] == 40
-    assert ret[0]["stats"]["letter"]["delivered"] == 20
-    assert ret[0]["stats"]["letter"]["failed"] == 7
-
-
-def test_sum_service_usage_is_sum_of_all_activity(fake_uuid):
-    service = service_json(fake_uuid, "My Service 1")
-    service["statistics"] = create_stats(
-        emails_requested=100, emails_delivered=25, emails_failed=25, sms_requested=100, sms_delivered=25, sms_failed=25
-    )
-    assert sum_service_usage(service) == 200
-
-
-def test_sum_service_usage_with_zeros(fake_uuid):
-    service = service_json(fake_uuid, "My Service 1")
-    service["statistics"] = create_stats(
-        emails_requested=0, emails_delivered=0, emails_failed=25, sms_requested=0, sms_delivered=0, sms_failed=0
-    )
-    assert sum_service_usage(service) == 0
 
 
 def test_platform_admin_list_complaints(client_request, platform_admin_user, mocker):
@@ -202,30 +97,6 @@ def test_platform_admin_list_complaints_returns_404_with_invalid_page(
         page="invalid",
         _expected_status=404,
     )
-
-
-@pytest.mark.parametrize(
-    "number, total, threshold, result",
-    [
-        (0, 0, 0, False),
-        (1, 1, 0, True),
-        (2, 3, 66, True),
-        (2, 3, 67, False),
-    ],
-)
-def test_is_over_threshold(number, total, threshold, result):
-    assert is_over_threshold(number, total, threshold) is result
-
-
-def test_get_tech_failure_status_box_data_removes_percentage_data():
-    stats = {
-        "failures": {"permanent-failure": 0, "technical-failure": 0, "temporary-failure": 1, "virus-scan-failed": 0},
-        "test-key": 0,
-        "total": 5589,
-    }
-    tech_failure_data = get_tech_failure_status_box_data(stats)
-
-    assert "percentage" not in tech_failure_data
 
 
 def test_platform_admin_show_submit_returned_letters_page(
