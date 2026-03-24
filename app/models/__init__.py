@@ -14,7 +14,7 @@ class JSONModelMeta(SerialisedModelMeta, ABCMeta):
 
 
 @total_ordering
-class JSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
+class StrictJSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
     @property
     @abstractmethod
     def __sort_attribute__(self):
@@ -43,6 +43,8 @@ class JSONModel(SerialisedModel, ABC, metaclass=JSONModelMeta):
     def __hash__(self):
         return hash(self.id)
 
+
+class JSONModel(StrictJSONModel):
     def __init__(self, _dict):
         # in the case of a bad request _dict may be `None`
         self._dict = _dict or {}

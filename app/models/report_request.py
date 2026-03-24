@@ -5,11 +5,11 @@ from flask import current_app
 from notifications_utils.s3 import s3download
 
 from app import report_request_api_client
-from app.models import JSONModel
+from app.models import StrictJSONModel
 from app.s3_client import check_s3_object_exists
 
 
-class ReportRequest(JSONModel):
+class ReportRequest(StrictJSONModel):
     id: Any
     user_id: Any
     service_id: Any

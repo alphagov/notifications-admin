@@ -1913,13 +1913,13 @@ def mock_create_contact_list(notify_admin, mocker, api_user_active):
         row_count,
         template_type,
     ):
-        return {
-            "service_id": service_id,
-            "upload_id": upload_id,
-            "original_file_name": original_file_name,
-            "row_count": row_count,
-            "template_type": template_type,
-        }
+        return contact_list_json(
+            id_=upload_id,
+            service_id=service_id,
+            original_file_name=original_file_name,
+            row_count=row_count,
+            template_type=template_type,
+        )
 
     return mocker.patch(
         "app.contact_list_api_client.create_contact_list",
