@@ -828,7 +828,7 @@ def test_create_email_branding_government_identity_logo_form(client_request, pla
         ),
         (
             "HM Coastguard",
-            "https://static.example.com/images/branding/insignia/HM Coastguard.png?537cf92fcce79f185084b70bf04cf93c",
+            "https://static.example.com/images/branding/insignia/HM Coastguard.png?0ec1ded403c571998e3006be299758ed",
         ),
         (
             "HM Government",
