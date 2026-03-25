@@ -14,13 +14,14 @@
 
   <h1 class="heading-large">Letter pricing</h1>
 
-    {{ content_metadata(
-      data={
-        "Last updated": letter_rates.last_updated | format_date_normal
-      }
-    ) }}
+  {{ content_metadata(
+    data={
+      "Last updated": letter_rates.last_updated | format_date_normal
+    }
+  ) }}
 
-<div class="govuk-inset-text">
+  {% if letter_rates.last_updated.isoformat() < "2026-04-07" %}
+  <div class="govuk-inset-text">
     <p class="govuk-body">
     Royal Mail is increasing its rates.
     </p>
@@ -28,9 +29,10 @@
       On 7 April 2026, first class letters will go up by between 7 and 9 pence (not including VAT).
     </p>
     <p class="govuk-body">
-      The exact difference will depend on the number of pages in your letter. 
-    </p>  
+      The exact difference will depend on the number of pages in your letter.
+    </p>
   </div>
+  {% endif %}
 
   <p class="govuk-body">The cost of sending a letter depends on the postage you choose and how many sheets of paper you need.</p>
 
