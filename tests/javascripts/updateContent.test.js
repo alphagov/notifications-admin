@@ -86,6 +86,8 @@ describe('Update content', () => {
       // default the response to match the content inside div[data-notify-module]
       responseObj[updateKey] = `<p class="notification-status">Sending</p>`;
 
+      window.GOVUK.utils.locationReload = jest.fn();
+
     });
 
     describe("By default", () => {
@@ -222,10 +224,6 @@ describe('Update content', () => {
 
     test('With a 401 response status code, polling should be stopped', () => {
 
-      const locationMock = new helpers.LocationMock();
-
-      window.location.reload = jest.fn();
-
       // start the module
       window.GOVUK.notifyModules.start();
 
@@ -243,10 +241,10 @@ describe('Update content', () => {
       serverResponse.complete();
 
       // We expect the 401 to trigger a page reload, to force a redirect to the sign in page
-      expect(window.location.reload).toHaveBeenCalled();
+      expect(window.GOVUK.utils.locationReload).toHaveBeenCalled();
 
       // Tidy up
-      locationMock.reset();
+      window.GOVUK.utils.locationReload.mockRestore();
       serverResponse.statusCode = 200;
       forceRequestCompletion();
 
