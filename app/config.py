@@ -8,6 +8,7 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY")
     DANGEROUS_SALT = os.environ.get("DANGEROUS_SALT")
     ZENDESK_API_KEY = os.environ.get("ZENDESK_API_KEY")
+    NEW_PASSWORD_ENCRYPTION_KEY = os.environ.get("NEW_PASSWORD_ENCRYPTION_KEY")
 
     # if we're not on cloudfoundry, we can get to this app from localhost. but on cloudfoundry its different
     ADMIN_BASE_URL = os.environ.get("ADMIN_BASE_URL", "http://localhost:6012")
@@ -126,6 +127,8 @@ class Development(Config):
     ADMIN_CLIENT_SECRET = "dev-notify-secret-key"
     DANGEROUS_SALT = "dev-notify-salt"
     SECRET_KEY = "dev-notify-secret-key"
+    NEW_PASSWORD_ENCRYPTION_KEY = "dev-new-password-encryption-key"
+
     API_HOST_NAME = os.environ.get("API_HOST_NAME", "http://localhost:6011")
     ANTIVIRUS_API_HOST = os.environ.get("ANTIVIRUS_API_HOST", "http://localhost:6016")
     ANTIVIRUS_API_KEY = "test-key"

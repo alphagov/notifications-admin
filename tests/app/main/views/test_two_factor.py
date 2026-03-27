@@ -3,6 +3,7 @@ from unittest.mock import PropertyMock
 import pytest
 from flask import url_for
 
+from app.utils.login import encrypt_new_password
 from tests.app.test_event_handlers import event_dict
 from tests.conftest import (
     SERVICE_ONE_ID,
@@ -200,7 +201,7 @@ def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
         session["user_details"] = {
             "id": api_user_active["id"],
             "email": api_user_active["email_address"],
-            "password": "changedpassword",
+            "password": encrypt_new_password("changedpassword"),
         }
 
     client_request.post(

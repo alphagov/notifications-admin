@@ -1,6 +1,7 @@
 from functools import wraps
 
-from flask import redirect, request, session, url_for
+from flask import current_app, redirect, request, session, url_for
+from pyrage import passphrase
 
 from app.models.user import User
 
@@ -23,7 +24,7 @@ def log_in_user(user_id):
         session["current_session_id"] = user.current_session_id
         # Check if coming from new password page
         if "password" in session.get("user_details", {}):
-            user.update_password(session["user_details"]["password"])
+            user.update_password(decrypt_new_password(session["user_details"]["password"]))
         user.activate()
         user.login()
     finally:
@@ -62,3 +63,13 @@ def is_safe_redirect_url(target):
     host_url = urlparse(request.host_url)
     redirect_url = urlparse(urljoin(request.host_url, target))
     return redirect_url.scheme in ("http", "https") and host_url.netloc == redirect_url.netloc
+
+
+def encrypt_new_password(new_password: str) -> bytes:
+    return passphrase.encrypt(new_password.encode(encoding="utf-8"), current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"])
+
+
+def decrypt_new_password(new_password: bytes) -> str:
+    return (passphrase.decrypt(new_password, current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"])).decode(
+        encoding="utf-8"
+    )
