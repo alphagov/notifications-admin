@@ -96,7 +96,6 @@ export default [
       paths.npm + 'cbor-js/cbor.js',
       paths.src + 'javascripts/modules.js',
       paths.src + 'javascripts/stick-to-window-when-scrolling.js',
-      paths.src + 'javascripts/cookieCleanup.js',
       paths.src + 'javascripts/updateContent.js',
       paths.src + 'javascripts/templateFolderForm.js',
       paths.src + 'javascripts/main.js',
