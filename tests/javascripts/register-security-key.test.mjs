@@ -1,17 +1,25 @@
-import RegisterSecurityKey from '../../app/assets/javascripts/esm/register-security-key.mjs';
-import ErrorBanner from '../../app/assets/javascripts/esm/error-banner.mjs';
 import { jest } from '@jest/globals';
-import * as helpers from './support/helpers';
+import ErrorBanner from '../../app/assets/javascripts/esm/error-banner.mjs';
+
+jest.unstable_mockModule('../../app/assets/javascripts/utils/location.mjs', () => ({
+  locationReload: jest.fn()
+}));
+
+let RegisterSecurityKey;
+let locationReload;
 
 beforeAll( async() => {
   const CBOR = await import('../../node_modules/cbor-js/cbor.js');
+  const registerSecurityKeyModule = await import('../../app/assets/javascripts/esm/register-security-key.mjs');
+  const locationUtilModule = await import('../../app/assets/javascripts/utils/location.mjs');
+
+  RegisterSecurityKey = registerSecurityKeyModule.default;
+  locationReload = locationUtilModule.locationReload;
   window.CBOR = CBOR.default || CBOR;
 })
 
 describe('Register security key', () => {
   let button;
-  let mockAuthLocation;
-  let mockWindowLocation;
   let mockClickEvent;
   let mockFetch;
   let mockWebauthnOptions;
@@ -29,12 +37,7 @@ describe('Register security key', () => {
     }
   };
 
-  beforeAll(() => {
-    mockAuthLocation = new helpers.LocationMock('http://localhost:6012/webauth/authenticate');
-  });
-
   afterAll(() => {
-    mockAuthLocation.reset();
     jest.restoreAllMocks();
   });
 
@@ -42,6 +45,9 @@ describe('Register security key', () => {
     // disable console.error() so we don't see it in test output
     // you might need to comment this out to debug some failures
     console.error = jest.fn();
+
+    // clear the window.location mock
+    locationReload.mockClear();
 
     document.body.classList.add('govuk-frontend-supported');
     document.body.innerHTML = `
@@ -63,11 +69,6 @@ describe('Register security key', () => {
 
     // mock WebAuthn browser API
     window.navigator.credentials = mockBrowserCredentials;
-
-    // mock the window location object
-    mockWindowLocation = new helpers.LocationMock();
-    window.location = mockWindowLocation;
-    mockWindowLocation.reload = jest.fn();
 
     mockWebauthnOptions = window.CBOR.encode('options');
     // instantiate class
@@ -110,7 +111,7 @@ describe('Register security key', () => {
     expect(decodedData.clientDataJSON).toEqual(new Uint8Array([4, 5, 6]));
  
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(mockWindowLocation.reload).toHaveBeenCalledWith();
+    expect(locationReload).toHaveBeenCalled();
     expect(ErrorBanner.prototype.showBanner).not.toHaveBeenCalled();
   });
 
@@ -131,7 +132,7 @@ describe('Register security key', () => {
     await registerKeyInstance.registerKey(mockClickEvent);
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockWindowLocation.reload).not.toHaveBeenCalled();
+    expect(locationReload).not.toHaveBeenCalled();
     expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 
@@ -162,7 +163,7 @@ describe('Register security key', () => {
     await registerKeyInstance.registerKey(mockClickEvent);
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(mockWindowLocation.reload).not.toHaveBeenCalled();
+    expect(locationReload).not.toHaveBeenCalled();
     expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 
@@ -180,7 +181,7 @@ describe('Register security key', () => {
     await registerKeyInstance.registerKey(mockClickEvent);
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockWindowLocation.reload).not.toHaveBeenCalled();
+    expect(locationReload).not.toHaveBeenCalled();
     expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   })
 });
