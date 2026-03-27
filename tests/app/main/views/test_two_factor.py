@@ -1,7 +1,9 @@
+import logging
 from unittest.mock import PropertyMock
 
 import pytest
 from flask import url_for
+from pyrage import passphrase
 
 from app.utils.login import encrypt_new_password
 from tests.app.test_event_handlers import event_dict
@@ -214,6 +216,89 @@ def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
         api_user_active["id"],
         "changedpassword",
     )
+
+
+@pytest.mark.parametrize(
+    "new_password, expected_error",
+    [
+        (
+            "just-a-string",
+            (
+                "Error during new password decryption for user id 6ce466d0-fd6a-11e5-82f5-e0accb9d11a6: "
+                "argument 'ciphertext': 'str' object cannot be converted to 'PyBytes'"
+            ),
+        ),
+        (
+            b"bytes-string",
+            (
+                "Error during new password decryption for user id 6ce466d0-fd6a-11e5-82f5-e0accb9d11a6: "
+                "failed to fill whole buffer"
+            ),
+        ),
+    ],
+)
+def test_two_factor_sms_should_return_error_if_new_password_not_encrypted(
+    client_request,
+    api_user_active,
+    mock_update_user_password,
+    mock_email_validated_recently,
+    caplog,
+    new_password,
+    expected_error,
+):
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
+        session["user_details"] = {
+            "id": api_user_active["id"],
+            "email": api_user_active["email_address"],
+            "password": new_password,
+        }
+    with caplog.at_level(logging.WARNING):
+        page = client_request.post(
+            "main.two_factor_sms",
+            _data={"sms_code": "12345"},
+            _follow_redirects=True,
+        )
+
+    assert expected_error in caplog.messages
+
+    assert page.select_one("h1").string == "Sign in"
+    assert page.select_one(".banner-dangerous").text.strip() == (
+        "There was a problem with your password. Please try again."
+    )
+
+    mock_update_user_password.assert_not_called()
+
+
+def test_two_factor_sms_should_return_error_if_new_password_encrypted_with_wrong_key(
+    client_request, api_user_active, mock_update_user_password, mock_email_validated_recently, caplog
+):
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
+        session["user_details"] = {
+            "id": api_user_active["id"],
+            "email": api_user_active["email_address"],
+            "password": passphrase.encrypt(b"changedpassword", "wrong-key"),
+        }
+    with caplog.at_level(logging.WARNING):
+        page = client_request.post(
+            "main.two_factor_sms",
+            _data={"sms_code": "12345"},
+            _follow_redirects=True,
+        )
+
+    assert (
+        f"Error during new password decryption for user id {api_user_active['id']}: Decryption failed"
+    ) in caplog.messages
+
+    assert page.select_one("h1").string == "Sign in"
+    assert page.select_one(".banner-dangerous").text.strip() == (
+        "There was a problem with your password. Please try again."
+    )
+
+    mock_update_user_password.assert_not_called()
 
 
 def test_two_factor_sms_returns_error_when_user_is_locked(

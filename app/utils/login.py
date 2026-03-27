@@ -1,7 +1,7 @@
 from functools import wraps
 
-from flask import current_app, redirect, request, session, url_for
-from pyrage import passphrase
+from flask import current_app, flash, redirect, request, session, url_for
+from pyrage import DecryptError, passphrase
 
 from app.models.user import User
 
@@ -24,7 +24,17 @@ def log_in_user(user_id):
         session["current_session_id"] = user.current_session_id
         # Check if coming from new password page
         if "password" in session.get("user_details", {}):
-            user.update_password(decrypt_new_password(session["user_details"]["password"]))
+            try:
+                user.update_password(decrypt_new_password(session["user_details"]["password"]))
+            except (DecryptError, TypeError) as e:
+                current_app.logger.warning(
+                    "Error during new password decryption for user id %s: %s",
+                    user_id,
+                    e,
+                )
+                flash("There was a problem with your password. Please try again.")
+                return redirect(url_for("main.sign_in"))
+
         user.activate()
         user.login()
     finally:
