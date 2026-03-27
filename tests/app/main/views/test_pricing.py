@@ -10,6 +10,10 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
 
     pricing_rows = page.select("main table tbody tr")
 
+    assert [normalize_spaces(heading.text) for heading in page.select("th.table-field[scope=row]")] == [
+        "1 sheet", "2 sheets", "3 sheets", "4 sheets", "5 sheets"
+    ]
+
     first_row = pricing_rows[0]
     assert "1 sheet" in first_row.text
 
@@ -25,6 +29,9 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
     assert "86p" in last_row.text
     assert "£1.67" in last_row.text
     assert "£1.76" in last_row.text
+
+    for row in pricing_rows:
+        assert "99.99" not in row.text
 
 
 @pytest.mark.parametrize(

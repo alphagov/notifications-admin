@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from app.models import JSONModel, ModelList
@@ -39,19 +39,27 @@ class LetterRates(ModelList):
         return letter_rate_api_client.get_letter_rates(*args, **kwargs)
 
     @property
+    def current(self):
+        return tuple(rate for rate in self if rate.start_date <= datetime.now(UTC))
+
+    @property
+    def upcoming(self):
+        return tuple(rate for rate in self if rate.start_date > datetime.now(UTC))
+
+    @property
     def rates(self):
-        return tuple(rate.rate_in_pennies for rate in self)
+        return tuple(rate.rate_in_pennies for rate in self.current)
 
     @property
     def sheet_counts(self):
-        return sorted({rate.sheet_count for rate in self})
+        return sorted({rate.sheet_count for rate in self.current})
 
     @property
     def last_updated(self):
-        return max(rate.start_date for rate in self)
+        return max(rate.start_date for rate in self.current)
 
     def get(self, *, sheet_count, post_class):
-        for rate in self:
+        for rate in self.current:
             if rate.sheet_count == sheet_count and rate.post_class == post_class:
                 return rate.rate_in_pennies
         raise KeyError

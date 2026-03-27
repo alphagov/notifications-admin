@@ -4526,6 +4526,8 @@ def mock_get_letter_rates(mocker):
             {"post_class": "first", "rate": "1.67", "sheet_count": 5, "start_date": "2024-06-30T23:00:00"},
             {"post_class": "europe", "rate": "1.76", "sheet_count": 5, "start_date": "2024-01-02T00:00:00"},
             {"post_class": "rest-of-world", "rate": "1.76", "sheet_count": 5, "start_date": "2024-01-02T00:00:00"},
+            # Rate in the far future
+            {"post_class": "first", "rate": "99.99", "sheet_count": 9, "start_date": "2099-09-09T09:09:09"},
         ]
 
     return mocker.patch("app.models.letter_rates.LetterRates._get_items", side_effect=_get_letter_rates)
