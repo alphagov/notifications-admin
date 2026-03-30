@@ -3339,9 +3339,7 @@ def webauthn_dev_server(notify_admin, mocker):
 @pytest.fixture(scope="function")
 def valid_token(notify_admin, fake_uuid):
     return generate_token(
-        json.dumps({"user_id": fake_uuid, "secret_code": "my secret"}),
-        notify_admin.config["SECRET_KEY"],
-        notify_admin.config["DANGEROUS_SALT"],
+        json.dumps({"user_id": fake_uuid, "secret_code": "my secret"}), notify_admin.config["SECRET_KEY"], "salt"
     )
 
 

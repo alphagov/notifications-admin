@@ -255,7 +255,7 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
     token = generate_token(
         payload=json.dumps({"user_id": api_user_active["id"], "email": "new_email@gov.uk"}),
         secret=notify_admin.config["SECRET_KEY"],
-        salt=notify_admin.config["DANGEROUS_SALT"],
+        salt="your_account_email_confirm",
     )
     client_request.get_url(
         url_for_endpoint_with_token(

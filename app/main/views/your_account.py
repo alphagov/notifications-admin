@@ -107,7 +107,7 @@ def your_account_email_confirm(token):
     token_data = check_token(
         token,
         current_app.config["SECRET_KEY"],
-        current_app.config["DANGEROUS_SALT"],
+        "your_account_email_confirm",
         current_app.config["EMAIL_EXPIRY_SECONDS"],
     )
     token = Token(token_data)

@@ -23,7 +23,7 @@ def new_password(token):
         token_data = check_token(
             token,
             current_app.config["SECRET_KEY"],
-            current_app.config["DANGEROUS_SALT"],
+            "new_password",
             current_app.config["EMAIL_EXPIRY_SECONDS"],
         )
     except SignatureExpired:

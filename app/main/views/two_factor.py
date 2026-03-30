@@ -43,7 +43,7 @@ def two_factor_email(token):
         token_data = check_token(
             token,
             current_app.config["SECRET_KEY"],
-            current_app.config["DANGEROUS_SALT"],
+            "two_factor_email",
             current_app.config["EMAIL_2FA_EXPIRY_SECONDS"],
         )
     except SignatureExpired:

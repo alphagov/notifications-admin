@@ -40,7 +40,7 @@ def verify_email(token):
         token_data = check_token(
             token,
             current_app.config["SECRET_KEY"],
-            current_app.config["DANGEROUS_SALT"],
+            "verify_email",
             current_app.config["EMAIL_EXPIRY_SECONDS"],
         )
     except SignatureExpired:
