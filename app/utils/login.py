@@ -23,9 +23,9 @@ def log_in_user(user_id):
         # the user will have a new current_session_id set by the API - store it in the cookie for future requests
         session["current_session_id"] = user.current_session_id
         # Check if coming from new password page
-        if "password" in session.get("user_details", {}):
+        if "new_password" in session.get("user_details", {}):
             try:
-                user.update_password(decrypt_new_password(session["user_details"]["password"]))
+                user.update_password(decrypt_new_password(session["user_details"]["new_password"]))
             except InvalidToken:
                 current_app.logger.warning(
                     "Error during new password decryption for user id %s",
@@ -33,6 +33,8 @@ def log_in_user(user_id):
                 )
                 flash("There was a problem with your password. Please try again.")
                 return redirect(url_for("main.sign_in"))
+        elif "password" in session.get("user_details", {}):
+            user.update_password(session["user_details"]["password"])
 
         user.activate()
         user.login()

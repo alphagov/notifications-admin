@@ -75,7 +75,8 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(
     mock_get_user_by_email_request_password_reset.assert_called_once_with(user["email_address"])
 
     with client_request.session_transaction() as session:
-        assert decrypt_new_password(session["user_details"]["password"]) == "a-new_password"
+        assert decrypt_new_password(session["user_details"]["new_password"]) == "a-new_password"
+        assert session["user_details"]["password"] == "a-new_password"
         assert session["user_details"]["id"] == user["id"]
         assert session["user_details"]["email"] == user["email_address"]
 

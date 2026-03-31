@@ -2,8 +2,8 @@ import logging
 from unittest.mock import PropertyMock
 
 import pytest
+from cryptography.fernet import Fernet
 from flask import url_for
-from pyrage import passphrase
 
 from app.utils.login import encrypt_new_password
 from tests.app.test_event_handlers import event_dict
@@ -203,7 +203,34 @@ def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
         session["user_details"] = {
             "id": api_user_active["id"],
             "email": api_user_active["email_address"],
-            "password": encrypt_new_password("changedpassword"),
+            "new_password": encrypt_new_password("changedpassword"),
+        }
+
+    client_request.post(
+        "main.two_factor_sms",
+        _data={"sms_code": "12345"},
+        _expected_redirect=url_for("main.show_accounts_or_dashboard"),
+    )
+
+    mock_update_user_password.assert_called_once_with(
+        api_user_active["id"],
+        "changedpassword",
+    )
+
+
+def test_two_factor_sms_should_set_password_when_new_password_exists_in_session_OLD_WAY(
+    client_request,
+    api_user_active,
+    mock_update_user_password,
+    mock_email_validated_recently,
+):
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
+        session["user_details"] = {
+            "id": api_user_active["id"],
+            "email": api_user_active["email_address"],
+            "password": "changedpassword",
         }
 
     client_request.post(
@@ -233,7 +260,7 @@ def test_two_factor_sms_should_return_error_if_new_password_not_encrypted(
         session["user_details"] = {
             "id": api_user_active["id"],
             "email": api_user_active["email_address"],
-            "password": new_password,
+            "new_password": new_password,
         }
     with caplog.at_level(logging.WARNING):
         page = client_request.post(
@@ -257,11 +284,13 @@ def test_two_factor_sms_should_return_error_if_new_password_encrypted_with_wrong
 ):
     client_request.logout()
 
+    wrong_key_fernet = Fernet(Fernet.generate_key())
+
     with client_request.session_transaction() as session:
         session["user_details"] = {
             "id": api_user_active["id"],
             "email": api_user_active["email_address"],
-            "password": passphrase.encrypt(b"changedpassword", "wrong-key"),
+            "new_password": wrong_key_fernet.encrypt(b"changedpassword"),
         }
     with caplog.at_level(logging.WARNING):
         page = client_request.post(
