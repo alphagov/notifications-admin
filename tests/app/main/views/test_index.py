@@ -382,7 +382,7 @@ def test_sms_price(
     expected_rate = "1.97"
     assert (
         normalize_spaces(home_page.select(".product-page-section")[4].select(".govuk-grid-column-one-half")[1].text)
-        == f"Text messages Up to 30,000 free text messages a year, then {expected_rate} pence per message"
+        == f"Text messages Up to 20,000 free text messages a year, then {expected_rate} pence per message"
     )
 
     assert f"A single, 160-character text message costs {expected_rate} pence (plus VAT)." in normalize_spaces(
