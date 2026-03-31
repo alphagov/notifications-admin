@@ -1,7 +1,7 @@
 from functools import wraps
 
+from cryptography.fernet import Fernet, InvalidToken
 from flask import current_app, flash, redirect, request, session, url_for
-from pyrage import DecryptError, passphrase
 
 from app.models.user import User
 
@@ -26,11 +26,10 @@ def log_in_user(user_id):
         if "password" in session.get("user_details", {}):
             try:
                 user.update_password(decrypt_new_password(session["user_details"]["password"]))
-            except (DecryptError, TypeError) as e:
+            except InvalidToken:
                 current_app.logger.warning(
-                    "Error during new password decryption for user id %s: %s",
+                    "Error during new password decryption for user id %s",
                     user_id,
-                    e,
                 )
                 flash("There was a problem with your password. Please try again.")
                 return redirect(url_for("main.sign_in"))
@@ -76,10 +75,10 @@ def is_safe_redirect_url(target):
 
 
 def encrypt_new_password(new_password: str) -> bytes:
-    return passphrase.encrypt(new_password.encode(encoding="utf-8"), current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"])
+    fernet = Fernet(current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"])
+    return fernet.encrypt(new_password.encode(encoding="utf-8"))
 
 
 def decrypt_new_password(new_password: bytes) -> str:
-    return (passphrase.decrypt(new_password, current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"])).decode(
-        encoding="utf-8"
-    )
+    fernet = Fernet(current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"])
+    return fernet.decrypt(new_password).decode(encoding="utf-8")
