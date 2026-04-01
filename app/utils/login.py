@@ -77,10 +77,10 @@ def is_safe_redirect_url(target):
 
 
 def encrypt_new_password(new_password: str) -> bytes:
-    fernet = Fernet(current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"])
+    fernet = Fernet(current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"].encode("utf-8"))
     return fernet.encrypt(new_password.encode(encoding="utf-8"))
 
 
 def decrypt_new_password(new_password: bytes) -> str:
-    fernet = Fernet(current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"])
+    fernet = Fernet(current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"].encode("utf-8"))
     return fernet.decrypt(new_password).decode(encoding="utf-8")

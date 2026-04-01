@@ -128,7 +128,7 @@ class Development(Config):
     DANGEROUS_SALT = "dev-notify-salt"
     SECRET_KEY = "dev-notify-secret-key"
     # Fernet key must be 32 url-safe base64-encoded bytes:
-    NEW_PASSWORD_ENCRYPTION_KEY = b"vGUd-3kOibOKqJVMIdfLPOXB4OmSbzRRHr8832ItpzM="
+    NEW_PASSWORD_ENCRYPTION_KEY = "vGUd-3kOibOKqJVMIdfLPOXB4OmSbzRRHr8832ItpzM="
 
     API_HOST_NAME = os.environ.get("API_HOST_NAME", "http://localhost:6011")
     ANTIVIRUS_API_HOST = os.environ.get("ANTIVIRUS_API_HOST", "http://localhost:6016")
