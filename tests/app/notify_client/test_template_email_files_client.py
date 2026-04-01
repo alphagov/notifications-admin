@@ -34,8 +34,6 @@ def test_create_file_calls_endpoint_with_correct_data(mocker, data):
     data["id"] = data.pop("file_id")
     if "validate_users_email" not in data.keys():
         data["validate_users_email"] = True
-    if "pending" not in data.keys():
-        data["pending"] = True
     mock_post.assert_called_once_with(expected_url, data=data)
 
 
