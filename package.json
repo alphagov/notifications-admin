@@ -67,9 +67,7 @@
     "testEnvironmentOptions": {
       "url": "https://www.notifications.service.gov.uk"
     },
-    "transform": {
-      "^.+\\mjs$": "babel-jest"
-    },
+    "transform": {},
     "testMatch": [
       "<rootDir>/**/?(*.)(test).{js,mjs}"
     ],
