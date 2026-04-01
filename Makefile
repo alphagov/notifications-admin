@@ -9,6 +9,8 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD 2> /dev/null || echo "")
 
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 
+EXCLUDE_REQUIREMENTS_NEWER_THAN_DAYS ?= 30
+
 ## DEVELOPMENT
 
 .PHONY: bootstrap
@@ -69,7 +71,7 @@ fix-imports: ## Fix imports using ruff
 
 .PHONY: refreeze-requirements
 refreeze-requirements: ## Update unpinned requirements
-	EXTRA_UV_PIP_COMPILE_FLAGS="--upgrade --exclude-newer 30d" make freeze-requirements
+	EXTRA_UV_PIP_COMPILE_FLAGS="--upgrade --exclude-newer $(EXCLUDE_REQUIREMENTS_NEWER_THAN_DAYS)d" make freeze-requirements
 
 .PHONY: freeze-requirements
 freeze-requirements: ## create static requirements.txt
