@@ -6,7 +6,8 @@
     "node": ">=10.15.3"
   },
   "scripts": {
-    "test": "npm run lint:scss && npm run lint:js && node --experimental-vm-modules node_modules/.bin/jest tests/javascripts",
+    "test": "npm run lint:scss && npm run lint:js && npm run test:js tests/javascripts",
+    "test:js": "node --experimental-vm-modules node_modules/.bin/jest",
     "test-watch": "jest --watch tests/javascripts",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand $npm_config_test",
     "build": "npm run clean && rollup -c",

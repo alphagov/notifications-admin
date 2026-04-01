@@ -85,10 +85,10 @@ make bootstrap
 make test
 
 # run the js tests
-npx jest
+npm test:js
 
 # run a single js test
-npx jest <pathToAJavascriptTestfile>
+npm run test:js -- <pathToAJavascriptTestfile>
 
 # continuously run js tests
 npm run test-watch
