@@ -4,7 +4,8 @@ from unittest.mock import ANY, Mock, call
 import pytest
 from flask import url_for
 from notifications_python_client.errors import HTTPError
-from notifications_utils.testing.comparisons import AnyStringMatching
+from notifications_utils.testing.comparisons import AnyInstanceOf, AnyStringMatching
+from werkzeug.datastructures import FileStorage
 
 from tests import UUID4_REGEX_PATTERN
 from tests.conftest import (
@@ -602,7 +603,13 @@ def test_create_file_redirects_to_manage_files_page(
             _data={"file": file},
             _follow_redirects=True,
         )
-        assert mock_create_file.call_args[1]["pending"]  # check the created file is set to pending
+    assert mock_create_file.call_args_list == [
+        call(
+            filename="tests/test_pdf_files/one_page_pdf.pdf",
+            file_contents=AnyInstanceOf(FileStorage),
+            template_id=fake_uuid,
+        ),
+    ]
     assert normalize_spaces(page.select_one("form .govuk-button")) == "Add to template"
     assert page.select_one("form").get("method") == "post"
     assert (
@@ -1014,7 +1021,6 @@ def test_upload_file_does_not_update_template_content(
                 "created_by_id": AnyStringMatching(UUID4_REGEX_PATTERN),
                 "retention_period": 78,
                 "validate_users_email": True,
-                "pending": True,
             },
         ),
     ]

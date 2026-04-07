@@ -30,7 +30,7 @@ class TemplateEmailFile(JSONModel):
     __sort_attribute__ = "filename"
 
     @staticmethod
-    def create(*, filename, file_contents, template_id, pending=True):
+    def create(*, filename, file_contents, template_id):
         from app import current_service, current_user, template_email_file_client
 
         file_id = uuid.uuid4()
