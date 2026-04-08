@@ -20,7 +20,7 @@
 
    {% set files = [] %}
     {%  if template.email_files %}
-    {% for item in template.email_files %}
+    {% for item in template.email_files | sort %}
       {% do files.append(
         {
           "key": {
