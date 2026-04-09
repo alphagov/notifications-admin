@@ -7,6 +7,7 @@ from freezegun import freeze_time
 from itsdangerous import SignatureExpired
 from notifications_utils.url_safe_token import generate_token
 
+from app.utils.login import decrypt_new_password
 from tests.conftest import SERVICE_ONE_ID, url_for_endpoint_with_token
 
 
@@ -72,6 +73,12 @@ def test_should_redirect_to_two_factor_when_password_reset_is_successful(
         _expected_redirect=url_for(".two_factor_sms", next=redirect_url),
     )
     mock_get_user_by_email_request_password_reset.assert_called_once_with(user["email_address"])
+
+    with client_request.session_transaction() as session:
+        assert decrypt_new_password(session["user_details"]["new_password"]) == "a-new_password"
+        assert session["user_details"]["password"] == "a-new_password"
+        assert session["user_details"]["id"] == user["id"]
+        assert session["user_details"]["email"] == user["email_address"]
 
 
 @pytest.mark.parametrize(
