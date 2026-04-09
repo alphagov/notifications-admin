@@ -2735,6 +2735,81 @@ def test_post_copy_template(
     ]
 
 
+def test_post_copy_template_with_file(
+    client_request,
+    active_user_with_permissions,
+    mock_get_service,
+    multiple_sms_senders,
+    mock_get_service_email_template_with_file,
+    mock_get_service_templates,
+    mock_get_organisations_and_services_for_user,
+    fake_uuid,
+    mock_create_service_template,
+    mocker,
+):
+    active_user_with_permissions["services"].append(SERVICE_TWO_ID)
+    active_user_with_permissions["permissions"][SERVICE_TWO_ID] = active_user_with_permissions["permissions"][
+        SERVICE_ONE_ID
+    ]
+    s3_upload_mock = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
+    s3_download_mock = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3download")
+    template_email_file_client_create_file_mock = mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.create_file"
+    )
+    template_email_file_client_update_file_mock = mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.update_file"
+    )
+    mocker.patch("uuid.uuid4", return_value=fake_uuid)
+    client_request.post(
+        "main.copy_template",
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+        template_id=TEMPLATE_ONE_ID,
+        _data={
+            "service": SERVICE_ONE_ID,
+            "name": "Two week reminder (copy)",
+        },
+        _expected_status=302,
+    )
+    assert mock_create_service_template.call_args_list == [
+        mocker.call(
+            name="Two week reminder (copy)",
+            type_="email",
+            service_id=SERVICE_ONE_ID,
+            parent_folder_id=None,
+            subject="Your ((thing)) is due soon",
+            content="Your vehicle tax expires on ((date)). Please click the file ((example.pdf))",
+            letter_languages=None,
+            letter_welsh_subject=None,
+            letter_welsh_content=None,
+            has_unsubscribe_link=None,
+        )
+    ]
+    assert template_email_file_client_create_file_mock.call_args_list == [
+        mocker.call(
+            file_id=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            filename="example.pdf",
+            created_by_id=active_user_with_permissions["id"],
+        )
+    ]
+    assert template_email_file_client_update_file_mock.call_args_list == [
+        mocker.call(
+            file_id=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            pending=False,
+            link_text="example file",
+            retention_period=12,
+            validate_users_email=True,
+        )
+    ]
+
+    s3_upload_mock.assert_called_once()
+    s3_download_mock.assert_called_once()
+
+
 def test_post_copy_template_into_folder(
     client_request,
     active_user_with_permissions,
