@@ -17,6 +17,7 @@ from app.models.service import Service
 from tests import (
     NotifyBeautifulSoup,
     sample_uuid,
+    service_json,
     template_json,
     template_version_json,
     validate_route_permission,
@@ -2838,6 +2839,124 @@ def test_post_copy_template(
             has_unsubscribe_link=None,
         )
     ]
+
+
+def test_post_copy_template_with_email_files_without_contact_link_redirects(
+    client_request,
+    active_user_with_permissions,
+    mock_get_service,
+    multiple_sms_senders,
+    mock_get_service_email_template_with_file,
+    mock_get_service_templates,
+    mock_get_organisations_and_services_for_user,
+    mock_create_service_template,
+    mock_get_no_api_keys,
+    mock_s3_download,
+    mocker,
+):
+    active_user_with_permissions["services"].append(SERVICE_TWO_ID)
+    active_user_with_permissions["permissions"][SERVICE_TWO_ID] = active_user_with_permissions["permissions"][
+        SERVICE_ONE_ID
+    ]
+    page = client_request.post(
+        "main.copy_template",
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID,
+        template_id=TEMPLATE_ONE_ID,
+        _data={
+            "service": SERVICE_ONE_ID,
+            "name": "Two week reminder (copy)",
+        },
+        _expected_status=200,
+        _follow_redirects=True,
+    )
+    assert not mock_create_service_template.call_args_list
+    assert (
+        normalize_spaces(page.select_one(".banner-dangerous"))
+        == "You need to add contact details for your service. Add contact details for your service"
+    )
+    assert normalize_spaces(page.select_one(".heading-large")) == "Choose an existing template to copy"
+
+
+@pytest.mark.parametrize("copy_to_different_service", [True, False])
+def test_post_copy_template_with_file(
+    client_request,
+    active_user_with_permissions,
+    mock_get_service,
+    multiple_sms_senders,
+    mock_get_service_email_template_with_file,
+    mock_get_service_templates,
+    mock_get_organisations_and_services_for_user,
+    fake_uuid,
+    mock_create_service_template,
+    mocker,
+    copy_to_different_service,
+):
+    active_user_with_permissions["services"].append(SERVICE_TWO_ID)
+    active_user_with_permissions["permissions"][SERVICE_TWO_ID] = active_user_with_permissions["permissions"][
+        SERVICE_ONE_ID
+    ]
+    mocker.patch(
+        "app.service_api_client.get_service",
+        side_effect=lambda service_id: {"data": service_json(service_id, contact_link="https://example.com")},
+    )
+    s3_upload_mock = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
+    s3_download_mock = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3download")
+    template_email_file_client_create_file_mock = mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.create_file"
+    )
+    template_email_file_client_update_file_mock = mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.update_file"
+    )
+    mocker.patch("uuid.uuid4", return_value=fake_uuid)
+    client_request.post(
+        "main.copy_template",
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_TWO_ID if copy_to_different_service else SERVICE_ONE_ID,
+        template_id=TEMPLATE_ONE_ID,
+        _data={
+            "service": SERVICE_ONE_ID,
+            "name": "Two week reminder (copy)",
+        },
+        _expected_status=302,
+    )
+    assert mock_create_service_template.call_args_list == [
+        mocker.call(
+            name="Two week reminder (copy)",
+            type_="email",
+            service_id=SERVICE_ONE_ID,
+            parent_folder_id=None,
+            subject="Your ((thing)) is due soon",
+            content="Your vehicle tax expires on ((date)). Please click the file ((example.pdf))",
+            letter_languages=None,
+            letter_welsh_subject=None,
+            letter_welsh_content=None,
+            has_unsubscribe_link=None,
+        )
+    ]
+    assert template_email_file_client_create_file_mock.call_args_list == [
+        mocker.call(
+            file_id=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            filename="example.pdf",
+            created_by_id=active_user_with_permissions["id"],
+        )
+    ]
+    assert template_email_file_client_update_file_mock.call_args_list == [
+        mocker.call(
+            file_id=fake_uuid,
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            pending=False,
+            link_text="example file",
+            retention_period=12,
+            validate_users_email=True,
+        )
+    ]
+
+    s3_upload_mock.assert_called_once()
+    s3_download_mock.assert_called_once()
 
 
 def test_post_copy_template_into_folder(
