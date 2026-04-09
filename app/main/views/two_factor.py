@@ -45,6 +45,7 @@ def two_factor_email(token):
             current_app.config["SECRET_KEY"],
             current_app.config["DANGEROUS_SALT"],
             current_app.config["EMAIL_2FA_EXPIRY_SECONDS"],
+            current_app.config["TOKEN_SECRET_KEY"],
         )
     except SignatureExpired:
         return render_template("views/email-link-invalid.html", redirect_url=redirect_url)

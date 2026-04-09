@@ -109,6 +109,7 @@ def your_account_email_confirm(token):
         current_app.config["SECRET_KEY"],
         current_app.config["DANGEROUS_SALT"],
         current_app.config["EMAIL_EXPIRY_SECONDS"],
+        current_app.config["TOKEN_SECRET_KEY"],
     )
     token = Token(token_data)
     user = User.from_id(token.user_id)

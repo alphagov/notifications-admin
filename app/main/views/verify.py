@@ -42,6 +42,7 @@ def verify_email(token):
             current_app.config["SECRET_KEY"],
             current_app.config["DANGEROUS_SALT"],
             current_app.config["EMAIL_EXPIRY_SECONDS"],
+            current_app.config["TOKEN_SECRET_KEY"],
         )
     except SignatureExpired:
         flash("The link in the email we sent you has expired. We’ve sent you a new one.")
