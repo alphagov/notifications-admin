@@ -1,6 +1,7 @@
 from functools import wraps
 
-from flask import redirect, request, session, url_for
+from cryptography.fernet import Fernet, InvalidToken
+from flask import current_app, flash, redirect, request, session, url_for
 
 from app.models.user import User
 
@@ -22,8 +23,19 @@ def log_in_user(user_id):
         # the user will have a new current_session_id set by the API - store it in the cookie for future requests
         session["current_session_id"] = user.current_session_id
         # Check if coming from new password page
-        if "password" in session.get("user_details", {}):
+        if "new_password" in session.get("user_details", {}):
+            try:
+                user.update_password(decrypt_new_password(session["user_details"]["new_password"]))
+            except InvalidToken:
+                current_app.logger.warning(
+                    "Error during new password decryption for user id %s",
+                    user_id,
+                )
+                flash("There was a problem with your password. Please try again.")
+                return redirect(url_for("main.sign_in"))
+        elif "password" in session.get("user_details", {}):
             user.update_password(session["user_details"]["password"])
+
         user.activate()
         user.login()
     finally:
@@ -62,3 +74,13 @@ def is_safe_redirect_url(target):
     host_url = urlparse(request.host_url)
     redirect_url = urlparse(urljoin(request.host_url, target))
     return redirect_url.scheme in ("http", "https") and host_url.netloc == redirect_url.netloc
+
+
+def encrypt_new_password(new_password: str) -> bytes:
+    fernet = Fernet(current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"].encode("utf-8"))
+    return fernet.encrypt(new_password.encode(encoding="utf-8"))
+
+
+def decrypt_new_password(new_password: bytes) -> str:
+    fernet = Fernet(current_app.config["NEW_PASSWORD_ENCRYPTION_KEY"].encode("utf-8"))
+    return fernet.decrypt(new_password).decode(encoding="utf-8")
