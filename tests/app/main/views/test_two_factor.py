@@ -218,33 +218,6 @@ def test_two_factor_sms_should_set_password_when_new_password_exists_in_session(
     )
 
 
-def test_two_factor_sms_should_set_password_when_new_password_exists_in_session_OLD_WAY(
-    client_request,
-    api_user_active,
-    mock_update_user_password,
-    mock_email_validated_recently,
-):
-    client_request.logout()
-
-    with client_request.session_transaction() as session:
-        session["user_details"] = {
-            "id": api_user_active["id"],
-            "email": api_user_active["email_address"],
-            "password": "changedpassword",
-        }
-
-    client_request.post(
-        "main.two_factor_sms",
-        _data={"sms_code": "12345"},
-        _expected_redirect=url_for("main.show_accounts_or_dashboard"),
-    )
-
-    mock_update_user_password.assert_called_once_with(
-        api_user_active["id"],
-        "changedpassword",
-    )
-
-
 @pytest.mark.parametrize("new_password", ["just-a-string", b"bytes-string"])
 def test_two_factor_sms_should_return_error_if_new_password_not_encrypted(
     client_request,
