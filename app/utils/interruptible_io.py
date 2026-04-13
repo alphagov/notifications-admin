@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from io import RawIOBase
 from time import sleep
 from zipfile import ZipFile
@@ -101,3 +102,19 @@ class InterruptibleIOZipFile(ZipFile):
 
     def open(self, *args, **kwargs) -> RawIOBase:
         return InterruptibleRawIOWrapper(super().open(*args, **kwargs), read_limit=8_192)
+
+
+def interruptible_iter[T](it: Iterable[T], interruptible_every: int) -> Iterable[T]:
+    """
+    Given an iterable `it`, will yield its contents, calling sleep(0) before yielding each
+    `interruptible_every`'th iteration.
+    """
+    i = 0
+    for item in it:
+        if i >= interruptible_every:
+            sleep(0)
+            i = 0
+
+        yield item
+
+        i += 1
