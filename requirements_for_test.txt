@@ -52,6 +52,7 @@ cryptography==44.0.3
     #   -r requirements.txt
     #   fido2
     #   moto
+    #   notifications-utils
 dnspython==2.8.0
     # via
     #   -r requirements.txt
@@ -162,7 +163,7 @@ moto==5.1.21
     # via -r requirements_for_test.in
 notifications-python-client==10.0.0
     # via -r requirements.txt
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@38f6a108f6bab59de8ec5d1bb89f813cc1f2ef52
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@e4fa60ffd42a92d3d7526133d218442a09e18c0c
     # via -r requirements.txt
 openpyxl==3.1.5
     # via -r requirements.txt

@@ -28,7 +28,9 @@ charset-normalizer==3.4.4
 click==8.3.1
     # via flask
 cryptography==44.0.3
-    # via fido2
+    # via
+    #   fido2
+    #   notifications-utils
 dnspython==2.8.0
     # via eventlet
 docopt==0.6.2
@@ -100,7 +102,7 @@ mistune==0.8.4
     # via notifications-utils
 notifications-python-client==10.0.0
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@38f6a108f6bab59de8ec5d1bb89f813cc1f2ef52
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@e4fa60ffd42a92d3d7526133d218442a09e18c0c
     # via -r requirements.in
 openpyxl==3.1.5
     # via -r requirements.in
