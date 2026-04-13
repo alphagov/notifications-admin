@@ -20,9 +20,19 @@
     }
   ) }}
 
-  {% set date_new_letter_rates_go_live = "YYYY-MM-DD" %}
+  {% set date_new_letter_rates_go_live = "2026-05-03" %}
   {% if letter_rates.last_updated | format_date_numeric < date_new_letter_rates_go_live %}
-    {# Insert a notice about the new letter rates here #}
+    <div class="govuk-inset-text">
+      <p class="govuk-body">
+        Royal Mail is increasing its rates.
+      </p>
+      <p class="govuk-body">
+        On 3 May 2026, international letters will go up by between 6 and 8 pence (not including VAT).
+      </p>
+      <p class="govuk-body">
+        The exact difference will depend on the number of pages in your letter.
+      </p>
+    </div>
   {% endif %}
 
   <p class="govuk-body">The cost of sending a letter depends on the postage you choose and how many sheets of paper you need.</p>
