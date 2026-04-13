@@ -17,7 +17,7 @@ notifications-python-client==10.0.0
 fido2~=1.1
 
 # Run `make bump-utils` to update to the latest version
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@113.5.0
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@113.5.1
 
 govuk-frontend-jinja==4.0.0
 
