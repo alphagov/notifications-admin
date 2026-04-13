@@ -203,7 +203,10 @@ def test_manage_a_template_email_file(
     rows = page.select("dl .govuk-summary-list__row:not(.govuk-visually-hidden)")
     assert [normalize_spaces(row.get_text(separator=" ", strip=True)) for row in rows] == [
         "Link text Not set Change link text for the file",
-        "Available for 90 weeks after sending Change how long the file should be available once it's sent",
+        (
+            "Available for 90 weeks after sending (about 1 year, 9 months) "
+            "Change how long the file should be available once it's sent"
+        ),
         "Ask recipient for email address No Change if recipient should be asked for email address",
     ]
     delete_link = page.select_one("a.govuk-link.govuk-link--destructive")
@@ -1019,7 +1022,7 @@ def test_upload_file_does_not_update_template_content(
                 "id": AnyStringMatching(UUID4_REGEX_PATTERN),
                 "filename": "tests/test_pdf_files/one_page_pdf.pdf",
                 "created_by_id": AnyStringMatching(UUID4_REGEX_PATTERN),
-                "retention_period": 78,
+                "retention_period": 26,
                 "validate_users_email": True,
             },
         ),

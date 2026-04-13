@@ -484,3 +484,15 @@ def format_provider(provider):
         return provider.title()
 
     return provider.upper()
+
+
+def format_retention_period(weeks):
+    if weeks == 1:
+        return "1 week after sending"
+    if weeks < 9:
+        return f"{weeks} weeks after sending"
+    delta = humanize.naturaltime(timedelta(weeks=weeks)).replace(" ago", "")
+    return Markup(f"""
+        {weeks} weeks after sending<br>
+        <span class='govuk-hint'>(about {delta})</span>
+    """)
