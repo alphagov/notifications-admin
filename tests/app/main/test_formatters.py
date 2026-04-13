@@ -10,9 +10,12 @@ from app.formatters import (
     format_notification_status_as_url,
     format_pennies_as_currency,
     format_pounds_as_currency,
+    format_retention_period,
     message_finished_processing_notification,
     sentence_case,
 )
+from tests import NotifyBeautifulSoup
+from tests.conftest import normalize_spaces
 
 
 @pytest.mark.parametrize(
@@ -167,3 +170,23 @@ def test_sentence_case(sentence, sentence_case_sentence):
 def test_message_finished_processing_notification(processing_started, data_retention_period, expected_message):
     message = message_finished_processing_notification(processing_started, data_retention_period)
     assert message == expected_message
+
+
+@pytest.mark.parametrize(
+    "weeks, expected, expected_hint",
+    (
+        (1, "1 week after sending", None),
+        (2, "2 weeks after sending", None),
+        (8, "8 weeks after sending", None),
+        (9, "9 weeks after sending (about 2 months)", "(about 2 months)"),
+        (26, "26 weeks after sending (about 6 months)", "(about 6 months)"),  # Default for new files
+        (52, "52 weeks after sending (about a year)", "(about a year)"),
+        (78, "78 weeks after sending (about 1 year, 6 months)", "(about 1 year, 6 months)"),  # Maximum
+    ),
+)
+def test_format_retention_period(weeks, expected, expected_hint):
+    snippet = NotifyBeautifulSoup(format_retention_period(weeks))
+    assert normalize_spaces(snippet) == expected
+
+    hint = snippet.select_one(".govuk-hint")
+    assert normalize_spaces(hint) == expected_hint
