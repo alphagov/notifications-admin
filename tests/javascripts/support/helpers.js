@@ -1,4 +1,3 @@
-const globals = require('./helpers/globals.js');
 const events = require('./helpers/events.js');
 const domInterfaces = require('./helpers/dom_interfaces.js');
 const cookies = require('./helpers/cookies.js');
@@ -7,7 +6,6 @@ const elements = require('./helpers/elements.js');
 const rendering = require('./helpers/rendering.js');
 const utilities = require('./helpers/utilities.js');
 
-exports.LocationMock = globals.LocationMock;
 exports.triggerEvent = events.triggerEvent;
 exports.clickElementWithMouse = events.clickElementWithMouse;
 exports.moveSelectionToRadio = events.moveSelectionToRadio;

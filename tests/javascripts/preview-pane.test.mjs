@@ -7,23 +7,10 @@ const emailPreviewConfirmationURL = '/services/6658542f-0cad-491f-bec8-ab8457700
 const letterPageURL = '/services/6658542f-0cad-491f-bec8-ab8457700ead/service-settings/set-letter-branding';
 const letterPreviewConfirmationURL = '/services/6658542f-0cad-491f-bec8-ab8457700ead/service-settings/preview-letter-branding';
 
-let locationMock;
-
 beforeAll(() => {
-
-  // mock calls to window.location
-  locationMock = new helpers.LocationMock();
-
   // default to the email page, the pathname can be changed inside specific tests
-  window.location.pathname = emailPageURL;
+  history.replaceState(history.state, null, emailPageURL);
   document.body.classList.add('govuk-frontend-supported');
-
-});
-
-afterAll(() => {
-
-  // reset window.location to its original state
-  locationMock.reset();
 
 });
 
@@ -169,7 +156,7 @@ describe('Preview pane', () => {
     beforeEach(() => {
 
       // set page URL and page type to 'letter'
-      window.location.pathname = letterPreviewConfirmationURL;
+      history.replaceState(history.state, null, letterPreviewConfirmationURL);
       form.setAttribute('data-preview-type', 'letter');
 
     });

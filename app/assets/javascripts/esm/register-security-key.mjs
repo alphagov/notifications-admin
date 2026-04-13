@@ -1,5 +1,6 @@
 import { isSupported } from 'govuk-frontend';
 import ErrorBanner from './error-banner.mjs';
+import { locationReload } from '../utils/location.mjs';
 
 class RegisterSecurityKey {
   constructor($module) {
@@ -56,7 +57,7 @@ class RegisterSecurityKey {
     if (!response.ok) {
       throw Error(response.statusText);
     }
-    window.location.reload();
+    locationReload();
   }
 
   handleError(error) {

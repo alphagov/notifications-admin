@@ -6,6 +6,10 @@
   var defaultInterval = 2000;
   var intervals = {};
 
+  global.GOVUK.utils = global.GOVUK.utils || {
+    locationReload: () => window.location.reload()
+  };
+
   var calculateBackoff = responseTime => parseInt(Math.max(
       (250 * Math.sqrt(responseTime)) - 1000,
       1000
@@ -71,7 +75,7 @@
           window.clearTimeout(timeout); // stop polling
           clearQueue(queue);
           if (response.status === 401) {
-            window.location.reload();
+            global.GOVUK.utils.locationReload();
           }
         }
       );

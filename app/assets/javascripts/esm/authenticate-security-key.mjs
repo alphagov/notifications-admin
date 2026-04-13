@@ -1,5 +1,6 @@
 import { isSupported } from 'govuk-frontend';
 import ErrorBanner from './error-banner.mjs';
+import { locationAssign } from '../utils/location.mjs';
 
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
 // that uses ES 015 Classes -
@@ -87,7 +88,7 @@ class AuthenticateSecurityKey {
     const data = window.CBOR.decode(cbor);
 
     // Redirect the user on successful authentication
-    window.location.assign(data.redirect_url);
+    locationAssign(data.redirect_url);
   }
 
   handleError(error) {

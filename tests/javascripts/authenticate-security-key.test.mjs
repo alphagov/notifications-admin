@@ -1,17 +1,25 @@
-import AuthenticateSecurityKey from '../../app/assets/javascripts/esm/authenticate-security-key.mjs';
-import ErrorBanner from '../../app/assets/javascripts/esm/error-banner.mjs';
-import * as helpers from './support/helpers.js';
 import { jest } from '@jest/globals';
+import ErrorBanner from '../../app/assets/javascripts/esm/error-banner.mjs';
+
+jest.unstable_mockModule('../../app/assets/javascripts/utils/location.mjs', () => ({
+  locationAssign: jest.fn()
+}));
+
+let AuthenticateSecurityKey;
+let locationAssign;
 
 beforeAll( async() => {
   const CBOR = await import('../../node_modules/cbor-js/cbor.js');
+  const authenticateSecurityKeyModule = await import('../../app/assets/javascripts/esm/authenticate-security-key.mjs');
+  const locationUtilModule = await import('../../app/assets/javascripts/utils/location.mjs');
+
+  AuthenticateSecurityKey = authenticateSecurityKeyModule.default;
+  locationAssign = locationUtilModule.locationAssign;
   window.CBOR = CBOR.default || CBOR;
 })
 
 describe('Authenticate with security key', () => {
   let button;
-  let mockAuthLocation;
-  let mockWindowLocation;
   let mockClickEvent;
   let mockFetch;
   let mockWebauthnOptions;
@@ -34,12 +42,7 @@ describe('Authenticate with security key', () => {
     type: "public-key",
   };
 
-  beforeAll(() => {
-    mockAuthLocation = new helpers.LocationMock('http://localhost:6012/webauth/authenticate');
-  });
-
   afterAll(() => {
-    mockAuthLocation.reset();
     jest.restoreAllMocks();
   });
 
@@ -47,6 +50,9 @@ describe('Authenticate with security key', () => {
     // disable console.error() so we don't see it in test output
     // you might need to comment this out to debug some failures
     console.error = jest.fn();
+
+    // clear the window.location mock
+    locationAssign.mockClear();
 
     document.body.classList.add('govuk-frontend-supported');
     document.body.innerHTML = `
@@ -67,11 +73,6 @@ describe('Authenticate with security key', () => {
 
     // mock WebAuthn browser API
     window.navigator.credentials = mockBrowserCredentials;
-
-    // mock the window location object
-    mockWindowLocation = new helpers.LocationMock();
-    window.location = mockWindowLocation;
-    mockWindowLocation.assign = jest.fn();
 
     mockWebauthnOptions = window.CBOR.encode('someArbitraryOptions');
     mockLoginResponse = window.CBOR.encode({ redirect_url: '/foo' });
@@ -119,12 +120,13 @@ describe('Authenticate with security key', () => {
     expect(decodedData.clientDataJSON).toEqual(new Uint8Array([4, 4, 4]))
  
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(mockWindowLocation.assign).toHaveBeenCalledWith('/foo');
+    expect(locationAssign).toHaveBeenCalledWith('/foo');
     expect(ErrorBanner.prototype.showBanner).not.toHaveBeenCalled();
   });
 
   it('authenticates and passes a redirect url through to the authenticate admin endpoint', async() => {
-    window.location.search = '?next=%2Ffoo%3Fbar%3Dbaz';
+
+    history.pushState({}, '', '/webauth/authenticate?next=%2Ffoo%3Fbar%3Dbaz');
 
     // mock fetch auth
      mockFetch.mockResolvedValueOnce({
@@ -154,7 +156,7 @@ describe('Authenticate with security key', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockBrowserCredentials.get.mock.calls[0][0]).toEqual('someArbitraryOptions');
-    expect(mockWindowLocation.assign).toHaveBeenCalledWith('/foo');
+    expect(locationAssign).toHaveBeenCalledWith('/foo');
     expect(ErrorBanner.prototype.showBanner).not.toHaveBeenCalled();
     expect(mockFetch.mock.calls[1][0].toString()).toEqual(
       'https://www.notifications.service.gov.uk/webauthn/authenticate?next=%2Ffoo%3Fbar%3Dbaz'
@@ -178,7 +180,7 @@ describe('Authenticate with security key', () => {
     await authenticateKeyInstance.authenticateKey(mockClickEvent);
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockWindowLocation.assign).not.toHaveBeenCalled();
+    expect(locationAssign).not.toHaveBeenCalled();
     expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 
@@ -221,7 +223,7 @@ describe('Authenticate with security key', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockBrowserCredentials.get.mock.calls[0][0]).toEqual('someArbitraryOptions');
-    expect(mockWindowLocation.assign).not.toHaveBeenCalled();
+    expect(locationAssign).not.toHaveBeenCalled();
     expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 
@@ -246,7 +248,7 @@ describe('Authenticate with security key', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
     expect(mockBrowserCredentials.get.mock.calls[0][0]).toEqual('someArbitraryOptions');
-    expect(mockWindowLocation.assign).not.toHaveBeenCalledWith();
+    expect(locationAssign).not.toHaveBeenCalledWith();
     expect(ErrorBanner.prototype.showBanner).toHaveBeenCalled();
   });
 });
