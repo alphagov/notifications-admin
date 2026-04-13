@@ -14,7 +14,7 @@
   <div id="template-list" class="{{ 'govuk-!-margin-top-1' if (not show_template_nav and not show_search_box) else 'govuk-!-margin-top-6' }}">
     {% set checkboxes_data = [] %}
 
-    {% for item in template_list %}
+    {% for item in template_list.interruptible_iter %}
       {% set item_num = loop.index %}
       {% set item_link_content %}
         {% for ancestor in item.ancestors %}

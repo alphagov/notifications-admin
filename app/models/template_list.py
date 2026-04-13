@@ -1,6 +1,7 @@
 from werkzeug.utils import cached_property
 
 from app import format_notification_type
+from app.utils import interruptible_io
 
 
 class TemplateList:
@@ -22,6 +23,8 @@ class TemplateList:
     comments on those classes for more details.
     """
 
+    INTERRUPTIBLE_ITER_INTERRUPTIBLE_EVERY = 32
+
     def __init__(
         self,
         *,
@@ -35,6 +38,10 @@ class TemplateList:
 
     def __iter__(self):
         yield from self.items
+
+    @property
+    def interruptible_iter(self):
+        return interruptible_io.interruptible_iter(self, self.INTERRUPTIBLE_ITER_INTERRUPTIBLE_EVERY)
 
     @cached_property
     def items(self):
