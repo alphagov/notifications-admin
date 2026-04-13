@@ -1019,7 +1019,7 @@ def test_upload_file_does_not_update_template_content(
                 "id": AnyStringMatching(UUID4_REGEX_PATTERN),
                 "filename": "tests/test_pdf_files/one_page_pdf.pdf",
                 "created_by_id": AnyStringMatching(UUID4_REGEX_PATTERN),
-                "retention_period": 78,
+                "retention_period": 26,
                 "validate_users_email": True,
             },
         ),
