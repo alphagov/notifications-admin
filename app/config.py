@@ -157,6 +157,8 @@ class Test(Development):
     ANTIVIRUS_API_HOST = "https://test-antivirus"
     ANTIVIRUS_API_KEY = "test-antivirus-secret"
     ANTIVIRUS_ENABLED = True
+    REDIS_ENABLED = False
+    ZENDESK_API_KEY = "test"
 
     ASSET_DOMAIN = "static.example.com"
     ASSET_PATH = "https://static.example.com/"
