@@ -130,18 +130,20 @@ def render_govuk_frontend_macro(component, params):
         },
     }
 
-    # we need to duplicate all curly braces to escape them from the f string so jinja still sees them
-    template_string = f"""
-        {{%- from '{govuk_frontend_components[component]["path"]}'
-        import {govuk_frontend_components[component]["macro"]} -%}}
-
-        {{{{ {govuk_frontend_components[component]["macro"]}(params) }}}}
-    """
-    template = compile_govuk_frontend_macro(template_string)
+    template = compile_govuk_frontend_macro(
+        govuk_frontend_components[component]["path"],
+        govuk_frontend_components[component]["macro"],
+    )
 
     return Markup(templating._render(current_app, template, {"params": params}))
 
 
 @cache
-def compile_govuk_frontend_macro(template_string):
+def compile_govuk_frontend_macro(path, macro):
+    # we need to duplicate all curly braces to escape them from the f string so jinja still sees them
+    template_string = f"""
+        {{%- from '{path}' import {macro} -%}}
+
+        {{{{ {macro}(params) }}}}
+    """
     return current_app.jinja_env.from_string(template_string)
