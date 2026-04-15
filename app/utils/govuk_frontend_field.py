@@ -1,7 +1,8 @@
 import copy
 from abc import ABC, abstractmethod
+from functools import cache
 
-from flask import render_template_string
+from flask import current_app, templating
 from markupsafe import Markup
 
 from app.utils import merge_jsonlike
@@ -136,5 +137,11 @@ def render_govuk_frontend_macro(component, params):
 
         {{{{ {govuk_frontend_components[component]["macro"]}(params) }}}}
     """
+    template = compile_govuk_frontend_macro(template_string)
 
-    return Markup(render_template_string(template_string, params=params))
+    return Markup(templating._render(current_app, template, {"params": params}))
+
+
+@cache
+def compile_govuk_frontend_macro(template_string):
+    return current_app.jinja_env.from_string(template_string)
