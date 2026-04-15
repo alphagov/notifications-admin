@@ -1,6 +1,7 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from io import RawIOBase
 from time import sleep
+from typing import Any, Self, TypeVar
 from zipfile import ZipFile
 
 
@@ -104,17 +105,48 @@ class InterruptibleIOZipFile(ZipFile):
         return InterruptibleRawIOWrapper(super().open(*args, **kwargs), read_limit=8_192)
 
 
-def interruptible_iter[T](it: Iterable[T], interruptible_every: int) -> Iterable[T]:
-    """
-    Given an iterable `it`, will yield its contents, calling sleep(0) before yielding each
-    `interruptible_every`'th iteration.
-    """
-    i = 0
-    for item in it:
-        if i >= interruptible_every:
+InterruptibleIterAny = TypeVar("InterruptibleIterAny", bound="InterruptibleIter[Any]")
+
+
+class InterruptibleIter[T]:
+    _inner_iterator: Iterator[T]
+    _boxed_counter: list[int]
+    _interruptible_every: int
+
+    def __init__(
+        self,
+        iterable: Iterable[T],
+        *,
+        interruptible_every: int | None = None,
+        sync_with: InterruptibleIterAny | None = None,
+    ):
+        """
+        Given an `iterable`, will yield its contents, calling sleep(0) before yielding each `interruptible_every`'th
+        iteration. Can alternatively be provided with a `sync_with` argument which will share the counter from
+        another InterruptibleIter and inherit its interruptible_every value.
+        """
+        self._inner_iterator = iter(iterable)
+
+        if interruptible_every is None == sync_with is None:
+            raise TypeError("Must specify interruptible_every or sync_with (and not both)")
+
+        if interruptible_every is not None:
+            self._interruptible_every = interruptible_every
+            self._boxed_counter = [0]
+        else:
+            self._interruptible_every = sync_with._interruptible_every
+            self._boxed_counter = sync_with._boxed_counter
+
+    def __iter__(self) -> Self:
+        return self
+
+    def __next__(self) -> T:
+        ret = next(self._inner_iterator)
+
+        if self._boxed_counter[0] >= self._interruptible_every:
             sleep(0)
-            i = 0
+            self._boxed_counter[0] = 0
 
-        yield item
+        self._boxed_counter[0] += 1
 
-        i += 1
+        return ret
