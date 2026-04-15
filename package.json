@@ -46,7 +46,6 @@
     "eslint-plugin-jest": "28.14",
     "globals": "16.3.0",
     "jest": "29.7.0",
-    "jest-each": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
     "postcss-replace": "2.0.1",
     "rollup": "4.59.0",
