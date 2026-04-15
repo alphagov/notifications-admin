@@ -97,14 +97,12 @@ describe('Update content', () => {
         await jest.advanceTimersByTimeAsync(1);
         expect(mockFetch).toHaveBeenCalledTimes(1);
 
-        await Promise.resolve();
 
         await jest.advanceTimersByTimeAsync(1000);
         expect(mockFetch).toHaveBeenCalledTimes(2);
 
         await jest.advanceTimersByTimeAsync(1000);
 
-        await Promise.resolve();
 
         await jest.advanceTimersByTimeAsync(6904);
         expect(mockFetch).toHaveBeenCalledTimes(2);
