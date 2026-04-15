@@ -33,8 +33,6 @@ def log_in_user(user_id):
                 )
                 flash("There was a problem with your password. Please try again.")
                 return redirect(url_for("main.sign_in"))
-        elif "password" in session.get("user_details", {}):
-            user.update_password(session["user_details"]["password"])
 
         user.activate()
         user.login()

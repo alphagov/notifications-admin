@@ -46,7 +46,6 @@ def new_password(token):
         session["user_details"] = {
             "id": user.id,
             "email": user.email_address,
-            "password": form.new_password.data,
             "new_password": encrypt_new_password(form.new_password.data),
         }
         if user.email_auth:
