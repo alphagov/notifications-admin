@@ -1,4 +1,5 @@
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
+from functools import wraps
 from io import RawIOBase
 from time import sleep
 from zipfile import ZipFile
@@ -102,6 +103,31 @@ class InterruptibleIOZipFile(ZipFile):
 
     def open(self, *args, **kwargs) -> RawIOBase:
         return InterruptibleRawIOWrapper(super().open(*args, **kwargs), read_limit=8_192)
+
+
+def interruptible_every[**A, R](iterations: int) -> Callable[[Callable[A, R]], Callable[A, R]]:
+    """
+    Returns a decorator that, applied to a function, will keep a global counter of invocations
+    and yield before every `iterations`'th call.
+    """
+
+    def interruptible_decorator(inner: Callable[A, R]) -> Callable[A, R]:
+        i = 0
+
+        @wraps(inner)
+        def interruptible_wrapper(*args, **kwargs):
+            nonlocal i
+            if i >= iterations:
+                sleep(0)
+                i = 0
+
+            i += 1
+
+            return inner(*args, **kwargs)
+
+        return interruptible_wrapper
+
+    return interruptible_decorator
 
 
 def interruptible_iter[T](it: Iterable[T], interruptible_every: int) -> Iterable[T]:
