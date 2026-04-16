@@ -134,7 +134,7 @@ pyexcel-xls==0.7.1
     # via -r requirements.in
 pyjwt==2.12.1
     # via notifications-python-client
-pypdf==6.9.2
+pypdf==6.10.1
     # via notifications-utils
 python-dateutil==2.9.0.post0
     # via
