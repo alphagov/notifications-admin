@@ -9,7 +9,7 @@ GIT_COMMIT ?= $(shell git rev-parse HEAD 2> /dev/null || echo "")
 
 NOTIFY_CREDENTIALS ?= ~/.notify-credentials
 
-EXCLUDE_REQUIREMENTS_NEWER_THAN_DAYS ?= 30
+EXCLUDE_REQUIREMENTS_NEWER_THAN_DAYS ?= 7
 
 ## DEVELOPMENT
 
