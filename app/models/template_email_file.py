@@ -79,6 +79,7 @@ class TemplateEmailFile(JSONModel):
             service_id=self.service_id,
             document_id=self.id,
             key=uuid_to_base64(self.template.id),
+            template_version=self.template.version,
             _external=True,
         )
         if self.link_text:

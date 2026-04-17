@@ -12,10 +12,12 @@ from app.utils.user import user_has_permissions
 @user_has_permissions()
 def document_download_landing(service_id, document_id):
     template_id = base64_to_uuid_or_404(request.args.get("key"))
+    template_version = request.args.get("template_version")
     template = current_service.get_template_with_user_permission_or_403(
         template_id,
         current_user,
         must_be_of_type="email",
+        version=template_version,
     )
     template_email_file = template.email_files.by_id(document_id)
 
