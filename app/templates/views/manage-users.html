@@ -91,15 +91,19 @@
     {% endfor %}
   </div>
 
-  {% if current_user.has_permissions('manage_service') %}
+  {% if current_user.has_permissions('manage_service', allow_org_user=True) %}
     <div class="js-stick-at-bottom-when-scrolling">
-      {{ govukButton({
-        "element": "a",
-        "text": "Invite a team member",
-        "href": url_for('main.invite_user', service_id=current_service.id),
-        "classes": "govuk-button--secondary"
-      }) }}
-      <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link" href="{{ url_for('main.manage_users_download', service_id=current_service.id) }}">Download list of team members (CSV)</a>
+      {% if current_user.has_permissions('manage_service') %}
+        {{ govukButton({
+          "element": "a",
+          "text": "Invite a team member",
+          "href": url_for('main.invite_user', service_id=current_service.id),
+          "classes": "govuk-button--secondary"
+        }) }}
+        <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link" href="{{ url_for('main.manage_users_download', service_id=current_service.id) }}">Download list of team members (CSV)</a>
+      {% else %}
+        <a class="govuk-link govuk-link--no-visited-state page-footer-link" href="{{ url_for('main.manage_users_download', service_id=current_service.id) }}">Download list of team members (CSV)</a>
+      {% endif %}
     </div>
   {% endif %}
 

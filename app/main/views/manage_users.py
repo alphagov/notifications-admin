@@ -46,7 +46,7 @@ def manage_users(service_id):
 
 
 @main.route("/services/<uuid:service_id>/users.csv")
-@user_has_permissions("manage_service")
+@user_has_permissions("manage_service", allow_org_user=True)
 def manage_users_download(service_id):
     rows = [
         [

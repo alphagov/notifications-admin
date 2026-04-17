@@ -12,11 +12,12 @@ from app.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_RE
 from app.formatters import format_date_short
 from app.utils.user import is_gov_user
 from app.utils.user_permissions import permission_mappings, translate_permissions_from_ui_to_db
-from tests import organisation_json
+from tests import organisation_json, service_json
 from tests.conftest import (
     ORGANISATION_ID,
     ORGANISATION_TWO_ID,
     SERVICE_ONE_ID,
+    SERVICE_TWO_ID,
     USER_ONE_ID,
     create_active_user_empty_permissions,
     create_active_user_manage_template_permissions,
@@ -304,11 +305,73 @@ def test_should_show_caseworker_on_overview_page(
     )
 
 
+def test_manage_settings_user_can_see_download_users_link(
+    client_request,
+    mocked_get_service_data,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+):
+    page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
+    download_link = page.select_one(".js-stick-at-bottom-when-scrolling a.page-footer-right-aligned-link")
+
+    assert normalize_spaces(download_link) == "Download list of team members (CSV)"
+    assert download_link["href"] == url_for(
+        "main.manage_users_download",
+        service_id=SERVICE_ONE_ID,
+    )
+
+
+def test_view_only_user_cannot_see_download_users_link(
+    client_request,
+    mocked_get_service_data,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    active_user_view_permissions,
+):
+    client_request.login(active_user_view_permissions)
+    page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
+
+    assert not page.select_one(".js-stick-at-bottom-when-scrolling")
+    assert not page.select_one("a.page-footer-right-aligned-link")
+    assert not page.select_one("a.page-footer-right-aligned-link-without-button")
+
+
+def test_org_user_can_see_download_users_link(
+    client_request,
+    mocked_get_service_data,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    active_user_view_permissions,
+):
+    active_user_view_permissions["organisations"] = [ORGANISATION_ID]
+    client_request.login(active_user_view_permissions)
+    service = service_json(
+        name="SERVICE WITH ORG",
+        id_=SERVICE_TWO_ID,
+        users=[],
+        organisation_id=ORGANISATION_ID,
+    )
+    mocked_get_service_data[service["id"]] = service
+    page = client_request.get("main.manage_users", service_id=SERVICE_TWO_ID)
+
+    sticky_footer = page.select_one(".js-stick-at-bottom-when-scrolling")
+    download_link = sticky_footer.select_one("a.page-footer-link")
+    assert normalize_spaces(download_link) == "Download list of team members (CSV)"
+    assert download_link["href"] == url_for(
+        "main.manage_users_download",
+        service_id=SERVICE_TWO_ID,
+    )
+    # Org user can’t see invite button
+    assert not sticky_footer.select(".govuk-button")
+
+
 def test_download_csv_of_users(
     client_request,
     mocker,
     mock_get_invites_for_service,
-    mock_get_template_folders,
     service_one,
     active_user_view_permissions,
     active_caseworking_user,
@@ -328,6 +391,13 @@ def test_download_csv_of_users(
         "user_2@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
         "user_3@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
         "user_4@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
+    )
+
+    client_request.login(active_user_view_permissions)
+    client_request.get_response(
+        "main.manage_users_download",
+        service_id=SERVICE_ONE_ID,
+        _expected_status=403,
     )
 
 
