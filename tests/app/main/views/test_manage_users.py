@@ -304,6 +304,33 @@ def test_should_show_caseworker_on_overview_page(
     )
 
 
+def test_download_csv_of_users(
+    client_request,
+    mocker,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    service_one,
+    active_user_view_permissions,
+    active_caseworking_user,
+):
+    mocker.patch(
+        "app.models.user.Users._get_items", return_value=[active_user_view_permissions, active_caseworking_user]
+    )
+
+    response = client_request.get_response("main.manage_users_download", service_id=SERVICE_ONE_ID)
+
+    assert response.get_data(as_text=True) == (
+        'Email address,Name,"Manage settings, team and usage",See dashboard,Send messages,Add and edit templates,Manage API integration,Sign in method\r\n'  # noqa: E501
+        "caseworker@example.gov.uk,Test User,No,No,Yes,No,No,Text message code\r\n"
+        "test@user.gov.uk,Test User With Permissions,No,Yes,No,No,No,Text message code\r\n"
+        "user_0@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
+        "user_1@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
+        "user_2@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
+        "user_3@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
+        "user_4@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
+    )
+
+
 @pytest.mark.parametrize(
     "endpoint, extra_args, service_has_email_auth, auth_options_hidden",
     [

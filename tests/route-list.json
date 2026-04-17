@@ -351,6 +351,7 @@
     "/services/<uuid:service_id>/uploads",
     "/services/<uuid:service_id>/usage",
     "/services/<uuid:service_id>/users",
+    "/services/<uuid:service_id>/users.csv",
     "/services/<uuid:service_id>/users/<uuid:user_id>",
     "/services/<uuid:service_id>/users/<uuid:user_id>/delete",
     "/services/<uuid:service_id>/users/<uuid:user_id>/edit-email",

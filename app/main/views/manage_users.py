@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 from flask import abort, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
@@ -5,7 +7,13 @@ from notifications_python_client.errors import HTTPError
 from app import current_service, service_api_client
 from app.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_REJECTED
 from app.event_handlers import Events
-from app.formatters import redact_mobile_number
+from app.formatters import (
+    format_auth_type,
+    format_date_numeric,
+    format_invite_status,
+    format_yes_no,
+    redact_mobile_number,
+)
 from app.main import main
 from app.main.forms import (
     ChangeEmailForm,
@@ -17,6 +25,7 @@ from app.main.forms import (
     SearchUsersForm,
 )
 from app.models.service import Service, ServiceJoinRequest
+from app.models.spreadsheet import Spreadsheet
 from app.models.user import InvitedUser, User
 from app.utils.user import is_gov_user, user_has_permissions
 from app.utils.user_permissions import permission_options, translate_permissions_from_ui_to_db
@@ -33,6 +42,42 @@ def manage_users(service_id):
         form=SearchUsersForm(),
         permissions=permission_options,
         extra_spacing_around_flash_messages=False,
+    )
+
+
+@main.route("/services/<uuid:service_id>/users.csv")
+@user_has_permissions("manage_service")
+def manage_users_download(service_id):
+    rows = [
+        [
+            "Email address",
+            "Name",
+        ]
+        + list(dict(permission_options).values())
+        + [
+            "Sign in method",
+        ],
+    ] + [
+        [
+            user.email_address,
+            format_invite_status(user.status) if user.is_invited_user else user.name,
+        ]
+        + [
+            format_yes_no(user.has_permission_for_service(current_service.id, permission))
+            for permission in dict(permission_options)
+        ]
+        + [
+            format_auth_type(user.auth_type),
+        ]
+        for user in sorted(current_service.team_members)
+    ]
+    return (
+        Spreadsheet.from_rows(rows).as_csv_data,
+        200,
+        {
+            "Content-Type": "text/csv; charset=utf-8",
+            "Content-Disposition": (f'inline; filename="Team members {format_date_numeric(datetime.now(UTC))}.csv"'),
+        },
     )
 
 

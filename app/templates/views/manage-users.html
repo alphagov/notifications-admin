@@ -39,10 +39,8 @@
                 </span>&ensp;
               {%- endif -%}
               <span class="hint">
-              {%- if user.is_invited_user and user.status == 'pending' -%}
-                <span class="live-search-relevant">{{ user.email_address }}</span> (invited)
-              {%- elif user.is_invited_user and user.status == 'cancelled' -%}
-                <span class="live-search-relevant">{{ user.email_address }}</span> (cancelled invite)
+              {%- if user.is_invited_user -%}
+                <span class="live-search-relevant">{{ user.email_address }}</span> {{ user.status|format_invite_status }}
               {%- elif user.id == current_user.id -%}
                 <span class="live-search-relevant">(you)</span>
               {% else %}
@@ -101,6 +99,7 @@
         "href": url_for('main.invite_user', service_id=current_service.id),
         "classes": "govuk-button--secondary"
       }) }}
+      <a class="govuk-link govuk-link--no-visited-state page-footer-right-aligned-link" href="{{ url_for('main.manage_users_download', service_id=current_service.id) }}">Download list of team members (CSV)</a>
     </div>
   {% endif %}
 
