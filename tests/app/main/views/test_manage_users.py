@@ -313,7 +313,7 @@ def test_manage_settings_user_can_see_download_users_link(
     mock_get_template_folders,
 ):
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
-    download_link = page.select_one(".js-stick-at-bottom-when-scrolling a.page-footer-right-aligned-link")
+    download_link = page.select_one(".js-stick-at-bottom-when-scrolling .govuk-button-group .govuk-link")
 
     assert normalize_spaces(download_link) == "Download list of team members (CSV)"
     assert download_link["href"] == url_for(
@@ -334,8 +334,7 @@ def test_view_only_user_cannot_see_download_users_link(
     page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
 
     assert not page.select_one(".js-stick-at-bottom-when-scrolling")
-    assert not page.select_one("a.page-footer-right-aligned-link")
-    assert not page.select_one("a.page-footer-right-aligned-link-without-button")
+    assert not page.select_one(".govuk-button-group")
 
 
 def test_org_user_can_see_download_users_link(
