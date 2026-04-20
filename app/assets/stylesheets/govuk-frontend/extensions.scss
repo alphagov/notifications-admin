@@ -290,6 +290,18 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
   }
 }
 
+// extend govuk-button-group from Design System 
+// to allow right link to be right aligned
+.govuk-button-group--align-right-desktop {
+  @include govuk-media-query($from: desktop) {
+    .govuk-link {
+      margin-left: auto;
+    }
+  }
+}
+
+
+
 // used with nested checkboxes and radios
 // exampel use on templates page
 $govuk-touch-target-gutter: 4px;
