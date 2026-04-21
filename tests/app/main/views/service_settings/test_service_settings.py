@@ -150,7 +150,6 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Receive inbound SMS Off Change your settings for Receive inbound SMS",
                 "Email authentication Off Change your settings for Email authentication",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
-                "Send files via email using admin ui Off Change your settings for Send files via email using admin ui",
             ],
         ),
         (
@@ -184,7 +183,6 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Custom data retention Email – 7 days Change data retention",
                 "Email authentication Off Change your settings for Email authentication",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
-                "Send files via email using admin ui Off Change your settings for Send files via email using admin ui",
             ],
         ),
     ],
@@ -4426,46 +4424,22 @@ def test_cant_archive_inactive_service(
     assert "Delete service" not in {a.text for a in page.select("a.button")}
 
 
-@pytest.mark.parametrize(
-    "extra_permissions, expected_paragraphs",
-    (
-        (
-            [],
-            [
-                "This is an API-only feature.",
-                "To send a file by email, follow the instructions in our API documentation.",
-                "You need to include contact details for your service so your users can get in touch if "
-                "there’s a problem. For example, if the link to download the file you sent them has expired.",
-            ],
-        ),
-        (
-            ["send_files_via_ui"],
-            [
-                "To send a file by email, either:",
-                "choose a template and select ‘Attach files’",
-                "or follow the instructions in our API documentation",
-                "You need to include contact details for your service so your users can get in touch if "
-                "there’s a problem. For example, if the link to download the file you sent them has expired.",
-            ],
-        ),
-    ),
-)
-def test_send_files_by_email_in_page_guidance(
-    client_request,
-    service_one,
-    extra_permissions,
-    expected_paragraphs,
-):
-    service_one["permissions"] += extra_permissions
+def test_send_files_by_email_in_page_guidance(client_request):
     page = client_request.get("main.send_files_by_email_contact_details", service_id=SERVICE_ONE_ID)
-    assert [normalize_spaces(p.text) for p in page.select("main p, main li")] == expected_paragraphs
+    assert [normalize_spaces(p.text) for p in page.select("main p, main li")] == [
+        "To send a file by email, either:",
+        "choose a template and select ‘Attach files’",
+        "or follow the instructions in our API documentation",
+        "You need to include contact details for your service so your users can get in touch if "
+        "there’s a problem. For example, if the link to download the file you sent them has expired.",
+    ]
 
 
 @pytest.mark.parametrize(
-    "endpoint, extra_permissions, extra_args",
+    "endpoint, extra_args",
     (
-        ("main.send_files_by_email_contact_details", [], {}),
-        ("main.setup_template_email_files", ["send_files_via_ui"], {"template_id": sample_uuid()}),
+        ("main.send_files_by_email_contact_details", {}),
+        ("main.setup_template_email_files", {"template_id": sample_uuid()}),
     ),
 )
 @pytest.mark.parametrize(
@@ -4483,11 +4457,9 @@ def test_send_files_by_email_contact_details_prefills_the_form_with_the_existing
     contact_details_type,
     contact_details_value,
     endpoint,
-    extra_permissions,
     extra_args,
 ):
     service_one["contact_link"] = contact_details_value
-    service_one["permissions"] += extra_permissions
 
     page = client_request.get(endpoint, service_id=SERVICE_ONE_ID, **extra_args)
     assert page.select_one(f"input[name=contact_details_type][value={contact_details_type}]").has_attr("checked")
@@ -4495,17 +4467,15 @@ def test_send_files_by_email_contact_details_prefills_the_form_with_the_existing
 
 
 @pytest.mark.parametrize(
-    "endpoint, extra_permissions, extra_args, expected_redirect_endpoint",
+    "endpoint, extra_args, expected_redirect_endpoint",
     (
         (
             "main.send_files_by_email_contact_details",
-            [],
             {},
             "main.service_settings",
         ),
         (
             "main.setup_template_email_files",
-            ["send_files_via_ui"],
             {"template_id": sample_uuid()},
             "main.template_email_files",
         ),
@@ -4532,12 +4502,10 @@ def test_send_files_by_email_contact_details_updates_contact_details_and_redirec
     old_value,
     new_value,
     endpoint,
-    extra_permissions,
     extra_args,
     expected_redirect_endpoint,
 ):
     service_one["contact_link"] = old_value
-    service_one["permissions"] += extra_permissions
 
     client_request.post(
         endpoint,
@@ -4553,17 +4521,15 @@ def test_send_files_by_email_contact_details_updates_contact_details_and_redirec
 
 
 @pytest.mark.parametrize(
-    "endpoint, extra_permissions, extra_args, expected_redirect_endpoint",
+    "endpoint, extra_args, expected_redirect_endpoint",
     (
         (
             "main.send_files_by_email_contact_details",
-            [],
             {},
             "main.service_settings",
         ),
         (
             "main.setup_template_email_files",
-            ["send_files_via_ui"],
             {"template_id": sample_uuid()},
             "main.template_email_files",
         ),
@@ -4579,12 +4545,10 @@ def test_send_files_by_email_contact_details_uses_the_selected_field_when_multip
     no_letter_contact_blocks,
     single_sms_sender,
     endpoint,
-    extra_permissions,
     extra_args,
     expected_redirect_endpoint,
 ):
     service_one["contact_link"] = "http://www.old-url.com"
-    service_one["permissions"] += extra_permissions
 
     client_request.post(
         endpoint,
@@ -4625,10 +4589,10 @@ def test_send_files_by_email_contact_details_page(
 
 
 @pytest.mark.parametrize(
-    "endpoint, extra_permissions, extra_args",
+    "endpoint, extra_args",
     (
-        ("main.send_files_by_email_contact_details", [], {}),
-        ("main.setup_template_email_files", ["send_files_via_ui"], {"template_id": sample_uuid()}),
+        ("main.send_files_by_email_contact_details", {}),
+        ("main.setup_template_email_files", {"template_id": sample_uuid()}),
     ),
 )
 def test_send_files_by_email_contact_details_displays_error_message_when_no_radio_button_selected(
@@ -4636,10 +4600,8 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
     service_one,
     mock_get_service_email_template,
     endpoint,
-    extra_permissions,
     extra_args,
 ):
-    service_one["permissions"] += extra_permissions
     page = client_request.post(
         endpoint,
         service_id=SERVICE_ONE_ID,
@@ -4657,10 +4619,10 @@ def test_send_files_by_email_contact_details_displays_error_message_when_no_radi
 
 
 @pytest.mark.parametrize(
-    "endpoint, extra_permissions, extra_args",
+    "endpoint, extra_args",
     (
-        ("main.send_files_by_email_contact_details", [], {}),
-        ("main.setup_template_email_files", ["send_files_via_ui"], {"template_id": sample_uuid()}),
+        ("main.send_files_by_email_contact_details", {}),
+        ("main.setup_template_email_files", {"template_id": sample_uuid()}),
     ),
 )
 @pytest.mark.parametrize(
@@ -4679,12 +4641,10 @@ def test_send_files_by_email_contact_details_does_not_update_invalid_contact_det
     invalid_value,
     error,
     endpoint,
-    extra_permissions,
     extra_args,
     mocker,
 ):
     service_one["contact_link"] = "http://example.com/"
-    service_one["permissions"] += extra_permissions
 
     page = client_request.post(
         endpoint,

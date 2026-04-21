@@ -4778,14 +4778,16 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
 
 
 @pytest.mark.parametrize(
-    "extra_permissions, template_type, email_files, expected_button_text, expected_button_endpoint, expected_hint",
+    "template_type, email_files, expected_button_text, expected_button_endpoint, expected_hint",
     (
-        ([], "email", None, None, None, None),
-        ([], "sms", None, None, None, None),
-        ([], "letter", None, "Attach pages", "main.letter_template_attach_pages", None),
-        (["send_files_via_ui"], "email", None, "Attach files", "main.template_email_files", "No files added"),
         (
-            ["send_files_via_ui"],
+            "email",
+            None,
+            "Attach files",
+            "main.template_email_files",
+            "No files added",
+        ),
+        (
             "email",
             [
                 {
@@ -4800,7 +4802,6 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
             "1 file added",
         ),
         (
-            ["send_files_via_ui"],
             "email",
             [
                 {
@@ -4820,8 +4821,20 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
             "main.template_email_files",
             "2 files added",
         ),
-        (["send_files_via_ui"], "sms", None, None, None, None),
-        (["send_files_via_ui"], "letter", None, "Attach pages", "main.letter_template_attach_pages", None),
+        (
+            "sms",
+            None,
+            None,
+            None,
+            None,
+        ),
+        (
+            "letter",
+            None,
+            "Attach pages",
+            "main.letter_template_attach_pages",
+            None,
+        ),
     ),
 )
 def test_attach_files_button(
@@ -4831,7 +4844,6 @@ def test_attach_files_button(
     mock_get_page_counts_for_letter,
     single_letter_contact_block,
     fake_uuid,
-    extra_permissions,
     template_type,
     email_files,
     expected_button_text,
@@ -4849,7 +4861,6 @@ def test_attach_files_button(
             )
         },
     )
-    service_one["permissions"] += extra_permissions
     page = client_request.get(
         "main.view_template",
         service_id=SERVICE_ONE_ID,
@@ -4862,7 +4873,7 @@ def test_attach_files_button(
     if expected_button_text or expected_button_endpoint:
         assert button["href"] == url_for(expected_button_endpoint, service_id=SERVICE_ONE_ID, template_id=fake_uuid)
         assert normalize_spaces(button.text) == expected_button_text
-        if template_type == "email" and extra_permissions:
+        if template_type == "email":
             assert normalize_spaces(page.select_one("h2.govuk-visually-hidden").text) == "Added Files"
     else:
         assert button is None

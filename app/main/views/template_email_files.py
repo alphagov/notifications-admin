@@ -12,12 +12,10 @@ from app.main.forms import (
     TemplateEmailFilesUploadForm,
 )
 from app.models.template_email_file import TemplateEmailFile
-from app.utils import service_has_permission
 from app.utils.user import user_has_permissions
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files", methods=["GET"])
-@service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
 def template_email_files(template_id, service_id):
     template = current_service.get_template_with_user_permission_or_403(
@@ -47,7 +45,6 @@ def template_email_files(template_id, service_id):
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files/setup", methods=["GET", "POST"])
-@service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
 def setup_template_email_files(template_id, service_id):
     template = current_service.get_template_with_user_permission_or_403(
@@ -72,7 +69,6 @@ def setup_template_email_files(template_id, service_id):
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>",
     methods=["GET", "POST"],
 )
-@service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
 def manage_a_template_email_file(service_id, template_id, template_email_file_id):
     template = current_service.get_template_with_user_permission_or_403(
@@ -112,7 +108,6 @@ def manage_a_template_email_file(service_id, template_id, template_email_file_id
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/make-live",
     methods=["POST"],
 )
-@service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
 def make_file_live(service_id, template_id, template_email_file_id):
     template = current_service.get_template_with_user_permission_or_403(
@@ -136,7 +131,6 @@ def make_file_live(service_id, template_id, template_email_file_id):
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/files/upload", methods=["GET", "POST"])
-@service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
 def upload_template_email_files(template_id, service_id):
     template = current_service.get_template_with_user_permission_or_403(
@@ -175,7 +169,6 @@ def upload_template_email_files(template_id, service_id):
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change-link-text",
     methods=["GET", "POST"],
 )
-@service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
 def change_link_text(service_id, template_id, template_email_file_id):
     template = current_service.get_template_with_user_permission_or_403(
@@ -211,7 +204,6 @@ def change_link_text(service_id, template_id, template_email_file_id):
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change-data-retention",
     methods=["GET", "POST"],
 )
-@service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
 def change_data_retention_period(service_id, template_id, template_email_file_id):
     template = current_service.get_template_with_user_permission_or_403(
@@ -248,7 +240,6 @@ def change_data_retention_period(service_id, template_id, template_email_file_id
     "/services/<uuid:service_id>/templates/<uuid:template_id>/files/<uuid:template_email_file_id>/change-email-validation",
     methods=["GET", "POST"],
 )
-@service_has_permission("send_files_via_ui")
 @user_has_permissions("manage_templates")
 def change_email_validation(service_id, template_id, template_email_file_id):
     template = current_service.get_template_with_user_permission_or_403(
