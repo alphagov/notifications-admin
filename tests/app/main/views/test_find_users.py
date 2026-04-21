@@ -337,9 +337,8 @@ def test_archive_user_shows_error_message_if_user_cannot_be_archived(
 
     assert normalize_spaces(page.select_one("h1").text) == "Platform admin user"
     assert (
-        normalize_spaces(page.select_one(".banner-dangerous").text)
-        == "User can’t be removed from a service - check all services have another team member with manage_settings"
-    )
+        "You cannot archive this user They have the ‘manage settings’ permission for at least one service."
+    ) in normalize_spaces(page.select_one(".banner-dangerous").text)
 
 
 def test_archive_user_does_not_create_event_if_user_client_raises_unexpected_exception(
