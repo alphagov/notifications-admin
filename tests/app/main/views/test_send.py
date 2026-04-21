@@ -4022,7 +4022,13 @@ def test_letters_from_csv_files_dont_have_download_link(
     assert not page.select("a[download]")
 
 
-@pytest.mark.parametrize("restricted", [True, False])
+@pytest.mark.parametrize(
+    "restricted, expected_link_selector",
+    [
+        (True, "a.page-footer-right-aligned-link-without-button"),
+        (False, "a.page-footer-right-aligned-link"),
+    ],
+)
 def test_one_off_letters_have_download_link(
     client_request,
     mocker,
@@ -4031,6 +4037,7 @@ def test_one_off_letters_have_download_link(
     fake_uuid,
     mock_get_service_statistics,
     restricted,
+    expected_link_selector,
     service_one,
 ):
     service_one["restricted"] = restricted
@@ -4055,13 +4062,14 @@ def test_one_off_letters_have_download_link(
 
     assert len(page.select(".letter img")) == 5
 
-    assert page.select_one("a[download]")["href"] == url_for(
+    download_link = page.select_one(expected_link_selector)
+    assert download_link["href"] == url_for(
         "no_cookie.check_notification_preview",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         filetype="pdf",
     )
-    assert page.select_one("a[download]").text == "Download as a PDF"
+    assert normalize_spaces(download_link) == "Download as a PDF"
 
 
 @pytest.mark.parametrize("filetype", ("png", "pdf"))
@@ -4141,7 +4149,7 @@ def test_send_one_off_letter_errors_in_trial_mode(
 
     assert not page.select("form button")
     assert page.select_one(".govuk-back-link").text.strip() == "Back"
-    assert page.select_one("a[download]").text == "Download as a PDF"
+    assert page.select_one("a.page-footer-right-aligned-link-without-button").text == "Download as a PDF"
 
 
 def test_send_one_off_letter_errors_if_letter_longer_than_10_pages(

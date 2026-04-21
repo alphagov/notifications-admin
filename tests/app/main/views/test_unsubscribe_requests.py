@@ -324,7 +324,9 @@ def test_unsubscribe_request_report_for_processed_batched_reports(client_request
     availability_date = page.select("#unsubscribe_report_availability")[0].text
     "completed_unsubscribe_report_main_text"
     update_button = page.select("#process_unsubscribe_report")
-    assert page.select_one("p a[download]")["href"] == url_for(
+    download_link = page.select_one("main a")
+    assert normalize_spaces(download_link.text) == "Download the report"
+    assert download_link["href"] == url_for(
         "main.download_unsubscribe_request_report",
         service_id=SERVICE_ONE_ID,
         batch_id=test_data[0]["batch_id"],

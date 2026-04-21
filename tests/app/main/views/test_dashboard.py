@@ -296,7 +296,7 @@ def test_inbox_showing_inbound_messages(
     rows = page.select("tbody tr")
     assert len(rows) == 8
     assert normalize_spaces(rows[index].text) == expected_row
-    assert page.select_one("a[download]")["href"] == url_for(
+    assert page.select_one("[data-key=messages] a.govuk-\\!-font-weight-bold")["href"] == url_for(
         "main.inbox_download",
         service_id=SERVICE_ONE_ID,
     )

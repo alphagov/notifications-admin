@@ -62,7 +62,7 @@
           {% if scheduled_recipients|length > scheduled_recipients.displayed_rows|list|length %}
             <p class="govuk-!-margin-bottom-1">Only showing the first {{ scheduled_recipients.displayed_rows|list|length }} rows</p>
           {% endif %}
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job_original_file_csv', service_id=current_service.id, job_id=job.id) }}" download>Download this file (CSV)</a>
+          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job_original_file_csv', service_id=current_service.id, job_id=job.id) }}">Download this file (CSV)</a>
         </div>
       </div>
     {% endif %}

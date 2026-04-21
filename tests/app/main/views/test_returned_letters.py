@@ -168,8 +168,10 @@ def test_returned_letters_page_with_many_letters(
     )
 
     assert len(page.select("tbody tr")) == 50
-    assert page.select_one("a[download]").text == "Download this report (CSV)"
-    assert page.select_one("a[download]")["href"] == url_for(
+
+    download_link = page.select_one("main a")
+    assert normalize_spaces(download_link.text) == "Download this report (CSV)"
+    assert download_link["href"] == url_for(
         ".returned_letters_report",
         service_id=SERVICE_ONE_ID,
         reported_at="2019-12-24",
