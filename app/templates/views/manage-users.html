@@ -39,10 +39,8 @@
                 </span>&ensp;
               {%- endif -%}
               <span class="hint">
-              {%- if user.is_invited_user and user.status == 'pending' -%}
-                <span class="live-search-relevant">{{ user.email_address }}</span> (invited)
-              {%- elif user.is_invited_user and user.status == 'cancelled' -%}
-                <span class="live-search-relevant">{{ user.email_address }}</span> (cancelled invite)
+              {%- if user.is_invited_user -%}
+                <span class="live-search-relevant">{{ user.email_address }}</span> {{ user.status|format_invite_status }}
               {%- elif user.id == current_user.id -%}
                 <span class="live-search-relevant">(you)</span>
               {% else %}
@@ -93,14 +91,21 @@
     {% endfor %}
   </div>
 
-  {% if current_user.has_permissions('manage_service') %}
+  {% if current_user.has_permissions('manage_service', allow_org_user=True) %}
     <div class="js-stick-at-bottom-when-scrolling">
-      {{ govukButton({
-        "element": "a",
-        "text": "Invite a team member",
-        "href": url_for('main.invite_user', service_id=current_service.id),
-        "classes": "govuk-button--secondary"
-      }) }}
+        {% if current_user.has_permissions('manage_service') %}
+          <div class="govuk-button-group govuk-button-group--align-right-desktop govuk-!-margin-bottom-0">
+            {{ govukButton({
+              "element": "a",
+              "text": "Invite a team member",
+              "href": url_for('main.invite_user', service_id=current_service.id),
+              "classes": "govuk-button--secondary govuk-!-margin-bottom-1"
+            }) }}
+            <a class="govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-1" href="{{ url_for('main.manage_users_download', service_id=current_service.id) }}">Download list of team members (CSV)</a>
+          </div>
+          {% else %}
+          <a class="govuk-link govuk-link--no-visited-state page-footer-link" href="{{ url_for('main.manage_users_download', service_id=current_service.id) }}">Download list of team members (CSV)</a>
+        {% endif %}
     </div>
   {% endif %}
 

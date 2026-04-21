@@ -37,6 +37,7 @@ from tests.conftest import (
     (
         ("main.usage", {}),
         ("main.manage_users", {}),
+        ("main.manage_users_download", {}),
         ("main.choose_template", {"template_id": sample_uuid()}),
         ("main.choose_template", {"template_folder_id": sample_uuid()}),
         ("main.view_template", {"template_id": sample_uuid()}),

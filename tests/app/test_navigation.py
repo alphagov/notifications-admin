@@ -217,6 +217,7 @@ EXCLUDED_ENDPOINTS = set(
             "manage_org_users",
             "manage_template_folder",
             "manage_users",
+            "manage_users_download",
             "monthly",
             "name_service",
             "new_terms_of_use",

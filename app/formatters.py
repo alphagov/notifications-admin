@@ -496,3 +496,10 @@ def format_retention_period(weeks):
         {weeks} weeks after sending<br>
         <span class='govuk-hint'>(about {delta})</span>
     """)
+
+
+def format_invite_status(user_status):
+    if user_status == "pending":
+        return "(invited)"
+    if user_status == "cancelled":
+        return "(cancelled invite)"
