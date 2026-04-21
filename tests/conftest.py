@@ -3056,6 +3056,8 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
 
             ClientRequest._test_for_duplicate_ids(page)
 
+            ClientRequest._test_download_attribute_on_links(page)
+
             return page
 
         @staticmethod
@@ -3252,6 +3254,10 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
                 assert ids.count(id) == 1, f"Duplicate id `{id}` found on these elements:\n    " + ", ".join(
                     f"<{element.name}>" for element in page.select(f"*[id='{id}']")
                 )
+
+        @staticmethod
+        def _test_download_attribute_on_links(page):
+            assert not page.select("a[download]"), "Don’t use <a download> (set the Content-Disposition header instead)"
 
     return ClientRequest
 
