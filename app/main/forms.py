@@ -114,6 +114,7 @@ from app.utils.govuk_frontend_field import (
     render_govuk_frontend_macro,
 )
 from app.utils.image_processing import CorruptImage, ImageProcessor, WrongImageFormat
+from app.utils.interruptible_io import interruptible_iter
 from app.utils.user_permissions import (
     all_ui_permissions,
     organisation_user_permission_names,
@@ -455,12 +456,17 @@ class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
 
 
 class NestedFieldMixin:
+    CHILD_MAP_ITERATION_INTERRUPTIBLE_EVERY = 128
+
     def children(self):
+        # beginning iteration through a Field is surprisingly expensive - cache the list of options
+        options = tuple(self)
+
         # start map with root option as a single child entry
-        child_map = {None: [option for option in self if option.data == self.NONE_OPTION_VALUE]}
+        child_map = {None: [option for option in options if option.data == self.NONE_OPTION_VALUE]}
 
         # add entries for all other children
-        for option in self:
+        for option in interruptible_iter(options, self.CHILD_MAP_ITERATION_INTERRUPTIBLE_EVERY):
             # assign all options with a NONE_OPTION_VALUE (not always None) to the None key
             if option.data == self.NONE_OPTION_VALUE:
                 child_ids = [folder["id"] for folder in self.all_template_folders if folder["parent_id"] is None]
@@ -469,7 +475,7 @@ class NestedFieldMixin:
                 child_ids = [folder["id"] for folder in self.all_template_folders if folder["parent_id"] == option.data]
                 key = option.data
 
-            child_map[key] = [option for option in self if option.data in child_ids]
+            child_map[key] = [option for option in options if option.data in child_ids]
 
         return child_map
 
