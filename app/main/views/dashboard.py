@@ -471,7 +471,7 @@ def inbox_download(service_id):
         mimetype="text/csv",
         headers={
             "Content-Disposition": (
-                f'inline; filename="Received text messages {format_date_numeric(datetime.now(UTC))}.csv"'
+                f'attachment; filename="Received text messages {format_date_numeric(datetime.now(UTC))}.csv"'
             )
         },
     )

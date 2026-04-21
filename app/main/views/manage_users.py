@@ -76,7 +76,9 @@ def manage_users_download(service_id):
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": (f'inline; filename="Team members {format_date_numeric(datetime.now(UTC))}.csv"'),
+            "Content-Disposition": (
+                f'attachment; filename="Team members {format_date_numeric(datetime.now(UTC))}.csv"'
+            ),
         },
     )
 

@@ -6,7 +6,7 @@ from io import BytesIO
 from itertools import repeat
 from os import path
 from random import randbytes
-from unittest.mock import ANY
+from unittest.mock import ANY, Mock
 from uuid import uuid4
 from zipfile import BadZipFile
 
@@ -4062,6 +4062,48 @@ def test_one_off_letters_have_download_link(
         filetype="pdf",
     )
     assert page.select_one("a[download]").text == "Download as a PDF"
+
+
+@pytest.mark.parametrize("filetype", ("png", "pdf"))
+def test_one_off_letters_pdf_download(
+    client_request,
+    mocker,
+    mock_get_service_letter_template,
+    mock_has_permissions,
+    fake_uuid,
+    mock_get_service_statistics,
+    filetype,
+):
+    mocker.patch(
+        "app.template_preview_client.requests_session.post",
+        return_value=Mock(content=b"foo", status_code=200, headers={"content-type": "foo/bar"}),
+    )
+
+    do_mock_get_page_counts_for_letter(mocker, count=5)
+
+    with client_request.session_transaction() as session:
+        session["recipient"] = None
+        session["placeholders"] = {
+            "address_line_1": "First Last",
+            "address_line_2": "123 Street",
+            "postcode": "SW1 1AA",
+        }
+
+    response = client_request.get_response(
+        "no_cookie.check_notification_preview",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        filetype=filetype,
+    )
+
+    assert response.get_data() == b"foo"
+    assert response.headers["content-type"] == "foo/bar"  # Whatever we get from template preview
+
+    if filetype == "pdf":
+        assert response.headers["Content-Disposition"] == "attachment"
+    else:
+        assert "Content-Disposition" not in response.headers
+    assert response.headers["Content-Length"] == "3"
 
 
 def test_send_one_off_letter_errors_in_trial_mode(

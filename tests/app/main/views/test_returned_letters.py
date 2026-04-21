@@ -211,6 +211,8 @@ def test_returned_letters_reports(client_request, mocker):
     response = client_request.get_response(
         "main.returned_letters_report", service_id=SERVICE_ONE_ID, reported_at="2019-12-24"
     )
+    assert response.headers["Content-Type"] == "text/csv; charset=utf-8"
+    assert response.headers["Content-Disposition"] == ('attachment; filename="2019-12-24 returned letters.csv"')
 
     report = response.get_data(as_text=True)
     mock.assert_called_once_with(SERVICE_ONE_ID, "2019-12-24")

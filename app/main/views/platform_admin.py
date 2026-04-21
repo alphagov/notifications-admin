@@ -122,7 +122,9 @@ def live_services_csv():
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())} live services report.csv"',
+            "Content-Disposition": (
+                f'attachment; filename="{format_date_numeric(datetime.now())} live services report.csv"'
+            ),
         },
     )
 
@@ -710,7 +712,7 @@ def platform_admin_users_list():
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": f'inline; filename="{format_date_numeric(datetime.now())}_users_list.csv"',
+            "Content-Disposition": f'attachment; filename="{format_date_numeric(datetime.now())}_users_list.csv"',
         },
     )
 

@@ -534,6 +534,10 @@ def test_download_unsubscribe_request_report(client_request, mocker):
     response = client_request.get_response(
         "main.download_unsubscribe_request_report", service_id=SERVICE_ONE_ID, batch_id=report_data["batch_id"]
     )
+    assert response.headers["Content-Type"] == "text/csv; charset=utf-8"
+    assert response.headers["Content-Disposition"] == (
+        'attachment; filename="Email unsubscribe requests 2024-07-18 to 2024-07-20.csv'
+    )
 
     mock_get_report.assert_called_once_with(SERVICE_ONE_ID, report_data["batch_id"])
     report = response.get_data(as_text=True)
