@@ -458,6 +458,7 @@ class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
 class NestedFieldMixin:
     CHILD_MAP_ITERATION_INTERRUPTIBLE_EVERY = 128
 
+    @cached_property
     def children(self):
         # beginning iteration through a Field is surprisingly expensive - cache the list of options
         options = tuple(self)
@@ -479,18 +480,13 @@ class NestedFieldMixin:
 
         return child_map
 
-    # to be used as the only version of .children once radios are converted
-    @cached_property
-    def _children(self):
-        return self.children()
-
     def get_items_from_options(self, field):
         items = []
 
-        for option in self._children[None]:
+        for option in self.children[None]:
             item = self.get_item_from_option(option)
-            if option.data in self._children:
-                item["children"] = self.render_children(field.name, option.label.text, self._children[option.data])
+            if option.data in self.children:
+                item["children"] = self.render_children(field.name, option.label.text, self.children[option.data])
             items.append(item)
 
         return items
@@ -506,8 +502,8 @@ class NestedFieldMixin:
         for option in options:
             item = self.get_item_from_option(option)
 
-            if len(self._children[option.data]):
-                item["children"] = self.render_children(name, option.label.text, self._children[option.data])
+            if len(self.children[option.data]):
+                item["children"] = self.render_children(name, option.label.text, self.children[option.data])
 
             params["items"].append(item)
 
@@ -895,8 +891,8 @@ class GovukNestedRadiosField(NestedFieldMixin, GovukRadiosFieldWithNoneOption):
                     "hint": {"text": self.option_hints.get(option.data, "")},
                 }
             )
-            if len(self._children[option.data]):
-                item["children"] = self.render_children(name, option.label.text, self._children[option.data])
+            if len(self.children[option.data]):
+                item["children"] = self.render_children(name, option.label.text, self.children[option.data])
 
             params["items"].append(item)
 

@@ -204,7 +204,7 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
         template_type=template_type,
         _search_form=SearchTemplatesForm(current_service.api_keys),
         form=templates_and_folders_form,
-        move_to_children=templates_and_folders_form.move_to.children(),
+        move_to_children=templates_and_folders_form.move_to.children,
         user_has_template_folder_permission=user_has_template_folder_permission,
         option_hints=option_hints,
         error_summary_enabled=True,
