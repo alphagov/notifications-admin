@@ -1538,9 +1538,50 @@ def test_remove_user_from_service_when_user_api_gives_error(
         _follow_redirects=True,
     )
 
-    assert "You cannot remove the only user for a service" in normalize_spaces(
-        page.select_one(".banner-dangerous").text
+    assert (
+        "You cannot remove this team member Your service needs at least 2 team members: from your organisation"
+    ) in normalize_spaces(page.select_one(".banner-dangerous").text)
+    assert not mock_event_handler.called
+
+
+@pytest.mark.parametrize(
+    "api_error_message",
+    [
+        "You cannot remove the only user for a service",
+        "User cannot be removed from the service",
+    ],
+)
+def test_remove_user_from_service_when_user_api_gives_error_for_platform_admin_user(
+    client_request,
+    active_user_with_permissions,
+    platform_admin_user,
+    service_one,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    api_error_message,
+    mocker,
+):
+    mocker.patch(
+        "app.service_api_client.remove_user_from_service",
+        side_effect=HTTPError(
+            response=mocker.Mock(status_code=400, json={"result": "error", "message": api_error_message}),
+            message=api_error_message,
+        ),
     )
+    mock_event_handler = mocker.patch("app.main.views.manage_users.Events.remove_user_from_service")
+
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        "main.remove_user_from_service",
+        service_id=service_one["id"],
+        user_id=active_user_with_permissions["id"],
+        _follow_redirects=True,
+    )
+
+    assert (
+        "You cannot remove this team member A service needs at least 2 team members: from a public sector organisation"
+    ) in normalize_spaces(page.select_one(".banner-dangerous").text)
     assert not mock_event_handler.called
 
 

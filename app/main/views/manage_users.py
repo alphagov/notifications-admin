@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 
 from flask import abort, flash, redirect, render_template, request, session, url_for
 from flask_login import current_user
+from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 
 from app import current_service, service_api_client
@@ -318,7 +319,42 @@ def remove_user_from_service(service_id, user_id):
         msg = "You cannot remove the only user for a service"
         new_msg = "User cannot be removed from the service"
         if e.status_code == 400 and (msg in e.message or new_msg in e.message):
-            flash(msg, "info")
+            if current_user.platform_admin:
+                flash(
+                    Markup(
+                        """
+                        <h2 class='govuk-heading-m'>You cannot remove this team member</h2>
+                        <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
+                            A service needs at least 2 team members:
+                        </p>
+                        <ul class='govuk-list govuk-list--bullet error-text-colour govuk-!-font-weight-bold'>
+                            <li>from a public sector organisation</li>
+                            <li>with the ‘manage settings, team and usage’ permission</li>
+                        </ul>
+                        <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
+                            Ask the user to add new team members or update the permissions for their team.
+                        </p>
+                        """
+                    )
+                )
+            else:
+                flash(
+                    Markup(
+                        """
+                        <h2 class='govuk-heading-m'>You cannot remove this team member</h2>
+                        <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
+                            Your service needs at least 2 team members:
+                        </p>
+                        <ul class='govuk-list govuk-list--bullet error-text-colour govuk-!-font-weight-bold'>
+                            <li>from your organisation</li>
+                            <li>with the ‘manage settings, team and usage’ permission</li>
+                        </ul>
+                        <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
+                            Add new team members or update the permissions for your team, then try again.
+                        </p>
+                        """
+                    )
+                )
             return redirect(url_for(".manage_users", service_id=service_id))
         else:
             abort(500, e)
