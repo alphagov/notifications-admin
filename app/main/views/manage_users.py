@@ -316,7 +316,8 @@ def remove_user_from_service(service_id, user_id):
         service_api_client.remove_user_from_service(service_id, user_id)
     except HTTPError as e:
         msg = "You cannot remove the only user for a service"
-        if e.status_code == 400 and msg in e.message:
+        new_msg = "User cannot be removed from the service"
+        if e.status_code == 400 and (msg in e.message or new_msg in e.message):
             flash(msg, "info")
             return redirect(url_for(".manage_users", service_id=service_id))
         else:
