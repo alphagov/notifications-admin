@@ -168,8 +168,10 @@ def test_returned_letters_page_with_many_letters(
     )
 
     assert len(page.select("tbody tr")) == 50
-    assert page.select_one("a[download]").text == "Download this report (CSV)"
-    assert page.select_one("a[download]")["href"] == url_for(
+
+    download_link = page.select_one("main a")
+    assert normalize_spaces(download_link.text) == "Download this report (CSV)"
+    assert download_link["href"] == url_for(
         ".returned_letters_report",
         service_id=SERVICE_ONE_ID,
         reported_at="2019-12-24",
@@ -211,6 +213,8 @@ def test_returned_letters_reports(client_request, mocker):
     response = client_request.get_response(
         "main.returned_letters_report", service_id=SERVICE_ONE_ID, reported_at="2019-12-24"
     )
+    assert response.headers["Content-Type"] == "text/csv; charset=utf-8"
+    assert response.headers["Content-Disposition"] == ('attachment; filename="2019-12-24 returned letters.csv"')
 
     report = response.get_data(as_text=True)
     mock.assert_called_once_with(SERVICE_ONE_ID, "2019-12-24")

@@ -765,7 +765,7 @@ def test_organisation_services_links_to_downloadable_report(
     client_request.login(active_user_with_permissions)
     page = client_request.get(".organisation_dashboard", org_id=ORGANISATION_ID)
 
-    link_to_report = page.select_one("a[download]")
+    link_to_report = page.select_one(".js-stick-at-bottom-when-scrolling a")
     assert normalize_spaces(link_to_report.text) == "Download this report (CSV)"
     assert link_to_report.attrs["href"] == url_for(
         ".download_organisation_usage_report", org_id=ORGANISATION_ID, selected_year=2021

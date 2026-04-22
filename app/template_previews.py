@@ -64,7 +64,10 @@ class TemplatePreviewClient:
             json=data,
             headers=self._get_outbound_headers(),
         )
-        return response.content, response.status_code, self.get_allowed_headers(response.headers)
+        headers = list(self.get_allowed_headers(response.headers))
+        if filetype == "pdf":
+            headers.append(("Content-Disposition", "attachment"))
+        return response.content, response.status_code, headers
 
     def get_png_for_valid_pdf_page(self, pdf_file, page):
         pdf_page = extract_page_from_pdf(BytesIO(pdf_file), int(page) - 1)

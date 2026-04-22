@@ -158,7 +158,7 @@ def get_example_csv(service_id, template_id):
         200,
         {
             "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": f'inline; filename="{template.name}.csv"',
+            "Content-Disposition": f'attachment; filename="{template.name}.csv"',
         },
     )
 

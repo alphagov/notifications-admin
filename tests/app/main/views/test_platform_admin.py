@@ -4,6 +4,7 @@ from unittest.mock import ANY, call
 
 import pytest
 from flask import url_for
+from freezegun import freeze_time
 
 from app.main.views.platform_admin import build_live_service_permissions_for_users_list
 from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, create_user, normalize_spaces
@@ -965,6 +966,7 @@ def test_platform_admin_users_list_when_no_results_for_filters(client_request, p
     assert normalize_spaces(error.text) == "No results for filters selected"
 
 
+@freeze_time("2020-2-02")
 def test_platform_admin_users_list_csv_export(client_request, platform_admin_user, mocker):
     client_request.login(platform_admin_user)
 
@@ -995,7 +997,7 @@ def test_platform_admin_users_list_csv_export(client_request, platform_admin_use
     )
 
     assert response.content_type == "text/csv; charset=utf-8"
-    assert response.headers["Content-Disposition"].startswith('inline; filename="')
+    assert response.headers["Content-Disposition"] == 'attachment; filename="2020-02-02_users_list.csv"'
 
     csv_content = response.get_data(as_text=True)
 

@@ -296,7 +296,7 @@ def test_inbox_showing_inbound_messages(
     rows = page.select("tbody tr")
     assert len(rows) == 8
     assert normalize_spaces(rows[index].text) == expected_row
-    assert page.select_one("a[download]")["href"] == url_for(
+    assert page.select_one("[data-key=messages] a.govuk-\\!-font-weight-bold")["href"] == url_for(
         "main.inbox_download",
         service_id=SERVICE_ONE_ID,
     )
@@ -428,7 +428,7 @@ def test_download_inbox(
         service_id=SERVICE_ONE_ID,
     )
     assert response.headers["Content-Type"] == "text/csv; charset=utf-8"
-    assert response.headers["Content-Disposition"] == ('inline; filename="Received text messages 2016-07-01.csv"')
+    assert response.headers["Content-Disposition"] == ('attachment; filename="Received text messages 2016-07-01.csv"')
     assert response.get_data(as_text=True) == (
         "Phone number,Message,Received\r\n"
         "07900 900000,message-1,2016-07-01 13:00\r\n"

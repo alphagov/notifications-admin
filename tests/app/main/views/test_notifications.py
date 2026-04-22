@@ -786,7 +786,7 @@ def test_notification_page_has_link_to_download_letter(
     )
 
     try:
-        download_link = page.select_one("a[download]")["href"]
+        download_link = page.select_one("a.page-footer-right-aligned-link-without-button")["href"]
     except TypeError:
         download_link = None
 
