@@ -9,16 +9,15 @@
 {% else %}
   <div id="template-list" class="{{ 'govuk-!-margin-top-1' if (not show_template_nav and not show_search_box) else 'govuk-!-margin-top-6' }}">
 
-    {% for link in form.links %}
-      {% if not current_user.has_permissions('manage_templates') %}
-        {{ link }}
-      {% endif %}
-    {% endfor %}
-
     {% if current_user.has_permissions('manage_templates') %}
       {{ form.templates_and_folders(param_extensions={
         "formGroup": {"classes": "govuk-!-margin-bottom-0"}
       }) }}
+    {% else %}
+      {% for link in form.links %}
+        {{ link }}
+      {% endfor %}
     {% endif %}
+
   </div>
 {% endif %}
