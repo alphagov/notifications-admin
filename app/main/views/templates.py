@@ -167,6 +167,7 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
         available_template_types=current_service.available_template_types,
         allow_adding_copy_of_template=(current_service.all_templates or len(current_user.service_ids) > 1),
         option_hints=option_hints,
+        has_manage_template_permission=current_user.has_permissions("manage_templates"),
     )
 
     if request.method == "POST" and templates_and_folders_form.validate_on_submit():

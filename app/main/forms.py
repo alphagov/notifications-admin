@@ -2788,22 +2788,26 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
         available_template_types,
         allow_adding_copy_of_template,
         option_hints,
+        has_manage_template_permission,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
 
+        self.op = None
+        self.is_move_op = self.is_add_folder_op = self.is_add_template_op = False
+
         self.available_template_types = available_template_types
         template_type = kwargs.get("template_type")
 
-        self.links = [self.get_link(item, template_type) for item in template_list]
+        if not has_manage_template_permission:
+            self.links = [self.get_link(item, template_type) for item in template_list]
+            return
 
         self.templates_and_folders.choices = [(item.id, item.name) for item in template_list]
-
-        self.templates_and_folders.param_extensions["items"] = [self.get_checkbox_item(item) for item in template_list]
-
-        self.op = None
-        self.is_move_op = self.is_add_folder_op = self.is_add_template_op = False
+        self.templates_and_folders.param_extensions["items"] = [
+            self.get_checkbox_item(item, template_type) for item in template_list
+        ]
 
         self.move_to.all_template_folders = all_template_folders
 
@@ -2907,13 +2911,17 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
     # this means '__NONE__' (self.ALL_TEMPLATES option) is selected when no form data has been submitted
     # set default to empty string so process_data method doesn't perform any transformation
     move_to = GovukNestedRadiosField(
-        "Choose a folder", default="", validators=[required_for_ops("move-to-existing-folder"), Optional()]
+        "Choose a folder",
+        choices=[],  # Overridden in __init__
+        default="",
+        validators=[required_for_ops("move-to-existing-folder"), Optional()],
     )
 
     add_new_folder_name = GovukTextInputField("Folder name", validators=[required_for_ops("add-new-folder")])
     move_to_new_folder_name = GovukTextInputField("Folder name", validators=[required_for_ops("move-to-new-folder")])
     add_template_by_template_type = GovukRadiosFieldWithRequiredMessage(
         "New template",
+        choices=[],  # Overridden in __init__
         validators=[
             required_for_ops("add-new-template"),
             Optional(),
