@@ -8,7 +8,7 @@ from math import ceil
 from numbers import Number
 from zipfile import BadZipFile
 
-from flask import request
+from flask import render_template, request
 from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed, FileSize
@@ -2794,8 +2794,13 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
         super().__init__(*args, **kwargs)
 
         self.available_template_types = available_template_types
+        template_type = kwargs.get("template_type")
+
+        self.links = [self.get_link(item, template_type) for item in template_list]
 
         self.templates_and_folders.choices = [(item.id, item.name) for item in template_list]
+
+        self.templates_and_folders.param_extensions["items"] = [self.get_checkbox_item(item) for item in template_list]
 
         self.op = None
         self.is_move_op = self.is_add_folder_op = self.is_add_template_op = False
@@ -2817,6 +2822,45 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
                     ("letter", "Letter") if "letter" in available_template_types else None,
                     ("copy-existing", "Copy an existing template") if allow_adding_copy_of_template else None,
                 ],
+            )
+        )
+
+    @staticmethod
+    def get_checkbox_item(item, template_type):
+        return {
+            "html": render_template(
+                "views/templates/template-list/item-label-content.html",
+                item=item,
+            ),
+            "label": {
+                "classes": "template-list-item-label",
+            },
+            "id": f"templates-or-folder-{item.id}",
+            "classes": "template-list-item template-list-item-with-checkbox {}".format(
+                "template-list-item-hidden-by-default" if item.ancestors else "template-list-item-without-ancestors"
+            ),
+            "after": Markup(
+                render_template(
+                    "views/templates/template-list/item-link.html",
+                    item=item,
+                    template_type=template_type,
+                    wrapping_div=False,
+                )
+            ),
+            # This needs to be added when govuk-frontend-jinja supports it
+            # "attributes": {
+            #     "aria-describedby": f"{item.id}-hint",
+            # }
+        }
+
+    @staticmethod
+    def get_link(item, template_type):
+        return Markup(
+            render_template(
+                "views/templates/template-list/item-link.html",
+                item=item,
+                template_type=template_type,
+                wrapping_div=True,
             )
         )
 

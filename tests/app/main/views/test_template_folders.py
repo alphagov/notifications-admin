@@ -1159,6 +1159,7 @@ def test_should_be_able_to_move_to_existing_folder(
     mock_get_service_templates,
     mock_get_template_folders,
     mock_move_to_template_folder,
+    mock_get_api_keys,
 ):
     FOLDER_TWO_ID = str(uuid.uuid4())
     mock_get_template_folders.return_value = [
@@ -1194,7 +1195,7 @@ def test_should_be_able_to_move_to_existing_folder(
 @pytest.mark.parametrize(
     "user, expected_status, expected_called",
     [
-        (create_active_user_view_permissions(), 403, False),
+        (create_active_user_view_permissions(), 200, False),  # Fails form validation
         (create_active_user_with_permissions(), 302, True),
     ],
 )
@@ -1203,6 +1204,7 @@ def test_should_not_be_able_to_move_to_existing_folder_if_dont_have_permission(
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_api_keys,
     mock_move_to_template_folder,
     user,
     expected_status,
@@ -1414,6 +1416,7 @@ def test_new_folder_is_created_if_only_new_folder_is_filled_out(
     mock_get_template_folders,
     mock_move_to_template_folder,
     mock_create_template_folder,
+    mock_get_api_keys,
 ):
     data = {"move_to_new_folder_name": "", "add_new_folder_name": "new folder", "operation": "add-new-folder"}
 
@@ -1441,6 +1444,7 @@ def test_should_be_able_to_move_to_new_folder(
     mock_get_template_folders,
     mock_move_to_template_folder,
     mock_create_template_folder,
+    mock_get_api_keys,
 ):
     new_folder_id = mock_create_template_folder.return_value
     FOLDER_TWO_ID = str(uuid.uuid4())

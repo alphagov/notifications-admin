@@ -1,0 +1,39 @@
+{% from "components/folder-path.html" import format_template_name %}
+{% import "components/svgs.html" as svgs %}
+
+{% if wrapping_div %}
+<div class="template-list-item {%- if item.ancestors %} template-list-item-hidden-by-default {%- else %} template-list-item-without-ancestors{%- endif %}">
+{% endif %}
+
+{% for ancestor in item.ancestors %}
+    <a href="{{ url_for('main.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=ancestor.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
+    {{ svgs.folder(classes="template-list-folder__icon") }}
+    {{- format_template_name(ancestor.name) -}}
+    </a> <span class="message-name-separator"></span>
+{% endfor %}
+{% if item.is_folder %}
+    <a href="{{ url_for('main.choose_template', service_id=current_service.id, template_type=template_type, template_folder_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-folder">
+    {{ svgs.folder(classes="template-list-folder__icon") }}
+    <span class="live-search-relevant">{{- format_template_name(item.name) -}}</span>
+    </a>
+{% else %}
+    <a href="{{ url_for('main.view_template', service_id=current_service.id, template_id=item.id) }}" class="govuk-link govuk-link--no-visited-state template-list-template">
+    <span class="live-search-relevant">
+        {%- if current_service.api_keys -%}
+        <span class="govuk-!-display-none">{{ item.id }} </span>
+        {%- endif -%}
+        {{- format_template_name(item.name) -}}
+    </span>
+    </a>
+{% endif %}
+
+{% if wrapping_div %}
+    <p class="template-list-item-hint govuk-!-margin-bottom-4">
+        {{ item.hint }}
+    </p>
+</div>
+{% else %}
+    <span id="{{ item.id }}-item-hint" class="govuk-hint govuk-checkboxes__hint template-list-item-hint">
+        {{ item.hint }}
+    </span>
+{% endif %}

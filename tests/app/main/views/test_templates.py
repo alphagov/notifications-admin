@@ -2255,6 +2255,7 @@ def test_choosing_to_copy_redirects(
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_api_keys,
 ):
     client_request.post(
         "main.choose_template",
@@ -2296,6 +2297,7 @@ def test_choosing_letter_creates(
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_api_keys,
     mock_create_service_template,
     fake_uuid,
 ):
@@ -2947,6 +2949,7 @@ def test_should_not_allow_creation_of_template_through_form_without_correct_perm
     service_one,
     mock_get_service_templates,
     mock_get_template_folders,
+    mock_get_api_keys,
     service_permissions,
     data,
     expected_error,

@@ -1,0 +1,6 @@
+{% from "components/folder-path.html" import format_template_name %}
+
+<span class="govuk-visually-hidden">
+    {%- for ancestor in item.ancestors %}{{ format_template_name(ancestor.name, separators=False) }} {% endfor -%}
+    {{ format_template_name(item.name, separators=False) -}}
+</span>
