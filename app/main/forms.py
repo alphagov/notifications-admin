@@ -114,7 +114,7 @@ from app.utils.govuk_frontend_field import (
     render_govuk_frontend_macro,
 )
 from app.utils.image_processing import CorruptImage, ImageProcessor, WrongImageFormat
-from app.utils.interruptible_io import interruptible_iter
+from app.utils.interruptible_io import InterruptibleIterableList, interruptible_iter
 from app.utils.user_permissions import (
     all_ui_permissions,
     organisation_user_permission_names,
@@ -723,6 +723,25 @@ class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
         }
 
         return params
+
+
+class InterruptibleItemsFieldMixin:
+    def __init__(self, *args, items_iteration_interruptible_every=32, **kwargs):
+        self.items_iteration_interruptible_every = items_iteration_interruptible_every
+        super().__init__(*args, **kwargs)
+
+    def get_items_from_options(self, field):
+        r = InterruptibleIterableList(super().get_items_from_options(field))
+        r.INTERRUPTIBLE_ITERABLE_INTERRUPTIBLE_EVERY = self.items_iteration_interruptible_every
+        r.INTERRUPTIBLE_ITERABLE_LABEL_OVERRIDE = self.__class__.__name__
+        # the returned InterruptibleIterableList *usually* survives an encounter with
+        # merge_jsonlike, but arbitrary processing steps are liable to replace it with
+        # a regular list or other Sequence, defeating its purpose
+        return r
+
+
+class InterruptibleItemsGovukCheckboxesField(InterruptibleItemsFieldMixin, GovukCheckboxesField):
+    pass
 
 
 # Wraps checkboxes rendering in HTML needed by the collapsible JS
@@ -2852,7 +2871,7 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
             return self.move_to_new_folder_name.data
         return None
 
-    templates_and_folders = GovukCheckboxesField(
+    templates_and_folders = InterruptibleItemsGovukCheckboxesField(
         "Choose templates or folders",
         validators=[required_for_ops("move-to-new-folder", "move-to-existing-folder")],
         choices=[],  # added to keep order of arguments, added properly in __init__
