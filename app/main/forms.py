@@ -3256,6 +3256,11 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
         if field.errors:
             return
 
+        if (length := len(field.data.filename)) > 100:
+            raise ValidationError(
+                f"File name cannot be longer than 100 characters (‘{field.data.filename}’ is {length} characters)"
+            )
+
         if field.data.filename in self.existing_file_names:
             raise ValidationError(f"Your template already has a file called ‘{field.data.filename}’")
 

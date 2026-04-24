@@ -1,4 +1,5 @@
 import uuid
+from io import BytesIO
 from unittest.mock import ANY, Mock, call
 
 import pytest
@@ -994,6 +995,60 @@ def test_upload_file_does_not_update_template_content(
             },
         ),
     ]
+
+
+@pytest.mark.parametrize(
+    "filename, expected_length, expected_status, expected_file_created",
+    (
+        (
+            ("a" * 96) + ".pdf",
+            100,
+            302,
+            True,
+        ),
+        (
+            ("a" * 97) + ".pdf",
+            101,
+            200,
+            False,
+        ),
+    ),
+)
+def test_upload_file_returns_error_if_filename_is_too_long(
+    client_request,
+    fake_uuid,
+    service_one,
+    mocker,
+    mock_get_service_email_template,
+    filename,
+    expected_status,
+    expected_length,
+    expected_file_created,
+):
+    assert len(filename) == expected_length
+    service_one["contact_link"] = "https://example.com"
+    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
+    mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
+    mock_post = mocker.patch("app.template_email_file_client.post")
+
+    page = client_request.post(
+        "main.upload_template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"file": (BytesIO(b"abcdef"), filename)},
+        _expected_status=expected_status,
+    )
+
+    if expected_status < 300:
+        assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
+            "File name cannot be longer than 100 characters (‘"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.pdf’ "
+            "is 101 characters)"
+        )
+
+    assert mock_antivirus.called is True
+    assert mock_s3.called is expected_file_created
+    assert mock_post.called is expected_file_created
 
 
 @pytest.mark.parametrize(
