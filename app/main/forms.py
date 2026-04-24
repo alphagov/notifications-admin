@@ -3,7 +3,7 @@ from contextlib import suppress
 from copy import deepcopy
 from datetime import UTC, datetime, timedelta
 from functools import partial
-from itertools import chain
+from itertools import chain, repeat
 from math import ceil
 from numbers import Number
 from zipfile import BadZipFile
@@ -510,6 +510,18 @@ class NestedFieldMixin:
         return render_govuk_frontend_macro(self.govuk_frontend_component_name, params=params)
 
 
+class InterruptibleChildRenderingNestedFieldMixin:
+    def __init__(self, *args, child_rendering_interruptible_every=32, **kwargs):
+        self.child_rendering_interruptible_dummy_iterator = interruptible_iter(
+            repeat(None), child_rendering_interruptible_every, label=self.__class__.__name__
+        )
+        super().__init__(*args, **kwargs)
+
+    def render_children(self, *args, **kwargs):
+        next(self.child_rendering_interruptible_dummy_iterator)
+        return super().render_children(*args, **kwargs)
+
+
 class NestedCheckboxesField(SelectMultipleField, NestedFieldMixin):
     NONE_OPTION_VALUE = None
 
@@ -916,6 +928,12 @@ class GovukNestedRadiosField(NestedFieldMixin, GovukRadiosFieldWithNoneOption):
             params["items"].append(item)
 
         return render_govuk_frontend_macro(self.govuk_frontend_component_name, params=params)
+
+
+class InterruptibleChildRenderingGovukNestedRadiosField(
+    InterruptibleChildRenderingNestedFieldMixin, GovukNestedRadiosField
+):
+    pass
 
 
 class GovukRadiosWithImagesField(GovukRadiosField):
@@ -2881,7 +2899,7 @@ class TemplateAndFoldersSelectionForm(OrderableFieldsForm):
     # if no default set, it is set to None, which process_data transforms to '__NONE__'
     # this means '__NONE__' (self.ALL_TEMPLATES option) is selected when no form data has been submitted
     # set default to empty string so process_data method doesn't perform any transformation
-    move_to = GovukNestedRadiosField(
+    move_to = InterruptibleChildRenderingGovukNestedRadiosField(
         "Choose a folder", default="", validators=[required_for_ops("move-to-existing-folder"), Optional()]
     )
 

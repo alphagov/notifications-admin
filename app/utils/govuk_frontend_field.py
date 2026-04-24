@@ -6,7 +6,6 @@ from flask import current_app, templating
 from markupsafe import Markup
 
 from app.utils import merge_jsonlike
-from app.utils.interruptible_io import interruptible_every
 
 
 class GovukFrontendWidgetMixin(ABC):
@@ -98,7 +97,6 @@ class GovukFrontendWidgetMixin(ABC):
         return render_govuk_frontend_macro(self.govuk_frontend_component_name, params)
 
 
-@interruptible_every(32)
 def render_govuk_frontend_macro(component, params):
     """
     jinja needs a template to render but govuk_frontend_jinja only provides macros
