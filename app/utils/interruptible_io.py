@@ -1,4 +1,4 @@
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Iterator
 from functools import wraps
 from io import RawIOBase
 from time import sleep
@@ -144,3 +144,20 @@ def interruptible_iter[T](it: Iterable[T], interruptible_every: int) -> Iterable
         yield item
 
         i += 1
+
+
+class InterruptibleIterableMixin:
+    """
+    A mixin for an Iterable that will yield the GIL or greenthread every
+    INTERRUPTIBLE_ITERABLE_INTERRUPTIBLE_EVERY iterations when its iterator
+    is iterated through
+    """
+
+    INTERRUPTIBLE_ITERABLE_INTERRUPTIBLE_EVERY: int = 32
+
+    def __iter__(self) -> Iterator:
+        return interruptible_iter(super().__iter__(), self.INTERRUPTIBLE_ITERABLE_INTERRUPTIBLE_EVERY)
+
+
+class InterruptibleIterableList(InterruptibleIterableMixin, list):
+    pass
