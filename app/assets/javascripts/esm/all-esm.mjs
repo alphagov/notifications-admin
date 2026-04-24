@@ -148,4 +148,4 @@ if ($updateContentBlocks.length > 0) {
   });
 };
 
-const focusBanner = new FocusBanner();
+new FocusBanner();
