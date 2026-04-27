@@ -6,6 +6,7 @@ class Config:
     ADMIN_CLIENT_SECRET = os.environ.get("ADMIN_CLIENT_SECRET")
     API_HOST_NAME = os.environ.get("API_HOST_NAME")
     SECRET_KEY = os.environ.get("SECRET_KEY")
+    TOKEN_SECRET_KEY = os.environ.get("TOKEN_SECRET_KEY")
     DANGEROUS_SALT = os.environ.get("DANGEROUS_SALT")
     ZENDESK_API_KEY = os.environ.get("ZENDESK_API_KEY")
     NEW_PASSWORD_ENCRYPTION_KEY = os.environ.get("NEW_PASSWORD_ENCRYPTION_KEY")
@@ -130,6 +131,7 @@ class Development(Config):
     # Fernet key must be 32 url-safe base64-encoded bytes:
     NEW_PASSWORD_ENCRYPTION_KEY = "vGUd-3kOibOKqJVMIdfLPOXB4OmSbzRRHr8832ItpzM="
 
+    TOKEN_SECRET_KEY = "5YNWU0e_pN5ZyaSZvBd5uZb_sZlrVDFeOjiea6dq4zQ="
     API_HOST_NAME = os.environ.get("API_HOST_NAME", "http://localhost:6011")
     ANTIVIRUS_API_HOST = os.environ.get("ANTIVIRUS_API_HOST", "http://localhost:6016")
     ANTIVIRUS_API_KEY = "test-key"
