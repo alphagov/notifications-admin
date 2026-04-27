@@ -5,6 +5,14 @@ from time import sleep
 from zipfile import ZipFile
 
 
+def _interruptible(label: str) -> None:
+    """
+    Wrapping our `sleep(0)` calls in a wrapper makes them more instrumentable,
+    especially if a useful `label` is supplied.
+    """
+    sleep(0)
+
+
 class InterruptibleRawIOWrapper(RawIOBase):
     """
     A fileobj wrapper that will make itself "interruptible" by calling sleep(0)
@@ -43,13 +51,13 @@ class InterruptibleRawIOWrapper(RawIOBase):
         return self._wrapped.readable(*args, **kwargs)
 
     def readline(self, size=-1, /):
-        sleep(0)
+        _interruptible(self.__class__.__name__)
         if size >= 0:
             size = min(self._read_limit, size)
         return self._wrapped.readline(size)
 
     def readlines(self, hint=-1, /):
-        sleep(0)
+        _interruptible(self.__class__.__name__)
         if hint >= 0:
             hint = min(self._read_limit, hint)
         return self._wrapped.readlines(hint)
@@ -70,28 +78,28 @@ class InterruptibleRawIOWrapper(RawIOBase):
         return self._wrapped.writable(*args, **kwargs)
 
     def writelines(self, *args, **kwargs):
-        sleep(0)
+        _interruptible(self.__class__.__name__)
         return self._wrapped.writelines(*args, **kwargs)
 
     def __del__(self, *args, **kwargs):
         return self._wrapped.__del__(*args, **kwargs)
 
     def read(self, size=-1, /):
-        sleep(0)
+        _interruptible(self.__class__.__name__)
         if size >= 0:
             size = min(self._read_limit, size)
         return self._wrapped.read(size)
 
     def readall(self, *args, **kwargs):
-        sleep(0)
+        _interruptible(self.__class__.__name__)
         return self._wrapped.readall(*args, **kwargs)
 
     def readinto(self, *args, **kwargs):
-        sleep(0)
+        _interruptible(self.__class__.__name__)
         return self._wrapped.readinto(*args, **kwargs)
 
     def write(self, *args, **kwargs):
-        sleep(0)
+        _interruptible(self.__class__.__name__)
         return self._wrapped.write(*args, **kwargs)
 
 
@@ -105,7 +113,9 @@ class InterruptibleIOZipFile(ZipFile):
         return InterruptibleRawIOWrapper(super().open(*args, **kwargs), read_limit=8_192)
 
 
-def interruptible_every[**A, R](iterations: int) -> Callable[[Callable[A, R]], Callable[A, R]]:
+def interruptible_every[**A, R](
+    iterations: int, *, label: str = "interruptible_every"
+) -> Callable[[Callable[A, R]], Callable[A, R]]:
     """
     Returns a decorator that, applied to a function, will keep a global counter of invocations
     and yield before every `iterations`'th call.
@@ -118,7 +128,7 @@ def interruptible_every[**A, R](iterations: int) -> Callable[[Callable[A, R]], C
         def interruptible_wrapper(*args, **kwargs):
             nonlocal i
             if i >= iterations:
-                sleep(0)
+                _interruptible(label)
                 i = 0
 
             i += 1
@@ -130,7 +140,9 @@ def interruptible_every[**A, R](iterations: int) -> Callable[[Callable[A, R]], C
     return interruptible_decorator
 
 
-def interruptible_iter[T](it: Iterable[T], interruptible_every: int) -> Iterable[T]:
+def interruptible_iter[T](
+    it: Iterable[T], interruptible_every: int, *, label: str = "interruptible_iter"
+) -> Iterable[T]:
     """
     Given an iterable `it`, will yield its contents, calling sleep(0) before yielding each
     `interruptible_every`'th iteration.
@@ -138,7 +150,7 @@ def interruptible_iter[T](it: Iterable[T], interruptible_every: int) -> Iterable
     i = 0
     for item in it:
         if i >= interruptible_every:
-            sleep(0)
+            _interruptible(label)
             i = 0
 
         yield item
@@ -154,9 +166,14 @@ class InterruptibleIterableMixin:
     """
 
     INTERRUPTIBLE_ITERABLE_INTERRUPTIBLE_EVERY: int = 32
+    INTERRUPTIBLE_ITERABLE_LABEL_OVERRIDE: str | None = None
 
     def __iter__(self) -> Iterator:
-        return interruptible_iter(super().__iter__(), self.INTERRUPTIBLE_ITERABLE_INTERRUPTIBLE_EVERY)
+        return interruptible_iter(
+            super().__iter__(),
+            self.INTERRUPTIBLE_ITERABLE_INTERRUPTIBLE_EVERY,
+            label=self.INTERRUPTIBLE_ITERABLE_LABEL_OVERRIDE or self.__class__.__name__,
+        )
 
 
 class InterruptibleIterableList(InterruptibleIterableMixin, list):
