@@ -41,7 +41,9 @@ class TemplateList:
 
     @property
     def interruptible_iter(self):
-        return interruptible_io.interruptible_iter(self, self.INTERRUPTIBLE_ITER_INTERRUPTIBLE_EVERY)
+        return interruptible_io.interruptible_iter(
+            self, self.INTERRUPTIBLE_ITER_INTERRUPTIBLE_EVERY, label=self.__class__.__name__
+        )
 
     @cached_property
     def items(self):
