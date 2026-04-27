@@ -30,6 +30,7 @@ from app.notify_client.service_api_client import service_api_client
 from app.notify_client.template_folder_api_client import template_folder_api_client
 from app.utils import get_default_sms_sender
 from app.utils.templates import get_template as get_template_as_rich_object
+from app.utils.user import is_gov_user
 
 
 class Service(JSONModel):
@@ -192,6 +193,13 @@ class Service(JSONModel):
     def active_users_with_permission(self, permission):
         return tuple(user for user in self.active_users if user.has_permission_for_service(self.id, permission))
 
+    def active_gov_users_with_permission(self, permission):
+        return tuple(
+            user
+            for user in self.active_users
+            if (user.has_permission_for_service(self.id, permission) and is_gov_user(user.email_address))
+        )
+
     @cached_property
     def team_members(self):
         return self.invited_users + self.active_users
@@ -201,7 +209,7 @@ class Service(JSONModel):
 
     @cached_property
     def has_team_members_with_manage_service_permission(self):
-        return len(self.team_members_with_permission("manage_service")) > 1
+        return len(self.active_gov_users_with_permission("manage_service")) > 1
 
     def cancel_invite(self, invited_user_id):
         if str(invited_user_id) not in {user.id for user in self.invited_users}:
