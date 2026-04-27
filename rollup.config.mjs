@@ -124,7 +124,6 @@ export default [
           paths.npm + 'jquery/dist/jquery.min.js',
           paths.npm + 'timeago/jquery.timeago.js',
           paths.npm + 'textarea-caret/index.js',
-          paths.npm + 'cbor-js/cbor.js',
           paths.src + 'javascripts/modules.js',
           paths.src + 'javascripts/stick-to-window-when-scrolling.js',
           paths.src + 'javascripts/templateFolderForm.js',
