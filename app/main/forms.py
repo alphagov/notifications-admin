@@ -467,7 +467,9 @@ class NestedFieldMixin:
         child_map = {None: [option for option in options if option.data == self.NONE_OPTION_VALUE]}
 
         # add entries for all other children
-        for option in interruptible_iter(options, self.CHILD_MAP_ITERATION_INTERRUPTIBLE_EVERY):
+        for option in interruptible_iter(
+            options, self.CHILD_MAP_ITERATION_INTERRUPTIBLE_EVERY, label="child map iteration"
+        ):
             # assign all options with a NONE_OPTION_VALUE (not always None) to the None key
             if option.data == self.NONE_OPTION_VALUE:
                 child_ids = [folder["id"] for folder in self.all_template_folders if folder["parent_id"] is None]
