@@ -542,8 +542,12 @@ class Service(JSONModel):
         )
 
     @cached_property
+    def all_template_folders_by_id(self):
+        return {folder["id"]: folder for folder in self.all_template_folders}
+
+    @cached_property
     def all_template_folder_ids(self):
-        return {folder["id"] for folder in self.all_template_folders}
+        return self.all_template_folders_by_id.keys()
 
     def get_template_folder(self, folder_id):
         if folder_id is None:
@@ -552,10 +556,10 @@ class Service(JSONModel):
                 "name": "Templates",
                 "parent_id": None,
             }
-        for folder in self.all_template_folders:
-            if folder["id"] == str(folder_id):
-                return folder
-        abort(404)
+        try:
+            return self.all_template_folders_by_id[str(folder_id)]
+        except KeyError:
+            abort(404)
 
     def get_template_folder_path(self, template_folder_id):
         folder = self.get_template_folder(template_folder_id)
