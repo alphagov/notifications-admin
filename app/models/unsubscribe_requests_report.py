@@ -100,8 +100,8 @@ class UnsubscribeRequestsReports(ModelList):
     def _get_items(*args, **kwargs):
         return service_api_client.get_unsubscribe_reports_summary(*args, **kwargs)
 
-    def __getitem__(self, index):
-        instance = super().__getitem__(index)
+    def _get_model_instance_from_item(self, item):
+        instance = super()._get_model_instance_from_item(item)
         instance.all_reports = self
         return instance
 
