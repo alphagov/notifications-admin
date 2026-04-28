@@ -1,7 +1,7 @@
 from werkzeug.utils import cached_property
 
 from app import format_notification_type
-from app.utils import interruptible_io
+from app.utils.interruptible_io import InterruptibleIterableMixin
 
 
 class TemplateList:
@@ -23,8 +23,6 @@ class TemplateList:
     comments on those classes for more details.
     """
 
-    INTERRUPTIBLE_ITER_INTERRUPTIBLE_EVERY = 32
-
     def __init__(
         self,
         *,
@@ -38,12 +36,6 @@ class TemplateList:
 
     def __iter__(self):
         yield from self.items
-
-    @property
-    def interruptible_iter(self):
-        return interruptible_io.interruptible_iter(
-            self, self.INTERRUPTIBLE_ITER_INTERRUPTIBLE_EVERY, label=self.__class__.__name__
-        )
 
     @cached_property
     def items(self):
@@ -208,6 +200,12 @@ class UserTemplateList(TemplateList):
         return user_folders
 
 
+# why not just mix this in to `UserTemplateList`? we always want to apply it "on top" of any
+# __iter__ implementations that subclasses or wrapper classes might override
+class InterruptibleUserTemplateList(InterruptibleIterableMixin, UserTemplateList):
+    pass
+
+
 class ServiceTemplateList(UserTemplateList):
     """
     Represents a list of templates and folders for a service,
@@ -272,6 +270,10 @@ class UserTemplateLists:
     @property
     def templates_to_show(self):
         return bool(self.services)
+
+
+class InterruptibleUserTemplateLists(InterruptibleIterableMixin, UserTemplateLists):
+    pass
 
 
 class TemplateListItem:

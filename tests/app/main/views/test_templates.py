@@ -42,6 +42,47 @@ from tests.conftest import (
 )
 
 
+@pytest.fixture()
+def mock_complex_templates_and_folders(
+    notify_admin,
+    mocker,
+):
+    # generate an interesting mixture of folder depths and contained template counts in a
+    # fizzbuzz-style fashion
+    c = count()
+    folders = [_folder(f"folder {i}", str(uuid.uuid4())) for i in islice(c, 0, 100)]
+    folders.extend(
+        _folder(f"folder {i}", str(uuid.uuid4()), parent=parent["id"])
+        for parent, i in zip(folders[::2], c, strict=False)
+    )
+    folders.extend(
+        _folder(f"folder {i}", str(uuid.uuid4()), parent=parent["id"])
+        for parent, i in zip(folders[::3], c, strict=False)
+    )
+    folders.extend(
+        _folder(f"folder {i}", str(uuid.uuid4()), parent=parent["id"])
+        for parent, i in zip(folders[::5], c, strict=False)
+    )
+
+    c = count()
+    templates = [_template("sms", f"sms template {i}") for i in islice(c, 0, 500)]
+    templates.extend(
+        _template("sms", f"sms template {i}", folder["id"])
+        for folder, i in zip(islice(cycle(folders), 0, 2000, 7), c, strict=False)
+    )
+
+    mocker.patch(
+        "app.template_folder_api_client.get_template_folders",
+        return_value=folders,
+    )
+    mocker.patch(
+        "app.service_api_client.get_service_templates",
+        return_value={
+            "data": templates,
+        },
+    )
+
+
 @pytest.mark.parametrize(
     "permissions, expected_message",
     (
@@ -355,43 +396,9 @@ def test_choose_template_interruptible(
     client_request,
     service_one,
     mock_get_no_api_keys,
+    mock_complex_templates_and_folders,
     mocker,
 ):
-    # generate an interesting mixture of folder depths and contained template counts in a
-    # fizzbuzz-style fashion
-    c = count()
-    folders = [_folder(f"folder {i}", str(uuid.uuid4())) for i in islice(c, 0, 100)]
-    folders.extend(
-        _folder(f"folder {i}", str(uuid.uuid4()), parent=parent["id"])
-        for parent, i in zip(folders[::2], c, strict=False)
-    )
-    folders.extend(
-        _folder(f"folder {i}", str(uuid.uuid4()), parent=parent["id"])
-        for parent, i in zip(folders[::3], c, strict=False)
-    )
-    folders.extend(
-        _folder(f"folder {i}", str(uuid.uuid4()), parent=parent["id"])
-        for parent, i in zip(folders[::5], c, strict=False)
-    )
-
-    c = count()
-    templates = [_template("sms", f"sms template {i}") for i in islice(c, 0, 500)]
-    templates.extend(
-        _template("sms", f"sms template {i}", folder["id"])
-        for folder, i in zip(islice(cycle(folders), 0, 2000, 7), c, strict=False)
-    )
-
-    mocker.patch(
-        "app.template_folder_api_client.get_template_folders",
-        return_value=folders,
-    )
-    mocker.patch(
-        "app.service_api_client.get_service_templates",
-        return_value={
-            "data": templates,
-        },
-    )
-
     mock_interruptible = mocker.patch("app.utils.interruptible_io._interruptible")
 
     client_request.get("main.choose_template", service_id=SERVICE_ONE_ID, _test_page_title=False)
@@ -401,7 +408,7 @@ def test_choose_template_interruptible(
     # nullification of one of the forms of interruptibility without noticing. of course, it doesn't
     # test that they're all called an appropriate number of times and in the right *places*.
     assert mocker.call("child map iteration") in mock_interruptible.mock_calls
-    assert mocker.call("UserTemplateList") in mock_interruptible.mock_calls
+    assert mocker.call("InterruptibleUserTemplateList") in mock_interruptible.mock_calls
     assert mocker.call("InterruptibleItemsGovukCheckboxesField") in mock_interruptible.mock_calls
     assert mocker.call("InterruptibleChildRenderingGovukNestedRadiosField") in mock_interruptible.mock_calls
 
@@ -2617,6 +2624,47 @@ def test_choose_a_template_to_copy_from_folder_within_service(
         template_id=TEMPLATE_ONE_ID,
         from_service=SERVICE_ONE_ID,
     )
+
+
+def test_choose_template_to_copy_interruptible(
+    client_request,
+    service_one,
+    mock_get_no_api_keys,
+    mock_complex_templates_and_folders,
+    mock_get_just_services_for_user,
+    mocker,
+):
+    mock_interruptible = mocker.patch("app.utils.interruptible_io._interruptible")
+
+    client_request.get(
+        "main.choose_template_to_copy",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    # assert this view calls _interruptible in the expected way at least once. this may need
+    # updating if class names, inheritance or the view structure changes.
+    assert mocker.call("InterruptibleUserTemplateLists") in mock_interruptible.mock_calls
+
+
+def test_choose_template_to_copy_from_service_interruptible(
+    client_request,
+    service_one,
+    mock_get_no_api_keys,
+    mock_complex_templates_and_folders,
+    mock_get_just_services_for_user,
+    mocker,
+):
+    mock_interruptible = mocker.patch("app.utils.interruptible_io._interruptible")
+
+    client_request.get(
+        "main.choose_template_to_copy",
+        service_id=SERVICE_ONE_ID,
+        from_service=SERVICE_ONE_ID,
+    )
+
+    # assert this view calls _interruptible in the expected way at least once. this may need
+    # updating if class names, inheritance or the view structure changes.
+    assert mocker.call("InterruptibleUserTemplateList") in mock_interruptible.mock_calls
 
 
 @pytest.mark.parametrize(
