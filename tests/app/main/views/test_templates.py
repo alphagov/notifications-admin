@@ -2,6 +2,7 @@ import json
 import uuid
 from functools import partial
 from io import BytesIO
+from itertools import count, cycle, islice
 from unittest.mock import ANY, Mock
 
 import pytest
@@ -348,6 +349,61 @@ def test_should_show_new_template_choices_if_service_has_folder_permission(
     assert normalize_spaces(page.select_one("#add_new_template_form fieldset legend").text) == "New template"
     assert [choice["value"] for choice in page.select("#add_new_template_form input[type=radio]")] == expected_values
     assert [normalize_spaces(choice.text) for choice in page.select("#add_new_template_form label")] == expected_labels
+
+
+def test_choose_template_interruptible(
+    client_request,
+    service_one,
+    mock_get_no_api_keys,
+    mocker,
+):
+    # generate an interesting mixture of folder depths and contained template counts in a
+    # fizzbuzz-style fashion
+    c = count()
+    folders = [_folder(f"folder {i}", str(uuid.uuid4())) for i in islice(c, 0, 100)]
+    folders.extend(
+        _folder(f"folder {i}", str(uuid.uuid4()), parent=parent["id"])
+        for parent, i in zip(folders[::2], c, strict=False)
+    )
+    folders.extend(
+        _folder(f"folder {i}", str(uuid.uuid4()), parent=parent["id"])
+        for parent, i in zip(folders[::3], c, strict=False)
+    )
+    folders.extend(
+        _folder(f"folder {i}", str(uuid.uuid4()), parent=parent["id"])
+        for parent, i in zip(folders[::5], c, strict=False)
+    )
+
+    c = count()
+    templates = [_template("sms", f"sms template {i}") for i in islice(c, 0, 500)]
+    templates.extend(
+        _template("sms", f"sms template {i}", folder["id"])
+        for folder, i in zip(islice(cycle(folders), 0, 2000, 7), c, strict=False)
+    )
+
+    mocker.patch(
+        "app.template_folder_api_client.get_template_folders",
+        return_value=folders,
+    )
+    mocker.patch(
+        "app.service_api_client.get_service_templates",
+        return_value={
+            "data": templates,
+        },
+    )
+
+    mock_interruptible = mocker.patch("app.utils.interruptible_io._interruptible")
+
+    client_request.get("main.choose_template", service_id=SERVICE_ONE_ID, _test_page_title=False)
+
+    # assert this view calls _interruptible in all the expected ways at least once. this may need
+    # updating if class names, inheritance or the view structure changes, but this is here to avoid
+    # nullification of one of the forms of interruptibility without noticing. of course, it doesn't
+    # test that they're all called an appropriate number of times and in the right *places*.
+    assert mocker.call("child map iteration") in mock_interruptible.mock_calls
+    assert mocker.call("UserTemplateList") in mock_interruptible.mock_calls
+    assert mocker.call("InterruptibleItemsGovukCheckboxesField") in mock_interruptible.mock_calls
+    assert mocker.call("InterruptibleChildRenderingGovukNestedRadiosField") in mock_interruptible.mock_calls
 
 
 @pytest.mark.parametrize(
