@@ -1,7 +1,7 @@
 import { isSupported } from 'govuk-frontend';
 
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
-// that uses ES 015 Classes -
+// that uses ES 2015 Classes -
 // https://github.com/alphagov/govuk-frontend/blob/main/docs/contributing/coding-standards/js.md#skeleton
 //
 // It replaces the previously used way of setting methods on the component's `prototype`.
@@ -19,23 +19,27 @@ class FocusBanner {
     }
 
     // focus any error banners when the page loads
-    this.focusBanner($('.banner-dangerous'));
+    const $bannerEl = document.querySelector('.banner-dangerous');
+    if ($bannerEl) {
+      this.focusBanner($bannerEl);
+    }
 
     // focus success and error banners when they appear in any content updates
-    document.addEventListener("updateContent.onafterupdate", function(event) {
-      const $el = event.detail.el[0];
-      this.focusBanner($(".banner-dangerous", $el));
-    }.bind(this));
+    document.addEventListener('updateContent.onafterupdate', (event) => {
+      const el = event.detail.el[0];
+      const $bannerEl = el.classList.contains("banner-dangerous") ? el : el.querySelector(".banner-dangerous");
+      if ($bannerEl) {
+        this.focusBanner($bannerEl);
+      }
+    });
   }
 
-  focusBanner ($bannerEl) {
-    if ($bannerEl.length === 0) { return; }
-
-    $bannerEl.attr('tabindex', '-1');
-    $bannerEl.trigger('focus');
-    $bannerEl.on('blur', () => {
-      $bannerEl.removeAttr('tabindex');
-    });
+  focusBanner($bannerEl) {
+    $bannerEl.setAttribute('tabindex', '-1');
+    $bannerEl.focus();
+    $bannerEl.addEventListener('blur', () => {
+      $bannerEl.removeAttribute('tabindex');
+    }, { once: true });
   }
 }
 
