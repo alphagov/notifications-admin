@@ -1505,15 +1505,29 @@ def test_remove_user_from_service(
     )
 
 
-def test_remove_user_from_service_when_user_api_gives_error(
+@pytest.mark.parametrize(
+    "user_is_gov_user, expected_error_msg",
+    [
+        (True, "Your service needs at least 2 team members: from your organisation"),
+        (False, "Your service needs at least 2 team members: from a public sector organisation"),
+    ],
+)
+def test_remove_user_from_service_when_user_api_gives_error_x(
     client_request,
     active_user_with_permissions,
     service_one,
-    mock_get_users_by_service,
+    mock_get_organisations,
+    api_nongov_user_active,
     mock_get_invites_for_service,
     mock_get_template_folders,
+    user_is_gov_user,
+    expected_error_msg,
     mocker,
 ):
+    mocker.patch(
+        "app.models.user.Users._get_items",
+        return_value=[active_user_with_permissions, api_nongov_user_active],
+    )
     mocker.patch(
         "app.service_api_client.remove_user_from_service",
         side_effect=HTTPError(
@@ -1525,16 +1539,19 @@ def test_remove_user_from_service_when_user_api_gives_error(
     )
     mock_event_handler = mocker.patch("app.main.views.manage_users.Events.remove_user_from_service")
 
+    if not user_is_gov_user:
+        client_request.login(api_nongov_user_active)
+
     page = client_request.post(
         "main.remove_user_from_service",
         service_id=service_one["id"],
         user_id=active_user_with_permissions["id"],
         _follow_redirects=True,
     )
+    error_message = normalize_spaces(page.select_one(".banner-dangerous").text)
 
-    assert (
-        "You cannot remove this team member Your service needs at least 2 team members: from your organisation"
-    ) in normalize_spaces(page.select_one(".banner-dangerous").text)
+    assert error_message.startswith("You cannot remove this team member")
+    assert expected_error_msg in error_message
     assert not mock_event_handler.called
 
 
