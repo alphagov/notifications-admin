@@ -14,6 +14,7 @@ from app.models.api_key import APIKey
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES
+from app.utils.interruptible_io import InterruptibleIterableMixin
 from app.utils.letters import get_letter_printing_statement
 from app.utils.templates import EmailPreviewTemplate
 
@@ -178,6 +179,10 @@ class Notifications(ModelList):
         self.items = resp["notifications"]
         self.prev = resp.get("links", {}).get("prev", None)
         self.next = resp.get("links", {}).get("next", None)
+
+
+class InterruptibleNotifications(InterruptibleIterableMixin, Notifications):
+    pass
 
 
 class NotificationForCSV(Notification):

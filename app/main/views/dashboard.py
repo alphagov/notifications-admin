@@ -20,7 +20,7 @@ from app.extensions import redis_client
 from app.formatters import format_date_numeric, format_datetime_numeric, format_phone_number_human_readable
 from app.main import json_updates, main
 from app.main.forms import SearchNotificationsForm
-from app.models.notification import InboundSMSMessages, Notifications
+from app.models.notification import InboundSMSMessages, InterruptibleNotifications
 from app.statistics_utils import get_formatted_percentage
 from app.utils import (
     DELIVERED_STATUSES,
@@ -301,7 +301,7 @@ def _get_notifications_dashboard_partials_data(service_id, message_type):
     if message_type is not None:
         service_data_retention_days = current_service.get_days_of_retention(message_type)
 
-    notifications = Notifications(
+    notifications = InterruptibleNotifications(
         service_id=service_id,
         page=page,
         template_type=[message_type] if message_type else [],

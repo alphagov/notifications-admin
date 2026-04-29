@@ -130,8 +130,8 @@ class TemplateEmailFiles(SerialisedModelCollection):
 
         super().__init__(template._template.get("email_files", []))
 
-    def __getitem__(self, index):
-        return self.model(self.items[index] | {"service_id": self.service_id, "template": self.template})
+    def _get_model_instance_from_item(self, item):
+        return super()._get_model_instance_from_item(item | {"service_id": self.service_id, "template": self.template})
 
     @property
     def as_personalisation(self):

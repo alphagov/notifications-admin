@@ -58,7 +58,7 @@ from app.main.forms import (
 )
 from app.main.views.send import get_sender_details
 from app.models.service import Service
-from app.models.template_list import TemplateList, UserTemplateList, UserTemplateLists
+from app.models.template_list import InterruptibleUserTemplateList, InterruptibleUserTemplateLists, TemplateList
 from app.s3_client.s3_letter_upload_client import (
     backup_original_letter_to_s3,
     get_attachment_pdf_and_metadata,
@@ -154,11 +154,13 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
     user_has_template_folder_permission = current_user.has_template_folder_permission(
         template_folder, service=current_service
     )
-    template_list = UserTemplateList(
+    template_list = InterruptibleUserTemplateList(
         service=current_service, template_type=template_type, template_folder_id=template_folder_id, user=current_user
     )
 
-    all_template_folders = UserTemplateList(service=current_service, user=current_user).all_template_folders
+    all_template_folders = InterruptibleUserTemplateList(
+        service=current_service, user=current_user
+    ).all_template_folders
     option_hints = {template_folder_id: "current folder"}
     templates_and_folders_form = TemplateAndFoldersSelectionForm(
         all_template_folders=all_template_folders,
@@ -418,7 +420,7 @@ def choose_template_to_copy(
 
         return render_template(
             "views/templates/copy.html",
-            services_templates_and_folders=UserTemplateList(
+            services_templates_and_folders=InterruptibleUserTemplateList(
                 service=service, template_folder_id=from_folder, user=current_user
             ),
             template_folder_path=service.get_template_folder_path(from_folder),
@@ -430,7 +432,7 @@ def choose_template_to_copy(
     else:
         return render_template(
             "views/templates/copy.html",
-            services_templates_and_folders=UserTemplateLists(current_user),
+            services_templates_and_folders=InterruptibleUserTemplateLists(current_user),
             _search_form=SearchTemplatesForm(current_service.api_keys),
             to_folder_id=to_folder_id,
         )
