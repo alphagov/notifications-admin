@@ -1910,7 +1910,10 @@ class SupportWhatHappenedForm(StripWhitespaceForm):
     what_happened = GovukRadiosField(
         "What happened?",
         choices=[
-            ("technical-difficulties", "I got a ‘technical difficulties’ error when I tried to upload a file"),
+            (
+                "technical-difficulties",
+                "I got a ‘technical difficulties’ error when I tried to send messages using the Notify website",
+            ),
             ("api-500-response", "I got a 500 response code from the API"),
             ("something-else", "Something else"),
         ],
