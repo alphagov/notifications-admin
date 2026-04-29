@@ -479,6 +479,16 @@ def copy_template(service_id, template_id):
             letter_welsh_content=template.get_raw("letter_welsh_content"),
             has_unsubscribe_link=template.get_raw("has_unsubscribe_link"),
         )["data"]
+        if template.template_type == "email":
+            if new_files := template.email_files:
+                for file in new_files:
+                    file.copy_file(
+                        destination_template_id=new_template["id"],
+                        destination_service_id=current_service.id,
+                        retention_period=file.retention_period,
+                        validate_users_email=file.validate_users_email,
+                        link_text=file.link_text,
+                    )
         if template.template_type == "letter" and template.get_raw("letter_attachment"):
             _copy_letter_attachment(from_template=template, to_template=new_template)
         return redirect(url_for(".view_template", service_id=service_id, template_id=new_template["id"]))

@@ -855,6 +855,36 @@ def mock_get_service_email_template(notify_admin, mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_get_service_email_template_with_file(notify_admin, mocker):
+    def _get(service_id, template_id, version=None):
+        email_files = [
+            {
+                "service_id": SERVICE_ONE_ID,
+                "template_id": str(template_id),
+                "id": fake_uuid,
+                "filename": "example.pdf",
+                "created_by_id": str(uuid4()),
+                "link_text": "example file",
+                "retention_period": 12,
+                "validate_users_email": True,
+            }
+        ]
+        template = template_json(
+            service_id=service_id,
+            id_=template_id,
+            name="Two week reminder",
+            type_="email",
+            content="Your vehicle tax expires on ((date)). Please click the file ((example.pdf))",
+            subject="Your ((thing)) is due soon",
+            redact_personalisation=False,
+            email_files=email_files,
+        )
+        return {"data": template}
+
+    return mocker.patch("app.service_api_client.get_service_template", side_effect=_get)
+
+
+@pytest.fixture(scope="function")
 def mock_get_service_email_template_without_placeholders(notify_admin, mocker):
     def _get(service_id, template_id, version=None):
         template = template_json(
