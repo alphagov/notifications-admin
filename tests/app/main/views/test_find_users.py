@@ -299,10 +299,18 @@ def test_archive_user_posts_to_user_client(
     assert mock_events.called
 
 
+@pytest.mark.parametrize(
+    "api_error_message",
+    [
+        "User can’t be removed from a service - check all services have another team member with manage_settings",
+        "User cannot be removed from a service",
+    ],
+)
 def test_archive_user_shows_error_message_if_user_cannot_be_archived(
     client_request,
     platform_admin_user,
     api_user_active,
+    api_error_message,
     mocker,
     mock_get_non_empty_organisations_and_services_for_user,
 ):
@@ -313,12 +321,10 @@ def test_archive_user_shows_error_message_if_user_cannot_be_archived(
                 status_code=400,
                 json={
                     "result": "error",
-                    "message": "User can’t be removed from a service - check all services have another "
-                    "team member with manage_settings",
+                    "message": api_error_message,
                 },
             ),
-            message="User can’t be removed from a service - check all services have another team member "
-            "with manage_settings",
+            message=api_error_message,
         ),
     )
 
@@ -331,9 +337,8 @@ def test_archive_user_shows_error_message_if_user_cannot_be_archived(
 
     assert normalize_spaces(page.select_one("h1").text) == "Platform admin user"
     assert (
-        normalize_spaces(page.select_one(".banner-dangerous").text)
-        == "User can’t be removed from a service - check all services have another team member with manage_settings"
-    )
+        "You cannot archive this user They have the ‘manage settings’ permission for at least one service."
+    ) in normalize_spaces(page.select_one(".banner-dangerous").text)
 
 
 def test_archive_user_does_not_create_event_if_user_client_raises_unexpected_exception(
