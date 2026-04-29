@@ -714,10 +714,9 @@ class GovukCheckboxesField(GovukFrontendWidgetMixin, SelectMultipleField):
 
     @property
     def error_summary_id(self):
-        items = self.get_items_from_options(self)
-        if len(items) > 0:
-            return items[0]["id"]
-
+        for option in self:
+            # Stop looping through `self` as soon as we’ve found something
+            return option.id
         return self.id
 
     def prepare_params(self, **kwargs):
@@ -836,10 +835,9 @@ class GovukRadiosField(GovukFrontendWidgetMixin, RadioField):
 
     @property
     def error_summary_id(self):
-        items = self.get_items_from_options(self)
-        if len(items) > 0:
-            return items[0]["id"]
-
+        for option in self:
+            # Stop looping through `self` as soon as we’ve found something
+            return option.id
         return self.id
 
     def prepare_params(self, **kwargs):
