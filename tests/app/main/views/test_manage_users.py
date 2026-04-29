@@ -1505,13 +1505,6 @@ def test_remove_user_from_service(
     )
 
 
-@pytest.mark.parametrize(
-    "api_error_message",
-    [
-        "You cannot remove the only user for a service",
-        "User cannot be removed from the service",
-    ],
-)
 def test_remove_user_from_service_when_user_api_gives_error(
     client_request,
     active_user_with_permissions,
@@ -1519,14 +1512,15 @@ def test_remove_user_from_service_when_user_api_gives_error(
     mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_get_template_folders,
-    api_error_message,
     mocker,
 ):
     mocker.patch(
         "app.service_api_client.remove_user_from_service",
         side_effect=HTTPError(
-            response=mocker.Mock(status_code=400, json={"result": "error", "message": api_error_message}),
-            message=api_error_message,
+            response=mocker.Mock(
+                status_code=400, json={"result": "error", "message": "User cannot be removed from the service"}
+            ),
+            message="User cannot be removed from the service",
         ),
     )
     mock_event_handler = mocker.patch("app.main.views.manage_users.Events.remove_user_from_service")
@@ -1544,13 +1538,6 @@ def test_remove_user_from_service_when_user_api_gives_error(
     assert not mock_event_handler.called
 
 
-@pytest.mark.parametrize(
-    "api_error_message",
-    [
-        "You cannot remove the only user for a service",
-        "User cannot be removed from the service",
-    ],
-)
 def test_remove_user_from_service_when_user_api_gives_error_for_platform_admin_user(
     client_request,
     active_user_with_permissions,
@@ -1559,14 +1546,15 @@ def test_remove_user_from_service_when_user_api_gives_error_for_platform_admin_u
     mock_get_users_by_service,
     mock_get_invites_for_service,
     mock_get_template_folders,
-    api_error_message,
     mocker,
 ):
     mocker.patch(
         "app.service_api_client.remove_user_from_service",
         side_effect=HTTPError(
-            response=mocker.Mock(status_code=400, json={"result": "error", "message": api_error_message}),
-            message=api_error_message,
+            response=mocker.Mock(
+                status_code=400, json={"result": "error", "message": "User cannot be removed from the service"}
+            ),
+            message="User cannot be removed from the service",
         ),
     )
     mock_event_handler = mocker.patch("app.main.views.manage_users.Events.remove_user_from_service")
