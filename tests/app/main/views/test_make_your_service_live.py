@@ -1,6 +1,5 @@
 from datetime import UTC, datetime
 from unittest.mock import ANY, Mock, PropertyMock, call
-from uuid import uuid4
 
 import pytest
 from flask import url_for
@@ -8,7 +7,7 @@ from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
-from tests import invite_json, organisation_json, validate_route_permission
+from tests import organisation_json, validate_route_permission
 from tests.conftest import ORGANISATION_ID, SERVICE_ONE_ID, create_template, normalize_spaces
 
 
@@ -290,11 +289,12 @@ def test_should_check_for_email_from_name_on_go_live(
 
 
 @pytest.mark.parametrize(
-    "count_of_users_with_manage_service,count_of_invites_with_manage_service,expected_user_checklist_item",
+    "count_of_users_with_manage_service,count_of_invites_with_manage_service,count_of_non_gov_users_with_manage,expected_user_checklist_item",
     [
-        (1, 0, "Give another team member the ‘manage settings’ permission Incomplete"),
-        (2, 0, "Give another team member the ‘manage settings’ permission Completed"),
-        (1, 1, "Give another team member the ‘manage settings’ permission Completed"),
+        (1, 0, 0, "Give another team member the ‘manage settings’ permission Incomplete"),
+        (2, 0, 0, "Give another team member the ‘manage settings’ permission Completed"),
+        (1, 1, 0, "Give another team member the ‘manage settings’ permission Incomplete"),
+        (1, 0, 1, "Give another team member the ‘manage settings’ permission Incomplete"),
     ],
 )
 @pytest.mark.parametrize(
@@ -312,8 +312,10 @@ def test_should_check_for_sending_things_right(
     single_sms_sender,
     count_of_users_with_manage_service,
     count_of_invites_with_manage_service,
+    count_of_non_gov_users_with_manage,
     expected_user_checklist_item,
     count_of_templates,
+    api_nongov_user_active,
     expected_templates_checklist_item,
     active_user_with_permissions,
     active_user_no_settings_permission,
@@ -324,30 +326,18 @@ def test_should_check_for_sending_things_right(
         return_value={"data": [create_template(template_type="sms") for _ in range(count_of_templates)]},
     )
 
+    mocker.patch(
+        "app.organisations_client.get_domains",
+        return_value=[],
+    )
+
     mock_get_users = mocker.patch(
         "app.models.user.Users._get_items",
         return_value=(
-            [active_user_with_permissions] * count_of_users_with_manage_service + [active_user_no_settings_permission]
+            [active_user_with_permissions] * count_of_users_with_manage_service
+            + [active_user_no_settings_permission]
+            + [api_nongov_user_active] * count_of_non_gov_users_with_manage
         ),
-    )
-    invite_one = invite_json(
-        id_=uuid4(),
-        from_user=service_one["users"][0],
-        service_id=service_one["id"],
-        email_address="invited_user@test.gov.uk",
-        permissions="view_activity,send_messages,manage_service,manage_api_keys",
-        created_at=datetime.now(UTC),
-        status="pending",
-        auth_type="sms_auth",
-        folder_permissions=[],
-    )
-
-    invite_two = invite_one.copy()
-    invite_two["permissions"] = "view_activity"
-
-    mock_get_invites = mocker.patch(
-        "app.models.user.InvitedUsers._get_items",
-        return_value=(([invite_one] * count_of_invites_with_manage_service) + [invite_two]),
     )
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
@@ -358,7 +348,6 @@ def test_should_check_for_sending_things_right(
     assert normalize_spaces(checklist_items[3].text) == expected_templates_checklist_item
 
     mock_get_users.assert_called_once_with(SERVICE_ONE_ID)
-    mock_get_invites.assert_called_once_with(SERVICE_ONE_ID)
 
 
 @pytest.mark.parametrize(
