@@ -316,9 +316,7 @@ def remove_user_from_service(service_id, user_id):
     try:
         service_api_client.remove_user_from_service(service_id, user_id)
     except HTTPError as e:
-        msg = "You cannot remove the only user for a service"
-        new_msg = "User cannot be removed from the service"
-        if e.status_code == 400 and (msg in e.message or new_msg in e.message):
+        if e.status_code == 400 and "User cannot be removed from the service" in e.message:
             if current_user.platform_admin:
                 flash(
                     Markup(
@@ -340,13 +338,13 @@ def remove_user_from_service(service_id, user_id):
             else:
                 flash(
                     Markup(
-                        """
+                        f"""
                         <h2 class='govuk-heading-m'>You cannot remove this team member</h2>
                         <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
                             Your service needs at least 2 team members:
                         </p>
                         <ul class='govuk-list govuk-list--bullet error-text-colour govuk-!-font-weight-bold'>
-                            <li>from your organisation</li>
+                            <li>from {"your" if current_user.is_gov_user else "a public sector"} organisation</li>
                             <li>with the ‘manage settings, team and usage’ permission</li>
                         </ul>
                         <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>

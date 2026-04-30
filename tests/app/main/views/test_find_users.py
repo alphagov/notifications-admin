@@ -299,18 +299,10 @@ def test_archive_user_posts_to_user_client(
     assert mock_events.called
 
 
-@pytest.mark.parametrize(
-    "api_error_message",
-    [
-        "User can’t be removed from a service - check all services have another team member with manage_settings",
-        "User cannot be removed from a service",
-    ],
-)
 def test_archive_user_shows_error_message_if_user_cannot_be_archived(
     client_request,
     platform_admin_user,
     api_user_active,
-    api_error_message,
     mocker,
     mock_get_non_empty_organisations_and_services_for_user,
 ):
@@ -321,10 +313,10 @@ def test_archive_user_shows_error_message_if_user_cannot_be_archived(
                 status_code=400,
                 json={
                     "result": "error",
-                    "message": api_error_message,
+                    "message": "User cannot be removed from a service",
                 },
             ),
-            message=api_error_message,
+            message="User cannot be removed from a service",
         ),
     )
 

@@ -42,8 +42,7 @@ def archive_user(user_id):
         try:
             user_api_client.archive_user(user_id)
         except HTTPError as e:
-            new_msg = "User cannot be removed from a service"
-            if e.status_code == 400 and ("manage_settings" in e.message or new_msg in e.message):
+            if e.status_code == 400 and "User cannot be removed from a service" in e.message:
                 flash(
                     Markup(
                         """
