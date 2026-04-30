@@ -1,21 +1,24 @@
 import { jest } from '@jest/globals';
 import ErrorBanner from '../../app/assets/javascripts/esm/error-banner.mjs';
 
+
 jest.unstable_mockModule('../../app/assets/javascripts/utils/location.mjs', () => ({
   locationAssign: jest.fn()
 }));
+
 
 let AuthenticateSecurityKey;
 let locationAssign;
 
 beforeAll( async() => {
-  const CBOR = await import('../../node_modules/cbor-js/cbor.js');
+  const CBOR = await import('cbor2');
   const authenticateSecurityKeyModule = await import('../../app/assets/javascripts/esm/authenticate-security-key.mjs');
   const locationUtilModule = await import('../../app/assets/javascripts/utils/location.mjs');
 
   AuthenticateSecurityKey = authenticateSecurityKeyModule.default;
   locationAssign = locationUtilModule.locationAssign;
-  window.CBOR = CBOR.default || CBOR;
+  decode = CBOR.decode;
+  encode = CBOR.encode;
 })
 
 describe('Authenticate with security key', () => {
@@ -74,8 +77,8 @@ describe('Authenticate with security key', () => {
     // mock WebAuthn browser API
     window.navigator.credentials = mockBrowserCredentials;
 
-    mockWebauthnOptions = window.CBOR.encode('someArbitraryOptions');
-    mockLoginResponse = window.CBOR.encode({ redirect_url: '/foo' });
+    mockWebauthnOptions = encode('someArbitraryOptions');
+    mockLoginResponse = encode({ redirect_url: '/foo' });
     // instantiate class
     authenticateKeyInstance = new AuthenticateSecurityKey(button);
     
@@ -113,7 +116,7 @@ describe('Authenticate with security key', () => {
 
     expect(mockBrowserCredentials.get.mock.calls[0][0]).toEqual('someArbitraryOptions')
 
-    const decodedData = window.CBOR.decode(mockFetchOptions.body)
+    const decodedData = decode(mockFetchOptions.body)
     expect(decodedData.credentialId).toEqual(new Uint8Array([1, 1, 1]))
     expect(decodedData.authenticatorData).toEqual(new Uint8Array([2, 2, 2]))
     expect(decodedData.signature).toEqual(new Uint8Array([3, 3, 3]))
