@@ -837,6 +837,119 @@ def test_cant_edit_non_member_user_permissions(
     assert mock_set_user_permissions.called is False
 
 
+@pytest.mark.parametrize(
+    "user_is_gov_user, expected_error_msg",
+    [
+        (
+            True,
+            (
+                "You cannot change this team member’s permissions "
+                "Your service needs at least 2 team members: "
+                "from your organisation "
+                "with the ‘manage settings, team and usage’ permission "
+                "Add new team members or update the permissions for your team, then try again."
+            ),
+        ),
+        (
+            False,
+            (
+                "You cannot change this team member’s permissions "
+                "Your service needs at least 2 team members: "
+                "from a public sector organisation "
+                "with the ‘manage settings, team and usage’ permission "
+                "Add new team members or update the permissions for your team, then try again."
+            ),
+        ),
+    ],
+)
+def test_edit_user_permissions_when_api_gives_error_that_permissions_cannot_be_changed(
+    client_request,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    mock_get_template_folders,
+    mock_get_organisations,
+    service_one,
+    api_nongov_user_active,
+    user_is_gov_user,
+    expected_error_msg,
+    mocker,
+):
+    mocker.patch(
+        "app.models.user.User.set_permissions",
+        side_effect=HTTPError(
+            response=mocker.Mock(
+                status_code=400,
+                json={
+                    "result": "error",
+                    "message": "Cannot change user permissions - service would have too few users with manage_settings",
+                },
+            ),
+            message="Cannot change user permissions - service would have too few users with manage_settings",
+        ),
+    )
+
+    if not user_is_gov_user:
+        client_request.login(api_nongov_user_active)
+
+    page = client_request.post(
+        "main.edit_user_permissions",
+        service_id=service_one["id"],
+        user_id=active_user_with_permissions["id"],
+        _data={
+            "email_address": "test@example.com",
+            "manage_service": "y",
+        },
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == expected_error_msg
+
+
+def test_edit_user_permissions_when_user_is_platform_admin_and_api_gives_error_that_permissions_cannot_be_changed(
+    client_request,
+    active_user_with_permissions,
+    mock_get_users_by_service,
+    mock_get_template_folders,
+    service_one,
+    platform_admin_user,
+    mocker,
+):
+    mocker.patch(
+        "app.models.user.User.set_permissions",
+        side_effect=HTTPError(
+            response=mocker.Mock(
+                status_code=400,
+                json={
+                    "result": "error",
+                    "message": "Cannot change user permissions - service would have too few users with manage_settings",
+                },
+            ),
+            message="Cannot change user permissions - service would have too few users with manage_settings",
+        ),
+    )
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.post(
+        "main.edit_user_permissions",
+        service_id=service_one["id"],
+        user_id=active_user_with_permissions["id"],
+        _data={
+            "email_address": "test@example.com",
+            "manage_service": "y",
+        },
+        _follow_redirects=True,
+    )
+
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
+        "You cannot change this team member’s permissions "
+        "A service needs at least 2 team members: "
+        "from a public sector organisation "
+        "with the ‘manage settings, team and usage’ permission "
+        "Ask the user to add new team members or update the permissions for their team."
+    )
+
+
 def test_edit_user_permissions_including_authentication_with_email_auth_service(
     client_request,
     service_one,
