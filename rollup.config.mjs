@@ -4,7 +4,7 @@ import copy from 'rollup-plugin-copy';
 import styles from "rollup-plugin-styler";
 import postCSSReplace from 'postcss-replace';
 import fs from 'node:fs/promises';
- 
+
 
 const LEGACY_BUNDLE_ID = 'legacy-bundle'
 // Simple file concatenation plugin
@@ -124,7 +124,6 @@ export default [
           paths.npm + 'jquery/dist/jquery.min.js',
           paths.npm + 'textarea-caret/index.js',
           paths.src + 'javascripts/modules.js',
-          paths.src + 'javascripts/stick-to-window-when-scrolling.js',
           paths.src + 'javascripts/templateFolderForm.js',
           paths.src + 'javascripts/main.js'
         ]),
