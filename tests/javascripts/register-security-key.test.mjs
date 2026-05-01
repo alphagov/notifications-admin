@@ -9,13 +9,14 @@ let RegisterSecurityKey;
 let locationReload;
 
 beforeAll( async() => {
-  const CBOR = await import('../../node_modules/cbor-js/cbor.js');
+  const CBOR = await import('cbor2');
   const registerSecurityKeyModule = await import('../../app/assets/javascripts/esm/register-security-key.mjs');
   const locationUtilModule = await import('../../app/assets/javascripts/utils/location.mjs');
 
   RegisterSecurityKey = registerSecurityKeyModule.default;
   locationReload = locationUtilModule.locationReload;
-  window.CBOR = CBOR.default || CBOR;
+  decode = CBOR.decode;
+  encode = CBOR.encode;
 })
 
 describe('Register security key', () => {
@@ -70,7 +71,7 @@ describe('Register security key', () => {
     // mock WebAuthn browser API
     window.navigator.credentials = mockBrowserCredentials;
 
-    mockWebauthnOptions = window.CBOR.encode('options');
+    mockWebauthnOptions = encode('options');
     // instantiate class
     registerKeyInstance = new RegisterSecurityKey(button);
   })
@@ -106,7 +107,7 @@ describe('Register security key', () => {
     expect(mockFetchOptions.headers['X-CSRFToken']).toBe();
     expect(mockFetchOptions.method).toBe('POST');
 
-    const decodedData = window.CBOR.decode(mockFetchOptions.body);
+    const decodedData = decode(mockFetchOptions.body);
     expect(decodedData.attestationObject).toEqual(new Uint8Array([1, 2, 3]));
     expect(decodedData.clientDataJSON).toEqual(new Uint8Array([4, 5, 6]));
  

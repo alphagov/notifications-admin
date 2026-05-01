@@ -1,9 +1,10 @@
 import { isSupported } from 'govuk-frontend';
 import ErrorBanner from './error-banner.mjs';
 import { locationAssign } from '../utils/location.mjs';
+import { decode, encode } from 'cbor2';
 
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
-// that uses ES 015 Classes -
+// that uses ES 2015 Classes -
 // https://github.com/alphagov/govuk-frontend/blob/main/docs/contributing/coding-standards/js.md#skeleton
 //
 // It replaces the previously used way of setting methods on the component's `prototype`.
@@ -14,7 +15,7 @@ import { locationAssign } from '../utils/location.mjs';
 
 class AuthenticateSecurityKey {
   constructor($module) {
-    if (!isSupported()) {
+    if (!isSupported() || !window.TextEncoder) {
       return this;
     }
     this.authenticationEndpoint = '/webauthn/authenticate';
@@ -44,7 +45,7 @@ class AuthenticateSecurityKey {
     }
 
     const data = await response.arrayBuffer();
-    return window.CBOR.decode(data);
+    return decode(new Uint8Array(data));
   }
 
   async getCredential(options) {
@@ -70,7 +71,7 @@ class AuthenticateSecurityKey {
     return fetch(authenticateURL, {
       method: 'POST',
       headers: { 'X-CSRFToken': this.$module.dataset.csrfToken },
-      body: window.CBOR.encode({
+      body: encode({
         credentialId: new Uint8Array(credential.rawId),
         authenticatorData: new Uint8Array(credential.response.authenticatorData),
         signature: new Uint8Array(credential.response.signature),
@@ -85,7 +86,7 @@ class AuthenticateSecurityKey {
     }
 
     const cbor = await response.arrayBuffer();
-    const data = window.CBOR.decode(cbor);
+    const data = decode(new Uint8Array(cbor));
 
     // Redirect the user on successful authentication
     locationAssign(data.redirect_url);

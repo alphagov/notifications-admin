@@ -1,10 +1,21 @@
 import { isSupported } from 'govuk-frontend';
 import ErrorBanner from './error-banner.mjs';
 import { locationReload } from '../utils/location.mjs';
+import { decode, encode } from 'cbor2';
+
+// This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
+// that uses ES 2015 Classes -
+// https://github.com/alphagov/govuk-frontend/blob/main/docs/contributing/coding-standards/js.md#skeleton
+//
+// It replaces the previously used way of setting methods on the component's `prototype`.
+// We use a class declaration way of defining classes -
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class
+//
+// More on ES2015 Classes at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
 
 class RegisterSecurityKey {
   constructor($module) {
-    if (!isSupported()) {
+    if (!isSupported() || !window.TextEncoder) {
       return this;
     }
     this.registerAuthenticationEndpoint = '/webauthn/register';
@@ -34,7 +45,7 @@ class RegisterSecurityKey {
     }
 
     const data = await response.arrayBuffer();
-    return window.CBOR.decode(data);
+    return decode(new Uint8Array(data));
   }
 
   createCredential(options) {
@@ -46,7 +57,7 @@ class RegisterSecurityKey {
     return fetch(this.registerAuthenticationEndpoint, {
       method: 'POST',
       headers: { 'X-CSRFToken': this.$module.dataset.csrfToken },
-      body: window.CBOR.encode({
+      body: encode({
         attestationObject: new Uint8Array(credential.response.attestationObject),
         clientDataJSON: new Uint8Array(credential.response.clientDataJSON),
       })
