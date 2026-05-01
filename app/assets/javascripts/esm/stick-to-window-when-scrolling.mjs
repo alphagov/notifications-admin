@@ -270,7 +270,7 @@ StickyElement.prototype._getShimCSS = function () {
   };
 };
 StickyElement.prototype.stickyClass = function () {
-  return (this._sticky._initialPositionsSet) ? this._fixedClass : this._initialFixedClass;
+  return (this._sticky.initialPositionsSet) ? this._fixedClass : this._initialFixedClass;
 };
 StickyElement.prototype.appliedClass = function () {
   return this._appliedClass;
@@ -412,7 +412,7 @@ var dialog = {
   fitToHeight: function (sticky) {
     var self = this;
     var els = sticky._els.slice();
-    var height = sticky.getWindowDimensions().height;
+    var height = Sticky.getWindowDimensions().height;
     var totalStickyHeight = function () {
       return self._getTotalHeight(self._elsThatCanBeStuck(els));
     };
@@ -458,7 +458,7 @@ var dialog = {
     return this._getTotalHeight(this._elsThatCanBeStuck(els));
   },
   adjustForResize: function (sticky) {
-    var windowHeight = sticky.getWindowDimensions().height;
+    var windowHeight = Sticky.getWindowDimensions().height;
 
     if (sticky.edge === 'top') {
       $(window).scrollTop(this.getInPageEdgePosition(sticky));
@@ -475,346 +475,375 @@ var dialog = {
 
 // Constructor for objects collecting together all generic behaviour for controlling the state of
 // sticky elements
-var Sticky = function (selector) {
-  this._hasScrolled = false;
-  this._scrollTimeout = false;
-  this._windowHasResized = false;
-  this._resizeTimeout = false;
-  this._elsLoaded = false;
-  this._initialPositionsSet = false;
-  this._els = [];
+//
+// This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
+// that uses ES 015 Classes -
+// https://github.com/alphagov/govuk-frontend/blob/main/docs/contributing/coding-standards/js.md#skeleton
+//
+// It replaces the previously used way of setting methods on the component's `prototype`.
+// We use a class declaration way of defining classes -
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class
+//
+// More on ES2015 Classes at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
+class Sticky {
+  #hasScrolled = false;
+  #scrollTimeout = false;
+  #windowHasResized = false;
+  #resizeTimeout = false;
 
-  this.CSS_SELECTOR = selector;
-  this.STOP_PADDING = 10;
-};
-Sticky.prototype.setMode = function (mode) {
-  _mode = mode;
-};
-Sticky.prototype.getWindowDimensions = function () {
-  return {
-    height: $(global).height(),
-    width: $(global).width()
-  };
-};
-Sticky.prototype.getWindowPositions = function () {
-  return {
-    scrollTop: $(global).scrollTop()
-  };
-};
-// Change state of sticky elements based on their position relative to the window
-Sticky.prototype.setElementPositions = function () {
-  var self = this,
-      windowDimensions = self.getWindowDimensions(),
-      windowTop = self.getWindowPositions().scrollTop,
-      windowPositions = {
-        'top': windowTop,
-        'bottom':  windowTop + windowDimensions.height
-      };
+  constructor (selector) {
+    this._els = [];
+    this.initialPositionsSet = false;
 
-  var _setElementPosition = function (el) {
-    if (self.viewportIsWideEnough(windowDimensions.width)) {
+    this.CSS_SELECTOR = selector;
+    this.STOP_PADDING = 10;
+  }
 
-      if (self.windowNotPastScrolledFrom(windowPositions, self.getScrolledFrom(el))) {
-        self.reset(el);
-      } else { // past the point it sits in the document
-        if (self.windowNotPastScrollingTo(windowPositions, self.getScrollingTo(el))) {
-          self.stick(el);
-          if (el.isStopped()) {
-            self.unstop(el);
+  setMode (mode) {
+    _mode = mode;
+  }
+
+  // Change state of sticky elements based on their position relative to the window
+  setElementPositions () {
+    const windowDimensions = Sticky.getWindowDimensions(),
+          windowTop = Sticky.getWindowPositions().scrollTop,
+          windowPositions = {
+            'top': windowTop,
+            'bottom':  windowTop + windowDimensions.height
+          };
+
+    const setElementPosition = (el) => {
+      if (this.viewportIsWideEnough(windowDimensions.width)) {
+
+        if (this.windowNotPastScrolledFrom(windowPositions, this.getScrolledFrom(el))) {
+          this.reset(el);
+        } else { // past the point it sits in the document
+          if (this.windowNotPastScrollingTo(windowPositions, this.getScrollingTo(el))) {
+            this.stick(el);
+            if (el.isStopped) {
+              this.unstop(el);
+            }
+          } else { // window past scrollingTo position
+            if (!el.isStuck) {
+              this.stick(el);
+            }
+            this.stop(el);
           }
-        } else { // window past scrollingTo position
-          if (!el.isStuck()) {
-            self.stick(el);
-          }
-          self.stop(el);
         }
+
+      } else {
+
+        this.reset(el);
+
       }
-
-    } else {
-
-      self.reset(el);
-
-    }
-  };
-
-  // clean up any existing styles marking the edges of sticky elements
-  oppositeEdge.unmark(self);
-
-  $.each(self._els, function (i, el) {
-    if (el.canBeStuck()) {
-      _setElementPosition(el);
-    }
-  });
-
-  // add styles to mark the edge of sticky elements opposite to that stuck to the window
-  oppositeEdge.mark(self);
-
-  if (self._initialPositionsSet === false) { self._initialPositionsSet = true; }
-};
-// Store all the dimensions for a sticky element to limit DOM queries
-Sticky.prototype.setElementDimensions = function (el, callback) {
-  var self = this;
-  var $el = el.$fixedEl;
-  var onHeightSet = function () {
-    // if element is shim'ed, pass changes in dimension on to the shim
-    if (el._$shim) {
-      el.updateShim();
-    }
-    if (callback !== undefined) {
-      callback();
-    }
-  };
-
-  this.setElWidth(el);
-  this.setElHeight(el, onHeightSet);
-};
-// Reset element to original state in the page
-Sticky.prototype.reset = function (el) {
-  if (el.isStopped()) {
-    this.unstop(el);
-  }
-  if (el.isStuck()) {
-    this.release(el);
-  }
-};
-// Recalculate stored dimensions for all sticky elements
-Sticky.prototype.recalculate = function () {
-  var self = this;
-  var onSyncComplete = function () {
-    scrollAreas.syncEls(self._els);
-    self.setEvents();
-    if (_mode === 'dialog') {
-      dialog.fitToHeight(self);
-      if (dialog.hasResized) {
-        dialog.adjustForResize(self);
-      }
-    }
-    self.setElementPositions();
-  };
-
-  this.syncWithDOM(onSyncComplete);
-};
-// Public method to scroll so an element isn't covered by the sticky nav
-Sticky.prototype.scrollToRevealElement = function (el) {
-  var $el = $(el);
-  var scrollAreaNode = $el.closest('.sticky-scroll-area').get(0);
-  var matches = $.grep(scrollAreas._scrollAreas, function (scrollArea) {
-    return scrollArea.node === scrollAreaNode;
-  });
-
-  if (matches.length) {
-    matches[0].scrollToRevealElement($el);
-  }
-};
-Sticky.prototype.setElWidth = function (el) {
-  var $el = el.$fixedEl;
-  var scrollArea = scrollAreas.getAreaByEl(el);
-  var width = $(scrollArea.node).width();
-
-  el.horizontalSpace = width;
-  // if stuck, element won't inherit width from parent so set explicitly
-  if (el._$shim) {
-    $el.width(width);
-  }
-};
-Sticky.prototype.setElHeight = function (el, callback) {
-  var self = this;
-  var $el = el.$fixedEl;
-  var $img = $el.find('img');
-  var onload = function () {
-    el.height = $el.outerHeight();
-    // if element has a shim, the shim's offset represents the element's in-page position
-    if (el._$shim) {
-      el.inPageEdgePosition = self.getInPageEdgePosition(el._$shim);
-    } else {
-      el.inPageEdgePosition = self.getInPageEdgePosition($el);
-    }
-    callback();
-  };
-
-  if ((!el.hasLoaded()) && ($img.length > 0)) {
-    var image = new global.Image();
-    image.onload = function () {
-      onload();
     };
-    image.src = $img.attr('src');
-  } else {
-    onload();
-  }
-};
-Sticky.prototype.allElementsLoaded = function (totalEls) {
-  return this._els.length === totalEls;
-};
-Sticky.prototype.getElForNode = function (node) {
-  var matches = $.grep(this._els, function (el) { return el.$fixedEl.is(node); });
 
-  return !!matches.length ? matches[0] : false;
-};
-Sticky.prototype.add = function (el, setPositions, cb) {
-  var self = this;
-  var $el = $(el);
-  var onDimensionsSet;
-  var elObj = this.getElForNode(el);
-  var exists = !!elObj;
+    // clean up any existing styles marking the edges of sticky elements
+    oppositeEdge.unmark(this);
 
-  onDimensionsSet = function () {
-    elObj.hasLoaded(true);
+    this._els.forEach(el => {
+      if (el.canBeStuck()) {
+        setElementPosition(el);
+      }
+    });
 
-    // guard against adding elements already stored
-    if (!exists) {
-      self._els.push(elObj);
-    }
+    // add styles to mark the edge of sticky elements opposite to that stuck to the window
+    oppositeEdge.mark(this);
 
-    if (setPositions) {
-      self.setElementPositions();
-    }
-
-    if (cb !== undefined) {
-      cb();
-    }
-  };
-
-  if (!exists) {
-    elObj = new StickyElement($el, self);
-    scrollAreas.addEl(elObj, self.edge, self.CSS_SELECTOR);
+    if (this.initialPositionsSet === false) { this.initialPositionsSet = true; }
   }
 
-  self.setElementDimensions(elObj, onDimensionsSet);
-};
-Sticky.prototype.remove = function (el) {
-  if ($.inArray(el, this._els) !== -1) {
-
-    // reset DOM node to original state
-    this.reset(el);
-
-    // remove sticky element object
-    this._els = $.grep(this._els, function (_el) { return _el !== el; });
-  }
-};
-// gets all sticky elements in the DOM and removes any in this._els no longer in attached to it
-Sticky.prototype.syncWithDOM = function (callback) {
-  var self = this;
-  var $els = $(self.CSS_SELECTOR);
-  var numOfEls = $els.length;
-  var onLoaded;
-
-  onLoaded = function () {
-    if (self._els.length === numOfEls) {
-      self.endOfScrollArea = self.getEndOfScrollArea();
+  // Store all the dimensions for a sticky element to limit DOM queries
+  setElementDimensions (el, callback) {
+    const onHeightSet = () => {
+      // if element is shim'ed, pass changes in dimension on to the shim
+      if (el.$shim) {
+        el.updateShim();
+      }
       if (callback !== undefined) {
         callback();
       }
+    };
+
+    this.setElWidth(el);
+    this.setElHeight(el, onHeightSet);
+  }
+
+  // Reset element to original state in the page
+  reset (el) {
+    if (el.isStopped()) {
+      this.unstop(el);
     }
-  };
 
-  // remove any els no longer in the DOM
-  if (this._els.length) {
-    $.each(this._els, function (i, el) {
-      if (!el.isInPage()) {
-        self.remove(el);
-      }
-    });
+    if (el.isStuck()) {
+      this.release(el);
+    }
   }
 
-  if (numOfEls) {
-    // reset flag marking page load
-    this._initialPositionsSet = false;
-
-    $els.each(function (i, el) {
-      // delay setting position until all stickys are loaded
-      self.add(el, false, onLoaded);
-    });
-  }
-};
-Sticky.prototype.init = function () {
-  this.recalculate();
-};
-Sticky.prototype.setEvents = function () {
-  this._scrollEvent = this.onScroll.bind(this);
-  this._resizeEvent = this.onResize.bind(this);
-
-  // flag when scrolling takes place and check (and re-position) sticky elements relative to
-  // window position
-  if (this._scrollTimeout === false) {
-    $(global).scroll(this._scrollEvent);
-    this._scrollTimeout = global.setInterval(this.checkScroll.bind(this), 50);
-  }
-
-  // Recalculate all dimensions when the window resizes
-  if (this._resizeTimeout === false) {
-    $(global).resize(this._resizeEvent);
-    this._resizeTimeout = global.setInterval(this.checkResize.bind(this), 50);
-  }
-};
-Sticky.prototype.clearEvents = function () {
-  if (this._scrollTimeout !== false) {
-    $(global).off('scroll', this._scrollEvent);
-    global.clearInterval(this._scrollTimeout);
-    this._scrollTimeout = false;
-  }
-
-  if (this._resizeTimeout !== false) {
-    $(global).off('resize', this._resizeEvent);
-    global.clearInterval(this._resizeTimeout);
-    this._resizeTimeout = false;
-  }
-
-};
-Sticky.prototype.viewportIsWideEnough = function (windowWidth) {
-  return windowWidth > 768;
-};
-Sticky.prototype.onScroll = function () {
-  this._hasScrolled = true;
-};
-Sticky.prototype.onResize = function () {
-  this._windowHasResized = true;
-};
-Sticky.prototype.checkScroll = function () {
-  var self = this;
-
-  if (self._hasScrolled === true) {
-    self._hasScrolled = false;
-    self.setElementPositions();
-  }
-};
-Sticky.prototype.checkResize = function () {
-  var self = this,
-      windowWidth = self.getWindowDimensions().width;
-
-  if (self._windowHasResized === true) {
-    self._windowHasResized = false;
-
-    $.each(self._els, function (i, el) {
-      if (!self.viewportIsWideEnough(windowWidth)) {
-        self.reset(el);
-      } else {
-        self.setElementDimensions(el);
-      }
-    });
-
-    if (self.viewportIsWideEnough(windowWidth)) {
+  // Recalculate stored dimensions for all sticky elements
+  recalculate () {
+    const onSyncComplete = () => {
+      scrollAreas.syncEls(this._els);
+      this.setEvents();
       if (_mode === 'dialog') {
-        dialog.fitToHeight(self);
+        dialog.fitToHeight(this);
         if (dialog.hasResized) {
-          dialog.adjustForResize(self);
+          dialog.adjustForResize(this);
         }
       }
-      self.setElementPositions();
+      this.setElementPositions();
+    };
+
+    this.syncWithDOM(onSyncComplete);
+  }
+
+  // Public method to scroll so an element isn't covered by the sticky nav
+  scrollToRevealElement ($el) {
+    const scrollAreaNode = $el.closest('.sticky-scroll-area');
+    const matches = scrollAreas._scrollAreas.filter(scrollArea => {
+      return scrollArea.node === scrollAreaNode;
+    });
+
+    if (matches.length) {
+      matches[0].scrollToRevealElement($el);
     }
   }
-};
-Sticky.prototype.release = function (el) {
-  if (el.isStuck()) {
-    var $el = el.$fixedEl;
 
-    el.removeStickyClasses(this);
-    $el.css('width', '');
-    // clear styles from any elements stuck while in a dialog mode
-    dialog.releaseEl(el, this);
-    el.removeShim();
-    el.release(this);
+  setElWidth (el) {
+    const $el = el.$fixedEl;
+    const scrollArea = scrollAreas.getAreaByEl(el);
+    const width = scrollArea.node.getBoundingClientRect().width;
+
+    el.horizontalSpace = width;
+
+    // if stuck, element won't inherit width from parent so set explicitly
+    if (el.$shim) {
+      $el.style.width = width + 'px';
+    }
   }
-};
+
+  setElHeight (el, callback) {
+    const $el = el.$fixedEl;
+    const $img = $el.querySelector('img');
+
+    const onload = () => {
+      el.height = $el.offsetHeight;
+      // if element has a shim, the shim's offset represents the element's in-page position
+      if (el.$shim) {
+        el.inPageEdgePosition = this.getInPageEdgePosition(el.$shim);
+      } else {
+        el.inPageEdgePosition = this.getInPageEdgePosition($el);
+      }
+      callback();
+    };
+
+    if ((!el.hasLoaded()) && ($img !== null)) {
+      const image = new window.Image();
+      image.onload = () => {
+        onload();
+      };
+      image.src = $img.attr('src');
+    } else {
+      onload();
+    }
+  }
+
+  allElementsLoaded (totalEls) {
+    return this._els.length === totalEls;
+  }
+
+  getElForNode (node) {
+    const matches = this._els.filter(el => el.$fixedEl === node);
+
+    return matches.length ? matches[0] : false;
+  }
+
+  add (node, setPositions, cb) {
+    const $el = node;
+    let elObj = this.getElForNode(node);
+    const exists = !!elObj;
+
+    const onDimensionsSet = () => {
+      elObj.hasLoaded = true;
+
+      // guard against adding elements already stored
+      if (!exists) {
+        this._els.push(elObj);
+      }
+
+      if (setPositions) {
+        this.setElementPositions();
+      }
+
+      if (cb !== undefined) {
+        cb();
+      }
+    };
+
+    if (!exists) {
+      elObj = new StickyElement($($el), this); // TODO: replace this use of $() when jQuery use is removed from StickyElement
+      scrollAreas.addEl(elObj, this.edge, this.CSS_SELECTOR);
+    }
+
+    this.setElementDimensions(elObj, onDimensionsSet);
+  }
+
+  remove (el) {
+    if (this._els.includes(el)) {
+
+      // reset DOM node to original state
+      this.reset(el);
+
+      // remove sticky element object
+      this._els = this._els.filter(_el => _el !== el);
+    }
+  }
+
+  // gets all sticky elements in the DOM and removes any in this._els no longer in attached to it
+  syncWithDOM (callback) {
+    const $els = document.querySelectorAll(this.CSS_SELECTOR);
+    const numOfEls = $els.length;
+
+    const onLoaded = () => {
+      if (this._els.length === numOfEls) {
+        this.endOfScrollArea = this.getEndOfScrollArea();
+        if (callback !== undefined) {
+          callback();
+        }
+      }
+    };
+
+    // remove any els no longer in the DOM
+    if (this._els.length) {
+      this._els.forEach(el => {
+        if (!el.isInPage()) {
+          this.remove(el);
+        }
+      });
+    }
+
+    if (numOfEls) {
+      // reset flag marking page load
+      this.initialPositionsSet = false;
+
+      $els.forEach(el => {
+        // delay setting position until all stickys are loaded
+        this.add(el, false, onLoaded);
+      });
+    }
+  }
+
+  init () {
+    this.recalculate();
+  }
+
+  setEvents () {
+    this._scrollEvent = this.onScroll.bind(this);
+    this._resizeEvent = this.onResize.bind(this);
+
+    // flag when scrolling takes place and check (and re-position) sticky elements relative to
+    // window position
+    if (this.#scrollTimeout === false) {
+      // TODO: consider replacing with 'scrollEnd' event when more widely available
+      // https://developer.mozilla.org/en-US/docs/Web/API/Document/scroll_event
+      window.addEventListener('scroll', this._scrollEvent);
+      this.#scrollTimeout = window.setInterval(this.checkScroll.bind(this), 50);
+    }
+
+    // Recalculate all dimensions when the window resizes
+    if (this.#resizeTimeout === false) {
+      window.addEventListener('resize', this._resizeEvent);
+      this.#resizeTimeout = window.setInterval(this.checkResize.bind(this), 50);
+    }
+  }
+
+  clearEvents () {
+    if (this.#scrollTimeout !== false) {
+      document.removeEventListener('scroll', this._scrollEvent);
+      window.clearInterval(this.#scrollTimeout);
+      this.#scrollTimeout = false;
+    }
+
+    if (this.#resizeTimeout !== false) {
+      window.removeEventListener('resize', this._resizeEvent);
+      window.clearInterval(this.#resizeTimeout);
+      this.#resizeTimeout = false;
+    }
+
+  }
+
+  viewportIsWideEnough (windowWidth) {
+    return windowWidth > 768;
+  }
+
+  onScroll () {
+    this.#hasScrolled = true;
+  }
+
+  onResize () {
+    this.#windowHasResized = true;
+  }
+
+  checkScroll () {
+    if (this.#hasScrolled === true) {
+      this.#hasScrolled = false;
+      this.setElementPositions();
+    }
+  }
+
+  checkResize () {
+    const windowWidth = Sticky.getWindowDimensions().width;
+
+    if (this.#windowHasResized === true) {
+      this.#windowHasResized = false;
+
+      this._els.forEach(el => {
+        if (!this.viewportIsWideEnough(windowWidth)) {
+          this.reset(el);
+        } else {
+          this.setElementDimensions(el);
+        }
+      });
+
+      if (this.viewportIsWideEnough(windowWidth)) {
+        if (_mode === 'dialog') {
+          dialog.fitToHeight(this);
+          if (dialog.hasResized) {
+            dialog.adjustForResize(this);
+          }
+        }
+        this.setElementPositions();
+      }
+    }
+  }
+
+  release (el) {
+    if (el.isStuck()) {
+      const $el = el.$fixedEl;
+
+      el.removeStickyClasses(this);
+      $el.style.width = '';
+      // clear styles from any elements stuck while in a dialog mode
+      dialog.releaseEl(el, this);
+      el.removeShim();
+      el.release(this);
+    }
+  }
+
+  static getWindowDimensions () {
+    return {
+      height: window.innerHeight,
+      width: window.innerWidth
+    };
+  }
+
+  static getWindowPositions () {
+    return {
+      scrollTop: window.pageYOffset
+    };
+  }
+
+}
 
 // Extension of sticky object to add behaviours specific to sticking to top of window
 var stickAtTop = new Sticky('.js-stick-at-top-when-scrolling');
