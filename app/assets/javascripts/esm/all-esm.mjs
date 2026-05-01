@@ -26,8 +26,9 @@ import RegisterSecurityKey from './register-security-key.mjs';
 import UpdateStatus from './update-status.mjs';
 import UpdateContent from './update-content.mjs';
 import UpdateRelativeTime from './update-relative-time.mjs';
+import { stickAtTopWhenScrolling, stickAtBottomWhenScrolling } from './stick-to-window-when-scrolling.mjs';
 
-createAll(Button, 
+createAll(Button,
   { preventDoubleClick: true }
 );
 createAll(Radios);
@@ -35,6 +36,9 @@ createAll(ErrorSummary);
 createAll(SkipLink);
 createAll(Tabs);
 createAll(ServiceNavigation);
+
+stickAtTopWhenScrolling.init();
+stickAtBottomWhenScrolling.init();
 
 const $livesearch = document.querySelector('[data-notify-module="live-search"]');
 if ($livesearch) {
@@ -145,7 +149,7 @@ if ($updateStatus) {
 const $updateContentBlocks = document.querySelectorAll('[data-notify-module="update-content"]');
 if ($updateContentBlocks.length > 0) {
   $updateContentBlocks.forEach(updateBlockComponent => {
-    new UpdateContent(updateBlockComponent); 
+    new UpdateContent(updateBlockComponent);
   });
 };
 
@@ -157,3 +161,7 @@ const updateRelativeTimeSelector = '[data-notify-module="update-relative-time"]'
 if (document.querySelector('[data-notify-module="update-relative-time"]')) {
   new UpdateRelativeTime(updateRelativeTimeSelector);
 }
+
+window.GOVUK = window.GOVUK || {};
+window.GOVUK.stickAtTopWhenScrolling = stickAtTopWhenScrolling;
+window.GOVUK.stickAtBottomWhenScrolling = stickAtBottomWhenScrolling;
