@@ -50,7 +50,7 @@ class ScrollArea {
   }
 
   getFocusedDetails = {
-    forElement: function ($focusedElement) {
+    forElement: ($focusedElement) => {
       const focused = {
         'top': offset($focusedElement).top,
         'height': $focusedElement.offsetHeight,
@@ -60,7 +60,7 @@ class ScrollArea {
 
       return focused;
     },
-    forCaret: function ($textarea) {
+    forCaret: ($textarea) => {
       const textarea = $textarea;
       const caretCoordinates = Caret.getAbsolutePosition(textarea);
       const focused = {
@@ -144,7 +144,7 @@ class ScrollAreas {
   syncEls (elsInDOM) {
     const unusedAreas = [];
 
-    function getUsed (area) {
+    const getUsed = (area) => {
       return elsInDOM.filter(el => area.hasEl(el));
     };
 
@@ -177,7 +177,7 @@ class ScrollAreas {
 const scrollAreas = new ScrollAreas();
 
 // Object collecting together methods for stopping sticky overlapping focused elements
-var focusOverlap = {
+const focusOverlap = {
   getOverlap: function (focused, edge, endOfFurthestEl) {
     if (!endOfFurthestEl) { return 0; }
 
@@ -188,36 +188,31 @@ var focusOverlap = {
     }
   },
   endOfFurthestEl: function (els, edge) {
-    var stuckEls = $.grep(els, function (el) { return el.isStuck(); });
-    var edgeOfEl;
-    var offsets;
-
-    if (edge === 'bottom') {
-      edgeOfEl = function (el) {
-        return el.$fixedEl.offset().top;
-      };
-    } else {
-      edgeOfEl = function (el) {
-        return el.$fixedEl.offset().top + el.height;
-      };
-    }
+    const stuckEls = els.filter((el) => el.isStuck());
+    let edgeOfEl;
 
     if (!stuckEls.length) { return false; }
 
-    offsets = $.map(stuckEls, function (el) { return edgeOfEl(el); });
+    if (edge === 'bottom') {
+      edgeOfEl = el => offset(el.$fixedEl).top;
+    } else {
+      edgeOfEl = el => offset(el.$fixedEl).top + el.height;
+    }
 
-    return offsets.reduce(function (accumulator, offset) {
+    const offsets = stuckEls.map((el) => edgeOfEl(el));
+
+    return offsets.reduce((accumulator, offset) => {
       return (accumulator < offset) ? offset: accumulator;
     });
   },
   adjustForOverlap: function (focused, edge, overlap) {
-    var scrollTop = $(window).scrollTop();
+    const scrollTop = window.scrollY;
 
     // scroll so element becomes visible
     if (edge === 'top') {
-      $(window).scrollTop(scrollTop - overlap);
+      window.scrollTo(window.pageXOffset, (scrollTop - overlap));
     } else {
-      $(window).scrollTop(scrollTop + overlap);
+      window.scrollTo(window.pageXOffset, (scrollTop + overlap));
     }
   }
 };
