@@ -1,4 +1,5 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import terser from '@rollup/plugin-terser';
 import copy from 'rollup-plugin-copy';
 import styles from "rollup-plugin-styler";
@@ -51,6 +52,7 @@ export default [
       sourcemap: true
     },
     plugins: [
+      commonjs(),
       nodeResolve(),
       terser(),
       // copy images, error pages and govuk-frontend static assets
@@ -122,7 +124,6 @@ export default [
     plugins: [
       concatenateFiles([
           paths.npm + 'jquery/dist/jquery.min.js',
-          paths.npm + 'textarea-caret/index.js',
           paths.src + 'javascripts/modules.js',
           paths.src + 'javascripts/templateFolderForm.js',
           paths.src + 'javascripts/main.js'
