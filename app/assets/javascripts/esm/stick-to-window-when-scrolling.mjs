@@ -1,156 +1,162 @@
-var $ = function () {}; // fake jQuery until it's refactored out
-var _mode = 'default';
+import { offset } from './utils.mjs';
+import { Caret } from 'textarea-caret-ts';
+
+let _mode = 'default';
 
 // Constructor to make objects representing the area sticky elements can scroll in
-var ScrollArea = function (el, edge, selector) {
-  var $el = el.$fixedEl;
-  var $scrollArea = $el.closest('.sticky-scroll-area');
+class ScrollArea {
 
-  if($scrollArea.length === 0) {
-    $scrollArea = $el.parent();
-    $scrollArea.addClass('sticky-scroll-area');
+  constructor (el, edge, selector) {
+    const $el = el.$fixedEl;
+    let $scrollArea = $el.closest('.sticky-scroll-area');
+
+    if ($scrollArea === null) {
+      $scrollArea = $el.parentElement;
+      $scrollArea.classList.add('sticky-scroll-area');
+    }
+    this._els = [el];
+    this.edge = edge;
+    this.selector = selector;
+    this.node = $scrollArea;
+    this.setEvents();
   }
 
-  this._els = [el];
-  this.edge = edge;
-  this.selector = selector;
-  this.node = $scrollArea.get(0);
-  this.setEvents();
-};
-ScrollArea.prototype.addEl = function (el) {
-  this._els.push(el);
-};
-ScrollArea.prototype.hasEl = function (el) {
-  return $.inArray(el, this._els) !== -1;
-};
-ScrollArea.prototype.updateEls = function (usedEls) {
-  this._els = usedEls;
-};
-ScrollArea.prototype.setEvents = function () {
-  this.node.addEventListener('focus', this.focusHandler.bind(this), true);
-  $(this.node).on('keyup', 'textarea', this.focusHandler.bind(this));
-};
-ScrollArea.prototype.removeEvents = function () {
-  this.node.removeEventListener('focus', this.focusHandler.bind(this));
-  $(this.node).find('textarea').off('keyup', 'textarea', this.focusHandler.bind(this));
-};
-ScrollArea.prototype.getFocusedDetails = {
-  forElement: function ($focusedElement) {
-    var focused = {
-      'top': $focusedElement.offset().top,
-      'height': $focusedElement.outerHeight(),
-      'type': 'element'
-    };
-    focused.bottom = focused.top + focused.height;
-
-    return focused;
-  },
-  forCaret: function ($textarea) {
-    var textarea = $textarea.get(0);
-    var caretCoordinates = window.getCaretCoordinates(textarea, textarea.selectionEnd);
-    var focused = {
-      'top': $textarea.offset().top + caretCoordinates.top,
-      'height': caretCoordinates.height,
-      'type': 'caret'
-    };
-
-    focused.bottom = focused.top + focused.height;
-
-    return focused;
-  }
-};
-ScrollArea.prototype.focusHandler = function (e) {
-  this.scrollToRevealElement($(document.activeElement));
-};
-ScrollArea.prototype.scrollToRevealElement = function ($el) {
-  var nodeName = $el.get(0).nodeName.toLowerCase();
-  var nodeType =  $el.get(0).getAttribute('type');
-  var endOfFurthestEl = focusOverlap.endOfFurthestEl(this._els, this.edge);
-  var isInSticky = function () {
-    return $el.closest(this.selector).length > 0;
-  }.bind(this);
-  var focused;
-  var overlap;
-
-  // if textarea is focused, we care about checking the caret, not the whole element
-  if (nodeName === 'textarea') {
-    focused = this.getFocusedDetails.forCaret($el);
-  }
-  // if checkbox or radio are focused and not in strick footer we take the parent element
-  // and adjust for all of its height
-  else if (!isInSticky() && (nodeType === 'checkbox' || nodeType === 'radio')) {
-    focused = this.getFocusedDetails.forElement($el.parent());
-  }
-  else {
-    if (isInSticky()) { return; }
-    focused = this.getFocusedDetails.forElement($el);
+  addEl (el) {
+    this._els.push(el);
   }
 
-  overlap = focusOverlap.getOverlap(focused, this.edge, endOfFurthestEl);
-
-  if (overlap > 0) {
-    focusOverlap.adjustForOverlap(focused, this.edge, overlap);
+  hasEl (el) {
+    return this._els.includes(el);
   }
-};
-ScrollArea.prototype.destroy = function () {
-  this.removeEvents();
-};
 
-// Object collecting together methods for interacting with scrollareas
-var scrollAreas = {
-  _scrollAreas: [],
-  getAreaForEl: function (el) {
-    var loopIdx = this._scrollAreas.length;
+  updateEls (usedEls) {
+    this._els = usedEls;
+  }
+
+  #keyUpHandler (e) {
+    if (e.target.matches('textarea')) {
+      this.focusHandler(e);
+    }
+  }
+
+  setEvents () {
+    this.node.addEventListener('focus', this.focusHandler.bind(this), { capture: true, passive: true });
+    this.node.addEventListener('keyup', this.#keyUpHandler.bind(this), { passive: true });
+  }
+
+  removeEvents () {
+    this.node.removeEventListener('focus', this.focusHandler.bind(this), { capture: true, passive: true });
+    this.node.removeEventListener('keyup', this.#keyUpHandler.bind(this), { passive: true });
+  }
+
+  getFocusedDetails = {
+    forElement: function ($focusedElement) {
+      const focused = {
+        'top': offset($focusedElement).top,
+        'height': $focusedElement.offsetHeight,
+        'type': 'element'
+      };
+      focused.bottom = focused.top + focused.height;
+
+      return focused;
+    },
+    forCaret: function ($textarea) {
+      const textarea = $textarea;
+      const caretCoordinates = Caret.getAbsolutePosition(textarea);
+      const focused = {
+        'top': caretCoordinates.top,
+        'height': caretCoordinates.height,
+        'type': 'caret'
+      };
+      focused.bottom = focused.top + focused.height;
+
+      return focused;
+    }
+  };
+
+  focusHandler () {
+    this.scrollToRevealElement(document.activeElement);
+  }
+
+  scrollToRevealElement ($el) {
+    const nodeName = $el.nodeName.toLowerCase();
+    const nodeType = $el.getAttribute('type');
+    const endOfFurthestEl = focusOverlap.endOfFurthestEl(this._els, this.edge);
+    const isInSticky = $el.closest(this.selector) !== null;
+    let focused;
+    let overlap;
+
+    if (nodeName === 'textarea') {
+      focused = this.getFocusedDetails.forCaret($el);
+    } else if (!isInSticky && (nodeType === 'checkbox' || nodeType === 'radio')) {
+      focused = this.getFocusedDetails.forElement($el.parentElement);
+    } else {
+      if (isInSticky) { return; }
+      focused = this.getFocusedDetails.forElement($el);
+    }
+
+    overlap = focusOverlap.getOverlap(focused, this.edge, endOfFurthestEl);
+    if (overlap > 0) {
+      focusOverlap.adjustForOverlap(focused, this.edge, overlap);
+    }
+  }
+
+  destroy () {
+    this.removeEvents();
+  }
+
+}
+
+// Singleton class for interacting with scrollareas
+class ScrollAreas {
+  #scrollAreas = [];
+
+  constructor () {}
+
+  getAreaForEl (el) {
+    let loopIdx = this.#scrollAreas.length;
 
     while(loopIdx--) {
-      if (this._scrollAreas[loopIdx].hasEl(el)) {
-        return this._scrollAreas[loopIdx];
+      if (this.#scrollAreas[loopIdx].hasEl(el)) {
+        return this.#scrollAreas[loopIdx];
       }
     }
 
     return false;
-  },
-  getAreaByEl: function (el) {
-    var matches = $.grep(this._scrollAreas, function (area) {
-      return $.inArray(el, area.els) !== -1;
-    });
+  }
+
+  getAreaByEl (el) {
+    const matches = this.#scrollAreas.filter(area => area._els.includes(el));
 
     return matches[0] || false;
-  },
-  addEl: function (el, edge, selector) {
-    var scrollArea = this.getAreaForEl(el);
+  }
+
+  addEl (el, edge, selector) {
+    const scrollArea = this.getAreaForEl(el);
 
     if (!scrollArea) {
-      this._scrollAreas.push(new ScrollArea(el, edge, selector));
+      this.#scrollAreas.push(new ScrollArea(el, edge, selector));
     } else {
       scrollArea.addEl(el);
     }
-  },
-  syncEls: function (elsInDOM) {
-    var self = this;
-    var unusedAreas = [];
+  }
 
-    var getUsed = function (area) {
-      var used = [];
+  syncEls (elsInDOM) {
+    const unusedAreas = [];
 
-      $.each(elsInDOM, function (elIdx, el) {
-        if (area.hasEl(el)) {
-          used.push(el);
-        }
-      });
-
-      return used;
+    function getUsed (area) {
+      return elsInDOM.filter(el => area.hasEl(el));
     };
 
-    var deleteUnused = function (idx, areaIdx) {
+    const deleteUnused = (idx, areaIdx) => {
       // remove any events for overlap checking bound to the scrollArea
-      self._scrollAreas[areaIdx].destroy();
-      self._scrollAreas.splice(areaIdx, 1);
+      this.#scrollAreas[areaIdx].destroy();
+      this.#scrollAreas.splice(areaIdx, 1);
     };
 
     // update any scroll areas with els still in the DOM and track any with none
-    $.each(this._scrollAreas, function (areaIdx, area) {
-      var used = getUsed(area);
+    this.#scrollAreas.forEach((area, areaIdx) => {
+      const used = getUsed(area);
 
       if (!used.length) {
         unusedAreas.push(areaIdx);
@@ -160,9 +166,15 @@ var scrollAreas = {
     });
 
     // delete any scroll areas with no els still in DOM
-    $.each(unusedAreas, deleteUnused);
+    unusedAreas.forEach(deleteUnused);
   }
-};
+
+  filterBy (filterFunc) {
+    return this.#scrollAreas.filter(filterFunc);
+  }
+
+}
+const scrollAreas = new ScrollAreas();
 
 // Object collecting together methods for stopping sticky overlapping focused elements
 var focusOverlap = {
@@ -600,7 +612,7 @@ class Sticky {
   // Public method to scroll so an element isn't covered by the sticky nav
   scrollToRevealElement ($el) {
     const scrollAreaNode = $el.closest('.sticky-scroll-area');
-    const matches = scrollAreas._scrollAreas.filter(scrollArea => {
+    const matches = scrollAreas.filterBy(scrollArea => {
       return scrollArea.node === scrollAreaNode;
     });
 
