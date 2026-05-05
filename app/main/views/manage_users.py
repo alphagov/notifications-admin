@@ -290,12 +290,50 @@ def edit_user_permissions(service_id, user_id):
     form = PermissionsForm.from_user_and_service(user, current_service)
 
     if form.validate_on_submit():
-        user.set_permissions(
-            service_id,
-            permissions=form.permissions,
-            folder_permissions=form.folder_permissions.data,
-            set_by_id=current_user.id,
-        )
+        try:
+            user.set_permissions(
+                service_id,
+                permissions=form.permissions,
+                folder_permissions=form.folder_permissions.data,
+                set_by_id=current_user.id,
+            )
+        except HTTPError as e:
+            if e.status_code == 400 and "Cannot change user permissions" in e.message:
+                service_description = "A service" if current_user.platform_admin else "Your service"
+                org_description = (
+                    "your" if current_user.is_gov_user and not current_user.platform_admin else "a public sector"
+                )
+                action_to_take = (
+                    "Ask the user to add new team members or update the permissions for their team."
+                    if current_user.platform_admin
+                    else "Add new team members or update the permissions for your team, then try again."
+                )
+
+                flash(
+                    Markup(
+                        f"""
+                        <h2 class='govuk-heading-m'>You cannot change this team member’s permissions</h2>
+                        <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
+                            {service_description} needs at least 2 team members:
+                        </p>
+                        <ul class='govuk-list govuk-list--bullet error-text-colour govuk-!-font-weight-bold'>
+                            <li>from {org_description} organisation</li>
+                            <li>with the ‘manage settings, team and usage’ permission</li>
+                        </ul>
+                        <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
+                            {action_to_take}
+                        </p>
+                        """
+                    )
+                )
+                return render_template(
+                    "views/edit-user-permissions.html",
+                    user=user,
+                    form=form,
+                )
+            else:
+                raise e
+
         # Only change the auth type if this is supported for a service. If a user logs in with a
         # security key, we generally don't want them to be able to use something less secure.
         if current_service.has_permission("email_auth") and not user.webauthn_auth:
