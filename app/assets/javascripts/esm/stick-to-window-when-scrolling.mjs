@@ -217,18 +217,18 @@ const focusOverlap = {
   }
 };
 
-// Object collecting together methods for dealing with marking the edge of a sticky, or group of
-// sticky elements (as seen in dialog mode)
-var oppositeEdge = {
-  _classes: {
+// Singleton class for dealing with marking the edge of a sticky, or group of sticky elements (as seen in dialog mode)
+class OppositeEdge {
+
+  #classes = {
     'top': 'content-fixed__top',
     'bottom': 'content-fixed__bottom'
-  },
-  _getClassForEdge: function (edge) {
-    return this._classes[edge];
-  },
-  mark: function (sticky) {
-    var edgeClass = this._getClassForEdge(sticky.edge);
+  };
+
+  constructor () {}
+
+  mark (sticky) {
+    var edgeClass = this.#classes[sticky.edge];
     var els;
 
     if (_mode === 'dialog') {
@@ -237,20 +237,20 @@ var oppositeEdge = {
       els = sticky._els;
     }
 
-    els = $.grep(els, function (el) { return el.isStuck(); });
+    els = els.filter((el) => el.isStuck());
 
-    $.each(els, function (i, el) {
-      el.$fixedEl.addClass(edgeClass);
-    });
-  },
-  unmark: function (sticky) {
-    var edgeClass = this._getClassForEdge(sticky.edge);
-
-    $.each(sticky._els, function (i, el) {
-      el.$fixedEl.removeClass(edgeClass);
-    });
+    els.forEach((el) => el.$fixedEl.classList.add(edgeClass));
   }
-};
+
+  unmark (sticky) {
+    var edgeClass = this.#classes[sticky.edge];
+
+    sticky._els.forEach(el => el.$fixedEl.classList.remove(edgeClass));
+  }
+
+}
+const oppositeEdge = new OppositeEdge();
+
 
 // Constructor for objects holding data for each element to have sticky behaviour
 var StickyElement = function ($el, sticky) {
