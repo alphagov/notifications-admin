@@ -242,6 +242,7 @@ def format_notification_status_as_url(status, notification_type):
     if notification_type not in {
         "email",
         "sms",
+        "letter",
     }:
         return None
 

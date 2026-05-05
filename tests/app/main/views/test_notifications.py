@@ -425,7 +425,7 @@ def test_notification_page_shows_validation_failed_precompiled_letter(
         ),
         (
             "technical-failure",
-            "Technical failure – Notify will resend once the team have fixed the problem",
+            "Technical failure – Do not try to send this letter again",
         ),
     ),
 )
