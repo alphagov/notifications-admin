@@ -985,93 +985,103 @@ class StickAtTop extends Sticky {
 const stickAtTop = new StickAtTop();
 
 // Extension of sticky object to add behaviours specific to sticking to bottom of window
-var stickAtBottom = new Sticky('.js-stick-at-bottom-when-scrolling');
-stickAtBottom.edge = 'bottom';
-// Store furthest point sticky elements are allowed
-stickAtBottom.getEndOfScrollArea = function () {
-  var header = $('.js-header:eq(0)');
-  if (header.length === 0) {
-    return 0;
-  }
-  return (header.offset().top + header.outerHeight()) + this.STOP_PADDING;
-};
-// position of the bottom edge when in the page flow
-stickAtBottom.getInPageEdgePosition = function ($el) {
-  return $el.offset().top + $el.outerHeight();
-};
-stickAtBottom.getScrolledFrom = function (el) {
-  if (_mode === 'dialog') {
-    return dialog.getInPageEdgePosition(this);
-  } else {
-    return el.inPageEdgePosition;
-  }
-};
-stickAtBottom.getScrollingTo = function (el) {
-  var height = el.height;
-
-  if (_mode === 'dialog') {
-    height = dialog.getHeight(this._els);
+class StickAtBottom extends Sticky {
+  constructor () {
+    super('.js-stick-at-bottom-when-scrolling');
+    this.edge = 'bottom';
   }
 
-  return this.endOfScrollArea + height;
-};
-stickAtBottom.getStoppingPosition = function (el) {
-  var offset = 0;
-
-  if (_mode === 'dialog') {
-    offset = dialog.getOffsetFromEnd(el, this);
+  // Store furthest point sticky elements are allowed
+  getEndOfScrollArea () {
+    const header = document.querySelector('.js-header');
+    if (header === null) {
+      return 0;
+    }
+    return (offset(header).top + header.offsetHeight) + this.STOP_PADDING;
   }
 
-  return this.endOfScrollArea + offset;
-};
-stickAtBottom.windowNotPastScrolledFrom = function (windowPositions, scrolledFrom) {
-  return scrolledFrom < windowPositions.bottom;
-};
-stickAtBottom.windowNotPastScrollingTo = function (windowPositions, scrollingTo) {
-  return windowPositions.bottom > scrollingTo;
-};
-stickAtBottom.stick = function (el) {
-  if (!el.isStuck) {
-    var $el = el.$fixedEl;
-    var offset = 0;
+  // position of the bottom edge when in the page flow
+  getInPageEdgePosition ($el) {
+    return offset($el).top + $el.offsetHeight;
+  }
+
+  getScrolledFrom (el) {
+    if (_mode === 'dialog') {
+      return dialog.getInPageEdgePosition(this);
+    } else {
+      return el.inPageEdgePosition;
+    }
+  }
+
+  getScrollingTo (el) {
+    let height = el.height;
+
+    if (_mode === 'dialog') {
+      height = dialog.getHeight(this.els);
+    }
+
+    return this.endOfScrollArea + height;
+  }
+
+  getStoppingPosition (el) {
+    let offset = 0;
+
+    if (_mode === 'dialog') {
+      offset = dialog.getOffsetFromEnd(el, this);
+    }
+
+    return this.endOfScrollArea + offset;
+  }
+
+  windowNotPastScrolledFrom (windowPositions, scrolledFrom) {
+    return scrolledFrom < windowPositions.bottom;
+  }
+
+  windowNotPastScrollingTo (windowPositions, scrollingTo) {
+    return windowPositions.bottom > scrollingTo;
+  }
+
+  stick (el) {
+    if (!el.isStuck) {
+      const $el = el.$fixedEl;
+      let offset = 0;
+
+      if (_mode === 'dialog') {
+        offset = dialog.getOffsetFromEdge(el, this);
+      }
+
+      el.addShim('after');
+      // element will be absolutely positioned so cannot rely on parent element for width
+      $el.style.width = $el.getBoundingClientRect().width + 'px';
+      $el.style.bottom = offset + 'px';
+      el.stick();
+    }
+  }
+
+  stop (el) {
+    if (!el.isStopped) {
+      el.$fixedEl.style.position = 'absolute';
+      el.$fixedEl.style.top = this.getStoppingPosition(el) + 'px';
+      el.$fixedEl.style.bottom = 'auto';
+      el.stop();
+    }
+  }
+
+  unstop (el) {
+    let offset = 0;
 
     if (_mode === 'dialog') {
       offset = dialog.getOffsetFromEdge(el, this);
     }
 
-    el.addShim('after');
-    $el.css({
-      // element will be absolutely positioned so cannot rely on parent element for width
-      'width': $el.width() + 'px',
-      'bottom': offset + 'px'
-    });
-    el.stick();
-  }
-};
-stickAtBottom.stop = function (el) {
-  if (!el.isStopped) {
-    el.$fixedEl.css({
-      'position': 'absolute',
-      'top': this.getStoppingPosition(el),
-      'bottom': 'auto'
-    });
-    el.stop();
-  }
-};
-stickAtBottom.unstop = function (el) {
-  var offset = 0;
-
-  if (_mode === 'dialog') {
-    offset = dialog.getOffsetFromEdge(el, this);
+    el.$fixedEl.style.position = '';
+    el.$fixedEl.style.top = '';
+    el.$fixedEl.style.bottom = offset + 'px';
+    el.unstop();
   }
 
-  el.$fixedEl.css({
-    'position': '',
-    'top': '',
-    'bottom': offset + 'px'
-  });
-  el.unstop();
-};
+}
+const stickAtBottom = new StickAtBottom;
 
 export {
   stickAtTop as stickAtTopWhenScrolling,
