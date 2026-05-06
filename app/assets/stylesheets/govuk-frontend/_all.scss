@@ -3,34 +3,36 @@
 // All imports come from node_modules/govuk-frontend
 
 // set asset URL root to match that of application
-$govuk-assets-path: "/static/";
+@use "node_modules/govuk-frontend/dist/govuk/base" as * with (
+    $govuk-assets-path: "/static/"
+);
 
-@import "govuk/base";
-@import "govuk/core";
-@import "govuk/objects";
+@use "node_modules/govuk-frontend/dist/govuk/base";
+@use "node_modules/govuk-frontend/dist/govuk/core";
+@use "node_modules/govuk-frontend/dist/govuk/objects";
 
 // specifying which components to include
-@import "govuk/components/skip-link";
-@import "govuk/components/header";
-@import "govuk/components/footer";
-@import "govuk/components/back-link";
-@import "govuk/components/button";
-@import "govuk/components/details";
-@import "govuk/components/error-summary";
-@import "govuk/components/radios";
-@import "govuk/components/checkboxes";
-@import "govuk/components/input";
-@import "govuk/components/inset-text";
-@import "govuk/components/tabs";
-@import "govuk/components/textarea";
-@import "govuk/components/summary-list";
-@import "govuk/components/tag";
-@import "govuk/components/task-list";
-@import "govuk/components/service-navigation";
-@import "govuk/components/notification-banner";
+@use "node_modules/govuk-frontend/dist/govuk/components/skip-link";
+@use "node_modules/govuk-frontend/dist/govuk/components/header";
+@use "node_modules/govuk-frontend/dist/govuk/components/footer";
+@use "node_modules/govuk-frontend/dist/govuk/components/back-link";
+@use "node_modules/govuk-frontend/dist/govuk/components/button";
+@use "node_modules/govuk-frontend/dist/govuk/components/details";
+@use "node_modules/govuk-frontend/dist/govuk/components/error-summary";
+@use "node_modules/govuk-frontend/dist/govuk/components/radios";
+@use "node_modules/govuk-frontend/dist/govuk/components/checkboxes";
+@use "node_modules/govuk-frontend/dist/govuk/components/input";
+@use "node_modules/govuk-frontend/dist/govuk/components/inset-text";
+@use "node_modules/govuk-frontend/dist/govuk/components/tabs";
+@use "node_modules/govuk-frontend/dist/govuk/components/textarea";
+@use "node_modules/govuk-frontend/dist/govuk/components/summary-list";
+@use "node_modules/govuk-frontend/dist/govuk/components/tag";
+@use "node_modules/govuk-frontend/dist/govuk/components/task-list";
+@use "node_modules/govuk-frontend/dist/govuk/components/service-navigation";
+@use "node_modules/govuk-frontend/dist/govuk/components/notification-banner";
 
-@import "govuk/utilities";
-@import "govuk/overrides";
+@use "node_modules/govuk-frontend/dist/govuk/utilities";
+@use "node_modules/govuk-frontend/dist/govuk/overrides";
 
 // Styles extending those from GOV.UK Frontend
 @import "./extensions";

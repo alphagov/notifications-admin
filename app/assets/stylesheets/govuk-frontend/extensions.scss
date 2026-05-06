@@ -1,4 +1,5 @@
 @use "sass:map";
+@use "node_modules/govuk-frontend/dist/govuk/base" as *;
 
 // Custom colours for our destructive link
 // Based on the error colour in:

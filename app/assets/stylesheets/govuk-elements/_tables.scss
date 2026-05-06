@@ -1,6 +1,8 @@
 // Tables
 // ==========================================================================
 
+@use "node_modules/govuk-frontend/dist/govuk/base" as *;
+
 table {
     border-collapse: collapse;
     border-spacing: 0;

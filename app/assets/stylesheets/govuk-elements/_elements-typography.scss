@@ -4,6 +4,8 @@
 // Increase the base font size to 19px for the main content area
 // Using the govuk-font(19) mixin from the design system
 
+@use "node_modules/govuk-frontend/dist/govuk/base" as *;
+
 main {
     @include govuk-font(19);
     -webkit-font-smoothing: antialiased;
