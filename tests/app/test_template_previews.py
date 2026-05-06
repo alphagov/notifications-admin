@@ -1,4 +1,5 @@
 import base64
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
@@ -31,6 +32,14 @@ from tests.conftest import create_notification
     "letter_branding, expected_filename",
     [(LetterBranding({"filename": "hm-government"}), "hm-government"), (LetterBranding.from_id(None), None)],
 )
+@pytest.mark.parametrize(
+    "date_kwargs, expected_date_string_in_json",
+    (
+        ({}, None),
+        ({"date": None}, None),
+        ({"date": datetime(2021, 2, 3, 4, 5, 6, tzinfo=UTC)}, "2021-02-03T04:05:06+00:00"),
+    ),
+)
 def test_get_preview_for_templated_letter_makes_request(
     client_request,
     mocker,
@@ -39,6 +48,8 @@ def test_get_preview_for_templated_letter_makes_request(
     expected_url,
     letter_branding,
     expected_filename,
+    date_kwargs,
+    expected_date_string_in_json,
     mock_get_service_letter_template,
     mock_onwards_request_headers,
 ):
@@ -50,7 +61,7 @@ def test_get_preview_for_templated_letter_makes_request(
     response = template_preview_client.get_preview_for_templated_letter(
         db_template=template,
         service=service,
-        **extra_kwargs,
+        **(extra_kwargs | date_kwargs),
     )
 
     assert response[0] == "a"
@@ -62,6 +73,7 @@ def test_get_preview_for_templated_letter_makes_request(
         "template": template,
         "values": None,
         "filename": expected_filename,
+        "date": expected_date_string_in_json,
     }
     headers = {
         "Authorization": "Token my-secret-key",
@@ -131,6 +143,7 @@ def test_get_preview_for_templated_letter_from_notification_has_correct_args(
         "template": notification["template"],
         "values": {"name": "Jo"},
         "filename": "hm-government",
+        "date": None,
     }
     headers = {
         "Authorization": "Token my-secret-key",

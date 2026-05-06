@@ -1,4 +1,5 @@
 import base64
+from datetime import UTC, datetime
 from functools import partial
 from unittest.mock import Mock, mock_open
 
@@ -575,6 +576,7 @@ def test_notification_page_shows_page_for_other_postage_classes(
         create_active_caseworking_user(),
     ],
 )
+@freeze_time("2026-02-06")
 def test_should_show_image_of_letter_notification(
     client_request,
     fake_uuid,
@@ -607,6 +609,7 @@ def test_should_show_image_of_letter_notification(
             values=notification["personalisation"],
             page=None,
             service=RestrictedAny(lambda s: s.id == SERVICE_ONE_ID),
+            date=datetime(2026, 2, 6, 0, 0, 0, tzinfo=UTC),
         ),
     ]
 

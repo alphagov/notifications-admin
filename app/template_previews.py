@@ -42,6 +42,7 @@ class TemplatePreviewClient:
         page=None,
         branding_filename=None,
         service=None,
+        date=None,
     ):
         if db_template["is_precompiled_letter"]:
             raise ValueError
@@ -54,6 +55,7 @@ class TemplatePreviewClient:
             "template": db_template,
             "values": values,
             "filename": branding_filename or (service.letter_branding.filename if service else None),
+            "date": date.isoformat() if date else None,
         }
         response = self.requests_session.post(
             "{}/preview.{}{}".format(
