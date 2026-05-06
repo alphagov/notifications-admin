@@ -375,33 +375,39 @@ class StickyElement {
 
 }
 
-// Object collecting together methods for treating sticky elements as if they
-// were wrapped by a dialog component
-var dialog = {
-  hasResized: false,
-  spaceBetweenStickys: 40,
+// Class for treating sticky elements as if they were wrapped by a dialog component
+class Dialog {
+  static spaceBetweenStickys = 40
+  hasResized
+
+  constructor () {
+    this.hasResized = false
+  }
+
   // we add padding of 20px around each sticky to give some space between it and the rest of the page
   // this shouldn't apply between stickys in a stack
   // (the in-page CSS handles this by each subsequent sticky in a sequence having margin: -40px)
-  _getPaddingBetweenEls: function (els) {
+  #getPaddingBetweenEls (els) {
     if (els.length <= 1) { return 0; }
 
-    return (els.length - 1) * this.spaceBetweenStickys;
-  },
-  _getTotalHeight: function (els) {
-    var reducer = function (accumulator, currentValue) {
+    return (els.length - 1) * Dialog.spaceBetweenStickys;
+  }
+
+  #getTotalHeight (els) {
+    const reducer = (accumulator, currentValue) => {
       return accumulator + currentValue;
     };
-    var combinedHeight = $.map(els, function (el) { return el.height; }).reduce(reducer);
+    const combinedHeight = els.map(el => el.height).reduce(reducer);
 
-    return combinedHeight - this._getPaddingBetweenEls(els);
-  },
-  _elsThatCanBeStuck: function (els) {
-    return $.grep(els, function (el) { return el.canBeStuck; });
-  },
-  getOffsetFromEdge: function (el, sticky) {
-    var els = this._elsThatCanBeStuck(sticky._els).slice();
-    var elIdx;
+    return combinedHeight - this.#getPaddingBetweenEls(els);
+  }
+
+  #elsThatCanBeStuck (els) {
+    return els.filter(el => el.canBeStuck);
+  }
+
+  getOffsetFromEdge (el, sticky) {
+    let els = this.#elsThatCanBeStuck(sticky._els).slice();
 
     // els must be arranged furtherest from window edge is stuck to first
     // default direction is order in document
@@ -409,7 +415,7 @@ var dialog = {
       els.reverse();
     }
 
-    elIdx = els.indexOf(el);
+    const elIdx = els.indexOf(el);
 
     // if next to window edge the dialog is stuck to, no offset
     if (elIdx === (els.length - 1)) { return 0; }
@@ -418,11 +424,11 @@ var dialog = {
     els = els.slice(elIdx + 1);
 
     // remove the space between those els and the one on the edge
-    return this._getTotalHeight(els) - this.spaceBetweenStickys;
-  },
-  getOffsetFromEnd: function (el, sticky) {
-    var els = this._elsThatCanBeStuck(sticky._els).slice();
-    var elIdx;
+    return this.#getTotalHeight(els) - Dialog.spaceBetweenStickys;
+  }
+
+  getOffsetFromEnd (el, sticky) {
+    let els = this.#elsThatCanBeStuck(sticky._els);
 
     // els must be arranged furtherest from window edge is stuck to first
     // default direction is order in document
@@ -430,7 +436,7 @@ var dialog = {
       els.reverse();
     }
 
-    elIdx = els.indexOf(el);
+    const elIdx = els.indexOf(el);
 
     // if next to opposite edge to the one the dialog is stuck to, no offset
     if (elIdx === (els.length - 1)) { return 0; }
@@ -438,20 +444,17 @@ var dialog = {
     // make els all those from this one to the window edge
     els = els.slice(elIdx + 1);
 
-    return this._getTotalHeight(els) - this.spaceBetweenStickys;
-  },
+    return this.#getTotalHeight(els) - Dialog.spaceBetweenStickys;
+  }
+
   // checks total height of all this._sticky elements against a height
   // unsticks each that won't fit and marks them as unstickable
-  fitToHeight: function (sticky) {
-    var self = this;
-    var els = sticky._els.slice();
-    var height = Sticky.getWindowDimensions().height;
-    var totalStickyHeight = function () {
-      return self._getTotalHeight(self._elsThatCanBeStuck(els));
-    };
-    var dialogFitsHeight = function () {
-      return totalStickyHeight() <= height;
-    };
+  fitToHeight (sticky) {
+    const self = this;
+    const els = sticky._els.slice();
+    const height = Sticky.getWindowDimensions().height;
+    const totalStickyHeight = () => self.#getTotalHeight(self.#elsThatCanBeStuck(els));
+    const dialogFitsHeight = () => totalStickyHeight() <= height;
 
     // els must be arranged furtherest from window edge is stuck to first
     // default direction is order in document
@@ -460,51 +463,59 @@ var dialog = {
     }
 
     // reset elements
-    $.each(els, function (i, el) { el.canBeStuck = true; });
+    els.forEach(el => el.canBeStuck = true);
 
-    while (self._elsThatCanBeStuck(els).length && !dialogFitsHeight()) {
-      var currentEl = self._elsThatCanBeStuck(els)[0];
+    while (self.#elsThatCanBeStuck(els).length && !dialogFitsHeight()) {
+      const currentEl = self.#elsThatCanBeStuck(els)[0];
 
       sticky.reset(currentEl);
       currentEl.canBeStuck = false;
 
       if (!self.hasResized) { self.hasResized = true; }
     }
-  },
-  getElementAtStickyEdge: function (sticky) {
-    var els = this._elsThatCanBeStuck(sticky._els);
-    var idx = (sticky.edge === 'top') ? 0 : els.length - 1;
+  }
+
+  getElementAtStickyEdge (sticky) {
+    const els = this.#elsThatCanBeStuck(sticky._els);
+    const idx = (sticky.edge === 'top') ? 0 : els.length - 1;
 
     return els[idx];
-  },
+  }
+
   // get element at the end opposite the sticky edge
-  getElementAtOppositeEnd: function (sticky) {
-    var els = this._elsThatCanBeStuck(sticky._els);
-    var idx = (sticky.edge === 'top') ? els.length - 1 : 0;
+  getElementAtOppositeEnd (sticky) {
+    const els = this.#elsThatCanBeStuck(sticky._els);
+    const idx = (sticky.edge === 'top') ? els.length - 1 : 0;
 
     return els[idx];
-  },
-  getInPageEdgePosition: function (sticky) {
+  }
+
+  getInPageEdgePosition (sticky) {
     return this.getElementAtStickyEdge(sticky).inPageEdgePosition;
-  },
-  getHeight: function (els) {
-    return this._getTotalHeight(this._elsThatCanBeStuck(els));
-  },
-  adjustForResize: function (sticky) {
-    var windowHeight = Sticky.getWindowDimensions().height;
+  }
+
+  getHeight (els) {
+    return this.#getTotalHeight(this.#elsThatCanBeStuck(els));
+  }
+
+  adjustForResize (sticky) {
+    const windowHeight = Sticky.getWindowDimensions().height;
 
     if (sticky.edge === 'top') {
-      $(window).scrollTop(this.getInPageEdgePosition(sticky));
+      window.scrollTo(window.pageXOffset, this.getInPageEdgePosition(sticky));
     } else {
-      $(window).scrollTop(this.getInPageEdgePosition(sticky) - windowHeight);
+      window.scrollTo(window.pageXOffset, this.getInPageEdgePosition(sticky) - windowHeight);
     }
 
     this.hasResized = false;
-  },
-  releaseEl: function (el, sticky) {
-    el.$fixedEl.css(sticky.edge, '');
   }
-};
+
+  releaseEl (el, sticky) {
+    el.$fixedEl.style[sticky.edge] = '';
+  }
+
+}
+const dialog = new Dialog();
 
 // Constructor for objects collecting together all generic behaviour for controlling the state of
 // sticky elements
