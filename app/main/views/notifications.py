@@ -171,6 +171,7 @@ def view_letter_notification_as_preview(service_id, notification_id, filetype, w
             values=notification.personalisation,
             page=request.args.get("page"),
             service=current_service,
+            date=notification.created_at,
         )
 
     image_data = get_letter_file_data(service_id, notification_id, filetype, with_metadata)

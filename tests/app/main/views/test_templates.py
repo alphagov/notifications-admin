@@ -2242,6 +2242,7 @@ def test_letter_branding_preview_image(
             },
             "values": None,
             "filename": "example",
+            "date": None,
         },
         headers={
             "Authorization": "Token my-secret-key",
