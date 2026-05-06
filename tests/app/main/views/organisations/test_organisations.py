@@ -3,6 +3,7 @@ from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from tests import find_element_by_tag_and_partial_text, organisation_json, service_json
 from tests.app.main.views.test_agreement import MockS3Object
 from tests.conftest import (
@@ -12,9 +13,54 @@ from tests.conftest import (
     create_active_user_with_permissions,
     create_email_branding,
     create_platform_admin_user,
+    create_user,
     normalize_spaces,
+    sample_uuid,
 )
 from tests.utils import RedisClientMock
+
+
+def test_organisation_left_hand_nav_for_platform_admin_users(
+    platform_admin_user,
+    mock_get_organisation,
+    client_request,
+    mocker,
+):
+    mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": [], "updated_at": None})
+
+    client_request.login(platform_admin_user)
+
+    page = client_request.get("main.organisation_dashboard", org_id=ORGANISATION_ID)
+    nav_items = [item.text.strip() for item in page.select("nav.navigation a")]
+    assert nav_items == ["Usage", "Team members", "Settings", "Trial mode services", "Billing"]
+
+
+@pytest.mark.parametrize(
+    "user_org_permissions, expected_nav_items",
+    [
+        ([], ["Usage", "Team members"]),
+        ([PERMISSION_CAN_MAKE_SERVICES_LIVE], ["Usage", "Team members", "Trial mode services"]),
+    ],
+)
+def test_organisation_left_hand_nav_for_org_users(
+    mock_get_organisation,
+    client_request,
+    user_org_permissions,
+    expected_nav_items,
+    mocker,
+):
+    mocker.patch("app.organisations_client.get_services_and_usage", return_value={"services": [], "updated_at": None})
+
+    org_user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: user_org_permissions},
+    )
+    client_request.login(org_user)
+
+    page = client_request.get("main.organisation_dashboard", org_id=ORGANISATION_ID)
+    nav_items = [item.text.strip() for item in page.select("nav.navigation a")]
+    assert nav_items == expected_nav_items
 
 
 def test_organisation_page_shows_all_organisations(client_request, platform_admin_user, mocker):
@@ -849,11 +895,43 @@ def test_organisation_trial_mode_services_shows_all_non_live_services(
     assert services[1].find("a")["href"] == url_for("main.service_dashboard", service_id="3")
 
 
-def test_organisation_trial_mode_services_doesnt_work_if_not_platform_admin(
+def test_organisation_trial_mode_services_is_visible_to_platform_admin(
+    platform_admin_user,
     client_request,
     mock_get_organisation,
+    mock_get_organisation_services,
 ):
-    client_request.get(".organisation_trial_mode_services", org_id=ORGANISATION_ID, _expected_status=403)
+    client_request.login(platform_admin_user)
+    client_request.get(".organisation_trial_mode_services", org_id=ORGANISATION_ID, _test_page_title=False)
+
+
+@pytest.mark.parametrize(
+    "user_org_permissions, expected_status_code",
+    [
+        ([], 403),
+        ([PERMISSION_CAN_MAKE_SERVICES_LIVE], 200),
+    ],
+)
+def test_organisation_trial_mode_services_page_when_viewing_as_org_user(
+    client_request,
+    mock_get_organisation,
+    mock_get_organisation_services,
+    user_org_permissions,
+    expected_status_code,
+):
+    org_user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: user_org_permissions},
+    )
+
+    client_request.login(org_user)
+    client_request.get(
+        ".organisation_trial_mode_services",
+        org_id=ORGANISATION_ID,
+        _test_page_title=False,
+        _expected_status=expected_status_code,
+    )
 
 
 @pytest.mark.parametrize("can_approve_own_go_live_requests", (True, False))

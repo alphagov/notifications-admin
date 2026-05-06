@@ -12,6 +12,7 @@ from app import (
     org_invite_api_client,
     organisations_client,
 )
+from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.main import main
 from app.main.forms import (
     AddGPOrganisationForm,
@@ -200,8 +201,13 @@ def download_organisation_usage_report(org_id):
 
 
 @main.route("/organisations/<uuid:org_id>/trial-services", methods=["GET"])
-@user_is_platform_admin
+@user_has_permissions()
 def organisation_trial_mode_services(org_id):
+    if not current_user.platform_admin and not current_user.has_permission_for_organisation(
+        org_id, PERMISSION_CAN_MAKE_SERVICES_LIVE
+    ):
+        abort(403)
+
     return render_template(
         "views/organisations/organisation/trial-mode-services.html",
         _search_form=SearchByNameForm(),
