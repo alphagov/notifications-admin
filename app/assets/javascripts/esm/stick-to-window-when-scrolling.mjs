@@ -188,7 +188,7 @@ const focusOverlap = {
     }
   },
   endOfFurthestEl: function (els, edge) {
-    const stuckEls = els.filter((el) => el.isStuck());
+    const stuckEls = els.filter((el) => el.isStuck);
     let edgeOfEl;
 
     if (!stuckEls.length) { return false; }
@@ -237,7 +237,7 @@ class OppositeEdge {
       els = sticky._els;
     }
 
-    els = els.filter((el) => el.isStuck());
+    els = els.filter((el) => el.isStuck);
 
     els.forEach((el) => el.$fixedEl.classList.add(edgeClass));
   }
@@ -253,101 +253,127 @@ const oppositeEdge = new OppositeEdge();
 
 
 // Constructor for objects holding data for each element to have sticky behaviour
-var StickyElement = function ($el, sticky) {
-  this._sticky = sticky;
-  this.$fixedEl = $el;
-  this._initialFixedClass = 'content-fixed-onload';
-  this._fixedClass = 'content-fixed';
-  this._appliedClass = null;
-  this._$shim = null;
-  this._stopped = false;
-  this._hasLoaded = false;
-  this._canBeStuck = true;
-  this.verticalMargins = {
-    'top': parseInt(this.$fixedEl.css('margin-top'), 10),
-    'bottom': parseInt(this.$fixedEl.css('margin-bottom'), 10),
-  };
-};
-StickyElement.prototype._getShimCSS = function () {
-  return {
-    'width': this.horizontalSpace + 'px',
-    'height': this.height + 'px',
-    'margin-top': this.verticalMargins.top + 'px',
-    'margin-bottom': this.verticalMargins.bottom + 'px'
-  };
-};
-StickyElement.prototype.stickyClass = function () {
-  return (this._sticky.initialPositionsSet) ? this._fixedClass : this._initialFixedClass;
-};
-StickyElement.prototype.appliedClass = function () {
-  return this._appliedClass;
-};
-StickyElement.prototype.removeStickyClasses = function (sticky) {
-  this.$fixedEl.removeClass([
-    this._initialFixedClass,
-    this._fixedClass
-  ].join(' '));
-};
-StickyElement.prototype.isStuck = function () {
-  return this._appliedClass !== null;
-};
-StickyElement.prototype.stick = function (sticky) {
-  this._appliedClass = this.stickyClass();
-  this.$fixedEl.addClass(this._appliedClass);
-  this._hasBeenCalled = true;
-};
-StickyElement.prototype.release = function (sticky) {
-  this._appliedClass = null;
-  this.removeStickyClasses(sticky);
-  this._hasBeenCalled = true;
-};
-// When a sticky element is moved into the 'stuck' state, a shim is inserted into the
-// page to preserve the space the element occupies in the flow.
-StickyElement.prototype.addShim = function (position) {
-  this._$shim = $('<div class="shim">&nbsp</div>');
-  this._$shim.css(this._getShimCSS());
-  this.$fixedEl[position](this._$shim);
-};
-StickyElement.prototype.removeShim = function () {
-  if (this._$shim !== null) {
-    this._$shim.remove();
-    this._$shim = null;
-  }
-};
-// Changes to the dimensions of a sticky element with a shim need to be passed on to the shim
-StickyElement.prototype.updateShim = function () {
-  if (this._$shim) {
-    this._$shim.css(this._getShimCSS());
-  }
-};
-StickyElement.prototype.stop = function () {
-  this._stopped = true;
-};
-StickyElement.prototype.unstop = function () {
-  this._stopped = false;
-};
-StickyElement.prototype.isStopped = function () {
-  return this._stopped;
-};
-StickyElement.prototype.isInPage = function () {
-  var node = this.$fixedEl.get(0);
+class StickyElement {
+  #initialFixedClass = 'content-fixed-onload';
+  #fixedClass = 'content-fixed';
+  #appliedClass = null;
+  #stopped = false;
+  #hasLoaded = false;
+  #canBeStuck = true;
+  #sticky;
 
-  return (node === document.body) ? false : document.body.contains(node);
-};
-StickyElement.prototype.canBeStuck = function (val) {
-  if (val !== undefined) {
-    this._canBeStuck = val;
-  } else {
-    return this._canBeStuck;
+  constructor ($el, sticky) {
+    this.#sticky = sticky;
+    this.$fixedEl = $el;
+    this.$shim = null;
+
+    const marginTop = window.getComputedStyle(this.$fixedEl)['margin-top'];
+    const marginBottom = window.getComputedStyle(this.$fixedEl)['margin-bottom'];
+
+    this.verticalMargins = {
+      'top': (marginTop !== '') ? parseInt(marginTop, 10) : null,
+      'bottom': (marginBottom !== '') ? parseInt(marginBottom, 10) : null
+    };
   }
-};
-StickyElement.prototype.hasLoaded = function (val) {
-  if (val !== undefined) {
-    this._hasLoaded = val;
-  } else {
-    return this._hasLoaded;
+
+  #getShimCSS () {
+    let inlineStyles = `width: ${this.horizontalSpace}px; height: ${this.height}px`;
+
+    if (this.verticalMargins.top) {
+      inlineStyles += `; margin-top: ${this.verticalMargins.top}px`;
+    }
+    if (this.verticalMargins.bottom) {
+      inlineStyles += `; margin-bottom: ${this.verticalMargins.bottomtop}px`;
+    }
+    return inlineStyles;
   }
-};
+
+  stickyClass () {
+    return (this.#sticky.initialPositionsSet) ? this.#fixedClass : this.#initialFixedClass;
+  }
+
+  appliedClass () {
+    return this.#appliedClass;
+  }
+
+  removeStickyClasses () {
+    this.$fixedEl.classList.remove(this.#initialFixedClass, this.#fixedClass);
+  }
+
+  get isStuck () {
+    return this.#appliedClass !== null;
+  }
+
+  stick () {
+    this.#appliedClass = this.stickyClass();
+    this.$fixedEl.classList.add(this.#appliedClass);
+  }
+
+  release () {
+    this.#appliedClass = null;
+    this.removeStickyClasses();
+  }
+
+  // When a sticky element is moved into the 'stuck' state, a shim is inserted into the
+  // page to preserve the space the element occupies in the flow.
+  addShim (position) {
+    const insertPosition = (position === 'before') ? 'beforebegin' : 'afterend';
+
+    this.$shim = document.createElement('div');
+    this.$shim.appendChild(document.createTextNode('&nbsp'));
+    this.$shim.classList.add('shim');
+    this.$shim.setAttribute('style', this.#getShimCSS());
+    this.$fixedEl.insertAdjacentElement(insertPosition, this.$shim);
+  }
+
+  removeShim () {
+    if (this.$shim !== null) {
+      this.$shim.remove();
+      this.$shim = null;
+    }
+  }
+
+  // Changes to the dimensions of a sticky element with a shim need to be passed on to the shim
+  updateShim () {
+    if (this.$shim) {
+      this.$shim.setAttribute('style', this.#getShimCSS());
+    }
+  }
+
+  stop () {
+    this.#stopped = true;
+  }
+
+  unstop () {
+    this.#stopped = false;
+  }
+
+  get isStopped () {
+    return this.#stopped;
+  }
+
+  get isInPage () {
+    const node = this.$fixedEl;
+    return (node === document.body) ? false : document.body.contains(node);
+  }
+
+  get canBeStuck () {
+    return this.#canBeStuck;
+  }
+
+  set canBeStuck (val) {
+    this.#canBeStuck = val;
+  }
+
+  get hasLoaded () {
+    return this.#hasLoaded;
+  }
+
+  set hasLoaded (val) {
+    this.#hasLoaded = val;
+  }
+
+}
 
 // Object collecting together methods for treating sticky elements as if they
 // were wrapped by a dialog component
@@ -371,7 +397,7 @@ var dialog = {
     return combinedHeight - this._getPaddingBetweenEls(els);
   },
   _elsThatCanBeStuck: function (els) {
-    return $.grep(els, function (el) { return el.canBeStuck(); });
+    return $.grep(els, function (el) { return el.canBeStuck; });
   },
   getOffsetFromEdge: function (el, sticky) {
     var els = this._elsThatCanBeStuck(sticky._els).slice();
@@ -434,13 +460,13 @@ var dialog = {
     }
 
     // reset elements
-    $.each(els, function (i, el) { el.canBeStuck(true); });
+    $.each(els, function (i, el) { el.canBeStuck = true; });
 
     while (self._elsThatCanBeStuck(els).length && !dialogFitsHeight()) {
       var currentEl = self._elsThatCanBeStuck(els)[0];
 
       sticky.reset(currentEl);
-      currentEl.canBeStuck(false);
+      currentEl.canBeStuck = false;
 
       if (!self.hasResized) { self.hasResized = true; }
     }
@@ -548,8 +574,8 @@ class Sticky {
     // clean up any existing styles marking the edges of sticky elements
     oppositeEdge.unmark(this);
 
-    this._els.forEach(el => {
-      if (el.canBeStuck()) {
+    self._els.forEach(el => {
+      if (el.canBeStuck) {
         setElementPosition(el);
       }
     });
@@ -578,11 +604,11 @@ class Sticky {
 
   // Reset element to original state in the page
   reset (el) {
-    if (el.isStopped()) {
+    if (el.isStopped) {
       this.unstop(el);
     }
 
-    if (el.isStuck()) {
+    if (el.isStuck) {
       this.release(el);
     }
   }
@@ -644,7 +670,7 @@ class Sticky {
       callback();
     };
 
-    if ((!el.hasLoaded()) && ($img !== null)) {
+    if (!el.hasLoaded && ($img !== null)) {
       const image = new window.Image();
       image.onload = () => {
         onload();
@@ -688,7 +714,7 @@ class Sticky {
     };
 
     if (!exists) {
-      elObj = new StickyElement($($el), this); // TODO: replace this use of $() when jQuery use is removed from StickyElement
+      elObj = new StickyElement($el, this);
       scrollAreas.addEl(elObj, this.edge, this.CSS_SELECTOR);
     }
 
@@ -723,7 +749,7 @@ class Sticky {
     // remove any els no longer in the DOM
     if (this._els.length) {
       this._els.forEach(el => {
-        if (!el.isInPage()) {
+        if (!el.isInPage) {
           this.remove(el);
         }
       });
@@ -825,7 +851,7 @@ class Sticky {
   }
 
   release (el) {
-    if (el.isStuck()) {
+    if (el.isStuck) {
       const $el = el.$fixedEl;
 
       el.removeStickyClasses(this);
@@ -833,7 +859,7 @@ class Sticky {
       // clear styles from any elements stuck while in a dialog mode
       dialog.releaseEl(el, this);
       el.removeShim();
-      el.release(this);
+      el.release();
     }
   }
 
@@ -899,7 +925,7 @@ stickAtTop.windowNotPastScrollingTo = function (windowPositions, scrollingTo) {
   return windowPositions.top < scrollingTo;
 };
 stickAtTop.stick = function (el) {
-  if (!el.isStuck()) {
+  if (!el.isStuck) {
     var $el = el.$fixedEl;
     var offset = 0;
 
@@ -913,11 +939,11 @@ stickAtTop.stick = function (el) {
       'width': $el.width() + 'px',
       'top': offset + 'px'
     });
-    el.stick(this);
+    el.stick();
   }
 };
 stickAtTop.stop = function (el) {
-  if (!el.isStopped()) {
+  if (!el.isStopped) {
     el.$fixedEl.css({
       'position': 'absolute',
       'top': this.getStoppingPosition(el)
@@ -986,7 +1012,7 @@ stickAtBottom.windowNotPastScrollingTo = function (windowPositions, scrollingTo)
   return windowPositions.bottom > scrollingTo;
 };
 stickAtBottom.stick = function (el) {
-  if (!el.isStuck()) {
+  if (!el.isStuck) {
     var $el = el.$fixedEl;
     var offset = 0;
 
@@ -1000,11 +1026,11 @@ stickAtBottom.stick = function (el) {
       'width': $el.width() + 'px',
       'bottom': offset + 'px'
     });
-    el.stick(this);
+    el.stick();
   }
 };
 stickAtBottom.stop = function (el) {
-  if (!el.isStopped()) {
+  if (!el.isStopped) {
     el.$fixedEl.css({
       'position': 'absolute',
       'top': this.getStoppingPosition(el),
