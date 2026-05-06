@@ -14,7 +14,7 @@ class ScrollArea {
       $scrollArea = $el.parentElement;
       $scrollArea.classList.add('sticky-scroll-area');
     }
-    this._els = [el];
+    this.els = [el];
     this.edge = edge;
     this.selector = selector;
     this.node = $scrollArea;
@@ -22,15 +22,15 @@ class ScrollArea {
   }
 
   addEl (el) {
-    this._els.push(el);
+    this.els.push(el);
   }
 
   hasEl (el) {
-    return this._els.includes(el);
+    return this.els.includes(el);
   }
 
   updateEls (usedEls) {
-    this._els = usedEls;
+    this.els = usedEls;
   }
 
   #keyUpHandler (e) {
@@ -81,7 +81,7 @@ class ScrollArea {
   scrollToRevealElement ($el) {
     const nodeName = $el.nodeName.toLowerCase();
     const nodeType = $el.getAttribute('type');
-    const endOfFurthestEl = focusOverlap.endOfFurthestEl(this._els, this.edge);
+    const endOfFurthestEl = focusOverlap.endOfFurthestEl(this.els, this.edge);
     const isInSticky = $el.closest(this.selector) !== null;
     let focused;
     let overlap;
@@ -126,7 +126,7 @@ class ScrollAreas {
   }
 
   getAreaByEl (el) {
-    const matches = this.#scrollAreas.filter(area => area._els.includes(el));
+    const matches = this.#scrollAreas.filter(area => area.els.includes(el));
 
     return matches[0] || false;
   }
@@ -234,7 +234,7 @@ class OppositeEdge {
     if (_mode === 'dialog') {
       els = [dialog.getElementAtOppositeEnd(sticky)];
     } else {
-      els = sticky._els;
+      els = sticky.els;
     }
 
     els = els.filter((el) => el.isStuck);
@@ -245,7 +245,7 @@ class OppositeEdge {
   unmark (sticky) {
     const edgeClass = this.#classes[sticky.edge];
 
-    sticky._els.forEach(el => el.$fixedEl.classList.remove(edgeClass));
+    sticky.els.forEach(el => el.$fixedEl.classList.remove(edgeClass));
   }
 
 }
@@ -406,7 +406,7 @@ class Dialog {
   }
 
   getOffsetFromEdge (el, sticky) {
-    let els = this.#elsThatCanBeStuck(sticky._els).slice();
+    let els = this.#elsThatCanBeStuck(sticky.els).slice();
 
     // els must be arranged furtherest from window edge is stuck to first
     // default direction is order in document
@@ -427,7 +427,7 @@ class Dialog {
   }
 
   getOffsetFromEnd (el, sticky) {
-    let els = this.#elsThatCanBeStuck(sticky._els);
+    let els = this.#elsThatCanBeStuck(sticky.els);
 
     // els must be arranged furtherest from window edge is stuck to first
     // default direction is order in document
@@ -450,7 +450,7 @@ class Dialog {
   // unsticks each that won't fit and marks them as unstickable
   fitToHeight (sticky) {
     const self = this;
-    const els = sticky._els.slice();
+    const els = sticky.els.slice();
     const height = Sticky.getWindowDimensions().height;
     const totalStickyHeight = () => self.#getTotalHeight(self.#elsThatCanBeStuck(els));
     const dialogFitsHeight = () => totalStickyHeight() <= height;
@@ -475,7 +475,7 @@ class Dialog {
   }
 
   getElementAtStickyEdge (sticky) {
-    const els = this.#elsThatCanBeStuck(sticky._els);
+    const els = this.#elsThatCanBeStuck(sticky.els);
     const idx = (sticky.edge === 'top') ? 0 : els.length - 1;
 
     return els[idx];
@@ -483,7 +483,7 @@ class Dialog {
 
   // get element at the end opposite the sticky edge
   getElementAtOppositeEnd (sticky) {
-    const els = this.#elsThatCanBeStuck(sticky._els);
+    const els = this.#elsThatCanBeStuck(sticky.els);
     const idx = (sticky.edge === 'top') ? els.length - 1 : 0;
 
     return els[idx];
@@ -535,7 +535,7 @@ class Sticky {
   #resizeTimeout = false;
 
   constructor (selector) {
-    this._els = [];
+    this.els = [];
     this.initialPositionsSet = false;
 
     this.CSS_SELECTOR = selector;
@@ -584,7 +584,7 @@ class Sticky {
     // clean up any existing styles marking the edges of sticky elements
     oppositeEdge.unmark(this);
 
-    self._els.forEach(el => {
+    this.els.forEach(el => {
       if (el.canBeStuck) {
         setElementPosition(el);
       }
@@ -626,7 +626,7 @@ class Sticky {
   // Recalculate stored dimensions for all sticky elements
   recalculate () {
     const onSyncComplete = () => {
-      scrollAreas.syncEls(this._els);
+      scrollAreas.syncEls(this.els);
       this.setEvents();
       if (_mode === 'dialog') {
         dialog.fitToHeight(this);
@@ -692,11 +692,11 @@ class Sticky {
   }
 
   allElementsLoaded (totalEls) {
-    return this._els.length === totalEls;
+    return this.els.length === totalEls;
   }
 
   getElForNode (node) {
-    const matches = this._els.filter(el => el.$fixedEl === node);
+    const matches = this.els.filter(el => el.$fixedEl === node);
 
     return matches.length ? matches[0] : false;
   }
@@ -711,7 +711,7 @@ class Sticky {
 
       // guard against adding elements already stored
       if (!exists) {
-        this._els.push(elObj);
+        this.els.push(elObj);
       }
 
       if (setPositions) {
@@ -732,23 +732,23 @@ class Sticky {
   }
 
   remove (el) {
-    if (this._els.includes(el)) {
+    if (this.els.includes(el)) {
 
       // reset DOM node to original state
       this.reset(el);
 
       // remove sticky element object
-      this._els = this._els.filter(_el => _el !== el);
+      this.els = this.els.filter(_el => _el !== el);
     }
   }
 
-  // gets all sticky elements in the DOM and removes any in this._els no longer in attached to it
+  // gets all sticky elements in the DOM and removes any in this.els no longer in attached to it
   syncWithDOM (callback) {
     const $els = document.querySelectorAll(this.CSS_SELECTOR);
     const numOfEls = $els.length;
 
     const onLoaded = () => {
-      if (this._els.length === numOfEls) {
+      if (this.els.length === numOfEls) {
         this.endOfScrollArea = this.getEndOfScrollArea();
         if (callback !== undefined) {
           callback();
@@ -757,8 +757,8 @@ class Sticky {
     };
 
     // remove any els no longer in the DOM
-    if (this._els.length) {
-      this._els.forEach(el => {
+    if (this.els.length) {
+      this.els.forEach(el => {
         if (!el.isInPage) {
           this.remove(el);
         }
@@ -840,7 +840,7 @@ class Sticky {
     if (this.#windowHasResized === true) {
       this.#windowHasResized = false;
 
-      this._els.forEach(el => {
+      this.els.forEach(el => {
         if (!this.viewportIsWideEnough(windowWidth)) {
           this.reset(el);
         } else {
