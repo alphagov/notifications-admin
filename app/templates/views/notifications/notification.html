@@ -59,9 +59,7 @@
          </p>
       {% elif notification.status == 'technical-failure' %}
         <p class="notification-status-cancelled">
-          Technical failure – Notify will resend once the team have
-          fixed the problem
-        </p>
+          <a class="govuk-link govuk-link--destructive" href="{{ url_for('main.guidance_message_status', notification_type='letter') }}">Technical failure</a> – Do not try to send this letter again        </p>
       {% else %}
         {% if notification.sent_with_test_key %}
           {% if notification.is_precompiled_letter %}

@@ -32,8 +32,8 @@ from tests.conftest import normalize_spaces
         ("temporary-failure", "sms", partial(url_for, "main.guidance_message_status", notification_type="sms")),
         ("permanent-failure", "sms", partial(url_for, "main.guidance_message_status", notification_type="sms")),
         ("technical-failure", "sms", partial(url_for, "main.guidance_message_status", notification_type="sms")),
-        # Letter statuses are never linked
-        ("technical-failure", "letter", lambda: None),
+        # Failed letter statuses are linked
+        ("technical-failure", "letter", partial(url_for, "main.guidance_message_status", notification_type="letter")),
         ("cancelled", "letter", lambda: None),
         ("accepted", "letter", lambda: None),
         ("received", "letter", lambda: None),
