@@ -25,6 +25,7 @@ import AuthenticateSecurityKey from './authenticate-security-key.mjs';
 import RegisterSecurityKey from './register-security-key.mjs';
 import UpdateStatus from './update-status.mjs';
 import UpdateContent from './update-content.mjs';
+import UpdateRelativeTime from './update-relative-time.mjs';
 
 createAll(Button, 
   { preventDoubleClick: true }
@@ -149,3 +150,10 @@ if ($updateContentBlocks.length > 0) {
 };
 
 new FocusBanner();
+
+// if there's at least 1 element on the page initialise the class
+// multiple elements are handled by it
+const updateRelativeTimeSelector = '[data-notify-module="update-relative-time"]';
+if (document.querySelector('[data-notify-module="update-relative-time"]')) {
+  new UpdateRelativeTime(updateRelativeTimeSelector);
+}

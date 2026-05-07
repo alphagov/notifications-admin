@@ -57,7 +57,7 @@
             {{ notification.key_name }}
           </span>
           <span class="govuk-grid-column-one-half api-notifications-item__meta-time">
-            <time class="timeago" datetime="{{ notification.created_at }}">
+            <time data-notify-module="update-relative-time" datetime="{{ notification.created_at }}">
               {{ notification.created_at|format_delta }}
             </time>
           </span>

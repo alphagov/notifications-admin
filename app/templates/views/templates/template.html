@@ -78,7 +78,7 @@
     {% if template._template.updated_at %}
       <h2 class="heading-small bottom-gutter-2-3 heading-inline">
         Last edited
-        <time class="timeago" datetime="{{ template._template.updated_at }}">
+        <time data-notify-module="update-relative-time" datetime="{{ template._template.updated_at }}">
           {{ template._template.updated_at|format_delta }}
         </time>
       </h2>
