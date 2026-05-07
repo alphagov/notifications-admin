@@ -1,22 +1,29 @@
-const helpers = require('./support/helpers');
+import { jest } from '@jest/globals';
+
+import * as helpers from './support/helpers.js';
+
+import { offset } from '../../app/assets/javascripts/esm/utils.mjs';
+
 const PADDING_BETWEEN_STICKYS = 40;
 const PADDING_BEFORE_STOPPING_POINT = 10;
 
-function getScreenItemBottomPosition (screenItem) {
+let stickAtTopWhenScrolling;
+let stickAtBottomWhenScrolling;
+let caretCoordinates;
+
+const caretCoordinatesMock = jest.fn(() => caretCoordinates);
+
+jest.unstable_mockModule('textarea-caret-ts', () => ({
+  Caret: {
+    getAbsolutePosition: caretCoordinatesMock
+  }
+}));
+
+const getScreenItemBottomPosition = (screenItem) => {
   return screenItem.offsetTop + screenItem.offsetHeight;
 };
 
-function getCaretPosition (caretPosition, textarea) {
-
-  return {
-    top: textarea.offsetTop + caretPosition.top,
-    bottom: textarea.offsetTop + caretPosition.top + caretPosition.height,
-    height: caretPosition.height
-  };
-
-};
-
-function getStickyGroupPosition (screenMock, opts) {
+const getStickyGroupPosition = (screenMock, opts) => {
 
   const edgePosition = screenMock.window[opts.edge];
   const height = opts.stickyEls
@@ -40,26 +47,27 @@ function getStickyGroupPosition (screenMock, opts) {
 };
 
 class CaretCoordinates {
-  constructor (data) {
-    this.top = 5.5;
+  constructor (textarea) {
+    this.top = offset(textarea).top + 5.5;
     this.left = 2;
     this.height = 19;
+    this.textarea = textarea;
   }
 
   moveToLine (lineNumber) {
     const lineHeight = 30;
     const verticalPadding = 5.5;
 
-    this.top = ((lineNumber - 1) * lineHeight) + verticalPadding;
+    this.top = (offset(this.textarea).top + verticalPadding) + ((lineNumber - 1) * lineHeight);
   }
 }
 
-beforeAll(() => {
-  require('../../app/assets/javascripts/stick-to-window-when-scrolling.js');
+beforeAll(async () => {
+  ({ stickAtTopWhenScrolling, stickAtBottomWhenScrolling } = await import('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs'));
 });
 
 afterAll(() => {
-  require('./support/teardown.js');
+  jest.restoreAllMocks();
 });
 
 describe("Stick to top/bottom of window when scrolling", () => {
@@ -140,7 +148,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       document.body.innerHTML = '';
 
-      window.GOVUK.stickAtTopWhenScrolling.clearEvents();
+      stickAtTopWhenScrolling.clearEvents();
 
       screenMock.reset();
 
@@ -150,7 +158,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       // scroll position defaults to 0, element top defaults to 138px
 
-      window.GOVUK.stickAtTopWhenScrolling.init();
+      stickAtTopWhenScrolling.init();
 
       expect(inputForm.classList.contains('content-fixed-onload')).toBe(false);
       expect(inputForm.classList.contains('content-fixed')).toBe(false);
@@ -167,7 +175,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
       // scroll past top of form
       screenMock.scrollTo(inputForm.offsetTop + 10);
 
-      window.GOVUK.stickAtTopWhenScrolling.init();
+      stickAtTopWhenScrolling.init();
 
       expect(inputForm.classList.contains('content-fixed')).toBe(false);
       expect(inputForm.classList.contains('content-fixed-onload')).toBe(false); // check the class for onload isn't applied
@@ -181,7 +189,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // scroll past the top of the form
         screenMock.scrollTo(inputForm.offsetTop + 10);
 
-        window.GOVUK.stickAtTopWhenScrolling.init();
+        stickAtTopWhenScrolling.init();
 
       });
 
@@ -215,7 +223,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
       // scroll past the furthest point
       screenMock.scrollTo(furthestTopPoint + 10);
 
-      window.GOVUK.stickAtTopWhenScrolling.init();
+      stickAtTopWhenScrolling.init();
 
       // `.content-fixed-onload` adds the drop-shadow without fading in to show it did not become sticky from user interaction
       expect(inputForm.classList.contains('content-fixed-onload')).toBe(true);
@@ -232,7 +240,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
       beforeEach(() => {
 
         // default scroll position is above top of form
-        window.GOVUK.stickAtTopWhenScrolling.init();
+        stickAtTopWhenScrolling.init();
 
       });
 
@@ -275,7 +283,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // scroll past top of form
         screenMock.scrollTo(inputForm.offsetTop + 10);
 
-        window.GOVUK.stickAtTopWhenScrolling.init();
+        stickAtTopWhenScrolling.init();
 
       });
 
@@ -315,7 +323,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // move the sticky over the link. It's 168px high so this position will cause it to overlap.
         screenMock.scrollTo(link.offsetTop - 140);
 
-        window.GOVUK.stickAtTopWhenScrolling.init();
+        stickAtTopWhenScrolling.init();
 
       });
 
@@ -336,7 +344,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         expect(stickyPosition.top).toBeLessThanOrEqual(link.offsetTop);
         expect(stickyPosition.bottom).toBeGreaterThanOrEqual(linkBottom);
 
-        window.GOVUK.stickAtTopWhenScrolling.scrollToRevealElement(link);
+        stickAtTopWhenScrolling.scrollToRevealElement(link);
 
         stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
 
@@ -382,7 +390,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // move the sticky over the checkbox. It's 168px high so this position will cause it to overlap.
         screenMock.scrollTo(checkbox.offsetTop - 10);
 
-        window.GOVUK.stickAtTopWhenScrolling.init();
+        stickAtTopWhenScrolling.init();
 
       });
 
@@ -419,8 +427,6 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       let textarea;
       let textareaBottom;
-      let caretCoordinates;
-      let caretCoordinatesMock;
 
       beforeEach(() => {
 
@@ -438,12 +444,8 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         textareaBottom = getScreenItemBottomPosition(textarea);
 
-        // mock calls for caret position, relative to textarea
-        caretCoordinatesMock = jest.fn(() => caretCoordinates);
-        window.getCaretCoordinates = caretCoordinatesMock;
-
         // start caret on first line
-        caretCoordinates = new CaretCoordinates();
+        caretCoordinates = new CaretCoordinates(textarea);
 
         // move the sticky so it overlaps the top 168px of the textarea.
         screenMock.scrollTo(textarea.offsetTop);
@@ -451,7 +453,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // update inputForm position as DOM normally would
         inputForm.offsetTop = screenMock.window.top;
 
-        window.GOVUK.stickAtTopWhenScrolling.init();
+        stickAtTopWhenScrolling.init();
 
       });
 
@@ -466,17 +468,16 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         // caret is on first line
         const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
-        const caretPosition = getCaretPosition(caretCoordinates, textarea);
 
         // sticky position should overlap caret position
-        expect(stickyPosition.top).toBeLessThanOrEqual(caretPosition.top);
-        expect(stickyPosition.bottom).toBeGreaterThanOrEqual(caretPosition.bottom);
+        expect(stickyPosition.top).toBeLessThanOrEqual(caretCoordinates.top);
+        expect(stickyPosition.bottom).toBeGreaterThanOrEqual(caretCoordinates.top + caretCoordinates.height);
 
         // the sticky element (page footer) is 50 high so should cover the last of the radios if the bottom edge of the viewport is at its bottom
         textarea.focus();
 
         // the bottom of the sticky element should be at the top of the checkbox
-        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretPosition.top - stickyPosition.height]);
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretCoordinates.top - stickyPosition.height]);
 
       });
 
@@ -486,10 +487,9 @@ describe("Stick to top/bottom of window when scrolling", () => {
         caretCoordinates.moveToLine(7);
 
         const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
-        const caretPosition = getCaretPosition(caretCoordinates, textarea);
 
         // the sticky element should be above the caret
-        expect(stickyPosition.bottom).toBeLessThan(caretPosition.top);
+        expect(stickyPosition.bottom).toBeLessThan(caretCoordinates.top);
 
         textarea.focus();
 
@@ -510,16 +510,15 @@ describe("Stick to top/bottom of window when scrolling", () => {
         caretCoordinates.moveToLine(6);
 
         const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
-        const caretPosition = getCaretPosition(caretCoordinates, textarea);
 
         // sticky should now overlap the caret
-        expect(stickyPosition.bottom).toBeGreaterThanOrEqual(caretPosition.top);
+        expect(stickyPosition.bottom).toBeGreaterThanOrEqual(caretCoordinates.top);
 
         // the sticky element (page footer) is 50 high so should cover the last of the radios if the bottom edge of the viewport is at its bottom
         helpers.triggerEvent(textarea, 'keyup', { interface: window.KeyboardEvent });
 
         // the bottom of the sticky element should be at the top of the checkbox
-        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretPosition.top - stickyPosition.height]);
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretCoordinates.top - stickyPosition.height]);
 
       });
 
@@ -534,7 +533,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         const inputFormBottom = getScreenItemBottomPosition(inputForm);
 
         // set mode to 'dialog' so sticky elements are treated as one item
-        window.GOVUK.stickAtTopWhenScrolling.setMode('dialog')
+        stickAtTopWhenScrolling.setMode('dialog')
 
         // add another sticky element before the form footer
         radios = helpers.getRadioGroup({
@@ -579,7 +578,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       afterEach(() => {
 
-        window.GOVUK.stickAtTopWhenScrolling.setMode('default');
+        stickAtTopWhenScrolling.setMode('default');
 
       });
 
@@ -590,7 +589,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
           // scroll past top of first sticky element
           screenMock.scrollTo(inputForm.offsetTop + 10);
 
-          window.GOVUK.stickAtTopWhenScrolling.init();
+          stickAtTopWhenScrolling.init();
 
         });
 
@@ -635,7 +634,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
           // scroll past top of first sticky element
           screenMock.scrollTo(furthestTopPoint + 10);
 
-          window.GOVUK.stickAtTopWhenScrolling.init();
+          stickAtTopWhenScrolling.init();
 
         });
 
@@ -696,7 +695,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
           screenMock.scrollTo(inputForm.offsetTop + 10);
 
-          window.GOVUK.stickAtTopWhenScrolling.init()
+          stickAtTopWhenScrolling.init()
 
         });
 
@@ -727,7 +726,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
   describe("If intending to stick to the bottom", () => {
 
-    let header;
+    let heading;
     let content;
     let pageFooter;
     let windowHeight;
@@ -816,7 +815,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
     afterEach(() => {
 
-      window.GOVUK.stickAtBottomWhenScrolling.clearEvents();
+      stickAtBottomWhenScrolling.clearEvents();
 
     });
 
@@ -827,7 +826,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
       // scroll so the bottom of the window goes past the bottom of the element
       screenMock.scrollTo((pageFooterBottom - windowHeight) + 10);
 
-      window.GOVUK.stickAtBottomWhenScrolling.init();
+      stickAtBottomWhenScrolling.init();
 
       // `.content-fixed-onload` adds the drop-shadow without fading in to show it did not become sticky from user interaction
       expect(pageFooter.classList.contains('content-fixed-onload')).toBe(false);
@@ -847,7 +846,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
       // scroll past top of form
       screenMock.scrollTo(pageFooterBottom - 10);
 
-      window.GOVUK.stickAtTopWhenScrolling.init();
+      stickAtTopWhenScrolling.init();
 
       expect(pageFooter.classList.contains('content-fixed')).toBe(false);
       expect(pageFooter.classList.contains('content-fixed-onload')).toBe(false); // check the class for onload isn't applied
@@ -859,7 +858,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
       beforeEach(() => {
 
         // scroll position defaults to 0 so bottom of window starts at 940px. Element bottom defaults to 1160px.
-        window.GOVUK.stickAtBottomWhenScrolling.init();
+        stickAtBottomWhenScrolling.init();
 
       });
 
@@ -895,7 +894,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
       // scroll the window bottom past the furthest point
       screenMock.scrollTo((furthestBottomPoint - windowHeight) - 10);
 
-      window.GOVUK.stickAtBottomWhenScrolling.init();
+      stickAtBottomWhenScrolling.init();
 
       // `.content-fixed-onload` adds the drop-shadow without fading in to show it did not become sticky from user interaction
       expect(pageFooter.classList.contains('content-fixed-onload')).toBe(true);
@@ -923,7 +922,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // scroll to just below the element
         screenMock.scrollTo((pageFooterBottom - windowHeight) + 10);
 
-        window.GOVUK.stickAtBottomWhenScrolling.init();
+        stickAtBottomWhenScrolling.init();
 
       });
 
@@ -994,7 +993,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // move the sticky over the link. It's 50px high so this position will cause it to overlap.
         screenMock.scrollTo((linkBottom - windowHeight) + 5);
 
-        window.GOVUK.stickAtBottomWhenScrolling.init();
+        stickAtBottomWhenScrolling.init();
 
       });
 
@@ -1015,7 +1014,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         expect(stickyPosition.top).toBeLessThanOrEqual(link.offsetTop);
         expect(stickyPosition.bottom).toBeGreaterThanOrEqual(linkBottom);
 
-        window.GOVUK.stickAtBottomWhenScrolling.scrollToRevealElement(link)
+        stickAtBottomWhenScrolling.scrollToRevealElement(link)
 
         stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
 
@@ -1043,7 +1042,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
           offsetTop: pageFooter.offsetTop
         };
 
-        window.GOVUK.stickAtBottomWhenScrolling.init();
+        stickAtBottomWhenScrolling.init();
 
         // add mock for shim
         pageFooterShim = document.querySelector('.shim');
@@ -1120,7 +1119,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // move the sticky over the checkbox. It's 50px high so this position will cause it to overlap.
         screenMock.scrollTo((checkboxBottom - windowHeight) + 5);
 
-        window.GOVUK.stickAtBottomWhenScrolling.init();
+        stickAtBottomWhenScrolling.init();
 
       });
 
@@ -1157,8 +1156,6 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       let textarea;
       let textareaBottom;
-      let caretCoordinates;
-      let caretCoordinatesMock;
 
       beforeEach(() => {
 
@@ -1177,10 +1174,8 @@ describe("Stick to top/bottom of window when scrolling", () => {
         textareaBottom = getScreenItemBottomPosition(textarea);
 
         // start caret on the last line
-        caretCoordinates = new CaretCoordinates();
+        caretCoordinates = new CaretCoordinates(textarea);
         caretCoordinates.moveToLine(10);
-        caretCoordinatesMock = jest.fn(() => caretCoordinates);
-        window.getCaretCoordinates = caretCoordinatesMock;
 
         // move the sticky so it overlaps the bottom 50px of the textarea.
         screenMock.scrollTo(textareaBottom - windowHeight);
@@ -1188,7 +1183,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         // update content position as DOM normally would
         pageFooter.offsetTop = screenMock.window.bottom - pageFooter.offsetHeight;
 
-        window.GOVUK.stickAtBottomWhenScrolling.init();
+        stickAtBottomWhenScrolling.init();
 
       });
 
@@ -1202,15 +1197,15 @@ describe("Stick to top/bottom of window when scrolling", () => {
       test("if the textarea receives focus while its caret is underneath, the window should scroll to reveal the caret", () => {
 
         const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
-        const caretPosition = getCaretPosition(caretCoordinates, textarea);
+        const caretCoordinatesBottom = caretCoordinates.top + caretCoordinates.height;
 
         // sticky position should overlap caret position
-        expect(stickyPosition.top).toBeLessThan(caretPosition.bottom);
+        expect(stickyPosition.top).toBeLessThan(caretCoordinatesBottom);
 
         textarea.focus();
 
         // the top of the sticky element should be at the bottom of the caret
-        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretPosition.bottom - (windowHeight - stickyPosition.height)]);
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretCoordinatesBottom - (windowHeight - stickyPosition.height)]);
 
       });
 
@@ -1220,10 +1215,9 @@ describe("Stick to top/bottom of window when scrolling", () => {
         caretCoordinates.moveToLine(8);
 
         const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
-        const caretPosition = getCaretPosition(caretCoordinates, textarea);
 
         // the sticky element should be below the caret
-        expect(stickyPosition.top).toBeGreaterThan(caretPosition.bottom);
+        expect(stickyPosition.top).toBeGreaterThan(caretCoordinates.top + caretCoordinates.height);
 
         textarea.focus();
 
@@ -1244,16 +1238,16 @@ describe("Stick to top/bottom of window when scrolling", () => {
         caretCoordinates.moveToLine(9);
 
         const stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [pageFooter], edge: 'bottom' });
-        const caretPosition = getCaretPosition(caretCoordinates, textarea);
+        const caretCoordinatesBottom = caretCoordinates.top + caretCoordinates.height;
 
         // sticky position should overlap caret position
-        expect(stickyPosition.top).toBeLessThan(caretPosition.bottom);
+        expect(stickyPosition.top).toBeLessThan(caretCoordinatesBottom);
 
         // simulate a press of the down arrow
         helpers.triggerEvent(textarea, 'keyup', { interface: window.KeyboardEvent });
 
         // the top of the sticky element should be at the bottom of the caret
-        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretPosition.bottom - (windowHeight - stickyPosition.height)]);
+        expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretCoordinatesBottom - (windowHeight - stickyPosition.height)]);
 
       });
 
@@ -1268,7 +1262,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         const contentBottom = getScreenItemBottomPosition(content);
 
         // set mode to 'dialog' so sticky elements are treated as one item
-        window.GOVUK.stickAtBottomWhenScrolling.setMode('dialog')
+        stickAtBottomWhenScrolling.setMode('dialog')
 
         // add another sticky element before the form footer
         radios = helpers.getRadioGroup({
@@ -1311,7 +1305,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       afterEach(() => {
 
-        window.GOVUK.stickAtBottomWhenScrolling.setMode('default');
+        stickAtBottomWhenScrolling.setMode('default');
 
       });
 
@@ -1326,7 +1320,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
           // scroll to just above the element
           screenMock.scrollTo((pageFooterBottom - windowHeight) - 10);
 
-          window.GOVUK.stickAtBottomWhenScrolling.init();
+          stickAtBottomWhenScrolling.init();
 
         });
 
@@ -1369,7 +1363,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
           screenMock.scrollTo((furthestBottomPoint - windowHeight) - 10)
 
-          window.GOVUK.stickAtBottomWhenScrolling.init();
+          stickAtBottomWhenScrolling.init();
 
         });
 
@@ -1431,7 +1425,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
           screenMock.scrollTo((pageFooterBottom - windowHeight) - 10);
 
-          window.GOVUK.stickAtBottomWhenScrolling.init()
+          stickAtBottomWhenScrolling.init()
 
         });
 
