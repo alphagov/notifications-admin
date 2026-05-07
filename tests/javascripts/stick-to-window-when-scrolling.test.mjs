@@ -356,7 +356,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         const inputFormBottom = getScreenItemBottomPosition(inputForm);
 
-        inputForm.insertAdjacentHTML('afterEnd', 
+        inputForm.insertAdjacentHTML('afterEnd',
           `<div class="govuk-checkboxes__item">
             <input class="govuk-checkboxes__input" id="id" name="confirm" type="checkbox" value="yes">
             <label class="govuk-label govuk-checkboxes__label" for="id">Yes</label>
@@ -1101,7 +1101,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
         const contentBottom = getScreenItemBottomPosition(content);
 
-        content.insertAdjacentHTML('afterEnd', 
+        content.insertAdjacentHTML('afterEnd',
           `<div class="govuk-checkboxes__item">
             <input class="govuk-checkboxes__input" id="id" name="confirm" type="checkbox" value="yes">
             <label class="govuk-label govuk-checkboxes__label" for="id">Yes</label>
