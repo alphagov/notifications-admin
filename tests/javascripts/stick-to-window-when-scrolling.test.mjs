@@ -77,6 +77,8 @@ describe("Stick to top/bottom of window when scrolling", () => {
   describe("If intending to stick to the top", () => {
 
     let inputForm;
+    let emailMessage;
+    let scrollArea;
     let formFooter;
     let footer;
     let windowHeight;
@@ -87,8 +89,8 @@ describe("Stick to top/bottom of window when scrolling", () => {
       document.body.innerHTML = `
         <div class="govuk-grid-row">
           <main class="govuk-grid-column-three-quarters column-main">
-            <form method="post" autocomplete="off">
-              <div class="govuk-grid-row js-stick-at-top-when-scrolling">
+            <form method="post" autocomplete="off" class="js-stick-at-top-when-scrolling">
+              <div class="govuk-grid-row">
                 <div class="govuk-grid-column-two-thirds ">
                   <div class="govuk-form-group" data-notify-module="">
                     <label class="govuk-label" for="placeholder_value">
@@ -102,11 +104,59 @@ describe("Stick to top/bottom of window when scrolling", () => {
                 <button class="page-footer__button govuk-button" data-module="govuk-button">Continue</button>
               </div>
             </form>
+            <div class="email-message">
+              <dl class="govuk-summary-list email-message-meta">
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">
+                    From
+                  </dt>
+                  <dd class="govuk-summary-list__value">
+                    Licence applications
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">
+                    Reply&nbsp;to
+                  </dt>
+                  <dd class="govuk-summary-list__value email-message-meta__reply-to">
+                    licence.applications@notifications.service.gov.uk
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">
+                    To
+                  </dt>
+                  <dd class="govuk-summary-list__value email-message-meta__send-to">
+                    john.doe@gmail.com
+                  </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                  <dt class="govuk-summary-list__key">
+                    Subject
+                  </dt>
+                  <dd class="govuk-summary-list__value">
+                    Confirmation of <span class="placeholder">((type))</span> licence application
+                  </dd>
+                </div>
+              </dl>
+              <div class="email-message-body">
+                <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">
+                  Hello <span class="placeholder">((name))</span>,</p>
+                <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">
+                  This is notice that we have received your application and are now processing it.
+                </p>
+                <p style="Margin: 0 0 20px 0; font-size: 19px; line-height: 25px; color: #0B0C0C;">
+                  We will be in contact soon.
+                </p>
+              </div>
+            </div>
           </main>
         </div>
         <footer class="govuk-template__footer"><div class="govuk-footer js-footer"></div></footer>`;
 
-      inputForm = document.querySelector('form > .govuk-grid-row');
+      inputForm = document.querySelector('form');
+      emailMessage = document.querySelector('.email-message');
+      scrollArea = document.querySelector('main');
       formFooter = document.querySelector('.page-footer');
       footer = document.querySelector('.js-footer');
 
@@ -124,10 +174,20 @@ describe("Stick to top/bottom of window when scrolling", () => {
         offsetWidth: 727,
         offsetTop: 238
       });
+      screenMock.mockPositionAndDimension('emailMessage', emailMessage, {
+        offsetHeight: 320,
+        offsetWidth: 727,
+        offsetTop: inputForm.offsetTop + inputForm.offsetHeight
+      });
+      screenMock.mockPositionAndDimension('scrollArea', inputForm, {
+        offsetHeight: inputForm.offsetHeight + emailMessage.offsetHeight,
+        offsetWidth: 727,
+        offsetTop: inputForm.offsetTop
+      });
       screenMock.mockPositionAndDimension('formFooter', formFooter, {
         offsetHeight: 200,
         offsetWidth: 727,
-        offsetTop: inputForm.offsetTop + 200
+        offsetTop: emailMessage.offsetTop + emailMessage.offsetHeight
       });
       screenMock.mockPositionAndDimension('footer', footer, {
         offsetHeight: 535,
