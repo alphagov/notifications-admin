@@ -12,10 +12,9 @@ from app.utils.user import user_has_permissions
 @user_has_permissions()
 def document_download_landing(service_id, document_id):
     template_id = base64_to_uuid_or_404(request.args.get("key"))
+    template_version = request.args.get("template_version", None)
     template = current_service.get_template_with_user_permission_or_403(
-        template_id,
-        current_user,
-        must_be_of_type="email",
+        template_id, current_user, must_be_of_type="email", version=template_version
     )
     template_email_file = template.email_files.by_id(document_id)
 
@@ -27,6 +26,7 @@ def document_download_landing(service_id, document_id):
             service_id=current_service.id,
             document_id=template_email_file.id,
             key=uuid_to_base64(template.id),
+            template_version=template.version,
         ),
     )
 
@@ -35,10 +35,12 @@ def document_download_landing(service_id, document_id):
 @user_has_permissions()
 def document_download_confirm_email_address(service_id, document_id):
     template_id = base64_to_uuid_or_404(request.args.get("key"))
+    template_version = request.args.get("template_version", None)
     template = current_service.get_template_with_user_permission_or_403(
         template_id,
         current_user,
         must_be_of_type="email",
+        version=template_version,
     )
     template_email_file = template.email_files.by_id(document_id)
 
@@ -54,6 +56,7 @@ def document_download_confirm_email_address(service_id, document_id):
                 service_id=current_service.id,
                 document_id=template_email_file.id,
                 key=uuid_to_base64(template.id),
+                template_version=template.version,
             )
         )
 
@@ -68,10 +71,9 @@ def document_download_confirm_email_address(service_id, document_id):
 @user_has_permissions()
 def document_download_download_document(service_id, document_id):
     template_id = base64_to_uuid_or_404(request.args.get("key"))
+    template_version = request.args.get("template_version", None)
     template = current_service.get_template_with_user_permission_or_403(
-        template_id,
-        current_user,
-        must_be_of_type="email",
+        template_id, current_user, must_be_of_type="email", version=template_version
     )
     template_email_file = template.email_files.by_id(document_id)
 
