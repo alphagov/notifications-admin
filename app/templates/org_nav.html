@@ -4,7 +4,11 @@
     <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('team-members') }}" href="{{ url_for('main.manage_org_users', org_id=current_org.id) }}">Team members</a></li>
     {% if current_user.platform_admin %}
     <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('settings') }}" href="{{ url_for('main.organisation_settings', org_id=current_org.id) }}">Settings</a></li>
+    {% endif %}
+    {% if current_user.platform_admin or current_user.has_permission_for_organisation(current_org.id, 'can_make_services_live') %}
     <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('trial-services') }}" href="{{ url_for('main.organisation_trial_mode_services', org_id=current_org.id) }}">Trial mode services</a></li>
+    {% endif %}
+    {% if current_user.platform_admin %}
     <li class="navigation__item"><a class="govuk-link govuk-link--no-visited-state govuk-link--no-underline{{ org_navigation.is_selected('billing') }}" href="{{ url_for('main.organisation_billing', org_id=current_org.id) }}">Billing</a></li>
     {% endif %}
   </ul>
