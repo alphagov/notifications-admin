@@ -35,6 +35,11 @@ from app.utils.user_permissions import permission_options, translate_permissions
 @main.route("/services/<uuid:service_id>/users")
 @user_has_permissions(allow_org_user=True)
 def manage_users(service_id):
+    active_users_with_manage_service_permission = current_service.active_users_with_permission("manage_service")
+    active_gov_users_with_manage_service_permission = [
+        user for user in active_users_with_manage_service_permission if user.is_gov_user
+    ]
+
     return render_template(
         "views/manage-users.html",
         users=current_service.team_members,
@@ -43,6 +48,7 @@ def manage_users(service_id):
         form=SearchUsersForm(),
         permissions=permission_options,
         extra_spacing_around_flash_messages=False,
+        active_gov_users_with_manage_service_permission_count=len(active_gov_users_with_manage_service_permission),
     )
 
 
