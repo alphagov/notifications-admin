@@ -24,6 +24,25 @@ from app.notify_client.protected_sender_id_api_client import protected_sender_id
 from app.utils.user import is_gov_user
 
 
+class CanEncode:
+    """
+    Validates that the field data can be encoded into a specific character set.
+    """
+
+    def __init__(self, encoding="latin-1", message=None):
+        self.encoding = encoding
+        self.message = message
+
+    def __call__(self, form, field):
+        if field.data:
+            try:
+                field.data.encode(self.encoding)
+            except UnicodeEncodeError:
+                if self.message is None:
+                    self.message = f"Field contains characters not supported by {self.encoding}."
+                raise ValidationError(self.message) from None
+
+
 class CommonlyUsedPassword:
     def __init__(self, message=None):
         if not message:
