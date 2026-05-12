@@ -58,7 +58,7 @@
             <p class="hint">This number has never been used</p>
             {% else %}
             <p class="govuk-body">This number was last used
-                <time class="timeago" datetime="{{ recent_use_date}}">
+                <time data-notify-module="update-relative-time" datetime="{{ recent_use_date}}">
                     {{ recent_use_date|format_delta }}
                 </time>
             </p>

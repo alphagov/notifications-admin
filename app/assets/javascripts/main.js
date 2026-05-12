@@ -1,6 +1,5 @@
 
 if (document.body.classList.contains('govuk-frontend-supported')) {
-  $(() => $("time.timeago").timeago());
 
   $(() => GOVUK.stickAtTopWhenScrolling.init());
   $(() => GOVUK.stickAtBottomWhenScrolling.init());
