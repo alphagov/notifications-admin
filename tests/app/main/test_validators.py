@@ -5,6 +5,7 @@ from notifications_utils.recipient_validation.errors import InvalidPhoneError
 from wtforms import ValidationError
 
 from app.main.validators import (
+    CanEncode,
     CharactersNotAllowed,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
@@ -217,3 +218,39 @@ def test_string_cannot_contain_string_with_custom_error_message():
 
     assert str(error.value) == "No sequences please"
     assert mock_field.error_summary_messages == ["No sequences in %s please"]
+
+
+@pytest.mark.parametrize(
+    "data, err_msg",
+    [
+        (
+            "📵 ghi",
+            "You cannot use 📵 in this field. You must use percent encoding if you want to include this character.",
+        ),
+        (
+            "∆ abc 📲",
+            "You cannot use ∆ or 📲 in this field. You must use percent encoding if you want to include these characters.",  # noqa
+        ),
+    ],
+)
+def test_can_encode_validation(data, err_msg, client_request):
+    with pytest.raises(ValidationError) as error:
+        CanEncode()(None, _gen_mock_field(data))
+
+    assert str(error.value) == err_msg
+
+
+def test_string_can_encode_with_custom_field_type():
+    mock_field = _gen_mock_field("∆ abc 📲", error_summary_messages=[])
+    with pytest.raises(ValidationError) as error:
+        CanEncode(field_type="a web address")(None, mock_field)
+
+    assert (
+        str(error.value)
+        == "You cannot use ∆ or 📲 in a web address. You must use percent encoding if you want to include these characters."  # noqa
+    )
+
+
+@pytest.mark.parametrize("string", ["", "Résumé", "München"])
+def test_string_can_encode_does_not_raise(string):
+    CanEncode()(None, _gen_mock_field(string))
