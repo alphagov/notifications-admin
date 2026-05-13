@@ -777,6 +777,12 @@ class Sticky {
   }
 
   init () {
+    // reset all state
+    this.#hasScrolled = false;
+    this.#scrollTimeout = false;
+    this.#windowHasResized = false;
+    this.#resizeTimeout = false;
+
     this.recalculate();
   }
 
