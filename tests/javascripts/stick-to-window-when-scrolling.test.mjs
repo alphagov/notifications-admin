@@ -216,7 +216,8 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
     test("if top of viewport is above top of element on load, the element should not be marked as sticky", () => {
 
-      // scroll position defaults to 0, element top defaults to 138px
+      // scroll position defaults to 0, inputForm is 238px from top and window has 940px height
+      // so inputForm fits inside and doesn't need to stick to viewport
 
       stickAtTopWhenScrolling.init();
 
@@ -232,7 +233,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         width: 768
       });
 
-      // scroll past top of form
+      // scroll past top of inputForm
       screenMock.scrollTo(inputForm.offsetTop + 10);
 
       stickAtTopWhenScrolling.init();
@@ -336,7 +337,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
     });
 
-    describe("if viewport top starts below element top", () => {
+    describe("if viewport top starts below element top on page load", () => {
 
       beforeEach(() => {
 
@@ -367,21 +368,28 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       beforeEach(() => {
 
-        const inputFormBottom = getScreenItemBottomPosition(inputForm);
+        const emailMessageBottom = getScreenItemBottomPosition(emailMessage);
 
-        inputForm.insertAdjacentHTML('afterEnd', '<a href="" id="formatting-options">Formatting options</a>');
+        emailMessage.insertAdjacentHTML('afterEnd', '<a href="" id="formatting-options">Formatting options</a>');
         link = document.querySelector('#formatting-options');
 
         screenMock.mockPositionAndDimension('link', link, {
           offsetHeight: 25, // 143px smaller than the sticky
           offsetWidth: 727,
-          offsetTop: inputFormBottom
+          offsetTop: emailMessageBottom
         });
 
         linkBottom = getScreenItemBottomPosition(link);
 
+        // update formFooter and footer positions as DOM normally would
+        formFooter.offsetTop = formFooter.offsetTop + 25;
+        footer.offsetTop = footer.offsetTop + 25;
+
         // move the sticky over the link. It's 168px high so this position will cause it to overlap.
         screenMock.scrollTo(link.offsetTop - 140);
+
+        // update inputForm position to mimic what it would normally get given by the CSS classes applied when sticky
+        inputForm.offsetTop = screenMock.window.top;
 
         stickAtTopWhenScrolling.init();
 
@@ -394,9 +402,6 @@ describe("Stick to top/bottom of window when scrolling", () => {
       });
 
       test("the window should scroll so the element is revealed", () => {
-
-        // update inputForm position as DOM normally would
-        inputForm.offsetTop = screenMock.window.top;
 
         let stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
 
@@ -422,9 +427,9 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       beforeEach(() => {
 
-        const inputFormBottom = getScreenItemBottomPosition(inputForm);
+        const emailMessageBottom = getScreenItemBottomPosition(emailMessage);
 
-        inputForm.insertAdjacentHTML('afterEnd',
+        emailMessage.insertAdjacentHTML('afterEnd',
           `<div class="govuk-checkboxes__item">
             <input class="govuk-checkboxes__input" id="id" name="confirm" type="checkbox" value="yes">
             <label class="govuk-label govuk-checkboxes__label" for="id">Yes</label>
@@ -435,15 +440,19 @@ describe("Stick to top/bottom of window when scrolling", () => {
         screenMock.mockPositionAndDimension('checkbox', checkbox, {
           offsetHeight: 50, // 118px smaller than the sticky
           offsetWidth: 727,
-          offsetTop: inputFormBottom
+          offsetTop: emailMessageBottom
         });
 
         // also mock offeset for the parent containing element div
         screenMock.mockPositionAndDimension('checkboxParent', checkbox.parentNode, {
           offsetHeight: 50,
           offsetWidth: 727,
-          offsetTop: inputFormBottom
+          offsetTop: emailMessageBottom
         });
+
+        // update formFooter and footer positions as DOM normally would
+        formFooter.offsetTop = formFooter.offsetTop + 50;
+        footer.offsetTop = footer.offsetTop + 50;
 
         checkboxBottom = getScreenItemBottomPosition(checkbox);
 
@@ -451,6 +460,9 @@ describe("Stick to top/bottom of window when scrolling", () => {
         screenMock.scrollTo(checkbox.offsetTop - 10);
 
         stickAtTopWhenScrolling.init();
+
+        // update inputForm position to mimic what it would normally get given by the CSS classes applied when sticky
+        inputForm.offsetTop = screenMock.window.top;
 
       });
 
@@ -461,9 +473,6 @@ describe("Stick to top/bottom of window when scrolling", () => {
       });
 
       test("the window should scroll so the focused element is revealed", () => {
-
-        // update inputForm position as DOM normally would
-        inputForm.offsetTop = screenMock.window.top;
 
         let stickyPosition = getStickyGroupPosition(screenMock, { stickyEls: [inputForm], edge: 'top' });
 
@@ -490,17 +499,21 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       beforeEach(() => {
 
-        const inputFormBottom = getScreenItemBottomPosition(inputForm);
+        const emailMessageBottom = getScreenItemBottomPosition(emailMessage);
 
-        inputForm.insertAdjacentHTML('afterEnd', '<textarea name="notes"></textarea>');
+        emailMessage.insertAdjacentHTML('afterEnd', '<textarea name="notes"></textarea>');
         textarea = document.querySelector('textarea');
 
         // line height: 30px, text height: 19px, lines: 10
         screenMock.mockPositionAndDimension('textarea', textarea, {
           offsetHeight: 300,
           offsetWidth: 727,
-          offsetTop: inputFormBottom
+          offsetTop: emailMessageBottom
         });
+
+        // update formFooter and footer positions as DOM normally would
+        formFooter.offsetTop = formFooter.offsetTop + 50;
+        footer.offsetTop = footer.offsetTop + 50;
 
         textareaBottom = getScreenItemBottomPosition(textarea);
 
@@ -590,7 +603,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       beforeEach(() => {
 
-        const inputFormBottom = getScreenItemBottomPosition(inputForm);
+        const emailMessageBottom = getScreenItemBottomPosition(emailMessage);
 
         // set mode to 'dialog' so sticky elements are treated as one item
         stickAtTopWhenScrolling.setMode('dialog')
@@ -622,7 +635,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         screenMock.mockPositionAndDimension('radios', radios, {
           offsetHeight: 175,
           offsetWidth: 727,
-          offsetTop: inputFormBottom
+          offsetTop: emailMessageBottom
         });
         const radiosBottom = getScreenItemBottomPosition(radios);
 
@@ -642,7 +655,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       });
 
-      describe("if window top is below the top of the highest element on load", () => {
+      describe("if window top is below the top of the highest sticky element on load", () => {
 
         beforeEach(() => {
 
@@ -903,8 +916,8 @@ describe("Stick to top/bottom of window when scrolling", () => {
         width: 768
       });
 
-      // scroll past top of form
-      screenMock.scrollTo(pageFooterBottom - 10);
+      // scroll to position where bottom of viewport is above bottom of element
+      screenMock.scrollTo((pageFooterBottom - windowHeight) - 10);
 
       stickAtTopWhenScrolling.init();
 
@@ -945,14 +958,13 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
     test("if bottom of viewport is above the furthest point the bottom of the element can go in the scroll area on load, the element should be marked as stopped", () => {
 
-      // change window size so its bottom can go past stopping position
+      // change window height so its bottom can go past stopping position
+      // stopping position (furthestBottomPoint): 235, bottom of window: 200
       const windowHeight = 200;
       const furthestBottomPoint = getFurthestBottomPoint(pageFooter.offsetHeight);
 
+      // setting window height brings its bottom past the furthest point the page footer can go
       screenMock.window.setHeightTo(windowHeight);
-
-      // scroll the window bottom past the furthest point
-      screenMock.scrollTo((furthestBottomPoint - windowHeight) - 10);
 
       stickAtBottomWhenScrolling.init();
 
@@ -975,11 +987,12 @@ describe("Stick to top/bottom of window when scrolling", () => {
         pageFooterBottom = getScreenItemBottomPosition(pageFooter);
 
         // change window size so its bottom can go past stopping position
-        const windowHeight = 600;
+        const windowHeight = 200;
 
         screenMock.window.setHeightTo(windowHeight);
 
         // scroll to just below the element
+        // window bottom: 1220
         screenMock.scrollTo((pageFooterBottom - windowHeight) + 10);
 
         stickAtBottomWhenScrolling.init();
@@ -1018,8 +1031,8 @@ describe("Stick to top/bottom of window when scrolling", () => {
 
       test("if window resizes so bottom is above the bottom of the element, the element should be marked so it becomes sticky to the user", () => {
 
-        // resize window so the bottom is 30px above the bottom of the element
-        screenMock.window.resizeTo({ height: 560, width: screenMock.window.width });
+        // resize window so the bottom is 10px above the bottom of the element
+        screenMock.window.resizeTo({ height: 180, width: screenMock.window.width });
         jest.advanceTimersByTime(60); // fake advance of time to something similar to that for a resize
 
         // `content-fixed` fades the drop-shadow in to show it became sticky from user interaction
@@ -1174,7 +1187,15 @@ describe("Stick to top/bottom of window when scrolling", () => {
           offsetTop: contentBottom
         });
 
-        checkboxBottom = getScreenItemBottomPosition(checkbox.parentNode);
+        // the logic that moves the sticky clear of any focused elements it overlaps will query the dimensions and position of the parent element for radios and checkboxes.
+        // Because of this, we need to mock them for this checkbox.
+        screenMock.mockPositionAndDimension('checkboxWrapper', checkbox.parentNode, {
+          offsetHeight: 40, // 10px smaller than the sticky
+          offsetWidth: 727,
+          offsetTop: checkbox.offsetTop
+        });
+
+        checkboxBottom = getScreenItemBottomPosition(checkbox);
 
         // move the sticky over the checkbox. It's 50px high so this position will cause it to overlap.
         screenMock.scrollTo((checkboxBottom - windowHeight) + 5);
@@ -1355,8 +1376,6 @@ describe("Stick to top/bottom of window when scrolling", () => {
           offsetTop: contentBottom
         });
         const radiosBottom = getScreenItemBottomPosition(radios);
-
-        // adjust other screen items
 
         // pageFooter top should be at the radios bottom
         pageFooter.offsetTop = radiosBottom;
