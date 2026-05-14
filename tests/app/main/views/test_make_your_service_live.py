@@ -292,9 +292,9 @@ def test_should_check_for_email_from_name_on_go_live(
 @pytest.mark.parametrize(
     "count_of_users_with_manage_service,count_of_invites_with_manage_service,expected_user_checklist_item",
     [
-        (1, 0, "Give another team member the ‘manage settings’ permission Incomplete"),
-        (2, 0, "Give another team member the ‘manage settings’ permission Completed"),
-        (1, 1, "Give another team member the ‘manage settings’ permission Completed"),
+        (1, 0, "Finish setting up your team Incomplete"),
+        (2, 0, "Finish setting up your team Completed"),
+        (1, 1, "Finish setting up your team Completed"),
     ],
 )
 @pytest.mark.parametrize(

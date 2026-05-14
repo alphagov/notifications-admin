@@ -177,6 +177,94 @@ def test_should_show_overview_page(
 
 
 @pytest.mark.parametrize(
+    "current_user_email, other_user_emails, expected_banner_text",
+    [
+        pytest.param(
+            "test@example.gov.uk",
+            [],
+            "You need to add a team member from your organisation.",
+        ),
+        pytest.param(
+            "test@example.gov.uk",
+            ["test@example.com"],
+            "You need to add a team member from your organisation.",
+        ),
+        pytest.param(
+            "test@example.gov.uk",
+            ["test2@example.gov.uk"],
+            None,
+        ),
+        pytest.param(
+            "test@example.com",
+            [],
+            "You need to add at least two team members from a public sector organisation.",
+        ),
+        pytest.param(
+            "test@example.com",
+            ["test2@example.com"],
+            "You need to add at least two team members from a public sector organisation.",
+        ),
+        pytest.param(
+            "test@example.com",
+            ["test@example.gov.uk"],
+            "You need to add a team member from a public sector organisation.",
+        ),
+        pytest.param(
+            "test@example.com",
+            ["test@example.gov.uk", "test2@school.com"],
+            None,
+        ),
+    ],
+)
+def test_manage_users_shows_add_team_member_banner(
+    client_request,
+    mocker,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    service_one,
+    expected_banner_text,
+    current_user_email,
+    other_user_emails,
+):
+    current_user = create_user(
+        id=uuid.uuid4(),
+        email_address=current_user_email,
+        services=[SERVICE_ONE_ID],
+        permissions={SERVICE_ONE_ID: ["manage_service"]},
+    )
+
+    users = [current_user]
+
+    for email in other_user_emails:
+        other_user = create_user(
+            id=uuid.uuid4(),
+            email_address=email,
+            services=[SERVICE_ONE_ID],
+            permissions={SERVICE_ONE_ID: ["manage_service"]},
+        )
+        users.append(other_user)
+
+    mocker.patch(
+        "app.models.user.Users._get_items",
+        return_value=users,
+    )
+
+    mocker.patch("app.utils.user.organisations_client.get_domains", return_value=["example.gov.uk", "school.com"])
+
+    client_request.login(current_user)
+    page = client_request.get("main.manage_users", service_id=SERVICE_ONE_ID)
+
+    if expected_banner_text:
+        assert "Finish setting up your team" in page.text
+        assert expected_banner_text in page.text
+        assert "Give them the ‘manage settings, team and usage’ permission." in page.text
+        assert "You must have at least 2 team members with the ‘manage settings’ permission." not in page.text
+    else:
+        assert "Finish setting up your team" not in page.text
+        assert "You must have at least 2 team members with the ‘manage settings’ permission." in page.text
+
+
+@pytest.mark.parametrize(
     "state",
     (
         "active",

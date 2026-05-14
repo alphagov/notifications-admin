@@ -2,6 +2,8 @@
 {% from "components/tick-cross.html" import tick_cross %}
 {% from "components/live-search.html" import live_search %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
+
 
 {% block service_page_title %}
   Team members
@@ -9,11 +11,34 @@
 
 {% block maincolumn_content %}
 
+{% if active_gov_users_with_manage_service_permission_count < 2 %}
+    {% call govukNotificationBanner({
+      "titleText": "Finish setting up your team",
+      "classes": "govuk-!-margin-bottom-4"
+    }) %}
+      <p class="govuk-body govuk-!-font-weight-bold">
+        {% if current_user.is_gov_user %}
+          You need to add a team member from your organisation.
+        {% elif active_gov_users_with_manage_service_permission_count == 0 %}
+          You need to add at least two team members from a public sector organisation.
+        {% else %}
+          You need to add a team member from a public sector organisation.
+        {% endif %}
+      </p>
+      <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+        Give them the ‘manage settings, team and usage’ permission.
+      </p>
+    {% endcall %}
+  {% endif %}
+
+
   <h1 class="heading-large">
     Team members
   </h1>
 
-  <p class="govuk-body">You must have at least 2 team members with the ‘manage settings’ permission.</p>
+  {% if active_gov_users_with_manage_service_permission_count >= 2 %}
+    <p class="govuk-body">You must have at least 2 team members with the ‘manage settings’ permission.</p>
+  {% endif %}
 
   {% if show_search_box %}
     <div data-notify-module="autofocus">
