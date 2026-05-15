@@ -3,7 +3,13 @@ import { Caret } from 'textarea-caret-ts';
 
 let _mode = 'default';
 
-// Constructor to make objects representing the area sticky elements can scroll in
+// Class to make objects representing the area sticky elements move in
+// This includes holding a reference to the containing element but also methods to handle interactions in the area that may
+// overlapped by sticky elements
+//
+// Note: the actual boundaries of sticky behaviour are set by `.js-header` and `.js-footer` classes rather than the parent element
+//
+// More on ES2015 Classes at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
 class ScrollArea {
 
   constructor (el, edge, selector) {
@@ -107,7 +113,13 @@ class ScrollArea {
 
 }
 
-// Singleton class for interacting with scrollareas
+// Singleton class collecting together methods for interacting with the scrollareas on the page
+//
+// It replaces the previously used way of setting methods on the component's `prototype`.
+// We use a class declaration way of defining classes -
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class
+//
+// More on ES2015 Classes at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
 class ScrollAreas {
   #scrollAreas = [];
 
@@ -252,7 +264,13 @@ class OppositeEdge {
 const oppositeEdge = new OppositeEdge();
 
 
-// Constructor for objects holding data for each element to have sticky behaviour
+// Class wrapping sticky elements, to control changes to their HTML and CSS, as well as the shim inserted when they become sticky
+//
+// It replaces the previously used way of setting methods on the component's `prototype`.
+// We use a class declaration way of defining classes -
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class
+//
+// More on ES2015 Classes at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
 class StickyElement {
   #initialFixedClass = 'content-fixed-onload';
   #fixedClass = 'content-fixed';
@@ -375,7 +393,9 @@ class StickyElement {
 
 }
 
-// Class for treating sticky elements as if they were wrapped by a dialog component
+// Singleton class for treating multiple sticky elements as a group.
+//
+// More on ES2015 Classes at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
 class Dialog {
   static spaceBetweenStickys = 40;
 
@@ -451,7 +471,7 @@ class Dialog {
   fitToHeight (sticky) {
     const self = this;
     const els = sticky.els.slice();
-    const height = Sticky.getWindowDimensions().height;
+    const height = StickAtEdge.getWindowDimensions().height;
     const totalStickyHeight = () => self.#getTotalHeight(self.#elsThatCanBeStuck(els));
     const dialogFitsHeight = () => totalStickyHeight() <= height;
 
@@ -498,7 +518,7 @@ class Dialog {
   }
 
   adjustForResize (sticky) {
-    const windowHeight = Sticky.getWindowDimensions().height;
+    const windowHeight = StickAtEdge.getWindowDimensions().height;
 
     if (sticky.edge === 'top') {
       window.scrollTo(window.pageXOffset, this.getInPageEdgePosition(sticky));
@@ -516,19 +536,15 @@ class Dialog {
 }
 const dialog = new Dialog();
 
-// Constructor for objects collecting together all generic behaviour for controlling the state of
-// sticky elements
-//
-// This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
-// that uses ES 015 Classes -
-// https://github.com/alphagov/govuk-frontend/blob/main/docs/contributing/coding-standards/js.md#skeleton
+// Class collecting together all generic behaviour for controlling the state of
+// sticky elements and all their associated behaviour.
 //
 // It replaces the previously used way of setting methods on the component's `prototype`.
 // We use a class declaration way of defining classes -
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class
 //
 // More on ES2015 Classes at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
-class Sticky {
+class StickAtEdge {
   #hasScrolled = false;
   #scrollTimeout = false;
   #windowHasResized = false;
@@ -548,8 +564,8 @@ class Sticky {
 
   // Change state of sticky elements based on their position relative to the window
   setElementPositions () {
-    const windowDimensions = Sticky.getWindowDimensions(),
-          windowTop = Sticky.getWindowPositions().scrollTop,
+    const windowDimensions = StickAtEdge.getWindowDimensions(),
+          windowTop = StickAtEdge.getWindowPositions().scrollTop,
           windowPositions = {
             'top': windowTop,
             'bottom':  windowTop + windowDimensions.height
@@ -844,7 +860,7 @@ class Sticky {
   }
 
   checkResize () {
-    const windowWidth = Sticky.getWindowDimensions().width;
+    const windowWidth = StickAtEdge.getWindowDimensions().width;
 
     if (this.#windowHasResized === true) {
       this.#windowHasResized = false;
@@ -898,7 +914,13 @@ class Sticky {
 }
 
 // Extension of sticky object to add behaviours specific to sticking to top of window
-class StickAtTop extends Sticky {
+//
+// It replaces the previously used way of setting methods on the component's `prototype`.
+// We use a class declaration way of defining classes -
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class
+//
+// More on ES2015 Classes at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
+class StickAtTop extends StickAtEdge {
   constructor () {
     super('.js-stick-at-top-when-scrolling');
     this.edge = 'top';
@@ -994,7 +1016,13 @@ class StickAtTop extends Sticky {
 const stickAtTop = new StickAtTop();
 
 // Extension of sticky object to add behaviours specific to sticking to bottom of window
-class StickAtBottom extends Sticky {
+//
+// It replaces the previously used way of setting methods on the component's `prototype`.
+// We use a class declaration way of defining classes -
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/class
+//
+// More on ES2015 Classes at https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes
+class StickAtBottom extends StickAtEdge {
   constructor () {
     super('.js-stick-at-bottom-when-scrolling');
     this.edge = 'bottom';
