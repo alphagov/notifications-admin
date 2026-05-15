@@ -873,7 +873,7 @@ class Sticky {
     if (el.isStuck) {
       const $el = el.$fixedEl;
 
-      el.removeStickyClasses(this);
+      el.removeStickyClasses();
       $el.style.width = '';
       // clear styles from any elements stuck while in a dialog mode
       dialog.releaseEl(el, this);
