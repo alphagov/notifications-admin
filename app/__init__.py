@@ -304,6 +304,11 @@ def reset_memos():
 
 @login_manager.user_loader
 def load_user(user_id):
+    if g.get("failsafe"):
+        # avoid doing anything that may result in a network request and therefore another exception
+        # (sadly we're not in charge of flask-login's context processor so can't stop such attempts
+        # there)
+        return None
     return User.from_id(user_id)
 
 
@@ -420,7 +425,7 @@ def useful_headers_after_request(response):
 
 
 def register_errorhandlers(application):  # noqa (C901 too complex)
-    def _error_response(error_code, error_page_template=None):
+    def _error_response(error_code, *, error_page_template=None, failsafe=False):
         template_file = f"error/{error_code}.html"
 
         if error_code == 404 and request.view_args and "service_id" in request.view_args and g.current_service:
@@ -428,6 +433,11 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
 
         if error_page_template:
             template_file = f"error/{error_page_template}.html"
+
+        if failsafe:
+            # signal that any e.g. context processors should avoid doing things (like making external requests)
+            # that may result in more errors, which we would have trouble catching.
+            g.failsafe = True
 
         resp = make_response(render_template(template_file), error_code)
         return useful_headers_after_request(resp)
@@ -534,12 +544,12 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
         # We want the Flask in browser stacktrace
         if current_app.config.get("DEBUG", None):
             raise error
-        return _error_response(500)
+        return _error_response(500, failsafe=True)
 
     @application.errorhandler(EventletTimeout)
     def eventlet_timeout(error):
         application.logger.exception(error)
-        return _error_response(504, error_page_template=500)
+        return _error_response(504, error_page_template=500, failsafe=True)
 
 
 def setup_blueprints(application):
