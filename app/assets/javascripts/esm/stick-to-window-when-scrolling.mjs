@@ -320,7 +320,7 @@ class StickyElement {
     const insertPosition = (position === 'before') ? 'beforebegin' : 'afterend';
 
     this.$shim = document.createElement('div');
-    this.$shim.appendChild(document.createTextNode('&nbsp'));
+    this.$shim.innerHTML = '&nbsp;'; // we should use createTextNode but it won't take HTML entities
     this.$shim.classList.add('shim');
     this.$shim.setAttribute('style', this.#getShimCSS());
     this.$fixedEl.insertAdjacentElement(insertPosition, this.$shim);
