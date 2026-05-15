@@ -228,8 +228,8 @@ class OppositeEdge {
   constructor () {}
 
   mark (sticky) {
-    var edgeClass = this.#classes[sticky.edge];
-    var els;
+    const edgeClass = this.#classes[sticky.edge];
+    let els;
 
     if (_mode === 'dialog') {
       els = [dialog.getElementAtOppositeEnd(sticky)];
@@ -243,7 +243,7 @@ class OppositeEdge {
   }
 
   unmark (sticky) {
-    var edgeClass = this.#classes[sticky.edge];
+    const edgeClass = this.#classes[sticky.edge];
 
     sticky._els.forEach(el => el.$fixedEl.classList.remove(edgeClass));
   }
