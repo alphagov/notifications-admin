@@ -377,11 +377,10 @@ class StickyElement {
 
 // Class for treating sticky elements as if they were wrapped by a dialog component
 class Dialog {
-  static spaceBetweenStickys = 40
-  hasResized
+  static spaceBetweenStickys = 40;
 
   constructor () {
-    this.hasResized = false
+    this.hasResized = false;
   }
 
   // we add padding of 20px around each sticky to give some space between it and the rest of the page
