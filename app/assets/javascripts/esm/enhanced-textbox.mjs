@@ -37,6 +37,7 @@ class EnhancedTextbox {
     this.$backgroundHighlightElement = document.createElement('div');
     this.$backgroundHighlightElement.classList.add('govuk-textarea-highlight__background');
     this.$backgroundHighlightElement.setAttribute('aria-hidden', 'true');
+    this.$backgroundHighlightElement.setAttribute('dir', 'auto');
     this.$textbox.after(this.$backgroundHighlightElement);
 
     this.$textbox.addEventListener("input", this.update.bind(this));
