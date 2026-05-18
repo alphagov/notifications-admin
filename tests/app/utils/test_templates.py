@@ -1,3 +1,4 @@
+from datetime import date
 from unittest import mock
 from uuid import UUID
 
@@ -395,7 +396,7 @@ def test_letter_image_renderer(
                 Markup("<span class='placeholder-no-brackets'>address line 7</span>"),
             ],
             contact_block="10 Downing Street",
-            date="12 December 2012",
+            date=date(2012, 12, 12),
             subject="Subject",
             message="<p>Content</p>",
             show_postage=expected_show_postage,
