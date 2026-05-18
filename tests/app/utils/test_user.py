@@ -83,7 +83,7 @@ def test_no_user_returns_redirect_to_sign_in(client_request):
     assert response.location.startswith("/sign-in?next=")
 
 
-def test_user_has_permissions_for_organisation(
+def test_user_belongs_to_organisation(
     client_request,
     api_user_active,
 ):
@@ -93,6 +93,32 @@ def test_user_has_permissions_for_organisation(
     request.view_args = {"org_id": "org_2"}
 
     @user_has_permissions()
+    def index():
+        pass
+
+    index()
+
+
+@pytest.mark.parametrize(
+    "org_permissions",
+    [
+        pytest.param({}, marks=pytest.mark.xfail(raises=Forbidden)),  # doesn't have required permission
+        {"org_2": ["can_make_services_live"]},
+    ],
+)
+def test_user_has_permissions_for_organisation(
+    client_request,
+    api_user_active,
+    org_permissions,
+):
+    api_user_active["organisations"] = ["org_1", "org_2"]
+    api_user_active["organisation_permissions"] = org_permissions
+
+    client_request.login(api_user_active)
+
+    request.view_args = {"org_id": "org_2"}
+
+    @user_has_permissions(org_permissions=["can_make_services_live"])
     def index():
         pass
 

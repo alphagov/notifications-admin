@@ -19,6 +19,7 @@ from app.utils.time import is_less_than_days_ago, isoformat_no_tz
 from app.utils.user import is_gov_user
 from app.utils.user_permissions import (
     all_ui_permissions,
+    organisation_user_permission_names,
     translate_permissions_from_db_to_ui,
 )
 
@@ -239,10 +240,18 @@ class User(BaseUser, UserMixin):
     def platform_admin(self):
         return self._platform_admin and not session.get("disable_platform_admin_view", False)
 
-    def has_permissions(self, *permissions, restrict_admin_usage=False, allow_org_user=False):
-        unknown_permissions = set(permissions) - all_ui_permissions
+    def _validate_route_permissions(self, service_permissions, org_permissions):
+        unknown_permissions = set(service_permissions) - all_ui_permissions
         if unknown_permissions:
             raise TypeError(f"{list(unknown_permissions)} are not valid permissions")
+
+        unknown_org_permissions = set(org_permissions) - organisation_user_permission_names
+        if unknown_org_permissions:
+            raise TypeError(f"{list(unknown_org_permissions)} are not valid org permissions")
+
+    def has_permissions(self, *permissions, restrict_admin_usage=False, allow_org_user=False, org_permissions=None):
+        org_permissions = org_permissions or []
+        self._validate_route_permissions(service_permissions=permissions, org_permissions=org_permissions)
 
         # Service id is always set on the request for service specific views.
         service_id = _get_service_id_from_view_args()
@@ -256,6 +265,9 @@ class User(BaseUser, UserMixin):
         # platform admins should be able to do most things (except eg send messages, or create api keys)
         if self.platform_admin and not restrict_admin_usage:
             return True
+
+        if org_id and org_permissions:
+            return self.permissions_for_organisation(org_id) & set(org_permissions)
 
         if org_id:
             return self.belongs_to_organisation(org_id)
