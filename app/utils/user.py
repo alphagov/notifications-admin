@@ -1,16 +1,12 @@
-import os
 from functools import wraps
 
 from flask import abort, current_app
 from flask_login import current_user, login_required
+from notifications_utils.user import GOVERNMENT_EMAIL_DOMAIN_NAMES, email_address_ends_with
 
 from app.notify_client.organisations_api_client import organisations_client
 
 user_is_logged_in = login_required
-
-
-with open(f"{os.path.dirname(os.path.realpath(__file__))}/email_domains.txt") as email_domains:
-    GOVERNMENT_EMAIL_DOMAIN_NAMES = [line.strip() for line in email_domains]
 
 
 def user_has_permissions(*permissions, **permission_kwargs):
@@ -53,18 +49,6 @@ def user_is_platform_admin(f):
 
 
 def is_gov_user(email_address):
-    return _email_address_ends_with(email_address, GOVERNMENT_EMAIL_DOMAIN_NAMES) or _email_address_ends_with(
+    return email_address_ends_with(email_address, GOVERNMENT_EMAIL_DOMAIN_NAMES) or email_address_ends_with(
         email_address, organisations_client.get_domains()
-    )
-
-
-def _email_address_ends_with(email_address, known_domains):
-    return any(
-        email_address.lower().endswith(
-            (
-                f"@{known}",
-                f".{known}",
-            )
-        )
-        for known in known_domains
     )
