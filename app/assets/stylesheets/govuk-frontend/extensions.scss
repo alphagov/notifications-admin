@@ -190,6 +190,10 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
     z-index: 10;
     // match govuk-textarea line height
     line-height: 1.25;
+    text-align: start;
+    // This forces the HTML layout engine to calculate bidirectional text runs 
+    // character-by-character exactly like a native <textarea> does.
+    unicode-bidi: plaintext; 
 
     // transparent borders become visible in high contrast modes so set to match background
     @media (-ms-high-contrast: active), (forced-colors: active) {
@@ -199,6 +203,7 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
     .placeholder,
     .placeholder-conditional {
       color: transparent;
+      unicode-bidi: normal; 
     }
   }
 }
