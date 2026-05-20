@@ -624,10 +624,28 @@ def test_document_download_download_document_displays_the_right_file_metadata(
     ]
 
 
+@pytest.mark.parametrize(
+    "filename, expected_content_type, expected_content_disposition",
+    (
+        (
+            "test_file_1.pdf",
+            "application/pdf",
+            "attachment; filename=test_file_1.pdf",
+        ),
+        (
+            "test_file_1.DOCX",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "attachment; filename=test_file_1.DOCX",
+        ),
+    ),
+)
 def test_document_download_download_document_enables_download(
     client_request,
     fake_uuid,
     mocker,
+    filename,
+    expected_content_type,
+    expected_content_disposition,
 ):
     mocker.patch(
         "app.service_api_client.get_service",
@@ -640,7 +658,7 @@ def test_document_download_download_document_enables_download(
         email_files=[
             {
                 "id": fake_uuid,
-                "filename": "test_file_1.pdf",
+                "filename": filename,
                 "link_text": "file link",
                 "retention_period": 90,
                 "validate_users_email": True,
@@ -664,7 +682,7 @@ def test_document_download_download_document_enables_download(
     )
     assert response.status_code == 200
     assert response.data == expected_content
-    assert response.headers["Content-Type"] == "application/pdf"
+    assert response.headers["Content-Type"] == expected_content_type
     # Ensure that the file is made available for download only and not displayed in the browser
-    assert response.headers["Content-Disposition"] == "attachment; filename=test_file_1.pdf"
+    assert response.headers["Content-Disposition"] == expected_content_disposition
     mock_get_content.assert_called_once()

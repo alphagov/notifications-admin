@@ -1,5 +1,4 @@
 import math
-import mimetypes
 import uuid
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
@@ -8,6 +7,7 @@ from typing import Any
 import boto3
 from flask import abort, current_app, url_for
 from notifications_utils.base64_uuid import uuid_to_base64
+from notifications_utils.file_types import mime_type_from_extension
 from notifications_utils.s3 import s3download
 from notifications_utils.serialised_model import SerialisedModelCollection
 from notifications_utils.template import Template
@@ -103,7 +103,7 @@ class TemplateEmailFile(JSONModel):
 
     @property
     def mimetype(self):
-        return mimetypes.types_map[f".{self.extension}"]
+        return mime_type_from_extension(self.extension)
 
     @property
     def file_contents(self):
