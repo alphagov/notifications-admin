@@ -58,7 +58,7 @@ from wtforms.validators import (
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
 
-from app import asset_fingerprinter, current_organisation
+from app import asset_fingerprinter, current_organisation, document_download_api_client
 from app.constants import (
     SERVICE_JOIN_REQUEST_APPROVED,
     SERVICE_JOIN_REQUEST_REJECTED,
@@ -80,7 +80,6 @@ from app.main.validators import (
     CharactersNotAllowed,
     CommonlyUsedPassword,
     CsvFileValidator,
-    DocumentDownloadFileValidator,
     DoesNotStartWithDoubleZero,
     FileIsVirusFree,
     IsAUKMobileNumberOrShortCode,
@@ -109,6 +108,7 @@ from app.models.branding import (
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
 from app.models.spreadsheet import Spreadsheet
+from app.notify_client.document_download_api_client import DocumentDownloadError
 from app.utils import branding, unicode_truncate
 from app.utils.govuk_frontend_field import (
     GovukFrontendWidgetMixin,
@@ -3257,9 +3257,10 @@ class ProcessUnsubscribeRequestForm(StripWhitespaceForm):
 
 
 class TemplateEmailFilesUploadForm(StripWhitespaceForm):
-    def __init__(self, *args, template, **kwargs):
+    def __init__(self, *args, service_id, template, **kwargs):
         self.existing_file_names = template.filenames
         self.placeholders_in_subject = UtilsField(template._subject).placeholders
+        self.service_id = service_id
         super().__init__(*args, **kwargs)
 
     allowed_file_formats = {
@@ -3279,15 +3280,11 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
     }
     allowed_file_extensions = tuple(chain(*allowed_file_formats.values()))
 
-    file = VirusScannedFileField(
+    file = FileField(
         "Add a file",
         validators=[
             DataRequired(message="You need to upload a file to submit"),
-            DocumentDownloadFileValidator(),
-            FileSize(
-                max_size=2 * 1_024 * 1_024,
-                message="The file must be smaller than 2MB",
-            ),
+            # DocumentDownloadFileValidator(),
             NoBracketsInFileName(),
         ],
     )
@@ -3296,10 +3293,16 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
         if field.errors:
             return
 
-        if (length := len(field.data.filename)) > 100:
-            raise ValidationError(
-                f"File name cannot be longer than 100 characters (‘{field.data.filename}’ is {length} characters)"
+        # hand off file to document download api to perform file validation checks,
+        # antivirus scan and determination of the file mimetype
+        try:
+            data = document_download_api_client.file_check_and_antivirus_scan(
+                service_id=self.service_id, file_name=field.data.filename, file_bytes=field.data.read()
             )
+            field.data.seek(0)  # reset for subsequent file scans ie during S3 upload
+            field.mimetype = data.get("mimetype")
+        except DocumentDownloadError as e:
+            raise ValidationError(e.message) from e
 
         if field.data.filename in self.existing_file_names:
             raise ValidationError(f"Your template already has a file called ‘{field.data.filename}’")

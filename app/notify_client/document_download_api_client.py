@@ -18,9 +18,15 @@ class DocumentDownloadError(Exception):
     def from_exception(cls, e: requests.RequestException, status_code: int | None = None):
         if e.response is None:
             raise ValueError("RequestException has no response") from e
-        message = e.response.json()["error"]
-        status_code = status_code or e.response.status_code
-        return cls(message, status_code)
+
+        resolved_status_code = status_code or e.response.status_code
+
+        if resolved_status_code == 413:
+            message = "The file must be smaller than 2MB"
+        else:
+            message = e.response.json().get("error", None)
+
+        return cls(message, resolved_status_code)
 
 
 class DocumentDownloadAPIClient:
@@ -31,7 +37,10 @@ class DocumentDownloadAPIClient:
         self.base_url = app.config["DOCUMENT_DOWNLOAD_API_HOST_INTERNAL"]
         self.auth_token = app.config["DOCUMENT_DOWNLOAD_API_KEY"]
 
-    def file_check(self, service_id, file_name, file_bytes):
+    def file_check_and_antivirus_scan(self, service_id, file_name, file_bytes):
+        """
+        This method runs file validation checks and an antivirus scan and also determines the file mimetype
+        """
         file_check_url = f"{self.base_url}/services/{service_id}/antivirus-and-mimetype-check"
         headers = {"Authorization": f"Bearer {self.auth_token}"}
         file_data = {"document": base64.b64encode(file_bytes).decode("utf-8"), "filename": file_name}
@@ -45,16 +54,14 @@ class DocumentDownloadAPIClient:
                 headers=headers,
                 json=file_data,
             )
-
             response.raise_for_status()
-
         except requests.RequestException as e:
             # we want to specifically handle 400 (virus scan failed, file type unrecognised or file name too long)
             #  and 413 (file too big) anything else will be raised as a 500 internal server error here.
             if e.response is None:
                 raise Exception(f"Unhandled document download error: {repr(e)}") from e
             elif e.response.status_code in {400, 413}:
-                error = DocumentDownloadError.from_exception(e, status_code=400)
+                error = DocumentDownloadError.from_exception(e, status_code=e.response.status_code)
                 current_app.logger.info("Document download request failed with error: %s", error.message)
                 raise error from e
             else:
