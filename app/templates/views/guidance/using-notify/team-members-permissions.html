@@ -12,20 +12,51 @@
 {% block content_column_content %}
   <h1 class="heading-large">Team members and permissions</h1>
 
-  <p class="govuk-body">Notify lets you set different permissions for each member of your team.</p>
+  <p class="govuk-body">Go to the {{ service_link(current_service, 'main.manage_users', 'team members') }} page to invite colleagues to join your service.</p>
 
-  <p class="govuk-body">Go to the {{ service_link(current_service, 'main.manage_users', 'team members') }} page to:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>invite people to your service</li>
-    <li>control who can see, add, edit and send messages</li>
-    <li>let other team members change your service settings</li>
-    <li>update a team member’s email address and phone number</li>
-    <li>change each team member’s sign-in method</li>
-    <li>remove team members who have left</li>
-  </ul>
-  <p class="govuk-body">
-    You must have at least two team members with the ‘manage settings, team and usage’ permission at all times.
-    These people are responsible for your service if you or your colleagues are unable to sign in to Notify.
-  </p>
   <p class="govuk-body">You can invite team members who do not have a government email address.</p>
+
+  <p class="govuk-body">GOV.UK Notify lets you set different permissions for each member of your team.</p>
+
+  <p class="govuk-body">Choose from the following permissions:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>manage settings, team and usage</li>
+    <li>see dashboard</li>
+    <li>send messages</li>
+    <li>add and edit templates</li>
+    <li>manage API integration</li>
+  </ul>
+
+  <p class="govuk-body">Every service you add needs at least 2 team members with the ‘manage settings, team and usage’ permission.</p>
+
+  <h2 class="heading-medium">If you have the ‘manage settings’ permission</h2>
+
+  <p class="govuk-body">Team members with the ‘manage settings, team and usage’ permission are responsible for:</p>
+
+  <h3 class="heading-small">The service</h3>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>Managing the email, text message and letter settings</li>
+    <li>Adding email or letter branding</li>
+    <li>Requesting changes to daily message limits</li>
+    <li>Changing the data retention period</li>
+    <li>Deciding when to make the service live and when to delete it</li>
+  </ul>
+
+  <h3 class="heading-small">Team members</h3>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>Adding team members to the service</li>
+    <li>Making sure team members have the right permissions</li>
+    <li>Helping team members if they lose access to their Notify account</li>
+    <li>Removing team members who should no longer use Notify</li>
+    <li>Sharing important information with your team, for example, price increases or changes to the free text message allowance</li>
+  </ul>
+
+  <h3 class="heading-small">Usage</h3>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>Monitoring the number of emails, text messages and letters sent</li>
+    <li>Checking how many free text messages your service has left</li>
+    <li>Tracking what your service has spent</li>
+  </ul>
+
+  <p class="govuk-body">You will also act as a point of contact for anything related to billing.</p>
 {% endblock %}
