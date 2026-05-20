@@ -2,7 +2,7 @@ from flask import current_app
 from notifications_utils.s3 import s3upload as utils_s3upload
 
 
-def upload_template_email_file_to_s3(data, file_location):
+def upload_template_email_file_to_s3(data, file_location, mimetype):
     metadata = {}
 
     utils_s3upload(
@@ -11,4 +11,5 @@ def upload_template_email_file_to_s3(data, file_location):
         bucket_name=current_app.config["S3_BUCKET_TEMPLATE_EMAIL_FILES"],
         file_location=file_location,
         metadata=metadata,
+        content_type=mimetype,
     )

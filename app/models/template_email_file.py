@@ -33,13 +33,13 @@ class TemplateEmailFile(JSONModel):
     __sort_attribute__ = "position_in_template"
 
     @staticmethod
-    def create(*, filename, file_contents, template_id):
+    def create(*, filename, file_contents, template_id, mimetype):
         from app import current_service, current_user, template_email_file_client
 
         file_id = uuid.uuid4()
         file_bytes = file_contents.read()
         file_location = _get_file_location(file_id, current_service.id)
-        upload_template_email_file_to_s3(data=file_bytes, file_location=file_location)
+        upload_template_email_file_to_s3(data=file_bytes, file_location=file_location, mimetype=mimetype)
         template_email_file_client.create_file(
             file_id=file_id,
             service_id=current_service.id,
