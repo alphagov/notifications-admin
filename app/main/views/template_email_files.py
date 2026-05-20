@@ -146,6 +146,7 @@ def upload_template_email_files(template_id, service_id):
             filename=form.file.data.filename,
             file_contents=form.file.data,
             template_id=template.id,
+            mimetype=form.file.mimetype,
         )
 
         return redirect(

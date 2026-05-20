@@ -57,7 +57,7 @@ class DocumentDownloadAPIClient:
             response.raise_for_status()
         except requests.RequestException as e:
             # we want to specifically handle 400 (virus scan failed, file type unrecognised or file name too long)
-            #  and 413 (file too big) anything else will be raised as a 500 internal server error here.
+            #  and 413 (file too big).
             if e.response is None:
                 raise Exception(f"Unhandled document download error: {repr(e)}") from e
             elif e.response.status_code in {400, 413}:
