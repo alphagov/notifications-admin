@@ -64,6 +64,8 @@ class CaretCoordinates {
 
 beforeAll(async () => {
   ({ stickAtTopWhenScrolling, stickAtBottomWhenScrolling } = await import('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs'));
+
+  document.body.classList.add('govuk-frontend-supported');
 });
 
 afterAll(() => {

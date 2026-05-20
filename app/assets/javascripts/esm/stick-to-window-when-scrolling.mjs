@@ -1,3 +1,4 @@
+import { isSupported } from 'govuk-frontend';
 import { offset } from './utils.mjs';
 import { Caret } from 'textarea-caret-ts';
 
@@ -641,6 +642,11 @@ class StickAtEdge {
 
   // Recalculate stored dimensions for all sticky elements
   recalculate () {
+    // break early if GOVUK Frontend is not supported
+    if (!isSupported()) {
+      return;
+    }
+
     const onSyncComplete = () => {
       scrollAreas.syncEls(this.els);
       this.setEvents();
