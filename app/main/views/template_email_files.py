@@ -140,7 +140,7 @@ def upload_template_email_files(template_id, service_id):
     )
     if not current_service.contact_link:
         abort(403)
-    form = TemplateEmailFilesUploadForm(template=template)
+    form = TemplateEmailFilesUploadForm(service_id=service_id, template=template)
     if form.validate_on_submit():
         template_email_file_id = TemplateEmailFile.create(
             filename=form.file.data.filename,
