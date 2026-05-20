@@ -12,7 +12,7 @@ def test_document_download_api_file_check(client_request, requests_mock):
     file_content = b"%PDF-1.4 test content"
     expected_url = f"{client.base_url}/services/{service_id}/antivirus-and-mimetype-check"
     # mock the document download api response
-    requests_mock(expected_url, json={"mimetype": "application/pdf"}, status_code=201)
+    requests_mock.post(expected_url, json={"mimetype": "application/pdf"}, status_code=201)
     response = client.file_check_and_antivirus_scan(
         service_id=service_id, file_name="example.pdf", file_bytes=file_content
     )
