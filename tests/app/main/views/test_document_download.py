@@ -678,7 +678,6 @@ def test_document_download_download_document_enables_download(
         document_id=fake_uuid,
         key=uuid_to_base64(fake_uuid),
         download="True",
-        mimetype="application/pdf",
     )
     assert response.status_code == 200
     assert response.data == expected_content
