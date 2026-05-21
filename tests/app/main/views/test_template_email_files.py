@@ -559,6 +559,7 @@ def test_create_file_redirects_to_manage_files_page(
     test_template_email_files_data,
     mocker,
     active_user_with_permissions,
+    mock_document_download_api_client,
     mock_update_service,
     mock_get_service_email_template,
 ):
@@ -580,10 +581,7 @@ def test_create_file_redirects_to_manage_files_page(
             }
         },
     )
-    mocker.patch(
-        "app.extensions.antivirus_client.scan",
-        return_value=True,
-    )
+
     with open("tests/test_pdf_files/one_page_pdf.pdf", "rb") as file:
         page = client_request.post(
             "main.upload_template_email_files",
@@ -597,6 +595,7 @@ def test_create_file_redirects_to_manage_files_page(
             filename="tests/test_pdf_files/one_page_pdf.pdf",
             file_contents=AnyInstanceOf(FileStorage),
             template_id=fake_uuid,
+            mimetype="application/pdf",
         ),
     ]
     assert normalize_spaces(page.select_one("form .govuk-button")) == "Add to template"
@@ -878,12 +877,15 @@ def test_upload_file_page_requires_file(
     (
         ("tests/test_pdf_files/one_page_pdf.pdf", None),
         ("tests/spreadsheet_files/equivalents/excel 2007.xlsx", None),
-        ("tests/spreadsheet_files/equivalents/EXCEL_95.XLS", ".XLS is not an allowed file format"),
+        (
+            "tests/spreadsheet_files/equivalents/EXCEL_95.XLS",
+            "Unsupported file type '.xls'. Supported types are: '.csv', '.doc', '.docx', '.jpeg', '.jpg', '.json', '.odt', '.pdf', '.png', '.rtf', '.txt', '.xlsx'",  # noqa: E501
+        ),
         ("tests/test_img_files/small-but-perfectly-formed.png", None),
         ("tests/test_pdf_files/big.pdf", "The file must be smaller than 2MB"),
         ("tests/text_files/without brackets.txt", None),
         ("tests/text_files/with (brackets).txt", "File name cannot contain brackets"),
-        ("tests/text_files/no extension", "Not an allowed file format"),
+        ("tests/text_files/no extension", "`filename` must end with a file extension. For example, filename.csv"),
     ),
 )
 def test_upload_file_page_validates_extentions(
@@ -891,11 +893,11 @@ def test_upload_file_page_validates_extentions(
     fake_uuid,
     service_one,
     mock_get_service_email_template,
+    mock_document_download_api_client,
     test_file,
     expected_error_message,
     mocker,
 ):
-    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
     mock_post = mocker.patch("app.template_email_file_client.post")
     mock_template_update = mocker.patch("app.service_api_client.update_service_template")
@@ -922,7 +924,6 @@ def test_upload_file_page_validates_extentions(
                 _expected_status=200,  # if the form fails to validate we should return upload view with msg
             )
 
-    assert mock_antivirus.called
     error_message = page.select_one("form label .govuk-error-message")
 
     if expected_error_message:
@@ -947,6 +948,7 @@ def test_upload_file_does_not_update_template_content(
     fake_uuid,
     service_one,
     mocker,
+    mock_document_download_api_client,
     template_content,
 ):
     service_one["contact_link"] = "https://example.com"
@@ -960,7 +962,6 @@ def test_upload_file_does_not_update_template_content(
             )
         },
     )
-    mock_antivirus = mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
     mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
     mock_post = mocker.patch("app.template_email_file_client.post")
     mock_template_update = mocker.patch("app.service_api_client.update_service_template")
@@ -972,7 +973,7 @@ def test_upload_file_does_not_update_template_content(
             _data={"file": file},
             _expected_status=302,
         )
-    assert mock_antivirus.called is True
+
     assert mock_template_update.call_args_list == []
     assert mock_s3.call_args_list == [
         call(
@@ -981,6 +982,7 @@ def test_upload_file_does_not_update_template_content(
             bucket_name="test-template-email-files",
             file_location=AnyStringMatching(rf"{SERVICE_ONE_ID}/{UUID4_REGEX_PATTERN}"),
             metadata={},
+            content_type="application/pdf",
         ),
     ]
     assert mock_post.call_args_list == [
@@ -1000,12 +1002,12 @@ def test_upload_file_does_not_update_template_content(
 @pytest.mark.parametrize(
     "filename, expected_length, expected_status, expected_file_created",
     (
-        # (
-        #     ("a" * 96) + ".pdf",
-        #     100,
-        #     302,
-        #     True,
-        # ),
+        (
+            ("a" * 96) + ".pdf",
+            100,
+            302,
+            True,
+        ),
         (
             ("a" * 97) + ".pdf",
             101,
@@ -1020,6 +1022,7 @@ def test_upload_file_returns_error_if_filename_is_too_long(
     service_one,
     mocker,
     mock_get_service_email_template,
+    mock_document_download_api_client,
     filename,
     expected_status,
     expected_length,
@@ -1027,7 +1030,6 @@ def test_upload_file_returns_error_if_filename_is_too_long(
 ):
     assert len(filename) == expected_length
     service_one["contact_link"] = "https://example.com"
-    # mock_file_check_and_antivirus_scan = mocker.patch("app.document_download_api_client.file_check_and_antivirus_scan")
     mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
     mock_post = mocker.patch("app.template_email_file_client.post")
 
@@ -1041,12 +1043,9 @@ def test_upload_file_returns_error_if_filename_is_too_long(
 
     if expected_status < 300:
         assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
-            "File name cannot be longer than 100 characters (‘"
-            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.pdf’ "
-            "is 101 characters)"
+            "`filename` cannot be longer than 100 characters"
         )
 
-    # assert mock_file_check_and_antivirus_scan.called is True
     assert mock_s3.called is expected_file_created
     assert mock_post.called is expected_file_created
 
@@ -1062,6 +1061,7 @@ def test_upload_file_returns_error_if_file_with_same_name_exists(
     client_request,
     fake_uuid,
     service_one,
+    mock_document_download_api_client,
     mocker,
     existing_filename,
 ):
@@ -1084,7 +1084,7 @@ def test_upload_file_returns_error_if_file_with_same_name_exists(
             )
         },
     )
-    mock_file_check_and_antivirus_scan = mocker.patch("app.document_download_api_client.file_check_and_antivirus_scan")
+
     mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
     mock_post = mocker.patch("app.template_email_file_client.post")
     mock_template_update = mocker.patch("app.service_api_client.update_service_template")
@@ -1099,7 +1099,6 @@ def test_upload_file_returns_error_if_file_with_same_name_exists(
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
         "Your template already has a file called ‘tests/test_pdf_files/one_page_pdf.pdf’"
     )
-    assert mock_file_check_and_antivirus_scan.called is True
     assert mock_template_update.call_args_list == []
     assert mock_s3.call_args_list == []
     assert mock_post.call_args_list == []
@@ -1147,6 +1146,53 @@ def test_upload_file_returns_error_if_placeholder_exists_in_subject(
         "remove ((tests/test_pdf_files/one_page_pdf.pdf)) or rename your file"
     )
     assert mock_file_check_and_antivirus_scan.called is True
+    assert mock_template_update.call_args_list == []
+    assert mock_s3.call_args_list == []
+    assert mock_post.call_args_list == []
+
+
+def test_upload_file_returns_error_if_file_fails_antivirus_check(
+    client_request,
+    fake_uuid,
+    service_one,
+    mock_document_download_api_client,
+    mocker,
+):
+    service_one["contact_link"] = "https://example.com"
+    filename = "tests/test_pdf_files/simulate_antivirus_scan_failure.pdf"
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": create_template(
+                template_id=fake_uuid,
+                template_type="email",
+                email_files=[
+                    {
+                        "id": fake_uuid,
+                        "filename": filename,
+                        "link_text": None,
+                        "retention_period": 50,
+                        "validate_users_email": False,
+                    },
+                ],
+            )
+        },
+    )
+
+    mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
+    mock_post = mocker.patch("app.template_email_file_client.post")
+    mock_template_update = mocker.patch("app.service_api_client.update_service_template")
+    with open(filename, "rb") as file:
+        page = client_request.post(
+            "main.upload_template_email_files",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _data={"file": file},
+            _expected_status=200,
+        )
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
+        "File did not pass the virus scan"
+    )
     assert mock_template_update.call_args_list == []
     assert mock_s3.call_args_list == []
     assert mock_post.call_args_list == []

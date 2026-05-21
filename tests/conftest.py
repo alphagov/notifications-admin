@@ -16,6 +16,7 @@ from notifications_utils.url_safe_token import generate_token
 
 from app import create_app, reset_memos, webauthn_server
 from app.constants import REPORT_REQUEST_STORED, LetterLanguageOptions
+from app.notify_client.document_download_api_client import MockDocumentDownloadAPIClient
 
 from . import (
     NotifyBeautifulSoup,
@@ -4604,3 +4605,13 @@ def test_template_email_files_data():
 @pytest.fixture()
 def test_data_for_a_template_email_file(test_template_email_files_data):
     return copy.copy(test_template_email_files_data[0])
+
+
+@pytest.fixture()
+def mock_document_download_api_client(client_request, mocker):
+    document_download_api_client = MockDocumentDownloadAPIClient()
+    mocker.patch(
+        "app.document_download_api_client.file_check_and_antivirus_scan",
+        side_effect=document_download_api_client.file_check_and_antivirus_scan,
+    )
+    return document_download_api_client
