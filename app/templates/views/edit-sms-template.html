@@ -28,10 +28,11 @@
             "hint": {"text": "Your recipients will not see this"}
           }) }}
           {{ form.template_content(param_extensions={
-            "classes": "govuk-!-width-full govuk-textarea-highlight__textbox",
+            "classes": "govuk-!-width-full govuk-textarea-highlight__textbox govuk-textarea-highlight__textbox--sms",
             "attributes": {
               "data-notify-module": "enhanced-textbox",
-              "data-highlight-placeholders": "true"
+              "data-highlight-placeholders": "true",
+              "dir": "auto"
             },
             "rows": "5",
             "hint": content_hint,
