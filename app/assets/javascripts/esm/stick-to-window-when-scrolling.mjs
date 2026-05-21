@@ -664,9 +664,6 @@ class StickAtEdge {
 
   // Public method to scroll so an element isn't covered by the sticky nav
   scrollToRevealElement ($el) {
-    // guard against previous version of this method recieving `$el` as a jQuery-wrapped DOM node
-    if ('jquery' in $el) { $el = $el.get(0); }
-
     const scrollAreaNode = $el.closest('.sticky-scroll-area');
     const matches = scrollAreas.filterBy(scrollArea => {
       return scrollArea.node === scrollAreaNode;
