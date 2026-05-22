@@ -329,3 +329,9 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
     background: govuk-functional-colour(border);
   }
 }
+
+// break long text in the error summary link
+// file upload error for 100+ character file name return the file name in the error
+.govuk-error-summary__list a {
+  word-break: break-word;
+}

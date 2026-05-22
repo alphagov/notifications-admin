@@ -12,6 +12,7 @@
   &-label .govuk-error-message,
   &-button-label.govuk-error-message {
     padding: 0;
+    word-break: break-word;
   }
 
   &-field {
