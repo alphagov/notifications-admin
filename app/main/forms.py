@@ -80,6 +80,7 @@ from app.main.validators import (
     CharactersNotAllowed,
     CommonlyUsedPassword,
     CsvFileValidator,
+    DocumentDownloadFileValidator,
     DoesNotStartWithDoubleZero,
     FileIsVirusFree,
     IsAUKMobileNumberOrShortCode,
@@ -3284,7 +3285,11 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
         "Add a file",
         validators=[
             DataRequired(message="You need to upload a file to submit"),
-            # DocumentDownloadFileValidator(),
+            DocumentDownloadFileValidator(),
+            FileSize(
+                max_size=2 * 1_024 * 1_024,
+                message="The file must be smaller than 2MB",
+            ),
             NoBracketsInFileName(),
         ],
     )
@@ -3293,16 +3298,11 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
         if field.errors:
             return
 
-        # hand off file to document download api to perform file validation checks,
-        # antivirus scan and determination of the file mimetype
-        try:
-            data = document_download_api_client.file_check_and_antivirus_scan(
-                service_id=self.service_id, file_name=field.data.filename, file_bytes=field.data.read()
+        # Carry out a preliminary file name length checks
+        if (length := len(field.data.filename)) > 100:
+            raise ValidationError(
+                f"File name cannot be longer than 100 characters (‘{field.data.filename}’ is {length} characters)"
             )
-            field.data.seek(0)  # reset for subsequent file scans ie during S3 upload
-            field.mimetype = data.get("mimetype")
-        except DocumentDownloadError as e:
-            raise ValidationError(e.message) from e
 
         if field.data.filename in self.existing_file_names:
             raise ValidationError(f"Your template already has a file called ‘{field.data.filename}’")
@@ -3312,6 +3312,17 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
                 f"You cannot put a file in the subject of a template "
                 f"– remove (({field.data.filename})) or rename your file"
             )
+
+        # hand off file to document download api to perform further validation checks,
+        # antivirus scan and determination of the file mimetype
+        try:
+            document_download_api_client.file_check_and_antivirus_scan(
+                service_id=self.service_id, file_name=field.data.filename, file_bytes=field.data.read()
+            )
+            field.data.seek(0)  # reset for subsequent file scans ie during S3 upload
+
+        except DocumentDownloadError as e:
+            raise ValidationError(e.message) from e
 
 
 class TemplateEmailFileLinkTextForm(StripWhitespaceForm):

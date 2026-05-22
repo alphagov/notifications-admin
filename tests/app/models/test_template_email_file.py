@@ -12,7 +12,7 @@ def test_get_metadata_from_uploaded_file(notify_admin, fake_uuid):
     s3 = boto3.client("s3", region_name="eu-west-1")
     s3.create_bucket(Bucket="test-template-email-files", CreateBucketConfiguration={"LocationConstraint": "eu-west-1"})
 
-    upload_template_email_file_to_s3(b"hello", f"{SERVICE_ONE_ID}/{fake_uuid}", mimetype="application/pdf")
+    upload_template_email_file_to_s3(b"hello", f"{SERVICE_ONE_ID}/{fake_uuid}")
     template_email_file = TemplateEmailFile(
         {
             "service_id": SERVICE_ONE_ID,
