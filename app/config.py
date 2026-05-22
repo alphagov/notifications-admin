@@ -88,6 +88,8 @@ class Config:
 
     REDIS_URL = os.environ.get("REDIS_URL")
     REDIS_ENABLED = False if os.environ.get("REDIS_ENABLED") == "0" else True
+    REDIS_SOCKET_TIMEOUT = 5
+    REDIS_SOCKET_CONNECT_TIMEOUT = 5
 
     ASSET_DOMAIN = os.environ.get("ASSET_DOMAIN", "")
     ASSET_PATH = os.environ.get("ASSET_PATH", "/static/")
