@@ -4,7 +4,6 @@ from contextvars import ContextVar
 
 import requests
 from flask import current_app, has_request_context, request
-from notifications_utils.file_types import EXTENSIONS, is_allowed_file_extension, mime_type_from_extension
 from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
@@ -46,7 +45,7 @@ class DocumentDownloadAPIClient(AbstractDocumentDownloadClient):
     request_session = requests.Session()
 
     def __init__(self, app):
-        self.base_url = app.config["DOCUMENT_DOWNLOAD_API_HOST_INTERNAL"]
+        self.base_url = app.config["DOCUMENT_DOWNLOAD_API_HOST_NAME_INTERNAL"]
         self.auth_token = app.config["DOCUMENT_DOWNLOAD_API_KEY"]
 
     def file_check_and_antivirus_scan(self, service_id, file_name, file_bytes):
@@ -91,66 +90,3 @@ get_document_download_api_client: LazyLocalGetter[DocumentDownloadAPIClient] = L
 )
 memo_resetters.append(lambda: get_document_download_api_client.clear())
 document_download_api_client = LocalProxy(get_document_download_api_client)
-
-
-class MockDocumentDownloadAPIClient(AbstractDocumentDownloadClient):
-    """
-    This "mock" class is to act as a realistic approximation of the
-    behaviour of the document download api minus the network calls.
-    It is important that any changes in the document download API validation is caught
-    by the admin unit tests.
-    It mimics the exact file name validation logic, errors, and success responses of document download API.
-
-    """
-
-    def __init__(self):
-        self.base_url = "http://mock-document-download-api-url"
-        self.auth_token = "mock-auth-token"
-
-    def file_check_and_antivirus_scan(self, service_id: str, file_name: str, file_bytes: bytes) -> dict:
-        # check file name
-        try:
-            validate_filename(file_name)
-        except ValueError as e:
-            raise DocumentDownloadError(message=str(e), status_code=400) from e
-
-        # simulate failed antivirus scan if the test file name is:
-        # tests/test_pdf_files/simulate_antivirus_scan_failure.pdf
-        if file_name == "tests/test_pdf_files/simulate_antivirus_scan_failure.pdf":
-            raise DocumentDownloadError(message="File did not pass the virus scan", status_code=400)
-
-        # get the mimetype
-        extension = split_filename(file_name, dotted=False)[1].lower()
-        mimetype = mime_type_from_extension(extension)
-
-        # check file size
-        if len(file_bytes) > (2 * 1024 * 1024):
-            raise DocumentDownloadError(message="The file must be smaller than 2MB", status_code=413)
-
-        return {
-            "mimetype": mimetype,
-        }
-
-
-# TODO These helper functions where copied over from Document Download API and will be moved to notification utils
-def validate_filename(filename):
-    if len(filename) > current_app.config["MAX_CUSTOM_FILENAME_LENGTH"]:
-        raise ValueError(
-            f"`filename` cannot be longer than {current_app.config['MAX_CUSTOM_FILENAME_LENGTH']} characters"
-        )
-
-    if "." not in filename:
-        raise ValueError("`filename` must end with a file extension. For example, filename.csv")
-
-    extension = split_filename(filename, dotted=False)[1].lower()
-    if not is_allowed_file_extension(extension):
-        allowed_file_types = ", ".join(sorted({f"'.{x}'" for x in EXTENSIONS}))
-        raise ValueError(f"Unsupported file type '.{extension}'. Supported types are: {allowed_file_types}")
-
-    return filename
-
-
-def split_filename(filename: str, *, dotted: bool) -> tuple[str, str]:
-    *parts, ext = filename.split(".")
-    name = ".".join(parts)
-    return name, f".{ext}" if dotted else ext

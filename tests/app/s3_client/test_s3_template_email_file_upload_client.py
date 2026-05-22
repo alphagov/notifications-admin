@@ -9,13 +9,11 @@ def test_upload_template_email_file_to_s3(mocker, notify_admin):
     template_id = uuid.uuid4()
     file_id = uuid.uuid4()
     file_location = f"service-{service_id}/template-{template_id}/{file_id}"
-    mimetype = "application/pdf"
-    upload_template_email_file_to_s3("file_data", file_location, mimetype=mimetype)
+    upload_template_email_file_to_s3("file_data", file_location)
     kwargs = {
         "bucket_name": "test-template-email-files",
         "file_location": file_location,
         "filedata": "file_data",
-        "content_type": mimetype,
         "metadata": {},
         "region": "eu-west-1",
     }
