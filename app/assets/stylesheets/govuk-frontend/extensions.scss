@@ -201,6 +201,15 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
       color: transparent;
     }
   }
+
+  // apply only to sms template editor
+  &__textbox--sms + &__background {
+    // align text to logical start
+    text-align: start;
+    // This forces the HTML layout engine to calculate bidirectional text runs 
+    // character-by-character exactly like a native <textarea> does.
+    unicode-bidi: plaintext; 
+  }
 }
 
 // colour preview widget adjecent to govuk-input field
