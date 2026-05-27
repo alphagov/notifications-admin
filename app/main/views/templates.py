@@ -128,7 +128,9 @@ def view_template(service_id, template_id):
     if should_skip_template_page(template):
         return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
-    content_count_message = _get_fragment_count_message_for_template(template)
+    content_count_message = None
+    if template.template_type == "sms":
+        content_count_message = _get_fragment_count_message_for_sms_template(template)
 
     return render_template(
         "views/templates/template.html",
@@ -819,18 +821,15 @@ def edit_service_template(service_id, template_id, language=None):  # noqa
 
 
 @main.route(
-    "/services/<uuid:service_id>/templates/count-<template_type:template_type>-length",
+    "/services/<uuid:service_id>/templates/count-sms-length",
     methods=["POST"],
 )
 @user_has_permissions()
-def count_content_length(service_id, template_type):
-    if template_type != "sms":
-        abort(404)
-
-    error, message = _get_content_count_error_and_message_for_template(
+def count_content_length(service_id):
+    error, message = _get_content_count_error_and_message_for_sms_template(
         get_template(
             {
-                "template_type": template_type,
+                "template_type": "sms",
                 "content": request.form.get("template_content", ""),
             },
             current_service,
@@ -848,18 +847,15 @@ def count_content_length(service_id, template_type):
     )
 
 
-def _get_content_count_error_and_message_for_template(template):
-    if template.template_type == "sms":
-        if template.is_message_too_long():
-            return True, (
-                f"You have {character_count(template.content_count_without_prefix - SMS_CHAR_COUNT_LIMIT)} too many"
-            )
-        return False, _get_fragment_count_message_for_template(template)
+def _get_content_count_error_and_message_for_sms_template(template):
+    if template.is_message_too_long():
+        return True, (
+            f"You have {character_count(template.content_count_without_prefix - SMS_CHAR_COUNT_LIMIT)} too many"
+        )
+    return False, _get_fragment_count_message_for_sms_template(template)
 
 
-def _get_fragment_count_message_for_template(template):
-    if template.template_type != "sms":
-        return None
+def _get_fragment_count_message_for_sms_template(template):
     personalisation_hint = " (not including personalisation)" if template.placeholders else ""
     return f"Will be charged as {message_count(template.fragment_count, template.template_type)}{personalisation_hint}"
 
