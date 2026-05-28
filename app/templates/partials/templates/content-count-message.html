@@ -1,6 +1,6 @@
 <span {% if template.is_message_too_long() %}class="govuk-error-message"{% endif %}>
   {% if template.is_message_too_long() %}
-    You have {{ (template.content_count_without_prefix - sms_char_count_limit) | character_count }} too many
+    You have {{ template.count_of_characters_above_limit | character_count }} too many
   {% else %}
     Will be charged as {{ template.fragment_count | message_count(template.template_type) }}
     {% if template.placeholders %}

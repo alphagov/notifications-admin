@@ -18,7 +18,6 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.formatters import formatted_list
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.s3 import s3download
@@ -833,7 +832,6 @@ def count_content_length(service_id):
             "html": render_template(
                 "partials/templates/content-count-message.html",
                 template=template,
-                sms_char_count_limit=SMS_CHAR_COUNT_LIMIT,
             )
         }
     )
