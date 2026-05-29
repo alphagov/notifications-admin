@@ -4806,7 +4806,7 @@ def test_set_template_sender_escapes_letter_contact_block_names(
         (
             False,
             "a" * 161,
-            "Will be charged as 2 text messages",
+            "Will be charged as 2 text messages Reduce the cost of sending this message by removing 1 character",
             None,
         ),
         (
@@ -4820,13 +4820,13 @@ def test_set_template_sender_escapes_letter_contact_block_names(
             # service name takes 13 characters, 148 + 13 = 161
             True,
             "a" * 148,
-            "Will be charged as 2 text messages",
+            "Will be charged as 2 text messages Reduce the cost of sending this message by removing 1 character",
             None,
         ),
         (
             False,
             "a" * 918,
-            "Will be charged as 6 text messages",
+            "Will be charged as 6 text messages Reduce the cost of sending this message by removing 153 characters",
             None,
         ),
         (
@@ -4834,7 +4834,7 @@ def test_set_template_sender_escapes_letter_contact_block_names(
             # against total character limit
             True,
             "a" * 918,
-            "Will be charged as 7 text messages",
+            "Will be charged as 7 text messages Reduce the cost of sending this message by removing 13 characters",
             None,
         ),
         (
@@ -4869,13 +4869,13 @@ def test_set_template_sender_escapes_letter_contact_block_names(
         (
             False,
             "Ẅ" * 71,
-            "Will be charged as 2 text messages",
+            "Will be charged as 2 text messages Reduce the cost of sending this message by removing 1 character",
             None,
         ),
         (
             False,
             "Ẅ" * 918,
-            "Will be charged as 14 text messages",
+            "Will be charged as 14 text messages Reduce the cost of sending this message by removing 47 characters",
             None,
         ),
         (
