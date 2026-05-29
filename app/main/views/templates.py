@@ -436,7 +436,7 @@ def choose_template_to_copy(
 
 @main.route("/services/<uuid:service_id>/templates/copy/<uuid:template_id>", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-def copy_template(service_id, template_id):  # noqa: C901
+def copy_template(service_id, template_id):
     from_service_id = request.args.get("from_service")
     to_folder_id = request.args.get("to_folder_id")
 
@@ -465,16 +465,15 @@ def copy_template(service_id, template_id):  # noqa: C901
     form = CopyTemplateForm(template_id=template.id, name=template.name, parent_folder_id=to_folder_id)
 
     if request.method == "POST":
-        if template.template_type == "email":
-            files_to_copy = template.email_files
-            if files_to_copy and not current_service.contact_link:
-                flash(
-                    Markup(
-                        f"You need to add contact details for your service. "
-                        f'<p class="govuk-body govuk-!-font-weight-bold"><a href="{url_for("main.send_files_by_email_contact_details", service_id=service_id)}" class="govuk-link">Add contact details for your service</a></p>'  # noqa: E501
-                    )
+        files_to_copy = getattr(template, "email_files", False)
+        if template.template_type == "email" and files_to_copy and not current_service.contact_link:
+            flash(
+                Markup(
+                    f"You need to add contact details for your service. "
+                    f'<p class="govuk-body govuk-!-font-weight-bold"><a href="{url_for("main.send_files_by_email_contact_details", service_id=service_id)}" class="govuk-link">Add contact details for your service</a></p>'  # noqa: E501
                 )
-                return redirect(url_for("main.choose_template_to_copy", service_id=service_id))
+            )
+            return redirect(url_for("main.choose_template_to_copy", service_id=service_id))
         new_template = service_api_client.create_service_template(
             name=form.name.data,
             type_=template.template_type,
@@ -487,17 +486,16 @@ def copy_template(service_id, template_id):  # noqa: C901
             letter_welsh_content=template.get_raw("letter_welsh_content"),
             has_unsubscribe_link=template.get_raw("has_unsubscribe_link"),
         )["data"]
-        if template.template_type == "email":
-            if files_to_copy:
-                for file in files_to_copy:
-                    file.copy_file(
-                        destination_template_id=new_template["id"],
-                        source_service_id=from_service_id,
-                        destination_service_id=current_service.id,
-                        retention_period=file.retention_period,
-                        validate_users_email=file.validate_users_email,
-                        link_text=file.link_text,
-                    )
+        if template.template_type == "email" and files_to_copy:
+            for file in files_to_copy:
+                file.copy_file(
+                    destination_template_id=new_template["id"],
+                    source_service_id=from_service_id,
+                    destination_service_id=current_service.id,
+                    retention_period=file.retention_period,
+                    validate_users_email=file.validate_users_email,
+                    link_text=file.link_text,
+                )
         if template.template_type == "letter" and template.get_raw("letter_attachment"):
             _copy_letter_attachment(from_template=template, to_template=new_template)
         return redirect(url_for(".view_template", service_id=service_id, template_id=new_template["id"]))
