@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any
 
 from markupsafe import Markup
+from notifications_utils.interruptible_io import InterruptibleIterableMixin
 from notifications_utils.letter_timings import get_letter_timings, letter_can_be_cancelled
 from notifications_utils.template import (
     LetterPreviewTemplate,
@@ -14,7 +15,6 @@ from app.models.api_key import APIKey
 from app.notify_client.notification_api_client import notification_api_client
 from app.notify_client.service_api_client import service_api_client
 from app.utils import DELIVERED_STATUSES, FAILURE_STATUSES
-from app.utils.interruptible_io import InterruptibleIterableMixin
 from app.utils.letters import get_letter_printing_statement
 from app.utils.templates import EmailPreviewTemplate
 

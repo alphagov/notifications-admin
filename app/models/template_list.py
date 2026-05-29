@@ -1,7 +1,7 @@
+from notifications_utils.interruptible_io import InterruptibleIterableMixin
 from werkzeug.utils import cached_property
 
 from app import format_notification_type
-from app.utils.interruptible_io import InterruptibleIterableMixin
 
 
 class TemplateList:

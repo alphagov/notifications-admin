@@ -10,10 +10,9 @@ import openpyxl
 import openpyxl.reader.excel
 import pyexcel
 from notifications_utils.eventlet import greenlet_thread_time_ns, greenlet_thread_time_ns_max_continuous
+from notifications_utils.interruptible_io import InterruptibleIOZipFile
 from openpyxl.utils import get_column_letter as openpyxl_get_column_letter
 from openpyxl.worksheet.dimensions import DimensionHolder as openpyxl_DimensionHolder
-
-from app.utils.interruptible_io import InterruptibleIOZipFile
 
 # monkeypatch the reference openpyxl will use for ZipFile
 openpyxl.reader.excel.ZipFile = InterruptibleIOZipFile

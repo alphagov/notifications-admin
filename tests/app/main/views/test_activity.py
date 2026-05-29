@@ -243,7 +243,7 @@ def test_view_notifications_interruptible(
     mock_get_notifications_count_for_service,
     mocker,
 ):
-    mock_interruptible = mocker.patch("app.utils.interruptible_io._interruptible")
+    mock_interruptible = mocker.patch("notifications_utils.interruptible_io._allow_interruption")
 
     client_request.get(
         "main.view_notifications",
