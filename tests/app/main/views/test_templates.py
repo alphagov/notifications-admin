@@ -399,7 +399,7 @@ def test_choose_template_interruptible(
     mock_complex_templates_and_folders,
     mocker,
 ):
-    mock_interruptible = mocker.patch("app.utils.interruptible_io._interruptible")
+    mock_interruptible = mocker.patch("notifications_utils.interruptible_io._allow_interruption")
 
     client_request.get("main.choose_template", service_id=SERVICE_ONE_ID, _test_page_title=False)
 
@@ -2635,7 +2635,7 @@ def test_choose_template_to_copy_interruptible(
     mock_get_just_services_for_user,
     mocker,
 ):
-    mock_interruptible = mocker.patch("app.utils.interruptible_io._interruptible")
+    mock_interruptible = mocker.patch("notifications_utils.interruptible_io._allow_interruption")
 
     client_request.get(
         "main.choose_template_to_copy",
@@ -2655,7 +2655,7 @@ def test_choose_template_to_copy_from_service_interruptible(
     mock_get_just_services_for_user,
     mocker,
 ):
-    mock_interruptible = mocker.patch("app.utils.interruptible_io._interruptible")
+    mock_interruptible = mocker.patch("notifications_utils.interruptible_io._allow_interruption")
 
     client_request.get(
         "main.choose_template_to_copy",

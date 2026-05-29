@@ -19,6 +19,7 @@ from notifications_utils.eventlet import SoftEventletTimeout
 from notifications_utils.field import Field as UtilsField
 from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
+from notifications_utils.interruptible_io import InterruptibleIterableList, interruptible_iter
 from notifications_utils.recipient_validation.email_address import format_email_address, validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
 from notifications_utils.recipient_validation.phone_number import PhoneNumber as PhoneNumberUtils
@@ -114,7 +115,6 @@ from app.utils.govuk_frontend_field import (
     render_govuk_frontend_macro,
 )
 from app.utils.image_processing import CorruptImage, ImageProcessor, WrongImageFormat
-from app.utils.interruptible_io import InterruptibleIterableList, interruptible_iter
 from app.utils.user_permissions import (
     all_ui_permissions,
     organisation_user_permission_names,

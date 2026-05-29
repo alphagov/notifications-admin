@@ -1,9 +1,9 @@
 from pathlib import Path
 
 import pytest
+from notifications_utils.interruptible_io import InterruptibleIOZipFile
 
 from app.models.spreadsheet import Spreadsheet
-from app.utils.interruptible_io import InterruptibleIOZipFile
 
 conversion_original_files = tuple(
     (Path.cwd() / "tests" / "spreadsheet_files" / "conversions" / "originals").glob("[!.]*.*")
