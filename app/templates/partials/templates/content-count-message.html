@@ -6,5 +6,10 @@
     {% if template.placeholders %}
       (not including personalisation)
     {% endif %}
+    {% if template.fragment_count > 1 %}
+      <p class="govuk-hint govuk-!-margin-bottom-0">
+        Reduce the cost of sending this message by removing {{ template.count_of_characters_above_previous_fragment_boundary | character_count }}
+      </p>
+    {% endif %}
   {% endif %}
 </span>
