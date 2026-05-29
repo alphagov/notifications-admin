@@ -13,7 +13,6 @@ from notifications_utils.serialised_model import SerialisedModelCollection
 from notifications_utils.template import Template
 
 from app.models import JSONModel
-from app.s3_client.s3_template_email_file_upload_client import upload_template_email_file_to_s3
 from app.s3_client.s3_template_email_file_upload_client import (
     download_template_email_file_from_s3,
     upload_template_email_file_to_s3,

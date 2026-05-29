@@ -1,16 +1,18 @@
 import uuid
 
 import pytest
-import responses
+import requests.exceptions
 
 from app.notify_client.document_download_api_client import DocumentDownloadError, document_download_api_client
+
+test_document_download_api_base_url = "http://localhost:7000"
 
 
 def test_document_download_api_file_check(client_request, requests_mock):
     service_id = str(uuid.uuid4())
     client = document_download_api_client
     file_content = b"%PDF-1.4 test content"
-    expected_url = f"{client.base_url}/services/{service_id}/antivirus-and-mimetype-check"
+    expected_url = f"{test_document_download_api_base_url}/services/{service_id}/antivirus-and-mimetype-check"
     # mock the document download api response
     requests_mock.post(expected_url, json={"mimetype": "application/pdf"}, status_code=201)
     response = client.file_check_and_antivirus_scan(
@@ -36,11 +38,10 @@ def test_document_download_api_file_check(client_request, requests_mock):
     ],
 )
 def test_document_download_api_file_check_errors(client_request, requests_mock, file_name, error_message, status_code):
-    responses.reset()
     service_id = str(uuid.uuid4())
     client = document_download_api_client
     file_content = b"%PDF-1.4 test content"
-    expected_url = f"{client.base_url}/services/{service_id}/antivirus-and-mimetype-check"
+    expected_url = f"{test_document_download_api_base_url}/services/{service_id}/antivirus-and-mimetype-check"
     # mock document download api response
     requests_mock.post(expected_url, json={"error": error_message}, status_code=status_code)
 
@@ -49,3 +50,36 @@ def test_document_download_api_file_check_errors(client_request, requests_mock, 
 
     assert e.value.message == error_message
     assert e.value.status_code == status_code
+
+
+@pytest.mark.parametrize("status_code", [401, 403, 500])
+def test_document_download_api_client_only_handles_400_and_413_errors(client_request, requests_mock, status_code):
+    # DocumentDownloadAPIClient handles only 400 and 413 errors by raising DocumentDownloadError.
+    service_id = str(uuid.uuid4())
+    client = document_download_api_client
+    file_content = b"%PDF-1.4 test content"
+    file_name = "test-file.pdf"
+    expected_url = f"{test_document_download_api_base_url}/services/{service_id}/antivirus-and-mimetype-check"
+    # mock document download api response
+    requests_mock.post(expected_url, json={"error": "error-message"}, status_code=status_code)
+
+    with pytest.raises(Exception) as exc_info:
+        client.file_check_and_antivirus_scan(service_id=service_id, file_name=file_name, file_bytes=file_content)
+
+    assert exc_info.type.__name__ != "DocumentDownloadError"
+    assert 'Unhandled document download error: {"error": "error-message"}' in str(exc_info.value)
+
+
+def test_document_download_api_client_non_response_exception(client_request, requests_mock):
+    service_id = str(uuid.uuid4())
+    client = document_download_api_client
+    file_content = b"%PDF-1.4 test content"
+    file_name = "test-file.pdf"
+    expected_url = f"{test_document_download_api_base_url}/services/{service_id}/antivirus-and-mimetype-check"
+    # mock document download api response
+    requests_mock.post(expected_url, exc=requests.exceptions.ConnectionError)
+
+    with pytest.raises(Exception) as exc_info:
+        client.file_check_and_antivirus_scan(service_id=service_id, file_name=file_name, file_bytes=file_content)
+
+    assert exc_info.type.__name__ != "DocumentDownloadError"

@@ -1,5 +1,4 @@
 import base64
-from abc import ABC, abstractmethod
 from contextvars import ContextVar
 
 import requests
@@ -30,17 +29,7 @@ class DocumentDownloadError(Exception):
         return cls(message, resolved_status_code)
 
 
-class AbstractDocumentDownloadClient(ABC):
-    """
-    This will enforce uniformity of methods between the DocumentDownloadClient and the MockDocumentDownloadAPIClient
-    """
-
-    @abstractmethod
-    def file_check_and_antivirus_scan(self, service_id: str, file_name: str, file_bytes: bytes) -> dict:
-        pass
-
-
-class DocumentDownloadAPIClient(AbstractDocumentDownloadClient):
+class DocumentDownloadAPIClient:
     # This connection pool will be created once when the module loads and will be used across the instances
     request_session = requests.Session()
 
