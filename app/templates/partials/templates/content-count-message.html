@@ -13,14 +13,20 @@
       {% set list_of_non_gsm_characters = template.non_gsm_characters %}
     {% endif %}
 
-    {% if list_of_non_gsm_characters %}
+    {% if list_of_non_gsm_characters and template.fragment_count > 1 %}
+      <p class="govuk-hint govuk-!-margin-top-2 govuk-!-margin-bottom-1">
+        Reduce the cost of sending this message by:
+      </p>
+      <ul class="govuk-hint govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
+        <li>removing {{ list_of_non_gsm_characters | formatted_list(before_each="", after_each="") }}</li>
+        <li>removing {{ template.count_of_characters_above_previous_fragment_boundary | character_count }}</li>
+      </ul>
+    {% elif list_of_non_gsm_characters %}
       <p class="govuk-hint govuk-!-margin-bottom-0">
         Reduce the cost of sending this message by removing
         {{ list_of_non_gsm_characters | formatted_list(before_each="", after_each="") }}
       </p>
-    {% endif %}
-
-    {% if template.fragment_count > 1 %}
+    {% elif template.fragment_count > 1 %}
       <p class="govuk-hint govuk-!-margin-bottom-0">
         Reduce the cost of sending this message by removing {{ template.count_of_characters_above_previous_fragment_boundary | character_count }}
       </p>
