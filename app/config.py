@@ -17,6 +17,10 @@ class Config:
     TEMPLATE_PREVIEW_API_HOST = os.environ.get("TEMPLATE_PREVIEW_API_HOST", "http://localhost:6013")
     TEMPLATE_PREVIEW_API_KEY = os.environ.get("TEMPLATE_PREVIEW_API_KEY", "my-secret-key")
 
+    DOCUMENT_DOWNLOAD_API_HOST = os.environ.get("DOCUMENT_DOWNLOAD_API_HOST")
+    DOCUMENT_DOWNLOAD_API_HOST_NAME_INTERNAL = os.environ.get("DOCUMENT_DOWNLOAD_API_HOST_NAME_INTERNAL")
+    DOCUMENT_DOWNLOAD_API_KEY = os.environ.get("DOCUMENT_DOWNLOAD_API_KEY")
+
     # Logging
     DEBUG = False
     NOTIFY_REQUEST_LOG_LEVEL = os.getenv("NOTIFY_REQUEST_LOG_LEVEL", "INFO")
@@ -61,6 +65,7 @@ class Config:
     SESSION_REFRESH_EACH_REQUEST = False
 
     SEND_FILE_MAX_AGE_DEFAULT = 365 * 24 * 60 * 60  # 1 year
+    MAX_CUSTOM_FILENAME_LENGTH = 100
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None
     ACTIVITY_STATS_LIMIT_DAYS = 7
@@ -138,6 +143,12 @@ class Development(Config):
     ANTIVIRUS_API_HOST = os.environ.get("ANTIVIRUS_API_HOST", "http://localhost:6016")
     ANTIVIRUS_API_KEY = "test-key"
     ANTIVIRUS_ENABLED = os.getenv("ANTIVIRUS_ENABLED") == "1"
+
+    DOCUMENT_DOWNLOAD_API_HOST = os.environ.get("DOCUMENT_DOWNLOAD_API_HOST", "http://localhost:7000")
+    DOCUMENT_DOWNLOAD_API_HOST_NAME_INTERNAL = os.environ.get(
+        "DOCUMENT_DOWNLOAD_API_HOST_NAME_INTERNAL", "http://localhost:7000"
+    )
+    DOCUMENT_DOWNLOAD_API_KEY = os.environ.get("DOCUMENT_DOWNLOAD_API_KEY", "auth-token")
 
     ASSET_PATH = "/static/"
 
