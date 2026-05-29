@@ -244,6 +244,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
         self.from_name = from_name
         self.reply_to = reply_to
         self.show_recipient = show_recipient
+        self.version = template.get("version")
         if template.get("has_unsubscribe_link"):
             self.unsubscribe_link = url_for("main.unsubscribe_example", _external=True)
 

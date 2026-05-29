@@ -5012,21 +5012,21 @@ def test_attach_files_button(
             ],
             (
                 "For the appointment, you will need: "
-                "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg, "
+                "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg&template_version=1, "  # noqa: E501
                 "This is a link"
             ),
             [
                 (
                     "<a"
-                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg"'
+                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg&amp;template_version=1"'
                     ' style="word-wrap: break-word; color: #1D70B8;"'
                     ">"
-                    "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg"
+                    "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg&amp;template_version=1"
                     "</a>"
                 ),
                 (
                     "<a"
-                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAg?key=bORm0P1qEeWC9eCsy50Rpg"'
+                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAg?key=bORm0P1qEeWC9eCsy50Rpg&amp;template_version=1"'
                     ' style="word-wrap: break-word; color: #1D70B8;">'
                     "This is a link"
                     "</a>"
@@ -5060,21 +5060,21 @@ def test_attach_files_button(
             (
                 "This template contains a mixture of normal placeholders, and file placeholders: "
                 "((current_date)), "
-                "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg, "
+                "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg&template_version=1, "  # noqa: E501
                 "This is a link"
             ),
             [
                 (
                     "<a"
-                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg"'
+                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg&amp;template_version=1"'
                     ' style="word-wrap: break-word; color: #1D70B8;"'
                     ">"
-                    "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg"
+                    "http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAQ?key=bORm0P1qEeWC9eCsy50Rpg&amp;template_version=1"
                     "</a>"
                 ),
                 (
                     "<a"
-                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAg?key=bORm0P1qEeWC9eCsy50Rpg"'
+                    ' href="http://localhost/d/WWNkoIWOQsiQYqj-giJg6w/AAAAAAAAQACAAAAAAAAAAg?key=bORm0P1qEeWC9eCsy50Rpg&amp;template_version=1"'
                     ' style="word-wrap: break-word; color: #1D70B8;"'
                     ">"
                     "This is a link"

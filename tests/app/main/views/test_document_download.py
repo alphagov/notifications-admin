@@ -57,10 +57,11 @@ def test_403_if_user_does_not_have_permission_to_see_template(client_request, fa
         service_id=SERVICE_ONE_ID,
         document_id=uuid4(),
         key=uuid_to_base64(fake_uuid),
+        template_version=2,
         _expected_status=403,
     )
     assert mock_get_template.call_args_list == [
-        call(UUID(fake_uuid), RestrictedAny(lambda u: isinstance(u, User)), must_be_of_type="email"),
+        call(UUID(fake_uuid), RestrictedAny(lambda u: isinstance(u, User)), must_be_of_type="email", version="2"),
     ]
 
 
@@ -253,6 +254,7 @@ def test_landing_page(
         service_id=SERVICE_ONE_ID,
         document_id=fake_uuid,
         key=uuid_to_base64(fake_uuid),
+        template_version=email_template["version"],
     )
     assert normalize_spaces(button.text) == "Continue"
 
@@ -282,7 +284,7 @@ def test_confirm_email_page_redirects_if_confirmation_not_required(
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
     key = uuid_to_base64(fake_uuid)
     bae64_service_id = uuid_to_base64(SERVICE_ONE_ID)
-    expected_url = f"/d/{bae64_service_id}/{key}/download?key={key}"
+    expected_url = f"/d/{bae64_service_id}/{key}/download?key={key}&template_version={email_template['version']}"
     client_request.get(
         ".document_download_confirm_email_address",
         service_id=SERVICE_ONE_ID,
@@ -470,7 +472,7 @@ def test_confirm_email_page_redirects_for_correct_email(
     mocker.patch("app.service_api_client.get_service_template", return_value={"data": email_template})
     key = uuid_to_base64(fake_uuid)
     bae64_service_id = uuid_to_base64(SERVICE_ONE_ID)
-    expected_url = f"/d/{bae64_service_id}/{key}/download?key={key}"
+    expected_url = f"/d/{bae64_service_id}/{key}/download?key={key}&template_version={email_template['version']}"
     client_request.post(
         ".document_download_confirm_email_address",
         service_id=SERVICE_ONE_ID,
