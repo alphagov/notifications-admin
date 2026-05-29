@@ -6,6 +6,20 @@
     {% if template.placeholders %}
       (not including personalisation)
     {% endif %}
+
+    {% if template.non_gsm_characters | length > 3 %}
+      {% set list_of_non_gsm_characters = template.non_gsm_characters[:2] | list + ["similar characters"] %}
+    {% else %}
+      {% set list_of_non_gsm_characters = template.non_gsm_characters %}
+    {% endif %}
+
+    {% if list_of_non_gsm_characters %}
+      <p class="govuk-hint govuk-!-margin-bottom-0">
+        Reduce the cost of sending this message by removing
+        {{ list_of_non_gsm_characters | formatted_list(before_each="", after_each="") }}
+      </p>
+    {% endif %}
+
     {% if template.fragment_count > 1 %}
       <p class="govuk-hint govuk-!-margin-bottom-0">
         Reduce the cost of sending this message by removing {{ template.count_of_characters_above_previous_fragment_boundary | character_count }}

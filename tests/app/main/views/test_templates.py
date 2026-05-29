@@ -4744,19 +4744,48 @@ def test_set_template_sender_escapes_letter_contact_block_names(
         (
             False,
             "Ẅ" * 70,
-            "Will be charged as 1 text message",
+            "Will be charged as 1 text message Reduce the cost of sending this message by removing Ẅ",
+            None,
+        ),
+        (
+            False,
+            "Ẅÿ",
+            "Will be charged as 1 text message Reduce the cost of sending this message by removing Ẅ and ÿ",
+            None,
+        ),
+        (
+            False,
+            "ẄÿÈ",
+            "Will be charged as 1 text message Reduce the cost of sending this message by removing Ẅ, ÿ and È",
+            None,
+        ),
+        (
+            False,
+            "ẄÿÈẅ",
+            (
+                "Will be charged as 1 text message "
+                "Reduce the cost of sending this message by removing Ẅ, ÿ and similar characters"
+            ),
             None,
         ),
         (
             False,
             "Ẅ" * 71,
-            "Will be charged as 2 text messages Reduce the cost of sending this message by removing 1 character",
+            (
+                "Will be charged as 2 text messages "
+                "Reduce the cost of sending this message by removing Ẅ "
+                "Reduce the cost of sending this message by removing 1 character"
+            ),
             None,
         ),
         (
             False,
             "Ẅ" * 918,
-            "Will be charged as 14 text messages Reduce the cost of sending this message by removing 47 characters",
+            (
+                "Will be charged as 14 text messages "
+                "Reduce the cost of sending this message by removing Ẅ "
+                "Reduce the cost of sending this message by removing 47 characters"
+            ),
             None,
         ),
         (
