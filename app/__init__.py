@@ -52,6 +52,7 @@ from app.config import Config, configs
 from app.event_handlers import Events
 from app.extensions import antivirus_client, redis_client, zendesk_client  # noqa
 from app.formatters import (
+    character_count,
     convert_to_boolean,
     extract_path_from_url,
     format_auth_type,
@@ -593,6 +594,7 @@ def setup_event_handlers():
 
 def add_template_filters(application):
     for fn in [
+        character_count,
         format_auth_type,
         format_billions,
         format_datetime,

@@ -18,7 +18,6 @@ from flask import (
 )
 from flask_login import current_user
 from notifications_python_client.errors import HTTPError
-from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.formatters import formatted_list
 from notifications_utils.pdf import pdf_page_count
 from notifications_utils.s3 import s3download
@@ -38,7 +37,6 @@ from app import (
     template_statistics_client,
 )
 from app.constants import QR_CODE_TOO_LONG, LetterLanguageOptions
-from app.formatters import character_count, message_count
 from app.main import main, no_cookie
 from app.main.forms import (
     CopyTemplateForm,
@@ -128,13 +126,10 @@ def view_template(service_id, template_id):
     if should_skip_template_page(template):
         return redirect(url_for(".set_sender", service_id=service_id, template_id=template_id))
 
-    content_count_message = _get_fragment_count_message_for_template(template)
-
     return render_template(
         "views/templates/template.html",
         template=template,
         user_has_template_permission=user_has_template_permission,
-        content_count_message=content_count_message,
         extra_spacing_around_flash_messages=False,
     )
 
@@ -819,49 +814,27 @@ def edit_service_template(service_id, template_id, language=None):  # noqa
 
 
 @main.route(
-    "/services/<uuid:service_id>/templates/count-<template_type:template_type>-length",
+    "/services/<uuid:service_id>/templates/count-sms-length",
     methods=["POST"],
 )
 @user_has_permissions()
-def count_content_length(service_id, template_type):
-    if template_type != "sms":
-        abort(404)
-
-    error, message = _get_content_count_error_and_message_for_template(
-        get_template(
-            {
-                "template_type": template_type,
-                "content": request.form.get("template_content", ""),
-            },
-            current_service,
-        )
+def count_content_length(service_id):
+    template = get_template(
+        {
+            "template_type": "sms",
+            "content": request.form.get("template_content", ""),
+        },
+        current_service,
     )
 
     return jsonify(
         {
             "html": render_template(
                 "partials/templates/content-count-message.html",
-                error=error,
-                message=message,
+                template=template,
             )
         }
     )
-
-
-def _get_content_count_error_and_message_for_template(template):
-    if template.template_type == "sms":
-        if template.is_message_too_long():
-            return True, (
-                f"You have {character_count(template.content_count_without_prefix - SMS_CHAR_COUNT_LIMIT)} too many"
-            )
-        return False, _get_fragment_count_message_for_template(template)
-
-
-def _get_fragment_count_message_for_template(template):
-    if template.template_type != "sms":
-        return None
-    personalisation_hint = " (not including personalisation)" if template.placeholders else ""
-    return f"Will be charged as {message_count(template.fragment_count, template.template_type)}{personalisation_hint}"
 
 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/delete", methods=["GET", "POST"])

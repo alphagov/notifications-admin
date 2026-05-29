@@ -4811,27 +4811,6 @@ def test_content_count_json_endpoint(
 
 
 @pytest.mark.parametrize(
-    "template_type",
-    (
-        "email",
-        "letter",
-        "banana",
-    ),
-)
-def test_content_count_json_endpoint_for_unsupported_template_types(
-    client_request,
-    template_type,
-):
-    client_request.post(
-        "main.count_content_length",
-        service_id=SERVICE_ONE_ID,
-        template_type=template_type,
-        content="foo",
-        _expected_status=404,
-    )
-
-
-@pytest.mark.parametrize(
     "invalid_pages, page_requested, overlay_expected",
     (
         ("[1, 2]", 1, True),

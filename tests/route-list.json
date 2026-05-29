@@ -330,7 +330,7 @@
     "/services/<uuid:service_id>/templates/copy/from-folder/<uuid:from_folder>",
     "/services/<uuid:service_id>/templates/copy/from-service/<uuid:from_service>",
     "/services/<uuid:service_id>/templates/copy/from-service/<uuid:from_service>/from-folder/<uuid:from_folder>",
-    "/services/<uuid:service_id>/templates/count-<template_type:template_type>-length",
+    "/services/<uuid:service_id>/templates/count-sms-length",
     "/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>",
     "/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>/add-<template_type:template_type>",
     "/services/<uuid:service_id>/templates/folders/<uuid:template_folder_id>/delete",
