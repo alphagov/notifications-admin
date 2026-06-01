@@ -14,6 +14,11 @@ $tail-angle: 20deg;
   margin: 0 0 govuk-spacing(6) 0;
   clear: both;
   word-wrap: break-word;
+  // align text to logical start
+  text-align: start;
+  // This forces the HTML layout engine to calculate bidirectional text runs 
+  // character-by-character exactly like a native <textarea> does.
+  unicode-bidi: plaintext;
 
   &:after {
     content: "";
