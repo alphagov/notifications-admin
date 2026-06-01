@@ -1,0 +1,26 @@
+{% extends "withnav_template.html" %}
+{% block per_page_title %}Page not found{% endblock %}
+{% block maincolumn_content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+      <h1 class="heading-large">
+        Page not found
+      </h1>
+      <p class="govuk-body">
+        If you typed the web address, check it is correct.
+      </p>
+      <p class="govuk-body">
+        If you pasted the web address, check you copied the entire URL.
+      </p>
+      <p class="govuk-body">
+       If the web address is correct, the page you’re looking for may no longer exist.
+       </p>
+       <p class="govuk-body">
+       For security, GOV.UK Notify only keeps a temporary record of the emails, text messages and letters you send.
+       </p>
+       <p class="govuk-body">
+       For more information, see: <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_data_retention_period') }}">Data retention period</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

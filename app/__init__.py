@@ -432,6 +432,15 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
         if error_code == 404 and request.view_args and "service_id" in request.view_args and g.current_service:
             template_file = "error/404-service-page.html"
 
+        if (
+            error_code == 404
+            and request.view_args
+            and "service_id" in request.view_args
+            and g.current_service
+            and "notification_id" in request.view_args
+        ):
+            template_file = "error/404-notifications-page.html"
+
         if error_page_template:
             template_file = f"error/{error_page_template}.html"
 
