@@ -31,6 +31,7 @@ from tests.conftest import (
     create_active_user_with_permissions,
     create_multiple_email_reply_to_addresses,
     create_multiple_sms_senders,
+    create_service_one_admin,
     create_template,
     do_mock_get_page_counts_for_letter,
     mock_get_service_email_template,
@@ -3623,6 +3624,13 @@ def test_check_messages_shows_too_many_international_sms_messages_errors(
         ),
     ),
 )
+@pytest.mark.parametrize(
+    "user_name",
+    (
+        "07900900321",
+        "not-in-team@example.gov.uk",
+    ),
+)
 def test_check_messages_shows_trial_mode_error(
     client_request,
     mock_s3_get_metadata,
@@ -3635,6 +3643,7 @@ def test_check_messages_shows_trial_mode_error(
     template_type,
     file_contents,
     expected_error,
+    user_name,
     fake_uuid,
     mocker,
 ):
@@ -3644,6 +3653,12 @@ def test_check_messages_shows_trial_mode_error(
         return_value={"data": template},
     )
     mocker.patch("app.main.views.send.s3download", return_value=file_contents)
+    mocker.patch(
+        "app.models.user.Users._get_items",
+        return_value=[
+            create_service_one_admin(name=user_name),
+        ],
+    )
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {

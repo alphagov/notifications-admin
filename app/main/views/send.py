@@ -609,9 +609,7 @@ def _check_messages(service_id, template_id, upload_id, preview_row, emergency_c
         max_initial_rows_shown=50,
         max_errors_shown=50,
         guestlist=(
-            itertools.chain.from_iterable(
-                [user.name, user.mobile_number, user.email_address] for user in Users(service_id)
-            )
+            itertools.chain.from_iterable([user.mobile_number, user.email_address] for user in Users(service_id))
             if current_service.trial_mode
             else None
         ),
