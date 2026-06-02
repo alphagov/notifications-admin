@@ -4806,7 +4806,7 @@ def test_set_template_sender_escapes_letter_contact_block_names(
         (
             False,
             "a" * 161,
-            "Will be charged as 2 text messages",
+            "Will be charged as 2 text messages Reduce the cost of sending this message by removing 1 character",
             None,
         ),
         (
@@ -4820,13 +4820,13 @@ def test_set_template_sender_escapes_letter_contact_block_names(
             # service name takes 13 characters, 148 + 13 = 161
             True,
             "a" * 148,
-            "Will be charged as 2 text messages",
+            "Will be charged as 2 text messages Reduce the cost of sending this message by removing 1 character",
             None,
         ),
         (
             False,
             "a" * 918,
-            "Will be charged as 6 text messages",
+            "Will be charged as 6 text messages Reduce the cost of sending this message by removing 153 characters",
             None,
         ),
         (
@@ -4834,7 +4834,7 @@ def test_set_template_sender_escapes_letter_contact_block_names(
             # against total character limit
             True,
             "a" * 918,
-            "Will be charged as 7 text messages",
+            "Will be charged as 7 text messages Reduce the cost of sending this message by removing 13 characters",
             None,
         ),
         (
@@ -4863,19 +4863,46 @@ def test_set_template_sender_escapes_letter_contact_block_names(
         (
             False,
             "Ẅ" * 70,
-            "Will be charged as 1 text message",
+            "Will be charged as 1 text message Reduce the cost of sending this message by removing Ẅ",
+            None,
+        ),
+        (
+            False,
+            "Ẅÿ",
+            "Will be charged as 1 text message Reduce the cost of sending this message by removing Ẅ and ÿ",
+            None,
+        ),
+        (
+            False,
+            "ẄÿÈ",
+            "Will be charged as 1 text message Reduce the cost of sending this message by removing Ẅ, ÿ and È",
+            None,
+        ),
+        (
+            False,
+            "ẄÿÈẅ",
+            (
+                "Will be charged as 1 text message "
+                "Reduce the cost of sending this message by removing Ẅ, ÿ and similar characters"
+            ),
             None,
         ),
         (
             False,
             "Ẅ" * 71,
-            "Will be charged as 2 text messages",
+            (
+                "Will be charged as 2 text messages "
+                "Reduce the cost of sending this message by: removing Ẅ removing 1 character"
+            ),
             None,
         ),
         (
             False,
             "Ẅ" * 918,
-            "Will be charged as 14 text messages",
+            (
+                "Will be charged as 14 text messages "
+                "Reduce the cost of sending this message by: removing Ẅ removing 47 characters"
+            ),
             None,
         ),
         (
@@ -4927,6 +4954,32 @@ def test_content_count_json_endpoint(
         assert snippet["class"] == [expected_class]
     else:
         assert expected_class is None
+
+
+def test_content_count_json_endpoint_formats_multiple_suggestions_as_list(
+    client_request,
+):
+    response = client_request.post_response(
+        "main.count_content_length",
+        service_id=SERVICE_ONE_ID,
+        template_type="sms",
+        _data={
+            "template_content": ("ẄÿÈ" * 25),
+        },
+        _expected_status=200,
+    )
+
+    html = json.loads(response.get_data(as_text=True))["html"]
+    snippet = NotifyBeautifulSoup(html, "html.parser").select_one("span")
+
+    assert [normalize_spaces(p) for p in snippet.select("p.govuk-hint")] == [
+        "Reduce the cost of sending this message by:",
+    ]
+
+    assert [normalize_spaces(li) for li in snippet.select("ul.govuk-list.govuk-list--bullet.govuk-hint li")] == [
+        "removing Ẅ, ÿ and È",
+        "removing 18 characters",
+    ]
 
 
 @pytest.mark.parametrize(
