@@ -31,6 +31,7 @@ from tests.conftest import (
     create_active_user_with_permissions,
     create_multiple_email_reply_to_addresses,
     create_multiple_sms_senders,
+    create_service_one_admin,
     create_template,
     do_mock_get_page_counts_for_letter,
     mock_get_service_email_template,
@@ -3602,6 +3603,34 @@ def test_check_messages_shows_too_many_international_sms_messages_errors(
     assert normalize_spaces(page.select("div.banner-dangerous p")[1]) == expected_msg
 
 
+@pytest.mark.parametrize(
+    "template_type, file_contents, expected_error",
+    (
+        (
+            "sms",
+            "phone number,\n07900900321",
+            (
+                "You cannot send to this phone number "
+                "In trial mode you can only send to yourself and members of your team"
+            ),
+        ),
+        (
+            "email",
+            "email address,\nnot-in-team@example.gov.uk",
+            (
+                "You cannot send to this email address "
+                "In trial mode you can only send to yourself and members of your team"
+            ),
+        ),
+    ),
+)
+@pytest.mark.parametrize(
+    "user_name",
+    (
+        "07900900321",
+        "not-in-team@example.gov.uk",
+    ),
+)
 def test_check_messages_shows_trial_mode_error(
     client_request,
     mock_s3_get_metadata,
@@ -3611,10 +3640,25 @@ def test_check_messages_shows_trial_mode_error(
     mock_get_service_statistics,
     mock_get_job_doesnt_exist,
     mock_get_jobs,
+    template_type,
+    file_contents,
+    expected_error,
+    user_name,
     fake_uuid,
     mocker,
 ):
-    mocker.patch("app.main.views.send.s3download", return_value=("phone number,\n07900900321"))  # Not in team
+    template = create_template(template_type=template_type)
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={"data": template},
+    )
+    mocker.patch("app.main.views.send.s3download", return_value=file_contents)
+    mocker.patch(
+        "app.models.user.Users._get_items",
+        return_value=[
+            create_service_one_admin(name=user_name),
+        ],
+    )
 
     with client_request.session_transaction() as session:
         session["file_uploads"] = {
@@ -3631,9 +3675,7 @@ def test_check_messages_shows_trial_mode_error(
         _test_page_title=False,
     )
 
-    assert " ".join(page.select_one("div.banner-dangerous").text.split()) == (
-        "You cannot send to this phone number In trial mode you can only send to yourself and members of your team"
-    )
+    assert normalize_spaces(page.select_one("div.banner-dangerous")) == expected_error
 
 
 @pytest.mark.parametrize(
