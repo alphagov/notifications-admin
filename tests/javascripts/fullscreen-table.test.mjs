@@ -1,6 +1,23 @@
-import FullscreenTable from '../../app/assets/javascripts/esm/fullscreen-table.mjs';
 import { jest } from '@jest/globals';
 import * as helpers from './support/helpers';
+
+jest.unstable_mockModule('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs', () => ({
+  stickAtBottomWhenScrolling: {
+    recalculate: jest.fn()
+  }
+}));
+
+let FullscreenTable;
+let stickAtBottomWhenScrolling;
+
+beforeAll( async() => {
+  ({ stickAtBottomWhenScrolling } = await import('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs'));
+  const fullscreenTableModule = await import('../../app/assets/javascripts/esm/fullscreen-table.mjs');
+
+  FullscreenTable = fullscreenTableModule.default;
+
+  document.body.classList.add('govuk-frontend-supported');
+});
 
 
 describe('FullscreenTable', () => {
@@ -13,6 +30,8 @@ describe('FullscreenTable', () => {
   let fixedRowHeaders;
 
   beforeEach(() => {
+
+    stickAtBottomWhenScrolling.recalculate.mockClear();
 
     const tableHeadings = () => {
       let result = '';
@@ -80,12 +99,7 @@ describe('FullscreenTable', () => {
       scrollTop: 0
     });
 
-    window.GOVUK.stickAtBottomWhenScrolling = {
-      recalculate: jest.fn(() => {})
-    };
-
     // set up DOM
-    document.body.classList.add('govuk-frontend-supported')
     document.body.innerHTML =
       `<main>
         <div class="fullscreen-content" data-notify-module="fullscreen-table">
@@ -112,7 +126,6 @@ describe('FullscreenTable', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     screenMock.reset();
-    window.GOVUK.stickAtBottomWhenScrolling.recalculate.mockClear();
     jest.restoreAllMocks();
 
   });
@@ -135,14 +148,10 @@ describe('FullscreenTable', () => {
 
     test("it calls the sticky JS to update any cached dimensions", () => {
 
-      const stickyJSSpy = jest.spyOn(window.GOVUK.stickAtBottomWhenScrolling, 'recalculate');
-
       // start module
       new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
-      expect(stickyJSSpy.mock.calls.length).toBe(1);
-
-      stickyJSSpy.mockClear();
+      expect(stickAtBottomWhenScrolling.recalculate).toHaveBeenCalled();
 
     });
 
