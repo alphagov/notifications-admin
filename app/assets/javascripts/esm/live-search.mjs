@@ -1,4 +1,5 @@
 import { isSupported } from 'govuk-frontend';
+import { stickAtBottomWhenScrolling } from './stick-to-window-when-scrolling.mjs';
 
 class LiveSearch {
   constructor($module) {
@@ -98,9 +99,7 @@ class LiveSearch {
 
     // make sticky JS recalculate its cache of the element's position
     // because live search can change the height document
-    if ('stickAtBottomWhenScrolling' in window.GOVUK) {
-      window.GOVUK.stickAtBottomWhenScrolling.recalculate();
-    }
+    stickAtBottomWhenScrolling.recalculate();
 
   }
 

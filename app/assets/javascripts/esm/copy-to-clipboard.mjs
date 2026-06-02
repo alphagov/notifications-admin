@@ -1,4 +1,5 @@
 import { isSupported } from 'govuk-frontend';
+import { stickAtBottomWhenScrolling } from './stick-to-window-when-scrolling.mjs';
 
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
 // that uses ES2015 Classes -
@@ -79,9 +80,7 @@ class CopyToClipboard {
       }
     });
 
-    if ('stickAtBottomWhenScrolling' in window.GOVUK) {
-      window.GOVUK.stickAtBottomWhenScrolling.recalculate();
-    }
+    stickAtBottomWhenScrolling.recalculate();
   }
   
   updateHTML (buttonWasClicked, stateOptions, $module, $button) {
