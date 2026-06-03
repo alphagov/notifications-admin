@@ -44,7 +44,7 @@
     "jest": "30.3.0",
     "jest-environment-jsdom": "30.3.0",
     "postcss-replace": "2.0.1",
-    "rollup": "4.60.1",
+    "rollup": "4.60.4",
     "rollup-plugin-copy": "3.5.0",
     "rollup-plugin-styler": "2.0.0",
     "sass": "1.89.2",
