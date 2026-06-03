@@ -165,7 +165,14 @@ class OnlySMSCharacters:
         if non_sms_characters:
             raise ValidationError(
                 "You cannot use {} in text messages. {} will not display properly on some phones.".format(
-                    formatted_list(non_sms_characters, conjunction="or", before_each="", after_each=""),
+                    formatted_list(
+                        non_sms_characters,
+                        conjunction="or",
+                        before_each="",
+                        after_each="",
+                        max_items_shown=3,
+                        word_for_items_not_shown="similar characters",
+                    ),
                     ("It" if len(non_sms_characters) == 1 else "These characters"),
                 )
             )

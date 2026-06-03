@@ -45,7 +45,7 @@
           It needs to have 1 column, called ‘email address’ or ‘phone number’.
         </p>
         <p class="govuk-body">
-          Right now it has {{ recipients._raw_column_headers|length }} columns called {{ recipients._raw_column_headers[:512] | formatted_list }}.
+          Right now it has {{ recipients._raw_column_headers|length }} columns called {{ recipients._raw_column_headers | formatted_list(max_items_shown=512, word_for_items_not_shown="more")  }}.
         </p>
 
       {% endif %}
