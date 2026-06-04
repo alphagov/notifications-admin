@@ -15,11 +15,6 @@
         <li>removing {{ template.non_gsm_characters | formatted_list(before_each="", after_each="", max_items_shown=3, word_for_items_not_shown="similar characters") }}</li>
         <li>removing {{ template.count_of_characters_above_previous_fragment_boundary | character_count }}</li>
       </ul>
-    {% elif template.non_gsm_characters %}
-      <p class="govuk-hint govuk-!-margin-bottom-0">
-        Reduce the cost of sending this message by removing
-        {{ template.non_gsm_characters | formatted_list(before_each="", after_each="", max_items_shown=3, word_for_items_not_shown="similar characters") }}
-      </p>
     {% elif template.fragment_count > 1 %}
       <p class="govuk-hint govuk-!-margin-bottom-0">
         Reduce the cost of sending this message by removing {{ template.count_of_characters_above_previous_fragment_boundary | character_count }}
