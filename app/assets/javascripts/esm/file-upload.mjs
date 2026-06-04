@@ -59,28 +59,38 @@ class FileUpload {
     const buttonText = this.$field.dataset.buttonText;
     const fieldId = this.$field.getAttribute('id'); // copy the id across so error links work
     const oldFieldId = `hidden-${fieldId}`;
-    let buttonHTMLStr = `
-        <button type="button" class="file-upload-button govuk-button govuk-!-margin-right-1" id="${fieldId}">
-          ${buttonText}
-        </button>`; // Styled as a submit button to raise prominence. The type shouldn't change.
+    
+    const $button = document.createElement('button');
+    $button.setAttribute('type', 'button');
+    $button.classList.add('file-upload-button', 'govuk-button', 'govuk-!-margin-right-1');
+    $button.setAttribute('id', fieldId);
+    $button.textContent = buttonText; // Styled as a submit button to raise prominence. The type shouldn't change.
     
     // If errors with the upload, copy into a label above the button
     // Buttons don't need labels by default as the accessible name comes from their text but
     // errors need to be added to that.
     const formErrors = Boolean(this.$fieldErrors);
-    if (formErrors) {
-      buttonHTMLStr = `
-        <label class="file-upload-button-label govuk-error-message" for="${fieldId}">
-          <span class="govuk-visually-hidden">${buttonText} </span>
-          ${this.$fieldErrors.textContent}
-        </label>
-        ${buttonHTMLStr}`;
-    }
 
     // Change id of field now we're using it for the button
     this.$field.setAttribute('id', oldFieldId);
     this.$field.parentNode.querySelector(`label[for=${fieldId}]`).setAttribute('for', oldFieldId);
-    this.$field.insertAdjacentHTML('afterend', buttonHTMLStr);
+    
+    this.$field.insertAdjacentElement('afterend', $button);
+
+    if (formErrors) {
+      const $label = document.createElement('label');
+      $label.classList.add('file-upload-button-label', 'govuk-error-message');
+      $label.setAttribute('for', fieldId);
+
+      const $span = document.createElement('span');
+      $span.classList.add('govuk-visually-hidden');
+      $span.textContent = `${buttonText} `;
+      
+      $label.appendChild($span);
+      $label.appendChild(document.createTextNode(this.$fieldErrors.textContent));
+
+      this.$field.insertAdjacentElement('afterend', $label);
+    }
 
     document.querySelector('button.file-upload-button').addEventListener('click', () => {
       this.$field.click();
