@@ -73,27 +73,51 @@ class EnhancedTextbox {
     stickAtBottomWhenScrolling.recalculate();
   }
 
-  contentEscaped () {
-    const $el = document.createElement('div');
-    $el.innerHTML = this.$textbox.value;
-    return $el.innerHTML;
-  }
-
   contentReplaced () {
-    return this.contentEscaped().replace(
-      this.tagPattern, (match, name, separator, value) => {
-        if (value && separator) {
-          return `<span class='placeholder-conditional'>((${name}??</span>${value}))`;
-        } else {
-          return `<span class='placeholder'>((${name}${value}))</span>`;
-        }
+    const fragment = document.createDocumentFragment();
+    const text = this.$textbox.value;
+    let lastIndex = 0;
+
+    for (const match of text.matchAll(this.tagPattern)) {
+      // append plain text before the placeholder starts
+      fragment.append(text.slice(lastIndex, match.index));
+
+      const [
+        fullMatch,  // index 0: full match
+        name,       // index 1: capture group 1
+        separator,  // index 2: capture group 2
+        value       // index 3: capture group 3
+      ] = match;
+      const $span = document.createElement('span');
+
+      if (value && separator) {
+        $span.className = 'placeholder-conditional';
+        $span.textContent = `((${name}??`;
+        fragment.append($span, `${value}))`);
+      } else {
+        $span.className = 'placeholder';
+        $span.textContent = `((${name}${value}))`;
+        fragment.append($span);
       }
-    );
+
+      // update with the index where the current placeholder ends
+      lastIndex = match.index + fullMatch.length;
+    }
+
+    // append any remaining trailing text
+    fragment.append(text.slice(lastIndex));
+    return fragment;
   }
 
   update () {
-    this.$backgroundHighlightElement.innerHTML =
-      this.highlightPlaceholders ? this.contentReplaced() : this.contentEscaped();
+    // clear everything that's in the container to avoid any potential XSS
+    this.$backgroundHighlightElement.textContent = '';
+
+    if (this.highlightPlaceholders) {
+      this.$backgroundHighlightElement.append(this.contentReplaced());
+    } else {
+      this.$backgroundHighlightElement.textContent = this.$textbox.value;
+    }
 
     this.resize();
   }
