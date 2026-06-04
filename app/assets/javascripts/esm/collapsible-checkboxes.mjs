@@ -134,11 +134,20 @@ class CollapsibleCheckboxes  {
   }
 
   addHeadingHideLegend() {
-    const headingLevel = this.$module.getAttribute('data-heading-level') || '2';
-    const $heading = document.createElement(`H${headingLevel}`);
-    const $legend = this.$fieldset.querySelector('legend');
-    $heading.classList.add('heading-small');
+
+    const headingLevel = this.$module.getAttribute('data-heading-level');    
+  
+    // allowed list of heading levels
+    const safeHeadingLevels = ['1', '2', '3', '4', '5', '6'];
+    
+    // if data attribute is in the allowed array, apply it. If not use the default
+    const safeLevel = safeHeadingLevels.includes(headingLevel) ? headingLevel : '2';
+    const $heading = document.createElement(`H${safeLevel}`); 
+    
+    const $legend = this.$fieldset.querySelector('legend');    
+    $heading.classList.add('heading-small');    
     $heading.textContent = `${this.legendText}`;
+
     this.$fieldset.before($heading);
     $legend.classList.add('govuk-visually-hidden');
   }
