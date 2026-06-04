@@ -1,4 +1,6 @@
 import { isSupported } from 'govuk-frontend';
+import { stickAtBottomWhenScrolling } from './stick-to-window-when-scrolling.mjs';
+
 
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
 // that uses ES2015 Classes -
@@ -47,9 +49,7 @@ class FullscreenTable {
       this.$scrollableTable.addEventListener('blur', toggleFocusStyle);
     }
 
-    if (window.GOVUK.stickAtBottomWhenScrolling.recalculate) {
-      window.GOVUK.stickAtBottomWhenScrolling.recalculate();
-    }
+    stickAtBottomWhenScrolling.recalculate();
 
     this.maintainWidth();
   }

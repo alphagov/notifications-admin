@@ -1,19 +1,25 @@
-
-import RadioSelect from '../../app/assets/javascripts/esm/radio-select.mjs';
 import * as helpers from './support/helpers.js';
 import { jest } from '@jest/globals';
 
+jest.unstable_mockModule('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs', () => ({
+  stickAtBottomWhenScrolling: {
+    recalculate: jest.fn()
+  }
+}));
+
 let consoleErrorSpy;
+let RadioSelect;
+let stickAtBottomWhenScrolling;
 
-beforeAll(() => {
-  // The sticky JS should be called whenever the times are shown so stub it out as a mock
-  window.GOVUK.stickAtBottomWhenScrolling = {
-    recalculate: jest.fn(() => {})
-  };
+beforeAll( async() => {
+  ({ stickAtBottomWhenScrolling } = await import('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs'));
+  const radioSelectModule = await import('../../app/assets/javascripts/esm/radio-select.mjs');
 
+  RadioSelect = radioSelectModule.default;
+
+  document.body.classList.add('govuk-frontend-supported');
   // spy on console.error to track JSDOM errors
   consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-
 });
 
 afterAll(() => {
@@ -124,8 +130,6 @@ describe('RadioSelect', () => {
 
       return result;
     };
-
-    document.body.classList.add('govuk-frontend-supported');
     document.body.innerHTML = `
       <form method="post" enctype="multipart/form-data" action="/services/6658542f-0cad-491f-bec8-ab8457700ead/start-job/ab3080c8-f2d1-4524-b199-9718ecf6eabc">
         <fieldset class="govuk-fieldset">
@@ -151,7 +155,7 @@ describe('RadioSelect', () => {
 
   afterEach(() => {
     document.body.innerHTML = '';
-    window.GOVUK.stickAtBottomWhenScrolling.recalculate.mockClear();
+    stickAtBottomWhenScrolling.recalculate.mockClear();
   });
 
   describe("when the page has loaded", () => {
@@ -454,7 +458,7 @@ describe('RadioSelect', () => {
       const container = expandingSection.querySelector('.radio-select__confirm');
 
       expect(container.classList.contains('js-stick-at-bottom-when-scrolling')).toBe(true);
-      expect(GOVUK.stickAtBottomWhenScrolling.recalculate).toHaveBeenCalled();
+      expect(stickAtBottomWhenScrolling.recalculate).toHaveBeenCalled();
 
     });
 
