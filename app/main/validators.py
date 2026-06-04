@@ -163,18 +163,18 @@ class OnlySMSCharacters:
     def __call__(self, form, field):
         non_sms_characters = sorted(SanitiseSMS.get_non_compatible_characters(field.data))
         if non_sms_characters:
+            list_of_characters = formatted_list(
+                non_sms_characters,
+                conjunction="or",
+                before_each="",
+                after_each="",
+                max_items_shown=3,
+                word_for_items_not_shown="similar characters",
+            )
+            it_or_these = "It" if len(non_sms_characters) == 1 else "These characters"
             raise ValidationError(
-                "You cannot use {} in text messages. {} will not display properly on some phones.".format(
-                    formatted_list(
-                        non_sms_characters,
-                        conjunction="or",
-                        before_each="",
-                        after_each="",
-                        max_items_shown=3,
-                        word_for_items_not_shown="similar characters",
-                    ),
-                    ("It" if len(non_sms_characters) == 1 else "These characters"),
-                )
+                f"You cannot use {list_of_characters} in text messages. "
+                f"{it_or_these} will not display properly on some phones."
             )
 
 
