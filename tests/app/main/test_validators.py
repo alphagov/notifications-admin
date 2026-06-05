@@ -119,6 +119,13 @@ def test_sms_character_validation(client_request, msg):
     "data, err_msg",
     [
         (
+            "∆ abc 📲 def 📵 ghi 🤪",
+            (
+                "You cannot use ∆, 📲 or similar characters in text messages. "
+                "These characters will not display properly on some phones."
+            ),
+        ),
+        (
             "∆ abc 📲 def 📵 ghi",
             "You cannot use ∆, 📲 or 📵 in text messages. These characters will not display properly on some phones.",
         ),
