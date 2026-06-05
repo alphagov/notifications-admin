@@ -728,7 +728,7 @@ mistune==0.8.4 \
 notifications-python-client==10.0.1 \
     --hash=sha256:00d88eacb6fd6eb0467d7396a7e23677194cfebe0ebd88de2efa031fb51eb23f
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@79a5807653c2752e61db68e63acbc7bcab0d69c2
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@05d6c304a7b4900ee299fd3407aa14168846ed39
     # via -r requirements.in
 openpyxl==3.1.5 \
     --hash=sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2 \
@@ -1000,10 +1000,6 @@ six==1.17.0 \
 smartypants==2.0.2 \
     --hash=sha256:39d64ce1d7cc6964b698297bdf391bc12c3251b7f608e6e55d857cd7c5f800c6 \
     --hash=sha256:9471578606e8ee0740065bf8771f55fec8c83313cb98c5d1c1864ddd389d0f3a
-    # via notifications-utils
-statsd==4.0.1 \
-    --hash=sha256:99763da81bfea8daf6b3d22d11aaccb01a8d0f52ea521daab37e758a4ca7d128 \
-    --hash=sha256:c2676519927f7afade3723aca9ca8ea986ef5b059556a980a867721ca69df093
     # via notifications-utils
 texttable==1.7.0 \
     --hash=sha256:2d2068fb55115807d3ac77a4ca68fa48803e84ebb0ee2340f858107a36522638 \
