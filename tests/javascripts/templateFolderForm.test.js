@@ -971,7 +971,7 @@ describe('TemplateFolderForm', () => {
       // fake page refresh that sets a state of last submitted form
       templateFolderForm.setAttribute('data-prev-state',"add-new-template" );
       // append the error summary to fake an error
-      $(errorSummary).insertBefore(templateFolderForm);
+      templateFolderForm.insertAdjacentHTML('beforebegin', errorSummary);
       // start module
       window.GOVUK.notifyModules.start();
 
