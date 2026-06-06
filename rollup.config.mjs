@@ -125,7 +125,6 @@ export default [
       concatenateFiles([
           paths.npm + 'jquery/dist/jquery.min.js',
           paths.src + 'javascripts/modules.js',
-          paths.src + 'javascripts/templateFolderForm.js',
           paths.src + 'javascripts/main.js'
         ]),
       terser({
