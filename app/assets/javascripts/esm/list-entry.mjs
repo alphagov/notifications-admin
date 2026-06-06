@@ -177,7 +177,7 @@ class _ListEntry {
   bindEvents () {
     this.$wrapper.addEventListener('click', function (e) {
       if (e.target.matches('.input-list__button--remove')) {
-        this.removeEntry($(e.target));
+        this.removeEntry(e.target);
       }
       if (e.target.matches('.input-list__button--add')) {
         this.addEntry();
@@ -213,7 +213,7 @@ class _ListEntry {
   }
 
   removeEntry ($removeButton) {
-    var entryNumber = parseInt($removeButton.find('span').text().match(/\d+/)[0], 10);
+    var entryNumber = parseInt($removeButton.querySelector('span').textContent.match(/\d+/)[0], 10);
 
     this.getValuesAndErrors();
     this.removeEntryFromEntriesAndErrors(entryNumber);
