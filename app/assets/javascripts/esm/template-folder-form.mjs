@@ -145,7 +145,7 @@ class TemplateFolderForm {
       'update': numSelected => {
         let message = (numSelected.total > 0) ? this.selectionStatus.selected(numSelected) : this.selectionStatus.default;
 
-        document.querySelector('.checkbox-list-selected-counter__count').textContent = message
+        document.querySelector('.checkbox-list-selected-counter__count').textContent = message;
         this.$liveRegionCounter.textContent = message;
       }
     };
