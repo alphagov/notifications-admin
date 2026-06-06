@@ -1,6 +1,5 @@
 const events = require('./helpers/events.js');
 const domInterfaces = require('./helpers/dom_interfaces.js');
-const cookies = require('./helpers/cookies.js');
 const html = require('./helpers/html.js');
 const elements = require('./helpers/elements.js');
 const rendering = require('./helpers/rendering.js');
@@ -12,8 +11,6 @@ exports.moveSelectionToRadio = events.moveSelectionToRadio;
 exports.activateRadioWithSpace = events.activateRadioWithSpace;
 exports.RangeMock = domInterfaces.RangeMock;
 exports.SelectionMock = domInterfaces.SelectionMock;
-exports.getCookie = cookies.getCookie;
-exports.setCookie = cookies.setCookie;
 exports.getRadioGroup = html.getRadioGroup;
 exports.getRadios = html.getRadios;
 exports.templatesAndFoldersCheckboxes = html.templatesAndFoldersCheckboxes;
