@@ -27,6 +27,7 @@ import UpdateStatus from './update-status.mjs';
 import UpdateContent from './update-content.mjs';
 import UpdateRelativeTime from './update-relative-time.mjs';
 import { stickAtTopWhenScrolling, stickAtBottomWhenScrolling } from './stick-to-window-when-scrolling.mjs';
+import TemplateFolderForm from './template-folder-form.mjs';
 
 createAll(Button,
   { preventDoubleClick: true }
@@ -160,6 +161,11 @@ new FocusBanner();
 const updateRelativeTimeSelector = '[data-notify-module="update-relative-time"]';
 if (document.querySelector('[data-notify-module="update-relative-time"]')) {
   new UpdateRelativeTime(updateRelativeTimeSelector);
+}
+
+const $templateFolderForm = document.querySelector('[data-notify-module="template-folder-form"]');
+if ($templateFolderForm) {
+  new TemplateFolderForm($templateFolderForm);
 }
 
 window.GOVUK = window.GOVUK || {};
