@@ -1,4 +1,12 @@
-const helpers = require('./support/helpers');
+import { jest } from '@jest/globals';
+import * as helpers from './support/helpers';
+
+jest.unstable_mockModule('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs', () => ({
+  stickAtBottomWhenScrolling: {
+    recalculate: jest.fn(),
+    setMode: jest.fn()
+  }
+}));
 
 function setFixtures (hierarchy, newTemplateDataModules = "") {
 
@@ -134,22 +142,15 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
 
 };
 
-function resetStickyMocks () {
-
-  GOVUK.stickAtBottomWhenScrolling.recalculate.mockClear();
-  GOVUK.stickAtBottomWhenScrolling.setMode.mockClear();
-
-};
-
 beforeAll(() => {
-  require('../../app/assets/javascripts/templateFolderForm.js');
+
+  document.body.classList.add('govuk-frontend-supported');
 
   // plug JSDOM's lack of support for window.scrollTo
   window.scrollTo = () => {};
 });
 
 afterAll(() => {
-  require('./support/teardown.js');
 
   // tidy up
   delete window.scrollTo;
@@ -188,24 +189,26 @@ describe('TemplateFolderForm', () => {
     }
   ];
 
+  let TemplateFolderForm;
+  let stickAtBottomWhenScrolling;
   let templateFolderForm;
   let formControls;
   let visibleCounter;
+  let visibleCounterText;
   let hiddenCounter;
+  let hiddenCounterText;
 
-  beforeAll(() => {
+  beforeAll( async() => {
+  ({ stickAtBottomWhenScrolling } = await import('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs'));
+  const templateFolderFormModule = await import('../../app/assets/javascripts/esm/template-folder-form.mjs');
 
-    // stub out calls to sticky JS
-    GOVUK.stickAtBottomWhenScrolling = {
-      setMode: jest.fn(),
-      recalculate: jest.fn()
-    };
+  TemplateFolderForm = templateFolderFormModule.default;
 
   });
 
   afterAll(() => {
 
-    GOVUK.stickAtBottomWhenScrolling = undefined;
+    jest.restoreAllMocks();
 
   });
 
@@ -222,6 +225,11 @@ describe('TemplateFolderForm', () => {
     document.body.innerHTML = '';
 
   });
+
+  function resetStickyMocks () {
+    stickAtBottomWhenScrolling.recalculate.mockClear();
+    stickAtBottomWhenScrolling.setMode.mockClear();
+  };
 
   function getTemplateFolderCheckboxes () {
     return templateFolderForm.querySelectorAll('input[type=checkbox]');
@@ -256,7 +264,7 @@ describe('TemplateFolderForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new TemplateFolderForm(templateFolderForm);
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
       visibleCounter = getVisibleCounter();
@@ -318,11 +326,11 @@ describe('TemplateFolderForm', () => {
       expect(formControls.querySelector('#nothing_selected .js-stick-at-bottom-when-scrolling')).not.toBeNull();
 
       // .recalculate should have been called so the sticky JS picks up the controls
-      expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+      expect(stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
 
       // mode should have been set to 'default' as the controls only have one part
-      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
-      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
+      expect(stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+      expect(stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
 
     });
 
@@ -333,7 +341,7 @@ describe('TemplateFolderForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new TemplateFolderForm(templateFolderForm);
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
 
@@ -409,11 +417,11 @@ describe('TemplateFolderForm', () => {
       expect(formControls.querySelectorAll('#add_new_template_form .js-stick-at-bottom-when-scrolling').length).toEqual(2);
 
       // .recalculate should have been called so the sticky JS picks up the controls
-      expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+      expect(stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
 
       // the mode should be set to 'dialog' so both parts can be sticky
-      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
-      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('dialog');
+      expect(stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+      expect(stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('dialog');
 
     });
 
@@ -457,7 +465,7 @@ describe('TemplateFolderForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new TemplateFolderForm(templateFolderForm);
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
 
@@ -521,11 +529,11 @@ describe('TemplateFolderForm', () => {
       expect(formControls.querySelector('#add_new_folder_form .js-stick-at-bottom-when-scrolling')).not.toBeNull();
 
       // .recalculate should have been called so the sticky JS picks up the controls
-      expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+      expect(stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
 
       // mode should have been set to 'default' as the controls only have one part
-      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
-      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
+      expect(stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+      expect(stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
 
     });
 
@@ -564,7 +572,7 @@ describe('TemplateFolderForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new TemplateFolderForm(templateFolderForm);
 
       templateFolderCheckboxes = getTemplateFolderCheckboxes();
 
@@ -595,11 +603,11 @@ describe('TemplateFolderForm', () => {
       expect(formControls.querySelector('#items_selected .js-stick-at-bottom-when-scrolling')).not.toBeNull();
 
       // .recalculate should have been called so the sticky JS picks up the controls
-      expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+      expect(stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
 
       // mode should have been set to 'default' as the controls only have one part
-      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
-      expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
+      expect(stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+      expect(stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
 
     });
 
@@ -633,9 +641,6 @@ describe('TemplateFolderForm', () => {
     });
 
     describe("Selection counter", () => {
-
-      let visibleCounterText;
-      let hiddenCounterText;
 
       beforeEach(() => {
 
@@ -743,11 +748,11 @@ describe('TemplateFolderForm', () => {
         expect(formControls.querySelectorAll('#move_to_folder_radios .js-stick-at-bottom-when-scrolling').length).toEqual(2);
 
         // .recalculate should have been called so the sticky JS picks up the controls
-        expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+        expect(stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
 
         // the mode should be set to 'dialog' so both parts can be sticky
-        expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
-        expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('dialog');
+        expect(stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+        expect(stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('dialog');
 
       });
 
@@ -845,11 +850,11 @@ describe('TemplateFolderForm', () => {
         expect(formControls.querySelector('#move_to_new_folder_form .js-stick-at-bottom-when-scrolling')).not.toBeNull();
 
         // .recalculate should have been called so the sticky JS picks up the controls
-        expect(GOVUK.stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
+        expect(stickAtBottomWhenScrolling.recalculate.mock.calls.length).toEqual(1);
 
         // mode should have been set to 'default' as the controls only have one part
-        expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
-        expect(GOVUK.stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
+        expect(stickAtBottomWhenScrolling.setMode.mock.calls.length).toEqual(1);
+        expect(stickAtBottomWhenScrolling.setMode.mock.calls[0][0]).toEqual('default');
 
       });
 
@@ -890,7 +895,7 @@ describe('TemplateFolderForm', () => {
     beforeEach(() => {
 
       // start module
-      window.GOVUK.notifyModules.start();
+      new TemplateFolderForm(templateFolderForm);
 
       templateFolderCheckboxes = getTemplateFolderCheckboxes();
       visibleCounterText = getVisibleCounter().textContent.trim();
@@ -973,7 +978,7 @@ describe('TemplateFolderForm', () => {
       // append the error summary to fake an error
       templateFolderForm.insertAdjacentHTML('beforebegin', errorSummary);
       // start module
-      window.GOVUK.notifyModules.start();
+      new TemplateFolderForm(templateFolderForm);
 
       formControls = templateFolderForm.querySelector('#sticky_template_forms');
 
