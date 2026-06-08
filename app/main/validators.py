@@ -36,21 +36,18 @@ class CanEncode:
 
     def __call__(self, form, field):
         if field.data:
-            unsupported = set()
+            unsupported = OrderedSet()
             for char in field.data:
                 try:
                     char.encode(self.encoding)
                 except UnicodeEncodeError:
                     unsupported.add(char)
-            unsupported_char_list = list(unsupported)
-            if unsupported_char_list:
-                unsupported_char_list.sort()
 
             field_type = "this field"
             if self.field_type is not None:
                 field_type = self.field_type
 
-            if unsupported_char_list != []:
+            if unsupported:
                 message = self.message
                 if message is None:
                     message = (
