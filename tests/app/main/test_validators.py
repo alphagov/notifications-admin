@@ -238,6 +238,10 @@ def test_string_cannot_contain_string_with_custom_error_message():
             "∆ abc 📲",
             "You cannot use ∆ or 📲 in this field. You must use percent encoding if you want to include these characters.",  # noqa
         ),
+        (
+            "🦆🦆🦅🦅🦜🦢",
+            "You cannot use 🦆, 🦅 or similar characters in this field. You must use percent encoding if you want to include these characters.",  # noqa
+        ),
     ],
 )
 def test_can_encode_validation(data, err_msg, client_request):
