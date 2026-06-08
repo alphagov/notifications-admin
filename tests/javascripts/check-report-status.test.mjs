@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 
 // register the mock with the ESM loader first.
-jest.unstable_mockModule('../../app/assets/javascripts/utils/location.mjs', () => ({
+jest.unstable_mockModule('../../app/assets/javascripts/esm/utils.mjs', () => ({
   locationReplace: jest.fn()
 }));
 
@@ -10,7 +10,7 @@ let locationReplace;
 
 beforeAll( async() => {
   const checkReportStatusModule = await import('../../app/assets/javascripts/esm/check-report-status.mjs');
-  const locationUtilModule = await import('../../app/assets/javascripts/utils/location.mjs');
+  const locationUtilModule = await import('../../app/assets/javascripts/esm/utils.mjs');
 
   CheckReportStatus = checkReportStatusModule.default;
   locationReplace = locationUtilModule.locationReplace;

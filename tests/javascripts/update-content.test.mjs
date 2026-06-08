@@ -21,12 +21,12 @@ describe('Update content', () => {
   beforeEach(async () => {
     jest.resetModules();
 
-    jest.unstable_mockModule('../../app/assets/javascripts/utils/location.mjs', () => ({
+    jest.unstable_mockModule('../../app/assets/javascripts/esm/utils.mjs', () => ({
       locationReload: jest.fn()
     }));
 
     const updateContentModule = await import('../../app/assets/javascripts/esm/update-content.mjs');
-    const locationUtilModule = await import('../../app/assets/javascripts/utils/location.mjs');
+    const locationUtilModule = await import('../../app/assets/javascripts/esm/utils.mjs');
 
     UpdateContent = updateContentModule.default;
     locationReload = locationUtilModule.locationReload;
