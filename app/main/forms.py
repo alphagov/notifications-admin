@@ -76,6 +76,7 @@ from app.formatters import (
     sentence_case,
 )
 from app.main.validators import (
+    CanEncode,
     CannotContainURLsOrLinks,
     CharactersNotAllowed,
     CommonlyUsedPassword,
@@ -2534,11 +2535,16 @@ class CallbackForm(StripWhitespaceForm):
                 r"(?:#[\w\-._~%!$&'()*+,;=:@/?]*)?$",
                 message="Must be a valid https URL",
             ),
+            CanEncode(field_type="a web address"),
         ],
     )
     bearer_token = GovukPasswordField(
         "Bearer token",
-        validators=[DataRequired(message="Cannot be empty"), Length(min=10, thing="the bearer token")],
+        validators=[
+            DataRequired(message="Cannot be empty"),
+            Length(min=10, thing="the bearer token"),
+            CanEncode(field_type="a bearer token"),
+        ],
     )
 
     def validate(self, *args, **kwargs):

@@ -1,6 +1,7 @@
 import pytest
 
-from app.main.forms import OrderableFieldsForm, StripWhitespaceStringField
+from app.main.forms import CallbackForm, OrderableFieldsForm, StripWhitespaceStringField
+from app.main.validators import CanEncode
 from tests.conftest import set_config_values
 
 
@@ -41,3 +42,9 @@ class TestOrderableFieldsForm:
         with set_config_values(notify_admin, {"WTF_CSRF_ENABLED": True}):
             form = TestForm()
             assert [field.name for field in form] == ["csrf_token", "field2", "field1"]
+
+
+def test_callbackform_has_can_encode_validators(notify_admin, client_request):
+    cbf = CallbackForm()
+    assert any(isinstance(x, CanEncode) for x in cbf.url.validators)
+    assert any(isinstance(x, CanEncode) for x in cbf.bearer_token.validators)
