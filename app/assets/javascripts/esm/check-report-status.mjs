@@ -1,5 +1,5 @@
 import { isSupported } from 'govuk-frontend';
-import { locationReplace } from '../utils/location.mjs';
+import { locationReplace } from './utils.mjs';
 
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard
 // that uses ES2015 Classes -

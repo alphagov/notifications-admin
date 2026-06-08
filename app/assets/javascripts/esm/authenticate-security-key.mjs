@@ -1,6 +1,6 @@
 import { isSupported } from 'govuk-frontend';
 import ErrorBanner from './error-banner.mjs';
-import { locationAssign } from '../utils/location.mjs';
+import { locationAssign } from './utils.mjs';
 import { decode, encode } from 'cbor2';
 
 // This new way of writing Javascript components is based on the GOV.UK Frontend skeleton Javascript coding standard

@@ -1,6 +1,6 @@
 import { isSupported } from 'govuk-frontend';
 import morphdom from 'morphdom';
-import { locationReload } from '../utils/location.mjs';
+import { locationReload } from './utils.mjs';
 
 const resourceState = {};
 const defaultInterval = 2000;
