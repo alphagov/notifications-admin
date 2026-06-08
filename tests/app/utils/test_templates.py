@@ -6,7 +6,7 @@ import pytest
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
 from markupsafe import Markup
-from notifications_utils.template import SubjectMixin, Template
+from notifications_utils.template import Template
 from ordered_set import OrderedSet
 
 from app import load_service_before_request
@@ -481,7 +481,7 @@ def test_subject_line_gets_applied_to_correct_template_types():
         EmailPreviewTemplate,
         TemplatedLetterImageTemplate,
     ]:
-        assert issubclass(cls, SubjectMixin)
+        assert hasattr(cls, "subject")
 
 
 @pytest.mark.parametrize(
