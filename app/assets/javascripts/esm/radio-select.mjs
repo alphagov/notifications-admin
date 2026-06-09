@@ -31,6 +31,7 @@ class RadioSelect {
       };
     });
     this.componentName = this.$module.querySelector('input[type=radio]').getAttribute('name');
+    this.componentLabelText = this.$module.previousElementSibling.textContent.trim();
     this.$module.querySelectorAll('label').forEach(function (label, idx) {
       let labelText = label.textContent.trim();
       let relatedRadio = label.previousElementSibling;
@@ -55,14 +56,17 @@ class RadioSelect {
     this.selectedDay = this.days[0];
     this.selectedTime = this.timesByDay[this.selectedDay.value][0];
 
-
-    this.$module.innerHTML = this.getInitialHTML({
-      'componentLabel': this.$module.previousElementSibling.textContent.trim(),
+    const initialHTML = this.buildInitialHTML({
       'componentName': this.componentName,
       'selectedTime': this.selectedTime,
       'days': this.days,
       'times': this.timesByDay
-    });
+    }, this.componentLabelText);
+
+    // clear out the original HTML structure
+    this.$module.textContent = ''; 
+    // append new markup
+    this.$module.append(initialHTML);
 
     this.$module.closest('fieldset').replaceWith(this.$module);
 
@@ -74,48 +78,145 @@ class RadioSelect {
   }
 
   // Object holding all the states for the component's HTML
-  getInitialHTML (params) {
+  buildInitialHTML(params, labelText) {
+    const fragment = document.createDocumentFragment();
 
-    return `
-      <label for="radio-select__selected-day-and-time" class="govuk-label radio-select__label">${params.componentLabel}</label>
-      <div class="radio-select__selection-and-button">
-        <input type="text" class="radio-select__selected-day-and-time" id="radio-select__selected-day-and-time" readonly value="${params.selectedTime.label}">
-        <input type="hidden" class="radio-select__selected-value" value="${params.selectedTime.value}" name="${params.componentName}">
-        <div class="radio-select__expander-and-expandee">
-          <button type="button" class="govuk-button govuk-button--secondary radio-select__expander" aria-expanded="false" aria-controls="${params.componentName}-expanding-section">Choose a different time</button>
-          <div class="radio-select__expandee" id="${params.componentName}-expanding-section" hidden>
-            <div class="radio-select__view">
-              <fieldset class="govuk-fieldset radio-select__days">
-                <legend class="govuk-visually-hidden">Day to send these messages</legend>
-                ${params.days.map((day) => `
-                  <button class="govuk-button govuk-button--secondary radio-select__day" type="button" name="${day.value}" value="${day.value}">
-                    ${day.label}
-                  </button>`
-                ).join('')}
-              </fieldset>
-            </div>
-            <div class="radio-select__view" hidden>
-              <a href="" class="govuk-link govuk-back-link radio-select__return-to-days js-header">Change the day</a>
-              ${params.days.map((day) => `
-                <fieldset class="govuk-fieldset radio-select__times" id="radio-select__times-for-${day.value}" aria-describedby="radio-select__times-help" hidden>
-                  <legend class="govuk-visually-hidden">Time to send these messages</legend>
-                  <p class="govuk-visually-hidden radio-select__times-help govuk-body" id="radio-select__times-help">Choose a time and confirm</p>
-                  ${params.times[day.value].map((time) => `
-                    <div class="govuk-radios__item">
-                      <input class="govuk-radios__input radio-select__time" type="radio" value="${time.value}" id="${time.id}" name="${time.name}"${time.checked ? ' checked' : ''} />
-                      <label class="govuk-label govuk-radios__label" for="${time.id}">${time.label}</label>
-                    </div>`
-                  ).join('')}
-              </fieldset>`
-              ).join('')}
-              <div class="radio-select__confirm js-stick-at-bottom-when-scrolling">
-                <button type="button" class="govuk-button govuk-button--secondary radio-select__confirm__button">Confirm time</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+    const $sendNowInputLabel = document.createElement('label');
+    $sendNowInputLabel.setAttribute('for', 'radio-select__selected-day-and-time');
+    $sendNowInputLabel.className = 'govuk-label radio-select__label';
+    $sendNowInputLabel.textContent = labelText;
+    fragment.appendChild($sendNowInputLabel);
+
+    const $radioSelectContainer = document.createElement('div');
+    $radioSelectContainer.className = 'radio-select__selection-and-button';
+
+    const $sendNowInput = document.createElement('input');
+    $sendNowInput.type = 'text';
+    $sendNowInput.className = 'radio-select__selected-day-and-time';
+    $sendNowInput.id = 'radio-select__selected-day-and-time';
+    $sendNowInput.readOnly = true;
+    $sendNowInput.value = params.selectedTime.label;
+    $radioSelectContainer.appendChild($sendNowInput);
+
+    const $hiddenInput = document.createElement('input');
+    $hiddenInput.type = 'hidden';
+    $hiddenInput.className = 'radio-select__selected-value';
+    $hiddenInput.value = params.selectedTime.value;
+    $hiddenInput.name = params.componentName;
+    $radioSelectContainer.appendChild($hiddenInput);
+
+    const $expanderContainer = document.createElement('div');
+    $expanderContainer.className = 'radio-select__expander-and-expandee';
+
+    const $expanderBtn = document.createElement('button');
+    $expanderBtn.type = 'button';
+    $expanderBtn.className = 'govuk-button govuk-button--secondary radio-select__expander';
+    $expanderBtn.setAttribute('aria-expanded', 'false');
+    $expanderBtn.setAttribute('aria-controls', `${params.componentName}-expanding-section`);
+    $expanderBtn.textContent = 'Choose a different time';
+    $expanderContainer.appendChild($expanderBtn);
+
+    const $expandeeContainer = document.createElement('div');
+    $expandeeContainer.className = 'radio-select__expandee';
+    $expandeeContainer.id = `${params.componentName}-expanding-section`;
+    $expandeeContainer.hidden = true;
+
+    const $daysContainer = document.createElement('div');
+    $daysContainer.className = 'radio-select__view';
+
+    const $daysFieldset = document.createElement('fieldset');
+    $daysFieldset.className = 'govuk-fieldset radio-select__days';
+
+    const $daysLegend = document.createElement('legend');
+    $daysLegend.className = 'govuk-visually-hidden';
+    $daysLegend.textContent = 'Day to send these messages';
+    $daysFieldset.appendChild($daysLegend);
+
+    params.days.forEach(day => {
+      const $dayBtn = document.createElement('button');
+      $dayBtn.className = 'govuk-button govuk-button--secondary radio-select__day';
+      $dayBtn.type = 'button';
+      $dayBtn.name = day.value;
+      $dayBtn.value = day.value;
+      $dayBtn.textContent = day.label;
+      $daysFieldset.appendChild($dayBtn);
+    });
+
+    $daysContainer.appendChild($daysFieldset);
+    $expandeeContainer.appendChild($daysContainer);
+
+    const $dayTimesContainer = document.createElement('div');
+    $dayTimesContainer.className = 'radio-select__view';
+    $dayTimesContainer.hidden = true;
+
+    const $backLink = document.createElement('a');
+    $backLink.href = '';
+    $backLink.className = 'govuk-link govuk-back-link radio-select__return-to-days js-header';
+    $backLink.textContent = 'Change the day';
+    $dayTimesContainer.appendChild($backLink);
+
+    params.days.forEach(day => {
+      const $dayTimesFieldset = document.createElement('fieldset');
+      $dayTimesFieldset.className = 'govuk-fieldset radio-select__times';
+      $dayTimesFieldset.id = `radio-select__times-for-${day.value}`;
+      $dayTimesFieldset.setAttribute('aria-describedby', 'radio-select__times-help');
+      $dayTimesFieldset.hidden = true;
+
+      const $dayTimesLegend = document.createElement('legend');
+      $dayTimesLegend.className = 'govuk-visually-hidden';
+      $dayTimesLegend.textContent = 'Time to send these messages';
+      $dayTimesFieldset.appendChild($dayTimesLegend);
+
+      const $timesHint = document.createElement('p');
+      $timesHint.className = 'govuk-visually-hidden radio-select__times-help govuk-body';
+      $timesHint.id = 'radio-select__times-help';
+      $timesHint.textContent = 'Choose a time and confirm';
+      $dayTimesFieldset.appendChild($timesHint);
+
+      params.times[day.value].forEach(time => {
+        const $radioItemContainer = document.createElement('div');
+        $radioItemContainer.className = 'govuk-radios__item';
+
+        const $radioInput = document.createElement('input');
+        $radioInput.className = 'govuk-radios__input radio-select__time';
+        $radioInput.type = 'radio';
+        $radioInput.value = time.value;
+        $radioInput.id = time.id;
+        $radioInput.name = time.name;
+        if (time.checked) {
+          $radioInput.checked = true;
+        }
+        $radioItemContainer.appendChild($radioInput);
+
+        const $radioTimeLabel = document.createElement('label');
+        $radioTimeLabel.className = 'govuk-label govuk-radios__label';
+        $radioTimeLabel.setAttribute('for', time.id);
+        $radioTimeLabel.textContent = time.label;
+        $radioItemContainer.appendChild($radioTimeLabel);
+
+        $dayTimesFieldset.appendChild($radioItemContainer);
+      });
+
+      $dayTimesContainer.appendChild($dayTimesFieldset);
+    });
+
+    const $confirmContainer = document.createElement('div');
+    $confirmContainer.className = 'radio-select__confirm js-stick-at-bottom-when-scrolling';
+
+    const $confirmTimeBtn = document.createElement('button');
+    $confirmTimeBtn.type = 'button';
+    $confirmTimeBtn.className = 'govuk-button govuk-button--secondary radio-select__confirm__button';
+    $confirmTimeBtn.textContent = 'Confirm time';
+    $confirmContainer.appendChild($confirmTimeBtn);
+
+    $dayTimesContainer.appendChild($confirmContainer);
+    $expandeeContainer.appendChild($dayTimesContainer);
+
+    $expanderContainer.appendChild($expandeeContainer);
+    $radioSelectContainer.appendChild($expanderContainer);
+    fragment.appendChild($radioSelectContainer);
+
+    return fragment;
   }
 
   bindEvents() {
