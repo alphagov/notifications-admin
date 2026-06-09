@@ -124,4 +124,3 @@ def generate_notifications_csv(**kwargs):
             kwargs["older_than"] = notifications_batch[-1].id
         else:
             return
-    raise Exception("Should never reach here")

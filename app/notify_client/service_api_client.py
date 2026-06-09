@@ -552,7 +552,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     @cache.delete("service-join-request-{request_id}")
     @cache.delete("user-{requester_id}")
     @cache.delete("service-{service_id}-template-folders")
-    def update_service_join_requests(self, request_id, requester_id, service_id, **kwargs):
+    def update_service_join_requests(self, request_id, service_id, **kwargs):
         data = dict(**kwargs)
         return self.post(f"/service/{service_id}/service-join-request/{request_id}", data)
 
