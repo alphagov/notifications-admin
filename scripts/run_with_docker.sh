@@ -14,7 +14,6 @@ docker run -it --rm \
   -e FLASK_DEBUG=${FLASK_DEBUG:-1} \
   -e WERKZEUG_DEBUG_PIN=${WERKZEUG_DEBUG_PIN:-"off"} \
   -e FLASK_APP=application.py \
-  -e STATSD_ENABLED= \
   -e REDIS_ENABLED=${REDIS_ENABLED:-1} \
   -e REDIS_URL=$REDIS_URL \
   -e ADMIN_BASE_URL=${ADMIN_BASE_URL:-"http://host.docker.internal:6012"} \
