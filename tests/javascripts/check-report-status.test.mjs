@@ -10,10 +10,10 @@ let locationReplace;
 
 beforeAll( async() => {
   const checkReportStatusModule = await import('../../app/assets/javascripts/esm/check-report-status.mjs');
-  const locationUtilModule = await import('../../app/assets/javascripts/esm/utils.mjs');
+  const utilsModule = await import('../../app/assets/javascripts/esm/utils.mjs');
 
   CheckReportStatus = checkReportStatusModule.default;
-  locationReplace = locationUtilModule.locationReplace;
+  locationReplace = utilsModule.locationReplace;
 })
 
 describe('CheckReportStatus', () => {

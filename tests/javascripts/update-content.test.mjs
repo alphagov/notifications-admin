@@ -26,10 +26,10 @@ describe('Update content', () => {
     }));
 
     const updateContentModule = await import('../../app/assets/javascripts/esm/update-content.mjs');
-    const locationUtilModule = await import('../../app/assets/javascripts/esm/utils.mjs');
+    const utilsModule = await import('../../app/assets/javascripts/esm/utils.mjs');
 
     UpdateContent = updateContentModule.default;
-    locationReload = locationUtilModule.locationReload;
+    locationReload = utilsModule.locationReload;
 
     jest.useFakeTimers();
 

@@ -13,10 +13,10 @@ let locationAssign;
 beforeAll( async() => {
   const CBOR = await import('cbor2');
   const authenticateSecurityKeyModule = await import('../../app/assets/javascripts/esm/authenticate-security-key.mjs');
-  const locationUtilModule = await import('../../app/assets/javascripts/esm/utils.mjs');
+  const utilsModule = await import('../../app/assets/javascripts/esm/utils.mjs');
 
   AuthenticateSecurityKey = authenticateSecurityKeyModule.default;
-  locationAssign = locationUtilModule.locationAssign;
+  locationAssign = utilsModule.locationAssign;
   decode = CBOR.decode;
   encode = CBOR.encode;
 })

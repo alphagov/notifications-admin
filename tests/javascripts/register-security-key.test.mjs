@@ -11,10 +11,10 @@ let locationReload;
 beforeAll( async() => {
   const CBOR = await import('cbor2');
   const registerSecurityKeyModule = await import('../../app/assets/javascripts/esm/register-security-key.mjs');
-  const locationUtilModule = await import('../../app/assets/javascripts/esm/utils.mjs');
+  const utilsModule = await import('../../app/assets/javascripts/esm/utils.mjs');
 
   RegisterSecurityKey = registerSecurityKeyModule.default;
-  locationReload = locationUtilModule.locationReload;
+  locationReload = utilsModule.locationReload;
   decode = CBOR.decode;
   encode = CBOR.encode;
 })
