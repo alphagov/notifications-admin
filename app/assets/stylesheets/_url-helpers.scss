@@ -1,10 +1,12 @@
+@use "config";
+
 // Copy of _url-helpers.scss in govuk_frontend_toolkit
 // to prepend the path to where we store images
 
 @function file-url($file) {
   $url: '';
-  @if $path {
-    $url: url($path + $file);
+  @if config.$path {
+    $url: url(config.$path + $file);
   } @else {
     $url: url($file);
   }

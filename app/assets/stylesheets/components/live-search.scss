@@ -1,8 +1,10 @@
+@use "../config";
+
 .live-search {
 
   display: none;
 
-  .#{$govuk-frontend-supported-css-class} & {
+  .#{config.$govuk-frontend-supported-css-class} & {
     display: block;
   }
 }

@@ -1,3 +1,5 @@
+@use "config";
+
 // needed for IE10 desktop snap mode: http://menacingcloud.com/?c=cssViewportOrMetaTag
 @-ms-viewport {
   width: device-width;
@@ -22,7 +24,7 @@ abbr[title] {
   cursor: help;
 }
 
-.#{$govuk-frontend-supported-css-class} .js-hidden {
+.#{config.$govuk-frontend-supported-css-class} .js-hidden {
   display: none;
 }
 

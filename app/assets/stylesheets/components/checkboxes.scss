@@ -1,3 +1,5 @@
+@use "../config";
+
 // https://github.com/alphagov/govuk-frontend/blob/v5.4.1/packages/govuk-frontend/src/govuk/components/checkboxes/_index.scss
 .selection-summary {
   position: relative;
@@ -10,7 +12,7 @@
     height: 30px;
     display: none;
 
-    .#{$govuk-frontend-supported-css-class} & {
+    .#{config.$govuk-frontend-supported-css-class} & {
       display: block;
     }
   }
