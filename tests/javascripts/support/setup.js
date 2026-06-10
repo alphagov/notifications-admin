@@ -3,10 +3,3 @@
 const { TextEncoder, TextDecoder } = require('util');
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
-
-// set up jQuery
-window.jQuery = require('jquery');
-$ = window.jQuery;
-
-// load module code
-require('../../../app/assets/javascripts/modules.js');
