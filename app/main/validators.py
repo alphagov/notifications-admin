@@ -36,28 +36,32 @@ class CanEncode:
 
     def __call__(self, form, field):
         if field.data:
-            unsupported = set()
+            unsupported = OrderedSet()
             for char in field.data:
                 try:
                     char.encode(self.encoding)
                 except UnicodeEncodeError:
                     unsupported.add(char)
-            unsupported_char_list = list(unsupported)
-            if unsupported_char_list:
-                unsupported_char_list.sort()
 
             field_type = "this field"
             if self.field_type is not None:
                 field_type = self.field_type
 
-            if unsupported_char_list != []:
+            if unsupported:
                 message = self.message
                 if message is None:
                     message = (
                         "You cannot use {} in {}. You must use percent encoding if you want to include {}.".format(
-                            formatted_list(unsupported_char_list, conjunction="or", before_each="", after_each=""),
+                            formatted_list(
+                                unsupported,
+                                conjunction="or",
+                                before_each="",
+                                after_each="",
+                                max_items_shown=3,
+                                word_for_items_not_shown="similar characters",
+                            ),
                             field_type,
-                            "these characters" if len(unsupported_char_list) > 1 else "this character",
+                            "these characters" if len(unsupported) > 1 else "this character",
                         )
                     )
 
