@@ -1,3 +1,5 @@
+@use 'govuk/helpers' as *;
+
 .content-metadata {
   @include govuk-font(16);
   @include govuk-clearfix;
