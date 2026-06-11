@@ -1,4 +1,5 @@
 @use "../config";
+@use 'govuk/helpers' as *;
 
 // https://github.com/alphagov/govuk-frontend/blob/v5.4.1/packages/govuk-frontend/src/govuk/components/checkboxes/_index.scss
 .selection-summary {

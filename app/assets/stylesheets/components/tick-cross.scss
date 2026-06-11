@@ -1,3 +1,5 @@
+@use 'govuk/helpers' as *;
+
 .tick-cross__list {
   @include govuk-font(19);
   list-style: none;

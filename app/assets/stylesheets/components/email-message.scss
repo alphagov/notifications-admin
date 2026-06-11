@@ -1,3 +1,5 @@
+@use 'govuk/helpers' as *;
+
 $email-message-gutter-desktop: govuk-spacing(9);
 $email-message-gutter-mobile: govuk-spacing(3);
 
