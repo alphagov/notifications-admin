@@ -1,13 +1,15 @@
 /* stylelint-disable declaration-no-important */
 // set asset URL root to match that of application
-$govuk-assets-path: "/static/";
+@use "govuk/base" as * with (
+  $govuk-assets-path: "/static/"  // set asset URL root to match that of application
+);
 
-@import "govuk/settings";
-@import "govuk/tools";
-@import "govuk/helpers";
+@use "govuk/settings";
+@use "govuk/tools";
+@use "govuk/helpers";
 
-@import "govuk/core";
-@import "govuk/objects";
+@use "govuk/core";
+@use "govuk/objects";
 
 * {
   background: transparent;
