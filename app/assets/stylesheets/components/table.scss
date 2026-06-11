@@ -1,4 +1,5 @@
 @use 'govuk/helpers' as *;
+@use '../helpers' as *;
 
 .table {
   margin-bottom: govuk-spacing(6);
