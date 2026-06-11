@@ -1,39 +1,32 @@
-// Version of node_modules/govuk-frontend/govuk/components/all.scss specific to Notify
-// Included to allow us to only include the components we need
 // All imports come from node_modules/govuk-frontend
-
-// set asset URL root to match that of application
-$govuk-assets-path: "/static/";
-
-@import "govuk/base";
-@import "govuk/core";
-@import "govuk/objects";
+@forward "govuk/core";
+@forward "govuk/objects";
 
 // specifying which components to include
-@import "govuk/components/skip-link";
-@import "govuk/components/header";
-@import "govuk/components/footer";
-@import "govuk/components/back-link";
-@import "govuk/components/button";
-@import "govuk/components/details";
-@import "govuk/components/error-summary";
-@import "govuk/components/radios";
-@import "govuk/components/checkboxes";
-@import "govuk/components/input";
-@import "govuk/components/inset-text";
-@import "govuk/components/tabs";
-@import "govuk/components/textarea";
-@import "govuk/components/summary-list";
-@import "govuk/components/tag";
-@import "govuk/components/task-list";
-@import "govuk/components/service-navigation";
-@import "govuk/components/notification-banner";
+@forward "govuk/components/skip-link";
+@forward "govuk/components/header";
+@forward "govuk/components/footer";
+@forward "govuk/components/back-link";
+@forward "govuk/components/button";
+@forward "govuk/components/details";
+@forward "govuk/components/error-summary";
+@forward "govuk/components/radios";
+@forward "govuk/components/checkboxes";
+@forward "govuk/components/input";
+@forward "govuk/components/inset-text";
+@forward "govuk/components/tabs";
+@forward "govuk/components/textarea";
+@forward "govuk/components/summary-list";
+@forward "govuk/components/tag";
+@forward "govuk/components/task-list";
+@forward "govuk/components/service-navigation";
+@forward "govuk/components/notification-banner";
 
-@import "govuk/utilities";
-@import "govuk/overrides";
+@forward "govuk/utilities";
+@forward "govuk/overrides";
 
 // Styles extending those from GOV.UK Frontend
-@import "./extensions";
+@forward "extensions";
 
 // Styles for GOV.UK Frontend components specific to this application
-@import "./overrides";
+@forward "overrides";

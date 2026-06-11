@@ -1,63 +1,67 @@
+@use "govuk/base" as * with (
+  $govuk-assets-path: "/static/"  // set asset URL root to match that of application
+);
+
 // Specific to this application, needs to go at the top of the cascade
-@import './reset';
-@import './globals';
+// @import './reset';
+// @import './globals';
 
 // Dependencies from GOV.UK Frontend, packaged to be specific to this application
-@import './govuk-frontend/all';
+@use 'govuk-frontend/all';
 
 // Dependencies from GOV.UK Elements, moved here until all components are migrated
 // to GOVUK Frontend, and so no longer need these styles
 // https://github.com/alphagov/govuk_elements
-@import './govuk-elements/helpers';
-@import './govuk-elements/elements-typography';
-@import './govuk-elements/tables';
+// @import './govuk-elements/helpers';
+// @import './govuk-elements/elements-typography';
+// @import './govuk-elements/tables';
 
 // Specific to this application
-@import './local/typography';
-@import './grids';
-@import './components/placeholder';
-@import './components/sms-message';
-@import './components/page-footer';
-@import './components/table';
-@import './components/navigation';
-@import './components/big-number';
-@import './components/banner';
-@import './components/file-upload';
-@import './components/browse-list';
-@import './components/email-message';
-@import './components/copy-to-clipboard';
-@import './components/vendor/previous-next-navigation';
-@import './components/radios';
-@import './components/radios-with-images';
-@import './components/checkboxes';
-@import './components/pill';
-@import './components/show-more';
-@import './components/message';
-@import './components/tick-cross';
-@import './components/list-entry';
-@import './components/letter';
-@import './components/live-search';
-@import './components/stick-at-top-when-scrolling';
-@import './components/fullscreen-table';
-@import './components/conditional-radios';
-@import './components/preview-pane';
-@import './components/loading-indicator';
-@import './components/content-metadata';
-@import './components/simple-search-form';
-@import './components/formatting-example';
-@import './components/sender-email-preview';
-@import './views/branding';
-@import './views/dashboard';
-@import './views/users';
-@import './views/api';
-@import './views/product-page';
-@import './views/template';
-@import './views/notification';
-@import './views/send';
-@import './views/get_started';
-@import './views/history';
-@import './views/webauthn';
-@import './views/performance';
+// @import './local/typography';
+// @import './grids';
+// @import './components/placeholder';
+// @import './components/sms-message';
+// @import './components/page-footer';
+// @import './components/table';
+// @import './components/navigation';
+// @import './components/big-number';
+// @import './components/banner';
+// @import './components/file-upload';
+// @import './components/browse-list';
+// @import './components/email-message';
+// @import './components/copy-to-clipboard';
+// @import './components/vendor/previous-next-navigation';
+// @import './components/radios';
+// @import './components/radios-with-images';
+// @import './components/checkboxes';
+// @import './components/pill';
+// @import './components/show-more';
+// @import './components/message';
+// @import './components/tick-cross';
+// @import './components/list-entry';
+// @import './components/letter';
+// @import './components/live-search';
+// @import './components/stick-at-top-when-scrolling';
+// @import './components/fullscreen-table';
+// @import './components/conditional-radios';
+// @import './components/preview-pane';
+// @import './components/loading-indicator';
+// @import './components/content-metadata';
+// @import './components/simple-search-form';
+// @import './components/formatting-example';
+// @import './components/sender-email-preview';
+// @import './views/branding';
+// @import './views/dashboard';
+// @import './views/users';
+// @import './views/api';
+// @import './views/product-page';
+// @import './views/template';
+// @import './views/notification';
+// @import './views/send';
+// @import './views/get_started';
+// @import './views/history';
+// @import './views/webauthn';
+// @import './views/performance';
 
 // TODO: break this up
-@import './app';
+// @import './app';

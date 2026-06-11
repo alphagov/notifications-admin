@@ -1,3 +1,5 @@
+@use "govuk/base" as *;
+
 // Overrides for certain GOV.UK Frontend styles to make its components match this application's design
 
 $notify-secondary-button-colour: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
