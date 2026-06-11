@@ -17,7 +17,7 @@
 @use 'govuk-elements/tables';
 
 // Specific to this application
-// @import './local/typography';
+@use 'local/typography';
 // @import './grids';
 // @import './components/placeholder';
 // @import './components/sms-message';
