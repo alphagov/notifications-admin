@@ -1,3 +1,5 @@
+@use 'govuk/helpers' as *;
+
 .get-started-list {
 
   counter-reset: get-started-counter;
