@@ -3,8 +3,8 @@
 );
 
 // Specific to this application, needs to go at the top of the cascade
-// @import './reset';
-// @import './globals';
+@use 'reset';
+@use 'globals';
 
 // Dependencies from GOV.UK Frontend, packaged to be specific to this application
 @use 'govuk-frontend/all';
