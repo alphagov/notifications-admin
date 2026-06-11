@@ -50,18 +50,18 @@
 @use 'components/simple-search-form';
 @use 'components/formatting-example';
 @use 'components/sender-email-preview';
-// @import './views/branding';
-// @import './views/dashboard';
-// @import './views/users';
-// @import './views/api';
-// @import './views/product-page';
-// @import './views/template';
-// @import './views/notification';
-// @import './views/send';
-// @import './views/get_started';
-// @import './views/history';
-// @import './views/webauthn';
-// @import './views/performance';
+@use 'views/branding';
+@use 'views/dashboard';
+@use 'views/users';
+@use 'views/api';
+@use 'views/product-page';
+@use 'views/template';
+@use 'views/notification';
+@use 'views/send';
+@use 'views/get_started';
+@use 'views/history';
+@use 'views/webauthn';
+@use 'views/performance';
 
 // TODO: break this up
 @use 'app';

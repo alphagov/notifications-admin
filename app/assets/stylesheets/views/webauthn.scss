@@ -1,4 +1,5 @@
 @use "../config";
+@use 'govuk/helpers' as *;
 
 .webauthn__no-js {
   .#{config.$govuk-frontend-supported-css-class} & {

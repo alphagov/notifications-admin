@@ -1,3 +1,5 @@
+@use 'govuk/helpers' as *;
+
 // Function to make distance from the top scale when the image of the first page of the letter PDF does
 // We go by the image's largest dimensions, which are: 712px width and 1008px height
 // It has 2 parts:
