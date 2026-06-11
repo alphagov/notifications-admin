@@ -792,7 +792,7 @@ def fields_to_fill_in(template, prefill_current_user=False):
         session["recipient"] = current_user.email_address
         session["placeholders"]["email address"] = current_user.email_address
 
-    return InsensitiveSet(template.placeholders)
+    return template.placeholders
 
 
 def get_normalised_placeholders_from_session():
