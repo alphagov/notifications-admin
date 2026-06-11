@@ -1,5 +1,6 @@
 @use 'govuk/settings' as *;
 @use 'govuk/helpers' as *;
+@use "govuk/tools" as *;
 
 // mixin for fluid typoghraphy using clamp
 // accepts values from the DS typography scale
