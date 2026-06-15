@@ -3319,6 +3319,10 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
                 f"– remove (({field.data.filename})) or rename your file"
             )
 
+        if len(field.data.read()) == 0:
+            raise ValidationError("Your file is empty – check your file and try again")
+        field.data.seek(0)
+
         # hand off file to document download api to perform further validation checks,
         # antivirus scan and determination of the file mimetype
         try:

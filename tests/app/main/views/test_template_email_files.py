@@ -1196,3 +1196,26 @@ def test_upload_file_returns_error_if_file_fails_antivirus_check(
     assert mock_template_update.call_args_list == []
     assert mock_s3.call_args_list == []
     assert mock_post.call_args_list == []
+
+
+def test_upload_file_returns_error_if_file_is_empty(
+    client_request,
+    fake_uuid,
+    service_one,
+    mock_get_service_email_template,
+    mocker,
+):
+    service_one["contact_link"] = "https://example.com"
+    mock_file_check_and_antivirus_scan = mocker.patch("app.document_download_api_client.file_check_and_antivirus_scan")
+    with open("tests/text_files/empty.txt", "rb") as file:
+        page = client_request.post(
+            "main.upload_template_email_files",
+            service_id=SERVICE_ONE_ID,
+            template_id=fake_uuid,
+            _data={"file": file},
+            _expected_status=200,
+        )
+    assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
+        "Your file is empty – check your file and try again"
+    )
+    assert mock_file_check_and_antivirus_scan.call_args_list == []
