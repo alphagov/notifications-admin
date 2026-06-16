@@ -18,8 +18,8 @@ class ProviderClient(NotifyAdminAPIClient):
     def get_provider_versions(self, provider_id):
         return self.get(url=f"/provider-details/{provider_id}/versions")
 
-    def update_provider(self, provider_id, priority):
-        data = {"priority": priority}
+    def update_provider(self, provider_id, priority, reason=None):
+        data = {"priority": priority, "reason": reason}
         data = _attach_current_user(data)
         return self.post(url=f"/provider-details/{provider_id}", data=data)
 

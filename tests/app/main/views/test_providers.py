@@ -16,6 +16,7 @@ def provider_json(overrides):
         "identifier": "override-me",
         "notification_type": "sms",
         "updated_at": None,
+        "reason": None,
         "version": 1,
         "created_by_name": None,
         "supports_international": False,
@@ -38,6 +39,7 @@ def sms_provider_1():
             "updated_at": datetime(2017, 1, 16, 15, 20, 40).isoformat(),
             "created_by_name": "Test User",
             "current_month_billable_sms": 5020,
+            "reason": "reason",
         }
     )
 
@@ -52,6 +54,7 @@ def sms_provider_2():
             "identifier": "sms_provider_2",
             "notification_type": "sms",
             "current_month_billable_sms": 6891,
+            "reason": "reason",
         }
     )
 
@@ -309,7 +312,7 @@ def test_edit_sms_provider_provider_ratio(client_request, platform_admin_user, m
     )
 
     inputs = page.select('.govuk-input[type="text"]')
-    assert len(inputs) == 2
+    assert len(inputs) == 3
 
     first_input = page.select_one('.govuk-input[name="sms_provider_1"]')
     assert first_input.attrs["value"] == str(sms_provider_1["priority"])
@@ -335,24 +338,24 @@ def test_edit_sms_provider_provider_ratio_only_shows_active_providers(
     )
 
     inputs = page.select('.govuk-input[type="text"]')
-    assert len(inputs) == 1
+    assert len(inputs) == 2
 
 
 @pytest.mark.parametrize(
     "post_data, expected_calls",
     [
         (
-            {"sms_provider_1": 10, "sms_provider_2": 90},
+            {"sms_provider_1": 10, "sms_provider_2": 90, "reason": "reason"},
             [
-                call("sms_provider_1-id", 10),
-                call("sms_provider_2-id", 90),
+                call("sms_provider_1-id", 10, reason="reason"),
+                call("sms_provider_2-id", 90, reason="reason"),
             ],
         ),
         (
-            {"sms_provider_1": 80, "sms_provider_2": 20},
+            {"sms_provider_1": 80, "sms_provider_2": 20, "reason": "reason"},
             [
-                call("sms_provider_1-id", 80),
-                call("sms_provider_2-id", 20),
+                call("sms_provider_1-id", 80, reason="reason"),
+                call("sms_provider_2-id", 20, reason="reason"),
             ],
         ),
     ],
@@ -383,9 +386,9 @@ def test_edit_sms_provider_ratio_submit(
 @pytest.mark.parametrize(
     "post_data, expected_error",
     [
-        ({"sms_provider_1": 90, "sms_provider_2": 20}, "The total must add up to 100%"),
-        ({"sms_provider_1": 101, "sms_provider_2": 20}, "Must be between 0 and 100"),
-        ({"sms_provider_1": 99.9, "sms_provider_2": 0.1}, "Enter a percentage in digits"),
+        ({"sms_provider_1": 90, "sms_provider_2": 20, "reason": "Good reason"}, "The total must add up to 100%"),
+        ({"sms_provider_1": 101, "sms_provider_2": 20, "reason": "Good reason"}, "Must be between 0 and 100"),
+        ({"sms_provider_1": 99.9, "sms_provider_2": 0.1, "reason": "Good reason"}, "Enter a percentage in digits"),
     ],
 )
 def test_edit_sms_provider_submit_invalid_percentages(
