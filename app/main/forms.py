@@ -1945,11 +1945,13 @@ class EstimateUsageForm(StripWhitespaceForm):
 
 
 class AdminProviderRatioForm(OrderableFieldsForm):
-    def __init__(self, providers):
+    def __init__(self, providers, *args, **kwargs):
         self._providers = providers
 
+        super().__init__(*args, **kwargs)
+
         # hack: https://github.com/wtforms/wtforms/issues/736
-        self._unbound_fields = [
+        fields = [
             (
                 provider["identifier"],
                 GovukIntegerField(
@@ -1963,8 +1965,15 @@ class AdminProviderRatioForm(OrderableFieldsForm):
             )
             for provider in providers
         ]
+        fields += [
+            (
+                "reason",
+                GovukTextInputField("Reason"),
+            )
+        ]
 
-        super().__init__(data={provider["identifier"]: provider["priority"] for provider in providers})
+        self._unbound_fields = fields
+        super().__init__(*args, data={provider["identifier"]: provider["priority"] for provider in providers}, **kwargs)
 
     def validate(self, *args, **kwargs):
         if not super().validate(*args, **kwargs):
