@@ -111,8 +111,8 @@ def test_route_for_platform_admin(
 @pytest.mark.parametrize(
     "confirmed_unique, expected_status_text",
     [
-        (False, "Confirm that your service is unique Incomplete"),
-        (True, "Confirm that your service is unique Completed"),
+        (False, "Confirm your service name Incomplete"),
+        (True, "Confirm your service name Completed"),
     ],
 )
 def test_should_check_confirm_service_is_unique_task(
