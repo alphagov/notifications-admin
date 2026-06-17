@@ -22,25 +22,38 @@
         <div class="govuk-grid-column-five-sixths">
 
             <p class="govuk-body">
-                Our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}">terms of use</a> say that your service must be the only one of its kind in your organisation.
+                Your service name helps us to decide if you’re eligible for an annual allowance of free text messages.
             </p>
 
             <p class="govuk-body">
-                To help us check this, choose a service name that’s easy to understand.
+                The free allowance is discretionary. To qualify for it, your service must be the only one of its kind in your organisation.
             </p>
 
             <p class="govuk-body">
-                Do not include:
+                You can still use Notify if your service is not eligible for a free allowance.
             </p>
 
+            <h2 class="heading-medium">
+                If you do not plan to send text messages
+            </h2>
+
+            <p class="govuk-body">
+                You still need to confirm your service name.
+            </p>
+
+            <h2 class="heading-medium">
+                Choose a service name that’s easy to understand
+            </h2>
+
+            <p class="govuk-body">
+                Your service name must not include:
+            </p>
+
+            
             <ul class="govuk-list govuk-list--bullet">
                 <li>acronyms, initialisms or abbreviations</li>
                 <li>your own name or the name of someone on your team</li>
             </ul>
-
-            <p class="govuk-body">
-                If we cannot confirm that your service is unique, we may refuse your request to go live.
-            </p>
             
             {% call form_wrapper() %}
                 {{ form.name }}
