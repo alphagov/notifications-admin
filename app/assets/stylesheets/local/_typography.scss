@@ -1,5 +1,5 @@
-@import 'govuk/settings';
-@import 'govuk/helpers';
+@use 'govuk/settings' as *;
+@use 'govuk/helpers' as *;
 
 @mixin destructive-link-style-default {
   &:link {

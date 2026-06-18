@@ -1,3 +1,7 @@
+@use 'govuk/helpers' as *;
+@use 'govuk/core/typography' as *;
+@use '../config';
+
 $tail-angle: 20deg;
 
 .sms-message-wrapper {
@@ -50,7 +54,7 @@ $tail-angle: 20deg;
     }
 
     .govuk-link {
-      color: $link-colour-on-grey-background;
+      color: config.$link-colour-on-grey-background;
     }
 
   }

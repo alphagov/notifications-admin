@@ -1,3 +1,5 @@
+@use 'govuk/helpers' as *;
+
 .notify-radios-with-images {
   margin-top: govuk-spacing(3);
   margin-bottom: govuk-spacing(2);

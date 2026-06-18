@@ -12,7 +12,7 @@ def test_govuk_frontend_jinja_overrides_on_design_system_v6():
     govuk_frontend_jinja_version = Version(metadata.version("govuk-frontend-jinja"))
 
     # Compatibility between these two libs is defined at https://github.com/LandRegistry/govuk-frontend-jinja/
-    correct_govuk_frontend_version = Version("6.1.0") == govuk_frontend_version
+    correct_govuk_frontend_version = Version("6.2.0") == govuk_frontend_version
     correct_govuk_frontend_jinja_version = Version("4.0.0") == govuk_frontend_jinja_version
 
     assert correct_govuk_frontend_version and correct_govuk_frontend_jinja_version, (

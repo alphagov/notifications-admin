@@ -1,4 +1,7 @@
-$app-body-text-line-height-default: get-govuk-typography-style($size: 19, $breakpoint: null, $property: "line-height");
+@use 'govuk/helpers' as *;
+@use '../helpers';
+
+$app-body-text-line-height-default: helpers.get-govuk-typography-style($size: 19, $breakpoint: null, $property: "line-height");
 
 @mixin separator {
   display: inline-block;

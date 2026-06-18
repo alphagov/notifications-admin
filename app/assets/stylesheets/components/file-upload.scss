@@ -1,3 +1,6 @@
+@use "../config";
+@use 'govuk/helpers' as *;
+
 .file-upload {
 
   &-label,
@@ -20,9 +23,9 @@
   }
 
   // Hide normal upload form if we're adding a custom version with JS
-  .#{$govuk-frontend-supported-css-class} &-label,
-  .#{$govuk-frontend-supported-css-class} &-field,
-  .#{$govuk-frontend-supported-css-class} &-submit {
+  .#{config.$govuk-frontend-supported-css-class} &-label,
+  .#{config.$govuk-frontend-supported-css-class} &-field,
+  .#{config.$govuk-frontend-supported-css-class} &-submit {
     display: none;
   }
 

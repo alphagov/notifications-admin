@@ -1,78 +1,66 @@
-// Path to assets for use with file-url()
-$path: '/static/images/';
-
-// By default GOV.UK Frontend adds .js-enabled for all browsers that have
-// javascript enabled which isn't useful as their and our enhancements
-// only run in browsers that support type='module' and add
-// .govuk-frontend-supported to the body element
-// We use the this CSS class from GOV.UK Frontend to hide/show Javascript enhanced
-// elements in browser that we do/don't support
-$govuk-frontend-supported-css-class: 'govuk-frontend-supported';
-
-// Dependencies from GOVU.UK Frontend Toolkit, rewritten for this application
-@import './url-helpers';
+@use "govuk/base" as * with (
+  $govuk-assets-path: "/static/"  // set asset URL root to match that of application
+);
 
 // Specific to this application, needs to go at the top of the cascade
-@import './reset';
-@import './globals';
+@use 'reset';
+@use 'globals';
 
 // Dependencies from GOV.UK Frontend, packaged to be specific to this application
-$govuk-new-link-styles: true;
-@import './govuk-frontend/all';
+@use 'govuk-frontend/all';
 
 // Dependencies from GOV.UK Elements, moved here until all components are migrated
 // to GOVUK Frontend, and so no longer need these styles
 // https://github.com/alphagov/govuk_elements
-@import './govuk-elements/helpers';
-@import './govuk-elements/elements-typography';
-@import './govuk-elements/tables';
+@use 'govuk-elements/elements-typography';
+@use 'govuk-elements/tables';
 
 // Specific to this application
-@import './local/typography';
-@import './grids';
-@import './components/placeholder';
-@import './components/sms-message';
-@import './components/page-footer';
-@import './components/table';
-@import './components/navigation';
-@import './components/big-number';
-@import './components/banner';
-@import './components/file-upload';
-@import './components/browse-list';
-@import './components/email-message';
-@import './components/copy-to-clipboard';
-@import './components/vendor/previous-next-navigation';
-@import './components/radios';
-@import './components/radios-with-images';
-@import './components/checkboxes';
-@import './components/pill';
-@import './components/show-more';
-@import './components/message';
-@import './components/tick-cross';
-@import './components/list-entry';
-@import './components/letter';
-@import './components/live-search';
-@import './components/stick-at-top-when-scrolling';
-@import './components/fullscreen-table';
-@import './components/conditional-radios';
-@import './components/preview-pane';
-@import './components/loading-indicator';
-@import './components/content-metadata';
-@import './components/simple-search-form';
-@import './components/formatting-example';
-@import './components/sender-email-preview';
-@import './views/branding';
-@import './views/dashboard';
-@import './views/users';
-@import './views/api';
-@import './views/product-page';
-@import './views/template';
-@import './views/notification';
-@import './views/send';
-@import './views/get_started';
-@import './views/history';
-@import './views/webauthn';
-@import './views/performance';
+@use 'local/typography';
+@use 'grids';
+@use 'components/placeholder';
+@use 'components/sms-message';
+@use 'components/page-footer';
+@use 'components/table';
+@use 'components/navigation';
+@use 'components/big-number';
+@use 'components/banner';
+@use 'components/file-upload';
+@use 'components/browse-list';
+@use 'components/email-message';
+@use 'components/copy-to-clipboard';
+@use 'components/vendor/previous-next-navigation';
+@use 'components/radios';
+@use 'components/radios-with-images';
+@use 'components/checkboxes';
+@use 'components/pill';
+@use 'components/show-more';
+@use 'components/message';
+@use 'components/tick-cross';
+@use 'components/list-entry';
+@use 'components/letter';
+@use 'components/live-search';
+@use 'components/stick-at-top-when-scrolling';
+@use 'components/fullscreen-table';
+@use 'components/conditional-radios';
+@use 'components/preview-pane';
+@use 'components/loading-indicator';
+@use 'components/content-metadata';
+@use 'components/simple-search-form';
+@use 'components/formatting-example';
+@use 'components/sender-email-preview';
+@use 'views/branding';
+@use 'views/dashboard';
+@use 'views/users';
+@use 'views/api';
+@use 'views/product-page';
+@use 'views/template';
+@use 'views/notification';
+@use 'views/send';
+@use 'views/get_started';
+@use 'views/history';
+@use 'views/webauthn';
+@use 'views/performance';
 
 // TODO: break this up
-@import './app';
+@use 'app';
