@@ -36,7 +36,7 @@
       {% set actionOptions = [{
         "href": url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id),
         "text": "Revoke",
-        "classes": "govuk-link--no-visited-state"
+        "classes": "govuk-link--inverse"
       }]%}
     {% endif %}
 

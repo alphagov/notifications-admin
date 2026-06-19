@@ -99,16 +99,20 @@ $notify-secondary-button-hover-colour: mix(black, govuk-colour('black', $variant
   }
  }
 
- .govuk-summary-card__title-wrapper--revoked .govuk-summary-card__title-wrapper {
-  background: govuk-colour('red', $variant: "tint-50");
- }
+ .govuk-summary-card__title-wrapper--revoked {
+  .govuk-summary-card__title-wrapper {
+    background: govuk-colour('red');
+  }
+  .govuk-summary-card__title {
+    color: govuk-colour('white');
+  }
+}
 
  .govuk-summary-card__title-wrapper--active {
   .govuk-summary-card__title-wrapper {
-    background: govuk-colour('green', $variant: "tint-50");
+    background: govuk-colour('green');
   }
-
-  .govuk-link {
-    color: govuk-colour('black');
+  .govuk-summary-card__title {
+    color: govuk-colour('white');
   }
  }
