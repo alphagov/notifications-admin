@@ -98,3 +98,17 @@ $notify-secondary-button-hover-colour: mix(black, govuk-colour('black', $variant
     margin-left: auto;
   }
  }
+
+ .govuk-summary-card__title-wrapper--revoked .govuk-summary-card__title-wrapper {
+  background: govuk-colour('red', $variant: "tint-50");
+ }
+
+ .govuk-summary-card__title-wrapper--active {
+  .govuk-summary-card__title-wrapper {
+    background: govuk-colour('green', $variant: "tint-50");
+  }
+
+  .govuk-link {
+    color: govuk-colour('black');
+  }
+ }
