@@ -15,7 +15,7 @@ from notifications_utils.template import HTMLEmailTemplate
 from app import status_api_client
 from app.formatters import format_thousands
 from app.main import main
-from app.main.forms import FieldWithNoneOption
+from app.main.forms import FieldWithNoneOption, TemplateEmailFilesUploadForm
 from app.main.views.sub_navigation_dictionaries import features_nav, using_notify_nav
 from app.models.branding import EmailBranding
 from app.models.letter_rates import LetterRates
@@ -321,6 +321,7 @@ def guidance_schedule_messages():
 def guidance_send_files_by_email():
     return render_template(
         "views/guidance/using-notify/send-files-by-email.html",
+        allowed_file_formats=TemplateEmailFilesUploadForm.allowed_file_formats,
         navigation_links=using_notify_nav(),
     )
 
