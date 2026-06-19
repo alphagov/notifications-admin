@@ -28,19 +28,26 @@
     {% elif item.key_type == 'test' %}
       {% set key_type_text = "Test – pretends to send messages" %}
     {% endif %}
+
+    
+    {% if item.expiry_date %}
+      {% set actionOptions = [] %}
+    {% else %}
+      {% set actionOptions = [{
+        "href": url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id),
+        "text": "Revoke",
+        "classes": "govuk-link--no-visited-state"
+      }]%}
+    {% endif %}
+
     {{ govukSummaryList({
       "card": {
+        "classes": "govuk-summary-card__title-wrapper--revoked" if item.expiry_date else "govuk-summary-card__title-wrapper--active",
         "title": {
           "text": item.name
         },
         "actions": {
-          "items": [
-            {
-              "href": url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id),
-              "text": "Revoke",
-              "classes": "govuk-link--destructive"
-            }
-          ]
+          "items": actionOptions
         }
       },
       "rows": [
