@@ -353,6 +353,7 @@ def test_has_jobs_sets_cache(
         f"has_jobs-{fake_uuid}",
         expected_cache_value,
         ex=2_419_200,
+        skippable=True,
     )
 
 
@@ -377,4 +378,4 @@ def test_has_jobs_returns_from_cache(
 
     assert JobApiClient(mocker.MagicMock()).has_jobs(fake_uuid) is return_value
     assert not mock_get.called
-    mock_redis_get.assert_called_once_with(f"has_jobs-{fake_uuid}")
+    mock_redis_get.assert_called_once_with(f"has_jobs-{fake_uuid}", skippable=True)

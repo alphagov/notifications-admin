@@ -15,9 +15,14 @@ def test_sets_value_in_cache(mocker):
 
     assert client.get_letter_rates() == {"data_from": "api"}
 
-    mock_redis_get.assert_called_once_with("letter-rates")
+    mock_redis_get.assert_called_once_with("letter-rates", skippable=True)
     mock_api_get.assert_called_once_with(url="/letter-rates")
-    mock_redis_set.assert_called_once_with("letter-rates", '{"data_from": "api"}', ex=3_600)
+    mock_redis_set.assert_called_once_with(
+        "letter-rates",
+        '{"data_from": "api"}',
+        ex=3_600,
+        skippable=True,
+    )
 
 
 def test_returns_value_from_cache(mocker):
@@ -36,7 +41,7 @@ def test_returns_value_from_cache(mocker):
 
     assert client.get_letter_rates() == {"data_from": "cache"}
 
-    mock_redis_get.assert_called_once_with("letter-rates")
+    mock_redis_get.assert_called_once_with("letter-rates", skippable=True)
 
     assert mock_api_get.called is False
     assert mock_redis_set.called is False

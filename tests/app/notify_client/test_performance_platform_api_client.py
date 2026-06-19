@@ -40,7 +40,7 @@ def test_sets_value_in_cache(mocker):
         end_date=date(2022, 2, 2),
     ) == {"data_from": "api"}
 
-    mock_redis_get.assert_called_once_with("performance-stats-2021-01-01-to-2022-02-02")
+    mock_redis_get.assert_called_once_with("performance-stats-2021-01-01-to-2022-02-02", skippable=True)
     mock_api_get.assert_called_once_with(
         "/performance-dashboard", params={"start_date": "2021-01-01", "end_date": "2022-02-02"}
     )
@@ -48,6 +48,7 @@ def test_sets_value_in_cache(mocker):
         "performance-stats-2021-01-01-to-2022-02-02",
         '{"data_from": "api"}',
         ex=3600,
+        skippable=True,
     )
 
 
@@ -70,6 +71,6 @@ def test_returns_value_from_cache(mocker):
         end_date=date(2022, 2, 2),
     ) == {"data_from": "cache"}
 
-    mock_redis_get.assert_called_once_with("performance-stats-2021-01-01-to-2022-02-02")
+    mock_redis_get.assert_called_once_with("performance-stats-2021-01-01-to-2022-02-02", skippable=True)
     assert mock_api_get.called is False
     assert mock_redis_set.called is False

@@ -15,11 +15,12 @@ def test_get_email_branding(mocker, fake_uuid):
     )
     EmailBrandingClient(mocker.MagicMock()).get_email_branding(fake_uuid)
     mock_get.assert_called_once_with(url=f"/email-branding/{fake_uuid}")
-    mock_redis_get.assert_called_once_with(f"email_branding-{fake_uuid}")
+    mock_redis_get.assert_called_once_with(f"email_branding-{fake_uuid}", skippable=True)
     mock_redis_set.assert_called_once_with(
         f"email_branding-{fake_uuid}",
         '{"foo": "bar"}',
         ex=2_419_200,
+        skippable=True,
     )
 
 
@@ -36,11 +37,12 @@ def test_get_all_email_branding(mocker):
     )
     EmailBrandingClient(mocker.MagicMock()).get_all_email_branding()
     mock_get.assert_called_once_with(url="/email-branding")
-    mock_redis_get.assert_called_once_with("email_branding")
+    mock_redis_get.assert_called_once_with("email_branding", skippable=True)
     mock_redis_set.assert_called_once_with(
         "email_branding",
         "[1, 2, 3]",
         ex=2_419_200,
+        skippable=True,
     )
 
 

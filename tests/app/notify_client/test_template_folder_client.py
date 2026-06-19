@@ -42,9 +42,14 @@ def test_get_template_folders_calls_correct_api_endpoint(mocker):
 
     assert ret == {"a": "b"}
 
-    mock_redis_get.assert_called_once_with(redis_key)
+    mock_redis_get.assert_called_once_with(redis_key, skippable=True)
     mock_api_get.assert_called_once_with(expected_url)
-    mock_redis_set.assert_called_once_with(redis_key, '{"a": "b"}', ex=2_419_200)
+    mock_redis_set.assert_called_once_with(
+        redis_key,
+        '{"a": "b"}',
+        ex=2_419_200,
+        skippable=True,
+    )
 
 
 def test_move_templates_and_folders(mocker):

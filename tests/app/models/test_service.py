@@ -36,7 +36,7 @@ def test_organisation_name_comes_from_cache(notify_admin, mocker, service_one):
     service._dict["organisation"] = ORGANISATION_ID
 
     assert service.organisation_name == "Borchester Council"
-    mock_redis_get.assert_called_once_with(f"organisation-{ORGANISATION_ID}-name")
+    mock_redis_get.assert_called_once_with(f"organisation-{ORGANISATION_ID}-name", skippable=True)
     assert mock_get_organisation.called is False
 
 
@@ -60,6 +60,7 @@ def test_organisation_name_goes_into_cache(notify_admin, mocker, service_one):
         f"organisation-{ORGANISATION_ID}-name",
         '"Test Organisation"',
         ex=2_419_200,
+        skippable=True,
     )
 
 
