@@ -36,7 +36,7 @@
       "actions": {
         "items": [
           {
-            "href": "#",
+            "href": url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id),
             "text": "Revoke",
             "classes": "govuk-link--destructive"
           }
@@ -66,6 +66,14 @@
         },
         "value": {
           "html": "19 June at 13:00pm"
+        }
+      },
+      {
+        "key": {
+          "text": "Status"
+        },
+        "value": {
+          "html": "Revoked " + item.expiry_date|format_datetime_short if item.expiry_date else "Active"
         }
       }
     ]
