@@ -17,68 +17,70 @@
 
   {{ page_header('API keys') }}
 
- 
-
-{% for item in current_service.api_keys|sort %}
-
-  {% if item.key_type == 'normal' %}
-    {% set key_type_text = "Live – sends to anyone" %}
-  {% elif item.key_type == 'team' %}
-    {% set key_type_text = "Team and guest list – limits who you can send to" %}
-  {% elif item.key_type == 'test' %}
-    {% set key_type_text = "Test – pretends to send messages" %}
-  {% endif %}
+{% if current_service.api_keys | length == 0 %}
+  <p class="gobuk-body">You have not created any API keys yet.</p>
+{% else %}
+  {% for item in current_service.api_keys|sort %}
+    {% if item.key_type == 'normal' %}
+      {% set key_type_text = "Live – sends to anyone" %}
+    {% elif item.key_type == 'team' %}
+      {% set key_type_text = "Team and guest list – limits who you can send to" %}
+    {% elif item.key_type == 'test' %}
+      {% set key_type_text = "Test – pretends to send messages" %}
+    {% endif %}
     {{ govukSummaryList({
-    "card": {
-      "title": {
-        "text": item.name
+      "card": {
+        "title": {
+          "text": item.name
+        },
+        "actions": {
+          "items": [
+            {
+              "href": url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id),
+              "text": "Revoke",
+              "classes": "govuk-link--destructive"
+            }
+          ]
+        }
       },
-      "actions": {
-        "items": [
-          {
-            "href": url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id),
-            "text": "Revoke",
-            "classes": "govuk-link--destructive"
+      "rows": [
+        {
+          "key": {
+            "text": "Key type"
+          },
+          "value": {
+            "text": key_type_text
           }
-        ]
-      }
-    },
-    "rows": [
-      {
-        "key": {
-          "text": "Key type"
         },
-        "value": {
-          "text": key_type_text
-        }
-      },
-      {
-        "key": {
-          "text": "Created by"
+        {
+          "key": {
+            "text": "Created by"
+          },
+          "value": {
+            "html": "Jani on 19 June at 12:54pm"
+          }
         },
-        "value": {
-          "html": "Jani on 19 June at 12:54pm"
-        }
-      },
-      {
-        "key": {
-          "text": "Last used"
+        {
+          "key": {
+            "text": "Last used"
+          },
+          "value": {
+            "html": "19 June at 13:00pm"
+          }
         },
-        "value": {
-          "html": "19 June at 13:00pm"
+        {
+          "key": {
+            "text": "Status"
+          },
+          "value": {
+            "html": "Revoked " + item.expiry_date|format_datetime_short if item.expiry_date else "Active"
+          }
         }
-      },
-      {
-        "key": {
-          "text": "Status"
-        },
-        "value": {
-          "html": "Revoked " + item.expiry_date|format_datetime_short if item.expiry_date else "Active"
-        }
-      }
-    ]
-  }) }}
-{% endfor %}
+      ]
+    }) }}
+  {% endfor %}
+
+{% endif %}
 
 
 
