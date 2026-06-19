@@ -34,14 +34,11 @@
 
   <p class="govuk-body">You can upload the following file types:</p>
 
-<ul class="govuk-list govuk-list--bullet">
-  <li>CSV (.csv)</li>
-  <li>image (.jpeg, .jpg, .png)</li>
-  <li>Microsoft Excel Spreadsheet (.xlsx)</li>
-  <li>Microsoft Word Document (.doc, .docx)</li>
-  <li>PDF (.pdf)</li>
-  <li>text (.json, .odt, .rtf, .txt)</li>
-</ul>
+  <ul class="govuk-list govuk-list--bullet">
+    {% for label, extensions in allowed_file_formats.items() %}
+      <li>{{ label }} (.{{ extensions|join(", .") }})</li>
+    {% endfor %}
+  </ul>
 
   <p class="govuk-body">Your file must be smaller than 2MB. <a class="govuk-link govuk-link--no-visited-state" href="{{url_for('main.support')}}">Contact the GOV.UK Notify team</a> if you need to send other file types.</p>
 
