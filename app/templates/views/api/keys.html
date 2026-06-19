@@ -3,6 +3,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% block service_page_title %}
   API keys
@@ -15,6 +16,64 @@
 {% block maincolumn_content %}
 
   {{ page_header('API keys') }}
+
+ 
+
+{% for item in current_service.api_keys|sort %}
+
+  {% if item.key_type == 'normal' %}
+    {% set key_type_text = "Live – sends to anyone" %}
+  {% elif item.key_type == 'team' %}
+    {% set key_type_text = "Team and guest list – limits who you can send to" %}
+  {% elif item.key_type == 'test' %}
+    {% set key_type_text = "Test – pretends to send messages" %}
+  {% endif %}
+    {{ govukSummaryList({
+    "card": {
+      "title": {
+        "text": item.name
+      },
+      "actions": {
+        "items": [
+          {
+            "href": "#",
+            "text": "Revoke",
+            "classes": "govuk-link--destructive"
+          }
+        ]
+      }
+    },
+    "rows": [
+      {
+        "key": {
+          "text": "Key type"
+        },
+        "value": {
+          "text": key_type_text
+        }
+      },
+      {
+        "key": {
+          "text": "Created by"
+        },
+        "value": {
+          "html": "Jani on 19 June at 12:54pm"
+        }
+      },
+      {
+        "key": {
+          "text": "Last used"
+        },
+        "value": {
+          "html": "19 June at 13:00pm"
+        }
+      }
+    ]
+  }) }}
+{% endfor %}
+
+
+
 
   <div class="body-copy-table">
     {% call(item, row_number) list_table(
