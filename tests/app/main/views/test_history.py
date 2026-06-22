@@ -1,7 +1,7 @@
 import pytest
 from freezegun import freeze_time
 
-from tests.conftest import SERVICE_ONE_ID, normalize_spaces
+from tests.conftest import API_KEY_REVOKER_ID, SERVICE_ONE_ID, create_service_one_admin, normalize_spaces, sample_uuid
 
 
 @pytest.mark.parametrize(
@@ -23,7 +23,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
                 ),
                 (
                     "11 November",
-                    "Test User 12:12pm Revoked the ‘Bad key’ API key",
+                    "Key Revoker 12:12pm Revoked the ‘Bad key’ API key",
                 ),
                 (
                     "11 November 2011",
@@ -47,7 +47,7 @@ from tests.conftest import SERVICE_ONE_ID, normalize_spaces
             [
                 (
                     "11 November",
-                    "Test User 12:12pm Revoked the ‘Bad key’ API key",
+                    "Key Revoker 12:12pm Revoked the ‘Bad key’ API key",
                 ),
                 (
                     "11 November 2011",
@@ -94,6 +94,11 @@ def test_history(
     extra_args,
     expected_headings_and_events,
 ):
+    mock_get_users_by_service.side_effect = lambda service_id: [
+        create_service_one_admin(id=sample_uuid(), name="Test User"),
+        create_service_one_admin(id=API_KEY_REVOKER_ID, name="Key Revoker"),
+    ]
+
     page = client_request.get("main.history", service_id=SERVICE_ONE_ID, **extra_args)
 
     assert page.select_one("h1").text == "Audit events"
