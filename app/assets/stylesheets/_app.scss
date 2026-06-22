@@ -6,7 +6,7 @@
   > .heading-medium,
   > .heading-with-aside--heading-medium {
     margin: govuk-spacing(3) 0 govuk-spacing(4) 0;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 
     &.top-gutter-0 {
       margin-top: 0;
@@ -144,7 +144,7 @@ td {
     th,
     td {
       @include govuk-font(19);
-      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     thead {

@@ -28,7 +28,7 @@ body {
 
 a,
 a:visited {
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 a[href^="/"]:after,
