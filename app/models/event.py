@@ -123,6 +123,11 @@ class ServiceEvent(Event):
 class APIKeyEvent(Event):
     relevant = True
 
+    def __init__(self, item):
+        super().__init__(item)
+        if item.get("updated_at"):
+            self.user_id = item.get("updated_by_id")
+
     def __str__(self):
         if self.item["updated_at"]:
             return f"Revoked the ‘{self.item['name']}’ API key"
