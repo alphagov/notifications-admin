@@ -65,6 +65,7 @@ class HeaderNavigation(Navigation):
             "guidance_data_retention_period",
             "guidance_delivery_times",
             "guidance_email_branding",
+            "guidance_fonts_typefaces",
             "guidance_formatting",
             "guidance_letter_branding",
             "guidance_links_and_URLs",
