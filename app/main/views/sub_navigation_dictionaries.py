@@ -113,7 +113,7 @@ def using_notify_nav():
                 {
                     "name": "Fonts and typefaces",
                     "link": "main.guidance_fonts_typefaces",
-                },                
+                },
                 {
                     "name": "Formatting emails and letters",
                     "link": "main.guidance_formatting",
