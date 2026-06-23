@@ -115,6 +115,7 @@ def test_hiding_pages_that_redirect_from_search_engines(client_request, endpoint
         "guidance_delivery_times",
         "guidance_email_branding",
         "guidance_features",
+        "guidance_fonts_typefaces",
         "guidance_formatting",
         "guidance_how_to_pay",
         "guidance_letter_branding",
