@@ -111,13 +111,13 @@ def using_notify_nav():
                     "link": "main.guidance_email_branding",
                 },
                 {
-                    "name": "Formatting emails and letters",
-                    "link": "main.guidance_formatting",
-                },
-                {
                     "name": "Fonts and typefaces",
                     "link": "main.guidance_fonts_typefaces",
                 },                
+                {
+                    "name": "Formatting emails and letters",
+                    "link": "main.guidance_formatting",
+                },
                 {
                     "name": "Letter branding",
                     "link": "main.guidance_letter_branding",
