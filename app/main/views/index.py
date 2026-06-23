@@ -237,6 +237,14 @@ def guidance_email_branding():
     )
 
 
+@main.route("/using-notify/fonts-typefaces")
+def guidance_formatting():
+    return render_template(
+        "views/guidance/using-notify/fonts-typefaces.html",
+        navigation_links=using_notify_nav(),
+    )
+
+
 @main.route("/using-notify/formatting")
 def guidance_formatting():
     return render_template(
