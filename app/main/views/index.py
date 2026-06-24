@@ -238,10 +238,14 @@ def guidance_email_branding():
 
 
 @main.route("/using-notify/fonts-typefaces")
-def guidance_fonts_typefaces():
+@main.route("/using-notify/fonts-typefaces/<template_type:notification_type>")
+def guidance_fonts_typefaces(notification_type=None):
+    if not notification_type:
+        return redirect(url_for(".guidance_fonts_typefaces", notification_type="email"))
     return render_template(
         "views/guidance/using-notify/fonts-typefaces.html",
         navigation_links=using_notify_nav(),
+        notification_type=notification_type,
     )
 
 
