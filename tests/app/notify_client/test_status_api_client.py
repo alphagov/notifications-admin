@@ -25,9 +25,14 @@ def test_sets_value_in_cache(mocker):
 
     assert client.get_count_of_live_services_and_organisations() == {"data_from": "api"}
 
-    mock_redis_get.assert_called_once_with("live-service-and-organisation-counts")
+    mock_redis_get.assert_called_once_with("live-service-and-organisation-counts", skippable=True)
     mock_api_get.assert_called_once_with("/_status/live-service-and-organisation-counts")
-    mock_redis_set.assert_called_once_with("live-service-and-organisation-counts", '{"data_from": "api"}', ex=3600)
+    mock_redis_set.assert_called_once_with(
+        "live-service-and-organisation-counts",
+        '{"data_from": "api"}',
+        ex=3600,
+        skippable=True,
+    )
 
 
 def test_returns_value_from_cache(mocker):
@@ -46,7 +51,7 @@ def test_returns_value_from_cache(mocker):
 
     assert client.get_count_of_live_services_and_organisations() == {"data_from": "cache"}
 
-    mock_redis_get.assert_called_once_with("live-service-and-organisation-counts")
+    mock_redis_get.assert_called_once_with("live-service-and-organisation-counts", skippable=True)
 
     assert mock_api_get.called is False
     assert mock_redis_set.called is False

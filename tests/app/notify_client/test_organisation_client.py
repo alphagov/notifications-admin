@@ -19,7 +19,10 @@ from tests.utils import RedisClientMock
         (
             "get_domains",
             [
-                call("domains"),
+                call(
+                    "domains",
+                    skippable=True,
+                ),
             ],
             b"""
                 [
@@ -34,8 +37,14 @@ from tests.utils import RedisClientMock
         (
             "get_domains",
             [
-                call("domains"),
-                call("organisations"),
+                call(
+                    "domains",
+                    skippable=True,
+                ),
+                call(
+                    "organisations",
+                    skippable=True,
+                ),
             ],
             None,
             [call(url="/organisations")],
@@ -44,15 +53,24 @@ from tests.utils import RedisClientMock
                     "organisations",
                     '[{"domains": ["x", "y", "z"]}]',
                     ex=2_419_200,
+                    skippable=True,
                 ),
-                call("domains", '["x", "y", "z"]', ex=2_419_200),
+                call(
+                    "domains",
+                    '["x", "y", "z"]',
+                    ex=2_419_200,
+                    skippable=True,
+                ),
             ],
             "from api",
         ),
         (
             "get_organisations",
             [
-                call("organisations"),
+                call(
+                    "organisations",
+                    skippable=True,
+                ),
             ],
             b"""
                 [
@@ -67,7 +85,10 @@ from tests.utils import RedisClientMock
         (
             "get_organisations",
             [
-                call("organisations"),
+                call(
+                    "organisations",
+                    skippable=True,
+                ),
             ],
             None,
             [call(url="/organisations")],
@@ -76,6 +97,7 @@ from tests.utils import RedisClientMock
                     "organisations",
                     '[{"domains": ["x", "y", "z"]}]',
                     ex=2_419_200,
+                    skippable=True,
                 ),
             ],
             "from api",
@@ -251,7 +273,10 @@ def test_get_letter_branding_pool(notify_admin, mocker):
     organisations_client.get_letter_branding_pool(org_id)
 
     mock_redis_set.assert_called_once_with(
-        f"organisation-{org_id}-letter-branding-pool", '{"filename": "gov.svg"}', ex=2_419_200
+        f"organisation-{org_id}-letter-branding-pool",
+        '{"filename": "gov.svg"}',
+        ex=2_419_200,
+        skippable=True,
     )
     mock_get.assert_called_with(url=f"/organisations/{org_id}/letter-branding-pool")
 

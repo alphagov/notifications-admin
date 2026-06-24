@@ -131,17 +131,17 @@ def test_client_converts_admin_permissions_to_db_permissions_on_add_to_service(n
     "expected_cache_get_calls,cache_value,expected_api_calls,expected_cache_set_calls,expected_return_value",
     [
         (
-            [call(f"user-{user_id}")],
+            [call(f"user-{user_id}", skippable=True)],
             b'{"data": "from cache"}',
             [],
             [],
             "from cache",
         ),
         (
-            [call(f"user-{user_id}")],
+            [call(f"user-{user_id}", skippable=True)],
             None,
             [call(f"/user/{user_id}")],
-            [call(f"user-{user_id}", '{"data": "from api"}', ex=2_419_200)],
+            [call(f"user-{user_id}", '{"data": "from api"}', ex=2_419_200, skippable=True)],
             "from api",
         ),
     ],
