@@ -106,43 +106,48 @@ def test_hiding_pages_that_redirect_from_search_engines(client_request, endpoint
 
 
 @pytest.mark.parametrize(
-    "view",
+    "view, view_vars",
     [
-        "accessibility_statement",
-        "cookies",
-        "guidance_api_documentation",
-        "guidance_billing_details",
-        "guidance_delivery_times",
-        "guidance_email_branding",
-        "guidance_features",
-        "guidance_fonts_typefaces",
-        "guidance_formatting",
-        "guidance_how_to_pay",
-        "guidance_letter_branding",
-        "guidance_links_and_URLs",
-        "guidance_optional_content",
-        "guidance_personalisation",
-        "guidance_pricing_letters",
-        "guidance_pricing_text_messages",
-        "guidance_pricing",
-        "guidance_qr_codes",
-        "guidance_receive_text_messages",
-        "guidance_reply_to_email_address",
-        "guidance_returned_letters",
-        "guidance_roadmap",
-        "guidance_schedule_messages",
-        "guidance_security",
-        "guidance_send_files_by_email",
-        "guidance_sign_in_method",
-        "guidance_team_members_and_permissions",
-        "guidance_templates",
-        "guidance_text_message_sender",
-        "guidance_unsubscribe_links",
-        "guidance_upload_a_letter",
-        "guidance_using_notify",
-        "guidance_who_can_use_notify",
-        "privacy",
-        "terms_of_use",
+        ["accessibility_statement", {}],
+        ["cookies", {}],
+        ["guidance_api_documentation", {}],
+        ["guidance_billing_details", {}],
+        ["guidance_delivery_times", {}],
+        ["guidance_email_branding", {}],
+        ["guidance_features", {}],
+        ["guidance_fonts_typefaces", {"notification_type": "email"}],
+        ["guidance_fonts_typefaces", {"notification_type": "sms"}],
+        ["guidance_fonts_typefaces", {"notification_type": "letter"}],
+        ["guidance_formatting", {}],
+        ["guidance_how_to_pay", {}],
+        ["guidance_letter_branding", {}],
+        ["guidance_links_and_URLs", {}],
+        ["guidance_message_status", {"notification_type": "email"}],
+        ["guidance_message_status", {"notification_type": "sms"}],
+        ["guidance_message_status", {"notification_type": "letter"}],
+        ["guidance_optional_content", {}],
+        ["guidance_personalisation", {}],
+        ["guidance_pricing_letters", {}],
+        ["guidance_pricing_text_messages", {}],
+        ["guidance_pricing", {}],
+        ["guidance_qr_codes", {}],
+        ["guidance_receive_text_messages", {}],
+        ["guidance_reply_to_email_address", {}],
+        ["guidance_returned_letters", {}],
+        ["guidance_roadmap", {}],
+        ["guidance_schedule_messages", {}],
+        ["guidance_security", {}],
+        ["guidance_send_files_by_email", {}],
+        ["guidance_sign_in_method", {}],
+        ["guidance_team_members_and_permissions", {}],
+        ["guidance_templates", {}],
+        ["guidance_text_message_sender", {}],
+        ["guidance_unsubscribe_links", {}],
+        ["guidance_upload_a_letter", {}],
+        ["guidance_using_notify", {}],
+        ["guidance_who_can_use_notify", {}],
+        ["privacy", {}],
+        ["terms_of_use", {}],
     ],
 )
 def test_static_pages(
@@ -150,8 +155,9 @@ def test_static_pages(
     mock_get_letter_rates,
     mock_get_sms_rate,
     view,
+    view_vars,
 ):
-    request = partial(client_request.get, f"main.{view}")
+    request = partial(client_request.get, f"main.{view}", **view_vars)
 
     # Check the page loads when user is signed in
     page = request()
@@ -234,11 +240,18 @@ def test_redirect_blueprint_contains_valid_urls(_client):
     assert not invalid_redirects, "historical_redirects redirects to invalid endpoint name"
 
 
-def test_message_status_page_redirects_without_notification_type_specified(client_request):
+@pytest.mark.parametrize(
+    "view",
+    [
+        "guidance_message_status",
+        "guidance_fonts_typefaces",
+    ],
+)
+def test_guidance_pages_redirect_without_notification_type_specified(client_request, view):
     client_request.get(
-        "main.guidance_message_status",
+        f"main.{view}",
         _expected_redirect=url_for(
-            "main.guidance_message_status",
+            f"main.{view}",
             notification_type="email",
         ),
     )
