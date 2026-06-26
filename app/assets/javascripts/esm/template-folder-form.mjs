@@ -24,11 +24,11 @@ class TemplateFolderForm {
 
     this.$liveRegionCounter = this.$form.querySelector('.selection-counter');
 
-    this.nothingSelectedButtons = this.createNothingSelectedButtons();
-    this.itemsSelectedButtons = this.createItemsSelectedButtons();
+    this.$nothingSelectedButtons = this.createNothingSelectedButtons();
+    this.$itemsSelectedButtons = this.createItemsSelectedButtons();
 
-    this.$liveRegionCounter.before(this.nothingSelectedButtons);
-    this.$liveRegionCounter.before(this.itemsSelectedButtons);
+    this.$liveRegionCounter.before(this.$nothingSelectedButtons);
+    this.$liveRegionCounter.before(this.$itemsSelectedButtons);
   }
 
   setupStates() {
@@ -227,16 +227,16 @@ class TemplateFolderForm {
     }
     $btn.setAttribute('tabindex', '0');
 
-    const handleTrigger = (event) => {
+    const handleOnClick = (event) => {
       event.preventDefault();
       if (opts.hasOwnProperty('onclick')) { opts.onclick(); }
     };
 
-    $btn.addEventListener('click', handleTrigger);
+    $btn.addEventListener('click', handleOnClick);
     $btn.addEventListener('keydown', (event) => {
       // enter or space pressed - https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key
       if (event.key === "Enter" || event.key === " ") {
-        handleTrigger(event);
+        handleOnClick(event);
       }
     });
 
@@ -322,18 +322,28 @@ class TemplateFolderForm {
     let scrollTop;
 
     // detach everything, unless they are the currentState
-    this.states.forEach(
-      state => (state.key === this.currentState ? (this.$liveRegionCounter && state.$el && this.$liveRegionCounter.before(state.$el)) : (state.$el && state.$el.remove()))
-    );
+    this.states.forEach(state => {
+      if (state.key === this.currentState) {
+        if (this.$liveRegionCounter && state.$el) {
+          this.$liveRegionCounter.before(state.$el);
+        }
+      } else {
+        if (state.$el) {
+          state.$el.remove();
+        }
+      }
+    });
 
     // use dialog mode for states which contain more than one form control
-    if (['move-to-existing-folder', 'add-new-template'].indexOf(this.currentState) !== -1) {
+    if (['move-to-existing-folder', 'add-new-template'].includes(this.currentState)) {
       mode = 'dialog';
     }
     stickAtBottomWhenScrolling.setMode(mode);
+    // we cache and reset the scrollTop to negate scrolling the browser does when elements inside the new state are focused
     // make sticky JS recalculate its cache of the element's position
     stickAtBottomWhenScrolling.recalculate();
 
+    // if the rendered page contains an error summary, we don't focus the form and let Design System Javascript handle error-summary focus
     if (currentStateObj && ('setFocus' in currentStateObj) && !this.formHasError()) {
       scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       currentStateObj.setFocus();
