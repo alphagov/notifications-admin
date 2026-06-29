@@ -107,6 +107,6 @@ To run a specific JavaScript test, you'll need to copy the full command from `pa
 
 ## Licence
 
-Unless stated otherwise, the codebase is released under [the MIT License][mit].
+Unless stated otherwise, the codebase is released under [the MIT License][mit]. This covers both the codebase and any sample code in the documentation.
 
 [mit]: LICENCE
