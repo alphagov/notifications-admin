@@ -45,7 +45,7 @@ from app.utils import PermanentRedirect, should_skip_template_page
 from app.utils.csv import Spreadsheet, get_errors_for_csv
 from app.utils.user import user_has_permissions
 
-letter_address_columns = [column.replace("_", " ") for column in address_lines_1_to_7_keys]
+letter_address_columns = InsensitiveSet(column.replace("_", " ") for column in address_lines_1_to_7_keys)
 
 
 def get_example_csv_fields(column_headers, use_example_as_example, submitted_fields):
@@ -66,11 +66,7 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
             for key in letter_address_columns
         ],
     }[template.template_type] + get_example_csv_fields(
-        (
-            placeholder
-            for placeholder in template.placeholders
-            if placeholder not in InsensitiveSet(first_column_headings[template.template_type])
-        ),
+        template.placeholders - first_column_headings[template.template_type],
         use_example_as_example,
         submitted_fields,
     )
@@ -778,10 +774,10 @@ def start_job(service_id, upload_id):
 
 def fields_to_fill_in(template, prefill_current_user=False):
     if "letter" == template.template_type:
-        return InsensitiveSet(letter_address_columns + list(template.placeholders))
+        return letter_address_columns | template.placeholders
 
     if not prefill_current_user:
-        return InsensitiveSet(first_column_headings[template.template_type] + list(template.placeholders))
+        return first_column_headings[template.template_type] | template.placeholders
 
     if template.template_type == "sms":
         session["recipient"] = current_user.mobile_number
