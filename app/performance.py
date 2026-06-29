@@ -48,7 +48,7 @@ def init_performance_monitoring():
             environment=environment,
             sample_rate=error_sample_rate,
             send_default_pii=send_pii,
-            request_bodies=send_request_bodies,
+            max_request_body_size=send_request_bodies,
             traces_sampler=traces_sampler,
             release=release,
         )
