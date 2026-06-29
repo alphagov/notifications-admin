@@ -69,7 +69,7 @@ def get_example_csv_rows(template, use_example_as_example=True, submitted_fields
         (
             placeholder
             for placeholder in template.placeholders
-            if placeholder not in InsensitiveDict.from_keys(first_column_headings[template.template_type])
+            if placeholder not in InsensitiveSet(first_column_headings[template.template_type])
         ),
         use_example_as_example,
         submitted_fields,
