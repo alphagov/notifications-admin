@@ -713,6 +713,7 @@ ORGANISATION_ID = "c011fa40-4cbe-4524-b415-dde2f421bd9c"
 ORGANISATION_TWO_ID = "d9b5be73-0b36-4210-9d89-8f1a5c2fef26"
 TEMPLATE_ONE_ID = "b22d7d94-2197-4a7d-a8e7-fd5f9770bf48"
 USER_ONE_ID = "7b395b52-c6c1-469c-9d61-54166461c1ab"
+API_KEY_REVOKER_ID = "df4beeef-8ee7-4fa2-b3d8-0d9d7f739dcc"
 
 
 @pytest.fixture(scope="function")
@@ -3970,6 +3971,7 @@ def mock_get_service_history(notify_admin, mocker):
                     "updated_at": "2012-11-11T12:12:12.000000Z",
                     "created_at": "2011-11-11T11:11:11.000000Z",
                     "created_by_id": sample_uuid(),
+                    "updated_by_id": API_KEY_REVOKER_ID,
                 },
                 {
                     "name": "Bad key",
