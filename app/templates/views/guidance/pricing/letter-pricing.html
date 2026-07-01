@@ -24,11 +24,16 @@
   {% if letter_rates.last_updated | format_date_numeric < date_new_letter_rates_go_live %}
     <div class="govuk-inset-text">
       <p class="govuk-body">
-        Economy mail prices will change in July 2026.
+        Economy mail letter prices have changed from 1 July:
       </p>
-      <p class="govuk-body">
-        The cost will depend on the number of pages in your letter.
-      </p>
+      <ul class="govuk-list govuk-list--bullet">
+     <li>1 sheet (double-sided) is now 63.8p</li>
+     <li>2 sheets (double-sided) are now 68.4p</li>
+     <li>3 sheets (double-sided) are now 72.4p</li>
+     <li>4 sheets (double-sided) are now 77.9p</li>
+     <li>5 sheets (double-sided) are now 82.3p</li> 
+  </ul>
+    <p class="govuk-body">Prices do not include VAT.</p>
     </div>
   {% endif %}
 
