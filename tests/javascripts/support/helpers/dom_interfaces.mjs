@@ -45,5 +45,7 @@ class SelectionMock extends DOMInterfaceMock {
 
 }
 
-exports.RangeMock = RangeMock;
-exports.SelectionMock = SelectionMock;
+export {
+  RangeMock,
+  SelectionMock
+};
