@@ -75,13 +75,13 @@ const triggerEvent = (el, evtType, options) => {
 // helpers for simulating events fired by certain interactions
 // simulates those fired in Chrome, other browsers vary the events fired
 
-function clickElementWithMouse (el) {
+const clickElementWithMouse = (el) => {
   triggerEvent(el, 'mousedown');
   triggerEvent(el, 'mouseup');
   triggerEvent(el, 'click');
 };
 
-function moveSelectionToRadio (el, options) {
+const moveSelectionToRadio = (el, options) => {
   // movement within a radio group with arrow keys fires no keyboard events
 
   // click event fired from option radio being activated
@@ -91,7 +91,7 @@ function moveSelectionToRadio (el, options) {
 
 };
 
-function activateRadioWithSpace (el) {
+const activateRadioWithSpace = (el) => {
 
   // simulate events for space key press to confirm selection
   // event for space key press
@@ -105,7 +105,9 @@ function activateRadioWithSpace (el) {
 
 }
 
-exports.triggerEvent = triggerEvent;
-exports.clickElementWithMouse = clickElementWithMouse;
-exports.moveSelectionToRadio = moveSelectionToRadio;
-exports.activateRadioWithSpace = activateRadioWithSpace;
+export {
+  triggerEvent,
+  clickElementWithMouse,
+  moveSelectionToRadio,
+  activateRadioWithSpace
+};
