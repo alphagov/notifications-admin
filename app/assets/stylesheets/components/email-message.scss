@@ -92,7 +92,7 @@ $email-message-gutter-mobile: govuk-spacing(3);
     margin: 0 0 0 0;
     clear: both;
     position: relative;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 
     @include govuk-media-query($from: tablet) {
       padding-left: $email-message-gutter-desktop;

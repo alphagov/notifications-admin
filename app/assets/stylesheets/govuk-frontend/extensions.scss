@@ -172,7 +172,6 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
     color: transparent;
     white-space: pre-wrap;
     overflow-wrap: break-word;
-    word-wrap: break-word;
     box-sizing: border-box;
     padding: 4px 4px govuk-spacing(6) 4px;
     border: 2px solid transparent;
@@ -314,7 +313,7 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
   // the radio
   margin-top: govuk-spacing(1) + ($border-thickness / 2);
   margin-bottom: govuk-spacing(1) * -1;
-  padding-left: $govuk-checkboxes-size + govuk-spacing(3); //padding of the checkbox label
+  padding-left: $govuk-checkboxes-size + govuk-spacing(3); // padding of the checkbox label
   flex-basis: 100%;
 
   &:before {

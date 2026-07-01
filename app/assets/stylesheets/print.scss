@@ -28,7 +28,7 @@ body {
 
 a,
 a:visited {
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 a[href^="/"]:after,
@@ -55,7 +55,7 @@ select {
 
   .govuk-header__logo {
     @include govuk-font($size: 19);
-    text-rendering: optimizeLegibility;
+    text-rendering: optimizelegibility;
 
     a {
       &,
