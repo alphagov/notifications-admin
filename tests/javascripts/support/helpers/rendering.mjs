@@ -3,7 +3,7 @@
 // - the page
 // - the window
 
-const triggerEvent = require('./events.js').triggerEvent;
+import { triggerEvent } from './events.mjs'
 
 class WindowMock {
   constructor (jest) {
@@ -384,5 +384,7 @@ class ScreenMock {
 }
 ScreenMock.REQUIRED_WINDOW_PROPS = ['height', 'width', 'scrollTop'];
 
-exports.WindowMock = WindowMock;
-exports.ScreenMock = ScreenMock;
+export {
+  WindowMock,
+  ScreenMock
+};
