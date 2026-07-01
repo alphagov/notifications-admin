@@ -4557,7 +4557,7 @@ def mock_create_service_join_request(notify_admin, mocker):
 def mock_get_letter_rates(mocker):
     def _get_letter_rates():
         return [
-            {"post_class": "economy", "rate": "0.59", "sheet_count": 1, "start_date": "2024-06-30T23:00:00"},
+            {"post_class": "economy", "rate": "0.592", "sheet_count": 1, "start_date": "2024-06-30T23:00:00"},
             {"post_class": "second", "rate": "0.68", "sheet_count": 1, "start_date": "2024-06-30T23:00:00"},
             {"post_class": "first", "rate": "1.49", "sheet_count": 1, "start_date": "2024-06-30T23:00:00"},
             {"post_class": "europe", "rate": "1.56", "sheet_count": 1, "start_date": "2024-01-02T00:00:00"},

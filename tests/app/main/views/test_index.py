@@ -36,7 +36,7 @@ def test_non_logged_in_user_can_see_homepage(
     )
     assert page.select_one("#whos-using-notify a")["href"] == url_for("main.performance")
 
-    assert "From 59 pence to print and post a one page letter" in normalize_spaces(page.text)
+    assert "From 59.2 pence to print and post a one page letter" in normalize_spaces(page.text)
 
 
 def test_logged_in_user_redirects_to_your_services(client_request):
