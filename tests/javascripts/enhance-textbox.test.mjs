@@ -1,7 +1,7 @@
-import * as helpers from './support/helpers.js'
+
 import EnhancedTextbox from '../../app/assets/javascripts/esm/enhanced-textbox.mjs';
 import { jest } from '@jest/globals';
-
+import { triggerEvent } from './support/helpers/events.mjs';
 
 describe('Enhanced textbox', () => {
 
@@ -250,7 +250,7 @@ describe('Enhanced textbox', () => {
       // mock calls for the background element's current height
       jest.spyOn(backgroundEl, 'offsetHeight', 'get').mockImplementation(() => 248);
 
-      helpers.triggerEvent(textarea, 'input');
+      triggerEvent(textarea, 'input');
 
       expect(window.getComputedStyle(textarea).height).toEqual("248px");
 
@@ -267,7 +267,7 @@ describe('Enhanced textbox', () => {
       expect(window.getComputedStyle(backgroundEl).width).toEqual("576px");
 
       textarea.style.width = "500px"
-      helpers.triggerEvent(window, 'resize');
+      triggerEvent(window, 'resize');
 
       expect(window.getComputedStyle(textarea).width).toEqual("500px");
       expect(window.getComputedStyle(backgroundEl).width).toEqual("500px");
@@ -285,7 +285,7 @@ describe('Enhanced textbox', () => {
 
       // add some more content with a new variable
       textarea.textContent += "\nRef: ((reference))";
-      helpers.triggerEvent(textarea, 'input');
+      triggerEvent(textarea, 'input');
 
       const highlightTags = backgroundEl.querySelectorAll('.placeholder');
 
@@ -305,7 +305,7 @@ describe('Enhanced textbox', () => {
 
       // add some more content with some optional content inside
       textarea.textContent += "\nYour appointment will be on ((date)). When you arrive, please go to the ((weekday??main entrance))((weekend??side entrance))";
-      helpers.triggerEvent(textarea, 'input');
+      triggerEvent(textarea, 'input');
 
       const highlightTags = backgroundEl.querySelectorAll('.placeholder');
       const optionalHighlightTags = backgroundEl.querySelectorAll('.placeholder-conditional');
@@ -331,7 +331,7 @@ describe('Enhanced textbox', () => {
 
       // add some more content with a new variable
       textarea.textContent = "Dear ((title)) ((name))";
-      helpers.triggerEvent(textarea, 'input');
+      triggerEvent(textarea, 'input');
 
       const highlightTags = backgroundEl.querySelectorAll('.placeholder');
 
@@ -359,7 +359,7 @@ describe('Enhanced textbox', () => {
 
         Your appointment will be on ((date)). When you arrive, please go to the ((weekday??main entrance))`;
 
-      helpers.triggerEvent(textarea, 'input');
+      triggerEvent(textarea, 'input');
 
       const highlightTags = backgroundEl.querySelectorAll('.placeholder');
       const optionalHighlightTags = backgroundEl.querySelectorAll('.placeholder-conditional');
@@ -405,7 +405,7 @@ describe('Enhanced textbox', () => {
       // mock calls for the background element's current height
       jest.spyOn(backgroundEl, 'offsetHeight', 'get').mockImplementation(() => 248);
 
-      helpers.triggerEvent(textarea, 'input');
+      triggerEvent(textarea, 'input');
 
       expect(window.getComputedStyle(textarea).height).toEqual("248px");
 
@@ -421,7 +421,7 @@ describe('Enhanced textbox', () => {
       expect(window.getComputedStyle(backgroundEl).width).toEqual("576px");
 
       textarea.style.width = "500px"
-      helpers.triggerEvent(window, 'resize');
+      triggerEvent(window, 'resize');
 
       expect(window.getComputedStyle(textarea).width).toEqual("500px");
       expect(window.getComputedStyle(backgroundEl).width).toEqual("500px");
@@ -439,7 +439,7 @@ describe('Enhanced textbox', () => {
 
       // add some more content with a new variable
       textarea.textContent += "\nRef: ((reference))";
-      helpers.triggerEvent(textarea, 'input');
+      triggerEvent(textarea, 'input');
 
       const highlightTags = backgroundEl.querySelectorAll('.placeholder');
 
@@ -459,7 +459,7 @@ describe('Enhanced textbox', () => {
 
       // add some more content with some optional content inside
       textarea.textContent += "\nYour appointment will be on ((date)). When you arrive, please go to the ((weekday??main entrance))((weekend??side entrance))";
-      helpers.triggerEvent(textarea, 'input');
+      triggerEvent(textarea, 'input');
 
       const highlightTags = backgroundEl.querySelectorAll('.placeholder');
       const optionalHighlightTags = backgroundEl.querySelectorAll('.placeholder-conditional');
@@ -485,7 +485,7 @@ describe('Enhanced textbox', () => {
 
       // add some more content with a new variable
       textarea.textContent = "Dear ((title)) ((name))";
-      helpers.triggerEvent(textarea, 'input');
+      triggerEvent(textarea, 'input');
 
       const highlightTags = backgroundEl.querySelectorAll('.placeholder');
 

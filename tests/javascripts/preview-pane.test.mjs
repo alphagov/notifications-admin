@@ -1,6 +1,7 @@
 import PreviewPane from '../../app/assets/javascripts/esm/preview-pane.mjs';
-import * as helpers from './support/helpers.js';
 import { jest } from '@jest/globals';
+import { moveSelectionToRadio } from './support/helpers/events.mjs';
+import { getRadioGroup } from './support/helpers/html.mjs';
 
 const emailPageURL = '/services/6658542f-0cad-491f-bec8-ab8457700ead/service-settings/set-email-branding';
 const emailPreviewConfirmationURL = '/services/6658542f-0cad-491f-bec8-ab8457700ead/service-settings/preview-email-branding';
@@ -72,7 +73,7 @@ describe('Preview pane', () => {
         </div>
       </form>`;
 
-    document.querySelector('.govuk-grid-column-full').appendChild(helpers.getRadioGroup(brands));
+    document.querySelector('.govuk-grid-column-full').appendChild(getRadioGroup(brands));
     form = document.querySelector('form');
     radios = form.querySelector('fieldset');
 
@@ -141,7 +142,7 @@ describe('Preview pane', () => {
 
         const newSelection = radios.querySelectorAll('input[type=radio]')[1];
 
-        helpers.moveSelectionToRadio(newSelection);
+        moveSelectionToRadio(newSelection);
 
         expect(document.querySelector('iframe').getAttribute('src')).toEqual(`/_email?branding_style=${newSelection.value}`);
 
@@ -212,7 +213,7 @@ describe('Preview pane', () => {
 
         const newSelection = radios.querySelectorAll('input[type=radio]')[1];
 
-        helpers.moveSelectionToRadio(newSelection);
+        moveSelectionToRadio(newSelection);
 
         expect(document.querySelector('img').getAttribute('src')).toEqual(`/templates/letter-preview-image?branding_style=${newSelection.value}`);
 

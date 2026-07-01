@@ -1,6 +1,7 @@
 import LiveSearch from '../../app/assets/javascripts/esm/live-search.mjs';
-import * as helpers from './support/helpers.js';
 import { jest } from '@jest/globals';
+import { getRadioGroup, templatesAndFoldersCheckboxes } from './support/helpers/html.mjs';
+import { triggerEvent } from './support/helpers/events.mjs';
 
 describe('Live search', () => {
 
@@ -77,7 +78,7 @@ describe('Live search', () => {
       list = document.querySelector('form');
 
       // getRadioGroup returns a DOM node so append once DOM is set up
-      list.appendChild(helpers.getRadioGroup(departmentData));
+      list.appendChild(getRadioGroup(departmentData));
 
     });
 
@@ -156,7 +157,7 @@ describe('Live search', () => {
 
         // simulate the input of new search text
         searchTextbox.value = '';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -175,7 +176,7 @@ describe('Live search', () => {
 
         // simulate the input of new search text
         searchTextbox.value = 'Home';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -194,7 +195,7 @@ describe('Live search', () => {
 
         // simulate the input of new search text
         searchTextbox.value = 'Department for';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.govuk-radios__item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -217,7 +218,7 @@ describe('Live search', () => {
 
         // simulate the input of new search text
         searchTextbox.value = 'Home Office';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         expect(window.getComputedStyle(checkedItem).display).not.toEqual('none');
 
@@ -270,7 +271,7 @@ describe('Live search', () => {
         </div>
         <form method="post" autocomplete="off" novalidate>
           <div id="template-list">
-            ${helpers.templatesAndFoldersCheckboxes(templatesAndFolders)}
+            ${templatesAndFoldersCheckboxes(templatesAndFolders)}
           </div>
         </form>`;
 
@@ -374,7 +375,7 @@ describe('Live search', () => {
 
         // simulate input of new search text
         searchTextbox.value = '';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.template-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -393,7 +394,7 @@ describe('Live search', () => {
 
         // simulate input of new search text
         searchTextbox.value = 'Prescriptions';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.template-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -412,7 +413,7 @@ describe('Live search', () => {
 
         // simulate input of new search text
         searchTextbox.value = 'New doctor';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.template-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -435,7 +436,7 @@ describe('Live search', () => {
 
         // simulate input of new search text
         searchTextbox.value = 'Prescriptions';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         // should show despite not matching
         expect(window.getComputedStyle(checkedItem).display).not.toEqual('none');
@@ -451,7 +452,7 @@ describe('Live search', () => {
 
         // simulate input of new search text
         searchTextbox.value = 'Email template';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.template-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -672,7 +673,7 @@ describe('Live search', () => {
 
         // simulate input of new search text
         searchTextbox.value = '';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.user-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -690,7 +691,7 @@ describe('Live search', () => {
 
         // simulate input of new search text
         searchTextbox.value = 'Administrator';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.user-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -711,7 +712,7 @@ describe('Live search', () => {
         // Both the name and email address are different but have the live-search-relevant class. This searches for the
         // second class, the email address
         searchTextbox.value = 'email-address-different-from-name';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.user-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -730,7 +731,7 @@ describe('Live search', () => {
 
         // simulate input of new search text
         searchTextbox.value = 'Team member';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.user-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');
@@ -749,7 +750,7 @@ describe('Live search', () => {
 
         // simulate input of new search text
         searchTextbox.value = 'Add and edit templates';
-        helpers.triggerEvent(searchTextbox, 'input');
+        triggerEvent(searchTextbox, 'input');
 
         const listItems = list.querySelectorAll('.user-list-item');
         const listItemsShowing = Array.from(listItems).filter(item => window.getComputedStyle(item).display !== 'none');

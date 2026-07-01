@@ -1,5 +1,6 @@
-import CollapsibleCheckboxes from '../../app/assets/javascripts/esm/collapsible-checkboxes.mjs'
-import * as helpers from './support/helpers.js'
+import CollapsibleCheckboxes from '../../app/assets/javascripts/esm/collapsible-checkboxes.mjs';
+import { element } from './support/helpers/elements.mjs';
+import { triggerEvent } from './support/helpers/events.mjs';
 
 describe('Collapsible checkboxes', () => {
 
@@ -86,7 +87,7 @@ describe('Collapsible checkboxes', () => {
 
     test("adds a heading before the selected fieldset", () => {
 
-      const heading = helpers.element(fieldset).getPreviousSibling(
+      const heading = element(fieldset).getPreviousSibling(
         el => (el.nodeName === 'h2') && (el.hasClass('heading-small'))
       );
 
@@ -105,7 +106,7 @@ describe('Collapsible checkboxes', () => {
 
     test("the legend of the fieldset is visually hidden", () => {
 
-      const legend = helpers.element(fieldset.querySelector('legend'));
+      const legend = element(fieldset.querySelector('legend'));
 
       expect(legend.hasClass('govuk-visually-hidden')).toBe(true);
 
@@ -122,7 +123,7 @@ describe('Collapsible checkboxes', () => {
 
     test("has the correct aria attributes on the button", () => {
 
-      expect(helpers.element(formGroup.querySelector('.govuk-button')).hasAttributesSetTo({
+      expect(element(formGroup.querySelector('.govuk-button')).hasAttributesSetTo({
         'aria-expanded': 'false'
       })).toBe(true);
 
@@ -130,7 +131,7 @@ describe('Collapsible checkboxes', () => {
 
     test("hides the fieldset", () => {
 
-      expect(helpers.element(fieldset).is('hidden')).toEqual(true);
+      expect(element(fieldset).is('hidden')).toEqual(true);
 
     });
 
@@ -233,13 +234,13 @@ describe('Collapsible checkboxes', () => {
       // start module
       new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
-      helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
+      triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
 
     });
 
     test("it shows the checkboxes (inside the fieldset)", () => {
 
-      expect(helpers.element(fieldset).is('hidden')).toBe(false);
+      expect(element(fieldset).is('hidden')).toBe(false);
 
     });
 
@@ -259,16 +260,16 @@ describe('Collapsible checkboxes', () => {
       new CollapsibleCheckboxes(document.querySelector('[data-notify-module="collapsible-checkboxes"]'))
 
       // show the checkboxes
-      helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
+      triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
 
       // click the button
-      helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
+      triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
 
     });
 
     test("it hides the checkboxes (inside the fieldset)", () => {
 
-      expect(helpers.element(fieldset).is('hidden')).toBe(true);
+      expect(element(fieldset).is('hidden')).toBe(true);
 
     });
 
@@ -288,7 +289,7 @@ describe('Collapsible checkboxes', () => {
   describe("when the selection changes", () => {
 
     const showCheckboxes = () => {
-      helpers.triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
+      triggerEvent(formGroup.querySelector('.govuk-button'), 'click');
     };
 
     const checkFirstCheckbox = () => {
@@ -328,7 +329,7 @@ describe('Collapsible checkboxes', () => {
         const summaryText = document.querySelector('.selection-summary__text');
 
         // click the first checkbox
-        helpers.triggerEvent(checkboxes[0], 'click');
+        triggerEvent(checkboxes[0], 'click');
 
         expect(summaryText.textContent.trim()).toEqual("No folders (only templates outside a folder)");
 
@@ -348,7 +349,7 @@ describe('Collapsible checkboxes', () => {
         const summaryText = document.querySelector('.selection-summary__text');
 
         // click the first checkbox
-        helpers.triggerEvent(checkboxes[0], 'click');
+        triggerEvent(checkboxes[0], 'click');
 
         expect(summaryText.textContent.trim()).toEqual("No team members (only you)");
 
@@ -368,7 +369,7 @@ describe('Collapsible checkboxes', () => {
         const summaryText = document.querySelector('.selection-summary__text');
 
         // click the first checkbox
-        helpers.triggerEvent(checkboxes[0], 'click');
+        triggerEvent(checkboxes[0], 'click');
 
         expect(summaryText.textContent.trim()).toEqual("No arbitrary things");
 
@@ -392,7 +393,7 @@ describe('Collapsible checkboxes', () => {
         const summaryText = document.querySelector('.selection-summary__text');
 
         // click the first checkbox
-        helpers.triggerEvent(checkboxes[1], 'click');
+        triggerEvent(checkboxes[1], 'click');
 
         expect(summaryText.textContent.trim()).toEqual("9 of 10 folders");
 
@@ -412,7 +413,7 @@ describe('Collapsible checkboxes', () => {
         const summaryText = document.querySelector('.selection-summary__text');
 
         // click the first checkbox
-        helpers.triggerEvent(checkboxes[1], 'click');
+        triggerEvent(checkboxes[1], 'click');
 
         expect(summaryText.textContent.trim()).toEqual("9 of 10 team members");
 
@@ -435,7 +436,7 @@ describe('Collapsible checkboxes', () => {
 
         const summaryText = document.querySelector('.selection-summary__text');
 
-        helpers.triggerEvent(checkboxes[0], 'click');
+        triggerEvent(checkboxes[0], 'click');
 
         expect(summaryText.textContent.trim()).toEqual("All folders");
 
@@ -454,7 +455,7 @@ describe('Collapsible checkboxes', () => {
 
         const summaryText = document.querySelector('.selection-summary__text');
 
-        helpers.triggerEvent(checkboxes[0], 'click');
+        triggerEvent(checkboxes[0], 'click');
 
         expect(summaryText.textContent.trim()).toEqual("All team members");
 
