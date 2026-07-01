@@ -5,6 +5,7 @@
   "engines": {
     "node": ">=10.15.3"
   },
+  "type": "module",
   "scripts": {
     "test": "npm run lint:scss && npm run lint:js && npm run test:js tests/javascripts",
     "test:js": "node --experimental-vm-modules node_modules/.bin/jest",
