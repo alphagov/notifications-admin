@@ -1,5 +1,7 @@
-import * as helpers from './support/helpers.js';
+;
 import { beforeEach, jest } from '@jest/globals';
+import { triggerEvent } from './support/helpers/events.mjs';
+import { RangeMock } from './support/helpers/dom_interfaces.mjs';
 
 jest.unstable_mockModule('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs', () => ({
   stickAtBottomWhenScrolling: {
@@ -44,7 +46,7 @@ describe('copy to clipboard', () => {
   beforeEach(() => {
     stickAtBottomWhenScrolling.recalculate.mockClear();
     // mock objects used to manipulate the page selection
-    rangeMock = new helpers.RangeMock(jest);
+    rangeMock = new RangeMock(jest);
 
     // plug gaps in JSDOM's API for Range
     document.createRange = jest.fn(() => rangeMock);
@@ -215,7 +217,7 @@ describe('copy to clipboard', () => {
 
           keyEl = component.querySelector('.copy-to-clipboard__value');
 
-          helpers.triggerEvent(component.querySelector('button'), 'click');
+          triggerEvent(component.querySelector('button'), 'click');
 
         });
 
@@ -278,7 +280,7 @@ describe('copy to clipboard', () => {
 
           beforeEach(() => {
 
-            helpers.triggerEvent(component.querySelector('button'), 'click');
+            triggerEvent(component.querySelector('button'), 'click');
 
           });
 
@@ -313,7 +315,7 @@ describe('copy to clipboard', () => {
           // start the module
           new CopyToClipboard(component);
 
-          helpers.triggerEvent(component.querySelector('button'), 'click');
+          triggerEvent(component.querySelector('button'), 'click');
 
         });
 
@@ -354,7 +356,7 @@ describe('copy to clipboard', () => {
           // start the module
           new CopyToClipboard(component);
 
-          helpers.triggerEvent(component.querySelector('button'), 'click');
+          triggerEvent(component.querySelector('button'), 'click');
 
         });
 

@@ -1,5 +1,6 @@
-import * as helpers from './support/helpers.js';
 import { jest } from '@jest/globals';
+import { triggerEvent } from './support/helpers/events.mjs';
+import { ScreenMock } from './support/helpers/rendering.mjs';
 
 jest.unstable_mockModule('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs', () => ({
   stickAtBottomWhenScrolling: {
@@ -61,7 +62,7 @@ describe('RadioSelect', () => {
   };
 
   beforeEach(() => {
-    screenMock = new helpers.ScreenMock(jest);
+    screenMock = new ScreenMock(jest);
     screenMock.setWindow({
       scrollTop: scrollPosition
     });
@@ -271,7 +272,7 @@ describe('RadioSelect', () => {
       daysView = expandingSection.querySelector('.radio-select__days').parentElement;
       timesView = expandingSection.querySelector('.radio-select__times').parentElement;
 
-      helpers.triggerEvent(expanderButton, 'click');
+      triggerEvent(expanderButton, 'click');
 
     });
 
@@ -329,8 +330,8 @@ describe('RadioSelect', () => {
       expanderButton = document.querySelector('.radio-select__expander');
       expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
 
-      helpers.triggerEvent(expanderButton, 'click');
-      helpers.triggerEvent(expanderButton, 'click');
+      triggerEvent(expanderButton, 'click');
+      triggerEvent(expanderButton, 'click');
 
     });
 
@@ -380,13 +381,13 @@ describe('RadioSelect', () => {
       timesView = expandingSection.querySelector('.radio-select__times').parentElement;
       buttonForTomorrow = daysView.querySelectorAll('button[type=button]')[1];
 
-      helpers.triggerEvent(expanderButton, 'click');
+      triggerEvent(expanderButton, 'click');
 
     });
 
     test("the days view should be hidden", () => {
 
-      helpers.triggerEvent(buttonForTomorrow, 'click');
+      triggerEvent(buttonForTomorrow, 'click');
 
       expect(daysView.hasAttribute('hidden')).toBe(true);
 
@@ -394,7 +395,7 @@ describe('RadioSelect', () => {
 
     test("the times view and the times for that day should show", () => {
 
-      helpers.triggerEvent(buttonForTomorrow, 'click');
+      triggerEvent(buttonForTomorrow, 'click');
 
       expect(timesView.hasAttribute('hidden')).toBe(false);
 
@@ -405,7 +406,7 @@ describe('RadioSelect', () => {
 
     test("if no times are selected yet for that day, the first radio should be focused", () => {
 
-      helpers.triggerEvent(buttonForTomorrow, 'click');
+      triggerEvent(buttonForTomorrow, 'click');
 
       expect(document.activeElement).toBe(timesView.querySelector('#radio-select__times-for-tomorrow .govuk-radios__item:nth-of-type(1) input[type=radio]'));
 
@@ -417,7 +418,7 @@ describe('RadioSelect', () => {
 
       radioFor2amTomorrow.setAttribute('checked', 'checked');
 
-      helpers.triggerEvent(buttonForTomorrow, 'click');
+      triggerEvent(buttonForTomorrow, 'click');
 
       expect(document.activeElement).toBe(timesView.querySelector('#radio-select__times-for-tomorrow .govuk-radios__item:nth-of-type(2) input'));
 
@@ -425,7 +426,7 @@ describe('RadioSelect', () => {
 
     test("there should be a link to return to the days view", () => {
 
-      helpers.triggerEvent(buttonForTomorrow, 'click');
+      triggerEvent(buttonForTomorrow, 'click');
 
       const backLink = expandingSection.querySelector('.radio-select__times').parentElement.querySelector('.govuk-back-link');
 
@@ -436,7 +437,7 @@ describe('RadioSelect', () => {
 
     test("the radios should have a hidden legend and help text to give context for screen reader users", () => {
 
-      helpers.triggerEvent(buttonForTomorrow, 'click');
+      triggerEvent(buttonForTomorrow, 'click');
 
       const fieldsetForRadios = timesView.querySelector('fieldset.radio-select__times:not([hidden])');
       const legend = fieldsetForRadios.querySelector('legend');
@@ -453,7 +454,7 @@ describe('RadioSelect', () => {
 
     test("the 'confirm' button container should be made sticky", () => {
 
-      helpers.triggerEvent(buttonForTomorrow, 'click');
+      triggerEvent(buttonForTomorrow, 'click');
 
       const container = expandingSection.querySelector('.radio-select__confirm');
 
@@ -464,11 +465,11 @@ describe('RadioSelect', () => {
 
     test("if you select a time but don't confirm it and collapse the section, neither the selected time and day field or form data should be updated", () => {
 
-      helpers.triggerEvent(buttonForTomorrow, 'click');
+      triggerEvent(buttonForTomorrow, 'click');
 
       expandingSection.querySelectorAll('.radio-select__times input[name=times-for-tomorrow]')[2].checked = true;
 
-      helpers.triggerEvent(expanderButton, 'click');
+      triggerEvent(expanderButton, 'click');
 
       expect(expanderButton.getAttribute('aria-expanded')).toEqual('false');
       expect(expandingSection.hasAttribute('hidden')).toBe(true);
@@ -498,11 +499,11 @@ describe('RadioSelect', () => {
       buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
       radioFor3amTomorrow = expandingSection.querySelectorAll('.radio-select__times input[name=times-for-tomorrow]')[2];
 
-      helpers.triggerEvent(expanderButton, 'click');
-      helpers.triggerEvent(buttonForTomorrow, 'click');
+      triggerEvent(expanderButton, 'click');
+      triggerEvent(buttonForTomorrow, 'click');
 
       radioFor3amTomorrow.checked = true;
-      helpers.triggerEvent(expandingSection.querySelector('.radio-select__confirm button'), 'click');
+      triggerEvent(expandingSection.querySelector('.radio-select__confirm button'), 'click');
 
     });
 
@@ -550,12 +551,12 @@ describe('RadioSelect', () => {
       expanderButton = document.querySelector('.radio-select__expander');
       expandingSection = document.getElementById(expanderButton.getAttribute('aria-controls'));
 
-      helpers.triggerEvent(expanderButton, 'click');
+      triggerEvent(expanderButton, 'click');
 
       buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
       radioFor3amTomorrow = expandingSection.querySelectorAll('.radio-select__times input[name=times-for-tomorrow]')[2];
 
-      helpers.triggerEvent(buttonForTomorrow, 'click');
+      triggerEvent(buttonForTomorrow, 'click');
 
     });
 
@@ -610,9 +611,9 @@ describe('RadioSelect', () => {
         buttonForTomorrow = expandingSection.querySelectorAll('.radio-select__days button[type=button]')[1];
         backLink = expandingSection.querySelector('.govuk-back-link');
 
-        helpers.triggerEvent(expanderButton, 'click');
-        helpers.triggerEvent(buttonForTomorrow, 'click');
-        helpers.triggerEvent(backLink, 'click');
+        triggerEvent(expanderButton, 'click');
+        triggerEvent(buttonForTomorrow, 'click');
+        triggerEvent(backLink, 'click');
 
       });
 

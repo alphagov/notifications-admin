@@ -1,6 +1,6 @@
 import UpdateStatus from '../../app/assets/javascripts/esm/update-status.mjs';
 import { jest } from '@jest/globals';
-import * as helpers from './support/helpers.js';
+import { triggerEvent } from './support/helpers/events.mjs';
 
 const serviceNumber = '6658542f-0cad-491f-bec8-ab8457700ead';
 const updatesURL = `/services/${serviceNumber}/templates/count-sms-length`;
@@ -170,7 +170,7 @@ describe('Update content', () => {
     // 150ms of inactivity should mean we're no longer blocking updates fired by changes
     jest.advanceTimersByTime(150);
 
-    helpers.triggerEvent(textarea, 'input');
+    triggerEvent(textarea, 'input');
 
     expect(updateStatus.update).toHaveBeenCalledTimes(2);
 
@@ -194,17 +194,17 @@ describe('Update content', () => {
     expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
     // updates triggered less than 150ms after the initial update should be delayed by 150ms
-    helpers.triggerEvent(textarea, 'input');
+    triggerEvent(textarea, 'input');
     jest.advanceTimersByTime(149);
     expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
     // subsequent events will clear any existing, delayed, updates and replace them with their own, delayed, one
-    helpers.triggerEvent(textarea, 'input');
+    triggerEvent(textarea, 'input');
     jest.advanceTimersByTime(149);
     expect(updateStatus.update).toHaveBeenCalledTimes(1);
 
     // this should be the case however many times updates are triggered, if within the 150ms delay period
-    helpers.triggerEvent(textarea, 'input');
+    triggerEvent(textarea, 'input');
     jest.advanceTimersByTime(149);
     expect(updateStatus.update).toHaveBeenCalledTimes(1);
 

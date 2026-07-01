@@ -1,6 +1,7 @@
 import { jest } from '@jest/globals';
-
-import * as helpers from './support/helpers.js';
+import { triggerEvent } from './support/helpers/events.mjs';
+import { getRadioGroup, getRadios } from './support/helpers/html.mjs';
+import { ScreenMock } from './support/helpers/rendering.mjs';
 
 import { offset } from '../../app/assets/javascripts/esm/utils.mjs';
 
@@ -165,7 +166,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
       windowHeight = 940;
 
       // mock the rendering of all components
-      screenMock = new helpers.ScreenMock(jest);
+      screenMock = new ScreenMock(jest);
       screenMock.setWindow({
         width: 1990,
         height: windowHeight,
@@ -590,7 +591,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         expect(stickyPosition.bottom).toBeGreaterThanOrEqual(caretCoordinates.top);
 
         // the sticky element (page footer) is 50 high so should cover the last of the radios if the bottom edge of the viewport is at its bottom
-        helpers.triggerEvent(textarea, 'keyup', { interface: window.KeyboardEvent });
+        triggerEvent(textarea, 'keyup', { interface: window.KeyboardEvent });
 
         // the bottom of the sticky element should be at the top of the checkbox
         expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretCoordinates.top - stickyPosition.height]);
@@ -611,7 +612,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         stickAtTopWhenScrolling.setMode('dialog')
 
         // add another sticky element before the form footer
-        radios = helpers.getRadioGroup({
+        radios = getRadioGroup({
           cssClasses: ['js-stick-at-top-when-scrolling'],
           name: 'choose-send-time',
           label: 'Choose send time',
@@ -745,7 +746,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
                 }
               });
 
-            radios.querySelector('fieldset').insertAdjacentHTML('beforeend', helpers.getRadios(fields, 'days'));
+            radios.querySelector('fieldset').insertAdjacentHTML('beforeend', getRadios(fields, 'days'));
 
             radios.offsetHeight = 475;
 
@@ -855,7 +856,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
       windowHeight = 940;
 
       // mock the rendering of all components
-      screenMock = new helpers.ScreenMock(jest);
+      screenMock = new ScreenMock(jest);
       screenMock.setWindow({
         width: 1990,
         height: windowHeight,
@@ -1327,7 +1328,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         expect(stickyPosition.top).toBeLessThan(caretCoordinatesBottom);
 
         // simulate a press of the down arrow
-        helpers.triggerEvent(textarea, 'keyup', { interface: window.KeyboardEvent });
+        triggerEvent(textarea, 'keyup', { interface: window.KeyboardEvent });
 
         // the top of the sticky element should be at the bottom of the caret
         expect(screenMock.window.spies.window.scrollTo.mock.calls[0]).toEqual([0, caretCoordinatesBottom - (windowHeight - stickyPosition.height)]);
@@ -1348,7 +1349,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
         stickAtBottomWhenScrolling.setMode('dialog')
 
         // add another sticky element before the form footer
-        radios = helpers.getRadioGroup({
+        radios = getRadioGroup({
           cssClasses: ['js-stick-at-bottom-when-scrolling'],
           name: 'choose-send-time',
           label: 'Choose send time',
@@ -1482,7 +1483,7 @@ describe("Stick to top/bottom of window when scrolling", () => {
                 }
               });
 
-            radios.querySelector('fieldset').insertAdjacentHTML('beforeend', helpers.getRadios(fields, 'days'));
+            radios.querySelector('fieldset').insertAdjacentHTML('beforeend', getRadios(fields, 'days'));
 
             radios.offsetHeight = 475;
 

@@ -1,6 +1,6 @@
 import Autofocus from '../../app/assets/javascripts/esm/autofocus.mjs';
 import { jest } from '@jest/globals';
-import * as helpers from './support/helpers';
+import { ScreenMock } from './support/helpers/rendering.mjs';
 
 describe('Autofocus', () => {
 
@@ -14,7 +14,7 @@ describe('Autofocus', () => {
     document.body.classList.add('govuk-frontend-supported')
     document.title = 'Find services by name - GOV.UK Notify';
 
-    screenMock = new helpers.ScreenMock(jest);
+    screenMock = new ScreenMock(jest);
     screenMock.setWindow({
       width: 1200,
       height: 600,
