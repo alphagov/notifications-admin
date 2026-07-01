@@ -1,6 +1,6 @@
 // helpers for generating patterns of HTML
 
-function getRadios (fields, name) {
+const getRadios = (fields, name) => {
   const result = '';
 
   return fields.map((field, idx) => {
@@ -17,7 +17,7 @@ function getRadios (fields, name) {
   }).join("\n");
 };
 
-function getRadioGroup (data) {
+const getRadioGroup = (data) => {
   let radioGroup = document.createElement('div');
 
   radioGroup.classList.add('govuk-form-group');
@@ -37,7 +37,7 @@ function getRadioGroup (data) {
     return radioGroup;
 };
 
-function templatesAndFoldersCheckboxes (hierarchy) {
+const templatesAndFoldersCheckboxes = (hierarchy) => {
   let result = '';
 
   hierarchy.forEach((node, idx) => {
@@ -60,6 +60,8 @@ function templatesAndFoldersCheckboxes (hierarchy) {
 
 };
 
-exports.getRadios = getRadios;
-exports.getRadioGroup = getRadioGroup;
-exports.templatesAndFoldersCheckboxes = templatesAndFoldersCheckboxes;
+export {
+  getRadios,
+  getRadioGroup,
+  templatesAndFoldersCheckboxes
+};
