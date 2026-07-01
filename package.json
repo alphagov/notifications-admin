@@ -47,9 +47,9 @@
     "rollup-plugin-copy": "3.5.0",
     "rollup-plugin-styler": "2.0.0",
     "sass": "1.89.2",
-    "stylelint": "16.21.0",
-    "stylelint-config-gds": "2.0.0",
-    "stylelint-config-standard-scss": "15.0.1"
+    "stylelint": "17.13.0",
+    "stylelint-config-gds": "3.0.0",
+    "stylelint-config-standard-scss": "17.0.0"
   },
   "overrides": {
     "minimist": "1.2.6",
