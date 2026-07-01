@@ -65,7 +65,7 @@
     },
     "transform": {},
     "testMatch": [
-      "<rootDir>/**/?(*.)(test).{js,mjs}"
+      "<rootDir>/**/?(*.)(test).mjs"
     ],
     "testEnvironment": "jsdom"
   }
