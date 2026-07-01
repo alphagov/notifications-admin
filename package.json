@@ -58,7 +58,7 @@
   },
   "jest": {
     "setupFiles": [
-      "<rootDir>/tests/javascripts/support/setup.js"
+      "<rootDir>/tests/javascripts/support/setup.mjs"
     ],
     "testEnvironmentOptions": {
       "url": "https://www.notifications.service.gov.uk"
