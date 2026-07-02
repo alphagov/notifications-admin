@@ -32,6 +32,7 @@ from tests.conftest import (
     create_multiple_email_reply_to_addresses,
     create_multiple_sms_senders,
     create_service_one_admin,
+    create_service_one_user,
     create_template,
     do_mock_get_page_counts_for_letter,
     mock_get_service_email_template,
@@ -4356,6 +4357,86 @@ def test_check_notification_shows_back_link(client_request, service_one, fake_uu
 
     previous_page = client_request.get_url(back_link)
     assert normalize_spaces(previous_page.select_one("label").text) == "thing"
+
+
+@pytest.mark.parametrize(
+    "template_content, personalisation, recipient, expected_cost_message",
+    (
+        (
+            "hello",
+            {},
+            "07900900123",
+            "Will be charged as 1 text message",
+        ),
+        (
+            "hello ((name))",
+            {"name": "a" * 161},
+            "07900900123",
+            "Will be charged as 2 text messages",
+        ),
+        (
+            "ŵ" * 80,
+            {},
+            "07900900123",
+            "Will be charged as 2 text messages",
+        ),
+        (
+            "Sending abroad",
+            {},
+            "+225 01 01 01 01 01",  # Côte d'Ivoire
+            "Will be charged as 10 text messages",
+        ),
+    ),
+)
+@pytest.mark.parametrize(
+    "permissions",
+    [
+        ["send_texts", "send_emails", "send_letters", "manage_templates"],
+        ["send_texts", "send_emails", "send_letters", "manage_users", "manage_settings"],
+        pytest.param(
+            # All the permissions except manage templates/service
+            ["send_texts", "send_emails", "send_letters", "manage_api_keys", "view_activity"],
+            marks=pytest.mark.xfail(raises=AttributeError),  # Paragraph not found on page
+        ),
+    ],
+)
+def test_check_notification_shows_cost_of_text_message(
+    client_request,
+    template_content,
+    personalisation,
+    recipient,
+    expected_cost_message,
+    permissions,
+    fake_uuid,
+    mocker,
+):
+    user = create_service_one_user(
+        id=fake_uuid,
+        permissions={SERVICE_ONE_ID: permissions},
+    )
+    client_request.login(user)
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": template_json(
+                service_id=SERVICE_ONE_ID,
+                id_=fake_uuid,
+                type_="sms",
+                content=template_content,
+            )
+        },
+    )
+    with client_request.session_transaction() as session:
+        session["recipient"] = recipient
+        session["placeholders"] = personalisation
+
+    page = client_request.get(
+        "main.check_notification",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+    )
+
+    assert normalize_spaces(page.select_one("p.govuk-hint").text) == expected_cost_message
 
 
 @pytest.mark.parametrize(

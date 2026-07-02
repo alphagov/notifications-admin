@@ -14,6 +14,7 @@ from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
+from notifications_utils.recipient_validation.phone_number import PhoneNumber
 from notifications_utils.recipient_validation.postal_address import PostalAddress, address_lines_1_to_7_keys
 from notifications_utils.recipients import RecipientCSV, first_column_headings
 
@@ -947,9 +948,15 @@ def _check_notification(service_id, template_id, exception=None):
 
     template.values = get_recipient_and_placeholders_from_session(template.template_type)
 
+    rate_multiplier = None
+
+    if template.template_type == "sms":
+        rate_multiplier = PhoneNumber(template.values["phonenumber"]).get_international_phone_info().rate_multiplier
+
     return dict(
         template=template,
         back_link=back_link,
+        rate_multiplier=rate_multiplier,
         **(get_template_error_dict(exception) if exception else {}),
     )
 
