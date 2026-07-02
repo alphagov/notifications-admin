@@ -1,6 +1,6 @@
 import AddBrandingOptionsControls from '../../app/assets/javascripts/esm/add-branding-options-controls.mjs';
 import { jest } from '@jest/globals';
-import * as helpers from './support/helpers';
+import { triggerEvent } from './support/helpers/events.mjs';
 
 describe('AddBrandingOptionsForm', () => {
 
@@ -149,8 +149,8 @@ describe('AddBrandingOptionsForm', () => {
       $brandingOptionsCheckboxes = getBrandingOptionsCheckboxes();
       $formControls = $addBrandingOptionsForm.querySelector('.js-stick-at-bottom-when-scrolling');
 
-      helpers.triggerEvent($brandingOptionsCheckboxes[0], 'click');
-      helpers.triggerEvent($brandingOptionsCheckboxes[2], 'click');
+      triggerEvent($brandingOptionsCheckboxes[0], 'click');
+      triggerEvent($brandingOptionsCheckboxes[2], 'click');
 
     });
 
@@ -173,7 +173,7 @@ describe('AddBrandingOptionsForm', () => {
 
       test("clicking the link clears the selection", () => {
 
-        helpers.triggerEvent(clearLink, 'click');
+        triggerEvent(clearLink, 'click');
 
         const checkedCheckboxes = Array.from($brandingOptionsCheckboxes).filter(checkbox => checkbox.checked);
 
@@ -183,7 +183,7 @@ describe('AddBrandingOptionsForm', () => {
 
       test("clicking the link moves focus to first checkbox", () => {
 
-        helpers.triggerEvent(clearLink, 'click');
+        triggerEvent(clearLink, 'click');
 
         const firstCheckbox = $brandingOptionsCheckboxes[0];
 

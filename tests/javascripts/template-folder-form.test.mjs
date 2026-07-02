@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
-import * as helpers from './support/helpers';
+import { triggerEvent } from './support/helpers/events.mjs';
+import { templatesAndFoldersCheckboxes } from './support/helpers/html.mjs';
 
 jest.unstable_mockModule('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs', () => ({
   stickAtBottomWhenScrolling: {
@@ -136,7 +137,7 @@ function setFixtures (hierarchy, newTemplateDataModules = "") {
 
   document.body.innerHTML = `
     <form method="post" data-notify-module="template-folder-form">
-      ${helpers.templatesAndFoldersCheckboxes(hierarchy)}
+      ${templatesAndFoldersCheckboxes(hierarchy)}
       ${controlsHTML(newTemplateDataModules)}
     </form>`;
 
@@ -348,7 +349,7 @@ describe('TemplateFolderForm', () => {
       // reset sticky JS mocks called when the module starts
       resetStickyMocks();
 
-      helpers.triggerEvent(formControls.querySelector('[value=add-new-template]'), 'click');
+      triggerEvent(formControls.querySelector('[value=add-new-template]'), 'click');
 
     });
 
@@ -434,7 +435,7 @@ describe('TemplateFolderForm', () => {
         // reset sticky JS mocks called when the new template state loaded
         resetStickyMocks();
 
-        helpers.triggerEvent(formControls.querySelector('.js-cancel'), 'click');
+        triggerEvent(formControls.querySelector('.js-cancel'), 'click');
 
         addNewTemplateButton = formControls.querySelector('[value=add-new-template]');
 
@@ -472,7 +473,7 @@ describe('TemplateFolderForm', () => {
       // reset sticky JS mocks called when the module starts
       resetStickyMocks();
 
-      helpers.triggerEvent(formControls.querySelector('[value=add-new-folder]'), 'click');
+      triggerEvent(formControls.querySelector('[value=add-new-folder]'), 'click');
 
       textbox = formControls.querySelector('input[type=text]');
 
@@ -543,7 +544,7 @@ describe('TemplateFolderForm', () => {
 
       beforeEach(() => {
 
-        helpers.triggerEvent(formControls.querySelector('.js-cancel'), 'click');
+        triggerEvent(formControls.querySelector('.js-cancel'), 'click');
 
         addNewFolderButton = formControls.querySelector('button[value=add-new-folder]');
 
@@ -581,8 +582,8 @@ describe('TemplateFolderForm', () => {
       // reset sticky JS mocks called when the module starts
       resetStickyMocks();
 
-      helpers.triggerEvent(templateFolderCheckboxes[0], 'click');
-      helpers.triggerEvent(templateFolderCheckboxes[2], 'click');
+      triggerEvent(templateFolderCheckboxes[0], 'click');
+      triggerEvent(templateFolderCheckboxes[2], 'click');
 
     });
 
@@ -630,7 +631,7 @@ describe('TemplateFolderForm', () => {
 
       test("clicking the link clears the selection", () => {
 
-        helpers.triggerEvent(clearLink, 'click');
+        triggerEvent(clearLink, 'click');
 
         const checkedCheckboxes = Array.from(templateFolderCheckboxes).filter(checkbox => checkbox.checked);
 
@@ -670,7 +671,7 @@ describe('TemplateFolderForm', () => {
       // reset sticky JS mocks called when a selection was made
       resetStickyMocks();
 
-        helpers.triggerEvent(formControls.querySelector('[value=move-to-existing-folder]'), 'click');
+        triggerEvent(formControls.querySelector('[value=move-to-existing-folder]'), 'click');
 
       });
 
@@ -762,7 +763,7 @@ describe('TemplateFolderForm', () => {
 
         beforeEach(() => {
 
-          helpers.triggerEvent(formControls.querySelector('.js-cancel'), 'click');
+          triggerEvent(formControls.querySelector('.js-cancel'), 'click');
 
           moveToFolderButton = formControls.querySelector('button[value=move-to-existing-folder]');
 
@@ -793,7 +794,7 @@ describe('TemplateFolderForm', () => {
         // reset sticky JS mocks called when a selection was made
         resetStickyMocks();
 
-        helpers.triggerEvent(formControls.querySelector('[value=move-to-new-folder]'), 'click');
+        triggerEvent(formControls.querySelector('[value=move-to-new-folder]'), 'click');
 
         textbox = formControls.querySelector('input[type=text]');
 
@@ -864,7 +865,7 @@ describe('TemplateFolderForm', () => {
 
         beforeEach(() => {
 
-          helpers.triggerEvent(formControls.querySelector('.js-cancel'), 'click');
+          triggerEvent(formControls.querySelector('.js-cancel'), 'click');
 
           moveToNewFolderButton = formControls.querySelector('button[value=move-to-new-folder]');
 
@@ -914,8 +915,8 @@ describe('TemplateFolderForm', () => {
 
       test("the content of both visible and hidden counters should match", () => {
 
-        helpers.triggerEvent(templateFolderCheckboxes[1], 'click');
-        helpers.triggerEvent(templateFolderCheckboxes[2], 'click');
+        triggerEvent(templateFolderCheckboxes[1], 'click');
+        triggerEvent(templateFolderCheckboxes[2], 'click');
 
         expect(visibleCounterText).toEqual(hiddenCounterText);
 
@@ -923,8 +924,8 @@ describe('TemplateFolderForm', () => {
 
       test("the content of the counter should reflect the selection", () => {
 
-        helpers.triggerEvent(templateFolderCheckboxes[1], 'click');
-        helpers.triggerEvent(templateFolderCheckboxes[2], 'click');
+        triggerEvent(templateFolderCheckboxes[1], 'click');
+        triggerEvent(templateFolderCheckboxes[2], 'click');
 
         expect(visibleCounterText).toEqual('2 templates selected');
 
@@ -936,7 +937,7 @@ describe('TemplateFolderForm', () => {
 
       test("the content of both visible and hidden counters should match", () => {
 
-        helpers.triggerEvent(templateFolderCheckboxes[0], 'click');
+        triggerEvent(templateFolderCheckboxes[0], 'click');
 
         expect(visibleCounterText).toEqual(hiddenCounterText);
 
@@ -944,7 +945,7 @@ describe('TemplateFolderForm', () => {
 
       test("the content of the counter should reflect the selection", () => {
 
-        helpers.triggerEvent(templateFolderCheckboxes[0], 'click');
+        triggerEvent(templateFolderCheckboxes[0], 'click');
 
         expect(visibleCounterText).toEqual('1 folder selected');
 
