@@ -13,9 +13,9 @@ import { locationReplace } from './utils.mjs';
 
 class CheckReportStatus {
   constructor($module) {
-    // if (!isSupported()) {
-    //   return this;
-    // }
+    if (!isSupported()) {
+      return this;
+    }
 
     this.$module = $module;
     this.fetchInterval = 20000;
