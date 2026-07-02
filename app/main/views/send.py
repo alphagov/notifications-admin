@@ -951,7 +951,7 @@ def _check_notification(service_id, template_id, exception=None):
     rate_multiplier = None
 
     if template.template_type == "sms":
-        rate_multiplier = PhoneNumber(template.values["phonenumber"]).get_international_phone_info().rate_multiplier
+        rate_multiplier = PhoneNumber(session["recipient"]).get_international_phone_info().rate_multiplier
 
     return dict(
         template=template,
