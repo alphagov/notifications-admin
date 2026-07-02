@@ -54,9 +54,10 @@ def edit_sms_provider_ratio():
     form = AdminProviderRatioForm(providers)
 
     if form.validate_on_submit():
+        reason = form.reason
         for provider in providers:
             field = getattr(form, provider["identifier"])
-            provider_client.update_provider(provider["id"], field.data)
+            provider_client.update_provider(provider["id"], field.data, reason=reason.data)
         return redirect(url_for(".view_providers"))
 
     return render_template(

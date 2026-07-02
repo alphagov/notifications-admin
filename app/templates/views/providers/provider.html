@@ -27,7 +27,7 @@
         caption='',
         caption_visible=False,
         empty_message='No history for this provider',
-        field_headings=['Version', 'Last Updated', 'Updated By', 'Priority', 'Active'],
+        field_headings=['Version', 'Last Updated', 'Updated By', 'Priority', 'Active', 'Reason'],
         field_headings_visible=True,
         give_rows_ids=False,
       ) %}
@@ -46,9 +46,17 @@
             {{ text_field('None') }}
         {% endif %}
 
+
         {{ text_field(item.priority) }}
 
         {{ text_field(item.active) }}
+
+        {% if item.reason %}
+            {{ text_field(item.reason) }}
+        {% else %}
+            {{ text_field('None') }}
+        {% endif %}
+
 
       {% endcall %}
 
