@@ -1,8 +1,8 @@
 {% extends "views/platform-admin/_base_template.html" %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/table.html" import mapping_table, row, text_field %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% block per_page_title %}
     Users List
@@ -79,28 +79,77 @@
 </fieldset>
 {% endcall %}
 
-<div class="bottom-gutter-3-2">
-    {% call mapping_table(
-          caption="Data included in the report",
-          field_headings=['Field', 'Description'],
-          field_headings_visible=True,
-          caption_visible=True
-        ) %}
-        {% for column_heading, description in [
-            ('Name', 'The full name of the user'),
-            ('Email', 'The email address associated with the user'),
-            ('Created At', 'The date the user account was created'),
-            ('Research Opt In', 'Whether the user has opted in to research'),
-            ('Is Org Team Member', 'Indicates if the user is a member of an organisation'),
-            ('Number of Live Services', 'The number of live services the user has access to'),
-            ('Live Service Permissions', 'The services and associated permissions assigned to the user'),
-          ] %}
-            {% call row() %}
-                {{ text_field(column_heading) }}
-                {{ text_field(description) }}
-            {% endcall %}
-        {% endfor %}
-    {% endcall %}
-</div>
+<h2 class="heading-medium">
+    Data included in the report
+</h2>
+
+{{ govukSummaryList({
+  "classes": "notify-summary-list govuk-!-margin-bottom-7 govuk-!-font-size-16",
+  "rows": [
+    {
+      "key": {
+        "classes": "notify-summary-list__key",
+          "text": "Name"
+      },
+      "value": {
+          "text": "The full name of the user"
+      }
+    },
+    {
+      "key": {
+        "classes": "notify-summary-list__key",
+        "text": "Email"
+      },
+      "value": {
+        "text": "The email address associated with the user"
+      }
+    },
+    {
+      "key": {
+        "classes": "notify-summary-list__key",
+        "text": "Created At"
+      },
+      "value": {
+        "text": "The date the user account was created"
+      }
+    },
+    {
+      "key": {
+        "classes": "notify-summary-list__key",
+        "text": "Research Opt In"
+      },
+      "value": {
+        "text": "Whether the user has opted in to research"
+      }
+    },
+    {
+      "key": {
+        "classes": "notify-summary-list__key",
+        "text": "Is Org Team Member"
+      },
+      "value": {
+        "text": "Indicates if the user is a member of an organisation"
+      }
+    },
+    {
+      "key": {
+        "classes": "notify-summary-list__key",
+        "text": "Number of Live Services"
+      },
+      "value": {
+        "text": "The number of live services the user has access to"
+      }
+    },
+    {
+      "key": {
+        "classes": "notify-summary-list__key",
+        "text": "Live Service Permissions"
+      },
+      "value": {
+        "text": "The services and associated permissions assigned to the user"
+      }
+    }
+  ]
+}) }}
 
 {% endblock %}
