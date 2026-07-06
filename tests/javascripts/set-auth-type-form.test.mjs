@@ -1,6 +1,6 @@
 import LiveCheckboxControls from '../../app/assets/javascripts/esm/live-checkbox-controls.mjs'; '../../app/assets/javascripts/esm/live-checkbox-controls.mjs';
 import { jest } from '@jest/globals';
-import * as helpers from './support/helpers';
+import { triggerEvent } from './support/helpers/events.mjs';
 
 describe('SetAuthTypeForm', () => {
 
@@ -137,7 +137,7 @@ describe('SetAuthTypeForm', () => {
       });
 
       test("Clicking 'Select All' should select all the options", () => {
-        helpers.triggerEvent($formControls.querySelector('.js-action'), 'click');
+        triggerEvent($formControls.querySelector('.js-action'), 'click');
 
         const $userCheckboxes = getUserCheckboxes();
         const $selectedCheckboxes = Array.from($userCheckboxes).filter($el => $el.checked && $el.hasAttribute('checked'));
@@ -214,8 +214,8 @@ describe('SetAuthTypeForm', () => {
         setAuthTypeControls = new LiveCheckboxControls($setAuthTypeForm);
         $visibleCounter = getVisibleCounter();
 
-        helpers.triggerEvent($userCheckboxes[0], 'click');
-        helpers.triggerEvent($userCheckboxes[2], 'click');
+        triggerEvent($userCheckboxes[0], 'click');
+        triggerEvent($userCheckboxes[2], 'click');
 
       });
 
@@ -238,7 +238,7 @@ describe('SetAuthTypeForm', () => {
 
         test("clicking the link clears the selection", () => {
 
-          helpers.triggerEvent(clearLink, 'click');
+          triggerEvent(clearLink, 'click');
 
           const checkedCheckboxes = Array.from($userCheckboxes).filter(checkbox => checkbox.checked);
 
@@ -248,7 +248,7 @@ describe('SetAuthTypeForm', () => {
 
         test("clicking the link moves focus to first checkbox", () => {
 
-          helpers.triggerEvent(clearLink, 'click');
+          triggerEvent(clearLink, 'click');
 
           const firstCheckbox = $userCheckboxes[0];
 
@@ -300,8 +300,8 @@ describe('SetAuthTypeForm', () => {
 
       setAuthTypeControls = new LiveCheckboxControls($setAuthTypeForm);
 
-      helpers.triggerEvent($userCheckboxes[0], 'click');
-      helpers.triggerEvent($userCheckboxes[1], 'click');
+      triggerEvent($userCheckboxes[0], 'click');
+      triggerEvent($userCheckboxes[1], 'click');
 
     });
 
@@ -324,7 +324,7 @@ describe('SetAuthTypeForm', () => {
 
       test("clicking the link clears the selection", () => {
 
-        helpers.triggerEvent(clearLink, 'click');
+        triggerEvent(clearLink, 'click');
 
         const checkedCheckboxes = Array.from($userCheckboxes).filter(checkbox => checkbox.checked);
 
@@ -334,7 +334,7 @@ describe('SetAuthTypeForm', () => {
 
       test("clicking the link moves focus to first checkbox", () => {
 
-        helpers.triggerEvent(clearLink, 'click');
+        triggerEvent(clearLink, 'click');
 
         const firstCheckbox = $userCheckboxes[0];
 

@@ -5,6 +5,7 @@
   "engines": {
     "node": ">=10.15.3"
   },
+  "type": "module",
   "scripts": {
     "test": "npm run lint:scss && npm run lint:js && npm run test:js tests/javascripts",
     "test:js": "node --experimental-vm-modules node_modules/.bin/jest",
@@ -58,14 +59,14 @@
   },
   "jest": {
     "setupFiles": [
-      "<rootDir>/tests/javascripts/support/setup.js"
+      "<rootDir>/tests/javascripts/support/setup.mjs"
     ],
     "testEnvironmentOptions": {
       "url": "https://www.notifications.service.gov.uk"
     },
     "transform": {},
     "testMatch": [
-      "<rootDir>/**/?(*.)(test).{js,mjs}"
+      "<rootDir>/**/?(*.)(test).mjs"
     ],
     "testEnvironment": "jsdom"
   }

@@ -1,6 +1,6 @@
 import FileUpload from '../../app/assets/javascripts/esm/file-upload.mjs';
-import * as helpers from './support/helpers.js';
 import { jest } from '@jest/globals';
+import { triggerEvent } from './support/helpers/events.mjs';
 
 beforeAll(() => {
   document.body.classList.add('govuk-frontend-supported');
@@ -45,7 +45,7 @@ describe('File upload', () => {
     // start module
     new FileUpload(document.querySelector('[data-notify-module="file-upload"]'));
 
-    helpers.triggerEvent(window, 'pageshow');
+    triggerEvent(window, 'pageshow');
 
     expect(form.reset).toHaveBeenCalled();
 
@@ -130,10 +130,10 @@ describe('File upload', () => {
       uploadControl.addEventListener('click', fileUploadClickCallback);
 
       // click the 'upload' button
-      helpers.triggerEvent(form.querySelector('button'), 'click');
+      triggerEvent(form.querySelector('button'), 'click');
 
       // fake the 'onchange' event triggered in browsers by selection of a file
-      helpers.triggerEvent(uploadControl, 'change', { eventInit: { bubbles: true } });
+      triggerEvent(uploadControl, 'change', { eventInit: { bubbles: true } });
 
     });
 

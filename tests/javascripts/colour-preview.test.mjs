@@ -1,5 +1,5 @@
-import ColourPreview from '../../app/assets/javascripts/esm/colour-preview.mjs'
-import * as helpers from './support/helpers.js'
+import ColourPreview from '../../app/assets/javascripts/esm/colour-preview.mjs';
+import { triggerEvent } from './support/helpers/events.mjs';
 
 describe('Colour preview', () => {
 
@@ -135,7 +135,7 @@ describe('Colour preview', () => {
 
     test("If the textbox is empty it should make the swatch white", () => {
 
-      helpers.triggerEvent(textbox, 'input');
+      triggerEvent(textbox, 'input');
 
       // textbox defaults to empty
       expect(swatchEl.style.background).toEqual('rgb(255, 255, 255)');
@@ -146,7 +146,7 @@ describe('Colour preview', () => {
 
       textbox.setAttribute('value', '#00FF00');
 
-      helpers.triggerEvent(textbox, 'input');
+      triggerEvent(textbox, 'input');
 
       // textbox defaults to empty
       expect(swatchEl.style.background).toEqual('rgb(0, 255, 0)');
@@ -157,7 +157,7 @@ describe('Colour preview', () => {
 
       textbox.setAttribute('value', 'green');
 
-      helpers.triggerEvent(textbox, 'input');
+      triggerEvent(textbox, 'input');
 
       // textbox defaults to empty
       expect(swatchEl.style.background).toEqual('rgb(255, 255, 255)');
@@ -168,7 +168,7 @@ describe('Colour preview', () => {
 
       textbox.setAttribute('value', '  #00FF00 ');
 
-      helpers.triggerEvent(textbox, 'input');
+      triggerEvent(textbox, 'input');
 
       expect(swatchEl.style.background).toEqual('rgb(0, 255, 0)');
 

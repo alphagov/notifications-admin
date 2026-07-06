@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
-import * as helpers from './support/helpers';
+import { ScreenMock } from './support/helpers/rendering.mjs';
+import { triggerEvent } from './support/helpers/events.mjs';
 
 jest.unstable_mockModule('../../app/assets/javascripts/esm/stick-to-window-when-scrolling.mjs', () => ({
   stickAtBottomWhenScrolling: {
@@ -92,7 +93,7 @@ describe('FullscreenTable', () => {
 
     }
 
-    screenMock = new helpers.ScreenMock(jest);
+    screenMock = new ScreenMock(jest);
     screenMock.setWindow({
       width: 1990,
       height: 940,
@@ -475,7 +476,7 @@ describe('FullscreenTable', () => {
     test("the right edge of the table scroll area should have a drop-shadow if it isn't scrolled", () => {
 
       tableFrame.scrollLeft = 0;
-      helpers.triggerEvent(tableFrame, 'scroll');
+      triggerEvent(tableFrame, 'scroll');
 
       expect(numberColumnFrame.classList.contains('fullscreen-scrolled-table')).toBe(false);
       expect(rightEdgeShadow.classList.contains('visible')).toBe(true);
@@ -486,7 +487,7 @@ describe('FullscreenTable', () => {
 
       // scroll to end of table
       tableFrame.scrollLeft = 258;
-      helpers.triggerEvent(tableFrame, 'scroll');
+      triggerEvent(tableFrame, 'scroll');
 
       expect(numberColumnFrame.classList.contains('fullscreen-scrolled-table')).toBe(true);
       expect(rightEdgeShadow.classList.contains('visible')).toBe(false);
@@ -497,7 +498,7 @@ describe('FullscreenTable', () => {
 
       // scroll to middle of table
       tableFrame.scrollLeft = 129;
-      helpers.triggerEvent(tableFrame, 'scroll');
+      triggerEvent(tableFrame, 'scroll');
 
       expect(numberColumnFrame.classList.contains('fullscreen-scrolled-table')).toBe(true);
       expect(rightEdgeShadow.classList.contains('visible')).toBe(true);

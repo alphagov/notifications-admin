@@ -69,8 +69,10 @@ class ElementQuery {
 }
 
 // function to ask certain questions of a DOM Element
-function element (el) {
+const element = (el) => {
   return new ElementQuery(el);
 }
 
-exports.element = element;
+export {
+  element
+};
