@@ -780,29 +780,29 @@ def test_callbacks_button_links_straight_to_delivery_status_if_service_has_no_in
     [
         pytest.param(
             [],
-            ["Delivery receipts Not set Change"],
+            ["Delivery receipts Not set Change delivery receipts callback settings"],
             marks=pytest.mark.xfail(reason="Endpoint will redirect to delivery receipts page"),
         ),
         (
             ["inbound_sms"],
             [
-                "Delivery receipts Not set Change",
-                "Received text messages Not set Change",
+                "Delivery receipts Not set Change delivery receipts callback settings",
+                "Received text messages Not set Change received text messages callback settings",
             ],
         ),
         (
             ["letter"],
             [
-                "Delivery receipts Not set Change",
-                "Returned letters Not set Change",
+                "Delivery receipts Not set Change delivery receipts callback settings",
+                "Returned letters Not set Change returned letters callback settings",
             ],
         ),
         (
             ["inbound_sms", "letter"],
             [
-                "Delivery receipts Not set Change",
-                "Received text messages Not set Change",
-                "Returned letters Not set Change",
+                "Delivery receipts Not set Change delivery receipts callback settings",
+                "Received text messages Not set Change received text messages callback settings",
+                "Returned letters Not set Change returned letters callback settings",
             ],
         ),
     ],
@@ -817,7 +817,7 @@ def test_callbacks_page_lists_correct_rows_depending_on_service_permissions(
         service_id=service_one["id"],
     )
 
-    assert [normalize_spaces(row.text) for row in page.select("main tbody tr")] == expected_rows
+    assert [normalize_spaces(row.text) for row in page.select("main .govuk-summary-list__row")] == expected_rows
 
 
 def test_callbacks_page_redirects_to_delivery_status_if_service_has_no_inbound_sms_or_letter_permissions(
@@ -988,9 +988,9 @@ def test_update_service_callback_without_changes_does_not_update(
         (
             None,
             {},
-            "Delivery receipts Not set Change",
-            "Received text messages Not set Change",
-            "Returned letters Not set Change",
+            "Delivery receipts Not set Change delivery receipts callback settings",
+            "Received text messages Not set Change received text messages callback settings",
+            "Returned letters Not set Change returned letters callback settings",
         ),
         (
             [
@@ -999,36 +999,36 @@ def test_update_service_callback_without_changes_does_not_update(
                 {"callback_id": uuid.uuid4(), "callback_type": "inbound_sms"},
             ],
             {"url": "https://generic.urls"},
-            "Delivery receipts https://generic.urls Change",
-            "Received text messages https://generic.urls Change",
-            "Returned letters https://generic.urls Change",
+            "Delivery receipts https://generic.urls Change delivery receipts callback settings",
+            "Received text messages https://generic.urls Change received text messages callback settings",
+            "Returned letters https://generic.urls Change returned letters callback settings",
         ),
         (
             [
                 {"callback_id": uuid.uuid4(), "callback_type": "delivery_status"},
             ],
             {"url": "https://delivery.receipts"},
-            "Delivery receipts https://delivery.receipts Change",
-            "Received text messages Not set Change",
-            "Returned letters Not set Change",
+            "Delivery receipts https://delivery.receipts Change delivery receipts callback settings",
+            "Received text messages Not set Change received text messages callback settings",
+            "Returned letters Not set Change returned letters callback settings",
         ),
         (
             [
                 {"callback_id": uuid.uuid4(), "callback_type": "returned_letter"},
             ],
             {"url": "https://returned.letter"},
-            "Delivery receipts Not set Change",
-            "Received text messages Not set Change",
-            "Returned letters https://returned.letter Change",
+            "Delivery receipts Not set Change delivery receipts callback settings",
+            "Received text messages Not set Change received text messages callback settings",
+            "Returned letters https://returned.letter Change returned letters callback settings",
         ),
         (
             [
                 {"callback_id": uuid.uuid4(), "callback_type": "inbound_sms"},
             ],
             {"url": "https://inbound.sms"},
-            "Delivery receipts Not set Change",
-            "Received text messages https://inbound.sms Change",
-            "Returned letters Not set Change",
+            "Delivery receipts Not set Change delivery receipts callback settings",
+            "Received text messages https://inbound.sms Change received text messages callback settings",
+            "Returned letters Not set Change returned letters callback settings",
         ),
     ],
 )
@@ -1055,7 +1055,7 @@ def test_callbacks_page_works_when_no_apis_set(
         expected_2nd_row,
         expected_3rd_row,
     ]
-    rows = page.select("tbody tr")
+    rows = page.select("main .govuk-summary-list__row")
     assert len(rows) == 3
     for index, row in enumerate(expected_rows):
         assert row == normalize_spaces(rows[index].text)
