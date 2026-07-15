@@ -1,6 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/big-number.html" import big_number %}
-{% from "components/table.html" import list_table, field, text_field, row_heading %}
+{% from "components/table.html" import list_table, field, row_heading %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
@@ -104,25 +104,20 @@
 
   {% set recipient_column = contact_list.recipients.column_headers[0] %}
 
-  <div class="body-copy-table">
-    {% call(item, row_number) list_table(
-      contact_list.recipients.displayed_rows,
-      caption=contact_list.recipients|length|recipient_count_label(contact_list.template_type)|capitalize,
-      caption_visible=False,
-      field_headings=[recipient_column],
-      field_headings_visible=False,
-    ) %}
-      {{ text_field(item[recipient_column].data) }}
-    {% endcall %}
+  <ul class="contact-list govuk-list govuk-list--bordered">
+    {% for item in contact_list.recipients.displayed_rows %}
+    <li>
+      {{ item[recipient_column].data }}
+    </li>
+    {% endfor %}
+  </ul>
 
-    {% if contact_list.recipients.displayed_rows|list|length < contact_list.recipients|length %}
-      <p class="table-show-more-link">
-        Only showing the first {{ contact_list.recipients.displayed_rows|list|length }} rows
-      </p>
-    {% endif %}
-  </div>
-
-
+  {% if contact_list.recipients.displayed_rows|list|length < contact_list.recipients|length %}
+    <p class="govuk-body more-items-available-text">
+      Only showing the first {{ contact_list.recipients.displayed_rows|list|length }} rows
+    </p>
+  {% endif %}
+ 
   <div class="js-stick-at-bottom-when-scrolling">
     <div class="page-footer">
       {% if not confirm_delete_banner %}
