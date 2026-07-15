@@ -1835,7 +1835,7 @@ def test_org_breadcrumbs_show_if_user_is_platform_admin(
     )
 
 
-def test_breadcrumb_shows_if_service_is_suspended(
+def test_breadcrumb_shows_if_service_is_archived(
     mock_get_template_statistics,
     mock_get_service_templates_when_no_templates_exist,
     mock_has_no_jobs,
@@ -1847,12 +1847,38 @@ def test_breadcrumb_shows_if_service_is_suspended(
     client_request,
     mocker,
 ):
-    service_one_json = service_json(SERVICE_ONE_ID, active=False)
+    service_one_json = service_json(SERVICE_ONE_ID, active=False, restricted=False)
     client_request.login(platform_admin_user, service=service_one_json)
 
     page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
 
-    assert "Suspended" in page.select_one(".navigation-service-name").text
+    assert normalize_spaces(page.select_one(".navigation-status-tag").text) == "Archived"
+
+
+@pytest.mark.parametrize("service_restricted", [True, False])
+def test_service_navigation_shows_if_service_is_in_trial_mode(
+    mock_get_service_templates_when_no_templates_exist,
+    mock_has_no_jobs,
+    mock_get_unsubscribe_requests_statistics,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+    api_user_active,
+    client_request,
+    service_restricted,
+    mocker,
+):
+    service_one = service_json(
+        SERVICE_ONE_ID,
+        users=[api_user_active["id"]],
+        restricted=service_restricted,
+    )
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+
+    page = client_request.get("main.service_dashboard", service_id=SERVICE_ONE_ID)
+
+    if service_restricted:
+        assert normalize_spaces(page.select_one(".navigation-status-tag").text) == "Trial mode"
+    else:
+        assert not page.select_one(".navigation-status-tag")
 
 
 @pytest.mark.parametrize(

@@ -9,26 +9,15 @@
   $padding-bottom: 17px;
 
   &-service-name,
-  &-organisation-link {
+  &-organisation-link,
+  &-status-tag {
     float: left;
   }
 
-  &-service-type {
-
-    @include govuk-font(16, $weight: bold);
-    position: relative;
-    display: inline-block;
+  &-status-tag {
     margin-left: govuk-spacing(2);
-    padding: 0 govuk-spacing(1);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-
-    &--suspended {
-      background: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
-      color: mix(govuk-colour('black', $variant: "tint-25"), govuk-colour('black'));
-      box-shadow: 0 -3px 0 0 mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
-    }
-
+    margin-bottom: govuk-spacing(1);
+    letter-spacing: 0.02em;
   }
 
   &-service-back-to,
@@ -72,11 +61,15 @@
     }
   }
 
+  &-service-name {
+    margin-bottom: govuk-spacing(1);
+  }
+
   &-organisation-link {
 
     box-sizing: border-box;
     margin-bottom: govuk-spacing(1);
-    
+
     &:focus:before {
       border-color: govuk-functional-colour(focus-text);
     }
