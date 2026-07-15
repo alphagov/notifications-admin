@@ -473,10 +473,13 @@ def test_should_404_for_api_key_that_doesnt_exist(
 
 def test_should_redirect_after_revoking_api_key(
     client_request,
-    mock_revoke_api_key,
+    api_user_active,
     mock_get_api_keys,
     fake_uuid,
+    mocker,
 ):
+    post = mocker.patch("app.models.api_key.api_key_api_client.post")
+
     client_request.post(
         "main.revoke_api_key",
         service_id=SERVICE_ONE_ID,
@@ -487,7 +490,11 @@ def test_should_redirect_after_revoking_api_key(
             service_id=SERVICE_ONE_ID,
         ),
     )
-    mock_revoke_api_key.assert_called_once_with(service_id=SERVICE_ONE_ID, key_id=fake_uuid)
+
+    post.assert_called_once_with(
+        url=f"/service/{SERVICE_ONE_ID}/api-key/revoke/{fake_uuid}",
+        data={"created_by": api_user_active["id"]},
+    )
     mock_get_api_keys.assert_called_once_with(
         SERVICE_ONE_ID,
     )
