@@ -64,5 +64,5 @@ def test_guidance_pricing_sms(
     page = client_request.get(".guidance_pricing_text_messages")
 
     assert normalize_spaces(page.select_one(".content-metadata").text) == expected_last_updated
-    assert normalize_spaces(page.select("main .govuk-body")[1].text) == expected_first_paragraph
-    assert normalize_spaces(page.select("main .govuk-body")[2].text) == expected_second_paragraph
+    assert normalize_spaces(page.select("main > .govuk-body")[0].text) == expected_first_paragraph
+    assert normalize_spaces(page.select("main > .govuk-body")[1].text) == expected_second_paragraph
