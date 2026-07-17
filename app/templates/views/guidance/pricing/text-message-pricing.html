@@ -3,7 +3,6 @@
 {% from "components/table.html" import mapping_table, row, text_field, field %}
 {% from "components/live-search.html" import live_search %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
-{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Pricing information' %}
@@ -13,16 +12,6 @@ Text message pricing
 {% endblock %}
 
 {% block content_column_content %}
-
-{% call govukNotificationBanner({
-    "titleText": "You can no longer send text messages to China",
-    "classes": "govuk-!-margin-top-9"
-  }) %}
-    <p class="govuk-body govuk-!-font-weight-bold">
-      Some mobile phone networks in China are rejecting text messages sent by GOV.UK Notify.
-      Until we can find a solution, you can no longer send text messages to the +86 country code.
-    </p>
-  {% endcall %}
 
   <h1 class="heading-large">Text message pricing</h1>
 
@@ -54,7 +43,7 @@ Text message pricing
   <p class="govuk-body">The size of the allowance depends on the organisation you work for.</p>
 
   <div class="bottom-gutter-3-2">
-
+    
     {% set central_government_organisations_text %}
     Central government departments and <br>national organisations
     {% endset %}
