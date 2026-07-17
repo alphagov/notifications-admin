@@ -15,12 +15,14 @@ Text message pricing
 {% block content_column_content %}
 
 {% call govukNotificationBanner({
-    "titleText": "You can no longer send text messages to China",
+    "titleText": "Text messages to China",
     "classes": "govuk-!-margin-top-9"
   }) %}
     <p class="govuk-body govuk-!-font-weight-bold">
       Some mobile phone networks in China are rejecting text messages sent by GOV.UK Notify.
-      Until we can find a solution, you can no longer send text messages to the +86 country code.
+    </p>
+    <p class="govuk-body govuk-!-font-weight-bold">
+      Until we find a solution, we will stop you from sending text messages to the +86 country code.
     </p>
   {% endcall %}
 
