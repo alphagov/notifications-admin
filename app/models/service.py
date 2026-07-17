@@ -602,7 +602,7 @@ class Service(JSONModel):
 
     @property
     def able_to_accept_agreement(self):
-        return self.organisation.agreement_signed is not None or self.organisation_type in {
+        return self.organisation.agreement_signed is not False or self.organisation_type in {
             Organisation.TYPE_NHS_GP,
             Organisation.TYPE_NHS_LOCAL,
         }
