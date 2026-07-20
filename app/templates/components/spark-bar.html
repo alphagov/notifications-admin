@@ -1,0 +1,11 @@
+{% macro spark_bar(
+  count,
+  max_count,
+  id=None
+) %}
+<span {% if id %}id="{{ id }}"{% endif %} class="spark-bar">
+    <span class="spark-bar__bar" style="width: {{ count / max_count * 100 }}%">
+    {{ '{:,.0f}'.format(count) }}
+    </span>
+</span>
+{% endmacro %}

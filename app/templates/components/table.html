@@ -194,18 +194,3 @@
     {% endcall %}
   {% endif %}
 {% endmacro %}
-
-
-{% macro spark_bar_field(
-  count,
-  max_count,
-  id=None
-) %}
-  {% call field(align='right') %}
-    <span {% if id %}id="{{ id }}"{% endif %} class="spark-bar">
-      <span class="spark-bar-bar" style="width: {{ count / max_count * 100 }}%">
-        {{ '{:,.0f}'.format(count) }}
-      </span>
-    </span>
-  {% endcall %}
-{% endmacro %}
