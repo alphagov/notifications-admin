@@ -208,3 +208,15 @@ details .arrow {
 .form--inline {
   display: inline-flex;
 }
+
+// paragraph style for no data text
+// used on template statistics
+.no-data {
+  @include govuk-font(16);
+  color: govuk-functional-colour(secondary-text);
+  margin-top: 10px;
+  margin-bottom: govuk-spacing(7);
+  border-top: 1px solid govuk-functional-colour(border);
+  border-bottom: 1px solid govuk-functional-colour(border);
+  padding: 0.75em 0 0.5625em 0;
+}
