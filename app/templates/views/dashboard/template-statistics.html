@@ -1,44 +1,50 @@
-{% from "components/table.html" import list_table, row_heading, spark_bar_field %}
+{% from "components/spark-bar.html" import spark_bar %}
 {% from "components/show-more.html" import show_more %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 <div class="ajax-block-container">
   {% if template_statistics|length > 1 %}
-    <div class='template-statistics-table'>
-      {% call(item, row_number) list_table(
-        template_statistics,
-        caption="By template",
-        caption_visible=True,
-        empty_message='',
-        field_headings=[
-          'Template',
-          'Messages sent'
-        ],
-        field_headings_visible=False
-      ) %}
-
-        {% call row_heading() %}
+    <h3>By template</h3>
+    {% set template_stats = [] %}
+      {% for item in template_statistics %}
+        {% set summary_key_html %}
           {% if item.is_precompiled_letter %}
-          <span class="template-statistics-table-template-name">
-          Provided as PDF
-          </span>
-          <span class="template-statistics-table-hint">
-            Letter
-          </span>
+            <span class="notify-summary-list__key__filename">
+            Provided as PDF
+            </span>
+            <p class="govuk-body notify-summary-list__metadata">
+              Letter
+            </p>
           {% else %}
-          <a class="govuk-link govuk-link--no-visited-state template-statistics-table-template-name" href="{{ url_for('main.view_template', service_id=current_service.id, template_id=item.template_id) }}">{{ item.template_name }}</a>
-          <span class="template-statistics-table-hint">
-            {{ 1|message_count_label(item.template_type, suffix='template')|capitalize }}
-          </span>
+            <a class="govuk-link govuk-link--no-visited-state notify-summary-list__filename notify-summary-list__filename--large"
+              href="{{ url_for('main.view_template', service_id=current_service.id, template_id=item.template_id) }}">
+              {{ item.template_name }}
+            </a>
+            <p class="govuk-body notify-summary-list__metadata">
+              {{ 1|message_count_label(item.template_type, suffix='template')|capitalize }}
+            </p>
           {% endif %}
-        {% endcall %}
+        {% endset %}
+        {% do template_stats.append({
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--50-100",
+            "html": summary_key_html,
+          },
+          "value": {
+            "html": spark_bar(item.count, most_used_template_count, id=item.template_id),
+          }
+        }) %}
+      {% endfor %}
 
-        {{ spark_bar_field(item.count, most_used_template_count, id=item.template_id) }}
-      {% endcall %}
+      {{ govukSummaryList({
+        "classes": "notify-summary-list",
+        "rows": template_stats
+      }) }}
+
       {{ show_more(
         url_for('main.template_usage', service_id=current_service.id),
         'See templates used by month',
         with_border=False
       ) }}
-    </div>
   {% endif %}
 </div>
