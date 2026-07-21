@@ -114,8 +114,6 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
 
   @include govuk-media-query($from: tablet) {
     font-weight: normal;
-    padding-top: govuk-spacing(3);
-    padding-bottom: govuk-spacing(2) + 1px;
     width: 33%;
   }
 
