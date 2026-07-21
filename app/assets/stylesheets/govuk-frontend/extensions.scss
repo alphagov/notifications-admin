@@ -110,6 +110,25 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
 
 }
 
+// summary list with file name and metadata
+// there will be 2 variants
+// 24px filename and 19px metadata - template stats
+// 19px filename and 16px metadata - other lists
+
+.notify-summary-list__filename {
+  @include govuk-typography-weight-bold;
+}
+
+.notify-summary-list__filename--large {
+  @include govuk-font-size(24);
+}
+
+.notify-summary-list__metadata {
+  @include govuk-media-query($from: tablet) {
+    margin-bottom: 0;
+  }
+}
+
 .notify-summary-list__key {
 
   @include govuk-media-query($from: tablet) {
@@ -125,6 +144,14 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
 
   @include govuk-media-query($from: tablet) {
     width: 35%;
+  }
+
+}
+
+.notify-summary-list__key--50-100 {
+
+  @include govuk-media-query($from: tablet) {
+    width: 50%;
   }
 
 }
