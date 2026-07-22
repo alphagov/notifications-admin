@@ -52,8 +52,8 @@ class TemplatePreviewClient:
             abort(400)
         data = {
             "letter_contact_block": db_template.get("reply_to_text", ""),
-            "template": db_template,
-            "values": values,
+            "template": dict(db_template),
+            "values": values and dict(values),
             "filename": branding_filename or (service.letter_branding.filename if service else None),
             "date": date.isoformat() if date else None,
         }
@@ -119,8 +119,8 @@ class TemplatePreviewClient:
 
         data = {
             "letter_contact_block": db_template.get("reply_to_text", ""),
-            "template": db_template,
-            "values": values,
+            "template": dict(db_template),
+            "values": values and dict(values),
             "filename": service.letter_branding.filename,
         }
         response = self.requests_session.post(
