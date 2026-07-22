@@ -3,6 +3,7 @@ from contextvars import ContextVar
 
 import requests
 from flask import current_app, has_request_context, request
+from notifications_utils.json import RelaxedContainerJSONEncoder as RCJSONEncoder
 from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
@@ -42,7 +43,10 @@ class DocumentDownloadAPIClient:
         This method runs file validation checks and an antivirus scan and also determines the file mimetype
         """
         file_check_url = f"{self.base_url}/services/{service_id}/antivirus-and-mimetype-check"
-        headers = {"Authorization": f"Bearer {self.auth_token}"}
+        headers = {
+            "Authorization": f"Bearer {self.auth_token}",
+            "Content-Type": "application/json",
+        }
         file_data = {"document": base64.b64encode(file_bytes).decode("utf-8"), "filename": file_name}
 
         if has_request_context() and hasattr(request, "get_onwards_request_headers"):
@@ -52,7 +56,7 @@ class DocumentDownloadAPIClient:
             response = self.request_session.post(
                 file_check_url,
                 headers=headers,
-                json=file_data,
+                data=RCJSONEncoder().encode(file_data),
             )
             response.raise_for_status()
         except requests.RequestException as e:
