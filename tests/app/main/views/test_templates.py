@@ -2218,39 +2218,38 @@ def test_dont_show_preview_letter_templates_for_bad_filetype(
 def test_letter_branding_preview_image(
     client_request,
     mock_onwards_request_headers,
-    mocker,
+    requests_mock,
 ):
-    class MockedResponse:
-        content = "foo"
-        status_code = 200
-        headers = {}
+    requests_mock.post(
+        "http://localhost:9999/preview.png",
+        request_headers={
+            "Authorization": "Token my-secret-key",
+            "some-onwards": "request-headers",
+        },
+        content=b"foo",
+        status_code=200,
+        headers={"content-type": "image/png"},
+    )
 
-    mocked_preview = mocker.patch("app.template_preview_client.requests_session.post", return_value=MockedResponse())
     response = client_request.get_response(
         "no_cookie.letter_branding_preview_image",
         filename="example",
     )
-
-    mocked_preview.assert_called_with(
-        "http://localhost:9999/preview.png",
-        json={
-            "letter_contact_block": "",
-            "template": {
-                "subject": "An example letter",
-                "content": ANY,
-                "template_type": "letter",
-                "is_precompiled_letter": False,
-            },
-            "values": None,
-            "filename": "example",
-            "date": None,
-        },
-        headers={
-            "Authorization": "Token my-secret-key",
-            "some-onwards": "request-headers",
-        },
-    )
     assert response.get_data(as_text=True) == "foo"
+
+    assert len(requests_mock.request_history) == 1
+    assert requests_mock.request_history[0].json() == {
+        "letter_contact_block": "",
+        "template": {
+            "subject": "An example letter",
+            "content": ANY,
+            "template_type": "letter",
+            "is_precompiled_letter": False,
+        },
+        "values": None,
+        "filename": "example",
+        "date": None,
+    }
 
 
 @pytest.mark.parametrize("filename", [None, FieldWithNoneOption.NONE_OPTION_VALUE])
