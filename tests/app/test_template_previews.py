@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
+from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.testing.comparisons import AnySupersetOf
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -305,6 +306,7 @@ def test_page_count_returns_none_for_non_letter_templates(notify_admin, template
     (
         None,
         {"foo": "bar"},
+        InsensitiveDict({"foo": "bar"}),
     ),
 )
 def test_page_count_makes_a_call_to_template_preview_and_gets_page_count(
