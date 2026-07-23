@@ -1,10 +1,21 @@
+{% from "govuk_frontend_jinja/components/tag/macro.html" import govukTag %}
+
 {% macro navigation_service_name(service) %}
   <div class="navigation-service-name govuk-!-font-weight-bold">
     {{ service.name }}
-    {% if not service.active %}
-      <span class="navigation-service-type navigation-service-type--suspended">Suspended</span>
-    {% endif %}
   </div>
+  {% if service.trial_mode %}
+    {{ govukTag({
+      "text": "Trial mode",
+      "classes": "govuk-tag--grey navigation-status-tag",
+    }) }}
+  {% endif %}
+  {% if not service.active %}
+    {{ govukTag({
+      "text": "Archived",
+      "classes": "govuk-tag--orange navigation-status-tag",
+    }) }}
+  {% endif %}
 {% endmacro %}
 
 {% macro service_navigation(user, service) %}
