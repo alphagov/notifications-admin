@@ -28,6 +28,8 @@
                 {% if current_user.platform_admin and not user.is_invited_user%}
                   <span class="heading-small">
                     <a class="govuk-link govuk-link--text-colour" href="{{ url_for('main.user_information', user_id=user.id) }}">
+                      {{ user.name }}
+                    </a>
                   </span>&ensp;
                 {% else %}
                   <span class="heading-small">{{ user.name }}</span>&ensp;
