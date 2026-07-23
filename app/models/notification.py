@@ -3,7 +3,7 @@ from typing import Any
 
 from markupsafe import Markup
 from notifications_utils.interruptible_io import InterruptibleIterableMixin
-from notifications_utils.letter_timings import get_letter_timings, letter_can_be_cancelled
+from notifications_utils.letter_timings import LetterTimings, letter_can_be_cancelled
 from notifications_utils.template import (
     LetterPreviewTemplate,
     SMSBodyPreviewTemplate,
@@ -126,7 +126,7 @@ class Notification(JSONModel):
     @property
     def estimated_letter_delivery_date(self):
         if self.notification_type == "letter":
-            return get_letter_timings(self.created_at.replace(tzinfo=None), postage=self.postage).latest_delivery
+            return LetterTimings(self.created_at.replace(tzinfo=None), postage=self.postage).latest_delivery
 
     @property
     def letter_can_be_cancelled(self):
