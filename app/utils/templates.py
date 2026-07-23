@@ -7,6 +7,7 @@ from notifications_utils.countries import Postage
 from notifications_utils.field import Field
 from notifications_utils.formatters import escape_html, formatted_list, normalise_whitespace
 from notifications_utils.insensitive_dict import InsensitiveSet
+from notifications_utils.json import RelaxedContainerJSONEncoder as RCJSONEncoder
 from notifications_utils.take import Take
 from notifications_utils.template import (
     BaseEmailTemplate,
@@ -180,7 +181,7 @@ class TemplatedLetterImageTemplate(BaseLetterImageTemplate):
             service=current_service,
             values=self.values,
         )
-        redis_client.set(cache_key, json.dumps(self._all_page_counts), ex=cache.DEFAULT_TTL)
+        redis_client.set(cache_key, RCJSONEncoder().encode(self._all_page_counts), ex=cache.DEFAULT_TTL)
 
         return self._all_page_counts
 
