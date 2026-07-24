@@ -1,46 +1,39 @@
-{% from "components/table.html" import list_table, row_heading, field %}
 {% from "components/show-more.html" import show_more %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 <div class="ajax-block-container">
-    <div class='template-statistics-table'>
-      {% call(item, row_number) list_table(
-        [1],
-        caption="By template",
-        caption_visible=True,
-        empty_message='',
-        field_headings=[
-          'Template',
-          'Messages sent'
-        ],
-        field_headings_visible=False
-      ) %}
-
-        {% call row_heading() %}
-          <span class="template-statistics-table-template-name" aria-label="Loading data for templates">
-            <span class="spark-bar">
-              <span class="spark-bar-bar" style="width: 100%">
-                &nbsp;
-              </span>
-            </span>
-          </span>
-          <span class="template-statistics-table-hint">
-            &nbsp;
-          </span>
-        {% endcall %}
-
-        {% call field() %}
-          <span class="spark-bar" aria-label="Loading data for messages sent">
-            <span class="spark-bar-bar" style="width: 100%">
-              &nbsp;
-            </span>
-          </span>
-        {% endcall %}
-
-      {% endcall %}
-      {{ show_more(
-        url_for('main.template_usage', service_id=current_service.id),
-        'See templates used by month',
-        with_border=False
-      ) }}
-    </div>
+    <h3>By template</h3>
+    {% set summary_key_html %}
+      <span class="spark-bar" aria-label="Loading data for templates">
+        <span class="spark-bar__bar" style="width: 100%">
+          &nbsp;
+        </span>
+      </span>
+    {% endset %}
+    {% set summary_value_html %}
+      <span class="spark-bar" aria-label="Loading data for messages sent">
+        <span class="spark-bar__bar" style="width: 100%">
+          &nbsp;
+        </span>
+      </span>
+    {% endset %}
+    {{ govukSummaryList({
+      "classes": "notify-summary-list",
+      "rows": [
+        {
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--50-100",
+            "html": summary_key_html,
+          },
+          "value": {
+            "html": summary_value_html,
+          }
+        }
+      ]
+    }) }}
+    {{ show_more(
+      url_for('main.template_usage', service_id=current_service.id),
+      'See templates used by month',
+      with_border=False
+    ) }}
 </div>
