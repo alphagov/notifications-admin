@@ -1,5 +1,5 @@
-{% from "components/table.html" import list_table, field %}
 {% from "components/previous-next-navigation.html" import previous_next_navigation %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 <div class="ajax-block-container">
   {% if messages %}
@@ -7,38 +7,41 @@
       <a href="{{ url_for('main.inbox_download', service_id=current_service.id) }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold">Download all messages</a>
     </p>
   {% endif %}
-  {% call(item, row_number) list_table(
-    messages,
-    caption="Inbox",
-    caption_visible=False,
-    empty_message='When users text your service’s phone number ({}) you’ll see the messages here'.format(inbound_number),
-    field_headings=[
-      {
-        'text':'From',
-        'classes': 'govuk-!-width-two-thirds--static'
-      },
-      {
-        'text':'First two lines of message',
-        'classes': 'govuk-!-width-one-third--static'
-      }
-    ],
-    field_headings_visible=False
-  ) %}
-    {% call field() %}
-      <a
-        class="govuk-link govuk-link--no-visited-state file-list-filename"
-        href="{{ url_for('main.conversation', service_id=current_service.id, notification_id=item.id) }}"
-      >
-        {{ item.user_number | format_phone_number_human_readable }}
-      </a>
-      <span class="file-list-hint file-list-hint--flow-text">{{ item.content }}</span>
-    {% endcall %}
-    {% call field(align='right') %}
-      <span class="align-with-message-body">
-        {{ item.created_at | format_delta }}
-      </span>
-    {% endcall %}
-  {% endcall %}
+
+  {% if not messages %}
+    <p class="govuk-body no-data">
+      When users text your service’s phone number ({{ inbound_number | format }}) you’ll see the messages here
+    </p>
+  {% else %}
+    {% set message_list = [] %}
+    {% for item in messages %}
+        {% set summary_key_html %}
+          <a class="govuk-link govuk-link--no-visited-state notify-summary-list__filename"
+            href="{{ url_for('main.conversation', service_id=current_service.id, notification_id=item.id) }}">
+            {{ item.user_number | format_phone_number_human_readable }}
+          </a>
+        <p class="govuk-body notify-summary-list__metadata notify-summary-list__metadata--small">
+          {{ item.content }}
+        </p>
+        {% endset %}
+        {% do message_list.append({
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--60-100",
+            "html": summary_key_html,
+          },
+          "value": {
+            "classes": "govuk-summary-list__value--align-right govuk-summary-list__value--small",
+            "text": item.created_at | format_delta,
+          }
+        }) %}
+    {% endfor %}
+
+    {{ govukSummaryList({
+        "classes": "notify-summary-list",
+        "rows": message_list
+      }) }}
+
+  {% endif %}
 
   {{ previous_next_navigation(prev_page, next_page) }}
 </div>
