@@ -330,3 +330,27 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 .govuk-error-summary__list a {
   word-break: break-word;
 }
+
+// extending the list component
+// border between items
+.govuk-list--bordered > li {
+  border-top: 1px solid govuk-functional-colour(border);
+  padding-top: govuk-spacing(2);
+  padding-bottom: govuk-spacing(2);
+}
+
+.govuk-list--bordered > li:last-of-type {
+  border-bottom: 1px solid govuk-functional-colour(border);
+  padding-bottom: govuk-spacing(2);
+}
+
+// list with link and metadata
+.govuk-list__with-link-and-metadata a {
+  @include govuk-typography-weight-bold;
+}
+
+.govuk-list__with-link-and-metadata p {
+  @include govuk-font-size(16);
+  color: govuk-functional-colour(secondary-text);
+  margin-bottom: 0;
+}
