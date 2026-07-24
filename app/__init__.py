@@ -33,6 +33,7 @@ from notifications_utils.formatters import (
     formatted_list,
     get_lines_with_normalised_whitespace,
 )
+from notifications_utils.json import FlaskRelaxedContainerJSONProvider
 from notifications_utils.logging import flask as utils_logging
 from notifications_utils.safe_string import make_string_safe_for_email_local_part, make_string_safe_for_id
 from notifications_utils.sanitise_text import SanitiseASCII
@@ -178,6 +179,8 @@ navigation = {
 
 
 def create_app(application):
+    application.json_provider_class = FlaskRelaxedContainerJSONProvider
+
     notify_environment = os.environ["NOTIFY_ENVIRONMENT"]
 
     if notify_environment in configs:

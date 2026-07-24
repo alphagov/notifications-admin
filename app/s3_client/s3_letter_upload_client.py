@@ -1,4 +1,3 @@
-import json
 import urllib
 
 import botocore
@@ -6,6 +5,7 @@ from boto3 import resource
 from flask import current_app
 from notifications_utils.eventlet import EventletTimeout
 from notifications_utils.exception_handling import extract_reraise_chained_exception
+from notifications_utils.json import RelaxedContainerJSONEncoder as RCJSONEncoder
 from notifications_utils.s3 import s3upload as utils_s3upload
 
 
@@ -42,7 +42,7 @@ def upload_letter_to_s3(
     if message:
         metadata["message"] = message
     if invalid_pages:
-        metadata["invalid_pages"] = json.dumps(invalid_pages)
+        metadata["invalid_pages"] = RCJSONEncoder().encode(invalid_pages)
     if recipient:
         metadata["recipient"] = urllib.parse.quote(recipient)
 

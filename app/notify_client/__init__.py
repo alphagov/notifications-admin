@@ -1,12 +1,29 @@
+from typing import Any
+
 from flask import g, has_request_context, request
 from flask_login import current_user
 from notifications_python_client import __version__
 from notifications_python_client.base import BaseAPIClient
 from notifications_utils.clients.redis import RequestCache
+from notifications_utils.json import RelaxedContainerJSONEncoder, StrictJsonTopLevelType
 
 from app.extensions import redis_client
 
 cache = RequestCache(redis_client)
+
+
+class _ExtraRelaxedContainerJSONEncoder(RelaxedContainerJSONEncoder):
+    """
+    A RelaxedContainerJSONEncoder that even coerces `set`s into serializable types, mostly
+    because BaseAPIClient has committed to that.
+    """
+
+    def default(self, obj: Any) -> StrictJsonTopLevelType:
+        match obj:
+            case set():
+                return tuple(obj)
+
+        return super().default(obj)
 
 
 def _attach_current_user(data):
@@ -49,6 +66,9 @@ class NotifyAdminAPIClient(BaseAPIClient):
                 headers["X-Notify-User-Id"] = g.user_id
 
         return headers
+
+    def _serialize_data(self, data: Any) -> str:
+        return _ExtraRelaxedContainerJSONEncoder().encode(data)
 
 
 class InviteTokenError(Exception):

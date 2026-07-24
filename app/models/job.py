@@ -4,7 +4,7 @@ from typing import Any
 
 from notifications_utils.letter_timings import (
     CANCELLABLE_JOB_LETTER_STATUSES,
-    get_letter_timings,
+    LetterTimings,
     letter_can_be_cancelled,
 )
 from werkzeug.utils import cached_property
@@ -175,7 +175,7 @@ class Job(JSONModel):
 
     @property
     def letter_timings(self):
-        return get_letter_timings(self.created_at, postage=self.postage)
+        return LetterTimings(self.created_at.replace(tzinfo=None), postage=self.postage)
 
     @property
     def failure_rate(self):
