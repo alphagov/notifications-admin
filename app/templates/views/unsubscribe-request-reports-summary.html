@@ -1,7 +1,7 @@
 {% extends "withnav_template.html" %}
-{% from "components/table.html" import field, list_table, row_heading%}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% block service_page_title %}
   Email unsubscribe requests
@@ -15,33 +15,40 @@
 
     {{ page_header('Email unsubscribe requests') }}
 
-<div class="dashboard-table">
-    {% call(item, row_number) list_table(
-        current_service.unsubscribe_request_reports_summary,
-        caption="Unsubscribe Request Reports",
-        caption_visible=False,
-        empty_message='If you have any email unsubscribe requests they will be listed here',
-        field_headings=['Report', 'Status'],
-        field_headings_visible=False
-    ) %}
-    {% call row_heading() %}
+  {% if not current_service.unsubscribe_request_reports_summary %}
+    <p class="govuk-body no-data">
+      If you have any email unsubscribe requests they will be listed here
+    </p>
+  {% else %}
+    {% set report_list = [] %}
+    {% for item in current_service.unsubscribe_request_reports_summary %}
+      {% set summary_key_html %}
+          <a class="govuk-link govuk-link--no-visited-state notify-summary-list__filename"
+            href="{{url_for('main.unsubscribe_request_report', service_id=current_service.id, batch_id=item.batch_id)}}">
+              {{ item.title|sentence_case }}
+          </a>
+        <p class="govuk-body notify-summary-list__metadata notify-summary-list__metadata--small">
+          {{ item.count|format_thousands}} {{ item.count | message_count_label('unsubscribe request', suffix='') }}
+        </p>
+        {% endset %}
+        {% do report_list.append({
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--60-100",
+            "html": summary_key_html,
+          },
+          "value": {
+           "classes": "govuk-summary-list__value--align-right govuk-summary-list__value--small" ~ (" govuk-summary-list__value--default" if not item.is_a_batched_report else ""),
+            "text":  item.status,
+          }
+        }) %}
+    {% endfor %}
 
-      <a class="govuk-link govuk-link--no-visited-state file-list-filename"
-         href="{{url_for('main.unsubscribe_request_report', service_id=current_service.id, batch_id=item.batch_id)}}" >
-          {{ item.title|sentence_case }}
-        </a>
-       <p class="file-list-hint">
+    {{ govukSummaryList({
+      "classes": "notify-summary-list",
+      "rows": report_list
+    }) }}
 
-         {{ item.count|format_thousands}} {{ item.count | message_count_label('unsubscribe request', suffix='') }}
-         </p>
-    {% endcall %}
-    {% call field(align='right', status='' if item.is_a_batched_report else 'default') %}
-      <span class="align-with-message-body">
-        {{ item.status}}
-      </span>
-    {% endcall %}
-  {% endcall %}
-</div>
+  {% endif %}
 
 {% endblock %}
 
