@@ -1,8 +1,7 @@
 from flask import current_app, redirect, render_template, session, url_for
-from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
-from app import service_api_client
+from app import current_user, service_api_client
 from app.main import main
 from app.main.forms import CreateNhsServiceForm, CreateServiceForm
 from app.models.organisation import Organisation

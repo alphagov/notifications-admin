@@ -18,7 +18,8 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import LoginManager, current_user
+from flask_login import LoginManager
+from flask_login import current_user as _current_user
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFError
 from gds_metrics import GDSMetrics
@@ -41,11 +42,14 @@ from werkzeug.exceptions import HTTPException as WerkzeugHTTPException
 from werkzeug.exceptions import abort
 from werkzeug.local import LocalProxy
 
-from app.formatters import format_phone_number_human_readable
-
-# must be declared before rest of app is imported to satisfy circular import
+# things up here must be declared before rest of app is imported to satisfy circular import
 # ruff: noqa: E402
 memo_resetters: list[Callable] = []
+
+# importing this rather than current_user directly from flask_login will give you
+# a variable with the apparently-correct type (though it *is* technically a lie)
+current_user: "User" = _current_user  # type: ignore[assignment]
+
 
 from app import webauthn_server
 from app.commands import setup_commands
@@ -80,6 +84,7 @@ from app.formatters import (
     format_notification_status_as_url,
     format_notification_type,
     format_pennies_as_currency,
+    format_phone_number_human_readable,
     format_pluralise,
     format_pounds_as_currency,
     format_provider,

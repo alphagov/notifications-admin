@@ -8,11 +8,10 @@ from flask import (
     request,
     url_for,
 )
-from flask_login import current_user
 from notifications_utils.recipients import RecipientCSV
 from notifications_utils.template import HTMLEmailTemplate
 
-from app import status_api_client
+from app import current_user, status_api_client
 from app.formatters import format_thousands
 from app.main import main
 from app.main.forms import FieldWithNoneOption, TemplateEmailFilesUploadForm

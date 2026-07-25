@@ -1,11 +1,10 @@
 from datetime import UTC, datetime
 
 from flask import abort, flash, redirect, render_template, request, session, url_for
-from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 
-from app import current_service, service_api_client
+from app import current_service, current_user, service_api_client
 from app.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_REJECTED
 from app.event_handlers import Events
 from app.formatters import (

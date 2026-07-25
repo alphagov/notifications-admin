@@ -1,8 +1,8 @@
 from fido2 import cbor
 from fido2.webauthn import AuthenticatorData, CollectedClientData
 from flask import abort, current_app, flash, redirect, request, session, url_for
-from flask_login import current_user
 
+from app import current_user
 from app.main import main
 from app.models.user import User
 from app.models.webauthn_credential import RegistrationError, WebAuthnCredential

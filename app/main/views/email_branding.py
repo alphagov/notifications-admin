@@ -1,11 +1,10 @@
 from io import BytesIO
 
 from flask import abort, current_app, flash, redirect, render_template, request, url_for
-from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from werkzeug.datastructures import FileStorage
 
-from app import email_branding_client
+from app import current_user, email_branding_client
 from app.event_handlers import Events
 from app.main import main
 from app.main.forms import (

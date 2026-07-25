@@ -10,10 +10,9 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user
 from markupsafe import Markup
 
-from app import login_manager
+from app import current_user, login_manager
 from app.constants import JSON_UPDATES_BLUEPRINT_NAME
 from app.main import main
 from app.main.forms import LoginForm

@@ -1,9 +1,8 @@
 from flask import abort, flash, redirect, render_template, request, url_for
-from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 
-from app import user_api_client
+from app import current_user, user_api_client
 from app.event_handlers import Events
 from app.main import main
 from app.main.forms import AuthTypeForm

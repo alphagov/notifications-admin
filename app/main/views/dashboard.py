@@ -4,12 +4,12 @@ from functools import partial
 from itertools import groupby
 
 from flask import Response, abort, jsonify, render_template, request, session, url_for
-from flask_login import current_user
 from werkzeug.utils import redirect
 
 from app import (
     billing_api_client,
     current_service,
+    current_user,
     notification_api_client,
     report_request_api_client,
     service_api_client,

@@ -1,9 +1,9 @@
 from flask import abort, flash, redirect, render_template, request, url_for
-from flask_login import current_user
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
 from app import (
     current_service,
+    current_user,
     letter_branding_client,
     logo_client,
     organisations_client,

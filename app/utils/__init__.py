@@ -4,11 +4,12 @@ from functools import wraps
 from itertools import chain
 
 from flask import abort, g, make_response, request
-from flask_login import current_user
 from notifications_utils.field import Field
 from ordered_set import OrderedSet
 from werkzeug.datastructures import MultiDict
 from werkzeug.routing import RequestRedirect
+
+from app import current_user
 
 # if changing these, note there may be database indexes corresponding to some of
 # these status sets in -api which may also need updating to prevent a
