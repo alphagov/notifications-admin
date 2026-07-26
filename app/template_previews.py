@@ -159,7 +159,7 @@ class TemplatePreviewClient:
         )
 
 
-_template_preview_client_context_var: ContextVar[TemplatePreviewClient] = ContextVar("template_preview_client")
+_template_preview_client_context_var: ContextVar[TemplatePreviewClient | None] = ContextVar("template_preview_client")
 get_template_preview_client: LazyLocalGetter[TemplatePreviewClient] = LazyLocalGetter(
     _template_preview_client_context_var,
     lambda: TemplatePreviewClient(current_app),

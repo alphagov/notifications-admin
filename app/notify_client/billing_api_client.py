@@ -75,7 +75,7 @@ class BillingAPIClient(NotifyAdminAPIClient):
         )
 
 
-_billing_api_client_context_var: ContextVar[BillingAPIClient] = ContextVar("billing_api_client")
+_billing_api_client_context_var: ContextVar[BillingAPIClient | None] = ContextVar("billing_api_client")
 get_billing_api_client: LazyLocalGetter[BillingAPIClient] = LazyLocalGetter(
     _billing_api_client_context_var,
     lambda: BillingAPIClient(current_app),

@@ -23,7 +23,7 @@ class TemplateStatisticsApiClient(NotifyAdminAPIClient):
         return self.get(url=f"/service/{service_id}/template-statistics/last-used/{template_id}")["last_date_used"]
 
 
-_template_statistics_client_context_var: ContextVar[TemplateStatisticsApiClient] = ContextVar(
+_template_statistics_client_context_var: ContextVar[TemplateStatisticsApiClient | None] = ContextVar(
     "template_statistics_client"
 )
 get_template_statistics_client: LazyLocalGetter[TemplateStatisticsApiClient] = LazyLocalGetter(

@@ -29,7 +29,7 @@ class InboundNumberClient(NotifyAdminAPIClient):
         return self.post(f"inbound-number/service/{service_id}", data=data)
 
 
-_inbound_number_client_context_var: ContextVar[InboundNumberClient] = ContextVar("inbound_number_client")
+_inbound_number_client_context_var: ContextVar[InboundNumberClient | None] = ContextVar("inbound_number_client")
 get_inbound_number_client: LazyLocalGetter[InboundNumberClient] = LazyLocalGetter(
     _inbound_number_client_context_var,
     lambda: InboundNumberClient(current_app),

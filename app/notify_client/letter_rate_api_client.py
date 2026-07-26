@@ -14,7 +14,7 @@ class LetterRateApiClient(NotifyAdminAPIClient):
         return self.get(url="/letter-rates")
 
 
-_letter_rate_api_client_context_var: ContextVar[LetterRateApiClient] = ContextVar("letter_rate_api_client")
+_letter_rate_api_client_context_var: ContextVar[LetterRateApiClient | None] = ContextVar("letter_rate_api_client")
 get_letter_rate_api_client: LazyLocalGetter[LetterRateApiClient] = LazyLocalGetter(
     _letter_rate_api_client_context_var,
     lambda: LetterRateApiClient(current_app),

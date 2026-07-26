@@ -9,7 +9,7 @@ from werkzeug.local import LocalProxy
 
 from app import memo_resetters
 
-_antivirus_client_context_var: ContextVar[AntivirusClient] = ContextVar("antivirus_client")
+_antivirus_client_context_var: ContextVar[AntivirusClient | None] = ContextVar("antivirus_client")
 get_antivirus_client: LazyLocalGetter[AntivirusClient] = LazyLocalGetter(
     _antivirus_client_context_var,
     lambda: AntivirusClient(
@@ -20,7 +20,7 @@ get_antivirus_client: LazyLocalGetter[AntivirusClient] = LazyLocalGetter(
 memo_resetters.append(lambda: get_antivirus_client.clear())
 antivirus_client: AntivirusClient = LocalProxy(get_antivirus_client)  # type: ignore[assignment]
 
-_zendesk_client_context_var: ContextVar[ZendeskClient] = ContextVar("zendesk_client")
+_zendesk_client_context_var: ContextVar[ZendeskClient | None] = ContextVar("zendesk_client")
 get_zendesk_client: LazyLocalGetter[ZendeskClient] = LazyLocalGetter(
     _zendesk_client_context_var,
     lambda: ZendeskClient(

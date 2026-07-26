@@ -24,7 +24,7 @@ class ProviderClient(NotifyAdminAPIClient):
         return self.post(url=f"/provider-details/{provider_id}", data=data)
 
 
-_provider_client_context_var: ContextVar[ProviderClient] = ContextVar("provider_client")
+_provider_client_context_var: ContextVar[ProviderClient | None] = ContextVar("provider_client")
 get_provider_client: LazyLocalGetter[ProviderClient] = LazyLocalGetter(
     _provider_client_context_var,
     lambda: ProviderClient(current_app),

@@ -40,7 +40,7 @@ class ContactListApiClient(NotifyAdminAPIClient):
         return self.delete(f"/service/{service_id}/contact-list/{contact_list_id}")
 
 
-_contact_list_api_client_context_var: ContextVar[ContactListApiClient] = ContextVar("contact_list_api_client")
+_contact_list_api_client_context_var: ContextVar[ContactListApiClient | None] = ContextVar("contact_list_api_client")
 get_contact_list_api_client: LazyLocalGetter[ContactListApiClient] = LazyLocalGetter(
     _contact_list_api_client_context_var,
     lambda: ContactListApiClient(current_app),

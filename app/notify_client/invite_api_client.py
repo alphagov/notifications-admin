@@ -74,7 +74,7 @@ class InviteApiClient(NotifyAdminAPIClient):
         self.post(url=f"/service/{service_id}/invite/{invited_user_id}", data=data)
 
 
-_invite_api_client_context_var: ContextVar[InviteApiClient] = ContextVar("invite_api_client")
+_invite_api_client_context_var: ContextVar[InviteApiClient | None] = ContextVar("invite_api_client")
 get_invite_api_client: LazyLocalGetter[InviteApiClient] = LazyLocalGetter(
     _invite_api_client_context_var,
     lambda: InviteApiClient(current_app),

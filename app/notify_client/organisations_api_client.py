@@ -163,7 +163,7 @@ class OrganisationsClient(NotifyAdminAPIClient):
         )
 
 
-_organisations_client_context_var: ContextVar[OrganisationsClient] = ContextVar("organisations_client")
+_organisations_client_context_var: ContextVar[OrganisationsClient | None] = ContextVar("organisations_client")
 get_organisations_client: LazyLocalGetter[OrganisationsClient] = LazyLocalGetter(
     _organisations_client_context_var,
     lambda: OrganisationsClient(current_app),

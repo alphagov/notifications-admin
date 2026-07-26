@@ -15,7 +15,7 @@ class EventsApiClient(NotifyAdminAPIClient):
         return resp["data"]
 
 
-_events_api_client_context_var: ContextVar[EventsApiClient] = ContextVar("events_api_client")
+_events_api_client_context_var: ContextVar[EventsApiClient | None] = ContextVar("events_api_client")
 get_events_api_client: LazyLocalGetter[EventsApiClient] = LazyLocalGetter(
     _events_api_client_context_var,
     lambda: EventsApiClient(current_app),

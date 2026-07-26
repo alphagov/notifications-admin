@@ -243,7 +243,7 @@ class UserApiClient(NotifyAdminAPIClient):
         return self.delete(endpoint)
 
 
-_user_api_client_context_var: ContextVar[UserApiClient] = ContextVar("user_api_client")
+_user_api_client_context_var: ContextVar[UserApiClient | None] = ContextVar("user_api_client")
 get_user_api_client: LazyLocalGetter[UserApiClient] = LazyLocalGetter(
     _user_api_client_context_var,
     lambda: UserApiClient(current_app),

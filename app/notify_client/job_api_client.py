@@ -122,7 +122,7 @@ class JobApiClient(NotifyAdminAPIClient):
         return self.post(url=f"/service/{service_id}/job/{job_id}/cancel-letter-job", data={})
 
 
-_job_api_client_context_var: ContextVar[JobApiClient] = ContextVar("job_api_client")
+_job_api_client_context_var: ContextVar[JobApiClient | None] = ContextVar("job_api_client")
 get_job_api_client: LazyLocalGetter[JobApiClient] = LazyLocalGetter(
     _job_api_client_context_var,
     lambda: JobApiClient(current_app),

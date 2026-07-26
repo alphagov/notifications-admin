@@ -20,7 +20,7 @@ class UnsubscribeApiClient(NotifyAdminAPIClient):
         return True
 
 
-_unsubscribe_api_client_context_var: ContextVar[UnsubscribeApiClient] = ContextVar("unsubscribe_api_client")
+_unsubscribe_api_client_context_var: ContextVar[UnsubscribeApiClient | None] = ContextVar("unsubscribe_api_client")
 get_unsubscribe_api_client: LazyLocalGetter[UnsubscribeApiClient] = LazyLocalGetter(
     _unsubscribe_api_client_context_var,
     lambda: UnsubscribeApiClient(current_app),

@@ -74,7 +74,7 @@ class DocumentDownloadAPIClient:
         return response.json()
 
 
-_document_download_api_client_context_var: ContextVar[DocumentDownloadAPIClient] = ContextVar(
+_document_download_api_client_context_var: ContextVar[DocumentDownloadAPIClient | None] = ContextVar(
     "document_download_api_client"
 )
 get_document_download_api_client: LazyLocalGetter[DocumentDownloadAPIClient] = LazyLocalGetter(

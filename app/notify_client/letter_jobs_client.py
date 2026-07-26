@@ -15,7 +15,7 @@ class LetterJobsClient(NotifyAdminAPIClient):
         return self.post(url="/letters/returned", data={"references": references})
 
 
-_letter_jobs_client_context_var: ContextVar[LetterJobsClient] = ContextVar("letter_jobs_client")
+_letter_jobs_client_context_var: ContextVar[LetterJobsClient | None] = ContextVar("letter_jobs_client")
 get_letter_jobs_client: LazyLocalGetter[LetterJobsClient] = LazyLocalGetter(
     _letter_jobs_client_context_var,
     lambda: LetterJobsClient(current_app),

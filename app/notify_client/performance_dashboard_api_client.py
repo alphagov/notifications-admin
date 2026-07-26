@@ -25,7 +25,7 @@ class PerformanceDashboardAPIClient(NotifyAdminAPIClient):
         )
 
 
-_performance_dashboard_api_client_context_var: ContextVar[PerformanceDashboardAPIClient] = ContextVar(
+_performance_dashboard_api_client_context_var: ContextVar[PerformanceDashboardAPIClient | None] = ContextVar(
     "performance_dashboard_api_client"
 )
 get_performance_dashboard_api_client: LazyLocalGetter[PerformanceDashboardAPIClient] = LazyLocalGetter(

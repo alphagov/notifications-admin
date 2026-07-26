@@ -33,7 +33,9 @@ class LetterAttachmentClient(NotifyAdminAPIClient):
         return self.post(url=f"/letter-attachment/{letter_attachment_id}/archive", data=data)
 
 
-_letter_attachment_client_context_var: ContextVar[LetterAttachmentClient] = ContextVar("letter_attachment_client")
+_letter_attachment_client_context_var: ContextVar[LetterAttachmentClient | None] = ContextVar(
+    "letter_attachment_client"
+)
 get_letter_attachment_client: LazyLocalGetter[LetterAttachmentClient] = LazyLocalGetter(
     _letter_attachment_client_context_var,
     lambda: LetterAttachmentClient(current_app),

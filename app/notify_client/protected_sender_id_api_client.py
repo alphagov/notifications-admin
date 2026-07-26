@@ -13,7 +13,7 @@ class ProtectedSenderIDApiClient(NotifyAdminAPIClient):
         return self.get(url="/protected-sender-id/check", params={"sender_id": sender_id})
 
 
-_protected_sender_id_api_client_context_var: ContextVar[ProtectedSenderIDApiClient] = ContextVar(
+_protected_sender_id_api_client_context_var: ContextVar[ProtectedSenderIDApiClient | None] = ContextVar(
     "protected_sender_id_api_client"
 )
 get_protected_sender_id_api_client: LazyLocalGetter[ProtectedSenderIDApiClient] = LazyLocalGetter(

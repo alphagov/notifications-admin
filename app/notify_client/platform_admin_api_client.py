@@ -34,7 +34,7 @@ class AdminApiClient(NotifyAdminAPIClient):
         )
 
 
-_admin_api_client_context_var: ContextVar[AdminApiClient] = ContextVar("admin_api_client")
+_admin_api_client_context_var: ContextVar[AdminApiClient | None] = ContextVar("admin_api_client")
 get_admin_api_client: LazyLocalGetter[AdminApiClient] = LazyLocalGetter(
     _admin_api_client_context_var,
     lambda: AdminApiClient(current_app),
