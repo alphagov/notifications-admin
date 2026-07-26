@@ -30,4 +30,4 @@ get_provider_client: LazyLocalGetter[ProviderClient] = LazyLocalGetter(
     lambda: ProviderClient(current_app),
 )
 memo_resetters.append(lambda: get_provider_client.clear())
-provider_client = LocalProxy(get_provider_client)
+provider_client: ProviderClient = LocalProxy(get_provider_client)  # type: ignore[assignment]

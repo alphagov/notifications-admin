@@ -26,4 +26,4 @@ get_unsubscribe_api_client: LazyLocalGetter[UnsubscribeApiClient] = LazyLocalGet
     lambda: UnsubscribeApiClient(current_app),
 )
 memo_resetters.append(lambda: get_unsubscribe_api_client.clear())
-unsubscribe_api_client = LocalProxy(get_unsubscribe_api_client)
+unsubscribe_api_client: UnsubscribeApiClient = LocalProxy(get_unsubscribe_api_client)  # type: ignore[assignment]

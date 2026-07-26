@@ -81,4 +81,4 @@ get_billing_api_client: LazyLocalGetter[BillingAPIClient] = LazyLocalGetter(
     lambda: BillingAPIClient(current_app),
 )
 memo_resetters.append(lambda: get_billing_api_client.clear())
-billing_api_client = LocalProxy(get_billing_api_client)
+billing_api_client: BillingAPIClient = LocalProxy(get_billing_api_client)  # type: ignore[assignment]

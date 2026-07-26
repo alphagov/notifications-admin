@@ -46,4 +46,4 @@ get_contact_list_api_client: LazyLocalGetter[ContactListApiClient] = LazyLocalGe
     lambda: ContactListApiClient(current_app),
 )
 memo_resetters.append(lambda: get_contact_list_api_client.clear())
-contact_list_api_client = LocalProxy(get_contact_list_api_client)
+contact_list_api_client: ContactListApiClient = LocalProxy(get_contact_list_api_client)  # type: ignore[assignment]

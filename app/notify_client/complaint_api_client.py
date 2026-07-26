@@ -23,4 +23,4 @@ get_complaint_api_client: LazyLocalGetter[ComplaintApiClient] = LazyLocalGetter(
     lambda: ComplaintApiClient(current_app),
 )
 memo_resetters.append(lambda: get_complaint_api_client.clear())
-complaint_api_client = LocalProxy(get_complaint_api_client)
+complaint_api_client: ComplaintApiClient = LocalProxy(get_complaint_api_client)  # type: ignore[assignment]

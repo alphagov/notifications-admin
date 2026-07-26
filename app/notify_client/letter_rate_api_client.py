@@ -20,4 +20,4 @@ get_letter_rate_api_client: LazyLocalGetter[LetterRateApiClient] = LazyLocalGett
     lambda: LetterRateApiClient(current_app),
 )
 memo_resetters.append(lambda: get_letter_rate_api_client.clear())
-letter_rate_api_client = LocalProxy(get_letter_rate_api_client)
+letter_rate_api_client: LetterRateApiClient = LocalProxy(get_letter_rate_api_client)  # type: ignore[assignment]

@@ -26,4 +26,4 @@ get_report_request_api_client: LazyLocalGetter[ReportRequestClient] = LazyLocalG
     lambda: ReportRequestClient(current_app),
 )
 memo_resetters.append(lambda: get_report_request_api_client.clear())
-report_request_api_client = LocalProxy(get_report_request_api_client)
+report_request_api_client: ReportRequestClient = LocalProxy(get_report_request_api_client)  # type: ignore[assignment]

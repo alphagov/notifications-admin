@@ -138,4 +138,4 @@ get_notification_api_client: LazyLocalGetter[NotificationApiClient] = LazyLocalG
     lambda: NotificationApiClient(current_app),
 )
 memo_resetters.append(lambda: get_notification_api_client.clear())
-notification_api_client = LocalProxy(get_notification_api_client)
+notification_api_client: NotificationApiClient = LocalProxy(get_notification_api_client)  # type: ignore[assignment]

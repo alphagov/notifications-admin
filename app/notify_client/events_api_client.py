@@ -21,4 +21,4 @@ get_events_api_client: LazyLocalGetter[EventsApiClient] = LazyLocalGetter(
     lambda: EventsApiClient(current_app),
 )
 memo_resetters.append(lambda: get_events_api_client.clear())
-events_api_client = LocalProxy(get_events_api_client)
+events_api_client: EventsApiClient = LocalProxy(get_events_api_client)  # type: ignore[assignment]

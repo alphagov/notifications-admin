@@ -50,4 +50,4 @@ get_letter_branding_client: LazyLocalGetter[LetterBrandingClient] = LazyLocalGet
     lambda: LetterBrandingClient(current_app),
 )
 memo_resetters.append(lambda: get_letter_branding_client.clear())
-letter_branding_client = LocalProxy(get_letter_branding_client)
+letter_branding_client: LetterBrandingClient = LocalProxy(get_letter_branding_client)  # type: ignore[assignment]

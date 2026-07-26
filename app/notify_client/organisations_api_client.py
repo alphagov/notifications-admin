@@ -169,4 +169,4 @@ get_organisations_client: LazyLocalGetter[OrganisationsClient] = LazyLocalGetter
     lambda: OrganisationsClient(current_app),
 )
 memo_resetters.append(lambda: get_organisations_client.clear())
-organisations_client = LocalProxy(get_organisations_client)
+organisations_client: OrganisationsClient = LocalProxy(get_organisations_client)  # type: ignore[assignment]

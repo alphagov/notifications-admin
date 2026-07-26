@@ -33,4 +33,4 @@ get_performance_dashboard_api_client: LazyLocalGetter[PerformanceDashboardAPICli
     lambda: PerformanceDashboardAPIClient(current_app),
 )
 memo_resetters.append(lambda: get_performance_dashboard_api_client.clear())
-performance_dashboard_api_client = LocalProxy(get_performance_dashboard_api_client)
+performance_dashboard_api_client: PerformanceDashboardAPIClient = LocalProxy(get_performance_dashboard_api_client)  # type: ignore[assignment]

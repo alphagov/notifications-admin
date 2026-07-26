@@ -23,4 +23,4 @@ get_status_api_client: LazyLocalGetter[StatusApiClient] = LazyLocalGetter(
     lambda: StatusApiClient(current_app),
 )
 memo_resetters.append(lambda: get_status_api_client.clear())
-status_api_client = LocalProxy(get_status_api_client)
+status_api_client: StatusApiClient = LocalProxy(get_status_api_client)  # type: ignore[assignment]

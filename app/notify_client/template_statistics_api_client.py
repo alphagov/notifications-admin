@@ -31,4 +31,4 @@ get_template_statistics_client: LazyLocalGetter[TemplateStatisticsApiClient] = L
     lambda: TemplateStatisticsApiClient(current_app),
 )
 memo_resetters.append(lambda: get_template_statistics_client.clear())
-template_statistics_client = LocalProxy(get_template_statistics_client)
+template_statistics_client: TemplateStatisticsApiClient = LocalProxy(get_template_statistics_client)  # type: ignore[assignment]

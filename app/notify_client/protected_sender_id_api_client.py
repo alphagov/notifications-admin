@@ -21,4 +21,4 @@ get_protected_sender_id_api_client: LazyLocalGetter[ProtectedSenderIDApiClient] 
     lambda: ProtectedSenderIDApiClient(current_app),
 )
 memo_resetters.append(lambda: get_protected_sender_id_api_client.clear())
-protected_sender_id_api_client = LocalProxy(get_protected_sender_id_api_client)
+protected_sender_id_api_client: ProtectedSenderIDApiClient = LocalProxy(get_protected_sender_id_api_client)  # type: ignore[assignment]

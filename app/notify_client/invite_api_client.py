@@ -80,4 +80,4 @@ get_invite_api_client: LazyLocalGetter[InviteApiClient] = LazyLocalGetter(
     lambda: InviteApiClient(current_app),
 )
 memo_resetters.append(lambda: get_invite_api_client.clear())
-invite_api_client = LocalProxy(get_invite_api_client)
+invite_api_client: InviteApiClient = LocalProxy(get_invite_api_client)  # type: ignore[assignment]

@@ -40,4 +40,4 @@ get_admin_api_client: LazyLocalGetter[AdminApiClient] = LazyLocalGetter(
     lambda: AdminApiClient(current_app),
 )
 memo_resetters.append(lambda: get_admin_api_client.clear())
-admin_api_client = LocalProxy(get_admin_api_client)
+admin_api_client: AdminApiClient = LocalProxy(get_admin_api_client)  # type: ignore[assignment]

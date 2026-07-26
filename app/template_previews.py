@@ -165,4 +165,4 @@ get_template_preview_client: LazyLocalGetter[TemplatePreviewClient] = LazyLocalG
     lambda: TemplatePreviewClient(current_app),
 )
 memo_resetters.append(lambda: get_template_preview_client.clear())
-template_preview_client = LocalProxy(get_template_preview_client)
+template_preview_client: TemplatePreviewClient = LocalProxy(get_template_preview_client)

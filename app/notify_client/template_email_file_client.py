@@ -53,4 +53,4 @@ get_template_email_file_client: LazyLocalGetter[TemplateEmailFileClient] = LazyL
     lambda: TemplateEmailFileClient(current_app),
 )
 memo_resetters.append(lambda: get_template_email_file_client.clear())
-template_email_file_client = LocalProxy(get_template_email_file_client)
+template_email_file_client: TemplateEmailFileClient = LocalProxy(get_template_email_file_client)  # type: ignore[assignment]

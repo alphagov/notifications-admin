@@ -66,4 +66,4 @@ get_template_folder_api_client: LazyLocalGetter[TemplateFolderAPIClient] = LazyL
     lambda: TemplateFolderAPIClient(current_app),
 )
 memo_resetters.append(lambda: get_template_folder_api_client.clear())
-template_folder_api_client = LocalProxy(get_template_folder_api_client)
+template_folder_api_client: TemplateFolderAPIClient = LocalProxy(get_template_folder_api_client)  # type: ignore[assignment]

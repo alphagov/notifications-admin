@@ -35,4 +35,4 @@ get_inbound_number_client: LazyLocalGetter[InboundNumberClient] = LazyLocalGette
     lambda: InboundNumberClient(current_app),
 )
 memo_resetters.append(lambda: get_inbound_number_client.clear())
-inbound_number_client = LocalProxy(get_inbound_number_client)
+inbound_number_client: InboundNumberClient = LocalProxy(get_inbound_number_client)  # type: ignore[assignment]

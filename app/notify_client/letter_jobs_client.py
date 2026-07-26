@@ -21,4 +21,4 @@ get_letter_jobs_client: LazyLocalGetter[LetterJobsClient] = LazyLocalGetter(
     lambda: LetterJobsClient(current_app),
 )
 memo_resetters.append(lambda: get_letter_jobs_client.clear())
-letter_jobs_client = LocalProxy(get_letter_jobs_client)
+letter_jobs_client: LetterJobsClient = LocalProxy(get_letter_jobs_client)  # type: ignore[assignment]

@@ -20,4 +20,4 @@ get_sms_rate_api_client: LazyLocalGetter[SMSRateApiClient] = LazyLocalGetter(
     lambda: SMSRateApiClient(current_app),
 )
 memo_resetters.append(lambda: get_sms_rate_api_client.clear())
-sms_rate_api_client = LocalProxy(get_sms_rate_api_client)
+sms_rate_api_client: SMSRateApiClient = LocalProxy(get_sms_rate_api_client)  # type: ignore[assignment]

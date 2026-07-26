@@ -67,4 +67,4 @@ get_email_branding_client: LazyLocalGetter[EmailBrandingClient] = LazyLocalGette
     lambda: EmailBrandingClient(current_app),
 )
 memo_resetters.append(lambda: get_email_branding_client.clear())
-email_branding_client = LocalProxy(get_email_branding_client)
+email_branding_client: EmailBrandingClient = LocalProxy(get_email_branding_client)  # type: ignore[assignment]

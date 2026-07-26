@@ -128,4 +128,4 @@ get_job_api_client: LazyLocalGetter[JobApiClient] = LazyLocalGetter(
     lambda: JobApiClient(current_app),
 )
 memo_resetters.append(lambda: get_job_api_client.clear())
-job_api_client = LocalProxy(get_job_api_client)
+job_api_client: JobApiClient = LocalProxy(get_job_api_client)  # type: ignore[assignment]

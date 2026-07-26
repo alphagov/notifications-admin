@@ -39,4 +39,4 @@ get_letter_attachment_client: LazyLocalGetter[LetterAttachmentClient] = LazyLoca
     lambda: LetterAttachmentClient(current_app),
 )
 memo_resetters.append(lambda: get_letter_attachment_client.clear())
-letter_attachment_client = LocalProxy(get_letter_attachment_client)
+letter_attachment_client: LetterAttachmentClient = LocalProxy(get_letter_attachment_client)  # type: ignore[assignment]
