@@ -457,7 +457,7 @@ class RadioFieldWithNoneOption(FieldWithNoneOption, RadioField):
 
 
 class NestedFieldMixin:
-    CHILD_MAP_ITERATION_INTERRUPTIBLE_EVERY = 128
+    CHILD_MAP_ITERATION_INTERRUPTIBLE_EVERY: int = 128
 
     @cached_property
     def children(self):

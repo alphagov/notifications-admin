@@ -1,17 +1,19 @@
 import copy
 from abc import ABC, abstractmethod
 from functools import cache
+from typing import Any
 
 from flask import current_app, templating
 from markupsafe import Markup
+from notifications_utils.json import StrictMutableJsonType
 
 from app.utils import merge_jsonlike
 
 
 class GovukFrontendWidgetMixin(ABC):
-    param_extensions = {}
+    param_extensions: dict[str, StrictMutableJsonType] = {}
 
-    def __init__(self, label="", validators=None, param_extensions=None, **kwargs):
+    def __init__(self, label="", validators=None, param_extensions: StrictMutableJsonType = None, **kwargs):
         super().__init__(label, validators=validators, **kwargs)
         self._copy_params()
         merge_jsonlike(self.param_extensions, param_extensions)
@@ -58,7 +60,7 @@ class GovukFrontendWidgetMixin(ABC):
 
     @property
     @abstractmethod
-    def govuk_frontend_component_name(self):
+    def govuk_frontend_component_name(self) -> str:
         """
         Should be a string matching a key in the `govuk_frontend_components` dict - which roughly
         matches up with URLs found in https://design-system.service.gov.uk/components/
@@ -78,7 +80,7 @@ class GovukFrontendWidgetMixin(ABC):
         """
         return {}
 
-    def widget(self, _field, **kwargs):
+    def widget(self, _field, **kwargs) -> Markup:  # type: ignore[override]
         """
         override the widget function, which is called from the html template when rendering
 
@@ -97,7 +99,7 @@ class GovukFrontendWidgetMixin(ABC):
         return render_govuk_frontend_macro(self.govuk_frontend_component_name, params)
 
 
-def render_govuk_frontend_macro(component, params):
+def render_govuk_frontend_macro(component: str, params: Any) -> Markup:
     """
     jinja needs a template to render but govuk_frontend_jinja only provides macros
 

@@ -19,7 +19,7 @@ from app.s3_client.s3_template_email_file_upload_client import (
 )
 
 
-def _get_file_location(file_id: uuid, service_id: uuid) -> str:
+def _get_file_location(file_id, service_id) -> str:
     return f"{service_id}/{file_id}"
 
 

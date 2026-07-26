@@ -5,6 +5,7 @@ from itertools import chain
 
 from flask import abort, g, make_response, request
 from notifications_utils.field import Field
+from notifications_utils.json import StrictMutableJsonType
 from ordered_set import OrderedSet
 from werkzeug.datastructures import MultiDict
 from werkzeug.routing import RequestRedirect
@@ -133,7 +134,7 @@ def hide_from_search_engines(f):
 # JSON-like means they can contain all types JSON can: all the main primitives
 # plus nested lists or dictionaries.
 # Merge is additive. New values overwrite old and collections are added to.
-def merge_jsonlike(source, destination):  # noqa: C901
+def merge_jsonlike(source: StrictMutableJsonType, destination: StrictMutableJsonType) -> None:  # noqa: C901
     def merge_items(source_item, destination_item):
         if isinstance(source_item, dict) and isinstance(destination_item, dict):
             merge_dicts(source_item, destination_item)

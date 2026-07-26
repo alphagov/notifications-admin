@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from functools import total_ordering
 from inspect import get_annotations
+from typing import Any
 
 from notifications_utils.serialised_model import SerialisedModel, SerialisedModelCollection
 
@@ -16,6 +17,8 @@ class JSONModel(SerialisedModel, ABC):
         sorted. For example 'email_address' or 'created_at' to sort on
         instance.email_address or instance.created_at respectively.
         """
+
+    id: Any
 
     def __repr__(self):
         return f"{self.__class__.__name__}(<{self.id}>)"
