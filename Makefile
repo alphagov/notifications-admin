@@ -50,6 +50,11 @@ lint: ## Run static analysis
 	ruff check .
 	ruff format --check .
 
+.PHONY: check-types
+check-types: ## Run static type checking
+# This should be moved into the lint task once it’s passing
+	mypy
+
 .PHONY: test
 test: lint ## Run tests
 	npm test

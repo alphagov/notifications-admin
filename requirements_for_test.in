@@ -3,3 +3,12 @@
 
 moto
 html5lib
+
+mypy
+boto3-stubs[s3]
+botocore-stubs
+types-openpyxl
+types-python-dateutil
+types-requests
+types-wtforms
+types-xlrd

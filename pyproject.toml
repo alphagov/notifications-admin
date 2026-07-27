@@ -1,0 +1,4 @@
+[tool.mypy]
+files = "app/"
+follow_untyped_imports = true
+check_untyped_defs = true
