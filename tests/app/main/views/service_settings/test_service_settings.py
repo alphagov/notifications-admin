@@ -2016,8 +2016,10 @@ def test_incorrect_letter_contact_block_input(
         ("abcdefghijkhgkg", "Error: Text message sender ID cannot be longer than 11 characters"),
         (
             r" ¯\_(ツ)_/¯ ",
-            "Error: Text message sender ID can only include letters, "
-            "numbers, spaces, and the following characters: & . - _",
+            (
+                "Error: Text message sender ID can only include letters, "
+                "numbers, spaces, and the following characters: & . - _"
+            ),
         ),
         ("blood.co.uk", None),
         ("00123", "Error: Text message sender ID cannot start with 00"),
@@ -4430,8 +4432,10 @@ def test_send_files_by_email_in_page_guidance(client_request):
         "To send a file by email, either:",
         "choose a template and select ‘Attach files’",
         "or follow the instructions in our API documentation",
-        "You need to include contact details for your service so your users can get in touch if "
-        "there’s a problem. For example, if the link to download the file you sent them has expired.",
+        (
+            "You need to include contact details for your service so your users can get in touch if "
+            "there’s a problem. For example, if the link to download the file you sent them has expired."
+        ),
     ]
 
 
@@ -5165,10 +5169,14 @@ def test_service_receive_text_messages_when_inbound_number_is_not_set(
                 "Your service will receive text messages sent to:",
                 "You can see the number of received messages on your dashboard.",
                 "You can also download the last 7 days’ worth of received text messages.",
-                "If you’re using the API, you can fetch received messages or set up a "
-                "callback to push the message to your service.",
-                "You can still send text messages from a sender ID if you need to, but people "
-                "will not be able to reply to those messages.",
+                (
+                    "If you’re using the API, you can fetch received messages or set up a "
+                    "callback to push the message to your service."
+                ),
+                (
+                    "You can still send text messages from a sender ID if you need to, but people "
+                    "will not be able to reply to those messages."
+                ),
                 "Stop receiving text messages",
             ],
         ),
@@ -5178,8 +5186,10 @@ def test_service_receive_text_messages_when_inbound_number_is_not_set(
                 "Your service will receive text messages sent to:",
                 "You can see the number of received messages on your dashboard.",
                 "You can also download the last 7 days’ worth of received text messages.",
-                "You can still send text messages from a sender ID if you need to, but people "
-                "will not be able to reply to those messages.",
+                (
+                    "You can still send text messages from a sender ID if you need to, but people "
+                    "will not be able to reply to those messages."
+                ),
                 "Stop receiving text messages",
             ],
         ),
