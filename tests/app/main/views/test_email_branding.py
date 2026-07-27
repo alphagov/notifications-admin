@@ -818,13 +818,17 @@ def test_create_email_branding_government_identity_logo_form(client_request, pla
     assert list(zip(values, images, strict=True)) == [
         (
             "Department for Business & Trade",
-            "https://static.example.com/images/branding/insignia/"
-            "Department for Business & Trade.png?037794106095c182ff58655a47fe3bca",
+            (
+                "https://static.example.com/images/branding/insignia/"
+                "Department for Business & Trade.png?037794106095c182ff58655a47fe3bca"
+            ),
         ),
         (
             "Foreign, Commonwealth & Development Office",
-            "https://static.example.com/images/branding/insignia/"
-            "Foreign, Commonwealth & Development Office.png?890210781ce4936bb44462036e150b50",
+            (
+                "https://static.example.com/images/branding/insignia/"
+                "Foreign, Commonwealth & Development Office.png?890210781ce4936bb44462036e150b50"
+            ),
         ),
         (
             "HM Coastguard",
@@ -836,8 +840,10 @@ def test_create_email_branding_government_identity_logo_form(client_request, pla
         ),
         (
             "HM Revenue & Customs",
-            "https://static.example.com/images/branding/insignia/"
-            "HM Revenue & Customs.png?306230d3421662dacc0c2e185bc6a57b",
+            (
+                "https://static.example.com/images/branding/insignia/"
+                "HM Revenue & Customs.png?306230d3421662dacc0c2e185bc6a57b"
+            ),
         ),
         (
             "Home Office",
@@ -845,8 +851,10 @@ def test_create_email_branding_government_identity_logo_form(client_request, pla
         ),
         (
             "Ministry of Defence",
-            "https://static.example.com/images/branding/insignia/"
-            "Ministry of Defence.png?e58dccf7441c42356c5947a191a732ed",
+            (
+                "https://static.example.com/images/branding/insignia/"
+                "Ministry of Defence.png?e58dccf7441c42356c5947a191a732ed"
+            ),
         ),
         (
             "Scotland Office",
