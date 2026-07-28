@@ -139,6 +139,9 @@ class TemplatePreviewClient:
             },
         )
 
+        if response.status_code != 200:
+            abort(500, "Unable to calculate page count")
+
         page_count = json.loads(response.content.decode("utf-8"))
 
         return page_count
