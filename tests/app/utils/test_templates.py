@@ -1,4 +1,5 @@
 from datetime import date
+from functools import partial
 from unittest import mock
 from uuid import UUID
 
@@ -8,9 +9,11 @@ from freezegun import freeze_time
 from markupsafe import Markup
 from notifications_utils.template import Template
 from ordered_set import OrderedSet
+from requests.exceptions import HTTPError
 
 from app import load_service_before_request
 from app.models.template_email_file import TemplateEmailFile
+from app.template_previews import TemplatePreviewClient, template_preview_client
 from app.utils.templates import EmailPreviewTemplate, TemplateChange, TemplatedLetterImageTemplate, get_sample_template
 from tests import ConcreteTemplate, template_json
 from tests.conftest import SERVICE_ONE_ID, do_mock_get_page_counts_for_letter
@@ -66,6 +69,46 @@ def test_get_page_counts_for_letter_caches(
         ex=2_419_200,
     )
     assert len(mock_get_page_count.call_args_list) == 1
+
+
+def test_get_page_counts_for_letter_does_not_cache_on_error(
+    client_request,
+    service_one,
+    api_user_active,
+    mocker,
+    fake_uuid,
+    requests_mock,
+):
+    client_request.login(api_user_active, service_one)
+
+    mock_redis_get = mocker.patch(
+        "app.extensions.RedisClient.get",
+        return_value=None,
+    )
+    mock_redis_set = mocker.patch(
+        "app.extensions.RedisClient.set",
+    )
+
+    requests_mock.post("http://localhost:9999/get-page-count", status_code=500)
+    mocker.patch(
+        "app.template_preview_client.get_page_counts_for_letter",
+        wraps=partial(TemplatePreviewClient.get_page_counts_for_letter, template_preview_client),
+    )
+
+    template = TemplatedLetterImageTemplate(
+        template_json(
+            service_id=SERVICE_ONE_ID,
+            id_=fake_uuid,
+            type_="letter",
+        )
+    )
+
+    with pytest.raises(HTTPError):
+        _ = template.all_page_counts
+
+    mock_redis_get.assert_called_once_with(f"service-{SERVICE_ONE_ID}-template-{fake_uuid}-version-1-all-page-counts")
+
+    mock_redis_set.assert_not_called()
 
 
 def test_get_page_counts_for_letter_returns_cached_value(
