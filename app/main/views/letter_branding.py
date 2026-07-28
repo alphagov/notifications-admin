@@ -1,9 +1,8 @@
 from botocore.exceptions import ClientError as BotoClientError
 from flask import current_app, redirect, render_template, request, url_for
-from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 
-from app import letter_branding_client, logo_client
+from app import current_user, letter_branding_client, logo_client
 from app.event_handlers import Events
 from app.main import main
 from app.main.forms import (

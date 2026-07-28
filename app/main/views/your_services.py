@@ -1,7 +1,6 @@
 from flask import redirect, render_template, session, url_for
-from flask_login import current_user
 
-from app import status_api_client
+from app import current_user, status_api_client
 from app.main import main
 from app.models.organisation import AllOrganisations
 from app.utils import PermanentRedirect

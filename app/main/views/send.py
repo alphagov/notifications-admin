@@ -10,7 +10,6 @@ from flask import (
     session,
     url_for,
 )
-from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from notifications_utils import SMS_CHAR_COUNT_LIMIT
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
@@ -20,6 +19,7 @@ from notifications_utils.recipients import RecipientCSV, first_column_headings
 
 from app import (
     current_service,
+    current_user,
     job_api_client,
     nl2br,
     notification_api_client,

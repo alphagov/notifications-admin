@@ -2,8 +2,8 @@ from datetime import UTC, datetime, timedelta
 
 from flask import Flask, Request, Response, request
 from flask.sessions import SecureCookieSession, SecureCookieSessionInterface
-from flask_login import current_user
 
+from app import current_user
 from app.constants import JSON_UPDATES_BLUEPRINT_NAME, NO_COOKIE_BLUEPRINT_NAME
 
 

@@ -2,13 +2,13 @@ from datetime import datetime
 from functools import partial
 
 from flask import flash, redirect, render_template, request, send_file, url_for
-from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from werkzeug.exceptions import abort
 
 from app import (
     current_organisation,
     current_service,
+    current_user,
     org_invite_api_client,
     organisations_client,
 )

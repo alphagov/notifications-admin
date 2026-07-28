@@ -1,9 +1,10 @@
 from functools import wraps
 
 from flask import abort, current_app
-from flask_login import current_user, login_required
+from flask_login import login_required
 from notifications_utils.user import GOVERNMENT_EMAIL_DOMAIN_NAMES, email_address_ends_with
 
+from app import current_user
 from app.notify_client.organisations_api_client import organisations_client
 
 user_is_logged_in = login_required

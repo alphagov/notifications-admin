@@ -1,11 +1,10 @@
 from contextvars import ContextVar
 
 from flask import current_app
-from flask_login import current_user
 from notifications_utils.local_vars import LazyLocalGetter
 from werkzeug.local import LocalProxy
 
-from app import memo_resetters
+from app import current_user, memo_resetters
 from app.notify_client import NotifyAdminAPIClient, cache
 
 

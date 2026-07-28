@@ -9,7 +9,6 @@ from numbers import Number
 from zipfile import BadZipFile
 
 from flask import request
-from flask_login import current_user
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed, FileSize
 from flask_wtf.file import FileField as FileField_wtf
@@ -58,7 +57,7 @@ from wtforms.validators import (
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
 
-from app import asset_fingerprinter, current_organisation, document_download_api_client
+from app import asset_fingerprinter, current_organisation, current_user, document_download_api_client
 from app.constants import (
     SERVICE_JOIN_REQUEST_APPROVED,
     SERVICE_JOIN_REQUEST_REJECTED,

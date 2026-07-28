@@ -1,7 +1,6 @@
 from datetime import UTC, datetime
 
 from flask import current_app, redirect, render_template, request, session, url_for
-from flask_login import current_user
 from notifications_utils.bank_holidays import BankHolidays
 from notifications_utils.clients.zendesk.zendesk_client import (
     NotifySupportTicket,
@@ -10,7 +9,7 @@ from notifications_utils.clients.zendesk.zendesk_client import (
 )
 from notifications_utils.timezones import local_timezone
 
-from app import convert_to_boolean, current_service
+from app import convert_to_boolean, current_service, current_user
 from app.constants import ZendeskTopicId
 from app.extensions import zendesk_client
 from app.main import main

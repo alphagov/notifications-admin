@@ -1,10 +1,10 @@
 from flask import abort, flash, redirect, render_template, request, url_for
-from flask_login import current_user
 from markupsafe import Markup
 from notifications_utils.safe_string import make_string_safe
 
 from app import (
     current_service,
+    current_user,
     service_api_client,
 )
 from app.constants import ServiceCallbackTypes

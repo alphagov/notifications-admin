@@ -4,10 +4,9 @@ from pathlib import Path
 from typing import Any, TypedDict
 
 from flask import current_app
-from flask_login import current_user
 from notifications_utils.safe_string import make_string_safe
 
-from app import asset_fingerprinter
+from app import asset_fingerprinter, current_user
 from app.models import JSONModel, ModelList
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client

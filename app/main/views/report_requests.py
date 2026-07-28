@@ -1,9 +1,8 @@
 from flask import abort, jsonify, render_template, send_file, url_for
-from flask_login import current_user
 from notifications_python_client.errors import HTTPError
 from werkzeug.utils import redirect
 
-from app import current_service
+from app import current_service, current_user
 from app.constants import REPORT_REQUEST_FAILED, REPORT_REQUEST_MAX_NOTIFICATIONS, REPORT_REQUEST_STORED
 from app.main import main
 from app.models.report_request import ReportRequest

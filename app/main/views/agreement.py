@@ -1,9 +1,8 @@
 from datetime import UTC, datetime
 
 from flask import abort, redirect, render_template, request, send_file, url_for
-from flask_login import current_user
 
-from app import current_service
+from app import current_service, current_user
 from app.main import main
 from app.main.forms import AcceptAgreementForm
 from app.models.organisation import Organisation

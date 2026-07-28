@@ -16,7 +16,6 @@ from flask import (
     request,
     url_for,
 )
-from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 from notifications_utils.formatters import formatted_list
@@ -28,6 +27,7 @@ from requests import RequestException
 
 from app import (
     current_service,
+    current_user,
     format_delta,
     letter_attachment_client,
     letter_branding_client,

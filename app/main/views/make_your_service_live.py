@@ -1,10 +1,9 @@
 from flask import flash, redirect, render_template, url_for
-from flask_login import current_user
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 from notifications_utils.clients.zendesk.zendesk_client import NotifySupportTicket, NotifyTicketType
 
-from app import current_service, service_api_client
+from app import current_service, current_user, service_api_client
 from app.extensions import zendesk_client
 from app.main import main
 from app.main.forms import RenameServiceForm
