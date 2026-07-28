@@ -94,12 +94,12 @@ def get_template_form(
 
 
 class LetterAttachmentFormError(Exception):
-    def __init__(self, *, title: str = None, detail: str, attachment_page_count: int = 0) -> None:
+    def __init__(self, *, title: str | None = None, detail: str, attachment_page_count: int = 0) -> None:
         self.title = title or "There is a problem"
         self.detail = detail
         self.attachment_page_count = attachment_page_count
 
-    def as_error_dict(self) -> dict[str, int]:
+    def as_error_dict(self) -> dict[str, str | int | None]:
         return {"title": self.title, "detail": self.detail, "attachment_page_count": self.attachment_page_count}
 
 
