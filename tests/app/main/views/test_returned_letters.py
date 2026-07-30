@@ -49,9 +49,11 @@ def test_returned_letter_summary(
     mock.assert_called_once_with(SERVICE_ONE_ID)
 
     assert page.select_one("h1").string.strip() == "Returned letters"
-    assert [normalize_spaces(p.text) for p in page.select("main p.govuk-body")] == expected_paragraphs
-    assert normalize_spaces(page.select_one(".table-field").text) == "24 December 2019 1,234 letters"
-    assert page.select_one(".table-field a")["href"] == url_for(
+    assert [
+        normalize_spaces(p.text) for p in page.select("main p.govuk-body:not(ul p.govuk-body)")
+    ] == expected_paragraphs
+    assert normalize_spaces(page.select_one(".returned-letters-list li").text) == "24 December 2019 1,234 letters"
+    assert page.select_one(".returned-letters-list li a")["href"] == url_for(
         ".returned_letters",
         service_id=SERVICE_ONE_ID,
         reported_at="2019-12-24",
@@ -67,7 +69,7 @@ def test_returned_letter_summary_with_one_letter(client_request, mock_get_api_ke
     mock.assert_called_once_with(SERVICE_ONE_ID)
 
     assert page.select_one("h1").string.strip() == "Returned letters"
-    assert normalize_spaces(page.select_one(".table-field").text) == "24 December 2019 1 letter"
+    assert normalize_spaces(page.select_one(".returned-letters-list li").text) == "24 December 2019 1 letter"
 
 
 def test_returned_letters_page(client_request, mocker):

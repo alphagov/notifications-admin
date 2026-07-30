@@ -461,20 +461,20 @@ def test_view_contact_list(
         service_id=SERVICE_ONE_ID,
         contact_list_id=fake_uuid,
     )
-    assert len(page.select("tbody tr")) == 50
+    assert len(page.select(".contact-list li")) == 50
     assert [
-        normalize_spaces(page.select("tbody tr")[0].text),
-        normalize_spaces(page.select("tbody tr")[1].text),
-        normalize_spaces(page.select("tbody tr")[48].text),
-        normalize_spaces(page.select("tbody tr")[49].text),
+        normalize_spaces(page.select(".contact-list li")[0].text),
+        normalize_spaces(page.select(".contact-list li")[1].text),
+        normalize_spaces(page.select(".contact-list li")[48].text),
+        normalize_spaces(page.select(".contact-list li")[49].text),
     ] == [
         "test-0@example.com",
         "test-1@example.com",
         "test-48@example.com",
         "test-49@example.com",
     ]
-    assert "test-50@example.com" not in page.select_one("tbody").text
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 rows"
+    assert "test-50@example.com" not in page.select_one(".contact-list").text
+    assert normalize_spaces(page.select_one(".more-items-available-text").text) == "Only showing the first 50 rows"
 
 
 @freeze_time("2015-12-31 16:51:56")
