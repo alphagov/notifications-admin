@@ -78,9 +78,9 @@ refreeze-requirements: ## Update unpinned requirements
 
 .PHONY: freeze-requirements
 freeze-requirements: ## create static requirements.txt
-	uv pip compile requirements.in -o requirements.txt $(EXTRA_UV_PIP_COMPILE_FLAGS)
-	uv pip sync requirements.txt
+	uv pip install "`cat requirements.in | grep 'notifications-utils @'`"
 	python -c "from notifications_utils.version_tools import copy_config; copy_config()"
+	uv pip compile requirements.in -o requirements.txt $(EXTRA_UV_PIP_COMPILE_FLAGS)
 	uv pip compile requirements_for_test.in -o requirements_for_test.txt $(EXTRA_UV_PIP_COMPILE_FLAGS)
 	uv pip sync requirements_for_test.txt
 
