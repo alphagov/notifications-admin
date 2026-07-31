@@ -583,11 +583,6 @@ class InvitedUser(BaseUser):
             return False
         return self.service == service_id and permission in self.permissions
 
-    def has_permission_for_organisation(self, organisation_id, permission):
-        if self.status == "cancelled":
-            return False
-        return self.organisation == organisation_id and permission in self.organisation_permissions
-
     def __eq__(self, other):
         if not isinstance(other, InvitedUser):
             return False
