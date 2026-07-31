@@ -2,7 +2,9 @@ import { jest } from '@jest/globals';
 import UpdateRelativeTime from '../../app/assets/javascripts/esm/update-relative-time.mjs';
 
 describe('UpdateRelativeTime', () => {
-  const selector = '[data-notify-module="update-relative-time"]'
+  const selector = '[data-notify-module="update-relative-time"]';
+  const currentYear = new Date().getFullYear();
+  const previousYear = currentYear - 1;
   let now;
 
   beforeEach(() => {
@@ -15,7 +17,11 @@ describe('UpdateRelativeTime', () => {
     `;
 
     jest.useFakeTimers();
-    now = new Date(); 
+    // fix to mid-month for all offset calculations
+    // we now that JS module Intl.Date works as expected
+    // so in these tests we want to avoid doing JS month
+    // substractions and fixes for days with 31 months
+    now = new Date(`${currentYear}-07-15T12:00:00Z`); 
     jest.setSystemTime(now.getTime());
   });
 
@@ -30,13 +36,6 @@ describe('UpdateRelativeTime', () => {
     const date = new Date(jest.now() - offsetMs);
     el.setAttribute('datetime', date.toISOString());
     return el;
-  };
-
-  const getCalendarOffset = (unit, value) => {
-    const d = new Date(jest.now());
-    if (unit === 'month') d.setMonth(d.getMonth() - value);
-    if (unit === 'year') d.setFullYear(d.getFullYear() - value);
-    return jest.now() - d.getTime();
   };
 
   describe('on page load', () => {
@@ -124,14 +123,97 @@ describe('UpdateRelativeTime', () => {
       { label: 'hours (21h)', offset: 21 * 3600000, expected: '21 hours ago' },
       { label: 'yesterday (at 22h boundary)', offset: 22 * 3600000, expected: 'yesterday' },
       { label: 'days (26 days)', offset: 26 * 86400000, expected: '26 days ago' },
-      { label: 'last month', offset: getCalendarOffset('month', 1), expected: 'last month' },
-      { label: 'last year', offset: getCalendarOffset('year', 1), expected: 'last year' },
+      { label: 'last month', offset: 30 * 86400000, expected: 'last month' },
+      { label: 'last year', offset: 365 * 86400000, expected: 'last year' },
     ];
 
     test.each(scenarios)('displays correct text for $label', ({ offset, expected }) => {
       setElementDateTime(offset);
       new UpdateRelativeTime(selector);
       expect(document.querySelector(selector).textContent).toBe(expected);
+    });
+  });
+
+  describe('calendar boundary edge cases', () => {
+    
+
+    const boundaryScenarios = [
+      {
+        label: '1st of the month looking at 31st (1 day ago across month boundary)',
+        systemTime: `${currentYear}-08-01T12:00:00Z`,
+        elementTime: `${currentYear}-07-31T12:00:00Z`,
+        expected: 'yesterday'
+      },
+      {
+        label: '1st of the month looking at 30th (2 days ago across month boundary)',
+        systemTime: `${currentYear}-08-01T12:00:00Z`,
+        elementTime: `${currentYear}-07-30T12:00:00Z`,
+        expected: '2 days ago'
+      },
+      {
+        label: '31st of the month looking at 1st of the SAME month (>27 days ago)',
+        systemTime: `${currentYear}-07-31T12:00:00Z`,
+        elementTime: `${currentYear}-07-01T12:00:00Z`,
+        expected: 'this month'
+      },
+      {
+        label: '30th of the month looking at 1st of the SAME month (>27 days ago)',
+        systemTime: `${currentYear}-11-30T12:00:00Z`,
+        elementTime: `${currentYear}-11-01T12:00:00Z`,
+        expected: 'this month'
+      },
+      {
+        label: '1st of the month looking at 1st of the PREVIOUS month (~30 days ago)',
+        systemTime: `${currentYear}-08-01T12:00:00Z`,
+        elementTime: `${currentYear}-07-01T12:00:00Z`,
+        expected: 'last month'
+      },
+      {
+        label: '1st Jan looking back at 31st Dec (1 day ago at turn of the year)',
+        systemTime: `${currentYear}-01-01T12:00:00Z`,
+        elementTime: `${previousYear}-12-31T12:00:00Z`,
+        expected: 'yesterday'
+      },
+      {
+        label: '15th Jan looking back at 15th Dec (1 month ago across turn of the year)',
+        systemTime: `${currentYear}-01-15T12:00:00Z`,
+        elementTime: `${previousYear}-12-15T12:00:00Z`,
+        expected: 'last month'
+      },
+      {
+        label: '1st Jan looking back at 1st Jan of previous year (1 year ago)',
+        systemTime: `${currentYear}-01-01T12:00:00Z`,
+        elementTime: `${previousYear}-01-01T12:00:00Z`,
+        expected: 'last year'
+      },
+      {
+        label: 'March 1st looking back at Feb 29th in a leap year (1 day ago / yesterday)',
+        systemTime: '2024-03-01T12:00:00Z',
+        elementTime: '2024-02-29T12:00:00Z',
+        expected: 'yesterday'
+      },
+      {
+        label: 'March 1st looking back at Feb 28th in a leap year (2 days ago)',
+        systemTime: '2024-03-01T12:00:00Z',
+        elementTime: '2024-02-28T12:00:00Z',
+        expected: '2 days ago'
+      },
+      {
+        label: 'March 1st 2025 looking back at March 1st 2024 across a 366-day leap year (1 year ago)',
+        systemTime: '2025-03-01T12:00:00Z',
+        elementTime: '2024-03-01T12:00:00Z',
+        expected: 'last year'
+      }
+    ];
+
+    test.each(boundaryScenarios)('displays correct text for $label', ({ systemTime, elementTime, expected }) => {
+      jest.setSystemTime(new Date(systemTime).getTime());
+      
+      const el = document.querySelector(selector);
+      el.setAttribute('datetime', new Date(elementTime).toISOString());
+      
+      new UpdateRelativeTime(selector);
+      expect(el.textContent).toBe(expected);
     });
   });
 });
