@@ -340,17 +340,27 @@ def test_add_service_sets_nhs_gp_daily_sms_limit_to_zero_when_user_already_has_s
     assert mock_create_service_template.called is False
 
 
-def test_add_service_sets_nhs_gp_daily_sms_limit_to_zero_when_user_has_no_other_services(
+@pytest.mark.parametrize("org_type, mock_user_org_type", [("nhs_gp", "nhs"), ("nhs_notify", "nhs_notify")])
+def test_add_service_sets_daily_sms_limit_to_zero_for_nhs_services_with_no_allowance_when_user_has_no_other_services(
     mock_get_no_organisation_by_domain,
     client_request,
     mock_create_service,
     mock_create_service_template,
     mock_update_service,
     mock_get_services_with_no_services,
+    org_type,
+    mock_user_org_type,
+    mocker,
 ):
+    mocker.patch(
+        "app.models.user.User.default_organisation_type",
+        new_callable=mocker.PropertyMock,
+        return_value=mock_user_org_type,
+    )
+
     client_request.post(
         "main.name_service",
-        _data={"name": "testing the post", "organisation_type": "nhs_gp"},
+        _data={"name": "testing the post", "organisation_type": org_type},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.service_dashboard",
