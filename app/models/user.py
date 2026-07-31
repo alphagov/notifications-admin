@@ -377,7 +377,13 @@ class User(BaseUser, UserMixin):
         return Organisation.from_domain(self.email_domain)
 
     @property
+    def is_nhs_notify_org_member(self):
+        return self.belongs_to_organisation(Organisation.NHS_NOTIFY_ID)
+
+    @property
     def default_organisation_type(self):
+        if self.is_nhs_notify_org_member:
+            return "nhs_notify"
         if self.default_organisation:
             return self.default_organisation.organisation_type
         if self.has_nhs_email_address:

@@ -522,6 +522,9 @@ class Service(JSONModel):
 
     @property
     def organisation_type_label(self):
+        if self.organisation_type == Organisation.TYPE_NHS_NOTIFY:
+            return Organisation.NHS_NOTIFY_TYPE_LABEL
+
         return Organisation.TYPE_LABELS.get(self.organisation_type)
 
     @property

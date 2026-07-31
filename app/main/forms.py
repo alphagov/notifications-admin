@@ -1350,6 +1350,18 @@ class CreateServiceForm(StripWhitespaceForm):
     organisation_type = OrganisationTypeField()
 
 
+class CreateNhsNotifyServiceForm(StripWhitespaceForm):
+    name = GovukTextInputField(
+        "Enter a service name",
+        validators=[
+            DataRequired(message="Enter a service name"),
+            MustContainAlphanumericCharacters(),
+            Length(max=255, thing="service name"),
+        ],
+    )
+    organisation_type = HiddenField("organisation_type", default="nhs_notify")
+
+
 class CreateNhsServiceForm(CreateServiceForm):
     organisation_type = OrganisationTypeField(
         include_only={"nhs_central", "nhs_local", "nhs_gp"},
