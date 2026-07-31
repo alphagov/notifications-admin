@@ -21,6 +21,7 @@ class Organisation(JSONModel):
     TYPE_NHS_CENTRAL = "nhs_central"
     TYPE_NHS_LOCAL = "nhs_local"
     TYPE_NHS_GP = "nhs_gp"
+    TYPE_NHS_NOTIFY = "nhs_notify"
     TYPE_EMERGENCY_SERVICE = "emergency_service"
     TYPE_SCHOOL_OR_COLLEGE = "school_or_college"
     TYPE_OTHER = "other"
@@ -29,6 +30,7 @@ class Organisation(JSONModel):
         TYPE_NHS_CENTRAL,
         TYPE_NHS_LOCAL,
         TYPE_NHS_GP,
+        TYPE_NHS_NOTIFY,
     )
 
     TYPE_LABELS = {
