@@ -46,7 +46,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                 ),
             ],
             [
-                "Report Status",
                 "Today at 4:00pm 1 unsubscribe request Not downloaded",
                 "Today from midday to 2:17pm 1 unsubscribe request Downloaded",
                 "Today until midday 34 unsubscribe requests Downloaded",
@@ -68,7 +67,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                 ),
             ],
             [
-                "Report Status",
                 "1 January 2020 to 1 June 1 unsubscribe request Downloaded",
             ],
             [],
@@ -88,7 +86,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                 ),
             ],
             [
-                "Report Status",
                 "1 January at 1:18pm 1 unsubscribe request Downloaded",
                 "1 January at 12:17pm 1 unsubscribe request Downloaded",
             ],
@@ -112,7 +109,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                 ),
             ],
             [
-                "Report Status",
                 "1 May from midday to 2:17pm 1 unsubscribe request Completed",
                 "30 April to 1 May at 10:00am 12,345,678 unsubscribe requests Completed",
             ],
@@ -141,7 +137,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                 ),
             ],
             [
-                "Report Status",
                 "Today 1,234 unsubscribe requests Downloaded",
                 "Yesterday 4,567 unsubscribe requests Downloaded",
                 "20 June 7,890 unsubscribe requests Downloaded",
@@ -171,7 +166,6 @@ from tests.conftest import SERVICE_ONE_ID, create_unsubscribe_request_report, no
                 ),
             ],
             [
-                "Report Status",
                 "1 June from 11:22pm to midnight 1,234 unsubscribe requests Downloaded",
                 "1 June from 2:17pm to 2:18pm 4,567 unsubscribe requests Downloaded",
                 "1 June until midday 7,890 unsubscribe requests Downloaded",
@@ -192,10 +186,9 @@ def test_unsubscribe_request_reports_summary(
 
     page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
 
-    assert [normalize_spaces(row.text) for row in page.select("tr")] == expected_rows
+    assert [normalize_spaces(list_item.text) for list_item in page.select(".govuk-summary-list__row")] == expected_rows
     assert [
-        normalize_spaces(field.text)
-        for field in page.select("td.table-field-right-aligned .table-field-status-default .align-with-message-body")
+        normalize_spaces(list_value.text) for list_value in page.select(".govuk-summary-list__value--default")
     ] == expected_grey_text_statuses
 
 
@@ -204,9 +197,10 @@ def test_no_unsubscribe_request_reports_summary_to_display(client_request, mocke
 
     page = client_request.get("main.unsubscribe_request_reports_summary", service_id=SERVICE_ONE_ID)
 
-    assert ["Report Status", "If you have any email unsubscribe requests they will be listed here"] == [
-        normalize_spaces(row.text) for row in page.select("tr")
-    ]
+    assert (
+        normalize_spaces(page.select("p.no-data"))
+        == "If you have any email unsubscribe requests they will be listed here"
+    )
 
 
 @freeze_time("2024-06-22 12:00")
