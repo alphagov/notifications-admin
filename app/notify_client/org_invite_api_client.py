@@ -50,10 +50,10 @@ class OrgInviteApiClient(NotifyAdminAPIClient):
         self.post(url=f"/organisation/{org_id}/invite/{invited_user_id}", data=data)
 
 
-_org_invite_api_client_context_var: ContextVar[OrgInviteApiClient] = ContextVar("org_invite_api_client")
+_org_invite_api_client_context_var: ContextVar[OrgInviteApiClient | None] = ContextVar("org_invite_api_client")
 get_org_invite_api_client: LazyLocalGetter[OrgInviteApiClient] = LazyLocalGetter(
     _org_invite_api_client_context_var,
     lambda: OrgInviteApiClient(current_app),
 )
 memo_resetters.append(lambda: get_org_invite_api_client.clear())
-org_invite_api_client = LocalProxy(get_org_invite_api_client)
+org_invite_api_client: OrgInviteApiClient = LocalProxy(get_org_invite_api_client)  # type: ignore[assignment]

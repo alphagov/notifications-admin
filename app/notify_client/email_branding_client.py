@@ -61,10 +61,10 @@ class EmailBrandingClient(NotifyAdminAPIClient):
         return self.get(url=f"/email-branding/{branding_id}/orgs_and_services")
 
 
-_email_branding_client_context_var: ContextVar[EmailBrandingClient] = ContextVar("email_branding_client")
+_email_branding_client_context_var: ContextVar[EmailBrandingClient | None] = ContextVar("email_branding_client")
 get_email_branding_client: LazyLocalGetter[EmailBrandingClient] = LazyLocalGetter(
     _email_branding_client_context_var,
     lambda: EmailBrandingClient(current_app),
 )
 memo_resetters.append(lambda: get_email_branding_client.clear())
-email_branding_client = LocalProxy(get_email_branding_client)
+email_branding_client: EmailBrandingClient = LocalProxy(get_email_branding_client)  # type: ignore[assignment]

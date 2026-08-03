@@ -34,10 +34,10 @@ class AdminApiClient(NotifyAdminAPIClient):
         )
 
 
-_admin_api_client_context_var: ContextVar[AdminApiClient] = ContextVar("admin_api_client")
+_admin_api_client_context_var: ContextVar[AdminApiClient | None] = ContextVar("admin_api_client")
 get_admin_api_client: LazyLocalGetter[AdminApiClient] = LazyLocalGetter(
     _admin_api_client_context_var,
     lambda: AdminApiClient(current_app),
 )
 memo_resetters.append(lambda: get_admin_api_client.clear())
-admin_api_client = LocalProxy(get_admin_api_client)
+admin_api_client: AdminApiClient = LocalProxy(get_admin_api_client)  # type: ignore[assignment]

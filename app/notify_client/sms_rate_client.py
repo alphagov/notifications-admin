@@ -14,10 +14,10 @@ class SMSRateApiClient(NotifyAdminAPIClient):
         return self.get(url="/sms-rate")
 
 
-_sms_rate_api_client_context_var: ContextVar[SMSRateApiClient] = ContextVar("sms_rate_api_client")
+_sms_rate_api_client_context_var: ContextVar[SMSRateApiClient | None] = ContextVar("sms_rate_api_client")
 get_sms_rate_api_client: LazyLocalGetter[SMSRateApiClient] = LazyLocalGetter(
     _sms_rate_api_client_context_var,
     lambda: SMSRateApiClient(current_app),
 )
 memo_resetters.append(lambda: get_sms_rate_api_client.clear())
-sms_rate_api_client = LocalProxy(get_sms_rate_api_client)
+sms_rate_api_client: SMSRateApiClient = LocalProxy(get_sms_rate_api_client)  # type: ignore[assignment]

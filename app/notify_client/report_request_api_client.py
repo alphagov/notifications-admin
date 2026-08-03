@@ -20,10 +20,10 @@ class ReportRequestClient(NotifyAdminAPIClient):
         return response["data"]["id"]
 
 
-_report_request_api_client_context_var: ContextVar[ReportRequestClient] = ContextVar("report_request_api_client")
+_report_request_api_client_context_var: ContextVar[ReportRequestClient | None] = ContextVar("report_request_api_client")
 get_report_request_api_client: LazyLocalGetter[ReportRequestClient] = LazyLocalGetter(
     _report_request_api_client_context_var,
     lambda: ReportRequestClient(current_app),
 )
 memo_resetters.append(lambda: get_report_request_api_client.clear())
-report_request_api_client = LocalProxy(get_report_request_api_client)
+report_request_api_client: ReportRequestClient = LocalProxy(get_report_request_api_client)  # type: ignore[assignment]

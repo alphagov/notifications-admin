@@ -168,11 +168,10 @@ login_manager = LoginManager()
 csrf = CSRFProtect()
 metrics = GDSMetrics()
 
-
-current_service = LocalProxy(lambda: g.current_service)
+current_service: Service = LocalProxy(lambda: g.current_service)  # type: ignore[assignment]
 
 # The current organisation attached to the request stack.
-current_organisation = LocalProxy(lambda: g.current_organisation)
+current_organisation: Organisation = LocalProxy(lambda: g.current_organisation)  # type: ignore[assignment]
 
 navigation = {
     "casework_navigation": CaseworkNavigation(),

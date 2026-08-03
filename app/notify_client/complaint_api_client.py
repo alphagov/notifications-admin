@@ -17,10 +17,10 @@ class ComplaintApiClient(NotifyAdminAPIClient):
         return self.get("/complaint/count-by-date-range", params=params_dict)
 
 
-_complaint_api_client_context_var: ContextVar[ComplaintApiClient] = ContextVar("complaint_api_client")
+_complaint_api_client_context_var: ContextVar[ComplaintApiClient | None] = ContextVar("complaint_api_client")
 get_complaint_api_client: LazyLocalGetter[ComplaintApiClient] = LazyLocalGetter(
     _complaint_api_client_context_var,
     lambda: ComplaintApiClient(current_app),
 )
 memo_resetters.append(lambda: get_complaint_api_client.clear())
-complaint_api_client = LocalProxy(get_complaint_api_client)
+complaint_api_client: ComplaintApiClient = LocalProxy(get_complaint_api_client)  # type: ignore[assignment]

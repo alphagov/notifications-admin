@@ -23,10 +23,10 @@ class ApiKeyApiClient(NotifyAdminAPIClient):
         return self.post(url=f"/service/{service_id}/api-key/revoke/{key_id}", data=data)
 
 
-_api_key_api_client_context_var: ContextVar[ApiKeyApiClient] = ContextVar("api_key_api_client")
+_api_key_api_client_context_var: ContextVar[ApiKeyApiClient | None] = ContextVar("api_key_api_client")
 get_api_key_api_client: LazyLocalGetter[ApiKeyApiClient] = LazyLocalGetter(
     _api_key_api_client_context_var,
     lambda: ApiKeyApiClient(current_app),
 )
 memo_resetters.append(lambda: get_api_key_api_client.clear())
-api_key_api_client = LocalProxy(get_api_key_api_client)
+api_key_api_client: ApiKeyApiClient = LocalProxy(get_api_key_api_client)  # type: ignore[assignment]

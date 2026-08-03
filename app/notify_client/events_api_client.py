@@ -15,10 +15,10 @@ class EventsApiClient(NotifyAdminAPIClient):
         return resp["data"]
 
 
-_events_api_client_context_var: ContextVar[EventsApiClient] = ContextVar("events_api_client")
+_events_api_client_context_var: ContextVar[EventsApiClient | None] = ContextVar("events_api_client")
 get_events_api_client: LazyLocalGetter[EventsApiClient] = LazyLocalGetter(
     _events_api_client_context_var,
     lambda: EventsApiClient(current_app),
 )
 memo_resetters.append(lambda: get_events_api_client.clear())
-events_api_client = LocalProxy(get_events_api_client)
+events_api_client: EventsApiClient = LocalProxy(get_events_api_client)  # type: ignore[assignment]

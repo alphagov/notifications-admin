@@ -45,7 +45,7 @@ class TemplateEmailFileClient(NotifyAdminAPIClient):
         return self.post(f"/service/{service_id}/templates/{template_id}/template_email_files/{file_id}", data=data)
 
 
-_template_email_file_api_client_context_var: ContextVar[TemplateEmailFileClient] = ContextVar(
+_template_email_file_api_client_context_var: ContextVar[TemplateEmailFileClient | None] = ContextVar(
     "template_email_file_api_client_context_var"
 )
 get_template_email_file_client: LazyLocalGetter[TemplateEmailFileClient] = LazyLocalGetter(
@@ -53,4 +53,4 @@ get_template_email_file_client: LazyLocalGetter[TemplateEmailFileClient] = LazyL
     lambda: TemplateEmailFileClient(current_app),
 )
 memo_resetters.append(lambda: get_template_email_file_client.clear())
-template_email_file_client = LocalProxy(get_template_email_file_client)
+template_email_file_client: TemplateEmailFileClient = LocalProxy(get_template_email_file_client)  # type: ignore[assignment]

@@ -24,10 +24,10 @@ class ProviderClient(NotifyAdminAPIClient):
         return self.post(url=f"/provider-details/{provider_id}", data=data)
 
 
-_provider_client_context_var: ContextVar[ProviderClient] = ContextVar("provider_client")
+_provider_client_context_var: ContextVar[ProviderClient | None] = ContextVar("provider_client")
 get_provider_client: LazyLocalGetter[ProviderClient] = LazyLocalGetter(
     _provider_client_context_var,
     lambda: ProviderClient(current_app),
 )
 memo_resetters.append(lambda: get_provider_client.clear())
-provider_client = LocalProxy(get_provider_client)
+provider_client: ProviderClient = LocalProxy(get_provider_client)  # type: ignore[assignment]

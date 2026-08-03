@@ -25,7 +25,7 @@ class PerformanceDashboardAPIClient(NotifyAdminAPIClient):
         )
 
 
-_performance_dashboard_api_client_context_var: ContextVar[PerformanceDashboardAPIClient] = ContextVar(
+_performance_dashboard_api_client_context_var: ContextVar[PerformanceDashboardAPIClient | None] = ContextVar(
     "performance_dashboard_api_client"
 )
 get_performance_dashboard_api_client: LazyLocalGetter[PerformanceDashboardAPIClient] = LazyLocalGetter(
@@ -33,4 +33,4 @@ get_performance_dashboard_api_client: LazyLocalGetter[PerformanceDashboardAPICli
     lambda: PerformanceDashboardAPIClient(current_app),
 )
 memo_resetters.append(lambda: get_performance_dashboard_api_client.clear())
-performance_dashboard_api_client = LocalProxy(get_performance_dashboard_api_client)
+performance_dashboard_api_client: PerformanceDashboardAPIClient = LocalProxy(get_performance_dashboard_api_client)  # type: ignore[assignment]

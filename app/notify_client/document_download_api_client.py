@@ -74,7 +74,7 @@ class DocumentDownloadAPIClient:
         return response.json()
 
 
-_document_download_api_client_context_var: ContextVar[DocumentDownloadAPIClient] = ContextVar(
+_document_download_api_client_context_var: ContextVar[DocumentDownloadAPIClient | None] = ContextVar(
     "document_download_api_client"
 )
 get_document_download_api_client: LazyLocalGetter[DocumentDownloadAPIClient] = LazyLocalGetter(
@@ -82,4 +82,4 @@ get_document_download_api_client: LazyLocalGetter[DocumentDownloadAPIClient] = L
     lambda: DocumentDownloadAPIClient(current_app),
 )
 memo_resetters.append(lambda: get_document_download_api_client.clear())
-document_download_api_client = LocalProxy(get_document_download_api_client)
+document_download_api_client: DocumentDownloadAPIClient = LocalProxy(get_document_download_api_client)  # type: ignore[assignment]

@@ -60,10 +60,12 @@ class TemplateFolderAPIClient(NotifyAdminAPIClient):
         self.delete(f"/service/{service_id}/template-folder/{template_folder_id}", {})
 
 
-_template_folder_api_client_context_var: ContextVar[TemplateFolderAPIClient] = ContextVar("template_folder_api_client")
+_template_folder_api_client_context_var: ContextVar[TemplateFolderAPIClient | None] = ContextVar(
+    "template_folder_api_client"
+)
 get_template_folder_api_client: LazyLocalGetter[TemplateFolderAPIClient] = LazyLocalGetter(
     _template_folder_api_client_context_var,
     lambda: TemplateFolderAPIClient(current_app),
 )
 memo_resetters.append(lambda: get_template_folder_api_client.clear())
-template_folder_api_client = LocalProxy(get_template_folder_api_client)
+template_folder_api_client: TemplateFolderAPIClient = LocalProxy(get_template_folder_api_client)  # type: ignore[assignment]

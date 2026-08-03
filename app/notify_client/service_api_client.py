@@ -557,10 +557,10 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(f"/service/{service_id}/service-join-request/{request_id}", data)
 
 
-_service_api_client_context_var: ContextVar[ServiceAPIClient] = ContextVar("service_api_client")
+_service_api_client_context_var: ContextVar[ServiceAPIClient | None] = ContextVar("service_api_client")
 get_service_api_client: LazyLocalGetter[ServiceAPIClient] = LazyLocalGetter(
     _service_api_client_context_var,
     lambda: ServiceAPIClient(current_app),
 )
 memo_resetters.append(lambda: get_service_api_client.clear())
-service_api_client = LocalProxy(get_service_api_client)
+service_api_client: ServiceAPIClient = LocalProxy(get_service_api_client)  # type: ignore[assignment]

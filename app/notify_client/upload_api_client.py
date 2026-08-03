@@ -19,10 +19,10 @@ class UploadApiClient(NotifyAdminAPIClient):
         return self.get(url=f"/service/{service_id}/upload/uploaded-letters/{letter_print_day}?page={page}")
 
 
-_upload_api_client_context_var: ContextVar[UploadApiClient] = ContextVar("upload_api_client")
+_upload_api_client_context_var: ContextVar[UploadApiClient | None] = ContextVar("upload_api_client")
 get_upload_api_client: LazyLocalGetter[UploadApiClient] = LazyLocalGetter(
     _upload_api_client_context_var,
     lambda: UploadApiClient(current_app),
 )
 memo_resetters.append(lambda: get_upload_api_client.clear())
-upload_api_client = LocalProxy(get_upload_api_client)
+upload_api_client: UploadApiClient = LocalProxy(get_upload_api_client)  # type: ignore[assignment]

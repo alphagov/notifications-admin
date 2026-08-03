@@ -14,10 +14,10 @@ class LetterRateApiClient(NotifyAdminAPIClient):
         return self.get(url="/letter-rates")
 
 
-_letter_rate_api_client_context_var: ContextVar[LetterRateApiClient] = ContextVar("letter_rate_api_client")
+_letter_rate_api_client_context_var: ContextVar[LetterRateApiClient | None] = ContextVar("letter_rate_api_client")
 get_letter_rate_api_client: LazyLocalGetter[LetterRateApiClient] = LazyLocalGetter(
     _letter_rate_api_client_context_var,
     lambda: LetterRateApiClient(current_app),
 )
 memo_resetters.append(lambda: get_letter_rate_api_client.clear())
-letter_rate_api_client = LocalProxy(get_letter_rate_api_client)
+letter_rate_api_client: LetterRateApiClient = LocalProxy(get_letter_rate_api_client)  # type: ignore[assignment]

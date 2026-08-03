@@ -132,10 +132,10 @@ class NotificationApiClient(NotifyAdminAPIClient):
         return response.get("notifications_sent_count")
 
 
-_notification_api_client_context_var: ContextVar[NotificationApiClient] = ContextVar("notification_api_client")
+_notification_api_client_context_var: ContextVar[NotificationApiClient | None] = ContextVar("notification_api_client")
 get_notification_api_client: LazyLocalGetter[NotificationApiClient] = LazyLocalGetter(
     _notification_api_client_context_var,
     lambda: NotificationApiClient(current_app),
 )
 memo_resetters.append(lambda: get_notification_api_client.clear())
-notification_api_client = LocalProxy(get_notification_api_client)
+notification_api_client: NotificationApiClient = LocalProxy(get_notification_api_client)  # type: ignore[assignment]

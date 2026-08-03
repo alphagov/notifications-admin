@@ -159,10 +159,10 @@ class TemplatePreviewClient:
         )
 
 
-_template_preview_client_context_var: ContextVar[TemplatePreviewClient] = ContextVar("template_preview_client")
+_template_preview_client_context_var: ContextVar[TemplatePreviewClient | None] = ContextVar("template_preview_client")
 get_template_preview_client: LazyLocalGetter[TemplatePreviewClient] = LazyLocalGetter(
     _template_preview_client_context_var,
     lambda: TemplatePreviewClient(current_app),
 )
 memo_resetters.append(lambda: get_template_preview_client.clear())
-template_preview_client = LocalProxy(get_template_preview_client)
+template_preview_client: TemplatePreviewClient = LocalProxy(get_template_preview_client)
