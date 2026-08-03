@@ -1,0 +1,26 @@
+@use 'govuk/helpers' as *;
+@use 'govuk/settings' as *;
+
+.spark-bar {
+  @include govuk-font(16);
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  margin-bottom: govuk-spacing(3);
+  color: govuk-functional-colour(text);
+  text-align: left;
+}
+
+.spark-bar__bar {
+  @include govuk-font(27, $weight: bold, $tabular: true);
+  box-sizing: border-box;
+  display: inline-block;
+  overflow: visible;
+  background: mix(black, govuk-colour('black', $variant: "tint-95"), 7%);
+  color: govuk-functional-colour(text);
+  padding: 10px 6px 8px 0;
+  text-indent: 12px;
+  text-align: right;
+  margin: 2px 0 1px 0;
+  transition: width 0.6s ease-in-out;
+}
