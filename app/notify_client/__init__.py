@@ -9,7 +9,7 @@ from notifications_utils.json import RelaxedContainerJSONEncoder, StrictJsonTopL
 from app import current_user
 from app.extensions import redis_client
 
-cache = RequestCache(redis_client)
+cache: RequestCache = RequestCache(redis_client)
 
 
 class _ExtraRelaxedContainerJSONEncoder(RelaxedContainerJSONEncoder):
