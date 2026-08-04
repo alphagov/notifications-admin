@@ -293,15 +293,13 @@ def test_inbox_showing_inbound_messages(
         service_id=SERVICE_ONE_ID,
     )
 
-    rows = page.select("tbody tr")
+    rows = page.select(".govuk-summary-list__row")
     assert len(rows) == 8
     assert normalize_spaces(rows[index].text) == expected_row
     assert page.select_one("[data-key=messages] a.govuk-\\!-font-weight-bold")["href"] == url_for(
         "main.inbox_download",
         service_id=SERVICE_ONE_ID,
     )
-    assert len(page.select("thead th:first-child.govuk-\\!-width-two-thirds--static")) == 1
-    assert len(page.select("thead th:last-child.govuk-\\!-width-one-third--static")) == 1
 
 
 def test_get_inbound_sms_shows_page_links(
@@ -345,7 +343,7 @@ def test_empty_inbox(
         service_id=SERVICE_ONE_ID,
     )
 
-    assert normalize_spaces(page.select("tbody tr")) == (
+    assert normalize_spaces(page.select("p.no-data")) == (
         "When users text your service’s phone number (07812398712) you’ll see the messages here"
     )
     assert not page.select("a[download]")
