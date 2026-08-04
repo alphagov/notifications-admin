@@ -9,6 +9,9 @@ from notifications_utils.exception_handling import extract_reraise_chained_excep
 from notifications_utils.s3 import s3upload as utils_s3upload
 from werkzeug.datastructures import FileStorage
 
+if typing.TYPE_CHECKING:
+    from boto3 import S3ServiceResource  # type: ignore[attr-defined]
+
 LOGO_TYPES = typing.Literal["email", "letter"]
 
 
@@ -24,11 +27,10 @@ class LogoClient:
         "letter": "letters/static/images/letter-template/{filename}",
     }
 
-    def __init__(self):
-        # Make sure to call `init_app` to configure the client properly.
-        self.region = None
-        self.bucket_name = None
-        self.client = None
+    # invalid before init_app
+    region: str = None  # type: ignore[assignment]
+    bucket_name: str = None  # type: ignore[assignment]
+    client: "S3ServiceResource" = None  # type: ignore[assignment]
 
     def init_app(self, application):
         self.region = application.config["AWS_REGION"]
@@ -81,7 +83,7 @@ class LogoClient:
         returns:
             S3 object key (excluding bucket name)
         """
-        file_extension = os.path.splitext(file_data.filename)[1]
+        file_extension = os.path.splitext(file_data.filename or "")[1]
         content_type = file_data.content_type
         unique_id = str(uuid.uuid4())
         logo_file_name = f"{unique_id}{file_extension}"
