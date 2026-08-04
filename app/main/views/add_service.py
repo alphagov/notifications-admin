@@ -3,7 +3,7 @@ from notifications_python_client.errors import HTTPError
 
 from app import current_user, service_api_client
 from app.main import main
-from app.main.forms import CreateNhsServiceForm, CreateServiceForm
+from app.main.forms import CreateNhsNotifyServiceForm, CreateNhsServiceForm, CreateServiceForm
 from app.models.organisation import Organisation
 from app.models.service import Service
 from app.utils.user import user_is_gov_user, user_is_logged_in
@@ -62,6 +62,9 @@ def name_service():
     if default_organisation_type == "nhs":
         form = CreateNhsServiceForm()
         default_organisation_type = None
+    elif default_organisation_type == "nhs_notify":
+        form = CreateNhsNotifyServiceForm(organisation_type=default_organisation_type)
+        form.organisation_type.data = "nhs_notify"
     else:
         form = CreateServiceForm(organisation_type=default_organisation_type)
 
@@ -78,14 +81,14 @@ def name_service():
 
         new_service = Service.from_id(service_id)
 
-        # GPs have a zero message limit (to prevent them sending messages while in trial mode)
-        if form.organisation_type.data == Organisation.TYPE_NHS_GP:
+        # GPs and NHS Notify services have a zero message limit (to prevent them sending messages while in trial mode)
+        if form.organisation_type.data in Organisation.TYPES_WITH_NO_FREE_ALLOWANCE:
             new_service.update(sms_message_limit=0)
 
-        # show the tour if the user doesn't have any other services. Never show for NHS GPs
+        # show the tour if the user doesn't have any other services. Never show for NHS GPs or NHS Notify services
         show_tour = (
             len(service_api_client.get_active_services({"user_id": session["user_id"]}).get("data", [])) <= 1
-            and form.organisation_type.data != Organisation.TYPE_NHS_GP
+            and form.organisation_type.data not in Organisation.TYPES_WITH_NO_FREE_ALLOWANCE
         )
 
         if show_tour:

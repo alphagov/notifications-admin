@@ -21,6 +21,7 @@ class Organisation(JSONModel):
     TYPE_NHS_CENTRAL = "nhs_central"
     TYPE_NHS_LOCAL = "nhs_local"
     TYPE_NHS_GP = "nhs_gp"
+    TYPE_NHS_NOTIFY = "nhs_notify"
     TYPE_EMERGENCY_SERVICE = "emergency_service"
     TYPE_SCHOOL_OR_COLLEGE = "school_or_college"
     TYPE_OTHER = "other"
@@ -29,8 +30,15 @@ class Organisation(JSONModel):
         TYPE_NHS_CENTRAL,
         TYPE_NHS_LOCAL,
         TYPE_NHS_GP,
+        TYPE_NHS_NOTIFY,
     )
 
+    TYPES_WITH_NO_FREE_ALLOWANCE = (
+        TYPE_NHS_GP,
+        TYPE_NHS_NOTIFY,
+    )
+
+    # NHS_NOTIFY is excluded - it should not appear as an option for people to pick
     TYPE_LABELS = {
         TYPE_CENTRAL: "Central government",
         TYPE_LOCAL: "Local government",
@@ -41,6 +49,8 @@ class Organisation(JSONModel):
         TYPE_SCHOOL_OR_COLLEGE: "School or college",
         TYPE_OTHER: "Other",
     }
+
+    NHS_NOTIFY_ID = "477f8870-af2b-4b81-9a2c-1fad12028919"
 
     id: Any
     name: str
