@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
 
 from notifications_utils.formatters import formatted_list
+from notifications_utils.serialised_model import SerialisedModelCollection
 
 from app.formatters import format_thousands
-from app.models import ModelList
-from app.notify_client.service_api_client import service_api_client
 
 
 class Event(ABC):
@@ -130,22 +129,14 @@ class APIKeyEvent(Event):
             return f"Created an API key called ‘{self.item['name']}’"
 
 
-class APIKeyEvents(ModelList):
+class APIKeyEvents(SerialisedModelCollection):
     model = APIKeyEvent
 
-    @staticmethod
-    def _get_items(*args, **kwargs):
-        return service_api_client.get_service_api_key_history(*args, **kwargs)
 
-
-class ServiceEvents(ModelList):
+class ServiceEvents(SerialisedModelCollection):
     @property
     def model(self):
         return lambda x: x
-
-    @staticmethod
-    def _get_items(*args, **kwargs):
-        return service_api_client.get_service_service_history(*args, **kwargs)
 
     @staticmethod
     def splat(events):
@@ -162,5 +153,5 @@ class ServiceEvents(ModelList):
                         sorted_events[index][key],
                     )
 
-    def __init__(self, service_id):
-        self.items = [event for event in self.splat(self._get_items(service_id)) if event.relevant]
+    def __init__(self, items):
+        self.items = [event for event in self.splat(items) if event.relevant]

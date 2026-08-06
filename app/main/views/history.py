@@ -6,6 +6,7 @@ from flask import render_template, request
 from app import current_service, format_date_numeric
 from app.main import main
 from app.models.event import APIKeyEvent, APIKeyEvents, ServiceEvents
+from app.notify_client.service_api_client import service_api_client
 from app.utils.user import user_has_permissions
 
 
@@ -23,11 +24,13 @@ def history(service_id):
 
 
 def _get_events(service_id, selected):
+    history = service_api_client.get_service_history(service_id)
+
     if selected == "api":
-        return APIKeyEvents(service_id)
+        return APIKeyEvents(history["api_key_history"])
     if selected == "service":
-        return ServiceEvents(service_id)
-    return APIKeyEvents(service_id) + ServiceEvents(service_id)
+        return ServiceEvents(history["service_history"])
+    return APIKeyEvents(history["api_key_history"]) + ServiceEvents(history["service_history"])
 
 
 def _chunk_events_by_day(events):
