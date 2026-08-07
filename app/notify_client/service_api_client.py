@@ -304,12 +304,6 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_service_history(self, service_id):
         return self.get(f"/service/{service_id}/history")["data"]
 
-    def get_service_service_history(self, service_id):
-        return self.get_service_history(service_id)["service_history"]
-
-    def get_service_api_key_history(self, service_id):
-        return self.get_service_history(service_id)["api_key_history"]
-
     def get_monthly_notification_stats(self, service_id, year):
         return self.get(f"/service/{service_id}/notifications/monthly?year={year}")
 
