@@ -51,6 +51,7 @@ class HeaderNavigation(Navigation):
         "pricing": {
             "guidance_pricing",
             "guidance_pricing_text_messages",
+            "guidance_pricing_free_text_message_allowance",
             "guidance_pricing_letters",
             "guidance_trial_mode",
             "guidance_how_to_pay",

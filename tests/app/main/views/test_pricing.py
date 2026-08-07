@@ -40,7 +40,7 @@ def test_guidance_pricing_letters(client_request, mock_get_letter_rates):
         (
             0.024,
             "A single, 160-character text message costs 2.4 pence (plus VAT).",
-            "Find out how text message pricing works.",
+            "You only have to pay for text messages if you exceed your free text message allowance.",
         ),
     ),
 )

@@ -110,6 +110,7 @@
     "/pricing/how-to-pay",
     "/pricing/letters",
     "/pricing/text-messages",
+    "/pricing/free-text-message-allowance",
     "/pricing/trial-mode",
     "/privacy",
     "/provider/<uuid:provider_id>",
