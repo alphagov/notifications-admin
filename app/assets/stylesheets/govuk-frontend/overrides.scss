@@ -65,20 +65,6 @@ $notify-secondary-button-hover-colour: mix(black, govuk-colour('black', $variant
   }
 }
 
-
-// adjust header navigation menu button positioning for rebrand
-// menu button sits height due to taller header
-// this centrally aligns is with GOV.UK and product name
-// applied only when rebrans is turned on
-// remove when we move to service navigation
-
-.govuk-template--rebranded .govuk-header__menu-button {
-  @include govuk-media-query($until: desktop) {
-    top: 21px;
-  }
-}
-
-
 // make 'GOV.UK Notify' logo sit on top of any content below it
 // mainly to stop the breadcrumb, which has a negative margin-top,
 // overlapping its focus style
