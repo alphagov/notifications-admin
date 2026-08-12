@@ -78,7 +78,7 @@
 
   @extend %banner;
   background: govuk-functional-colour(brand);
-  color: govuk-colour("white");
+  color: govuk-functional-colour(inverse-text);
   margin-top: 10px;
   margin-bottom: 0;
   padding: govuk-spacing(6);
@@ -107,7 +107,7 @@
 
     margin-top: 0;
     margin-bottom: govuk-spacing(6);
-    color: govuk-colour("white");
+    color: govuk-functional-colour(inverse-text);
 
     &:last-child {
       margin-bottom: 0;
@@ -121,7 +121,7 @@
 
   ul {
     @include govuk-font(24);
-    color: govuk-colour("white");
+    color: govuk-functional-colour(inverse-text);
     margin-bottom: govuk-spacing(5);
   }
 
