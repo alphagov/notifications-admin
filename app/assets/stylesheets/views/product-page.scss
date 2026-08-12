@@ -2,18 +2,13 @@
 @use 'govuk/settings' as *;
 @use '../helpers' as *;
 
-$product-page-blue: #1D70B8;
-$product-page-underline-colour: rgb(govuk-colour("white"), 0.25);
-// See https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/button/_button.scss#L24
-$button-shadow-size: $govuk-border-width-form-element;
-
 .product-page {
 
   &-intro {
 
     margin: 0 0 govuk-spacing(6) * 1.5 0;
-    background: $product-page-blue;
-    color: govuk-colour("white");
+    background: govuk-functional-colour(brand);
+    color: govuk-functional-colour(inverse-text);
     padding-top: 2px;
 
     &-wrapper {
@@ -45,7 +40,7 @@ $button-shadow-size: $govuk-border-width-form-element;
 
     p {
       @include govuk-font(24);
-      color: govuk-colour("white");
+      color: govuk-functional-colour(inverse-text);
       margin: govuk-spacing(3) 0 govuk-spacing(6);
     }
 
@@ -89,10 +84,5 @@ $button-shadow-size: $govuk-border-width-form-element;
 }
 
 .product-page-button {
-
-  // based on the govuk-button styles:
-  // https://github.com/alphagov/govuk-frontend/blob/v2.13.0/src/components/button/_button.scss
   @include govuk-font($size: 24, $weight: bold);
-  box-shadow: 0 $button-shadow-size 0 mix(black, $product-page-blue, 15%);
-
 }
