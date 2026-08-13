@@ -1,22 +1,9 @@
 {% extends "views/platform-admin/_base_template.html" %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% block per_page_title %}
 Inbound SMS
 {% endblock %}
-
-{% set table_headings = {
-  'field_headings': [
-    'Number', 'Status', 'Service', 'Created on'
-  ],
-  'field_headings_visible': True,
-  'caption_visible': True
-} %}
-
-
-.inbound {
-  font-style:normal;
-  font-weight:normal;
-}
 
 {% block platform_admin_content %}
 
@@ -24,41 +11,39 @@ Inbound SMS
     Inbound SMS
   </h1>
 
-  <table class="inbound">
-          <col style="width:8%">
-          <col style="width:20%">
-          <col style="width:17%">
-          <col style="width:30%">
-          <thead>
-              <tr>
-                <th>{{table_headings.field_headings[0]}}</th>
-                <th>{{table_headings.field_headings[1]}}</th>
-                <th>{{table_headings.field_headings[2]}}</th>
-              </tr>
-          </thead>
-          <tbody>
+  {% set table_body = [] %}
+  {% for value in inbound_num_list.data: %}
+    {% do table_body.append(
+      [
+        {
+          "text": value.number
+        },
+        {
+          "text": "Active" if value.active else ("Not used" if not value.service.name else "Inactive")
+        },
+        {
+          "text": "",
+          "html": ('<a href="' ~ url_for('main.service_dashboard', service_id=value.service.id) ~ '" class="govuk-link govuk-link--no-visited-state govuk-!-font-size-24 govuk-!-font-weight-bold">' ~ value.service.name ~ '</a>') if value.service else ""
+        }
+      ]
+    )%}
+  {% endfor %}
 
-          {% for value in inbound_num_list.data: %}
-          <tr>
-              <td>{{value.number}}</td>
-              <td>
-
-              {% if value.active %}
-                Active
-              {% elif not value.service.name  %}
-                  Not used
-              {% else %}
-                Inactive
-              {% endif %}
-              </td>
-              <td>
-                  {% if value.service %}
-                    <a href="{{ url_for('main.service_dashboard', service_id=value.service.id) }}" class="govuk-link govuk-link--no-visited-state govuk-!-font-size-24 govuk-!-font-weight-bold">{{ value.service.name }}</a>
-                  {% endif %}
-              </td>
-          </tr>
-          {% endfor %}
-          </tbody>
-  </table>
+  {{ govukTable({
+    "caption": "Inbound sms",
+    "captionClasses": "govuk-visually-hidden",
+    "head": [
+      {
+        "text": "Number"
+      },
+      {
+        "text": "Status"
+      },
+      {
+        "text": "Service"
+      },
+    ],
+    "rows": table_body
+  }) }}
 
 {% endblock %}
