@@ -1,4 +1,5 @@
 {% extends "withoutnav_template.html" %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% block per_page_title %}
   Cookies
@@ -18,29 +19,35 @@
     <p class="govuk-body">
       We do not need to ask permission to use essential cookies.
     </p>
-    <table>
-        <caption class="govuk-visually-hidden">Essential cookies</caption>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Purpose</th>
-                <th>Expires</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                  notify_admin_session
-                </td>
-                <td width="50%">
-                  Used to keep you signed in
-                </td>
-                <td>
-                  20 hours
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    {{ govukTable({
+      "caption": "Essential cookies",
+      "captionClasses": "govuk-visually-hidden",
+      "head": [
+        {
+          "text": "Name"
+        },
+        {
+          "text": "Purpose",
+          "classes": "govuk-!-width-one-half"
+        },
+        {
+          "text": "Expires"
+        },
+      ],
+      "rows": [
+        [
+          {
+            "text": "notify_admin_session"
+          },
+          {
+            "text": " Used to keep you signed in"
+          },
+          {
+            "text": " 20 hours"
+          },
+        ]
+      ]
+    }) }}
   </div>
 </div>
 
