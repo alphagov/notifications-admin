@@ -1,4 +1,5 @@
 from io import BytesIO
+from typing import IO
 
 import PIL
 import PIL.Image
@@ -14,6 +15,10 @@ class CorruptImage(ValueError):
 
 
 class ImageProcessor:
+    _image: PIL.Image.Image
+    image_format: str
+    fp: IO[bytes]
+
     def __init__(self, fp: FileStorage, img_format: str = "png"):
         if not isinstance(fp, FileStorage):
             raise ValueError("Expected fp of type werkzeug.DataStructures.FileStorage")
@@ -54,7 +59,7 @@ class ImageProcessor:
         if new_width > self.width:
             raise NotImplementedError("Cannot increase image size with this method")
 
-        self._image.thumbnail((new_width, self.height), PIL.Image.LANCZOS)
+        self._image.thumbnail((new_width, self.height), PIL.Image.Resampling.LANCZOS)
 
     def pad(self, to_height=None, to_width=None):
         """Pads a smaller image to increase to size.
