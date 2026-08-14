@@ -98,7 +98,9 @@ def test_hiding_pages_from_search_engines(
         pytest.param("index", {}, marks=pytest.mark.xfail(raises=AssertionError)),
     ),
 )
-def test_hiding_pages_that_redirect_from_search_engines(client_request, endpoint, kwargs):
+def test_hiding_pages_that_redirect_from_search_engines(
+    client_request, mock_get_service_and_organisation_counts, mock_get_letter_rates, mock_get_sms_rate, endpoint, kwargs
+):
     client_request.logout()
     response = client_request.get_response(f"main.{endpoint}", _expected_status=301, **kwargs)
     assert "X-Robots-Tag" in response.headers
