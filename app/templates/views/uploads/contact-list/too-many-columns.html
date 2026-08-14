@@ -3,6 +3,7 @@
 {% from "components/table.html" import list_table, text_field, row_heading %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% block service_page_title %}
   Error
@@ -68,6 +69,54 @@
     {% set column_headers = recipients._raw_column_headers[:512] if recipients.duplicate_recipient_column_headers else recipients.column_headers %}
 
     <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
+
+    {% set table_headers = [
+      { "html": '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true">1</span>' }
+    ] %}
+    {% for header in recipients._raw_column_headers[:512] %}
+      {% set _ = table_headers.append({ "text": header }) %}
+    {% endfor %}
+
+
+    {% set table_rows = [] %}
+    {% for item in recipients.displayed_rows %}
+      {% set current_row = [
+        {
+          "text": (item.index + 2) | string,
+          "classes": "govuk-!-font-size-16"
+        }
+      ] %}
+
+      {% for column in column_headers %}
+        {% set cell_classes = "govuk-!-font-size-16" ~ (" govuk-table__cell--default" if item[column].ignore else "") %}
+
+        {% set _ = current_row.append({
+          "text": item[column].data or '',
+          "classes": cell_classes
+        }) %}
+      {% endfor %}
+
+      {% if item[None].data %}
+        {% for column in item[None].data %}
+          {% set _ = current_row.append({
+            "text": column or '',
+            "classes": "govuk-!-font-size-16 govuk-table__cell--default"
+          }) %}
+        {% endfor %}
+      {% endif %}
+
+      {% set _ = table_rows.append(current_row) %}
+    {% endfor %}
+
+    <div class="fullscreen-content" data-notify-module="fullscreen-table">
+      {{ govukTable({
+        "caption": original_file_name,
+        "captionClasses": "govuk-visually-hidden",
+        "firstCellIsHeader": true,
+        "head": table_headers,
+        "rows": table_rows
+      }) }}
+    </div>
 
     <div class="fullscreen-content" data-notify-module="fullscreen-table">
       {% call(item, row_number) list_table(
