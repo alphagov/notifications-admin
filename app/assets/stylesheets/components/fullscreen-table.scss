@@ -13,7 +13,7 @@
     overflow: hidden;
     border-bottom: 1px solid govuk-functional-colour(border);
 
-    .table {
+    .govuk-table {
 
       margin-bottom: 0;
 
@@ -26,8 +26,7 @@
     }
 
     th,
-    .table-field-error-label,
-    .table-field-left-aligned {
+    .govuk-table__cell {
       white-space: nowrap;
     }
 
@@ -60,19 +59,12 @@
     overflow-y: hidden;
 
     // hide the header cells, but only visually and in a way that doesn't disrupt the table layout
-    .table-field-heading-first,
-    tbody th.table-field {
+    .govuk-table__header:first-child {
       color: transparent;
       border-color: transparent;
       border-right-color: govuk-functional-colour(border);
       background: govuk-colour("white");
       box-sizing: border-box;
-    }
-
-    .table-field-left-aligned {
-      position: relative;
-      z-index: 150;
-      background: govuk-colour("white");
     }
 
     &::-webkit-scrollbar {
@@ -104,21 +96,16 @@
     overflow: hidden;
 
     // hide all cells except the headers
-    .table-field-heading,
-    .table-field-left-aligned {
+    .govuk-table__cell {
       visibility: hidden;
       border-color: transparent;
-    }
-
-    .table-field-left-aligned {
       width: 0;
       position: relative;
       z-index: 100;
-      visibility: hidden;
     }
 
-    .table-field-heading-first,
-    tbody th.table-field {
+    .govuk-table__header:first-child,
+    .govuk-table__row .govuk-table__header {
       transition: none;
       position: relative;
       z-index: 200;
@@ -131,8 +118,7 @@
 
     padding-bottom: 20px;
 
-    .table-field-heading-first,
-    tbody th.table-field {
+    .govuk-table__header:first-child {
       transition: box-shadow 0.3s ease-in-out;
       box-shadow: 1px 0 0 0 govuk-functional-colour(border), 3px 0 0 0 rgb(govuk-functional-colour(border), 0.2);
     }
@@ -147,12 +133,64 @@
     margin-bottom: 30px;
     pointer-events: none;
 
-    & + .table-show-more-link {
-      margin-top: -28px;
-    }
-
   }
 
+}
+
+// spreadsheet styling on upload
+.notify-table--spreadsheet {
+  border: 1px solid govuk-functional-colour(border);
+
+  .govuk-table__head {
+    .govuk-table__header {
+      background: govuk-colour('black', $variant: "tint-95");
+      font-weight: bold;
+      text-align: center;
+    }
+    .govuk-table__header:first-child {
+      border-right: 1px solid govuk-functional-colour(border);
+    }
+  }
+  .govuk-table__body {
+    .govuk-table__header,
+    .govuk-table__cell {
+      padding-left: govuk-spacing(2);
+    }
+    .govuk-table__header:first-child {
+      border-right: 1px solid govuk-functional-colour(border);
+      padding-right: govuk-spacing(2);
+      width:15px;
+    }
+  }
+}
+
+// spreadsheet table with fullscreen JS ehancement
+.fullscreen-fixed-table .notify-table--spreadsheet {
+  
+  .govuk-table__header:first-child {
+    background: govuk-colour('black', $variant: "tint-95");
+    min-width: auto;
+    width: auto;
+  }
+}
+
+.fullscreen-content .notify-table--spreadsheet {
+
+  .govuk-table__cell {
+    min-width: 183px;
+    border-right: 1px solid govuk-functional-colour(border);
+  }
+  .govuk-table__body {
+    .govuk-table__cell, .govuk-table__header {
+      border-bottom: 1px solid govuk-functional-colour(border);
+    }
+  }
+}
+
+// normally fullscreen conent border is below the scrollbar
+// but here we want it before
+.fullscreen-content:has(.notify-table--spreadsheet) {
+  border-bottom: 0;
 }
 
 .js-focus-style {
