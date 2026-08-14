@@ -2,6 +2,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "components/table.html" import list_table, text_field, row_heading %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block service_page_title %}
@@ -33,7 +34,6 @@
     <acronym title="Open Document Spreadsheet">ODS</acronym>,
     or Microsoft Excel spreadsheet
   </p>
-
   <div class="spreadsheet" data-notify-module="fullscreen-table">
     {% call(item, row_number) list_table(
       example,
@@ -48,6 +48,33 @@
         {{ text_field(column) }}
       {% endfor %}
     {% endcall %}
+  </div>
+
+  {% set table_headers = [{ "text": "" }] %}
+  {% for heading in column_headings %}
+    {% do table_headers.append({ "text": heading }) %}
+  {% endfor %}
+
+  {% set table_rows = [] %}
+  {% for item in example %}
+    {% set current_row = [
+      { "text": loop.index }
+    ] %}
+    {% for column in item %}
+      {% do current_row.append({ "html": column }) %}
+    {% endfor %}
+    {% do table_rows.append(current_row) %}
+  {% endfor %}
+
+  <div class="spreadsheet" data-notify-module="fullscreen-table">
+    {{ govukTable({
+      "caption": "Example",
+      "captionClasses": "govuk-visually-hidden",
+      "firstCellIsHeader": true,
+      "classes": "notify-table notify-table--body-small",
+      "head": table_headers,
+      "rows": table_rows
+    }) }}
   </div>
   <p class="table-show-more-link">
     <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.get_example_csv', service_id=current_service.id, template_id=template.id) }}">Download this example (<abbr title="Comma separated values">CSV</abbr>)</a>
