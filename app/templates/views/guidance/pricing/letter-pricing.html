@@ -1,6 +1,7 @@
 {% extends "content_template.html" %}
 
 {% from "components/content-metadata.html" import content_metadata %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 {% from "components/table.html" import mapping_table, row, text_field, row_heading %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
@@ -46,7 +47,37 @@
 
 <p class="govuk-body">Prices do not include VAT.</p>
 
+  {% set table_headers = [{ "text": "Paper" }] %}
+  {% for post_class in letter_rates.post_classes.values() %}
+    {% do table_headers.append({ "text": post_class }) %}
+  {% endfor %}
+
+  {% set table_rows = [] %}
+  {% for sheets in letter_rates.sheet_counts %}
+    {% set current_row = [
+      { "text": sheets ~ " sheet" ~ ('s' if sheets > 1 else '') }
+    ] %}
+    {% for post_class in letter_rates.post_classes.keys() %}
+      {% do current_row.append({
+        "text": letter_rates.get(sheet_count=sheets, post_class=post_class)|format_pennies_as_currency(long=False)
+      }) %}
+    {% endfor %}
+    {% do table_rows.append(current_row) %}
+  {% endfor %}
+
   <div class="fullscreen-content" data-notify-module="fullscreen-table">
+    {{ govukTable({
+      "caption": "Letter pricing. Prices do not include VAT.",
+      "captionClasses": "govuk-visually-hidden",
+      "classes": "notify-table notify-table--body-small",
+      "firstCellIsHeader": true,
+      "head": table_headers,
+      "rows": table_rows
+    }) }}
+  </div>
+
+  <div class="fullscreen-content" data-notify-module="fullscreen-table">
+    
     {% call mapping_table(
       caption='Letter pricing. Prices do not include VAT.',
       field_headings=['Paper'] + letter_rates.post_classes.values()|list,
