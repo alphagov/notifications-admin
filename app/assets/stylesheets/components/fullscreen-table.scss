@@ -13,7 +13,8 @@
     overflow: hidden;
     border-bottom: 1px solid govuk-functional-colour(border);
 
-    .table {
+    .table,
+    .govuk-table {
 
       margin-bottom: 0;
 
@@ -27,6 +28,7 @@
 
     th,
     .table-field-error-label,
+    .govuk-table__cell,
     .table-field-left-aligned {
       white-space: nowrap;
     }
@@ -61,6 +63,7 @@
 
     // hide the header cells, but only visually and in a way that doesn't disrupt the table layout
     .table-field-heading-first,
+    .govuk-table__header:first-child,
     tbody th.table-field {
       color: transparent;
       border-color: transparent;
@@ -105,12 +108,14 @@
 
     // hide all cells except the headers
     .table-field-heading,
-    .table-field-left-aligned {
+    .table-field-left-aligned,
+    .govuk-table__cell {
       visibility: hidden;
       border-color: transparent;
     }
 
-    .table-field-left-aligned {
+    .table-field-left-aligned,
+    .govuk-table__cell {
       width: 0;
       position: relative;
       z-index: 100;
@@ -118,7 +123,9 @@
     }
 
     .table-field-heading-first,
-    tbody th.table-field {
+    tbody th.table-field,
+    .govuk-table__header:first-child,
+    .govuk-table__row .govuk-table__header {
       transition: none;
       position: relative;
       z-index: 200;
@@ -132,6 +139,7 @@
     padding-bottom: 20px;
 
     .table-field-heading-first,
+    .govuk-table__header:first-child,
     tbody th.table-field {
       transition: box-shadow 0.3s ease-in-out;
       box-shadow: 1px 0 0 0 govuk-functional-colour(border), 3px 0 0 0 rgb(govuk-functional-colour(border), 0.2);
@@ -147,7 +155,8 @@
     margin-bottom: 30px;
     pointer-events: none;
 
-    & + .table-show-more-link {
+    & + .table-show-more-link,
+    & + .more-items-available-text {
       margin-top: -28px;
     }
 
