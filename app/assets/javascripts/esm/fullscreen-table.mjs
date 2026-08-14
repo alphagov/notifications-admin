@@ -111,8 +111,8 @@ class FullscreenTable {
   }
 
   maintainWidth() {
-    const $scrollableIndexColumnHeader = this.$scrollableTable.querySelector('.table-field-heading-first');
-    const $fixedIndexColumnHeader = this.$fixedTable.querySelector('.table-field-heading-first');
+    const $scrollableIndexColumnHeader = this.$scrollableTable.querySelector('.table-field-heading-first, .govuk-table__header');
+    const $fixedIndexColumnHeader = this.$fixedTable.querySelector('.table-field-heading-first, .govuk-table__header');
 
     if ($scrollableIndexColumnHeader === null || $fixedIndexColumnHeader === null) return;
 
