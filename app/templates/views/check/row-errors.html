@@ -3,6 +3,7 @@
 {% from "components/table.html" import mapping_table, row, field, text_field, index_field %}
 {% from "components/file-upload.html" import file_upload %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% block service_page_title %}
   Error
@@ -49,6 +50,105 @@
       ) }}
     </div>
     <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
+  </div>
+
+  <div class="fullscreen-content" data-notify-module="fullscreen-table">
+
+    {% set table_headers = [
+      { "html": '<span class="govuk-visually-hidden">Row in file</span><span aria-hidden="true" class="table-field-invisible-error">1</span>' }
+    ] %}
+    {% for header in recipients.column_headers %}
+      {% do table_headers.append({ "text": header }) %}
+    {% endfor %}
+
+    {% set table_rows = [] %}
+    {% for item in recipients.displayed_rows %}
+      {% if item.has_error_spanning_multiple_cells %}
+        {% set error_row = [] %}
+        {% do error_row.append({
+          "html": '<span class="govuk-table__cell__error-marker">' ~ (item.index + 2) ~ '</span>',
+          "rowspan": 2
+        }) %}
+
+        {% set error_msg_html %}
+          <span class="govuk-table__cell__error-label ">
+            {% if item.message_empty %}
+              No content for this message
+            {% elif item.message_too_long %}
+              Message is too long
+            {% elif not item.as_postal_address.has_alphanumeric_character_in_address_lines_1_and_2 %}
+              The first 2 lines of the address must both include at least one alphanumeric character
+            {% elif item.as_postal_address.has_invalid_country_for_bfpo_address %}
+              The last line of a BFPO address must not be a country.
+            {% elif not item.as_postal_address.has_enough_lines %}
+              Address must be at least {{ letter_min_address_lines }} lines long
+            {% elif item.as_postal_address.has_too_many_lines %}
+              Address must be no more than {{ letter_max_address_lines }} lines long
+            {% elif not item.as_postal_address.has_valid_last_line %}
+              {% if item.as_postal_address.allow_international_letters %}
+                Last line of the address must be a UK postcode or another country
+              {% elif item.as_postal_address.international %}
+                You do not have permission to send letters to other countries
+              {% else %}
+                Last line of the address must be a real UK postcode
+              {% endif %}
+            {% elif item.as_postal_address.has_invalid_characters %}
+              Address lines must not start with any of the following characters:
+              {{ " ".join(item.as_postal_address.INVALID_CHARACTERS_AT_START_OF_ADDRESS_LINE) }}
+            {% elif item.has_no_fixed_abode_address %}
+              This is not a real address
+            {% endif %}
+          </span>
+        {% endset %}
+
+        {% do error_row.append({
+          "html": error_msg_html,
+          "colspan": recipients.column_headers | length
+        }) %}
+
+        {% do table_rows.append(error_row) %}
+      {% endif %}
+
+      {% set data_row = [] %}
+      {# Only include index cell if it wasn't already created with rowspan=2 above #}
+      {% if not item.has_error_spanning_multiple_cells %}
+        {% set index_class = 'govuk-table__cell__error-marker' if item.has_errors else '' %}
+        {% do data_row.append({
+          "html": '<span class="' ~ index_class ~ '">' ~ (item.index + 2) ~ '</span>'
+        }) %}
+      {% endif %}
+
+      {% for column in recipients.column_headers %}
+        {% if item[column].error and not recipients.missing_column_headers %}
+          {% set cell_error_html %}
+              <span class="govuk-table__cell__error-label">{{ item[column].error }}</span>
+              {{ item[column].data if item[column].data != None }}
+          {% endset %}
+          {% do data_row.append({ "html": cell_error_html }) %}
+        {% elif item[column].ignore %}
+          {% do data_row.append({ "html": item[column].data or '', "classes": "govuk-table__cell--default" }) %}
+        {% else %}
+          {% do data_row.append({ "html": item[column].data or '' }) %}
+        {% endif %}
+      {% endfor %}
+
+      {% if item[None].data %}
+        {% for column in item[None].data %}
+          {% do data_row.append({ "html": column, "classes": "govuk-table__cell--default" }) %}
+        {% endfor %}
+      {% endif %}
+
+      {% do table_rows.append(data_row) %}
+    {% endfor %}
+
+    {{ govukTable({
+      "caption": "Errors in " + original_file_name,
+      "captionClasses": "govuk-visually-hidden",
+      "firstCellIsHeader": true,
+      "classes": "notify-table notify-table--body-small",
+      "head": table_headers,
+      "rows": table_rows
+    }) }}
   </div>
 
   <div class="fullscreen-content" data-notify-module="fullscreen-table">
@@ -131,7 +231,7 @@
     {% endcall %}
   </div>
   {% if count_of_displayed_recipients < count_of_recipients %}
-    <p class="table-show-more-link">
+    <p class="govuk-body more-items-available-text">
       {% if row_errors and not recipients.missing_column_headers %}
         Only showing the first {{ count_of_displayed_recipients }} rows with errors
       {% else %}
@@ -139,7 +239,7 @@
       {% endif %}
     </p>
   {% elif row_errors and not recipients.missing_column_headers %}
-    <p class="table-show-more-link">
+    <p class="govuk-body more-items-available-text">
       Only showing rows with errors
     </p>
   {% endif %}
