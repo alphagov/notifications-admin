@@ -4573,31 +4573,38 @@ def test_can_create_email_template_with_emoji(client_request, mock_create_servic
     assert mock_create_service_template.called is True
 
 
-def test_should_not_create_sms_template_with_emoji(
+def test_should_create_sms_template_with_non_gsm_characters(
     client_request,
     service_one,
     mock_create_service_template,
 ):
-    page = client_request.post(
+    client_request.post(
         ".add_service_template",
         service_id=SERVICE_ONE_ID,
         template_type="sms",
         _data={
             "name": "new name",
-            "template_content": "here are some noodles 🍜",
+            "template_content": "here are some noodles 🍜 and some “smart quotes”",
             "template_type": "sms",
             "service": SERVICE_ONE_ID,
         },
-        _expected_status=200,
     )
-    assert "You cannot use 🍜 in text messages." in page.text
-    assert mock_create_service_template.called is False
+    mock_create_service_template.assert_called_once_with(
+        name="new name",
+        type_="sms",
+        content="here are some noodles 🍜 and some “smart quotes”",
+        service_id=SERVICE_ONE_ID,
+        subject=None,
+        parent_folder_id=None,
+        has_unsubscribe_link=None,
+    )
 
 
-def test_should_not_update_sms_template_with_emoji(
+def test_should_update_sms_template_with_emoji(
     client_request,
     service_one,
     mock_update_service_template,
+    mock_get_no_api_keys,
     fake_uuid,
     mocker,
 ):
@@ -4611,21 +4618,24 @@ def test_should_not_update_sms_template_with_emoji(
             )
         },
     )
-    page = client_request.post(
+    client_request.post(
         ".edit_service_template",
         service_id=SERVICE_ONE_ID,
         template_id=fake_uuid,
         _data={
             "id": fake_uuid,
             "name": "new name",
-            "template_content": "here's a burger 🍔",
+            "template_content": "here’s a burger 🍔",
             "service": SERVICE_ONE_ID,
             "template_type": "sms",
         },
-        _expected_status=200,
     )
-    assert "You cannot use 🍔 in text messages." in page.text
-    assert mock_update_service_template.called is False
+    mock_update_service_template.assert_called_once_with(
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        content="here’s a burger 🍔",
+        name="new name",
+    )
 
 
 def test_should_create_sms_template_without_downgrading_unicode_characters(
