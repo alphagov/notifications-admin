@@ -10,7 +10,6 @@ from notifications_utils.markdown import notify_email_markdown
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
 from notifications_utils.recipient_validation.phone_number import PhoneNumber
-from notifications_utils.sanitise_text import SanitiseSMS
 from ordered_set import OrderedSet
 from wtforms import ValidationError
 from wtforms.validators import URL, DataRequired, InputRequired, StopValidation
@@ -197,29 +196,6 @@ class NoEmbeddedImagesInSVG(NoElementInSVG):
 class NoTextInSVG(NoElementInSVG):
     element = "text"
     message = "This SVG has text which has not been converted to paths and may not render well"
-
-
-class OnlySMSCharacters:
-    def __init__(self, *args, template_type, **kwargs):
-        self._template_type = template_type
-        super().__init__(*args, **kwargs)
-
-    def __call__(self, form, field):
-        non_sms_characters = sorted(SanitiseSMS.get_non_gsm_characters(field.data))
-        if non_sms_characters:
-            list_of_characters = formatted_list(
-                non_sms_characters,
-                conjunction="or",
-                before_each="",
-                after_each="",
-                max_items_shown=3,
-                word_for_items_not_shown="similar characters",
-            )
-            it_or_these = "It" if len(non_sms_characters) == 1 else "These characters"
-            raise ValidationError(
-                f"You cannot use {list_of_characters} in text messages. "
-                f"{it_or_these} will not display properly on some phones."
-            )
 
 
 class DoesNotStartWithDoubleZero:

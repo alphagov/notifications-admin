@@ -9,7 +9,6 @@ from app.main.validators import (
     CharactersNotAllowed,
     MustContainAlphanumericCharacters,
     NoCommasInPlaceHolders,
-    OnlySMSCharacters,
     StringsNotAllowed,
     ValidGovEmail,
     ValidPhoneNumber,
@@ -109,35 +108,6 @@ def test_for_commas_in_placeholders(
         NoCommasInPlaceHolders()(None, _gen_mock_field("Hello ((name,date))"))
     assert str(error.value) == "You cannot put commas between double brackets"
     NoCommasInPlaceHolders()(None, _gen_mock_field("Hello ((name))"))
-
-
-@pytest.mark.parametrize("msg", ["The quick brown fox", "Thé “quick” bröwn fox\u200b"])
-def test_sms_character_validation(client_request, msg):
-    OnlySMSCharacters(template_type="sms")(None, _gen_mock_field(msg))
-
-
-@pytest.mark.parametrize(
-    "data, err_msg",
-    [
-        (
-            "∆ abc 📲 def 📵 ghi 🤪",
-            (
-                "You cannot use ∆, 📲 or similar characters in text messages. "
-                "These characters will not display properly on some phones."
-            ),
-        ),
-        (
-            "∆ abc 📲 def 📵 ghi",
-            "You cannot use ∆, 📲 or 📵 in text messages. These characters will not display properly on some phones.",
-        ),
-        ("📵", "You cannot use 📵 in text messages. It will not display properly on some phones."),
-    ],
-)
-def test_non_sms_character_validation(data, err_msg, client_request):
-    with pytest.raises(ValidationError) as error:
-        OnlySMSCharacters(template_type="sms")(None, _gen_mock_field(data))
-
-    assert str(error.value) == err_msg
 
 
 @pytest.mark.parametrize("string", [".", "A.", ".8...."])
