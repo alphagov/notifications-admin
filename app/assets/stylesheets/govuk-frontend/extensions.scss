@@ -115,10 +115,17 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
 // 24px filename and 19px metadata - template stats
 // 19px filename and 16px metadata - other lists
 
+// by default this bold
 .notify-summary-list__filename {
   @include govuk-typography-weight-bold;
 }
 
+// used for unsubscribe requests
+.notify-summary-list__filename--regular {
+  @include govuk-typography-weight-regular;
+}
+
+// used for template usage list
 .notify-summary-list__filename--large {
   @include govuk-font-size(24);
 }
@@ -127,6 +134,11 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
   @include govuk-media-query($from: tablet) {
     margin-bottom: 0;
   }
+}
+
+// used for inbound sms, unsubscribe request lists and returned letters
+.notify-summary-list__metadata--small {
+  @include govuk-font-size(16);
 }
 
 .notify-summary-list__key {
@@ -148,6 +160,7 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
 
 }
 
+// used for template stats list
 .notify-summary-list__key--50-100 {
 
   @include govuk-media-query($from: tablet) {
@@ -156,8 +169,28 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
 
 }
 
+// unsubscribe reports, inbound sms list and returned letters
+// value does not need 50% of the width
+.notify-summary-list__key--60-100 {
+
+  @include govuk-media-query($from: tablet) {
+    width: 60%;
+  }
+
+}
+
 .govuk-summary-list__value--default {
   color: govuk-functional-colour(secondary-text);
+}
+
+.govuk-summary-list__value--align-right {
+  @include govuk-media-query($from: tablet) {
+    text-align: right;
+  }
+}
+
+.govuk-summary-list__value--small {
+  @include govuk-font-size(16);
 }
 
 .govuk-summary-list__value--truncate {

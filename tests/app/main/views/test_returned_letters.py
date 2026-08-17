@@ -108,14 +108,13 @@ def test_returned_letters_page(client_request, mocker):
     )
 
     assert [
-        "Template name Originally sent",
         "Example template Reference ABC123 Sent 24 December 2019",
         "Example template Sent from Example spreadsheet.xlsx Sent 24 December 2019",
         "Example template No reference provided Sent 24 December 2019",
         "Example precompiled.pdf Reference DEF456 Sent 24 December 2019",
         "Example one-off.pdf No reference provided Sent 24 December 2019",
         "Provided as PDF Reference XYZ999 Sent 24 December 2019",
-    ] == [normalize_spaces(row.text) for row in page.select("tr")]
+    ] == [normalize_spaces(list_item.text) for list_item in page.select(".govuk-summary-list__row")]
 
 
 @pytest.mark.parametrize(
@@ -169,7 +168,7 @@ def test_returned_letters_page_with_many_letters(
         reported_at="2019-12-24",
     )
 
-    assert len(page.select("tbody tr")) == 50
+    assert len(page.select(".govuk-summary-list__row")) == 50
 
     download_link = page.select_one("main a")
     assert normalize_spaces(download_link.text) == "Download this report (CSV)"
@@ -185,7 +184,7 @@ def test_returned_letters_page_with_many_letters(
     else:
         assert [normalize_spaces(e.text) for e in orphaned_paras] == [orphaned_expected_message]
 
-    show_more_links = [e for e in page.select(".table-show-more-link") if "Only showing" in e.text]
+    show_more_links = [e for e in page.select(".more-items-available-text") if "Only showing" in e.text]
     if more_expected_message is None:
         assert show_more_links == []
     else:
