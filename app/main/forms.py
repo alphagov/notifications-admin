@@ -26,7 +26,7 @@ from notifications_utils.recipient_validation.phone_number import PhoneNumber as
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
 from notifications_utils.sanitise_text import SanitiseASCII
-from notifications_utils.template import SMSMessageTemplate
+from notifications_utils.template import LetterPreviewTemplate, SMSMessageTemplate
 from notifications_utils.timezones import local_timezone, utc_string_to_aware_gmt_datetime
 from ordered_set import OrderedSet
 from werkzeug.utils import cached_property
@@ -1570,6 +1570,11 @@ class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
         if kwargs.get("letter_languages") == LetterLanguageOptions.welsh_then_english:
             self.subject.label.text = f"{self.subject.label.text} (English)"
             self.template_content.label.text = f"{self.template_content.label.text} (English)"
+
+    def validate_template_content(self, field):
+        template = LetterPreviewTemplate({"subject": "", "content": field.data, "template_type": "letter"})
+        if template.has_qr_code_with_too_much_data():
+            raise ValidationError("Cannot create a usable QR code - the link you entered is too long")
 
 
 class WelshLetterTemplateForm(BaseTemplateForm, TemplateNameMixin):

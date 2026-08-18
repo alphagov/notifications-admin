@@ -37,7 +37,7 @@ from app import (
     template_preview_client,
     template_statistics_client,
 )
-from app.constants import QR_CODE_TOO_LONG, LetterLanguageOptions
+from app.constants import LetterLanguageOptions
 from app.main import main, no_cookie
 from app.main.forms import (
     CopyTemplateForm,
@@ -778,15 +778,7 @@ def edit_service_template(service_id, template_id, language=None):
                 **update_data,
             )
         except HTTPError as e:
-            if e.status_code == 400:
-                if "content" in e.message and any(x == QR_CODE_TOO_LONG for x in e.message["content"]):
-                    form.template_content.errors.append(
-                        "Cannot create a usable QR code - the link you entered is too long"
-                    )
-                else:
-                    raise e
-            else:
-                raise e
+            raise e
         else:
             editing_english_content_in_bilingual_letter = (
                 template.template_type == "letter" and template.welsh_page_count and language != "welsh"
