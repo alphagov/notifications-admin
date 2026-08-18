@@ -27,7 +27,7 @@
   "homepage": "https://github.com/alphagov/notifications-admin#readme",
   "dependencies": {
     "cbor2": "2.3.0",
-    "govuk-frontend": "6.3.0",
+    "govuk-frontend": "6.4.0",
     "morphdom": "2.6.1",
     "textarea-caret-ts": "4.1.1"
   },
