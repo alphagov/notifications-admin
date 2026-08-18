@@ -666,14 +666,7 @@ def add_service_template(service_id, template_type, template_folder_id=None):
                 has_unsubscribe_link=form.has_unsubscribe_link.data if hasattr(form, "has_unsubscribe_link") else None,
             )
         except HTTPError as e:
-            if (
-                e.status_code == 400
-                and "content" in e.message
-                and any("character count greater than" in x for x in e.message["content"])
-            ):
-                form.template_content.errors.extend(e.message["content"])
-            else:
-                raise e
+            raise e
         else:
             return redirect(
                 url_for("main.view_template", service_id=service_id, template_id=new_template["data"]["id"])
@@ -739,7 +732,7 @@ def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: str | 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=["GET", "POST"])
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit/<string:language>", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-def edit_service_template(service_id, template_id, language=None):  # noqa
+def edit_service_template(service_id, template_id, language=None):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if template.template_type not in current_service.available_template_types:
@@ -786,9 +779,7 @@ def edit_service_template(service_id, template_id, language=None):  # noqa
             )
         except HTTPError as e:
             if e.status_code == 400:
-                if "content" in e.message and any("character count greater than" in x for x in e.message["content"]):
-                    form.template_content.errors.extend(e.message["content"])
-                elif "content" in e.message and any(x == QR_CODE_TOO_LONG for x in e.message["content"]):
+                if "content" in e.message and any(x == QR_CODE_TOO_LONG for x in e.message["content"]):
                     form.template_content.errors.append(
                         "Cannot create a usable QR code - the link you entered is too long"
                     )

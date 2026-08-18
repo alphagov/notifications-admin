@@ -1091,51 +1091,6 @@ def mock_update_service_template(notify_admin, mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_create_service_template_content_too_big(notify_admin, mocker):
-    def _create(
-        *,
-        name,
-        type_,
-        content,
-        service_id,
-        subject=None,
-        parent_folder_id=None,
-        has_unsubscribe_link=None,
-    ):
-        json_mock = Mock(
-            return_value={
-                "message": {"content": ["Content has a character count greater than the limit of 459"]},
-                "result": "error",
-            }
-        )
-        resp_mock = Mock(status_code=400, json=json_mock)
-        http_error = HTTPError(
-            response=resp_mock, message={"content": ["Content has a character count greater than the limit of 459"]}
-        )
-        raise http_error
-
-    return mocker.patch("app.service_api_client.create_service_template", side_effect=_create)
-
-
-@pytest.fixture(scope="function")
-def mock_update_service_template_400_content_too_big(notify_admin, mocker):
-    def _update(*, service_id, template_id, name=None, content=None, subject=None):
-        json_mock = Mock(
-            return_value={
-                "message": {"content": ["Content has a character count greater than the limit of 459"]},
-                "result": "error",
-            }
-        )
-        resp_mock = Mock(status_code=400, json=json_mock)
-        http_error = HTTPError(
-            response=resp_mock, message={"content": ["Content has a character count greater than the limit of 459"]}
-        )
-        raise http_error
-
-    return mocker.patch("app.service_api_client.update_service_template", side_effect=_update)
-
-
-@pytest.fixture(scope="function")
 def mock_update_service_template_400_qr_code_too_big(notify_admin, mocker):
     def _update(*, service_id, template_id, name=None, content=None, subject=None):
         json_mock = Mock(
