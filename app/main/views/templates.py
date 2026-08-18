@@ -655,22 +655,16 @@ def add_service_template(service_id, template_type, template_folder_id=None):
 
     form = get_template_form(template_type)()
     if form.validate_on_submit():
-        try:
-            new_template = service_api_client.create_service_template(
-                name=form.name.data,
-                type_=template_type,
-                content=form.template_content.data,
-                service_id=service_id,
-                subject=form.subject.data if hasattr(form, "subject") else None,
-                parent_folder_id=template_folder_id,
-                has_unsubscribe_link=form.has_unsubscribe_link.data if hasattr(form, "has_unsubscribe_link") else None,
-            )
-        except HTTPError as e:
-            raise e
-        else:
-            return redirect(
-                url_for("main.view_template", service_id=service_id, template_id=new_template["data"]["id"])
-            )
+        new_template = service_api_client.create_service_template(
+            name=form.name.data,
+            type_=template_type,
+            content=form.template_content.data,
+            service_id=service_id,
+            subject=form.subject.data if hasattr(form, "subject") else None,
+            parent_folder_id=template_folder_id,
+            has_unsubscribe_link=form.has_unsubscribe_link.data if hasattr(form, "has_unsubscribe_link") else None,
+        )
+        return redirect(url_for("main.view_template", service_id=service_id, template_id=new_template["data"]["id"]))
 
     return render_template(
         f"views/edit-{template_type}-template.html",
@@ -771,37 +765,34 @@ def edit_service_template(service_id, template_id, language=None):
         update_data = form.new_template_data
         if template_change.email_files_removed:
             update_data["archive_email_file_ids"] = [file.id for file in template_change.email_files_removed]
-        try:
-            service_api_client.update_service_template(
+
+        service_api_client.update_service_template(
+            service_id=service_id,
+            template_id=template_id,
+            **update_data,
+        )
+        editing_english_content_in_bilingual_letter = (
+            template.template_type == "letter" and template.welsh_page_count and language != "welsh"
+        )
+        if template_change.email_files_removed:
+            multiple_files_removed = len(template_change.email_filenames_removed) > 1
+            flash(
+                f"{formatted_list(template_change.email_filenames_removed)} "
+                f"{'have' if multiple_files_removed else 'has'} been removed",
+                "default_with_tick",
+            )
+        return redirect(
+            url_for(
+                "main.view_template",
                 service_id=service_id,
                 template_id=template_id,
-                **update_data,
+                **(
+                    {"_anchor": "first-page-of-english-in-bilingual-letter"}
+                    if editing_english_content_in_bilingual_letter
+                    else {}
+                ),
             )
-        except HTTPError as e:
-            raise e
-        else:
-            editing_english_content_in_bilingual_letter = (
-                template.template_type == "letter" and template.welsh_page_count and language != "welsh"
-            )
-            if template_change.email_files_removed:
-                multiple_files_removed = len(template_change.email_filenames_removed) > 1
-                flash(
-                    f"{formatted_list(template_change.email_filenames_removed)} "
-                    f"{'have' if multiple_files_removed else 'has'} been removed",
-                    "default_with_tick",
-                )
-            return redirect(
-                url_for(
-                    "main.view_template",
-                    service_id=service_id,
-                    template_id=template_id,
-                    **(
-                        {"_anchor": "first-page-of-english-in-bilingual-letter"}
-                        if editing_english_content_in_bilingual_letter
-                        else {}
-                    ),
-                )
-            )
+        )
 
     return render_template(
         f"views/edit-{template.template_type}-template.html",
