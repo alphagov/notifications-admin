@@ -3936,8 +3936,8 @@ def test_should_not_update_too_big_template(
 
 def test_should_not_edit_letter_template_with_too_big_qr_code(
     client_request,
-    mock_get_service_template,
-    mock_update_service_template_400_qr_code_too_big,
+    mock_get_service_letter_template,
+    mock_update_service_template,
     mock_get_no_api_keys,
     fake_uuid,
     service_one,
@@ -3964,6 +3964,7 @@ def test_should_not_edit_letter_template_with_too_big_qr_code(
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
         "Error: Cannot create a usable QR code - the link you entered is too long"
     )
+    assert mock_update_service_template.called is False
 
 
 def test_should_redirect_when_saving_a_template_email(

@@ -1090,22 +1090,6 @@ def mock_update_service_template(notify_admin, mocker):
     return mocker.patch("app.service_api_client.update_service_template", side_effect=_update)
 
 
-@pytest.fixture(scope="function")
-def mock_update_service_template_400_qr_code_too_big(notify_admin, mocker):
-    def _update(*, service_id, template_id, name=None, content=None, subject=None):
-        json_mock = Mock(
-            return_value={
-                "message": {"content": ["qr-code-too-long"]},
-                "result": "error",
-            }
-        )
-        resp_mock = Mock(status_code=400, json=json_mock)
-        http_error = HTTPError(response=resp_mock, message={"content": ["qr-code-too-long"]})
-        raise http_error
-
-    return mocker.patch("app.service_api_client.update_service_template", side_effect=_update)
-
-
 def create_service_templates(service_id, number_of_templates=6):
     template_types = ["sms", "sms", "email", "email", "letter", "letter"]
     service_templates = []
