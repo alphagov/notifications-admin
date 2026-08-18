@@ -1348,7 +1348,7 @@ def active_user_no_settings_permission():
 def api_user_locked(fake_uuid):
     return create_user(
         id=fake_uuid,
-        failed_login_count=5,
+        failed_login_count=11,
         password_changed_at=None,
     )
 
@@ -1357,7 +1357,7 @@ def api_user_locked(fake_uuid):
 def api_user_request_password_reset(fake_uuid):
     return create_user(
         id=fake_uuid,
-        failed_login_count=5,
+        failed_login_count=11,
     )
 
 
@@ -1365,7 +1365,7 @@ def api_user_request_password_reset(fake_uuid):
 def api_user_changed_password(fake_uuid):
     return create_user(
         id=fake_uuid,
-        failed_login_count=5,
+        failed_login_count=11,
         password_changed_at=str(datetime.now(UTC) + timedelta(minutes=1)),
     )
 

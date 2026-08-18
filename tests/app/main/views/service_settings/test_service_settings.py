@@ -3977,7 +3977,11 @@ def test_switch_service_channels_on_and_off(
     posted_value,
     expected_updated_permissions,
 ):
-    mocked_fn = mocker.patch("app.service_api_client.update_service", return_value=service_one)
+    mocked_update_service = mocker.patch("app.service_api_client.update_service", return_value=service_one)
+    mocked_get_reply_to_email_addresses = mocker.patch(
+        "app.service_api_client.get_reply_to_email_addresses", return_value=[]
+    )
+
     service_one["permissions"] = initial_permissions
 
     page = client_request.get(
@@ -4002,8 +4006,12 @@ def test_switch_service_channels_on_and_off(
             service_id=service_one["id"],
         ),
     )
-    assert set(mocked_fn.call_args[1]["permissions"]) == set(expected_updated_permissions)
-    assert mocked_fn.call_args[0][0] == service_one["id"]
+
+    assert set(mocked_update_service.call_args[1]["permissions"]) == set(expected_updated_permissions)
+    assert mocked_update_service.call_args[0][0] == service_one["id"]
+
+    # in cases where this *was* called we will have "failed" much earlier in the test
+    assert mocked_get_reply_to_email_addresses.mock_calls == []
 
 
 @pytest.mark.parametrize(
