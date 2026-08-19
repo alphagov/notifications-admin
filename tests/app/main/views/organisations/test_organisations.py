@@ -91,7 +91,7 @@ def test_organisation_page_shows_all_organisations(client_request, platform_admi
         ("Test 3", "0 live services", url_for("main.organisation_dashboard", org_id="A3")),
     ]
 
-    archived = page.select_one(".table-field-status-default.heading-medium")
+    archived = page.select_one(".browse-list-item__status.heading-medium")
     assert normalize_spaces(archived.text) == "– archived"
     assert normalize_spaces(archived.parent.text) == "Test 2 – archived 2 live services"
 
