@@ -72,7 +72,7 @@
       },
       "value": {
         "text": current_user.mobile_number or "Not set",
-        "classes": "" if current_user.mobile_number else "table-field-status-default"
+        "classes": "" if current_user.mobile_number else "govuk-summary-list__value--default"
       },
       "actions": {
         "items": [
@@ -154,7 +154,7 @@
       },
       "value": {
         "text": ('{} registered'.format(current_user.webauthn_credentials|length)) if current_user.webauthn_credentials else "None registered",
-        "classes": "" if current_user.webauthn_credentials else "table-field-status-default"
+        "classes": "" if current_user.webauthn_credentials else "govuk-summary-list__value--default"
       },
       "actions": {
         "items": [
