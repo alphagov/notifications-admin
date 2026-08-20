@@ -3888,7 +3888,7 @@ def test_removing_placeholders_is_not_a_breaking_change(
 
 def test_should_not_create_too_big_template(
     client_request,
-    mock_create_service_template_content_too_big,
+    mock_create_service_template,
 ):
     page = client_request.post(
         ".add_service_template",
@@ -3896,19 +3896,22 @@ def test_should_not_create_too_big_template(
         template_type="sms",
         _data={
             "name": "new name",
-            "template_content": "template content",
+            "template_content": "a" * 919,
             "template_type": "sms",
             "service": SERVICE_ONE_ID,
         },
         _expected_status=200,
     )
-    assert "Content has a character count greater than the limit of 459" in page.text
+    assert normalize_spaces(page.select_one(".govuk-error-message")) == (
+        "Error: Content has a character count greater than the limit of 918"
+    )
+    assert mock_create_service_template.called is False
 
 
 def test_should_not_update_too_big_template(
     client_request,
     mock_get_service_template,
-    mock_update_service_template_400_content_too_big,
+    mock_update_service_template,
     mock_get_no_api_keys,
     fake_uuid,
 ):
@@ -3919,19 +3922,22 @@ def test_should_not_update_too_big_template(
         _data={
             "id": fake_uuid,
             "name": "new name",
-            "template_content": "template content",
+            "template_content": "a" * 919,
             "service": SERVICE_ONE_ID,
             "template_type": "sms",
         },
         _expected_status=200,
     )
-    assert "Content has a character count greater than the limit of 459" in page.text
+    assert normalize_spaces(page.select_one(".govuk-error-message")) == (
+        "Error: Content has a character count greater than the limit of 918"
+    )
+    assert mock_update_service_template.called is False
 
 
 def test_should_not_edit_letter_template_with_too_big_qr_code(
     client_request,
-    mock_get_service_template,
-    mock_update_service_template_400_qr_code_too_big,
+    mock_get_service_letter_template,
+    mock_update_service_template,
     mock_get_no_api_keys,
     fake_uuid,
     service_one,
@@ -3958,6 +3964,7 @@ def test_should_not_edit_letter_template_with_too_big_qr_code(
     assert normalize_spaces(page.select_one(".govuk-error-message").text) == (
         "Error: Cannot create a usable QR code - the link you entered is too long"
     )
+    assert mock_update_service_template.called is False
 
 
 def test_should_redirect_when_saving_a_template_email(
