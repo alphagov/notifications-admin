@@ -205,7 +205,7 @@ class OnlySMSCharacters:
         super().__init__(*args, **kwargs)
 
     def __call__(self, form, field):
-        non_sms_characters = sorted(SanitiseSMS.get_non_compatible_characters(field.data))
+        non_sms_characters = sorted(SanitiseSMS.get_non_gsm_characters(field.data))
         if non_sms_characters:
             list_of_characters = formatted_list(
                 non_sms_characters,
