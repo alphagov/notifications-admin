@@ -131,6 +131,7 @@ def test_hiding_pages_that_redirect_from_search_engines(
         ["guidance_personalisation", {}],
         ["guidance_pricing_letters", {}],
         ["guidance_pricing_text_messages", {}],
+        ["guidance_pricing_free_text_message_allowance", {}],
         ["guidance_pricing", {}],
         ["guidance_qr_codes", {}],
         ["guidance_receive_text_messages", {}],
