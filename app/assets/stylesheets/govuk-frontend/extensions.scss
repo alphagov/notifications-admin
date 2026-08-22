@@ -417,3 +417,41 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
   color: govuk-functional-colour(secondary-text);
   margin-bottom: 0;
 }
+
+// govuk-table extensions
+
+// most of our tables have body font size of 16px
+// but keep table headers at 19px
+// instead of adding govuk-!-font-size-16 to each cell
+// we can add a class modifier on the table
+// more apparent use with fullscreen tables
+.notify-table--body-small .govuk-table__body {
+  .govuk-table__cell, 
+  .govuk-table__header {
+    @include govuk-font-size(16);
+  }
+} 
+
+// spreadsheet styling on upload
+.notify-table--spreadsheet {
+  border: 1px solid govuk-functional-colour(border);
+
+  .govuk-table__head {
+    .govuk-table__header {
+      background: govuk-colour('black', $variant: "tint-95");
+      font-weight: bold;
+      text-align: center;
+    }
+  }
+  .govuk-table__body {
+    .govuk-table__header,
+    .govuk-table__cell {
+      padding-left: govuk-spacing(2);
+    }
+    .govuk-table__header:first-child {
+      border-right: 1px solid govuk-functional-colour(border);
+      padding-right: govuk-spacing(2);
+      width:15px;
+    }
+  }
+}
