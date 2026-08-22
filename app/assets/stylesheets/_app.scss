@@ -84,6 +84,9 @@ td {
   color: govuk-functional-colour(secondary-text);
 }
 
+// this can be removed once the fullscreen table on
+// /services/<uuid:service_id>/send/<uuid:template_id>/csv 
+// is converted to a govuk-frontend table
 .spreadsheet {
 
   margin-bottom: -1 * govuk-spacing(6);
