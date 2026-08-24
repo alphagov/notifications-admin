@@ -119,9 +119,11 @@ def _verify_webauthn_authentication(user):
     request_data = cbor.decode(request.get_data())
 
     try:
+        # FIXME
         attested_credential_data = current_app.webauthn_server.authenticate_complete(
             state=state,
             credentials=user.webauthn_credentials.as_cbor,
+            response=
             credential_id=request_data["credentialId"],
             client_data=CollectedClientData(request_data["clientDataJSON"]),
             auth_data=AuthenticatorData(request_data["authenticatorData"]),
