@@ -817,10 +817,10 @@ def test_create_email_branding_government_identity_logo_form(client_request, pla
 
     assert list(zip(values, images, strict=True)) == [
         (
-            "Department for Business & Trade",
+            "Department for Business, Innovation, Science and Trade",
             (
                 "https://static.example.com/images/branding/insignia/"
-                "Department for Business & Trade.png?037794106095c182ff58655a47fe3bca"
+                "Department for Business, Innovation, Science and Trade.png?5bbdca1f88c78d6157a9ed4395b25a1d"
             ),
         ),
         (
@@ -900,13 +900,11 @@ def test_create_email_branding_government_identity_colour(client_request, platfo
         ("Attorney General’s Office", "#9f1888"),
         ("Cabinet Office", "#005abb"),
         ("Civil Service", "#af292e"),
-        ("Department for Business & Trade", "#cf102d"),
-        ("Department for Business Innovation & Skills", "#003479"),
+        ("Department for Business, Innovation, Science and Trade", "#ff4328"),
         ("Department for Digital, Culture, Media & Sport", "#d40072"),
         ("Department for Education", "#003a69"),
         ("Department for Environment Food & Rural Affairs", "#00a33b"),
-        ("Department for International Development", "#002878"),
-        ("Department for Levelling Up, Housing & Communities", "#012169"),
+        ("Ministry of Housing, Communities and Local Government", "#012169"),
         ("Department for Transport", "#006c56"),
         ("Department for Work & Pensions", "#00beb7"),
         ("Department of Health & Social Care", "#00ad93"),
