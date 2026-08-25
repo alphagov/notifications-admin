@@ -1,6 +1,7 @@
-{% from "components/table.html" import list_table, row_heading, notification_status_field %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+{% from "components/notification-state.html" import notification_state %}
 
 <div class="ajax-block-container" aria-labelledby='pill-selected-item' role="region">
   {% if job.scheduled %}
@@ -24,7 +25,7 @@
   {% else %}
 
     {% if notifications %}
-      <div class="dashboard-table bottom-gutter-3-2" id="job-notifications">
+      <div class="bottom-gutter-3-2" id="job-notifications">
     {% endif %}
 
       {% if job.template_type == 'letter' %}
@@ -45,28 +46,39 @@
         </div>
       {% endif %}
 
-      {% call(item, row_number) list_table(
-        notifications,
-        caption=job.original_file_name,
-        caption_visible=False,
-        empty_message='No messages to show yet…' if job.awaiting_processing_or_recently_processed else job.processing_started | message_finished_processing_notification(service_data_retention_days),
-        field_headings=[
-          'Recipient',
-          'Status'
-        ],
-        field_headings_visible=False
-      ) %}
-        {% call row_heading() %}
-          <a class="govuk-link govuk-link--no-visited-state file-list-filename" href="{{ url_for('main.view_notification', service_id=current_service.id, notification_id=item.id, from_job=job.id) }}">{{ item.to }}</a>
-          <p class="file-list-hint">
-            {{ item.preview_of_content }}
-          </p>
-        {% endcall %}
-        {{ notification_status_field(item) }}
-      {% endcall %}
+      {% if not notifications %}
+        <p class="govuk-body no-data">
+          {{ 'No messages to show yet…' if job.awaiting_processing_or_recently_processed else job.processing_started | message_finished_processing_notification(service_data_retention_days) }}
+        </p>
+      {% else %}
+        {% set notifications_list = [] %}
+        {% for item in notifications %}
+          {% set summary_key_html %}
+            <a class="govuk-link govuk-link--no-visited-state notify-summary-list__filename" href="{{ url_for('main.view_notification', service_id=current_service.id, notification_id=item.id, from_job=job.id) }}">{{ item.to }}</a>
+            <p class="govuk-body notify-summary-list__metadata notify-summary-list__metadata--small">
+              {{ item.preview_of_content }}
+            </p>
+          {% endset %}
+
+          {% do notifications_list.append({
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--50-100",
+              "html": summary_key_html,
+            },
+            "value": {
+              "classes": "govuk-summary-list__value--align-right govuk-summary-list__value--small",
+              "text":  notification_state(item),
+            }
+          }) %}
+        {% endfor %}
+        {{ govukSummaryList({
+          "classes": "notify-summary-list",
+          "rows": notifications_list
+        }) }}
+      {% endif %}
 
       {% if more_than_one_page %}
-        <p class="table-show-more-link">
+        <p class="govuk-body more-items-available-text">
           Only showing the first 50 rows
         </p>
       {% endif %}
