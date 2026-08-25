@@ -1,0 +1,26 @@
+{% macro notification_state(notification) %}
+
+  {% set state = notification.status|format_notification_status_as_field_status(notification.notification_type) %}
+  
+  <span class="notification-state{{ ' notification-state--' ~ state if state else '' }}">
+    {% if notification.status|format_notification_status_as_url(notification.notification_type) %}
+      <a class="notification-state__link govuk-link govuk-link--{% if state == 'error' %}destructive{% else %}no-visited-state{% endif %}" href="{{ notification.status|format_notification_status_as_url(notification.notification_type) }}">
+        {{ notification.status|format_notification_status(notification.template.template_type) }}
+      </a>
+    {% else %}
+      {{ notification.status|format_notification_status(notification.template.template_type) }}
+    {% endif %}
+    {% if notification['notification_type'] == "letter" %}
+      {% if notification.status == 'permanent-failure' %}
+        {{ (notification.updated_at)|format_datetime_short }}
+      {% else %}
+        {{ (notification.created_at)|format_datetime_short }}
+      {% endif %}
+    {% else %}
+      {{ notification.status|format_notification_status_as_time(
+          notification.created_at|format_datetime_short,
+          (notification.updated_at or notification.created_at)|format_datetime_short
+      ) }}
+    {% endif %}
+  </span>
+{% endmacro %}
