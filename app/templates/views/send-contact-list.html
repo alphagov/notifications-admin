@@ -2,8 +2,8 @@
 {% from "components/big-number.html" import big_number -%}
 {% from "components/list.html" import list_of_placeholders %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/table.html" import list_table, field, row_heading %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% block service_page_title %}
   Choose an emergency contact list
@@ -32,35 +32,39 @@
     </div>
   {% elif contact_lists %}
     <div class='dashboard-table ajax-block-container'>
-      {% call(item, row_number) list_table(
-        contact_lists|sort,
-        caption="Emergency contact lists",
-        caption_visible=False,
-        empty_message=(
-          'You have not saved any contact lists yet.'
-        ),
-        field_headings=[
-          'File',
-          'Status'
-        ],
-        field_headings_visible=False
-      ) %}
-        {% call row_heading() %}
-          <div class="file-list">
-            <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.send_from_contact_list', service_id=current_service.id, template_id=template.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
-            <span class="file-list-hint-large">
+      {% if not contact_lists %}
+        <p class="govuk-body no-data">
+          You have not saved any contact lists yet.
+        </p>
+      {% else %}
+        {% set lists = [] %}
+        {% for item in contact_lists|sort %}
+          {% set summary_key_html %}
+            <a class="govuk-link govuk-link--no-visited-state notify-summary-list__filename notify-summary-list__filename--large" href="{{ url_for('main.send_from_contact_list', service_id=current_service.id, template_id=template.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
+            <p class="fgovuk-body notify-summary-list__metadata">
               Uploaded {{ item.created_at|format_datetime_relative }}
-            </span>
-          </div>
-        {% endcall %}
-        {% call field() %}
-          {{ big_number(
-            item.row_count,
-            smallest=True,
-            label=item.row_count|recipient_count_label(item.template_type),
-          ) }}
-        {% endcall %}
-      {% endcall %}
+            </p>
+          {% endset %}
+
+          {% do lists.append({
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--50-100",
+              "html": summary_key_html,
+            },
+            "value": {
+              "html":  big_number(
+                        item.row_count,
+                        smallest=True,
+                        label=item.row_count|recipient_count_label(item.template_type),
+                        ),
+            }
+          }) %}
+        {% endfor %}
+        {{ govukSummaryList({
+          "classes": "notify-summary-list",
+          "rows": lists
+        }) }}
+      {% endif %}
     </div>
   {% else %}
     <div class="govuk-grid-row">
