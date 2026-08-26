@@ -105,12 +105,12 @@ def test_get_upload_hub_page(
     assert normalize_spaces(upload_button.text) == "Upload a letter"
     assert upload_button["href"] == url_for("main.upload_letter", service_id=SERVICE_ONE_ID)
 
-    uploads = page.select("tbody tr")
+    uploads = page.select(".govuk-summary-list__row")
 
     assert len(uploads) == 3
 
     assert normalize_spaces(uploads[0].text.strip()) == "Uploaded letters Printing today at 5:30pm 33 letters"
-    assert uploads[0].select_one("a.file-list-filename-large")["href"] == url_for(
+    assert uploads[0].select_one("a.notify-summary-list__filename")["href"] == url_for(
         "main.uploaded_letters",
         service_id=SERVICE_ONE_ID,
         letter_print_day="2017-10-10",
@@ -119,15 +119,17 @@ def test_get_upload_hub_page(
     assert normalize_spaces(uploads[1].text.strip()) == (
         "some.csv Sent 1 January 2016 at 11:09am 0 delivering 8 delivered 2 failed"
     )
-    assert uploads[1].select_one("a.file-list-filename-large")["href"] == f"/services/{SERVICE_ONE_ID}/jobs/job_id_1"
+    assert (
+        uploads[1].select_one("a.notify-summary-list__filename")["href"] == f"/services/{SERVICE_ONE_ID}/jobs/job_id_1"
+    )
 
     assert normalize_spaces(uploads[2].text.strip()) == (
         "some.pdf Sent 1 January 2016 at 11:09am Firstname Lastname 123 Example Street"
     )
-    assert normalize_spaces(str(uploads[2].select_one(".govuk-body"))) == (
+    assert normalize_spaces(str(uploads[2].select_one(".govuk-body.letter-recipient-summary"))) == (
         '<p class="govuk-body letter-recipient-summary"> Firstname Lastname<br/> 123 Example Street<br/> </p>'
     )
-    assert uploads[2].select_one("a.file-list-filename-large")["href"] == (
+    assert uploads[2].select_one("a.notify-summary-list__filename")["href"] == (
         f"/services/{SERVICE_ONE_ID}/notification/letter_id_1"
     )
 
@@ -148,12 +150,12 @@ def test_get_uploaded_letters(
     assert normalize_spaces(page.select("main p")[0].text) == "1,234 letters"
     assert normalize_spaces(page.select("main p")[1].text) == "Printing starts today at 5:30pm"
 
-    assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
+    assert [normalize_spaces(row.text) for row in page.select(".govuk-summary-list__row")] == [
         "Homer-Simpson.pdf 742 Evergreen Terrace 2 February at 1:59pm",
         "Kevin-McCallister.pdf 671 Lincoln Avenue, Winnetka 2 February at 12:59pm",
     ]
 
-    assert [link["href"] for link in page.select("tbody tr a")] == [
+    assert [link["href"] for link in page.select(".notify-summary-list__filename")] == [
         url_for(
             "main.view_notification",
             service_id=SERVICE_ONE_ID,
@@ -265,12 +267,11 @@ def test_uploads_page_shows_scheduled_jobs(
     client_request.login(user)
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
 
-    assert [normalize_spaces(row.text) for row in page.select("tr")] == [
-        "File Status",
+    assert [normalize_spaces(list_item.text) for list_item in page.select(".govuk-summary-list__row")] == [
         "even_later.csv Sending 1 January 2016 at 11:09pm 1 text message waiting to send",
         "send_me_later.csv Sending 1 January 2016 at 11:09am 1 text message waiting to send",
     ]
-    assert not page.select(".table-empty-message")
+    assert not page.select(".no-data")
 
 
 @freeze_time("2020-03-15")
@@ -284,15 +285,14 @@ def test_uploads_page_shows_contact_lists_first(
 ):
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
 
-    assert [normalize_spaces(row.text) for row in page.select("tr")] == [
-        "File Status",
+    assert [normalize_spaces(list_item.text) for list_item in page.select(".govuk-summary-list__row")] == [
         "phone number list.csv Used twice in the last 7 days 123 saved phone numbers",
         "EmergencyContactList.xls Not used in the last 7 days 100 saved email addresses",
         "UnusedList.tsv Not used yet 1 saved phone number",
         "even_later.csv Sending 1 January 2016 at 11:09pm 1 text message waiting to send",
         "send_me_later.csv Sending 1 January 2016 at 11:09am 1 text message waiting to send",
     ]
-    assert page.select_one(".file-list-filename-large")["href"] == url_for(
+    assert page.select_one(".notify-summary-list__filename")["href"] == url_for(
         "main.contact_list",
         service_id=SERVICE_ONE_ID,
         contact_list_id="d7b0bd1a-d1c7-4621-be5c-3c1b4278a2ad",
