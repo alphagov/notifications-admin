@@ -2,7 +2,13 @@ import datetime
 
 import pytest
 
-from app.models.user import AnonymousUser, InvitedOrgUser, InvitedUser, User
+from app.models.user import (
+    AnonymousUser,
+    InvitedOrgUser,
+    InvitedUser,
+    Organisation,
+    User,
+)
 from tests.conftest import SERVICE_ONE_ID, USER_ONE_ID, create_user
 
 
@@ -47,6 +53,22 @@ def test_user(notify_admin):
 
     with pytest.raises(TypeError):
         user.has_permissions("to_do_bad_things")
+
+
+def test_nhs_notify_user_with_generic_nhs_email_address_has_org_type_as_nhs_notify():
+    user_data = {
+        "id": 1,
+        "name": "Test User",
+        "email_address": "test@nhs.uk",
+        "mobile_number": "+4412341234",
+        "state": "active",
+        "failed_login_count": 0,
+        "platform_admin": False,
+        "organisations": [Organisation.NHS_NOTIFY_ID],
+    }
+    user = User(user_data)
+
+    assert user.default_organisation_type == "nhs_notify"
 
 
 def test_activate_user(notify_admin, api_user_pending, mock_activate_user):

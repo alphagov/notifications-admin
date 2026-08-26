@@ -101,6 +101,15 @@ def test_get_should_not_render_radios_if_org_type_known(
     assert page.select_one("input[name=name]").get("value") is None
 
 
+def test_get_name_service_should_not_render_org_type_radios_for_nhs_notify_user(client_request, mocker):
+    mocker.patch("app.models.user.User.is_nhs_notify_org_member", return_value=True)
+
+    page = client_request.get("main.name_service")
+    assert page.select_one("h1").text.strip() == "Name your service"
+    assert page.select_one("input[name=name]").get("value") is None
+    assert not page.select(".govuk-radios")
+
+
 def test_shows_back_link_if_come_from_your_services_page(
     client_request,
     mock_get_no_organisation_by_domain,
@@ -315,17 +324,64 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
         assert session["service_id"] == 101
 
 
-def test_add_service_sets_nhs_gp_daily_sms_limit_to_zero_when_user_already_has_services(
+def test_add_service_for_nhs_notify_user_sets_nhs_notify_org_type_automatically_without_org_type_being_provided(
+    client_request,
+    mock_update_service,
+    mock_get_services_with_no_services,
+    mock_create_service_template,
+    mock_create_service,
+    api_user_active,
+    mocker,
+):
+    mocker.patch("app.models.user.User.is_nhs_notify_org_member", return_value=True)
+
+    # org_type is not provided in POST data but the service still gets the correct org type of "nhs_notify"
+    client_request.post(
+        "main.name_service",
+        _data={"name": "testing the post"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.service_dashboard",
+            service_id=101,
+        ),
+    )
+
+    mock_create_service.assert_called_once_with(
+        user_id=api_user_active["id"],
+        service_name="testing the post",
+        organisation_type="nhs_notify",
+        email_message_limit=50,
+        international_sms_message_limit=100,
+        sms_message_limit=50,
+        letter_message_limit=50,
+        restricted=True,
+    )
+    mock_update_service.assert_called_once_with(101, sms_message_limit=0)
+
+    assert mock_create_service_template.called is False
+
+
+@pytest.mark.parametrize("org_type, mock_user_org_type", [("nhs_gp", "nhs"), ("nhs_notify", "nhs_notify")])
+def test_add_service_sets_daily_sms_limit_to_zero_for_nhs_services_with_no_allowance_when_user_already_has_services(
     mock_get_no_organisation_by_domain,
     client_request,
     mock_create_service,
     mock_create_service_template,
     mock_update_service,
     mock_get_services,
+    org_type,
+    mock_user_org_type,
+    mocker,
 ):
+    mocker.patch(
+        "app.models.user.User.default_organisation_type",
+        new_callable=mocker.PropertyMock,
+        return_value=mock_user_org_type,
+    )
+
     client_request.post(
         "main.name_service",
-        _data={"name": "testing the post", "organisation_type": "nhs_gp"},
+        _data={"name": "testing the post", "organisation_type": org_type},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.service_dashboard",
