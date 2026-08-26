@@ -4861,16 +4861,16 @@ def test_choose_from_contact_list(
         template_id=fake_uuid,
     )
     assert [
-        normalize_spaces(filename.text) for filename in page.select(".file-list-filename-large")
+        normalize_spaces(filename.text) for filename in page.select(".notify-summary-list__filename")
     ] == expected_filenames
 
-    assert page.select_one("a.file-list-filename-large")["href"] == url_for(
+    assert page.select_one("a.notify-summary-list__filename")["href"] == url_for(
         "main.send_from_contact_list",
         service_id=SERVICE_ONE_ID,
         template_id=template["id"],
         contact_list_id=expected_list_id,
     )
-    assert normalize_spaces(page.select_one(".file-list-hint-large").text) == (expected_time)
+    assert normalize_spaces(page.select_one(".notify-summary-list__metadata").text) == (expected_time)
     assert normalize_spaces(page.select_one(".big-number-smallest").text) == (expected_count)
 
 
@@ -4897,7 +4897,7 @@ def test_choose_from_contact_list_with_personalised_template(
         ),
         "Emergency contact lists can only include email addresses or phone numbers.",
     ]
-    assert not page.select("table")
+    assert not page.select(".govuk-summary-list")
 
 
 def test_choose_from_contact_list_with_no_lists(
