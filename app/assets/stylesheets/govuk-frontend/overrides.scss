@@ -84,3 +84,8 @@ $notify-secondary-button-hover-colour: mix(black, govuk-colour('black', $variant
     margin-left: auto;
   }
  }
+
+.govuk-tag {
+  max-width: none;
+  letter-spacing: 0.01em;
+}

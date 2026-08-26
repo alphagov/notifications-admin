@@ -3,6 +3,25 @@
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "components/tick-cross.html" import tick_cross %}
+
+{% set show_last_used = True %}
+{% set show_permissions = True %}
+
+{% set permissions %}
+  <ul class="tick-cross__list">
+    {% for ticked, label in [
+      (True , 'Send messages'),
+      (True , 'Get message data'),
+      (True , 'Get templates'),
+    ] %}
+      {{ tick_cross(ticked, label) }}
+    {% endfor %}
+  </ul>
+{% endset %}
+
+{% set permissions = permissions if show_permissions else "" %}
+
 
 {% block service_page_title %}
   API keys
@@ -30,21 +49,49 @@
     ) %}
       {% call field() %}
         <div class="file-list">
-          {{ item.name }}
-          <div class="hint">
-            {% if item.key_type == 'normal' %}
-              Live – sends to anyone
-            {% elif item.key_type == 'team' %}
-              Team and guest list – limits who you can send to
-            {% elif item.key_type == 'test' %}
-              Test – pretends to send messages
-            {% endif %}
+          <div class="govuk-!-margin-bottom-2">
+            <span class="govuk-!-font-weight-bold">{{ item.name }}</span>
           </div>
+          {% if item.key_type == 'normal' %}
+            <strong class="govuk-tag govuk-tag--teal govuk-!-margin-bottom-1">Live – sends to anyone</strong>
+            {{ permissions }}
+            <p class="govuk-hint govuk-!-margin-bottom-1">
+              Created by Anne Example 2 years ago
+            </p>
+            {% if show_last_used %}
+            <p class="govuk-hint govuk-!-margin-bottom-1">
+              Last used more than 3 months ago
+            </p>
+            {% endif %}
+          {% elif item.key_type == 'team' %}
+            <strong class="govuk-tag govuk-tag--grey govuk-!-margin-bottom-1">Team and guest list – limits who you can send to</strong>
+            {{ permissions }}
+            <p class="govuk-hint govuk-!-margin-bottom-1">
+              Created by Anne Example today
+            </p>
+            {% if show_last_used %}
+            <p class="govuk-hint govuk-!-margin-bottom-1">
+              Never used
+            </p>
+            {% endif %}
+          </p>
+          {% elif item.key_type == 'test' %}
+            <strong class="govuk-tag govuk-tag--purple govuk-!-margin-bottom-1">Test – pretends to send messages</strong>
+            {{ permissions }}
+            <p class="govuk-hint govuk-!-margin-bottom-1">
+              Created by Anne Example 6 months ago
+            </p>
+            {% if show_last_used %}
+            <p class="govuk-hint govuk-!-margin-bottom-1">
+              Last used today
+            </p>
+            {% endif %}
+          {% endif %}
         </div>
       {% endcall %}
       {% if item.expiry_date %}
         {% call field(align='right') %}
-          <span class='hint'>Revoked {{ item.expiry_date|format_datetime_short }}</span>
+          <span class='hint'>Revoked {{ item.expiry_date|format_datetime_relative }}</span>
         {% endcall %}
       {% else %}
         {% call field(align='right', status='error') %}
