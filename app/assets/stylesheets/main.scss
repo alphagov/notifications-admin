@@ -64,5 +64,7 @@
 @use 'views/webauthn';
 @use 'views/performance';
 
+@use 'utilities';
+
 // TODO: break this up
 @use 'app';
