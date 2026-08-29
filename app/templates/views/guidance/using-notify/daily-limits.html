@@ -1,7 +1,7 @@
 {% extends "content_template.html" %}
 
-{% from "components/table.html" import mapping_table, row, text_field %}
 {% from "components/service-link.html" import service_link %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = "Using Notify" %}
@@ -14,28 +14,32 @@
 
 <h1 class="heading-large">Daily limits</h1>
 <div class="bottom-gutter-3-2">
-<p class="govuk-body">There’s a limit to the number of messages you can send each day. </p>
-<p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">contact us</a>.</p>
-  
-  {% call mapping_table(
-    caption="Notification Daily limits",
-    field_headings=["Message type", "Daily limit"],
-    field_headings_visible=True,
-    caption_visible=False,
-    equal_length=True,
-  ) %}
-    {% for message, limit in  [
+  <p class="govuk-body">There’s a limit to the number of messages you can send each day. </p>
+  <p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">contact us</a>.</p>
+
+  {% set table_body = [] %}
+  {% for message, limit in [
     ("Emails", rate_limits.email),
     ("Text messages", rate_limits.sms),
-    ("Letters", rate_limits.letter)]
-    %}
-      {% call row() %}
-        {{ text_field(message) }}
-        {{ text_field(limit) }}
-      {% endcall %}
-    {% endfor %}
-  {% endcall %}
-  </div>
+    ("Letters", rate_limits.letter)
+  ] %}
+    {% do table_body.append([
+      { "text": message },
+      { "text": limit | string }
+    ]) %}
+  {% endfor %}
+
+  {{ govukTable({
+    "caption": "Notification Daily limits",
+    "captionClasses": "govuk-visually-hidden",
+    "classes": "notify-table notify-table--body-small",
+    "head": [
+      { "text": "Message type", "classes": "govuk-!-width-one-half" },
+      { "text": "Daily limit", "classes": "govuk-!-width-one-half" }
+    ],
+    "rows": table_body
+  }) }}
+</div>
 
 <h2 class="heading-medium">International text message limit</h2>
 
