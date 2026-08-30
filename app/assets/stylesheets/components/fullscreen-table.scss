@@ -155,8 +155,7 @@
     margin-bottom: 30px;
     pointer-events: none;
 
-    & + .table-show-more-link,
-    & + .more-items-available-text {
+    & + .table-show-more-link {
       margin-top: -28px;
     }
 
