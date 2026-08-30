@@ -1,0 +1,53 @@
+@use "govuk/helpers" as * ;
+@use "govuk/settings" as * ;
+
+.api-key-list {
+  border-top: 1px solid #b1b4b6;
+}
+
+.api-key-list__item {
+  border-bottom: 1px solid #b1b4b6;
+  padding-top: govuk-spacing(3);
+  padding-bottom: govuk-spacing(4);
+}
+
+.api-key__header {
+  display: flex;
+  flex-direction: column;
+  gap: govuk-spacing(1);
+  margin-bottom: govuk-spacing(3);
+
+  @include govuk-media-query($from: tablet) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: govuk-spacing(3);
+  }
+}
+
+.api-key__name {
+  margin-bottom: 0;
+}
+
+.api-key__action-link {
+  font-weight: $govuk-font-weight-bold;
+}
+.api-key__revoked {
+  color: govuk-functional-colour(secondary-text);
+  @include govuk-font(16);
+}
+
+.api-key__permissions {
+  margin-top: govuk-spacing(3);
+  margin-bottom: govuk-spacing(3);
+}
+
+.api-key__type {
+  max-width: fit-content;
+  margin-bottom: govuk-spacing(2);
+}
+
+.api-key__metadata {
+  color: govuk-functional-colour(secondary-text);
+  margin-bottom: govuk-spacing(2);
+}

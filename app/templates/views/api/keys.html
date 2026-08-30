@@ -3,6 +3,8 @@
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+{% from "components/tick-cross.html" import tick_cross %}
 
 {% block service_page_title %}
   API keys
@@ -16,45 +18,50 @@
 
   {{ page_header('API keys') }}
 
-  <div class="body-copy-table">
-    {% call(item, row_number) list_table(
-      current_service.api_keys|sort,
-      empty_message="You have not created any API keys yet",
-      caption="API keys",
-      caption_visible=false,
-      field_headings=[
-        'API keys',
-        'Action'
-      ],
-      field_headings_visible=False
-    ) %}
-      {% call field() %}
-        <div class="file-list">
-          {{ item.name }}
-          <div class="hint">
-            {% if item.key_type == 'normal' %}
-              Live – sends to anyone
-            {% elif item.key_type == 'team' %}
-              Team and guest list – limits who you can send to
-            {% elif item.key_type == 'test' %}
-              Test – pretends to send messages
-            {% endif %}
-          </div>
+{% if current_service.api_keys %}
+  <ul class="govuk-list api-key-list" aria-label="API keys">
+    {% for item in current_service.api_keys|sort %}
+      <li class="api-key-list__item api-key">
+        
+        <div class="api-key__header">
+          <h3 class="govuk-heading-s api-key__name">{{ item.name }}</h3>
+          {% if item.expiry_date %}
+            <span class="api-key__revoked">Revoked {{ item.expiry_date|format_datetime_short }}</span>
+          {% else %}
+            <a class="govuk-link govuk-link--destructive api-key__action-link" href="{{ url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id) }}">
+              Revoke<span class="govuk-visually-hidden">API key {{ item.name }}</span>
+            </a>
+          {% endif %}
         </div>
-      {% endcall %}
-      {% if item.expiry_date %}
-        {% call field(align='right') %}
-          <span class='hint'>Revoked {{ item.expiry_date|format_datetime_short }}</span>
-        {% endcall %}
-      {% else %}
-        {% call field(align='right', status='error') %}
-          <a class="govuk-link govuk-link--destructive" href='{{ url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id) }}'>
-            Revoke<span class="govuk-visually-hidden"> {{ item.name }}</span>
-          </a>
-        {% endcall %}
-      {% endif %}
-    {% endcall %}
-  </div>
+
+        {% if item.key_type == 'normal' %}
+          <strong class="govuk-tag govuk-tag--turquoise api-key__type">Live – sends to anyone</strong>
+        {% elif item.key_type == 'team' %}
+          <strong class="govuk-tag govuk-tag--grey api-key__type">Team and guest list – limits who you can send to</strong>
+        {% elif item.key_type == 'test' %}
+          <strong class="govuk-tag govuk-tag--purple api-key__type">Test – pretends to send messages</strong>
+        {% endif %}
+
+        <ul class="tick-cross__list api-key__permissions" aria-label="Permissions for {{ item.name }}">
+          {{ tick_cross('Can', 'Send messages') }}
+          {{ tick_cross('Can', 'Get message data') }}
+          {{ tick_cross('Can', 'Get templates') }}
+        </ul>
+
+        <p class="api-key__metadata">
+          Created by {{ item.created_by|default('Anne Example') }}
+          <time datetime="{{ item.created_at }}">{{ item.created_at|format_datetime_relative }}</time>
+        </p>
+        <p class="api-key__metadata">
+          Last used 
+          <time datetime="{{ item.last_used|default('now') }}">{{ item.last_used|default('more than 3 months ago') }}</time>
+        </p>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="govuk-body">You have not created any API keys yet</p>
+{% endif %}
 
   <div class="js-stick-at-bottom-when-scrolling">
     {{ govukButton({
