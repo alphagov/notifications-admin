@@ -181,20 +181,7 @@ class Test(Development):
     ASSET_PATH = "https://static.example.com/"
 
 
-class CloudFoundryConfig(Config):
-    pass
-
-
-# CloudFoundry sandbox
-class Sandbox(CloudFoundryConfig):
-    HTTP_PROTOCOL = "https"
-    S3_BUCKET_CSV_UPLOAD = "cf-sandbox-notifications-csv-upload"
-    S3_BUCKET_LOGO_UPLOAD = "cf-sandbox-notifications-logo-upload"
-    NOTIFY_ENVIRONMENT = "sandbox"
-
-
 configs = {
     "development": Development,
     "test": Test,
-    "sandbox": Sandbox,
 }
