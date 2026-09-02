@@ -96,7 +96,6 @@ from app.main.validators import (
     NotifyDataRequired,
     NotifyInputRequired,
     NotifyUrlValidator,
-    OnlySMSCharacters,
     StringsNotAllowed,
     ValidEmail,
     ValidGovEmail,
@@ -1481,8 +1480,7 @@ class BaseTemplateForm(StripWhitespaceForm):
 
 
 class SMSTemplateForm(BaseTemplateForm, TemplateNameMixin):
-    def validate_template_content(self, field):
-        OnlySMSCharacters(template_type="sms")(None, field)
+    pass
 
 
 class LetterAddressForm(StripWhitespaceForm):
