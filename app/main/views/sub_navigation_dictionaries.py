@@ -52,7 +52,7 @@ def pricing_nav():
                     "link": "main.guidance_pricing_text_messages",
                 },
                 {
-                    "name": "Letters",
+                    "name": "Letter pricing",
                     "link": "main.guidance_pricing_letters",
                 },
                 {
