@@ -34,6 +34,14 @@ def guidance_pricing_text_messages():
     )
 
 
+@main.route("/pricing/free-text-message-allowance")
+def guidance_pricing_free_text_message_allowance():
+    return render_template(
+        "views/guidance/pricing/free-text-message-allowance.html",
+        navigation_links=pricing_nav(),
+    )
+
+
 @main.route("/pricing/letters")
 def guidance_pricing_letters():
     return render_template(

@@ -44,7 +44,11 @@ def pricing_nav():
             "link": "main.guidance_pricing",
             "sub_navigation_items": [
                 {
-                    "name": "Text messages",
+                    "name": "Free text message allowance",
+                    "link": "main.guidance_pricing_free_text_message_allowance",
+                },
+                {
+                    "name": "Text message pricing",
                     "link": "main.guidance_pricing_text_messages",
                 },
                 {

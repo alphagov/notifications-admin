@@ -25,66 +25,30 @@ Text message pricing
     ) }}
 
   <p class="govuk-body">A single, 160-character text message costs {{ sms_rate }} (plus VAT).</p>
-  <p class="govuk-body">Find out <a class="govuk-link govuk-link--no-visited-state" href="#how-text-message-pricing-works">how text message pricing works</a>.</p>
+  <p class="govuk-body">You only have to pay for text messages if you exceed your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_free_text_message_allowance') }}">free text message allowance</a>.</p>
 
   {% if sms_rate != 2.4 %}
    <div class="govuk-inset-text">
      <p class="govuk-body">On 1 April 2026:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>the cost of a single text message will go up to 2.4 pence</li>
-    <li>we’re reducing the free allowance for central government departments and national organisations</li>
-  </ul>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>the cost of a single text message will go up to 2.4 pence</li>
+      <li>we’re reducing the free allowance for central government departments and national organisations</li>
+    </ul>
    </div>
    {% endif %}
 
-  <h2 class="heading-medium" id="free-text-message-allowance">Free text message allowance</h2>
-
-  <p class="govuk-body">Each eligible service you add will get an annual allowance of free text messages. The free allowance renews on 1 April.</p>
-  <p class="govuk-body">The size of the allowance depends on the organisation you work for.</p>
-
-  <div class="bottom-gutter-3-2">
-    
-    {% set central_government_organisations_text %}
-    Central government departments and <br>national organisations
-    {% endset %}
-
-    {% call mapping_table(
-      caption='Free text message allowance',
-      field_headings=['Organisation', 'Allowance per service'],
-      field_headings_visible=True,
-      caption_visible=False
-    ) %}
-      {% for organisation_type, charge in [
-        (central_government_organisations_text, '20,000 free text messages'),
-        ('Local authorities and regional organisations', '10,000 free text messages'),
-        ('State-funded schools', '5,000 free text messages'),
-        ('GP surgeries', 'No free allowance'),
-        ('Other organisations', '5,000 free text messages'),
-      ] %}
-        {% call row() %}
-          {{ text_field(organisation_type) }}
-          {{ text_field(charge) }}
-        {% endcall %}
-      {% endfor %}
-    {% endcall %}
-  </div>
-
-  <p class="govuk-body">The free allowance is discretionary. We review it every year to make sure GOV.​UK Notify can still support those teams who need it the most.</p>
-  <p class="govuk-body">If your service sends a very high volume of text messages in a single financial year, we may not renew its free allowance.</p>
-
-  <h2 class="heading-medium" id="how-text-message-pricing-works">How text message pricing works</h2>
-
-  <p class="govuk-body">You may use more free messages, or pay more for each message, if you:</p>
+  <p class="govuk-body">A text message may cost more, or use more of your free allowance, if it:</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>send <a class="govuk-link govuk-link--no-visited-state" href="#long-text-messages">text messages longer than 160 characters</a></li>
-    <li>use certain <a class="govuk-link govuk-link--no-visited-state" href="#symbols">signs and symbols</a></li>
-    <li>use <a class="govuk-link govuk-link--no-visited-state" href="#accents">accents and accented letters</a></li>
-    <li>send text messages to <a class="govuk-link govuk-link--no-visited-state" href="#international-numbers">international numbers</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#long-text-messages">is longer than 160 characters</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#language-other-than-english">is written in a language other than English</a></li>
+    <li> <a class="govuk-link govuk-link--no-visited-state" href="#symbols">uses certain signs and symbols</a></li>
+    <li><a class="govuk-link govuk-link--no-visited-state" href="#international-numbers">sent to an international phone number</a></li>
   </ul>
+  <p class="govuk-body">We’ll tell you how many text messages your template may count as before you send it.</p>
 
   <p class="govuk-body">It does not cost you anything to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_receive_text_messages') }}">receive text messages</a>.</p>
 
-  <h3 class="heading-small" id="long-text-messages">Long text messages</h3>
+  <h2 class="heading-medium" id="long-text-messages">Long text messages</h2>
   <p class="govuk-body">If a text message is longer than 160 characters (including spaces), it counts as more than one message.</p>
 
   <div class="bottom-gutter-3-2">
@@ -110,88 +74,15 @@ Text message pricing
     {% endcall %}
   </div>
 
-  <h3 class="heading-small" id="symbols">Signs and symbols</h3>
-
-  <p class="govuk-body">
-    The following signs and symbols count as 2 characters each:<br />
-    <span class="extended-gsm-characters">[]{}^\|~€</span>
-  </p>
-
-  <p class="govuk-body">Using them can increase the cost of sending text messages.</p>
-
-  <h3 class="heading-small" id="accents">Accents and accented characters</h3>
-  <p class="govuk-body">Some languages, such as Welsh, use accented characters.</p>
-  <p class="govuk-body">The following accented characters do not affect the cost of sending text messages: Ä, É, Ö, Ü, à, ä, é, è, ì, ò, ö, ù, ü.</p>
-  <p class="govuk-body">Using other accented characters can increase the cost of sending text messages.</p>
-  {% set accentedChars %}
-    <div class="bottom-gutter-3-2">
-      {% call mapping_table(
-        caption='Accented characters that affect text message charges',
-        field_headings=['Character', 'Description'],
-        field_headings_visible=True,
-        caption_visible=False
-      ) %}
-        {% for letter, description in [
-                ('Â', 'Capital letter A with circumflex'),
-                ('Á', 'Capital letter A with acute'),
-                ('À', 'Capital letter A with grave'),
-                ('Ê', 'Capital letter E with circumflex'),
-                ('È', 'Capital letter E with grave'),
-                ('Ë', 'Capital letter E with dieresis'),
-                ('Î', 'Capital letter I with circumflex'),
-                ('Í', 'Capital letter I with acute'),
-                ('Ì', 'Capital letter I with grave'),
-                ('Ï', 'Capital letter I with dieresis'),
-                ('Ô', 'Capital letter O with circumflex'),
-                ('Ó', 'Capital letter O with acute'),
-                ('Ò', 'Capital letter O with grave'),
-                ('Û', 'Capital letter U with circumflex'),
-                ('Ú', 'Capital letter U with acute'),
-                ('Ù', 'Capital letter U with grave'),
-                ('Ŵ', 'Capital letter W with circumflex'),
-                ('Ẃ', 'Capital letter W with acute'),
-                ('Ẁ', 'Capital letter W with grave'),
-                ('Ẅ', 'Capital letter W with dieresis'),
-                ('Ŷ', 'Capital letter Y with circumflex'),
-                ('Ý', 'Capital letter Y with acute'),
-                ('Ỳ', 'Capital letter Y with grave'),
-                ('Ÿ', 'Capital letter Y with dieresis'),
-                ('â', 'Lower case letter a with circumflex'),
-                ('á', 'Lower case letter a with acute'),
-                ('ê', 'Lower case letter e with circumflex'),
-                ('ë', 'Lower case letter e with dieresis'),
-                ('î', 'Lower case letter i with circumflex'),
-                ('í', 'Lower case letter i with acute'),
-                ('ï', 'Lower case letter i with dieresis'),
-                ('ô', 'Lower case letter o with circumflex'),
-                ('ó', 'Lower case letter o with acute'),
-                ('û', 'Lower case letter u with circumflex'),
-                ('ú', 'Lower case letter u with acute'),
-                ('ŵ', 'Lower case letter w with circumflex'),
-                ('ẃ', 'Lower case letter w with acute'),
-                ('ẁ', 'Lower case letter w with grave'),
-                ('ẅ', 'Lower case letter w with dieresis'),
-                ('ŷ', 'Lower case letter y with circumflex'),
-                ('ý', 'Lower case letter y with acute'),
-                ('ỳ', 'Lower case letter y with grave'),
-                ('ÿ', 'Lower case letter y with dieresis'),
-              ] %}
-          {% call row() %}
-            {{ text_field(letter) }}
-            {{ text_field(description) }}
-          {% endcall %}
-        {% endfor %}
-      {% endcall %}
-    </div>
-  {% endset %}
-  {{ govukDetails({
-    "summaryText": "Accented characters that affect text message charges",
-    "html": accentedChars
-  }) }}
+<h2 class="heading-medium" id="language-other-than-english">Text messages in a language other than English</h2>
+<p class="govuk-body">Most English language text messages use a set of <a class="govuk-link govuk-link--no-visited-state" href="#standard">standard letters and symbols</a>.</p>
+<p class="govuk-body">Languages such as Welsh, Arabic and Mandarin use non-standard characters.</p>
+<p class="govuk-body">Including a non-standard character in a text message changes the way we have to charge for it.</p>
+  <p class="govuk-body">Anything longer than 70 characters (including spaces) counts as more than one message.</p>
 
   <div class="bottom-gutter-3-2">
     {% call mapping_table(
-      caption='Pricing for text messages containing accented characters that affect the charges',
+      caption='Pricing for text messages containing non-standard letters and symbols',
       field_headings=['Message length', 'Charge'],
       field_headings_visible=True,
       caption_visible=False
@@ -201,7 +92,16 @@ Text message pricing
         ('Up to 134 characters', '2 text messages'),
         ('Up to 201 characters', '3 text messages'),
         ('Up to 268 characters', '4 text messages'),
-        ('Each additional 67 characters', '1 additional text message'),
+        ('Up to 335 characters', '5 text messages'),
+        ('Up to 402 characters', '6 text messages'),
+        ('Up to 469 characters', '7 text messages'),
+        ('Up to 536 characters', '8 text messages'),
+        ('Up to 603 characters', '9 text messages'),
+        ('Up to 670 characters', '10 text messages'),
+        ('Up to 737 characters', '11 text messages'),
+        ('Up to 804 characters', '12 text messages'),
+        ('Up to 871 characters', '13 text messages'),
+        ('Up to 938 characters', '14 text messages'),
       ] %}
         {% call row() %}
           {{ text_field(message_length) }}
@@ -211,7 +111,24 @@ Text message pricing
     {% endcall %}
   </div>
 
-  <h3 class="heading-small" id="international-numbers">Sending text messages to international numbers</h3>
+<h3 class="heading-small" id="standard">Standard letters and symbols</h3>
+<p class="govuk-body">Characters that do not affect the cost of a text message include:</p>
+ <ul class="govuk-list govuk-list--bullet">
+   <li>uppercase letters A to Z</li>
+   <li>lowercase letters a to z</li>
+   <li>Ä, É, Ö, Ü, à, ä, é, è, ì, ò, ö, ù, ü</li>
+   <li>numbers 0 to 9</li>
+   <li>common punctuation, for example . , ! ?</li>
+   <li>single and double quotation marks</li>
+   <li>dashes</li>
+ </ul>
+
+  <p class="govuk-body">
+    The following are standard letters and symbols but count as 2 characters each:<br />
+    <span class="extended-gsm-characters">[]{}^\|~€</span>
+  </p>
+    
+  <h2 class="heading-medium" id="international-numbers">Sending text messages to international numbers</h2>
   <p class="govuk-body">It might cost more to send text messages to international numbers than UK ones, depending on the country.</p>
   {% set smsIntRates %}
     {{ live_search(target_selector='#international-pricing .table-row', show=True, form=_search_form, label='Search by country name or code') }}
