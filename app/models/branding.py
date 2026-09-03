@@ -268,7 +268,7 @@ GOVERNMENT_IDENTITY_SYSTEM_COLOURS = {
     "HM Government": "#0076c0",
     "HM Revenue & Customs": "#009390",
     "HM Treasury": "#af292e",
-    "Home Office": "#9325b2",
+    "Home Office": "#732282",
     "Ministry of Defence": "#4d2942",
     "Ministry of Justice": "#231f20",
     "Northern Ireland Office": "#002663",
