@@ -39,6 +39,7 @@ class Service(JSONModel):
     billing_contact_names: str
     billing_reference: str
     confirmed_email_sender_name: Any
+    confirmed_service_name: bool
     confirmed_unique: bool
     contact_link: str
     count_as_live: bool

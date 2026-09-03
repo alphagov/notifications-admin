@@ -86,7 +86,7 @@ def confirm_service_is_unique(service_id):
 
     if form.validate_on_submit():
         try:
-            current_service.update(name=form.name.data, confirmed_unique=True)
+            current_service.update(name=form.name.data, confirmed_unique=True, confirmed_service_name=True)
         except HTTPError as http_error:
             if http_error.status_code == 400 and (
                 error_message := service_api_client.parse_edit_service_http_error(http_error)
