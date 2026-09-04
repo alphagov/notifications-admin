@@ -194,6 +194,7 @@ def service_json(
     has_active_go_live_request=False,
     go_live_user=None,
     confirmed_unique=False,
+    confirmed_service_name=False,
     confirmed_email_sender_name=None,
 ):
     if users is None:
@@ -241,6 +242,7 @@ def service_json(
         "has_active_go_live_request": has_active_go_live_request,
         "go_live_user": go_live_user,
         "confirmed_unique": confirmed_unique,
+        "confirmed_service_name": confirmed_service_name,
         "confirmed_email_sender_name": confirmed_email_sender_name,
     }
 
