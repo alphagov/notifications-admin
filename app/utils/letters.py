@@ -48,14 +48,14 @@ LETTER_VALIDATION_MESSAGES = {
         "detail": (
             "You need to change the size or orientation of {invalid_pages}. <br>"
             "Files must meet our "
-            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
+            '<a class="govuk-link govuk-link--destructive" href="{url_link}" target="_blank">'
             "letter specification (opens in a new tab)"
             "</a>."
         ),
         "summary": (
             "Validation failed because {invalid_pages} {invalid_pages_are_or_is} not A4 portrait size.<br>"
             "Files must meet our "
-            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}">'
+            '<a class="govuk-link govuk-link--no-visited-state" href="{url_link}">'
             "letter specification (opens in a new tab)"
             "</a>."
         ),
@@ -65,15 +65,33 @@ LETTER_VALIDATION_MESSAGES = {
         "detail": (
             "You need to edit {invalid_pages}.<br>"
             "Files must meet our "
-            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}">'
+            '<a class="govuk-link govuk-link--destructive" href="{url_link}">'
             "letter specification (opens in a new tab)"
             "</a>."
         ),
         "summary": (
             "Validation failed because content is outside the printable area on {invalid_pages}.<br>"
             "Files must meet our "
-            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
+            '<a class="govuk-link govuk-link--no-visited-state" href="{url_link}" target="_blank">'
             "letter specification (opens in a new tab)"
+            "</a>."
+        ),
+    },
+    "encroaching-text-on-notify-tag-area": {
+        "title": "Your content is outside the printable area",
+        "detail": (
+            "There's a problem with content at the top of your letter on {invalid_pages}. It cannot be printed.<br>"
+            "For help with this,  "
+            '<a class="govuk-link govuk-link--destructive" href="{url_link}">'
+            "contact us"
+            "</a>."
+        ),
+        "summary": (
+            "Validation failed because there's a problem with content at the top of your letter."
+            " It cannot be printed.<br>"
+            "For help with this,  "
+            '<a class="govuk-link govuk-link--no-visited-state" href="{url_link}" target="_blank">'
+            "contact us"
             "</a>."
         ),
     },
@@ -103,14 +121,14 @@ LETTER_VALIDATION_MESSAGES = {
         "detail": (
             "You need to add a recipient address.<br>"
             "Files must meet our "
-            '<a class="govuk-link govuk-link--destructive" href="{letter_spec_guidance}" target="_blank">'
+            '<a class="govuk-link govuk-link--destructive" href="{url_link}" target="_blank">'
             "letter specification (opens in a new tab)"
             "</a>."
         ),
         "summary": (
             "Validation failed because the address block is empty.<br>"
             "Files must meet our "
-            '<a class="govuk-link govuk-link--no-visited-state" href="{letter_spec_guidance}" target="_blank">'
+            '<a class="govuk-link govuk-link--no-visited-state" href="{url_link}" target="_blank">'
             "letter specification (opens in a new tab)"
             "</a>."
         ),
@@ -189,19 +207,26 @@ def get_letter_validation_error(validation_message, invalid_pages=None, page_cou
         invalid_pages, before_each="", after_each="", prefix="page", prefix_plural="pages"
     )
 
+    # For files that fail validation because of detected encroachment on the Notify tag area, the uploader
+    # will be directed to contact support.
+    if validation_message == "encroaching-text-on-notify-tag-area":
+        url_link = url_for("main.support")
+    else:
+        url_link = url_for("main.guidance_upload_a_letter")
+
     return {
         "title": LETTER_VALIDATION_MESSAGES[validation_message]["title"],
         "detail": LETTER_VALIDATION_MESSAGES[validation_message]["detail"].format(
             invalid_pages=invalid_pages,
             invalid_pages_are_or_is=invalid_pages_are_or_is,
             page_count=page_count,
-            letter_spec_guidance=url_for("main.guidance_upload_a_letter"),
+            url_link=url_link,
         ),
         "summary": LETTER_VALIDATION_MESSAGES[validation_message]["summary"].format(
             invalid_pages=invalid_pages,
             invalid_pages_are_or_is=invalid_pages_are_or_is,
             page_count=page_count,
-            letter_spec_guidance=url_for("main.guidance_upload_a_letter"),
+            url_link=url_link,
         ),
     }
 
