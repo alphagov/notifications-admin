@@ -11,13 +11,14 @@
   {% else %}
     {% set notifications_list = [] %}
     {% for item in notifications %}
+      {% set truncate_class = "notify-summary-list__metadata--truncate" if item.notification_type == 'sms' else "" %}
       {% set summary_key_html %}
         {% if item.status in ('pending-virus-check', 'virus-scan-failed') %}
           <span class="notify-summary-list__filename loading-indicator">Checking</span>
         {% else %}
           <a class="govuk-link govuk-link--no-visited-state notify-summary-list__filename" href="{{ single_notification_url(notification_id=item.id) }}">{{ item.to.splitlines()|join(', ') if item.to else '' }}</a>
         {% endif %}
-        <p class="govuk-body notify-summary-list__metadata notify-summary-list__metadata--small">
+        <p class="govuk-body notify-summary-list__metadata notify-summary-list__metadata--small {{ truncate_class }}">
           {{ item.preview_of_content }}
         </p>
       {% endset %}

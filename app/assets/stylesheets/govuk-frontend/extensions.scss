@@ -141,6 +141,12 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
   @include govuk-font-size(16);
 }
 
+.notify-summary-list__metadata--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .notify-summary-list__key {
 
   @include govuk-media-query($from: tablet) {
