@@ -53,9 +53,10 @@
       {% else %}
         {% set notifications_list = [] %}
         {% for item in notifications %}
+          {% set truncate_class = "notify-summary-list__metadata--truncate" if item.notification_type == 'sms' else "" %}
           {% set summary_key_html %}
             <a class="govuk-link govuk-link--no-visited-state notify-summary-list__filename" href="{{ url_for('main.view_notification', service_id=current_service.id, notification_id=item.id, from_job=job.id) }}">{{ item.to }}</a>
-            <p class="govuk-body notify-summary-list__metadata notify-summary-list__metadata--small">
+            <p class="govuk-body notify-summary-list__metadata notify-summary-list__metadata--small {{ truncate_class }}">
               {{ item.preview_of_content }}
             </p>
           {% endset %}
