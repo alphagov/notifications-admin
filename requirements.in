@@ -14,13 +14,14 @@ pyexcel-io~=0.6
 pyexcel-xls~=0.7
 pyexcel-odsr~=0.6
 
-notifications-python-client~=10.0
+notifications-python-client~=12.1
+# currently locked at v1 until this card is played: https://trello.com/c/V1pA36gF/560-bump-fido2-to-v2
 fido2~=1.1
 
 # Run `make bump-utils` to update to the latest version
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@128.0.0
 
-govuk-frontend-jinja==4.0.0
+govuk-frontend-jinja~=4.1.0
 
 git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
 
