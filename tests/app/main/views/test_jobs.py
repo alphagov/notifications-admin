@@ -95,7 +95,7 @@ def test_should_show_page_for_one_job(
         "main.uploads",
         service_id=SERVICE_ONE_ID,
     )
-    assert " ".join(page.select_one("tbody").find("tr").text.split()) == (
+    assert " ".join(page.select_one(".govuk-summary-list__row").text.split()) == (
         "07123456789 template content Delivered 1 January at 11:10am"
     )
     assert page.select_one("div[data-key=notifications]")["data-resource"] == url_for(
@@ -111,10 +111,10 @@ def test_should_show_page_for_one_job(
     assert csv_link.text == "Download this report (CSV)"
     assert page.select_one("span#time-left").text == "Data available for 7 days"
     assert page.select_one("#job-notifications")
-    assert normalize_spaces(page.select_one("tbody tr").text) == normalize_spaces(
+    assert normalize_spaces(page.select_one(".govuk-summary-list__row").text) == normalize_spaces(
         "07123456789 template content Delivered 1 January at 11:10am"
     )
-    assert page.select_one("tbody tr a")["href"] == url_for(
+    assert page.select_one(".notify-summary-list__filename")["href"] == url_for(
         "main.view_notification",
         service_id=SERVICE_ONE_ID,
         notification_id="00000000-0000-0000-0000-000000000000",
@@ -155,7 +155,7 @@ def test_get_jobs_should_tell_user_if_more_than_one_page(
         job_id=fake_uuid,
         status="",
     )
-    assert page.select_one("p.table-show-more-link").text.strip() == "Only showing the first 50 rows"
+    assert page.select_one("p.more-items-available-text").text.strip() == "Only showing the first 50 rows"
 
 
 def test_should_show_job_in_progress(
@@ -200,7 +200,7 @@ def test_should_show_job_without_notifications(
         "0 failed text messages",
     ]
     assert page.select_one("p.hint").text.strip() == "Report is 50% complete…"
-    assert page.select_one("tbody").text.strip() == "No messages to show yet…"
+    assert page.select_one(".no-data").text.strip() == "No messages to show yet…"
 
 
 def test_should_show_job_with_sending_limit_exceeded_status(
@@ -284,7 +284,7 @@ def test_should_show_old_job(
     assert not page.select(".pill")
     assert not page.select("p.hint")
     assert not page.select("a[download]")
-    assert page.select_one("tbody").text.strip() == expected_message
+    assert page.select_one(".no-data").text.strip() == expected_message
     assert [normalize_spaces(column.text) for column in page.select("main .govuk-grid-column-one-quarter")] == [
         "1 total text messages",
         "1 delivering text message",
@@ -317,7 +317,7 @@ def test_should_show_letter_job(
     assert normalize_spaces(page.select("p.bottom-gutter")[0].text) == ("Sent by Test User on 1 January at 11:09am")
     assert normalize_spaces(page.select("p#printing-info")[0].text) == ("Printing starts today at 5:30pm")
     assert page.select(".banner-default-with-tick") == []
-    assert normalize_spaces(page.select("tbody tr")[0].text) == (
+    assert normalize_spaces(page.select(".govuk-summary-list__row")[0].text) == (
         "1 Example Street template subject 1 January at 11:09am"
     )
     assert normalize_spaces(page.select(".keyline-block")[0].text) == "1 Letter"
@@ -722,9 +722,7 @@ def test_should_show_updates_for_one_job_as_json(
     assert "sending" in content["counts"]
     assert "delivered" in content["counts"]
     assert "failed" in content["counts"]
-    assert "Recipient" in content["notifications"]
     assert "07123456789" in content["notifications"]
-    assert "Status" in content["notifications"]
     assert "Delivered" in content["notifications"]
     assert "12:01am" in content["notifications"]
     assert "Sent by Test User on 1 January at midnight" in content["status"]
@@ -763,9 +761,7 @@ def test_should_show_updates_for_scheduled_job_as_json(
     assert "sending" in content["counts"]
     assert "delivered" in content["counts"]
     assert "failed" in content["counts"]
-    assert "Recipient" in content["notifications"]
     assert "07123456789" in content["notifications"]
-    assert "Status" in content["notifications"]
     assert "Delivered" in content["notifications"]
     assert "12:01am" in content["notifications"]
     assert "Sent by Test User on 1 June at 4:00pm" in content["status"]

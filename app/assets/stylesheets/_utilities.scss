@@ -1,0 +1,22 @@
+@use 'govuk/helpers' as *;
+
+// paragraph styles for no data
+// and more data text
+// used with lists and tables
+.no-data {
+  @include govuk-font(16);
+  color: govuk-functional-colour(secondary-text);
+  margin-top: 10px;
+  margin-bottom: govuk-spacing(7);
+  border-top: 1px solid govuk-functional-colour(border);
+  border-bottom: 1px solid govuk-functional-colour(border);
+  padding: 0.75em 0 0.5625em 0;
+}
+
+.more-items-available-text {
+  @include govuk-font(16);
+  color: govuk-functional-colour(secondary-text);
+  border-bottom: 1px solid govuk-functional-colour(border);
+  padding-bottom: govuk-spacing(6);
+  text-align: center;
+}

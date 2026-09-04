@@ -1,40 +1,32 @@
-{% from "components/table.html" import list_table, field, row_heading %}
 {% from "components/big-number.html" import big_number -%}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
-<div class='dashboard-table ajax-block-container'>
-  {% call(item, row_number) list_table(
-    jobs,
-    caption="Recent files uploaded",
-    caption_visible=False,
-    empty_message=(
-      'Upload a letter and Notify will print, pack and post it for you.' if current_service.has_permission('letter') else 'You have not uploaded any files yet.'
-    ),
-    field_headings=[
-      'File',
-      'Status'
-    ],
-    field_headings_visible=False,
-    give_rows_ids=False,
-  ) %}
-    {% call row_heading() %}
-      <div class="file-list">
+<div class="ajax-block-container">
+  {% if not jobs %}
+    <p class="govuk-body no-data">
+     {{ 'Upload a letter and Notify will print, pack and post it for you' if current_service.has_permission('letter') else 'You have not uploaded any files yet.' }}
+    </p>
+  {% else %}
+    {% set jobs_list = [] %}
+    {% for item in jobs %}
+      {% set summary_key_html %}
         {% if item.upload_type == 'letter_day' %}
-          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploaded_letters', service_id=current_service.id, letter_print_day=item.created_at|format_date_numeric) }}">{{ item.original_file_name }}</a>
+          <a class="notify-summary-list__filename notify-summary-list__filename--large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.uploaded_letters', service_id=current_service.id, letter_print_day=item.created_at|format_date_numeric) }}">{{ item.original_file_name }}</a>
         {% elif item.upload_type == 'letter' %}
-          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.original_file_name }}</a>
+          <a class="notify-summary-list__filename notify-summary-list__filename--large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_notification', service_id=current_service.id, notification_id=item.id) }}">{{ item.original_file_name }}</a>
         {% elif item.upload_type == 'contact_list' %}
-          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.contact_list', service_id=current_service.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
+          <a class="notify-summary-list__filename notify-summary-list__filename--large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.contact_list', service_id=current_service.id, contact_list_id=item.id) }}">{{ item.original_file_name }}</a>
         {% else %}
-          <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
+          <a class="notify-summary-list__filename notify-summary-list__filename--large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.original_file_name }}</a>
         {% endif %}
         {% if item.scheduled %}
-          <span class="file-list-hint-large">
+          <p class="govuk-body notify-summary-list__metadata">
             Sending {{
               item.scheduled_for|format_datetime_relative
             }}
-          </span>
+          </p>
         {% elif item.upload_type == 'contact_list' %}
-          <span class="file-list-hint-large">
+          <p class="govuk-body notify-summary-list__metadata">
             {% if item.recent_job_count %}
               Used {{ item.recent_job_count|iteration_count }}
               in the last
@@ -47,71 +39,84 @@
             {% else %}
               Not used yet
             {% endif %}
-          </span>
+          </p>
         {% elif item.upload_type == 'letter_day' %}
-          <span class="file-list-hint-large">
+          <p class="govuk-body notify-summary-list__metadata">
             {{ item.letter_printing_statement }}
-          </span>
+          </p>
         {% else %}
-          <span class="file-list-hint-large">
+          <p class="govuk-body notify-summary-list__metadata">
             Sent {{
               (item.scheduled_for or item.created_at)|format_datetime_relative
             }}
-          </span>
+          </p>
         {% endif %}
-
-      </div>
-    {% endcall %}
-    {% call field() %}
-      {% if item.scheduled %}
-        {{ big_number(
-          item.notification_count,
-          smallest=True,
-          label=item.notification_count|message_count_label(
-            item.template_type,
-            suffix='waiting to send'
-          )
-        ) }}
-      {% elif item.template_type == 'letter' %}
-        {{ big_number(
-          item.notification_count,
-          smallest=True,
-          label=item.notification_count|message_count_label(
-            item.template_type,
-            suffix=''
-          )
-        ) }}
-      {% elif item.upload_type == 'contact_list' %}
-        {{ big_number(
-          item.row_count,
-          smallest=True,
-          label="saved {}".format(item.row_count|recipient_count_label(item.template_type))
-        ) }}
-      {% elif item.pdf_letter %}
-        <p class="govuk-body letter-recipient-summary">
-          {% for line in item.recipient.splitlines() %}
-            {% if loop.index < 3 %}
-              {{ line }}<br>
-            {% endif %}
-          {% endfor %}
-        </p>
-      {% else %}
-        <div class="govuk-grid-row">
-          <div class="govuk-grid-column-one-third">
-            {{ big_number(
-              item.notifications_sending,
-              smallest=True,
-              label='delivering',
-            ) }}
+      {% endset %}
+      {% set summary_value_html %}
+        {% if item.scheduled %}
+          {{ big_number(
+            item.notification_count,
+            smallest=True,
+            label=item.notification_count|message_count_label(
+              item.template_type,
+              suffix='waiting to send'
+            )
+          ) }}
+        {% elif item.template_type == 'letter' %}
+          {{ big_number(
+            item.notification_count,
+            smallest=True,
+            label=item.notification_count|message_count_label(
+              item.template_type,
+              suffix=''
+            )
+          ) }}
+        {% elif item.upload_type == 'contact_list' %}
+          {{ big_number(
+            item.row_count,
+            smallest=True,
+            label="saved {}".format(item.row_count|recipient_count_label(item.template_type))
+          ) }}
+        {% elif item.pdf_letter %}
+          <p class="govuk-body letter-recipient-summary">
+            {% for line in item.recipient.splitlines() %}
+              {% if loop.index < 3 %}
+                {{ line }}<br>
+              {% endif %}
+            {% endfor %}
+          </p>
+        {% else %}
+          <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-third">
+              {{ big_number(
+                item.notifications_sending,
+                smallest=True,
+                label='delivering',
+              ) }}
+            </div>
+            <div class="govuk-grid-column-one-third">
+              {{ big_number(item.notifications_delivered, smallest=True, label='delivered') }}
+            </div>
+            <div class="govuk-grid-column-one-third">
+              {{ big_number(item.notifications_failed, smallest=True, label='failed') }}
+            </div>
           </div>
-          <div class="govuk-grid-column-one-third">
-        {{ big_number(item.notifications_delivered, smallest=True, label='delivered') }}
-      </div>
-      <div class="govuk-grid-column-one-third">
-        {{ big_number(item.notifications_failed, smallest=True, label='failed') }}
-      </div></div>
-
-      {% endif %}
-    {% endcall %}
-  {% endcall %}
+        {% endif %}
+      {% endset %}
+      {% do jobs_list.append({
+        "key": {
+          "classes": "notify-summary-list__key notify-summary-list__key--50-100",
+          "html": summary_key_html,
+        },
+        "value": {
+          "classes": "",
+          "html":  summary_value_html,
+        }
+      }) %}
+    {% endfor %}
+    {{ govukSummaryList({
+      "classes": "notify-summary-list",
+      "rows": jobs_list
+    }) }}
+  {% endif %}
 </div>

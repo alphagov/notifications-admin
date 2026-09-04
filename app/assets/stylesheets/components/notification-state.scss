@@ -1,0 +1,16 @@
+@use 'govuk/helpers' as *;
+@use 'govuk/settings' as *;
+
+.notification-state--default {
+  color: govuk-functional-colour(secondary-text);
+}
+
+.notification-state--error {
+  color: govuk-functional-colour(error);
+}
+
+.notification-state__link {
+  display: block;
+  @include govuk-typography-weight-bold;
+  margin-bottom: govuk-spacing(1);
+}
