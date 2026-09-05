@@ -24,12 +24,12 @@ from app.utils.user_permissions import (
 )
 
 
-def _get_service_id_from_view_args():
-    return str(request.view_args.get("service_id", "")) or None
+def _get_service_id_from_view_args() -> str | None:
+    return str((request.view_args or {}).get("service_id", "")) or None
 
 
-def _get_org_id_from_view_args():
-    return str(request.view_args.get("org_id", "")) or None
+def _get_org_id_from_view_args() -> str | None:
+    return str((request.view_args or {}).get("org_id", "")) or None
 
 
 class BaseUser(JSONModel):
@@ -705,7 +705,7 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 class Users(ModelList):
-    model = User
+    model: type[BaseUser] = User
 
     @staticmethod
     def _get_items(*args, **kwargs):
@@ -731,7 +731,7 @@ class OrganisationUsers(Users):
 
 
 class InvitedUsers(Users):
-    model = InvitedUser
+    model: type[BaseUser] = InvitedUser
 
     @staticmethod
     def _get_items(*args, **kwargs):
@@ -742,7 +742,7 @@ class InvitedUsers(Users):
 
 
 class OrganisationInvitedUsers(InvitedUsers):
-    model = InvitedOrgUser
+    model: type[BaseUser] = InvitedOrgUser
 
     @staticmethod
     def _get_items(*args, **kwargs):
