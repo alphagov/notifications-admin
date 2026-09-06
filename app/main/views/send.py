@@ -1,5 +1,7 @@
 import itertools
+from collections.abc import Sequence
 from string import ascii_uppercase
+from typing import Any, cast
 
 from flask import (
     abort,
@@ -208,7 +210,7 @@ def set_sender(service_id, template_id):
 
     # extend all radios that need hint text
     form.sender.param_extensions = {"items": []}
-    for item_id, _item_value in form.sender.choices:
+    for item_id, _item_value in cast(Sequence[tuple[str, str]], form.sender.choices):
         if item_id in option_hints:
             extensions = {"hint": {"text": option_hints[item_id]}}
         else:
@@ -230,7 +232,7 @@ def set_sender(service_id, template_id):
 
 
 def get_sender_context(sender_details, template_type):
-    context = {
+    context: dict[str, Any] = {
         "email": {
             "title": "Where should replies come back to?",
             "description": "Where should replies come back to?",
@@ -342,6 +344,7 @@ def send_one_off_letter_address(service_id, template_id):
     )
 
     if form.validate_on_submit():
+        assert form.address.data is not None  # type narrowing
         session["placeholders"].update(PostalAddress(form.address.data).as_personalisation)
 
         placeholders = fields_to_fill_in(template)
@@ -438,6 +441,7 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
                 )
             )
         if current_placeholder in InsensitiveDict(PostalAddress("").as_personalisation):
+            assert request.endpoint is not None  # type narrowing
             return redirect(
                 url_for(
                     request.endpoint,
@@ -474,6 +478,7 @@ def send_one_off_step(service_id, template_id, step_index):  # noqa: C901
             if all_placeholders_in_session(placeholders):
                 return get_notification_check_endpoint(service_id, template)
 
+            assert request.endpoint is not None  # type narrowing
             return redirect(
                 url_for(
                     request.endpoint,
