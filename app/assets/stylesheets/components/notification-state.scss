@@ -10,7 +10,11 @@
 }
 
 .notification-state__link {
-  display: block;
+  display: inline-block;
   @include govuk-typography-weight-bold;
   margin-bottom: govuk-spacing(1);
+}
+
+.notification-state__metadata {
+  display: block;
 }
