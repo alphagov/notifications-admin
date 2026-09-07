@@ -25,9 +25,6 @@ REPORT_REQUEST_STORED = "stored"
 REPORT_REQUEST_FAILED = "failed"
 REPORT_REQUEST_DELETED = "deleted"
 
-# Error codes from the API
-QR_CODE_TOO_LONG = "qr-code-too-long"
-
 # Allow upto 800,000 notifications to be requested in a report for phase 1a
 REPORT_REQUEST_MAX_NOTIFICATIONS = 800_000
 

@@ -37,7 +37,7 @@ from app import (
     template_preview_client,
     template_statistics_client,
 )
-from app.constants import QR_CODE_TOO_LONG, LetterLanguageOptions
+from app.constants import LetterLanguageOptions
 from app.main import main, no_cookie
 from app.main.forms import (
     CopyTemplateForm,
@@ -655,29 +655,16 @@ def add_service_template(service_id, template_type, template_folder_id=None):
 
     form = get_template_form(template_type)()
     if form.validate_on_submit():
-        try:
-            new_template = service_api_client.create_service_template(
-                name=form.name.data,
-                type_=template_type,
-                content=form.template_content.data,
-                service_id=service_id,
-                subject=form.subject.data if hasattr(form, "subject") else None,
-                parent_folder_id=template_folder_id,
-                has_unsubscribe_link=form.has_unsubscribe_link.data if hasattr(form, "has_unsubscribe_link") else None,
-            )
-        except HTTPError as e:
-            if (
-                e.status_code == 400
-                and "content" in e.message
-                and any("character count greater than" in x for x in e.message["content"])
-            ):
-                form.template_content.errors.extend(e.message["content"])
-            else:
-                raise e
-        else:
-            return redirect(
-                url_for("main.view_template", service_id=service_id, template_id=new_template["data"]["id"])
-            )
+        new_template = service_api_client.create_service_template(
+            name=form.name.data,
+            type_=template_type,
+            content=form.template_content.data,
+            service_id=service_id,
+            subject=form.subject.data if hasattr(form, "subject") else None,
+            parent_folder_id=template_folder_id,
+            has_unsubscribe_link=form.has_unsubscribe_link.data if hasattr(form, "has_unsubscribe_link") else None,
+        )
+        return redirect(url_for("main.view_template", service_id=service_id, template_id=new_template["data"]["id"]))
 
     return render_template(
         f"views/edit-{template_type}-template.html",
@@ -739,7 +726,7 @@ def abort_for_unauthorised_bilingual_letters_or_invalid_options(language: str | 
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit", methods=["GET", "POST"])
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/edit/<string:language>", methods=["GET", "POST"])
 @user_has_permissions("manage_templates")
-def edit_service_template(service_id, template_id, language=None):  # noqa
+def edit_service_template(service_id, template_id, language=None):
     template = current_service.get_template_with_user_permission_or_403(template_id, current_user)
 
     if template.template_type not in current_service.available_template_types:
@@ -778,47 +765,34 @@ def edit_service_template(service_id, template_id, language=None):  # noqa
         update_data = form.new_template_data
         if template_change.email_files_removed:
             update_data["archive_email_file_ids"] = [file.id for file in template_change.email_files_removed]
-        try:
-            service_api_client.update_service_template(
+
+        service_api_client.update_service_template(
+            service_id=service_id,
+            template_id=template_id,
+            **update_data,
+        )
+        editing_english_content_in_bilingual_letter = (
+            template.template_type == "letter" and template.welsh_page_count and language != "welsh"
+        )
+        if template_change.email_files_removed:
+            multiple_files_removed = len(template_change.email_filenames_removed) > 1
+            flash(
+                f"{formatted_list(template_change.email_filenames_removed)} "
+                f"{'have' if multiple_files_removed else 'has'} been removed",
+                "default_with_tick",
+            )
+        return redirect(
+            url_for(
+                "main.view_template",
                 service_id=service_id,
                 template_id=template_id,
-                **update_data,
+                **(
+                    {"_anchor": "first-page-of-english-in-bilingual-letter"}
+                    if editing_english_content_in_bilingual_letter
+                    else {}
+                ),
             )
-        except HTTPError as e:
-            if e.status_code == 400:
-                if "content" in e.message and any("character count greater than" in x for x in e.message["content"]):
-                    form.template_content.errors.extend(e.message["content"])
-                elif "content" in e.message and any(x == QR_CODE_TOO_LONG for x in e.message["content"]):
-                    form.template_content.errors.append(
-                        "Cannot create a usable QR code - the link you entered is too long"
-                    )
-                else:
-                    raise e
-            else:
-                raise e
-        else:
-            editing_english_content_in_bilingual_letter = (
-                template.template_type == "letter" and template.welsh_page_count and language != "welsh"
-            )
-            if template_change.email_files_removed:
-                multiple_files_removed = len(template_change.email_filenames_removed) > 1
-                flash(
-                    f"{formatted_list(template_change.email_filenames_removed)} "
-                    f"{'have' if multiple_files_removed else 'has'} been removed",
-                    "default_with_tick",
-                )
-            return redirect(
-                url_for(
-                    "main.view_template",
-                    service_id=service_id,
-                    template_id=template_id,
-                    **(
-                        {"_anchor": "first-page-of-english-in-bilingual-letter"}
-                        if editing_english_content_in_bilingual_letter
-                        else {}
-                    ),
-                )
-            )
+        )
 
     return render_template(
         f"views/edit-{template.template_type}-template.html",
