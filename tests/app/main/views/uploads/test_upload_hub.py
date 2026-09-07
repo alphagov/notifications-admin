@@ -85,7 +85,7 @@ def test_get_upload_hub_with_no_uploads(
     service_one["permissions"] += extra_permissions
     page = client_request.get("main.uploads", service_id=SERVICE_ONE_ID)
     assert normalize_spaces(" ".join(paragraph.text for paragraph in page.select("main p"))) == expected_empty_message
-    assert not page.select(".file-list-filename")
+    assert not page.select(".notify-summary-list__filename")
 
 
 @freeze_time("2017-10-10 10:10:10")
