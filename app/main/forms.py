@@ -2524,6 +2524,10 @@ class AdminServiceInboundNumberForm(StripWhitespaceForm):
 
 
 class AdminServiceInboundNumberArchive(StripWhitespaceForm):
+    def __init__(self, *args, service, **kwargs):
+        self.service = service
+        super().__init__(*args, **kwargs)
+
     removal_options = GovukRadiosField(
         "What do you want to do with the number?",
         choices=[("true", "Archive"), ("false", "Release")],
@@ -2535,6 +2539,10 @@ class AdminServiceInboundNumberArchive(StripWhitespaceForm):
             ]
         },
     )
+
+    def validate_removal_options(self, field):
+        if self.service.default_sms_sender == self.service.inbound_number:
+            raise ValidationError("You need to change your default text message sender ID before you can continue")
 
 
 class CallbackForm(StripWhitespaceForm):
