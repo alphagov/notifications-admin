@@ -1,5 +1,5 @@
 {% extends "content_template.html" %}
-{% from "components/table.html" import mapping_table, row, text_field %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Free text message allowance' %}
@@ -21,25 +21,38 @@ Free text message allowance
     Central government departments and <br>national organisations
     {% endset %}
 
-    {% call mapping_table(
-      caption='Free text message allowance',
-      field_headings=['Organisation', 'Allowance per service'],
-      field_headings_visible=True,
-      caption_visible=False
-    ) %}
-      {% for organisation_type, charge in [
+    {% set text_allowance_table_body = [] %}
+    {% for organisation_type, charge in [
         (central_government_organisations_text, '20,000 free text messages'),
         ('Local authorities and regional organisations', '10,000 free text messages'),
         ('State-funded schools', '5,000 free text messages'),
         ('GP surgeries', 'No free allowance'),
         ('Other organisations', '5,000 free text messages'),
       ] %}
-        {% call row() %}
-          {{ text_field(organisation_type) }}
-          {{ text_field(charge) }}
-        {% endcall %}
-      {% endfor %}
-    {% endcall %}
+      {% do text_allowance_table_body.append([
+        {
+          "text": organisation_type
+        },
+        {
+          "text": charge
+        }
+      ])%}
+    {% endfor %}
+
+    {{ govukTable({
+      "caption": "Free text message allowance",
+      "captionClasses": "govuk-visually-hidden",
+      "classes": "notify-table notify-table--body-small",
+      "head": [
+        {
+          "text": "Organisation"
+        },
+        {
+          "text": "Allowance per service",
+        },
+      ],
+      "rows": text_allowance_table_body
+    }) }}
   </div>
 
   <p class="govuk-body">The free allowance is discretionary. We review it every year to make sure GOV.​UK Notify can still support those teams who need it the most.</p>
