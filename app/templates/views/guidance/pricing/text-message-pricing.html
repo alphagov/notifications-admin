@@ -1,8 +1,8 @@
 {% extends "content_template.html" %}
 {% from "components/content-metadata.html" import content_metadata %}
-{% from "components/table.html" import mapping_table, row, text_field, field %}
 {% from "components/live-search.html" import live_search %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Pricing information' %}
@@ -51,13 +51,8 @@ Text message pricing
   <p class="govuk-body">If a text message is longer than 160 characters (including spaces), it counts as more than one message.</p>
 
   <div class="bottom-gutter-3-2">
-    {% call mapping_table(
-      caption='Text message pricing',
-      field_headings=['Message length', 'Charge'],
-      field_headings_visible=True,
-      caption_visible=False
-    ) %}
-      {% for message_length, charge in [
+    {% set standard_symbol_message_pricing_table_body = [] %}
+    {% for message_length, charge in [
         ('Up to 160 characters', '1 text message'),
         ('Up to 306 characters', '2 text messages'),
         ('Up to 459 characters', '3 text messages'),
@@ -65,12 +60,30 @@ Text message pricing
         ('Up to 765 characters', '5 text messages'),
         ('Up to 918 characters', '6 text messages'),
       ] %}
-        {% call row() %}
-          {{ text_field(message_length) }}
-          {{ text_field(charge) }}
-        {% endcall %}
+        {% do standard_symbol_message_pricing_table_body.append([
+          {
+            "text": message_length
+          },
+          {
+            "text": charge
+          }
+        ])%}
       {% endfor %}
-    {% endcall %}
+
+    {{ govukTable({
+      "caption": "Text message pricing",
+      "captionClasses": "govuk-visually-hidden",
+      "classes": "notify-table notify-table--body-small",
+      "head": [
+        {
+          "text": "Message length"
+        },
+        {
+          "text": "Charge",
+        },
+      ],
+      "rows": standard_symbol_message_pricing_table_body
+    }) }}
   </div>
 
 <h2 class="heading-medium" id="language-other-than-english">Text messages in a language other than English</h2>
@@ -80,13 +93,8 @@ Text message pricing
   <p class="govuk-body">Anything longer than 70 characters (including spaces) counts as more than one message.</p>
 
   <div class="bottom-gutter-3-2">
-    {% call mapping_table(
-      caption='Pricing for text messages containing non-standard letters and symbols',
-      field_headings=['Message length', 'Charge'],
-      field_headings_visible=True,
-      caption_visible=False
-    ) %}
-      {% for message_length, charge in [
+    {% set non_standard_symbol_message_pricing_table_body = [] %}
+    {% for message_length, charge in [
         ('Up to 70 characters', '1 text message'),
         ('Up to 134 characters', '2 text messages'),
         ('Up to 201 characters', '3 text messages'),
@@ -102,12 +110,30 @@ Text message pricing
         ('Up to 871 characters', '13 text messages'),
         ('Up to 938 characters', '14 text messages'),
       ] %}
-        {% call row() %}
-          {{ text_field(message_length) }}
-          {{ text_field(charge) }}
-        {% endcall %}
+        {% do non_standard_symbol_message_pricing_table_body.append([
+          {
+            "text": message_length
+          },
+          {
+            "text": charge
+          }
+        ])%}
       {% endfor %}
-    {% endcall %}
+
+    {{ govukTable({
+      "caption": "Pricing for text messages containing non-standard letters and symbols",
+      "captionClasses": "govuk-visually-hidden",
+      "classes": "notify-table notify-table--body-small",
+      "head": [
+        {
+          "text": "Message length"
+        },
+        {
+          "text": "Charge",
+        },
+      ],
+      "rows": non_standard_symbol_message_pricing_table_body
+    }) }}
   </div>
 
 <h3 class="heading-small" id="standard">Standard letters and symbols</h3>
@@ -130,33 +156,56 @@ Text message pricing
   <h2 class="heading-medium" id="international-numbers">Sending text messages to international numbers</h2>
   <p class="govuk-body">It might cost more to send text messages to international numbers than UK ones, depending on the country.</p>
   {% set smsIntRates %}
-    {{ live_search(target_selector='#international-pricing .table-row', show=True, form=_search_form, label='Search by country name or code') }}
+    {{ live_search(target_selector='#international-pricing .govuk-table__body .govuk-table__row', show=True, form=_search_form, label='Search by country name or code') }}
 
     <div id="international-pricing" class="bottom-gutter-3-2">
-      {% call mapping_table(
-        caption='International text message rates',
-        field_headings=['Country code', 'Country', 'Cost multiplier'],
-        field_headings_visible=True,
-        caption_visible=False
-      ) %}
-        {% for cc, names, billable_units in international_sms_rates %}
-          {% call row() %}
-            {{ text_field('+' + cc) }}
-            {% call field() %}
-              {% for name in names %}
-                {{ name }}<br>
-              {% endfor %}
-            {% endcall %}
-            {{ text_field('{}&hairsp;&times;'.format(billable_units)|safe) }}
-          {% endcall %}
-        {% endfor %}
-
-        {% call row() %}
-          {{ text_field('+882') }}
-          {% call field() %}Worldwide{% endcall %}
-          {{ text_field('Not supported') }}
-        {% endcall %}
-      {% endcall %}
+      {% set international_text_message_rates_table_body = [] %}
+      {% for cc, names, billable_units in international_sms_rates %}
+        {% set country_name_html %}
+          {% for name in names %}
+            {{ name }}<br>
+          {% endfor %}
+        {% endset %}
+        {% do international_text_message_rates_table_body.append([
+          {
+            "text": "+" ~ cc
+          },
+          {
+            "text": country_name_html
+          },
+          {
+            "html": billable_units ~ "&hairsp;&times;"
+          }
+        ])%}
+      {% endfor %}
+      {% do international_text_message_rates_table_body.append([
+        {
+          "text": "+882"
+        },
+        {
+          "text": "Worldwide"
+        },
+        {
+          "html": "Not supported"
+        }
+      ])%}
+      {{ govukTable({
+        "caption": "International text message rates",
+        "captionClasses": "govuk-visually-hidden",
+        "classes": "notify-table notify-table--body-small",
+        "head": [
+          {
+            "text": "Country code"
+          },
+          {
+            "text": "Country",
+          },
+          {
+            "text": "Cost multiplier",
+          },
+        ],
+        "rows": international_text_message_rates_table_body
+      }) }}
     </div>
   {% endset %}
 
