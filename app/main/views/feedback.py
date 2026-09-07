@@ -1,4 +1,6 @@
+from collections.abc import Mapping
 from datetime import UTC, datetime
+from typing import Any
 
 from flask import current_app, redirect, render_template, request, session, url_for
 from notifications_utils.bank_holidays import BankHolidays
@@ -41,6 +43,7 @@ ZENDESK_USER_LOGGED_OUT_NOTE = (
 @main.route("/support", methods=["GET", "POST"])
 @hide_from_search_engines
 def support():
+    form: SupportType | SupportRedirect
     if current_user.is_authenticated:
         form = SupportType()
         if form.validate_on_submit():
@@ -350,7 +353,7 @@ def support_public():
     return render_template("views/support/public.html")
 
 
-feedback_page_details = {
+feedback_page_details: Mapping[str, Mapping[str, Any]] = {
     QUESTION_TICKET_TYPE: {
         "default": {"zendesk_subject": "Question or feedback", "back_link": "main.support", "notify_ticket_type": None}
     },
