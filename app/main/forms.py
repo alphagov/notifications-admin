@@ -2105,8 +2105,13 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
 
 class ServiceConfirmFreeAllowanceTermsForm(StripWhitespaceForm):
     confirm = GovukCheckboxField(
+<<<<<<< HEAD
         "I have read and understood the terms of the free allowance",
         validators=[DataRequired(message="Select ‘I have read and understood the terms of the free allowance’")],
+=======
+        "I agree to the terms of the free allowance",
+        validators=[DataRequired(message="Select ‘I agree to the terms of the free allowance’")],
+>>>>>>> f216de7ed (Add a new page for agreeing to the free allowance terms)
     )
 
 

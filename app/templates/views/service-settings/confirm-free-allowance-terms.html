@@ -70,6 +70,7 @@
             <li>team members</li>
         </ul>
 
+<<<<<<< HEAD
     {% if not current_service.confirmed_unique %}
         {% call form_wrapper() %}
             {{ form.confirm(
@@ -77,6 +78,13 @@
             {{ page_footer('Save') }}
         {% endcall %}
     {% endif %}
+=======
+    {% call form_wrapper() %}
+        {{ form.confirm(
+        ) }}
+        {{ page_footer('Save') }}
+    {% endcall %}
+>>>>>>> f216de7ed (Add a new page for agreeing to the free allowance terms)
     </div>
 </div>
 
