@@ -2967,6 +2967,46 @@ def test_inbound_sms_sender_is_not_editable(client_request, service_one, fake_uu
         )
 
 
+def test_service_confirm_free_allowance_terms(client_request):
+    page = client_request.get("main.service_confirm_free_allowance_terms", service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one("h1").text) == "Free text message allowance"
+    assert (
+        normalize_spaces(page.select_one("main .govuk-checkboxes").label.text)
+        == "I have read and understood the terms of the free allowance"
+    )
+
+
+def test_service_confirm_free_allowance_terms_hides_checkbox_if_terms_already_accepted(client_request, service_one):
+    service_one["confirmed_unique"] = True
+    page = client_request.get("main.service_confirm_free_allowance_terms", service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one("h1").text) == "Free text message allowance"
+    assert not page.select("main .govuk-checkboxes")
+
+
+def test_service_confirm_free_allowance_terms_redirects_when_checkbox_is_checked(client_request, mock_update_service):
+    client_request.post(
+        "main.service_confirm_free_allowance_terms",
+        service_id=SERVICE_ONE_ID,
+        _data={"confirm": True},
+        _expected_redirect=url_for("main.service_settings", service_id=SERVICE_ONE_ID),
+    )
+    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, confirmed_unique=True)
+
+
+def test_service_confirm_free_allowance_terms_requires_checkbox_to_be_checked(client_request, mock_update_service):
+    page = client_request.post(
+        "main.service_confirm_free_allowance_terms", service_id=SERVICE_ONE_ID, _expected_status=200
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Free text message allowance"
+    assert (
+        normalize_spaces(page.select_one(".govuk-error-message").text)
+        == "Error: Select ‘I have read and understood the terms of the free allowance’"
+    )
+    assert not mock_update_service.called
+
+
 def test_service_set_letter_branding_platform_admin_only(
     client_request,
 ):
