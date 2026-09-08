@@ -22,39 +22,18 @@
         <div class="govuk-grid-column-five-sixths">
 
             <p class="govuk-body">
-                Your service name helps us to decide if you’re eligible for an annual allowance of free text messages.
+                You must choose a name that you think the GOV.UK Notify team will understand.
             </p>
 
             <p class="govuk-body">
-                The free allowance is discretionary. To qualify for it, your service must be the only one of its kind in your organisation.
+                Do not include:
             </p>
 
-            <p class="govuk-body">
-                You can still use Notify if your service is not eligible for a free allowance.
-            </p>
-
-            <h2 class="heading-medium">
-                If you do not plan to send text messages
-            </h2>
-
-            <p class="govuk-body">
-                You still need to confirm your service name.
-            </p>
-
-            <h2 class="heading-medium">
-                Choose a service name that’s easy to understand
-            </h2>
-
-            <p class="govuk-body">
-                Your service name must not include:
-            </p>
-
-            
             <ul class="govuk-list govuk-list--bullet">
                 <li>acronyms, initialisms or abbreviations</li>
                 <li>your own name or the name of someone on your team</li>
             </ul>
-            
+
             {% call form_wrapper() %}
                 {{ form.name }}
                 {{ page_footer('Confirm') }}
