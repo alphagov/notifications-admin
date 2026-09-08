@@ -321,7 +321,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
 
 class LetterAttachment(JSONModel):
-    id: Any
+    id: str
     original_filename: Any
     page_count: Any
 

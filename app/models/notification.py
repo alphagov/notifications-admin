@@ -20,7 +20,7 @@ from app.utils.templates import EmailPreviewTemplate
 
 
 class Notification(JSONModel):
-    id: Any
+    id: str
     to: str
     recipient: str
     template: Any
@@ -218,7 +218,7 @@ class InboundSMSMessage(JSONModel):
     notify_number: str
     content: str
     created_at: datetime
-    id: Any
+    id: str
 
     __sort_attribute__ = "created_at"
 

@@ -10,7 +10,7 @@ from app.s3_client import check_s3_object_exists
 
 
 class ReportRequest(JSONModel):
-    id: Any
+    id: str
     user_id: Any
     service_id: Any
     report_type: str

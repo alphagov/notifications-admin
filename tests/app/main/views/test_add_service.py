@@ -356,7 +356,7 @@ def test_add_service_for_nhs_notify_user_sets_nhs_notify_org_type_automatically_
         letter_message_limit=50,
         restricted=True,
     )
-    mock_update_service.assert_called_once_with(101, sms_message_limit=0)
+    mock_update_service.assert_called_once_with("101", sms_message_limit=0)
 
     assert mock_create_service_template.called is False
 
@@ -391,7 +391,7 @@ def test_add_service_sets_daily_sms_limit_to_zero_for_nhs_services_with_no_allow
     assert mock_get_services.called
     assert mock_create_service.called
 
-    mock_update_service.assert_called_once_with(101, sms_message_limit=0)
+    mock_update_service.assert_called_once_with("101", sms_message_limit=0)
 
     assert mock_create_service_template.called is False
 
@@ -426,7 +426,7 @@ def test_add_service_sets_daily_sms_limit_to_zero_for_nhs_services_with_no_allow
     assert mock_get_services_with_no_services.called
     assert mock_create_service.called
 
-    mock_update_service.assert_called_once_with(101, sms_message_limit=0)
+    mock_update_service.assert_called_once_with("101", sms_message_limit=0)
 
     assert mock_create_service_template.called is False
 
@@ -526,5 +526,5 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
         ),
     )
     assert mock_create_service.called
-    assert mock_update_service.call_args[0][0] == 101
+    assert mock_update_service.call_args[0][0] == "101"
     assert "email_auth" in mock_update_service.call_args[1]["permissions"]

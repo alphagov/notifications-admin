@@ -36,7 +36,7 @@ def test_user(notify_admin):
     }
     user = User(user_data)
 
-    assert user.id == 1
+    assert user.id == "1"
     assert user.name == "Test User"
     assert user.email_address == "test@user.gov.uk"
     assert user.mobile_number == "+4412341234"
