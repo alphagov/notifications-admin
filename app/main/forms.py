@@ -1163,17 +1163,14 @@ class TwoFactorForm(StripWhitespaceForm):
 
     sms_code = SMSCode("Text message code")
 
-    def validate(self, *args, **kwargs):
-        if not self.sms_code.validate(self):
-            return False
+    def validate_sms_code(self, field):
+        if field.errors:
+            return
 
-        is_valid, reason = self.validate_code_func(self.sms_code.data)
+        is_valid, reason = self.validate_code_func(field.data)
 
         if not is_valid:
-            self.sms_code.errors.append(reason)
-            return False
-
-        return super().validate(*args, **kwargs)
+            raise ValidationError(reason)
 
 
 class TextNotReceivedForm(StripWhitespaceForm):
@@ -2278,22 +2275,16 @@ class AdminEditEmailBrandingForm(StripWhitespaceForm):
         if op == "email-branding-details" and not self.name.data:
             raise ValidationError("Enter a name for the branding")
 
-    def validate(self, *args, **kwargs):
-        rv = super().validate(*args, **kwargs)
-
+    def validate_alt_text(self, field):
         op = request.form.get("operation")
         if op == "email-branding-details":
             # we only want to validate alt_text/text if we're editing the fields, not the file
 
             if self.alt_text.data and self.text.data:
-                self.alt_text.errors.append("Alt text must be empty if you have already entered logo text")
-                return False
+                raise ValidationError("Alt text must be empty if you have already entered logo text")
 
             if not (self.alt_text.data or self.text.data):
-                self.alt_text.errors.append("Enter alt text for your logo")
-                return False
-
-        return rv
+                raise ValidationError("Enter alt text for your logo")
 
 
 class DuplicatableHiddenField(HiddenField):
