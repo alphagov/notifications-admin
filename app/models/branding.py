@@ -23,7 +23,6 @@ class BrandingSerializedType(TypedDict):
 
 
 class Branding(JSONModel):
-    id: str
     name: str
     created_by: Any
     created_at: datetime

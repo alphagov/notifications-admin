@@ -26,7 +26,6 @@ class RegistrationError(Exception):
 
 
 class WebAuthnCredential(JSONModel):
-    id: str
     name: str
     credential_data: str  # contains public key and credential ID for auth
     registration_response: str  # sent to API for later auditing (not used)

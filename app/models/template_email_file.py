@@ -24,7 +24,6 @@ def _get_file_location(file_id: str, service_id: str) -> str:
 
 
 class TemplateEmailFile(JSONModel):
-    id: str
     service_id: Any
     template: Any
     filename: str

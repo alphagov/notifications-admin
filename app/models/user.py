@@ -33,7 +33,6 @@ def _get_org_id_from_view_args() -> str | None:
 
 
 class BaseUser(JSONModel):
-    id: str
     email_address: str
     created_at: datetime
     permissions: Any
