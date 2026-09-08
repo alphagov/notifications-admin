@@ -1,17 +1,17 @@
 from datetime import datetime
 from typing import Any
 
-from app.models import JSONModel, ModelList
+from notifications_utils.serialised_model import SerialisedModel
+
+from app.models import ModelList
 from app.notify_client.letter_rate_api_client import letter_rate_api_client
 
 
-class LetterRate(JSONModel):
+class LetterRate(SerialisedModel):
     sheet_count: int
     rate: float
     post_class: Any
     start_date: datetime
-
-    __sort_attribute__ = "rate"
 
     @property
     def rate_in_pennies(self):
