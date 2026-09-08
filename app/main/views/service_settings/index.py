@@ -104,7 +104,7 @@ def service_name_change(service_id):
             if http_error.status_code == 400 and (
                 error_message := service_api_client.parse_edit_service_http_error(http_error)
             ):
-                form.name.errors.append(error_message)
+                form.name.errors.append(error_message)  # type: ignore[attr-defined]  # is there a better way?
             else:
                 raise http_error
         else:
@@ -723,7 +723,9 @@ def service_receive_text_messages_stop(service_id):
                 e,
                 extra={"inbound_number": inbound_number, "service_id": service_id},
             )
-            form.removal_options.errors.append("Failed to remove number from service")
+            form.removal_options.errors.append(  # type: ignore[attr-defined]  # is there a better way?
+                "Failed to remove number from service"
+            )
 
     recent_use_date = None
 
@@ -884,6 +886,7 @@ def service_set_auth_type_for_users(service_id):
     )
 
     if form.validate_on_submit():
+        assert form.users.data is not None  # type narrowing
         for user in all_service_users:
             should_use_email_auth = user.id in form.users.data
             new_auth_type = "email_auth" if should_use_email_auth else "sms_auth"
@@ -912,6 +915,7 @@ def service_add_letter_contact(service_id):
     first_contact_block = current_service.count_letter_contact_details == 0
     from_template = request.args.get("from_template")
     if form.validate_on_submit():
+        assert form.letter_contact_block.data is not None  # type narrowing
         new_letter_contact = service_api_client.add_letter_contact(
             current_service.id,
             contact_block=form.letter_contact_block.data.replace("\r", "") or None,
@@ -955,6 +959,7 @@ def service_edit_letter_contact(service_id, letter_contact_id):
     if request.method == "GET":
         form.is_default.data = letter_contact_block["is_default"]
     if form.validate_on_submit():
+        assert form.letter_contact_block.data is not None  # type narrowing
         current_service.edit_letter_contact_block(
             id=letter_contact_id,
             contact_block=form.letter_contact_block.data.replace("\r", "") or None,
@@ -1006,6 +1011,7 @@ def service_add_sms_sender(service_id):
     form = ServiceSmsSenderForm()
     first_sms_sender = current_service.count_sms_senders == 0
     if form.validate_on_submit():
+        assert form.sms_sender.data is not None  # type narrowing
         service_api_client.add_sms_sender(
             current_service.id,
             sms_sender=form.sms_sender.data.replace("\r", "") or None,
@@ -1034,16 +1040,24 @@ def service_add_sms_sender(service_id):
 def service_edit_sms_sender(service_id, sms_sender_id):
     sms_sender = current_service.get_sms_sender(sms_sender_id)
     is_inbound_number = sms_sender["inbound_number_id"]
+
+    form: ServiceEditInboundNumberForm | ServiceSmsSenderForm
     if is_inbound_number:
         form = ServiceEditInboundNumberForm(is_default=sms_sender["is_default"])
     else:
         form = ServiceSmsSenderForm(**sms_sender)
 
     if form.validate_on_submit():
+        if isinstance(form, ServiceEditInboundNumberForm):
+            sms_sender_data = sms_sender["sms_sender"]
+        else:
+            assert form.sms_sender.data is not None
+            sms_sender_data = form.sms_sender.data.replace("\r", "")
+
         service_api_client.update_sms_sender(
             current_service.id,
             sms_sender_id=sms_sender_id,
-            sms_sender=sms_sender["sms_sender"] if is_inbound_number else form.sms_sender.data.replace("\r", ""),
+            sms_sender=sms_sender_data,
             is_default=True if sms_sender["is_default"] else form.is_default.data,
         )
         return redirect(url_for(".service_sms_senders", service_id=service_id))
