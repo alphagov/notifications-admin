@@ -312,6 +312,7 @@ EXCLUDED_ENDPOINTS = set(
             "service_confirm_delete_letter_contact",
             "service_confirm_delete_sms_sender",
             "service_confirm_disable_email_auth",
+            "service_confirm_free_allowance_terms",
             "service_dashboard",
             "service_data_retention",
             "service_delete_email_reply_to",
