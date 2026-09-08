@@ -7,6 +7,8 @@ from notifications_utils.serialised_model import SerialisedModel, SerialisedMode
 
 @total_ordering
 class JSONModel(SerialisedModel, ABC):
+    id: str
+
     @property
     @abstractmethod
     def __sort_attribute__(self):
