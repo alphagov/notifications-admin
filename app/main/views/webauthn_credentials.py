@@ -1,5 +1,13 @@
+from collections.abc import Mapping
+
 from fido2 import cbor
-from fido2.webauthn import AuthenticatorData, CollectedClientData
+from fido2.server import Fido2Server
+from fido2.webauthn import (
+    AuthenticatorData,
+    CollectedClientData,
+    PublicKeyCredentialUserEntity,
+    UserVerificationRequirement,
+)
 from flask import abort, current_app, flash, redirect, request, session, url_for
 
 from app import current_user
@@ -17,16 +25,16 @@ def webauthn_begin_register():
     if not current_user.can_use_webauthn:
         abort(403)
 
-    server = current_app.webauthn_server
+    server: Fido2Server = current_app.webauthn_server  # type: ignore[attr-defined]
 
     registration_data, state = server.register_begin(
-        {
-            "id": bytes(current_user.id, "utf-8"),
-            "name": current_user.email_address,
-            "displayName": current_user.name,
-        },
+        PublicKeyCredentialUserEntity(
+            id=bytes(current_user.id, "utf-8"),
+            name=current_user.email_address,
+            display_name=current_user.name,
+        ),
         credentials=current_user.webauthn_credentials.as_cbor,
-        user_verification="discouraged",  # don't ask for PIN
+        user_verification=UserVerificationRequirement.DISCOURAGED,  # don't ask for PIN
         authenticator_attachment=None,
     )
 
@@ -83,9 +91,11 @@ def webauthn_begin_authentication():
     if not user_to_login.webauthn_auth:
         abort(403)
 
-    authentication_data, state = current_app.webauthn_server.authenticate_begin(
+    server: Fido2Server = current_app.webauthn_server  # type: ignore[attr-defined]
+
+    authentication_data, state = server.authenticate_begin(
         credentials=user_to_login.webauthn_credentials.as_cbor,
-        user_verification="discouraged",  # don't ask for PIN
+        user_verification=UserVerificationRequirement.DISCOURAGED,  # don't ask for PIN
     )
     session["webauthn_authentication_state"] = state
     return cbor.encode(authentication_data)
@@ -119,7 +129,12 @@ def _verify_webauthn_authentication(user):
     request_data = cbor.decode(request.get_data())
 
     try:
-        attested_credential_data = current_app.webauthn_server.authenticate_complete(
+        if not isinstance(request_data, Mapping):  # type narrowing
+            raise ValueError("Decoded request data is not a Mapping")
+
+        server: Fido2Server = current_app.webauthn_server  # type: ignore[attr-defined]
+
+        attested_credential_data = server.authenticate_complete(
             state=state,
             credentials=user.webauthn_credentials.as_cbor,
             credential_id=request_data["credentialId"],
