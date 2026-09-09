@@ -1123,8 +1123,6 @@ def letter_template_edit_pages(template_id, service_id):
 
     form = PDFUploadForm()
 
-    error = {}
-
     if not template.attachment:
         abort(404)
 
@@ -1158,7 +1156,6 @@ def letter_template_edit_pages(template_id, service_id):
             attachment_id=template.attachment.id,
         ),
         page_numbers=_get_page_numbers(template.attachment.page_count),
-        error=error,
     )
 
 
