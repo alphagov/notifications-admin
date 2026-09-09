@@ -1605,7 +1605,7 @@ def test_post_attach_pages_doesnt_replace_existing_attachment_if_new_attachment_
             service_id=SERVICE_ONE_ID,
             template_id=sample_uuid(),
             _data={"file": file},
-            _expected_status=200,
+            _expected_status=400,
         )
 
     assert page.select_one(".banner-dangerous h1").text == "Your content is outside the printable area"

@@ -1045,6 +1045,7 @@ def letter_template_attach_pages(service_id, template_id):
     form = PDFUploadForm(service=current_service, is_an_attachment=True, template=template)
     error = {}
     letter_attachment_image_url = None
+    page_count = 0
 
     if form.validate_on_submit():
         if "file" in form.sanitise_response.json():
@@ -1087,40 +1088,27 @@ def letter_template_attach_pages(service_id, template_id):
             service_id=service_id,
             file_id=form.upload_id,
         )
-
-    if not template.attachment:
-        return (
-            render_template(
-                "views/templates/attach-pages.html",
-                form=form,
-                template=template,
-                error=error,
-                letter_attachment_image_url=letter_attachment_image_url,
-                page_numbers=_get_page_numbers(getattr(form, "pdf_page_count", 0)),
-                error_summary_enabled=True,
-                use_error_summary=False,
-            ),
-            400 if error else 200,
+        page_count = getattr(form, "pdf_page_count", None)
+    elif template.attachment:
+        letter_attachment_image_url = letter_attachment_image_url or url_for(
+            "no_cookie.view_letter_attachment_preview",
+            service_id=service_id,
+            attachment_id=template.attachment.id,
         )
+        page_count = template.attachment.page_count
 
-    letter_attachment_image_url = letter_attachment_image_url or url_for(
-        "no_cookie.view_letter_attachment_preview",
-        service_id=service_id,
-        attachment_id=template.attachment.id,
-    )
-
-    attachment_page_count = getattr(form, "pdf_page_count", template.attachment.page_count)
+    jinja_template = "views/templates/manage-attachment.html" if template.attachment else "views/templates/attach-pages.html"
 
     return render_template(
-        "views/templates/manage-attachment.html",
+        jinja_template,
         form=form,
         template=template,
         service_id=service_id,
         letter_attachment_image_url=letter_attachment_image_url,
-        page_numbers=_get_page_numbers(attachment_page_count),
+        page_numbers=_get_page_numbers(page_count),
         error=error,
-        use_error_summary=form.errors,
-    )
+        use_error_summary=False,
+    ), 400 if error else 200,
 
 
 @no_cookie.route("/services/<uuid:service_id>/attachment/<uuid:attachment_id>.png")
