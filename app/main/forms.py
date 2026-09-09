@@ -2453,6 +2453,7 @@ class PDFUploadForm(StripWhitespaceForm):
         service: Service,
         is_an_attachment: bool = False,
         template: Template | None = None,
+        fail_validation_on_santise_error: bool = False,
         **kwargs,
     ):
         self.upload_id = uuid.uuid4()
@@ -2462,6 +2463,7 @@ class PDFUploadForm(StripWhitespaceForm):
             if not template:
                 raise ValueError("Attachments must have a template")
             self._template = template
+        self._fail_validation_on_santise_error = fail_validation_on_santise_error
         super().__init__(*args, **kwargs)
 
     file = VirusScannedFileField(
@@ -2517,6 +2519,8 @@ class PDFUploadForm(StripWhitespaceForm):
                 message=validation_failed_message,
                 invalid_pages=invalid_pages,
             )
+            if self._fail_validation_on_santise_error:
+                raise ValidationError("sanitisation-failed") from None
             # The file has failed validation but we don’t raise that as an error on
             # the form. Instead we allow the view to redirect and the next endpoint
             # will look at the metadata and show the appropriate error message

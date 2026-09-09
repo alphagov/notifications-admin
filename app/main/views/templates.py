@@ -1042,45 +1042,38 @@ def letter_template_attach_pages(service_id, template_id):
     if template.template_type != "letter":
         abort(404)
 
-    form = PDFUploadForm(service=current_service, is_an_attachment=True, template=template)
+    form = PDFUploadForm(service=current_service, is_an_attachment=True, template=template, fail_validation_on_santise_error=True,)
     error = {}
     letter_attachment_image_url = None
     page_count = 0
 
     if form.validate_on_submit():
-        if "file" in form.sanitise_response.json():
-            # Archive letter attachment if there is already one
-            if template.attachment:
-                letter_attachment_client.archive_letter_attachment(
-                    letter_attachment_id=template.attachment.id,
-                    service_id=service_id,
-                    user_id=current_user.id,
-                )
-            _save_letter_attachment(
+        # Archive letter attachment if there is already one
+        if template.attachment:
+            letter_attachment_client.archive_letter_attachment(
+                letter_attachment_id=template.attachment.id,
                 service_id=service_id,
+                user_id=current_user.id,
+            )
+        _save_letter_attachment(
+            service_id=service_id,
+            template_id=template.id,
+            upload_id=form.upload_id,
+            original_filename=form.file.data.filename,
+            original_file=form.pdf_file_bytes,
+            sanitise_response=form.sanitise_response,
+        )
+        return redirect(
+            url_for(
+                "main.view_template",
+                service_id=current_service.id,
                 template_id=template.id,
-                upload_id=form.upload_id,
-                original_filename=form.file.data.filename,
-                original_file=form.pdf_file_bytes,
-                sanitise_response=form.sanitise_response,
+                _anchor="first-page-of-attachment",
             )
-            return redirect(
-                url_for(
-                    "main.view_template",
-                    service_id=current_service.id,
-                    template_id=template.id,
-                    _anchor="first-page-of-attachment",
-                )
-            )
-        else:
-            error = get_letter_validation_error(
-                form.sanitise_response.json()["message"],
-                form.sanitise_response.json()["invalid_pages"],
-                form.pdf_page_count,
-            )
+        )
 
     if form.file.errors:
-        error = get_error_from_upload_form(form.file.errors[0])
+        error = get_error_from_upload_form(form)
 
     if error:
         letter_attachment_image_url = url_for(
