@@ -1216,7 +1216,12 @@ def test_confirm_service_is_unique_sets_confirmed_unique_and_updates_name(
         _expected_redirect=url_for("main.request_to_go_live", service_id=SERVICE_ONE_ID),
     )
 
-    mock_update_service.assert_called_once_with(SERVICE_ONE_ID, name="Updated Service", confirmed_unique=True)
+    mock_update_service.assert_called_once_with(
+        SERVICE_ONE_ID,
+        name="Updated Service",
+        confirmed_unique=True,
+        confirmed_service_name=True,
+    )
 
 
 @pytest.mark.parametrize(
