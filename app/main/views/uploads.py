@@ -1,7 +1,6 @@
 import base64
 import itertools
 import json
-import uuid
 from functools import partial
 from io import BytesIO
 
@@ -18,7 +17,6 @@ from flask import (
 from notifications_utils.insensitive_dict import InsensitiveDict
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.recipients import RecipientCSV
-from requests import RequestException
 
 from app import (
     current_service,
@@ -34,7 +32,6 @@ from app.s3_client.s3_letter_upload_client import (
     backup_original_letter_to_s3,
     get_letter_metadata,
     get_letter_pdf_and_metadata,
-    get_transient_letter_file_location,
     upload_letter_to_s3,
 )
 from app.utils.csv import Spreadsheet, get_errors_for_csv
@@ -134,62 +131,30 @@ def add_preview_of_content_uploaded_letters(notifications):
 @main.route("/services/<uuid:service_id>/upload-letter", methods=["GET", "POST"])
 @user_has_permissions("send_messages")
 def upload_letter(service_id):
-    form = PDFUploadForm(service_id=service_id)
+    form = PDFUploadForm(service=current_service)
 
     if form.validate_on_submit():
-        original_filename = form.file.data.filename
-        upload_id = uuid.uuid4()
-        file_location = get_transient_letter_file_location(service_id, upload_id)
+        sanitise_response = form.sanitise_response.json()
 
-        try:
-            response = template_preview_client.sanitise_letter(
-                BytesIO(form.pdf_file_bytes),
-                upload_id=upload_id,
-                allow_international_letters=current_service.has_permission("international_letters"),
-            )
-            response.raise_for_status()
-        except RequestException as ex:
-            if ex.response is not None and ex.response.status_code == 400:
-                validation_failed_message = response.json().get("message")
-                invalid_pages = response.json().get("invalid_pages")
-
-                status = "invalid"
-                upload_letter_to_s3(
-                    form.pdf_file_bytes,
-                    file_location=file_location,
-                    status=status,
-                    page_count=form.pdf_page_count,
-                    filename=original_filename,
-                    message=validation_failed_message,
-                    invalid_pages=invalid_pages,
-                )
-            else:
-                raise ex
-        else:
-            response = response.json()
-            recipient = response["recipient_address"]
-            status = "valid"
-            file_contents = base64.b64decode(response["file"].encode())
-
+        if "file" in sanitise_response:
             upload_letter_to_s3(
-                file_contents,
-                file_location=file_location,
-                status=status,
+                base64.b64decode(sanitise_response["file"].encode()),
+                file_location=form.file_location,
+                status="valid",
                 page_count=form.pdf_page_count,
-                filename=original_filename,
-                recipient=recipient,
+                filename=form.file.data.filename,
+                recipient=sanitise_response["recipient_address"],
             )
-
             backup_original_letter_to_s3(
                 form.pdf_file_bytes,
-                upload_id=upload_id,
+                upload_id=form.upload_id,
             )
 
         return redirect(
             url_for(
                 "main.uploaded_letter_preview",
                 service_id=current_service.id,
-                file_id=upload_id,
+                file_id=form.upload_id,
             )
         )
 
@@ -201,7 +166,7 @@ def upload_letter(service_id):
 @main.route("/services/<uuid:service_id>/preview-letter/<uuid:file_id>")
 @user_has_permissions("send_messages")
 def uploaded_letter_preview(service_id, file_id):
-    re_upload_form = PDFUploadForm()
+    re_upload_form = PDFUploadForm(service=current_service)
 
     try:
         metadata = get_letter_metadata(service_id, file_id)

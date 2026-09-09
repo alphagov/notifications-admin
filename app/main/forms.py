@@ -1,3 +1,4 @@
+import uuid
 import weakref
 from contextlib import suppress
 from copy import deepcopy
@@ -28,10 +29,11 @@ from notifications_utils.recipient_validation.phone_number import PhoneNumber as
 from notifications_utils.recipient_validation.postal_address import PostalAddress
 from notifications_utils.safe_string import make_string_safe_for_email_local_part
 from notifications_utils.sanitise_text import SanitiseASCII
-from notifications_utils.template import LetterPreviewTemplate, SMSMessageTemplate
+from notifications_utils.template import LetterPreviewTemplate, SMSMessageTemplate, Template
 from notifications_utils.timezones import local_timezone, utc_string_to_aware_gmt_datetime
 from ordered_set import OrderedSet
 from pypdf.errors import PdfReadError
+from requests import RequestException
 from werkzeug.utils import cached_property
 from wtforms import (
     BooleanField,
@@ -62,7 +64,13 @@ from wtforms.validators import (
 from xlrd.biffh import XLRDError
 from xlrd.xldate import XLDateError
 
-from app import asset_fingerprinter, current_organisation, current_user, document_download_api_client
+from app import (
+    asset_fingerprinter,
+    current_organisation,
+    current_user,
+    document_download_api_client,
+    template_preview_client,
+)
 from app.constants import (
     SERVICE_JOIN_REQUEST_APPROVED,
     SERVICE_JOIN_REQUEST_REJECTED,
@@ -112,8 +120,13 @@ from app.models.branding import (
 )
 from app.models.feedback import PROBLEM_TICKET_TYPE, QUESTION_TICKET_TYPE
 from app.models.organisation import Organisation
+from app.models.service import Service
 from app.models.spreadsheet import Spreadsheet
 from app.notify_client.document_download_api_client import DocumentDownloadError
+from app.s3_client.s3_letter_upload_client import (
+    get_transient_letter_file_location,
+    upload_letter_to_s3,
+)
 from app.utils import branding, unicode_truncate
 from app.utils.govuk_frontend_field import (
     GovukFrontendWidgetMixin,
@@ -2434,8 +2447,22 @@ class PDFUploadForm(StripWhitespaceForm):
     pdf_file_bytes: bytes
     pdf_page_count: int
 
-    def __init__(self, *args, service_id: str, **kwargs):
-        self._service_id = service_id
+    def __init__(
+        self,
+        *args,
+        service: Service,
+        is_an_attachment: bool = False,
+        template: Template | None = None,
+        **kwargs,
+    ):
+        self.upload_id = uuid.uuid4()
+        self._service = service
+        self._is_an_attachment = is_an_attachment
+        if self._is_an_attachment:
+            if not template:
+                raise ValueError("Attachments must have a template")
+            self._template = template
+        super().__init__(*args, **kwargs)
 
     file = VirusScannedFileField(
         "Upload a letter in PDF format",
@@ -2446,22 +2473,63 @@ class PDFUploadForm(StripWhitespaceForm):
         ],
     )
 
-    def post_validate(self, form, validation_stopped):
-        if validation_stopped:
+    def validate_file(self, field):
+        if field.errors:
             return
 
         self.pdf_file_bytes = self.file.data.read()
 
         try:
             # TODO: get page count from the sanitise response once template preview handles malformed files nicely
-            self.pdf_page_count = pdf_page_count(BytesIO(form.pdf_file_bytes))
-        except PdfReadError as e:
+            self.pdf_page_count = pdf_page_count(BytesIO(self.pdf_file_bytes))
+        except PdfReadError:
             current_app.logger.info(
                 "Invalid PDF uploaded for service %s",
-                self._service_id,
-                extra={"service_id": self._service_id},
+                self._service.id,
+                extra={"service_id": self._service.id},
             )
-            raise ValidationError("Notify cannot read this PDF - save a new copy and try again") from e
+            raise ValidationError("Notify cannot read this PDF - save a new copy and try again") from None
+
+        self.file_location = get_transient_letter_file_location(self._service.id, self.upload_id)
+
+        try:
+            self.sanitise_response = template_preview_client.sanitise_letter(
+                BytesIO(self.pdf_file_bytes),
+                upload_id=self.upload_id,
+                allow_international_letters=self._service.has_permission("international_letters"),
+                is_an_attachment=self._is_an_attachment,
+            )
+            self.sanitise_response.raise_for_status()
+        except RequestException as ex:
+            if ex.response is None or ex.response.status_code != 400:
+                raise
+
+            validation_failed_message = self.sanitise_response.json().get("message")
+            invalid_pages = self.sanitise_response.json().get("invalid_pages")
+
+            status = "invalid"
+            upload_letter_to_s3(
+                self.pdf_file_bytes,
+                file_location=self.file_location,
+                status=status,
+                page_count=self.pdf_page_count,
+                filename=self.file.data.filename,
+                message=validation_failed_message,
+                invalid_pages=invalid_pages,
+            )
+            # The file has failed validation but we don’t raise that as an error on
+            # the form. Instead we allow the view to redirect and the next endpoint
+            # will look at the metadata and show the appropriate error message
+            return
+
+        if self._is_an_attachment and self._template:
+            if self.pdf_page_count + self._template.page_count > self._template.max_page_count:
+                raise ValidationError(
+                    f"Letters must be {self._template.max_page_count} pages or less "
+                    f"({self._template.max_sheet_count} double-sided sheets of paper). "
+                    "In total, your letter template and the file you attached are "
+                    f"{self._template.page_count + self.pdf_page_count} pages long."
+                )
 
 
 class EmailFieldInGuestList(GovukEmailField, StripWhitespaceStringFieldInListEntry):

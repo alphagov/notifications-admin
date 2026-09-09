@@ -92,6 +92,7 @@ def test_post_upload_letter_redirects_for_valid_file(
         ANY,
         allow_international_letters=expected_allow_international,
         upload_id=ANY,
+        is_an_attachment=False,
     )
 
     assert "The Queen" in page.select_one("div.js-stick-at-bottom-when-scrolling").text
@@ -133,7 +134,7 @@ def test_post_upload_letter_shows_letter_preview_for_valid_file(
     )
     mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
-    mocker.patch("app.main.views.uploads.pdf_page_count", return_value=3)
+    mocker.patch("app.main.forms.pdf_page_count", return_value=3)
     do_mock_get_page_counts_for_letter(mocker, count=3)
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
@@ -201,7 +202,7 @@ def test_upload_international_letter_shows_preview_with_no_choice_of_postage(
     )
     mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
-    mocker.patch("app.main.views.uploads.pdf_page_count", return_value=3)
+    mocker.patch("app.main.forms.pdf_page_count", return_value=3)
     do_mock_get_page_counts_for_letter(mocker, count=3)
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",
@@ -441,10 +442,9 @@ def test_post_choose_upload_letter_attachment_when_file_is_malformed(
             _data={"file": file},
             _expected_status=400,
         )
-    assert page.select_one("div.banner-dangerous").find("h1").text == "There’s a problem with your file"
-    assert (
-        page.select_one("div.banner-dangerous").find("p").text
-        == "Notify cannot read this PDF - save a new copy and try again"
+    assert normalize_spaces(page.select_one("h2.govuk-error-summary__title").text) == "There is a problem"
+    assert normalize_spaces(page.select_one(".govuk-error-summary__body li").text) == (
+        "Notify cannot read this PDF - save a new copy and try again"
     )
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
@@ -456,7 +456,7 @@ def test_post_upload_letter_with_invalid_file(
 ):
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-    mock_s3_upload = mocker.patch("app.main.views.uploads.upload_letter_to_s3")
+    mock_s3_upload = mocker.patch("app.main.forms.upload_letter_to_s3")
     mock_s3_backup = mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
 
     mock_sanitise_response = Mock()
@@ -482,7 +482,10 @@ def test_post_upload_letter_with_invalid_file(
         file.seek(0)
 
         page = client_request.post(
-            "main.upload_letter", service_id=SERVICE_ONE_ID, _data={"file": file}, _follow_redirects=True
+            "main.upload_letter",
+            service_id=SERVICE_ONE_ID,
+            _data={"file": file},
+            _follow_redirects=True,
         )
 
         mock_s3_upload.assert_called_once_with(
@@ -517,7 +520,7 @@ def test_post_upload_letter_shows_letter_preview_for_invalid_file(
 
     mocker.patch("uuid.uuid4", return_value=fake_uuid)
     mocker.patch("app.extensions.antivirus_client.scan", return_value=True)
-    mocker.patch("app.main.views.uploads.upload_letter_to_s3")
+    mocker.patch("app.main.forms.upload_letter_to_s3")
     mock_sanitise_response = Mock()
     mock_sanitise_response.raise_for_status.side_effect = RequestException(response=Mock(status_code=400))
     mock_sanitise_response.json = lambda: {"message": "template preview error", "recipient_address": "The Queen"}
@@ -788,7 +791,7 @@ def test_uploaded_letter_preview_displays_all_postage_for_service_with_permissio
     )
     mocker.patch("app.main.views.uploads.upload_letter_to_s3")
     mocker.patch("app.main.views.uploads.backup_original_letter_to_s3")
-    mocker.patch("app.main.views.uploads.pdf_page_count", return_value=3)
+    mocker.patch("app.main.forms.pdf_page_count", return_value=3)
     do_mock_get_page_counts_for_letter(mocker, count=3)
     mocker.patch(
         "app.main.views.uploads.get_letter_metadata",

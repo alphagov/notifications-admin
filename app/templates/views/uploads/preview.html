@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {% if status == 'invalid' and message %}
+  {% if status == 'invalid' %}
     {% include "partials/check/letter-validation-failed-banner.html" %}
     <div class="bottom-gutter-1-2">
       <div class="js-stick-at-top-when-scrolling">
