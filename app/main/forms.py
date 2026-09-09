@@ -883,7 +883,7 @@ class OnOffField(GovukRadiosField):
     def iter_choices(self):
         for value, label in self.choices:
             # This overrides WTForms default behaviour which is to check
-            # self.coerce(value) == self.data
+            # > self.coerce(value) == self.data
             # where self.coerce returns a string for a boolean input
             yield (value, label, (self.data in {value, self.coerce(value)}), {})
 

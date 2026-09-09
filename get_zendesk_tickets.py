@@ -9,11 +9,10 @@ import urllib.parse
 
 import requests
 
-# Group: 3rd Line--Notify Support
-NOTIFY_GROUP_ID = 360000036529
+NOTIFY_GROUP_ID = 360000036529  # Group: 3rd Line--Notify Support
 
-# Organization: GDS
-NOTIFY_ORG_ID = 21891972
+
+NOTIFY_ORG_ID = 21891972  # Organization: GDS
 
 # the account used to authenticate with. If no requester is provided, the ticket will come from this account.
 NOTIFY_ZENDESK_EMAIL = "zd-api-notify@digital.cabinet-office.gov.uk"
