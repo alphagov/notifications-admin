@@ -510,8 +510,9 @@ def test_view_jobs_for_contact_list(
     assert normalize_spaces(page.select_one("h1").text) == "EmergencyContactList.xls"
     assert normalize_spaces(page.select("main p")[0].text) == "Uploaded by Test User today at 12:12pm."
     assert normalize_spaces(page.select("main p")[1].text) == "Used 6 times in the last 7 days."
-    assert [normalize_spaces(row.text) for row in page.select_one("table").select("tr")] == [
-        "Template Status",
+    assert [
+        normalize_spaces(row.text) for row in page.select_one(".govuk-summary-list").select(".govuk-summary-list__row")
+    ] == [
         "Template Y Sending tomorrow at 11:09pm 1 text message waiting to send",
         "Template Z Sending tomorrow at 11:09am 1 text message waiting to send",
         "Template A Sent today at 4:51pm 1 delivering 0 delivered 0 failed",
@@ -519,7 +520,7 @@ def test_view_jobs_for_contact_list(
         "Template C Sent today at 4:51pm 1 delivering 0 delivered 0 failed",
         "Template D Sent today at 4:51pm 1 delivering 0 delivered 0 failed",
     ]
-    assert page.select_one("table a")["href"] == url_for(
+    assert page.select_one(".notify-summary-list__filename")["href"] == url_for(
         "main.view_job",
         service_id=SERVICE_ONE_ID,
         job_id=fake_uuid,
