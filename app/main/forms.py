@@ -3,12 +3,13 @@ from contextlib import suppress
 from copy import deepcopy
 from datetime import UTC, datetime, timedelta
 from functools import partial
+from io import BytesIO
 from itertools import chain, repeat
 from math import ceil
 from numbers import Number
 from zipfile import BadZipFile
 
-from flask import request
+from flask import current_app, request
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed, FileSize
 from flask_wtf.file import FileField as FileField_wtf
@@ -20,6 +21,7 @@ from notifications_utils.field import Field as UtilsField
 from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.insensitive_dict import InsensitiveDict, InsensitiveSet
 from notifications_utils.interruptible_io import InterruptibleIterableList, interruptible_iter
+from notifications_utils.pdf import pdf_page_count
 from notifications_utils.recipient_validation.email_address import format_email_address, validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError, InvalidPhoneError
 from notifications_utils.recipient_validation.phone_number import PhoneNumber as PhoneNumberUtils
@@ -29,6 +31,7 @@ from notifications_utils.sanitise_text import SanitiseASCII
 from notifications_utils.template import LetterPreviewTemplate, SMSMessageTemplate
 from notifications_utils.timezones import local_timezone, utc_string_to_aware_gmt_datetime
 from ordered_set import OrderedSet
+from pypdf.errors import PdfReadError
 from werkzeug.utils import cached_property
 from wtforms import (
     BooleanField,
@@ -2428,6 +2431,12 @@ class EmailBrandingLogoUpload(StripWhitespaceForm):
 
 
 class PDFUploadForm(StripWhitespaceForm):
+    pdf_file_bytes: bytes
+    pdf_page_count: int
+
+    def __init__(self, *args, service_id: str, **kwargs):
+        self._service_id = service_id
+
     file = VirusScannedFileField(
         "Upload a letter in PDF format",
         validators=[
@@ -2436,6 +2445,23 @@ class PDFUploadForm(StripWhitespaceForm):
             FileSize(max_size=2 * 1024 * 1024, message="The file must be smaller than 2MB"),
         ],
     )
+
+    def post_validate(self, form, validation_stopped):
+        if validation_stopped:
+            return
+
+        self.pdf_file_bytes = self.file.data.read()
+
+        try:
+            # TODO: get page count from the sanitise response once template preview handles malformed files nicely
+            self.pdf_page_count = pdf_page_count(BytesIO(form.pdf_file_bytes))
+        except PdfReadError as e:
+            current_app.logger.info(
+                "Invalid PDF uploaded for service %s",
+                self._service_id,
+                extra={"service_id": self._service_id},
+            )
+            raise ValidationError("Notify cannot read this PDF - save a new copy and try again") from e
 
 
 class EmailFieldInGuestList(GovukEmailField, StripWhitespaceStringFieldInListEntry):

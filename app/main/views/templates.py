@@ -19,10 +19,8 @@ from flask import (
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 from notifications_utils.formatters import formatted_list
-from notifications_utils.pdf import pdf_page_count
 from notifications_utils.s3 import s3download
 from notifications_utils.template import Template
-from pypdf.errors import PdfReadError
 from requests import RequestException
 
 from app import (
@@ -1047,7 +1045,7 @@ def letter_template_attach_pages(service_id, template_id):
     if template.template_type != "letter":
         abort(404)
 
-    form = PDFUploadForm()
+    form = PDFUploadForm(service_id=service_id)
     error = {}
     letter_attachment_image_url = None
     attachment_page_count = 0
@@ -1163,29 +1161,13 @@ def letter_template_edit_pages(template_id, service_id):
 
 
 def _process_letter_attachment_form(service_id, template, form, upload_id):
-    pdf_file_bytes = form.file.data.read()
     original_filename = form.file.data.filename
-
-    try:
-        # TODO: get page count from the sanitise response once template preview
-        # handles malformed files nicely - is this done yet?
-        attachment_page_count = pdf_page_count(BytesIO(pdf_file_bytes))
-    except PdfReadError:
-        current_app.logger.info(
-            "Invalid PDF uploaded for service %s",
-            service_id,
-            extra={"service_id": service_id, "upload_id": upload_id},
-        )
-        raise LetterAttachmentFormError(
-            title="There’s a problem with your file",
-            detail="Notify cannot read this PDF - save a new copy and try again",
-        ) from None
 
     file_location = get_transient_letter_file_location(service_id, upload_id)
 
     try:
         response = template_preview_client.sanitise_letter(
-            BytesIO(pdf_file_bytes),
+            BytesIO(form.pdf_file_bytes),
             upload_id=upload_id,
             allow_international_letters=current_service.has_permission("international_letters"),
             is_an_attachment=True,
@@ -1198,28 +1180,28 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
 
             status = "invalid"
             upload_letter_to_s3(
-                pdf_file_bytes,
+                form.pdf_file_bytes,
                 file_location=file_location,
                 status=status,
-                page_count=attachment_page_count,
+                page_count=form.pdf_page_count,
                 filename=original_filename,
                 message=validation_failed_message,
                 invalid_pages=invalid_pages,
             )
-            error_dict = get_letter_validation_error(validation_failed_message, invalid_pages, attachment_page_count)
+            error_dict = get_letter_validation_error(validation_failed_message, invalid_pages, form.pdf_page_count)
             raise LetterAttachmentFormError(
-                title=error_dict["title"], detail=error_dict["detail"], attachment_page_count=attachment_page_count
+                title=error_dict["title"], detail=error_dict["detail"], attachment_page_count=form.pdf_page_count
             ) from None
 
         raise
 
-    if attachment_page_count + template.page_count > template.max_page_count:
+    if form.pdf_page_count + template.page_count > template.max_page_count:
         raise LetterAttachmentFormError(
             detail=(
                 f"Letters must be {template.max_page_count} pages or less "
                 f"({template.max_sheet_count} double-sided sheets of paper). "
                 "In total, your letter template and the file you attached are "
-                f"{template.page_count + attachment_page_count} pages long."
+                f"{template.page_count + form.pdf_page_count} pages long."
             )
         )
 
@@ -1235,7 +1217,7 @@ def _process_letter_attachment_form(service_id, template, form, upload_id):
         template_id=template.id,
         upload_id=upload_id,
         original_filename=original_filename,
-        original_file=pdf_file_bytes,
+        original_file=form.pdf_file_bytes,
         sanitise_response=response,
     )
 
