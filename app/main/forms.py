@@ -9,7 +9,7 @@ from itertools import chain, repeat
 from math import ceil
 from numbers import Number
 from zipfile import BadZipFile
-
+from app.utils.letters import get_letter_validation_error
 from flask import current_app, request
 from flask_wtf import FlaskForm as Form
 from flask_wtf.file import FileAllowed, FileSize
@@ -2521,9 +2521,8 @@ class PDFUploadForm(StripWhitespaceForm):
             )
             if self._fail_validation_on_santise_error:
                 raise ValidationError("sanitisation-failed") from None
-            # The file has failed validation but we don’t raise that as an error on
-            # the form. Instead we allow the view to redirect and the next endpoint
-            # will look at the metadata and show the appropriate error message
+            # The file has failed validation but we instead we allow the view to redirect and
+            # the next endpoint will look at the metadata and show the appropriate error message
             return
 
         if self._is_an_attachment and self._template:
@@ -2534,6 +2533,20 @@ class PDFUploadForm(StripWhitespaceForm):
                     "In total, your letter template and the file you attached are "
                     f"{self._template.page_count + self.pdf_page_count} pages long."
                 )
+
+    def error_as_title_and_detail(self) -> None | dict:
+        if not self.file.errors:
+            return None
+        if self.file.errors[0] == "sanitisation-failed":
+            return get_letter_validation_error(
+                self.sanitise_response.json()["message"],
+                self.sanitise_response.json()["invalid_pages"],
+                self.pdf_page_count,
+            )
+        return {
+            "title": "Wrong file type" if "PDF" in self.file.errors[0] else "There is a problem",
+            "detail": self.file.errors[0],
+        }
 
 
 class EmailFieldInGuestList(GovukEmailField, StripWhitespaceStringFieldInListEntry):

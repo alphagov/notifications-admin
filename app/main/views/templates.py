@@ -63,10 +63,6 @@ from app.s3_client.s3_letter_upload_client import (
 from app.utils import (
     should_skip_template_page,
 )
-from app.utils.letters import (
-    get_error_from_upload_form,
-    get_letter_validation_error,
-)
 from app.utils.pagination import generate_optional_previous_and_next_dicts, get_page_from_request
 from app.utils.templates import TemplateChange, TemplatedLetterImageTemplate, get_template
 from app.utils.user import user_has_permissions
@@ -1042,8 +1038,12 @@ def letter_template_attach_pages(service_id, template_id):
     if template.template_type != "letter":
         abort(404)
 
-    form = PDFUploadForm(service=current_service, is_an_attachment=True, template=template, fail_validation_on_santise_error=True,)
-    error = {}
+    form = PDFUploadForm(
+        service=current_service,
+        is_an_attachment=True,
+        template=template,
+        fail_validation_on_santise_error=True,
+    )
     letter_attachment_image_url = None
     page_count = 0
 
@@ -1072,10 +1072,7 @@ def letter_template_attach_pages(service_id, template_id):
             )
         )
 
-    if form.file.errors:
-        error = get_error_from_upload_form(form)
-
-    if error:
+    if form.errors:
         letter_attachment_image_url = url_for(
             "no_cookie.view_invalid_letter_attachment_as_preview",
             service_id=service_id,
@@ -1083,25 +1080,26 @@ def letter_template_attach_pages(service_id, template_id):
         )
         page_count = getattr(form, "pdf_page_count", None)
     elif template.attachment:
-        letter_attachment_image_url = letter_attachment_image_url or url_for(
+        letter_attachment_image_url = url_for(
             "no_cookie.view_letter_attachment_preview",
             service_id=service_id,
             attachment_id=template.attachment.id,
         )
         page_count = template.attachment.page_count
 
-    jinja_template = "views/templates/manage-attachment.html" if template.attachment else "views/templates/attach-pages.html"
-
-    return render_template(
-        jinja_template,
-        form=form,
-        template=template,
-        service_id=service_id,
-        letter_attachment_image_url=letter_attachment_image_url,
-        page_numbers=_get_page_numbers(page_count),
-        error=error,
-        use_error_summary=False,
-    ), 400 if error else 200,
+    return (
+        render_template(
+            "views/templates/manage-attachment.html" if template.attachment else "views/templates/attach-pages.html",
+            form=form,
+            template=template,
+            service_id=service_id,
+            letter_attachment_image_url=letter_attachment_image_url,
+            page_numbers=_get_page_numbers(page_count),
+            error=form.error_as_title_and_detail(),
+            use_error_summary=False,
+        ),
+        400 if form.errors else 200,
+    )
 
 
 @no_cookie.route("/services/<uuid:service_id>/attachment/<uuid:attachment_id>.png")

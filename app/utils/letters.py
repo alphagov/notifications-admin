@@ -204,21 +204,3 @@ def get_letter_validation_error(validation_message, invalid_pages=None, page_cou
             letter_spec_guidance=url_for("main.guidance_upload_a_letter"),
         ),
     }
-
-
-def get_error_from_upload_form(form):
-    if form.file.errors[0] == "sanitisation-failed":
-        return get_letter_validation_error(
-            form.sanitise_response.json()["message"],
-            form.sanitise_response.json()["invalid_pages"],
-            form.pdf_page_count,
-        )
-    error = {}
-    if "PDF" in form.file.errors[0]:
-        error["title"] = "Wrong file type"
-    else:
-        error["title"] = "There is a problem"
-
-    error["detail"] = form.file.errors[0]
-
-    return error
