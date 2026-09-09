@@ -20,7 +20,6 @@ from app.utils.time import is_less_than_days_ago
 
 
 class Job(JSONModel):
-    id: Any
     service: Any
     template_name: str
     template_version: int

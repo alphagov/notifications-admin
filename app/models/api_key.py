@@ -11,7 +11,6 @@ class APIKey(JSONModel):
     created_at: datetime
     created_by: Any
     expiry_date: datetime
-    id: Any
     key_type: str
     name: str
 

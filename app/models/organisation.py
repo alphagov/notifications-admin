@@ -53,7 +53,6 @@ class Organisation(JSONModel):
     NHS_NOTIFY_ID = "477f8870-af2b-4b81-9a2c-1fad12028919"
     NHS_NOTIFY_TYPE_LABEL = "NHS Notify"
 
-    id: Any
     name: str
     active: bool
     crown: bool

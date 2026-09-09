@@ -20,7 +20,6 @@ from app.utils.templates import get_sample_template
 
 
 class ContactList(JSONModel):
-    id: Any
     created_at: datetime
     created_by: Any
     has_jobs: bool

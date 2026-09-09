@@ -47,7 +47,6 @@ class Service(JSONModel):
     email_sender_local_part: str
     go_live_at: datetime
     has_active_go_live_request: bool
-    id: Any
     email_message_limit: int
     international_sms_message_limit: int
     sms_message_limit: int
@@ -723,7 +722,6 @@ class Services(SerialisedModelCollection):
 
 
 class ServiceJoinRequest(JSONModel):
-    id: Any
     requester: Any
     service_id: Any
     created_at: datetime

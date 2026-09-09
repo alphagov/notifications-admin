@@ -19,12 +19,11 @@ from app.s3_client.s3_template_email_file_upload_client import (
 )
 
 
-def _get_file_location(file_id: uuid, service_id: uuid) -> str:
+def _get_file_location(file_id: str, service_id: str) -> str:
     return f"{service_id}/{file_id}"
 
 
 class TemplateEmailFile(JSONModel):
-    id: Any
     service_id: Any
     template: Any
     filename: str
