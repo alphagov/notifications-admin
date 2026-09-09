@@ -3,7 +3,6 @@ import json
 import math
 import uuid
 from functools import partial
-from io import BytesIO
 from typing import Literal
 
 from flask import (
@@ -19,11 +18,8 @@ from flask import (
 from markupsafe import Markup
 from notifications_python_client.errors import HTTPError
 from notifications_utils.formatters import formatted_list
-from notifications_utils.pdf import pdf_page_count
 from notifications_utils.s3 import s3download
 from notifications_utils.template import Template
-from pypdf.errors import PdfReadError
-from requests import RequestException
 
 from app import (
     current_service,
@@ -63,14 +59,9 @@ from app.s3_client.s3_letter_upload_client import (
     get_attachment_pdf_and_metadata,
     get_transient_letter_file_location,
     upload_letter_attachment_to_s3,
-    upload_letter_to_s3,
 )
 from app.utils import (
     should_skip_template_page,
-)
-from app.utils.letters import (
-    get_error_from_upload_form,
-    get_letter_validation_error,
 )
 from app.utils.pagination import generate_optional_previous_and_next_dicts, get_page_from_request
 from app.utils.templates import TemplateChange, TemplatedLetterImageTemplate, get_template
@@ -1047,59 +1038,67 @@ def letter_template_attach_pages(service_id, template_id):
     if template.template_type != "letter":
         abort(404)
 
-    form = PDFUploadForm()
-    error = {}
+    form = PDFUploadForm(
+        service=current_service,
+        is_an_attachment=True,
+        template=template,
+        fail_validation_on_santise_error=True,
+    )
     letter_attachment_image_url = None
-    attachment_page_count = 0
-    use_error_summary = False
+    page_count = 0
+
     if form.validate_on_submit():
-        upload_id = uuid.uuid4()
-        try:
-            return _process_letter_attachment_form(service_id, template, form, upload_id)
-        except LetterAttachmentFormError as e:
-            error = e.as_error_dict()
-            attachment_page_count = error.get("attachment_page_count", 0)
-            letter_attachment_image_url = url_for(
-                "no_cookie.view_invalid_letter_attachment_as_preview",
+        # Archive letter attachment if there is already one
+        if template.attachment:
+            letter_attachment_client.archive_letter_attachment(
+                letter_attachment_id=template.attachment.id,
                 service_id=service_id,
-                file_id=upload_id,
+                user_id=current_user.id,
             )
-
-    if form.file.errors:
-        error = get_error_from_upload_form(form.file.errors[0])
-        use_error_summary = True
-
-    if not template.attachment:
-        return (
-            render_template(
-                "views/templates/attach-pages.html",
-                form=form,
-                template=template,
-                error=error,
-                letter_attachment_image_url=letter_attachment_image_url,
-                page_numbers=_get_page_numbers(attachment_page_count),
-                error_summary_enabled=use_error_summary,
-                use_error_summary=use_error_summary,
-            ),
-            400 if error else 200,
+        _save_letter_attachment(
+            service_id=service_id,
+            template_id=template.id,
+            upload_id=form.upload_id,
+            original_filename=form.file.data.filename,
+            original_file=form.pdf_file_bytes,
+            sanitise_response=form.sanitise_response,
+        )
+        return redirect(
+            url_for(
+                "main.view_template",
+                service_id=current_service.id,
+                template_id=template.id,
+                _anchor="first-page-of-attachment",
+            )
         )
 
-    letter_attachment_image_url = letter_attachment_image_url or url_for(
-        "no_cookie.view_letter_attachment_preview",
-        service_id=service_id,
-        attachment_id=template.attachment.id,
-    )
+    if form.errors:
+        letter_attachment_image_url = url_for(
+            "no_cookie.view_invalid_letter_attachment_as_preview",
+            service_id=service_id,
+            file_id=form.upload_id,
+        )
+        page_count = getattr(form, "pdf_page_count", None)
+    elif template.attachment:
+        letter_attachment_image_url = url_for(
+            "no_cookie.view_letter_attachment_preview",
+            service_id=service_id,
+            attachment_id=template.attachment.id,
+        )
+        page_count = template.attachment.page_count
 
-    attachment_page_count = attachment_page_count or template.attachment.page_count
-
-    return render_template(
-        "views/templates/manage-attachment.html",
-        form=form,
-        template=template,
-        service_id=service_id,
-        letter_attachment_image_url=letter_attachment_image_url,
-        page_numbers=_get_page_numbers(attachment_page_count),
-        error=error,
+    return (
+        render_template(
+            "views/templates/manage-attachment.html" if template.attachment else "views/templates/attach-pages.html",
+            form=form,
+            template=template,
+            service_id=service_id,
+            letter_attachment_image_url=letter_attachment_image_url,
+            page_numbers=_get_page_numbers(page_count),
+            error=form.error_as_title_and_detail(),
+            use_error_summary=False,
+        ),
+        400 if form.errors else 200,
     )
 
 
@@ -1121,7 +1120,7 @@ def letter_template_edit_pages(template_id, service_id):
     if template.template_type != "letter":
         abort(404)
 
-    form = PDFUploadForm()
+    form = PDFUploadForm(service=current_service)
 
     error = {}
 
@@ -1159,93 +1158,6 @@ def letter_template_edit_pages(template_id, service_id):
         ),
         page_numbers=_get_page_numbers(template.attachment.page_count),
         error=error,
-    )
-
-
-def _process_letter_attachment_form(service_id, template, form, upload_id):
-    pdf_file_bytes = form.file.data.read()
-    original_filename = form.file.data.filename
-
-    try:
-        # TODO: get page count from the sanitise response once template preview
-        # handles malformed files nicely - is this done yet?
-        attachment_page_count = pdf_page_count(BytesIO(pdf_file_bytes))
-    except PdfReadError:
-        current_app.logger.info(
-            "Invalid PDF uploaded for service %s",
-            service_id,
-            extra={"service_id": service_id, "upload_id": upload_id},
-        )
-        raise LetterAttachmentFormError(
-            title="There’s a problem with your file",
-            detail="Notify cannot read this PDF - save a new copy and try again",
-        ) from None
-
-    file_location = get_transient_letter_file_location(service_id, upload_id)
-
-    try:
-        response = template_preview_client.sanitise_letter(
-            BytesIO(pdf_file_bytes),
-            upload_id=upload_id,
-            allow_international_letters=current_service.has_permission("international_letters"),
-            is_an_attachment=True,
-        )
-        response.raise_for_status()
-    except RequestException as ex:
-        if ex.response is not None and ex.response.status_code == 400:
-            validation_failed_message = response.json().get("message")
-            invalid_pages = response.json().get("invalid_pages")
-
-            status = "invalid"
-            upload_letter_to_s3(
-                pdf_file_bytes,
-                file_location=file_location,
-                status=status,
-                page_count=attachment_page_count,
-                filename=original_filename,
-                message=validation_failed_message,
-                invalid_pages=invalid_pages,
-            )
-            error_dict = get_letter_validation_error(validation_failed_message, invalid_pages, attachment_page_count)
-            raise LetterAttachmentFormError(
-                title=error_dict["title"], detail=error_dict["detail"], attachment_page_count=attachment_page_count
-            ) from None
-
-        raise
-
-    if attachment_page_count + template.page_count > template.max_page_count:
-        raise LetterAttachmentFormError(
-            detail=(
-                f"Letters must be {template.max_page_count} pages or less "
-                f"({template.max_sheet_count} double-sided sheets of paper). "
-                "In total, your letter template and the file you attached are "
-                f"{template.page_count + attachment_page_count} pages long."
-            )
-        )
-
-    # Archive letter attachment if there is already one
-    if template.attachment:
-        letter_attachment_client.archive_letter_attachment(
-            letter_attachment_id=template.attachment.id,
-            service_id=service_id,
-            user_id=current_user.id,
-        )
-    _save_letter_attachment(
-        service_id=service_id,
-        template_id=template.id,
-        upload_id=upload_id,
-        original_filename=original_filename,
-        original_file=pdf_file_bytes,
-        sanitise_response=response,
-    )
-
-    return redirect(
-        url_for(
-            "main.view_template",
-            service_id=current_service.id,
-            template_id=template.id,
-            _anchor="first-page-of-attachment",
-        )
     )
 
 
