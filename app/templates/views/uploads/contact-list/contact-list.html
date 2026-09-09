@@ -1,8 +1,8 @@
 {% extends "withnav_template.html" %}
 {% from "components/big-number.html" import big_number %}
-{% from "components/table.html" import list_table, field, row_heading %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% block service_page_title %}
   {{ contact_list.original_file_name }}
@@ -26,39 +26,26 @@
       in the last {{ current_service.get_days_of_retention(contact_list.template_type) }}
       days.
     </p>
-    <div class='dashboard-table ajax-block-container'>
-      {% call(item, row_number) list_table(
-        jobs,
-        caption="Messages sent from this contact list",
-        caption_visible=False,
-        empty_message='',
-        field_headings=[
-          'Template',
-          'Status'
-        ],
-        field_headings_visible=False,
-        give_rows_ids=False,
-      ) %}
-        {% call row_heading() %}
-          <div class="file-list">
-            <a class="file-list-filename-large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.template_name }}</a>
-            {% if item.scheduled %}
-              <span class="file-list-hint-large">
-                Sending {{
-                  item.scheduled_for|format_datetime_relative
-                }}
-              </span>
-            {% else %}
-              <span class="file-list-hint-large">
-                Sent {{
-                  (item.scheduled_for or item.created_at)|format_datetime_relative
-                }}
-              </span>
-            {% endif %}
-
-          </div>
-        {% endcall %}
-        {% call field() %}
+    <div class="ajax-block-container">
+      {% set jobs_list = [] %}
+      {% for item in jobs %}
+        {% set summary_key_html %}
+          <a class="notify-summary-list__filename notify-summary-list__filename--large govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job', service_id=current_service.id, job_id=item.id) }}">{{ item.template_name }}</a>
+          {% if item.scheduled %}
+            <span class="file-list-hint-large">
+              Sending {{
+                item.scheduled_for|format_datetime_relative
+              }}
+            </span>
+          {% else %}
+            <span class="file-list-hint-large">
+              Sent {{
+                (item.scheduled_for or item.created_at)|format_datetime_relative
+              }}
+            </span>
+          {% endif %}
+        {% endset %}
+        {% set summary_value_html %}
           {% if item.scheduled %}
             {{ big_number(
               item.notification_count,
@@ -85,8 +72,23 @@
               </div>
             </div>
           {% endif %}
-        {% endcall %}
-      {% endcall %}
+        {% endset %}
+        {% do jobs_list.append({
+          "key": {
+            "classes": "notify-summary-list__key notify-summary-list__key--50-100",
+            "html": summary_key_html,
+          },
+          "value": {
+            "classes": "",
+            "html":  summary_value_html,
+          }
+        }) %}
+      {% endfor %}
+
+      {{ govukSummaryList({
+        "classes": "notify-summary-list",
+        "rows": jobs_list
+      }) }}
     </div>
   {% else %}
     <p class="govuk-body">
