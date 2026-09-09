@@ -190,6 +190,8 @@ def add_organisation_email_branding_options(org_id):
     ]
 
     if form.validate_on_submit():
+        assert form.branding_field.data is not None  # type narrowing
+
         selected_email_branding_ids = form.branding_field.data
 
         organisations_client.add_brandings_to_email_branding_pool(org_id, selected_email_branding_ids)
@@ -356,6 +358,8 @@ def add_organisation_letter_branding_options(org_id):
     ]
 
     if form.validate_on_submit():
+        assert form.branding_field.data is not None  # type narrowing
+
         selected_letter_branding_ids = form.branding_field.data
 
         organisations_client.add_brandings_to_letter_branding_pool(org_id, selected_letter_branding_ids)
