@@ -900,7 +900,6 @@ def test_should_redirect_after_service_name_change(
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
         name="New Name",
-        confirmed_unique=False,
         confirmed_service_name=False,
     )
 
@@ -1477,7 +1476,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
         "volume_email,"
         "volume_sms,"
         "volume_letter,"
-        "confirmed_unique,"
+        "confirmed_service_name,"
         "expected_readyness,"
         "agreement_signed,"
         "confirmed_email_sender_name,"
@@ -1579,7 +1578,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
         ),
-        (  # Just confirm unique service
+        (  # Needs service name to be confirmed
             True,
             True,
             True,
@@ -1643,7 +1642,7 @@ def test_ready_to_go_live(
     volume_email,
     volume_sms,
     volume_letter,
-    confirmed_unique,
+    confirmed_service_name,
     expected_readyness,
     agreement_signed,
     confirmed_email_sender_name,
@@ -1678,7 +1677,7 @@ def test_ready_to_go_live(
     service = app.models.service.Service(
         {
             "id": SERVICE_ONE_ID,
-            "confirmed_unique": confirmed_unique,
+            "confirmed_service_name": confirmed_service_name,
             "confirmed_email_sender_name": confirmed_email_sender_name,
         }
     )
