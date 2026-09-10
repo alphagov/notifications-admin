@@ -62,7 +62,7 @@ def guest_list(service_id):
 @main.route("/services/<uuid:service_id>/api/keys")
 @user_has_permissions("manage_api_keys")
 def api_keys(service_id):
-    return render_template("views/api/keys.html")
+    return render_template("views/api/keys.html", user_getter=current_service.active_users.get_name_from_id)
 
 
 @main.route("/services/<uuid:service_id>/api/keys/create", methods=["GET", "POST"])
@@ -117,9 +117,7 @@ def revoke_api_key(service_id, key_id):
             ],
             "revoke this API key",
         )
-        return render_template(
-            "views/api/keys.html",
-        )
+        return render_template("views/api/keys.html", user_getter=current_service.active_users.get_name_from_id)
     elif request.method == "POST":
         key.revoke(service_id=service_id)
         flash(f"‘{key.name}’ was revoked", "default_with_tick")
