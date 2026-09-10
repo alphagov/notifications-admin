@@ -300,6 +300,7 @@ def test_should_show_empty_api_keys_page(
     mock_login,
     mock_get_no_api_keys,
     mock_has_permissions,
+    mock_get_users_by_service,
 ):
     client_request.login(api_user_active)
     page = client_request.get("main.api_keys", service_id=SERVICE_ONE_ID)
@@ -313,17 +314,26 @@ def test_should_show_api_keys_page(
     client_request,
     mock_get_api_keys,
     fake_uuid,
+    mock_get_users_by_service,
 ):
     page = client_request.get("main.api_keys", service_id=SERVICE_ONE_ID)
-    rows = [normalize_spaces(row.text) for row in page.select("main tr")]
-    revoke_link = page.select_one("main tr a.govuk-link.govuk-link--destructive")
+    items = [normalize_spaces(item.text) for item in page.select("ul.api-key-list li")]
+    revoke_link = page.select_one("ul li a.govuk-link.govuk-link--destructive")
 
-    assert rows[0] == "API keys Action"
-    assert rows[1] == "another key name Test – pretends to send messages Revoked 1 January at 1:00am"
-    assert rows[2] == "some key name Live – sends to anyone Revoke some key name"
-    assert rows[3] == "third key Team and guest list – limits who you can send to Revoke third key"
+    assert items[0] == (
+        "another key name Revoked on 1 January 1970 at 1:00am Test – "
+        "pretends to send messages Created by Test User on 2 September at 1:00pm"
+    )
+    assert items[1] == (
+        "some key name Revoke some key name API key Live – "
+        "sends to anyone Created by Test User on 1 September at 11:00am"
+    )
+    assert items[2] == (
+        "third key Revoke third key API key Team and guest list – "
+        "limits who you can send to Created by Test User on 3 September at 8:00pm"
+    )
 
-    assert normalize_spaces(revoke_link.text) == "Revoke some key name"
+    assert normalize_spaces(revoke_link.text) == "Revoke some key name API key"
     assert revoke_link["href"] == url_for(
         "main.revoke_api_key",
         service_id=SERVICE_ONE_ID,
@@ -442,6 +452,7 @@ def test_should_show_confirm_revoke_api_key(
     client_request,
     mock_get_api_keys,
     fake_uuid,
+    mock_get_users_by_service,
 ):
     page = client_request.get(
         "main.revoke_api_key",
