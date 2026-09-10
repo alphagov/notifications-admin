@@ -46,6 +46,7 @@ from app.main.forms import (
     OnOffSettingForm,
     RenameServiceForm,
     SearchByNameForm,
+    ServiceConfirmFreeAllowanceTermsForm,
     ServiceContactDetailsForm,
     ServiceEditInboundNumberForm,
     ServiceEmailSenderForm,
@@ -990,6 +991,22 @@ def service_delete_letter_contact(service_id, letter_contact_id):
         letter_contact_id=letter_contact_id,
     )
     return redirect(url_for(".service_letter_contact_details", service_id=current_service.id))
+
+
+@main.route("/services/<uuid:service_id>/service-settings/free-allowance", methods=["GET", "POST"])
+@user_has_permissions("manage_service")
+def service_confirm_free_allowance_terms(service_id):
+    form = ServiceConfirmFreeAllowanceTermsForm()
+
+    if form.validate_on_submit():
+        current_service.update(confirmed_unique=True)
+        return redirect(url_for(".service_settings", service_id=service_id))
+
+    return render_template(
+        "views/service-settings/confirm-free-allowance-terms.html",
+        form=form,
+        error_summary_enabled=True,
+    )
 
 
 @main.route("/services/<uuid:service_id>/service-settings/sms-sender", methods=["GET"])

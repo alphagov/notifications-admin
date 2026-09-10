@@ -2103,6 +2103,13 @@ class ServiceSmsSenderForm(StripWhitespaceForm):
     is_default = GovukCheckboxField("Make this text message sender ID the default")
 
 
+class ServiceConfirmFreeAllowanceTermsForm(StripWhitespaceForm):
+    confirm = GovukCheckboxField(
+        "I have read and understood the terms of the free allowance",
+        validators=[DataRequired(message="Select ‘I have read and understood the terms of the free allowance’")],
+    )
+
+
 class ServiceEditInboundNumberForm(StripWhitespaceForm):
     is_default = GovukCheckboxField("Make this text message sender ID the default")
 

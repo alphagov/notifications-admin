@@ -306,6 +306,7 @@ class MainNavigation(Navigation):
             "service_confirm_delete_email_reply_to",
             "service_confirm_delete_letter_contact",
             "service_confirm_delete_sms_sender",
+            "service_confirm_free_allowance_terms",
             "service_edit_email_reply_to",
             "service_edit_letter_contact",
             "service_edit_sms_sender",

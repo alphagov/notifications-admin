@@ -1,0 +1,83 @@
+{% extends "withnav_template.html" %}
+{% from "components/page-header.html" import page_header %}
+{% from "components/form.html" import form_wrapper %}
+{% from "components/page-footer.html" import page_footer %}
+
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% set page_title = "Free text message allowance" %}
+
+{% block service_page_title %}
+    {{ page_title }}
+{% endblock %}
+
+{% block backLink %}
+    {{ govukBackLink({ "href": url_for('main.service_settings', service_id=current_service.id) }) }}
+{% endblock %}
+
+{% block maincolumn_content %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-five-sixths">
+        {{ page_header(page_title) }}
+
+        <p class="govuk-body">
+            If your service is eligible, it will get an annual allowance of free text messages.
+        </p>
+        <p class="govuk-body">
+            You can still use Notify if your service is not eligible for a free allowance.
+        </p>
+
+        <h2 class="heading-medium">Terms of the free allowance</h2>
+        <p class="govuk-body">
+            These terms apply to the way you use GOV.UK Notify.
+        </p>
+        <p class="govuk-body">
+            You accept our terms of use when you create an account.
+        </p>
+        <p class="govuk-body">
+            You must keep to the terms. If you do not, we will stop your free allowance.
+        </p>
+        <p class="govuk-body">
+            The free allowance is discretionary.
+        </p>
+        <p class="govuk-body">
+            The free allowance renews on 1 April. Unused free text messages expire on 31 March.
+        </p>
+        <p class="govuk-body">
+            GOV.UK Notify reviews the free allowance every year. As a result, we may need to change the size of the allowance.
+            This usually happens on 1 April.
+        </p>
+        <p class="govuk-body">
+            To qualify for the free allowance:
+        </p>
+        <ol class="govuk-list govuk-list--number">
+            <li>Your service must be the only one of its kind in your organisation.</li>
+            <li>Your service must not be for testing purposes.</li>
+            <li>Your service must not belong to a GP surgery.</li>
+        </ol>
+
+        <p class="govuk-body">
+            If your service sends a very high volume of text messages in a single financial year, we may not renew its free allowance on 1 April.
+        </p>
+
+        <p class="govuk-body">
+            GOV.UK Notify can remove your free allowance at any time if we find another live service with similar:
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>text message templates</li>
+            <li>recipients</li>
+            <li>team members</li>
+        </ul>
+
+    {% if not current_service.confirmed_unique %}
+        {% call form_wrapper() %}
+            {{ form.confirm(
+            ) }}
+            {{ page_footer('Confirm') }}
+        {% endcall %}
+    {% endif %}
+    </div>
+</div>
+
+{% endblock %}
