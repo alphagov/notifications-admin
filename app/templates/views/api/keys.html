@@ -40,6 +40,7 @@
               Test – pretends to send messages
             {% endif %}
           </div>
+          <p>Created by {{ user_getter(item.created_by) }} {{item.created_at | format_datetime_human}}</p>
         </div>
       {% endcall %}
       {% if item.expiry_date %}
