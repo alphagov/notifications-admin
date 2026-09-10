@@ -303,13 +303,7 @@
               }
             ] if current_user.has_permissions('manage_service') else []
           }
-        }
-      ]%}
-
-      {% set restricted_text_message_settings_rows = [] %}
-
-      {% if current_service.has_permission("sms") %}
-        {% set restricted_text_message_settings_rows = [
+        },
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
@@ -329,7 +323,13 @@
                 }
               ]
             }
-          },
+          }
+      ]%}
+
+      {% set restricted_text_message_settings_rows = [] %}
+
+      {% if current_service.has_permission("sms") %}
+        {% set restricted_text_message_settings_rows = [
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
