@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from datetime import datetime
 from typing import Any
 
@@ -63,13 +64,13 @@ class Service(JSONModel):
 
     __sort_attribute__ = "name"
 
-    TEMPLATE_TYPES = (
+    TEMPLATE_TYPES: Sequence[str] = (
         "email",
         "sms",
         "letter",
     )
 
-    ALL_PERMISSIONS = TEMPLATE_TYPES + (
+    ALL_PERMISSIONS: Sequence[str] = TEMPLATE_TYPES + (
         "edit_folder_permissions",
         "email_auth",
         "inbound_sms",

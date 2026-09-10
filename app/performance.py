@@ -20,7 +20,7 @@ def sentry_sampler(sampling_context, sample_rate: float = 0.0):
 
 
 def init_performance_monitoring():
-    environment = os.getenv("NOTIFY_ENVIRONMENT").lower()
+    environment = os.getenv("NOTIFY_ENVIRONMENT", "").lower()
     allow_pii = os.getenv("SENTRY_ALLOW_PII", "0") == "1"
     sentry_enabled = bool(int(os.getenv("SENTRY_ENABLED", "0")))
     sentry_dsn = os.getenv("SENTRY_DSN")
