@@ -78,6 +78,7 @@ def submit_request_to_go_live(service_id):
     return redirect(url_for(".request_to_go_live", service_id=service_id))
 
 
+# TODO: Rename route and function to remove references to service uniqueness
 @main.route("/services/<uuid:service_id>/make-your-service-live/confirm-service-unique", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def confirm_service_is_unique(service_id):
@@ -86,7 +87,7 @@ def confirm_service_is_unique(service_id):
 
     if form.validate_on_submit():
         try:
-            current_service.update(name=form.name.data, confirmed_unique=True, confirmed_service_name=True)
+            current_service.update(name=form.name.data, confirmed_service_name=True)
         except HTTPError as http_error:
             if http_error.status_code == 400 and (
                 error_message := service_api_client.parse_edit_service_http_error(http_error)

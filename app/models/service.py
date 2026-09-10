@@ -445,7 +445,7 @@ class Service(JSONModel):
                 not self.needs_to_confirm_email_sender_name,
                 not self.needs_to_add_email_reply_to_address,
                 not self.needs_to_change_sms_sender,
-                self.confirmed_unique,
+                self.confirmed_service_name,
             )
         )
 

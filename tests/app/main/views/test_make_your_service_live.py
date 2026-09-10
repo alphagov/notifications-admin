@@ -109,13 +109,13 @@ def test_route_for_platform_admin(
 
 
 @pytest.mark.parametrize(
-    "confirmed_unique, expected_status_text",
+    "confirmed_service_name, expected_status_text",
     [
         (False, "Confirm your service name Incomplete"),
         (True, "Confirm your service name Completed"),
     ],
 )
-def test_should_check_confirm_service_is_unique_task(
+def test_should_check_confirm_service_name_task(
     client_request,
     service_one,
     single_sms_sender,
@@ -123,10 +123,10 @@ def test_should_check_confirm_service_is_unique_task(
     mock_get_service_templates,
     mock_get_users_by_service,
     mock_get_invites_for_service,
-    confirmed_unique,
+    confirmed_service_name,
     expected_status_text,
 ):
-    service_one["confirmed_unique"] = confirmed_unique
+    service_one["confirmed_service_name"] = confirmed_service_name
 
     page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
     assert page.select_one("h1").text == "Make your service live"
@@ -1203,7 +1203,7 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
     assert mock_notify_users_of_request_to_go_live_for_service.call_args_list == expected_call_args
 
 
-def test_confirm_service_is_unique_sets_confirmed_unique_and_updates_name(
+def test_confirm_service_name_is_unique_sets_confirmed_service_name_and_updates_name(
     client_request,
     mock_update_service,
     service_one,
@@ -1219,7 +1219,6 @@ def test_confirm_service_is_unique_sets_confirmed_unique_and_updates_name(
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
         name="Updated Service",
-        confirmed_unique=True,
         confirmed_service_name=True,
     )
 
@@ -1233,7 +1232,7 @@ def test_confirm_service_is_unique_sets_confirmed_unique_and_updates_name(
         ("a" * 150 + " " * 100 + "a", "Service name cannot be longer than 143 characters"),
     ],
 )
-def test_confirm_service_is_unique_fails_validation(
+def test_confirm_service_name_when_validation_fails(
     client_request,
     mock_update_service,
     name,
@@ -1250,7 +1249,7 @@ def test_confirm_service_is_unique_fails_validation(
     assert error_message in page.select_one(".govuk-error-message").text
 
 
-def test_confirm_service_is_unique_doesnt_suppress_api_errors(client_request, mocker, service_one):
+def test_confirm_service_name_doesnt_suppress_api_errors(client_request, mocker, service_one):
     mocker.patch(
         "app.main.views.service_settings.index.service_api_client.update_service",
         side_effect=HTTPError(response=Mock(status_code=500)),
@@ -1264,7 +1263,7 @@ def test_confirm_service_is_unique_doesnt_suppress_api_errors(client_request, mo
     )
 
 
-def test_confirm_service_is_unique_prefills_name(client_request, service_one):
+def test_confirm_service_name_prefills_name(client_request, service_one):
     page = client_request.get(
         "main.confirm_service_is_unique",
         service_id=SERVICE_ONE_ID,
