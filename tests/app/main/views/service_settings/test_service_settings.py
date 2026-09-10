@@ -62,6 +62,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Send files by email contact_us@gov.uk Manage sending files by email",
                 "Email limit 1,000 per day 1,234 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
@@ -81,6 +82,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Email ‘from’ name Test Service test.service@notifications.service.gov.uk Change email ‘from’ name",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Send text messages Off Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
@@ -103,6 +105,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Send files by email contact_us@gov.uk",
                 "Email limit 1,000 per day 1,234 sent today",
                 "Send text messages On",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",  # user will see manage button
                 "Start text messages with service name On",
                 "Receive text messages Off",
@@ -129,6 +132,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Send files by email contact_us@gov.uk Manage sending files by email",
                 "Email limit 1,000 per day 1,234 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
@@ -164,6 +168,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Email ‘from’ name Test Service test.service@notifications.service.gov.uk Change email ‘from’ name",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Send text messages Off Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
@@ -392,6 +397,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send files by email Not set up Manage sending files by email",
                 "Email limit 1,000 per day 0 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages On Change your settings for receiving text messages",
@@ -414,6 +420,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send files by email Not set up Manage sending files by email",
                 "Email limit 1,000 per day 0 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
@@ -432,6 +439,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Email ‘from’ name service one service.one@notifications.service.gov.uk Change email ‘from’ name",
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Send text messages Off Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
@@ -5181,6 +5189,40 @@ class TestSetAuthTypeForUsers:
             assert mock_update_user_attribute.call_args_list == []
         else:
             assert mock_update_user_attribute.call_args_list != []
+
+
+@pytest.mark.parametrize(
+    "terms_read, row_description",
+    [
+        (True, "Read"),
+        (False, "Not read"),
+    ],
+)
+def test_service_settings_page_when_terms_of_free_allowance_have_been_agreed(
+    client_request,
+    single_reply_to_email_address,
+    single_sms_sender,
+    mock_get_service_data_retention,
+    service_one,
+    terms_read,
+    row_description,
+):
+    service_one["confirmed_unique"] = terms_read
+
+    page = client_request.get(
+        "main.service_settings",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    free_allowance_row = normalize_spaces(
+        find_element_by_tag_and_partial_text(
+            page, tag=".govuk-summary-list__row", string="Terms of the free text message allowance"
+        ).text
+    )
+
+    assert free_allowance_row == (
+        f"Terms of the free text message allowance {row_description} View the terms of the free text message allowance"
+    )
 
 
 def test_service_settings_page_loads_when_inbound_number_is_not_set(

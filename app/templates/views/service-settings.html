@@ -307,6 +307,25 @@
           {
             "key": {
               "classes": "notify-summary-list__key notify-summary-list__key--35-100",
+              "text": "Terms of the free text message allowance"
+            },
+            "value": {
+              "text": "Read" if current_service.confirmed_unique else "Not read"
+            },
+            "actions": {
+              "items": [
+                {
+                  "href": url_for('main.service_confirm_free_allowance_terms', service_id=current_service.id),
+                  "text": "View",
+                  "visuallyHiddenText": "the terms of the free text message allowance",
+                  "classes": "govuk-link--no-visited-state"
+                }
+              ]
+            }
+          },
+          {
+            "key": {
+              "classes": "notify-summary-list__key notify-summary-list__key--35-100",
               "text": "Text message sender IDs"
             },
             "value": {
