@@ -35,7 +35,7 @@
               "classes": "govuk-link--no-visited-state",
             },
             "href": url_for('main.confirm_service_is_unique', service_id=current_service.id),
-            "status": completed_status if current_service.confirmed_unique else incomplete_status,
+            "status": completed_status if current_service.confirmed_service_name else incomplete_status,
           },
           {
             "title": {
