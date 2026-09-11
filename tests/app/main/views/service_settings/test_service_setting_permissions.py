@@ -79,6 +79,18 @@ def test_service_set_permission_requires_platform_admin(
             "False",
             [],
         ),
+        (
+            [],
+            "block_ofcom_protected_block",
+            "True",
+            ["block_ofcom_protected_block"],
+        ),
+        (
+            ["block_ofcom_protected_block"],
+            "block_ofcom_protected_block",
+            "False",
+            [],
+        ),
     ],
 )
 def test_service_set_permission(
