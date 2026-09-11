@@ -394,6 +394,15 @@ class Service(JSONModel):
             )
         )
 
+    @property
+    def needs_to_confirm_terms_of_free_allowance(self):
+        return all(
+            (
+                self.intending_to_send_sms,
+                not self.confirmed_unique,
+            )
+        )
+
     @cached_property
     def letter_contact_details(self):
         return service_api_client.get_letter_contacts(self.id)
@@ -446,6 +455,7 @@ class Service(JSONModel):
                 not self.needs_to_confirm_email_sender_name,
                 not self.needs_to_add_email_reply_to_address,
                 not self.needs_to_change_sms_sender,
+                not self.needs_to_confirm_terms_of_free_allowance,
                 self.confirmed_service_name,
             )
         )
