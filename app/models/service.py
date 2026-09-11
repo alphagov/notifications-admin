@@ -315,9 +315,10 @@ class Service(JSONModel):
 
     @property
     def intending_to_send_sms(self):
-        if self.volume_sms is None:
-            return self.has_sms_templates
-        return self.volume_sms > 0
+        if self.has_sms_templates:
+            return True
+        else:
+            return self.volume_sms is not None and self.volume_sms > 0
 
     @cached_property
     def email_reply_to_addresses(self):
