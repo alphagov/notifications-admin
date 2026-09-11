@@ -110,6 +110,15 @@ $govuk-grid-widths: map.merge($govuk-grid-widths, $notify-grid-widths);
 
 }
 
+.notify-summary-list--no-action-full-span {
+  .govuk-summary-list__value {
+    @include govuk-media-query($from: tablet) {
+      text-align: right;
+      width: 20%;
+    }
+  }
+}
+
 // summary list with file name and metadata
 // there will be 2 variants
 // 24px filename and 19px metadata - template stats

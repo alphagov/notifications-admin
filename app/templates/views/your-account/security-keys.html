@@ -2,9 +2,9 @@
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "components/table.html" import edit_field, mapping_table, row, field %}
 {% from "components/webauthn-api-check.html" import webauthn_api_check %}
 {% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
 
 {% set page_title = 'Security keys' %}
 {% set credentials = current_user.webauthn_credentials %}
@@ -70,30 +70,40 @@
       <div class="govuk-grid-column-five-sixths">
         {{ errorSummaries }}
         {{ page_header(page_title) }}
-        <div class="body-copy-table">
-          {% call mapping_table(
-            caption=page_title,
-            field_headings=['Security key details', 'Action'],
-            field_headings_visible=False,
-            caption_visible=False,
-          ) %}
-            {% for credential in credentials %}
-              {% call row() %}
-                {% call field() %}
-                  <div class="govuk-body govuk-!-margin-bottom-2">{{ credential.name }}</div>
-                  <div class="govuk-hint govuk-!-margin-bottom-2">
-                    {% if credential.logged_in_at %}
-                      Last used {{ credential.logged_in_at|format_delta }}
-                    {% else %}
-                      Never used (registered {{ credential.created_at|format_delta }})
-                    {% endif %}
-                  </div>
-                {% endcall %}
-                {{ edit_field('Manage', url_for('main.your_account_manage_security_key', key_id=credential.id)) }}
-              {% endcall %}
-            {% endfor %}
-          {% endcall %}
-        </div>
+
+        {% set credentials_list = [] %}
+        {% for credential in credentials %}
+          {% set summary_key_html %}
+            <div class="govuk-body govuk-!-margin-bottom-2">{{ credential.name }}</div>
+            <div class="govuk-hint govuk-!-margin-bottom-2">
+              {% if credential.logged_in_at %}
+                Last used {{ credential.logged_in_at|format_delta }}
+              {% else %}
+                Never used (registered {{ credential.created_at|format_delta }})
+              {% endif %}
+            </div>
+          {% endset %}
+          {% set summary_key_value %}
+              <a class="govuk-link govuk-link--no-visited-state"
+                href="{{ url_for('main.your_account_manage_security_key', key_id=credential.id) }}">
+                Manage<span class="govuk-visually-hidden"> {{ credential.name }}</span>
+              </a>
+          {% endset %}
+          {% do credentials_list.append({
+            "key": {
+              "html": summary_key_html
+            },
+            "value": {
+              "html": summary_key_value
+            }
+          }) %}
+        {% endfor %}
+
+        {{ govukSummaryList({
+          "classes": "notify-summary-list notify-summary-list--no-action-full-span",
+          "rows": credentials_list
+          }) }}
+
         {{ webauthn_button }}
       </div>
     {% else %}
