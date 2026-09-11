@@ -562,15 +562,15 @@ def test_should_show_security_keys_page(
     page = client_request.get(".your_account_security_keys")
     assert page.select_one("h1").text.strip() == "Security keys"
 
-    cred_1 = page.select("tr")[1]
-    cred_2 = page.select("tr")[2]
-    cred_1_lhs = cred_1.select_one("td.table-field-left-aligned")
-    cred_2_lhs = cred_2.select_one("td.table-field-left-aligned")
+    cred_1 = page.select(".govuk-summary-list__row")[0]
+    cred_2 = page.select(".govuk-summary-list__row")[1]
+    cred_1_lhs = cred_1.select_one(".govuk-summary-list__key")
+    cred_2_lhs = cred_2.select_one(".govuk-summary-list__key")
 
     assert normalize_spaces(cred_1_lhs.text) == "Test credential Last used 4 years ago"
     assert normalize_spaces(cred_2_lhs.text) == "Another test credential Never used (registered 1 year, 5 months ago)"
-    manage_link = cred_1.select_one("td.table-field-right-aligned a")
-    assert normalize_spaces(manage_link.text) == "Manage"
+    manage_link = cred_1.select_one(".govuk-summary-list__value a")
+    assert normalize_spaces(manage_link.text) == "Manage Test credential"
     assert manage_link["href"] == url_for(".your_account_manage_security_key", key_id=webauthn_credential["id"])
 
     register_button = page.select_one("[data-notify-module='register-security-key']")
