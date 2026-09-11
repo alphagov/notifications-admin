@@ -547,9 +547,75 @@ def test_should_check_for_sms_sender_on_go_live(
     assert page.select_one("h1").text == "Make your service live"
 
     checklist_items = page.select(".govuk-task-list .govuk-task-list__item")
-    assert normalize_spaces(checklist_items[4].text) == expected_sms_sender_checklist_item
+    assert normalize_spaces(checklist_items[5].text) == expected_sms_sender_checklist_item
 
     mock_get_sms_senders.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    "volume_sms, sms_template, task_shown",
+    [
+        (0, True, False),
+        (None, True, True),
+        (1, False, True),
+        (1, True, True),
+        (0, False, False),
+    ],
+)
+def test_free_allowance_confirmation_task_only_appears_if_service_will_send_sms(
+    client_request,
+    mock_get_users_by_service,
+    volume_sms,
+    sms_template,
+    task_shown,
+    mocker,
+):
+    if sms_template:
+        mocker.patch(
+            "app.service_api_client.get_service_templates",
+            return_value={"data": [create_template(template_type="sms")]},
+        )
+    else:
+        mocker.patch(
+            "app.service_api_client.get_service_templates",
+            return_value={"data": [create_template(template_type="letter")]},
+        )
+
+    for channel, volume in (("sms", volume_sms), ("email", 0), ("letter", 1)):
+        mocker.patch(
+            f"app.models.service.Service.volume_{channel}",
+            create=True,
+            new_callable=PropertyMock,
+            return_value=volume,
+        )
+    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+    assert (normalize_spaces("Read the terms of the free text message") in page.text) is task_shown
+
+
+@pytest.mark.parametrize(
+    "confirmed_terms_read, expected_status_text",
+    [
+        (False, "Read the terms of the free text message allowance Incomplete"),
+        (True, "Read the terms of the free text message allowance Completed"),
+    ],
+)
+def test_should_check_terms_of_free_allowance_task(
+    client_request,
+    service_one,
+    single_sms_sender,
+    single_reply_to_email_address,
+    mock_get_service_templates,
+    mock_get_users_by_service,
+    mock_get_invites_for_service,
+    confirmed_terms_read,
+    expected_status_text,
+):
+    service_one["confirmed_unique"] = confirmed_terms_read
+
+    page = client_request.get("main.request_to_go_live", service_id=SERVICE_ONE_ID)
+    assert page.select_one("h1").text == "Make your service live"
+
+    assert normalize_spaces(page.select(".govuk-task-list .govuk-task-list__item")[6].text) == expected_status_text
 
 
 @pytest.mark.parametrize(

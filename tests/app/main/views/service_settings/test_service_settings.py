@@ -1473,6 +1473,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
         "has_email_reply_to_address,"
         "shouldnt_use_govuk_as_sms_sender,"
         "sms_sender_is_govuk,"
+        "confirmed_unique,"
         "volume_email,"
         "volume_sms,"
         "volume_letter,"
@@ -1490,6 +1491,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             True,
+            False,
             1,
             0,
             0,
@@ -1504,6 +1506,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             False,
             False,
+            True,
             True,
             True,
             1,
@@ -1522,6 +1525,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             False,
+            True,
             0,
             1,
             0,
@@ -1538,6 +1542,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             True,
+            True,
             0,
             1,
             0,
@@ -1545,6 +1550,23 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             False,
             True,
             False,
+        ),
+        (  # Needs to agree to terms of free allowance
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            0,
+            1,
+            0,
+            True,
+            False,
+            True,
+            True,
         ),
         (  # Needs team members
             False,
@@ -1554,6 +1576,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             False,
+            True,
             1,
             0,
             0,
@@ -1570,6 +1593,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             False,
+            True,
             0,
             1,
             0,
@@ -1579,6 +1603,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
         ),
         (  # Needs service name to be confirmed
+            True,
             True,
             True,
             True,
@@ -1602,6 +1627,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             True,
+            True,
             1,
             0,
             0,
@@ -1618,6 +1644,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             False,
             False,
             True,
+            False,
             None,
             None,
             None,
@@ -1639,6 +1666,7 @@ def test_ready_to_go_live(
     has_email_reply_to_address,
     shouldnt_use_govuk_as_sms_sender,
     sms_sender_is_govuk,
+    confirmed_unique,
     volume_email,
     volume_sms,
     volume_letter,
@@ -1679,6 +1707,7 @@ def test_ready_to_go_live(
             "id": SERVICE_ONE_ID,
             "confirmed_service_name": confirmed_service_name,
             "confirmed_email_sender_name": confirmed_email_sender_name,
+            "confirmed_unique": confirmed_unique,
         }
     )
 
