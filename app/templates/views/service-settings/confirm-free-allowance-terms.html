@@ -33,42 +33,37 @@
             These terms apply to the way you use GOV.UK Notify.
         </p>
         <p class="govuk-body">
-            You accept our terms of use when you create an account.
+            You accepted our terms of use when you created a Notify account.
         </p>
         <p class="govuk-body">
-            You must keep to the terms. If you do not, we will stop your free allowance.
+            The free text message allowance is discretionary.
         </p>
         <p class="govuk-body">
-            The free allowance is discretionary.
+            GOV.UK Notify can stop your free allowance at any time if you do not keep to the terms.
+        </p>
+        <p class="govuk-body">
+            To qualify for the free allowance, your service:
+        </p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>must be the only one of its kind run by your team, department or organisation</li>
+            <li>must not be for testing purposes</li>
+            <li>must not belong to a GP surgery</li>
+        </ul>
+        <p class="govuk-body">
+            Similar services run by the same team may not qualify for a free allowance.
+        </p>
+        <p class="govuk-body">
+            GOV.UK Notify reviews the size of the free allowance every financial year.
         </p>
         <p class="govuk-body">
             The free allowance renews on 1 April. Unused free text messages expire on 31 March.
+        </p>        
+        <p class="govuk-body">
+            If you send a very high volume of text messages in a single financial year, we may not renew your free allowance.
         </p>
         <p class="govuk-body">
-            GOV.UK Notify reviews the free allowance every year. As a result, we may need to change the size of the allowance.
-            This usually happens on 1 April.
+            If we need to change the size of the free allowance, we’ll announce this before 1 April.
         </p>
-        <p class="govuk-body">
-            To qualify for the free allowance:
-        </p>
-        <ol class="govuk-list govuk-list--number">
-            <li>Your service must be the only one of its kind in your organisation.</li>
-            <li>Your service must not be for testing purposes.</li>
-            <li>Your service must not belong to a GP surgery.</li>
-        </ol>
-
-        <p class="govuk-body">
-            If your service sends a very high volume of text messages in a single financial year, we may not renew its free allowance on 1 April.
-        </p>
-
-        <p class="govuk-body">
-            GOV.UK Notify can remove your free allowance at any time if we find another live service with similar:
-        </p>
-        <ul class="govuk-list govuk-list--bullet">
-            <li>text message templates</li>
-            <li>recipients</li>
-            <li>team members</li>
-        </ul>
 
     {% if not current_service.confirmed_unique %}
         {% call form_wrapper() %}
