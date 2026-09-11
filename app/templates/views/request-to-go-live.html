@@ -84,6 +84,18 @@
             }
           ])%}
         {% endif %}
+        {% if current_service.intending_to_send_sms %}
+          {% do task_list_items.append(
+            {
+              "title": {
+                "text": "Read the terms of the free text message allowance",
+                "classes": "govuk-link--no-visited-state",
+              },
+              "href": url_for('main.service_confirm_free_allowance_terms', service_id=current_service.id),
+              "status": completed_status if not current_service.needs_to_confirm_terms_of_free_allowance else incomplete_status,
+            }
+          )%}
+        {% endif %}
         {% if (current_service.intending_to_send_sms and current_service.shouldnt_use_govuk_as_sms_sender) %}
           {% do task_list_items.append(
             {
