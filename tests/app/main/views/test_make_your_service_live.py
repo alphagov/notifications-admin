@@ -476,6 +476,13 @@ def test_request_to_go_live_redirects_if_service_already_live(
             "Change your Text message sender ID Incomplete",
         ),
         (
+            0,
+            "local",
+            1,
+            [],
+            "Change your Text message sender ID Incomplete",
+        ),
+        (
             1,
             "nhs_local",
             0,
@@ -555,7 +562,7 @@ def test_should_check_for_sms_sender_on_go_live(
 @pytest.mark.parametrize(
     "volume_sms, sms_template, task_shown",
     [
-        (0, True, False),
+        (0, True, True),
         (None, True, True),
         (1, False, True),
         (1, True, True),
