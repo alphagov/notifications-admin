@@ -150,6 +150,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Receive inbound SMS Off Change your settings for Receive inbound SMS",
                 "Email authentication Off Change your settings for Email authentication",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
+                "Block sending to ofcom protected range Off Change your settings for Block sending to ofcom protected range",  # noqa: E501
             ],
         ),
         (
@@ -183,6 +184,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Custom data retention Email – 7 days Change data retention",
                 "Email authentication Off Change your settings for Email authentication",
                 "Sending SMS to UK landlines Off Change your settings for Sending SMS to UK landlines",
+                "Block sending to ofcom protected range Off Change your settings for Block sending to ofcom protected range",  # noqa: E501
             ],
         ),
     ],
