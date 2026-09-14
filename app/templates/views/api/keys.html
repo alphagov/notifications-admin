@@ -24,7 +24,7 @@
           <div class="api-key__header">
             <h3 class="govuk-heading-s api-key__name">{{ item.name }}</h3>
             {% if item.expiry_date %}
-              <span class="api-key__revoked">Revoked {{ item.expiry_date|format_datetime_human(date_prefix='on') }}</span>
+              <span class="api-key__revoked">Revoked {{ item.expiry_date|format_datetime_human }}</span>
             {% else %}
               <a class="govuk-link govuk-link--destructive api-key__action-link" href="{{ url_for('main.revoke_api_key', service_id=current_service.id, key_id=item.id) }}">
                 Revoke <span class="govuk-visually-hidden"> {{ item.name }} API key</span>
@@ -51,7 +51,7 @@
 
           <p class="api-key__metadata">
             Created by {{ user_getter(item.created_by) }}
-            <time datetime="{{ item.created_at }}">{{ item.created_at|format_datetime_human(date_prefix='on') }}</time>
+            <time datetime="{{ item.created_at }}">{{ item.created_at|format_delta }}</time>
           </p>
         </li>
       {% endfor %}

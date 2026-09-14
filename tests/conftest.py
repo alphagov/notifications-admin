@@ -3,7 +3,7 @@ import json
 import os
 import re
 from contextlib import contextmanager
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest import mock
 from unittest.mock import Mock, PropertyMock
 from uuid import UUID, uuid4
@@ -1463,12 +1463,12 @@ def mock_get_api_keys(notify_admin, mocker, fake_uuid):
                     name="some key name",
                     key_type="normal",
                     created_by=fake_uuid,
-                    created_at="2026-09-01 10:00:00.000000",
+                    created_at="2026-09-14 10:00:00.000000",
                 ),
                 api_key_json(
                     id_="1234567",
                     name="another key name",
-                    expiry_date=str(date.fromtimestamp(0)),
+                    expiry_date="2026-09-13 11:00:00.000000",
                     key_type="test",
                     created_by=fake_uuid,
                     created_at="2026-09-02 12:00:00.000000",
@@ -1478,7 +1478,7 @@ def mock_get_api_keys(notify_admin, mocker, fake_uuid):
                     name="third key",
                     key_type="team",
                     created_by=fake_uuid,
-                    created_at="2026-09-03 19:00:00.000000",
+                    created_at="2024-04-04 04:04:04.000000",
                 ),
             ]
         }
