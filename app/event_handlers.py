@@ -26,30 +26,37 @@ def event_creator[T: Callable](fn: T) -> T:
 
 
 class Events:
+    @staticmethod
     @event_creator
     def sucessful_login(*, user_id) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def update_user_email(*, user_id, updated_by_id, original_email_address, new_email_address) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def update_user_mobile_number(*, user_id, updated_by_id, original_mobile_number, new_mobile_number) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def remove_user_from_service(*, user_id, removed_by_id, service_id) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def add_user_to_service(*, user_id, invited_by_id, service_id, ui_permissions) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def set_user_permissions(*, user_id, service_id, original_ui_permissions, new_ui_permissions, set_by_id) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def set_organisation_user_permissions(
         *,
@@ -61,26 +68,32 @@ class Events:
     ) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def archive_user(*, user_id, user_email_address, archived_by_id) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def archive_service(*, service_id, archived_by_id) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def update_email_branding(*, email_branding_id, updated_by_id, old_email_branding) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def update_letter_branding(*, letter_branding_id, updated_by_id, old_letter_branding) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def set_inbound_sms_on(*, user_id, service_id, inbound_number_id) -> None:
         pass
 
+    @staticmethod
     @event_creator
     def remove_platform_admin(*, user_id, removed_by_id) -> None:
         pass
