@@ -50,7 +50,7 @@
           {% endif %}
 
           <p class="api-key__metadata">
-            Created by {{ user_getter(item.created_by) }}
+            Created by {{ user_getter(item.created_by, capitalise_unknown=False) }}
             <time datetime="{{ item.created_at }}">{{ item.created_at|format_delta }}</time>
           </p>
         </li>

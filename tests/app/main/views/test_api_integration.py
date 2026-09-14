@@ -6,7 +6,7 @@ from flask import url_for
 from freezegun import freeze_time
 
 from tests import generate_uuid, validate_route_permission
-from tests.conftest import SERVICE_ONE_ID, create_notifications, normalize_spaces
+from tests.conftest import SERVICE_ONE_ID, create_notifications, create_user, normalize_spaces
 
 
 def test_should_show_api_page(
@@ -317,7 +317,23 @@ def test_should_show_api_keys_page(
     mock_get_api_keys,
     fake_uuid,
     mock_get_users_by_service,
+    api_user_active,
+    mocker,
 ):
+    mocker.patch(
+        "app.user_api_client.get_user",
+        side_effect=[
+            # First call is to authenticate the user viewing the page
+            api_user_active,
+            # Second call returns an archived user who is not longer in the team
+            create_user(
+                id=str(uuid.uuid4()),
+                name="Archived user",
+                state="inactive",
+            ),
+        ],
+    )
+
     page = client_request.get("main.api_keys", service_id=SERVICE_ONE_ID)
     revoke_link = page.select_one("ul li a.govuk-link.govuk-link--destructive")
 
@@ -326,13 +342,10 @@ def test_should_show_api_keys_page(
             "another key name Revoked yesterday at midday Test – "
             "pretends to send messages Created by Test User 12 days ago"
         ),
-        (
-            "some key name Revoke some key name API key Live – "
-            "sends to anyone Created by Test User 2 hours ago"
-        ),
+        ("some key name Revoke some key name API key Live – sends to anyone Created by Test User 2 hours ago"),
         (
             "third key Revoke third key API key Team and guest list – "
-            "limits who you can send to Created by Test User 2 years ago"
+            "limits who you can send to Created by an archived user 2 years ago"
         ),
     ]
 

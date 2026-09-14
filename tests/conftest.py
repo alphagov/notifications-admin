@@ -1470,14 +1470,14 @@ def mock_get_api_keys(notify_admin, mocker, fake_uuid):
                     name="another key name",
                     expiry_date="2026-09-13 11:00:00.000000",
                     key_type="test",
-                    created_by=fake_uuid,
+                    created_by=str(uuid4()),
                     created_at="2026-09-02 12:00:00.000000",
                 ),
                 api_key_json(
                     id_=str(uuid4()),
                     name="third key",
                     key_type="team",
-                    created_by=fake_uuid,
+                    created_by=str(uuid4()),
                     created_at="2024-04-04 04:04:04.000000",
                 ),
             ]
