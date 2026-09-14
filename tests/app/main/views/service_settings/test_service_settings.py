@@ -741,6 +741,62 @@ def test_switch_service_to_live_turns_email_off_if_no_expected_volumes_and_no_em
         assert "permissions" not in update_service_kwargs
 
 
+@pytest.mark.parametrize(
+    "sms_volume, template_types, expect_sms_to_be_turned_off",
+    (
+        (20000, ["email", "email", "sms", "letter"], False),
+        (30, ["email", "letter"], False),
+        (None, ["email", "sms", "sms", "letter"], False),
+        (0, ["email", "email", "sms", "letter"], False),
+        (None, ["email", "email", "letter"], True),
+        (0, ["letter"], True),
+    ),
+)
+def test_switch_service_to_live_turns_sms_off_if_no_expected_volumes_and_no_sms_templates(
+    client_request,
+    service_one,
+    platform_admin_user,
+    mock_get_service_organisation,
+    sms_volume,
+    template_types,
+    expect_sms_to_be_turned_off,
+    mocker,
+):
+    service_one["permissions"] = ["sms", "email", "letter"]
+    service_one["volume_sms"] = sms_volume
+    templates = [_template(template_type, f"Template {index}") for index, template_type in enumerate(template_types)]
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": templates})
+    mocker.patch("app.service_api_client.update_service")
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(agreement_signed=True),
+    )
+    client_request.login(platform_admin_user)
+    client_request.post(
+        "main.service_switch_live",
+        service_id=SERVICE_ONE_ID,
+        _data={"enabled": "True"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.service_settings",
+            service_id=SERVICE_ONE_ID,
+        ),
+    )
+
+    # update_service should always be called to make the service live
+    # if SMS aren't being used it's called again, to remove the 'sms' service permission
+    update_service_kwargs = app.service_api_client.update_service.call_args.kwargs
+    if expect_sms_to_be_turned_off:
+        assert app.service_api_client.update_service.call_count == 2
+        assert "permissions" in update_service_kwargs and set(update_service_kwargs["permissions"]) == {
+            "email",
+            "letter",
+        }
+    else:
+        assert app.service_api_client.update_service.call_count == 1
+        assert "permissions" not in update_service_kwargs
+
+
 def test_show_live_service(
     client_request,
     mock_get_live_service,
