@@ -26,6 +26,7 @@ def test_owasp_useful_headers_set(
         "style-src 'self' static.example.com 'nonce-TESTs5Vr8v3jgRYLoQuVwA';"
         "style-src-attr 'self' static.example.com 'unsafe-inline';"
         "frame-ancestors 'self';"
+        "form-action 'self';"
         "frame-src 'self';"
     )
     assert response.headers["Link"] == (
@@ -74,5 +75,6 @@ def test_headers_non_ascii_characters_are_replaced(
         "style-src 'self' static.example.com 'nonce-TESTs5Vr8v3jgRYLoQuVwA';"
         "style-src-attr 'self' static.example.com 'unsafe-inline';"
         "frame-ancestors 'self';"
+        "form-action 'self';"
         "frame-src 'self';"
     )

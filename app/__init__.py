@@ -390,6 +390,7 @@ def useful_headers_after_request(response):
             "style-src 'self' {asset_domain} 'nonce-{csp_nonce}';"
             "style-src-attr 'self' {asset_domain} 'unsafe-inline';"
             "frame-ancestors 'self';"
+            "form-action 'self';"
             "frame-src 'self';".format(
                 asset_domain=current_app.config["ASSET_DOMAIN"],
                 logo_domain=current_app.config["LOGO_CDN_DOMAIN"],
