@@ -815,6 +815,32 @@ def enable_email_channel(service_id):
         return redirect(url_for(".service_set_channel", service_id=service_id, channel=channel))
 
 
+@main.route("/services/<uuid:service_id>/service-settings/set-sms/on", methods=["POST"])
+@user_has_permissions("manage_service")
+def enable_sms_channel(service_id):
+    channel = "sms"
+
+    needs_to_change_sms_sender = (
+        current_service.shouldnt_use_govuk_as_sms_sender and current_service.sms_sender_is_govuk
+    )
+
+    if not needs_to_change_sms_sender and current_service.confirmed_unique:
+        current_service.force_permission(channel, on=True)
+        return redirect(url_for(".service_settings", service_id=service_id))
+    else:
+        flash(
+            Markup(
+                """
+                    <h2 class='govuk-heading-m'>There is a problem</h2>
+                    <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
+                        Some of the tasks on this page are incomplete
+                    </p>
+                """
+            )
+        )
+        return redirect(url_for(".service_set_channel", service_id=service_id, channel=channel))
+
+
 @main.route("/services/<uuid:service_id>/service-settings/set-auth-type", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
 def service_set_auth_type(service_id):
