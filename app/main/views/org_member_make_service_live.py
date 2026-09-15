@@ -78,7 +78,7 @@ def org_member_make_service_live_service_name(service_id):
 
     if "unique" not in request.args:
         return redirect(url_for(".org_member_make_service_live_start", service_id=current_service.id))
-    elif (unique := request.args.get("unique").lower()) == "no":
+    elif (unique := request.args.get("unique", "").lower()) == "no":
         return redirect(url_for(".org_member_make_service_live_decision", service_id=current_service.id, unique=unique))
 
     form = OnOffSettingForm(
