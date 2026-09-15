@@ -12,7 +12,9 @@ Free text message allowance
 
   <h1 class="heading-large">Free text message allowance</h1>
 
-  <p class="govuk-body">Each eligible service you add will get an annual allowance of free text messages. The free allowance renews on 1 April.</p>
+  <p class="govuk-body">Eligible services get an annual allowance of free text messages.</p>
+  <p class="govuk-body">You can keep sending messages once your service has used its allowance, you’ll just be charged for each additional message that you send.</p>
+  <p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">text messages pricing</a></p>
   <p class="govuk-body">The size of the allowance depends on the organisation you work for.</p>
 
   <div class="bottom-gutter-3-2">
@@ -42,11 +44,27 @@ Free text message allowance
     {% endcall %}
   </div>
 
-  <p class="govuk-body">The free allowance is discretionary. We review it every year to make sure GOV.​UK Notify can still support those teams who need it the most.</p>
-  <p class="govuk-body">If your service sends a very high volume of text messages in a single financial year, we may not renew its free allowance.</p>
+  <h2 class="heading-medium">Terms of the free allowance</h2>
 
-  <p class="govuk-body">You only pay for text messages if you exceed your free allowance. Find out <a class="govuk-link govuk-link--no-visited-state"
-    href="{{ url_for('main.guidance_pricing_text_messages') }}">how much text messages cost</a>.</p>
+  <p class="govuk-body">The free text message allowance is discretionary.</p>
+
+  <p class="govuk-body">GOV.UK Notify can stop your free allowance at any time if you do not keep to the terms.</p>
+
+  <p class="govuk-body">To qualify for the free allowance, your service must:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+     <li>belong to an eligible organisation</li>
+     <li>be the only one of its kind run by your team or department</li>
+     <li>not be for testing purposes</li>
+  </ul>
+
+  <p class="govuk-body">Different campaigns or projects run by the same team do not qualify for a free allowance.</p>
+
+  <p class="govuk-body">The free allowance renews on 1 April. Unused free text messages expire on 31 March.</p>
+
+  <p class="govuk-body">If you send a very high volume of text messages in a single financial year, we may not renew your free allowance.</p>
+
+  <p class="govuk-body">Mobile phone network operators review their prices at the end of the financial year. If prices go up, GOV.UK Notify may need to reduce the free allowance. We’ll announce any changes before 1 April.</p>
 
 {% endblock %}
 
