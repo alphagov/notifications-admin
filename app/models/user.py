@@ -710,17 +710,24 @@ class Users(ModelList):
     def _get_items(*args, **kwargs):
         return user_api_client.get_users_for_service(*args, **kwargs)
 
-    def get_name_from_id(self, id):
+    def get_name_from_id(self, id, capitalise_unknown: bool = True):
+
         for user in self:
             if user.id == id:
                 return user.name
+
         # The user may not exist in the list of users for this service if they are
         # a platform admin or if they have since left the team. In this case, we fall
         # back to getting the user from the API (or Redis if it is in the cache)
         user = User.from_id(id)
-        if user and user.name:
-            return user.name
-        return "Unknown"
+
+        if not user:
+            return "Unknown" if capitalise_unknown else "an unknown user"
+
+        if user.name == "Archived user" and user.state == "inactive":
+            return "Archived user" if capitalise_unknown else "an archived user"
+
+        return user.name
 
 
 class OrganisationUsers(Users):

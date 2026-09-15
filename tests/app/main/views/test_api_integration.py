@@ -3,9 +3,10 @@ from unittest.mock import call
 
 import pytest
 from flask import url_for
+from freezegun import freeze_time
 
 from tests import generate_uuid, validate_route_permission
-from tests.conftest import SERVICE_ONE_ID, create_notifications, normalize_spaces
+from tests.conftest import SERVICE_ONE_ID, create_notifications, create_user, normalize_spaces
 
 
 def test_should_show_api_page(
@@ -310,28 +311,43 @@ def test_should_show_empty_api_keys_page(
     mock_get_no_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 
+@freeze_time("2026-09-14 12:00")
 def test_should_show_api_keys_page(
     client_request,
     mock_get_api_keys,
     fake_uuid,
     mock_get_users_by_service,
+    api_user_active,
+    mocker,
 ):
+    mocker.patch(
+        "app.user_api_client.get_user",
+        side_effect=[
+            # First call is to authenticate the user viewing the page
+            api_user_active,
+            # Second call returns an archived user who is not longer in the team
+            create_user(
+                id=str(uuid.uuid4()),
+                name="Archived user",
+                state="inactive",
+            ),
+        ],
+    )
+
     page = client_request.get("main.api_keys", service_id=SERVICE_ONE_ID)
-    items = [normalize_spaces(item.text) for item in page.select("ul.api-key-list li")]
     revoke_link = page.select_one("ul li a.govuk-link.govuk-link--destructive")
 
-    assert items[0] == (
-        "another key name Revoked on 1 January 1970 at 1:00am Test – "
-        "pretends to send messages Created by Test User on 2 September at 1:00pm"
-    )
-    assert items[1] == (
-        "some key name Revoke some key name API key Live – "
-        "sends to anyone Created by Test User on 1 September at 11:00am"
-    )
-    assert items[2] == (
-        "third key Revoke third key API key Team and guest list – "
-        "limits who you can send to Created by Test User on 3 September at 8:00pm"
-    )
+    assert [normalize_spaces(item.text) for item in page.select("ul.api-key-list li")] == [
+        (
+            "another key name Revoked yesterday at midday Test – "
+            "pretends to send messages Created by Test User 12 days ago"
+        ),
+        ("some key name Revoke some key name API key Live – sends to anyone Created by Test User 2 hours ago"),
+        (
+            "third key Revoke third key API key Team and guest list – "
+            "limits who you can send to Created by an archived user 2 years ago"
+        ),
+    ]
 
     assert normalize_spaces(revoke_link.text) == "Revoke some key name API key"
     assert revoke_link["href"] == url_for(
