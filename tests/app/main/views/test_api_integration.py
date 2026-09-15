@@ -35,6 +35,7 @@ def test_should_show_api_page_with_lots_of_notifications(
         "main.api_integration",
         service_id=SERVICE_ONE_ID,
     )
+    assert "When you send messages via the API they’ll appear here" not in normalize_spaces(page.select_one("main"))
     rows = page.select("div.api-notifications-item")
     assert " ".join(rows[len(rows) - 1].text.split()) == (
         "Only showing the first 50 messages. Notify deletes messages after 7 days."
