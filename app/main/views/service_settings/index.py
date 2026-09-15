@@ -100,7 +100,7 @@ def service_name_change(service_id):
 
     if form.validate_on_submit():
         try:
-            current_service.update(name=form.name.data, confirmed_unique=False, confirmed_service_name=False)
+            current_service.update(name=form.name.data, confirmed_service_name=False)
         except HTTPError as http_error:
             if http_error.status_code == 400 and (
                 error_message := service_api_client.parse_edit_service_http_error(http_error)
@@ -228,8 +228,13 @@ def service_switch_live(service_id):
 
     if form.validate_on_submit():
         current_service.update_status(live=form.enabled.data)
+
         if not current_service.has_email_templates and not bool(current_service.volume_email):
             current_service.force_permission("email", on=False)
+
+        if not current_service.has_sms_templates and not bool(current_service.volume_sms):
+            current_service.force_permission("sms", on=False)
+
         return redirect(url_for(".service_settings", service_id=service_id))
 
     return render_template(
@@ -791,6 +796,32 @@ def enable_email_channel(service_id):
     channel = "email"
 
     if current_service.has_email_reply_to_address and current_service.confirmed_email_sender_name:
+        current_service.force_permission(channel, on=True)
+        return redirect(url_for(".service_settings", service_id=service_id))
+    else:
+        flash(
+            Markup(
+                """
+                    <h2 class='govuk-heading-m'>There is a problem</h2>
+                    <p class='govuk-body error-text-colour govuk-!-font-weight-bold'>
+                        Some of the tasks on this page are incomplete
+                    </p>
+                """
+            )
+        )
+        return redirect(url_for(".service_set_channel", service_id=service_id, channel=channel))
+
+
+@main.route("/services/<uuid:service_id>/service-settings/set-sms/on", methods=["POST"])
+@user_has_permissions("manage_service")
+def enable_sms_channel(service_id):
+    channel = "sms"
+
+    needs_to_change_sms_sender = (
+        current_service.shouldnt_use_govuk_as_sms_sender and current_service.sms_sender_is_govuk
+    )
+
+    if not needs_to_change_sms_sender and current_service.confirmed_unique:
         current_service.force_permission(channel, on=True)
         return redirect(url_for(".service_settings", service_id=service_id))
     else:
