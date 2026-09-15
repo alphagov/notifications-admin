@@ -538,25 +538,27 @@ def _get_template_copy_name(template, existing_templates):
     return f"{template['name']} (copy)"
 
 
-@main.route("/services/<uuid:service_id>/templates/action-blocked/<template_type:notification_type>/<string:return_to>")
 @main.route(
-    "/services/<uuid:service_id>/templates/action-blocked/"
-    "<template_type:notification_type>/<string:return_to>/<uuid:template_id>"
+    "/services/<uuid:service_id>/templates/action-blocked/<template_type:notification_type>/<string:return_to>",
+)
+@main.route(
+    "/services/<uuid:service_id>/templates/action-blocked/<template_type:notification_type>/<string:return_to>/<uuid:template_id>",
 )
 @user_has_permissions("manage_templates")
 def action_blocked(service_id, notification_type, return_to, template_id=None):
-    back_link = {
-        "add_new_template": partial(url_for, ".choose_template", service_id=current_service.id),
-        "templates": partial(url_for, ".choose_template", service_id=current_service.id),
-        "view_template": partial(url_for, "main.view_template", service_id=current_service.id, template_id=template_id),
-    }.get(return_to)
+    back_link: str | None = None
+
+    if return_to in ("add_new_template", "templates"):
+        back_link = url_for(".choose_template", service_id=current_service.id)
+    if return_to == "view_template" and template_id:
+        back_link = url_for("main.view_template", service_id=current_service.id, template_id=template_id)
 
     return (
         render_template(
             "views/templates/action_blocked.html",
             service_id=service_id,
             notification_type=notification_type,
-            back_link=back_link(),
+            back_link=back_link,
         ),
         403,
     )
