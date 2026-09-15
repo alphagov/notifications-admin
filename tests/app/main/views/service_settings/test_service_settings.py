@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from functools import partial
 from unittest.mock import Mock, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
@@ -4081,10 +4081,10 @@ def test_unknown_channel_404s(
             "sms",
             "You have a free allowance of 250,000 text messages each financial year.",
             "Send text messages",
-            [],
-            "False",
+            ["sms", "email", "letter"],
             "True",
-            ["sms"],
+            "False",
+            ["email", "letter"],
         ),
         pytest.param(
             "email",
@@ -4107,7 +4107,7 @@ def test_unknown_channel_404s(
         ),
     ],
 )
-def test_switch_service_channels_on_and_off(
+def test_switch_service_channels_on_and_off_when_form_is_shown(
     client_request,
     service_one,
     mocker,
@@ -4301,6 +4301,178 @@ def test_switch_email_on_from_tasklist_form(
         assert not mock_update_service.called
 
     assert normalize_spaces(page.select_one("h1").text) == expected_page_title
+
+
+@pytest.mark.parametrize("terms_read", [True, False])
+@pytest.mark.parametrize(
+    "org_type,sms_sender,sms_sender_task_shown,sms_sender_task_status",
+    [
+        ("local", "GOVUK", True, "Incomplete"),
+        ("local", "my sender", True, "Completed"),
+        ("central", "GOVUK", False, None),
+        ("central", "my sender", False, None),
+    ],
+)
+def test_set_sms_page_markup(
+    client_request,
+    mock_get_sms_rate,
+    mock_get_free_sms_fragment_limit,
+    mock_get_letter_rates,
+    service_one,
+    terms_read,
+    org_type,
+    sms_sender,
+    sms_sender_task_shown,
+    sms_sender_task_status,
+    mocker,
+):
+    service_one["permissions"] = ["email"]
+    service_one["confirmed_unique"] = terms_read
+    service_one["organisation_type"] = org_type
+
+    mocker.patch(
+        "app.service_api_client.get_sms_senders",
+        return_value=[
+            {
+                "id": "1234",
+                "service_id": SERVICE_ONE_ID,
+                "sms_sender": sms_sender,
+                "is_default": True,
+                "created_at": datetime.now(UTC),
+                "inbound_number_id": None,
+                "updated_at": None,
+            }
+        ],
+    )
+
+    page = client_request.get(
+        "main.service_set_channel",
+        service_id=SERVICE_ONE_ID,
+        channel="sms",
+    )
+
+    assert (
+        normalize_spaces(
+            find_element_by_tag_and_partial_text(page, tag=".govuk-task-list__item", string="Read the terms").text
+        )
+        == f"Read the terms of the free text message allowance {'Completed' if terms_read else 'Incomplete'}"
+    )
+
+    if sms_sender_task_shown:
+        assert (
+            normalize_spaces(
+                find_element_by_tag_and_partial_text(
+                    page, tag=".govuk-task-list__item", string="Change your Text message sender ID"
+                ).text
+            )
+            == f"Change your Text message sender ID {sms_sender_task_status}"
+        )
+    else:
+        assert "Change your Text message sender ID" not in normalize_spaces(page.text)
+
+    assert normalize_spaces(page.select("form button")[0].text) == "Start sending text messages"
+    assert page.select_one("form")["action"] == url_for("main.enable_sms_channel", service_id=SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    "org_type,sms_sender",
+    [
+        ("local", "my sender"),
+        ("central", "GOVUK"),
+    ],
+)
+def test_switch_sms_on_from_tasklist_form_when_tasks_are_complete(
+    client_request,
+    mock_get_sms_rate,
+    mock_get_free_sms_fragment_limit,
+    mock_get_letter_rates,
+    mock_get_service_settings_page_common,
+    mock_get_service_data_retention,
+    single_reply_to_email_address,
+    mock_update_service,
+    service_one,
+    org_type,
+    sms_sender,
+    mocker,
+):
+    service_one["permissions"] = ["email"]
+    service_one["confirmed_unique"] = True
+    service_one["organisation_type"] = org_type
+
+    mocker.patch(
+        "app.service_api_client.get_sms_senders",
+        return_value=[
+            {
+                "id": "1234",
+                "service_id": SERVICE_ONE_ID,
+                "sms_sender": sms_sender,
+                "is_default": True,
+                "created_at": datetime.now(UTC),
+                "inbound_number_id": None,
+                "updated_at": None,
+            }
+        ],
+    )
+
+    page = client_request.post(
+        "main.enable_sms_channel", service_id=SERVICE_ONE_ID, channel="sms", _follow_redirects=True
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "Settings"
+    assert mock_update_service.call_count == 1
+    assert set(mock_update_service.call_args_list[0].kwargs["permissions"]) == {"sms", "email"}
+
+
+@pytest.mark.parametrize(
+    "terms_read,org_type,sms_sender",
+    [
+        (False, "local", "my sender"),
+        (False, "local", "GOVUK"),
+        (False, "central", "my sender"),
+        (True, "local", "GOVUK"),
+    ],
+)
+def test_switch_sms_on_from_tasklist_form_when_tasks_are_not_complete(
+    client_request,
+    mock_get_free_sms_fragment_limit,
+    mock_get_sms_rate,
+    mock_get_letter_rates,
+    mock_update_service,
+    service_one,
+    terms_read,
+    org_type,
+    sms_sender,
+    mocker,
+):
+    service_one["permissions"] = ["email"]
+    service_one["confirmed_unique"] = terms_read
+    service_one["organisation_type"] = org_type
+
+    mocker.patch(
+        "app.service_api_client.get_sms_senders",
+        return_value=[
+            {
+                "id": "1234",
+                "service_id": SERVICE_ONE_ID,
+                "sms_sender": sms_sender,
+                "is_default": True,
+                "created_at": datetime.now(UTC),
+                "inbound_number_id": None,
+                "updated_at": None,
+            }
+        ],
+    )
+
+    page = client_request.post(
+        "main.enable_sms_channel", service_id=SERVICE_ONE_ID, channel="sms", _follow_redirects=True
+    )
+
+    assert normalize_spaces(page.select_one(".banner-dangerous h2").text) == ("There is a problem")
+    assert normalize_spaces(page.select_one(".banner-dangerous p").text) == (
+        "Some of the tasks on this page are incomplete"
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Send text messages"
+    assert not mock_update_service.called
 
 
 @pytest.mark.parametrize(
