@@ -1,10 +1,11 @@
+from collections.abc import Mapping, Set
 from itertools import chain
 
 from flask import request, url_for
 
 
 class Navigation:
-    mapping = {}
+    mapping: Mapping[str, Set[str]] = {}
     selected_class = "selected"
 
     def __init__(self):

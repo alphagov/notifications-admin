@@ -195,8 +195,8 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         subject=None,
         parent_folder_id=None,
         letter_languages: LetterLanguageOptions | None = None,
-        letter_welsh_subject: str = None,
-        letter_welsh_content: str = None,
+        letter_welsh_subject: str | None = None,
+        letter_welsh_content: str | None = None,
         has_unsubscribe_link: bool | None = None,
     ):
         """
