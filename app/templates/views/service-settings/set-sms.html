@@ -3,6 +3,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/task-list/macro.html" import govukTaskList %}
 
 {% block service_page_title %}
   Send text messages
@@ -29,24 +30,66 @@
       <p class="govuk-body">
         See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">pricing</a> for more details.
       </p>
-      {% call form_wrapper() %}
-        {{ form.enabled }}
-        {{ page_footer('Save') }}
-      {% endcall %}
-        <h2 class="govuk-heading-m">
-          If you turn text messages off
-        </h2>
-      <p class="govuk-body">
-          GOV.UK Notify will hide:
+
+      {% if current_service.has_permission("sms") %}
+        {% call form_wrapper() %}
+          {{ form.enabled }}
+          {{ page_footer('Save') }}
+        {% endcall %}
+          <h2 class="govuk-heading-m">
+            If you turn text messages off
+          </h2>
+        <p class="govuk-body">
+            GOV.UK Notify will hide:
+          </p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>any existing text message templates</li>
+          <li>the option to add new text message templates</li>
+          <li>some of your text message settings</li>
+        </ul>
+        <p class="govuk-body">
+            To get them back, turn text messages on again.
         </p>
-      <ul class="govuk-list govuk-list--bullet">
-        <li>any existing text message templates</li>
-        <li>the option to add new text message templates</li>
-        <li>some of your text message settings</li>
-      </ul>
-      <p class="govuk-body">
-          To get them back, turn text messages on again.
+      {% else %}
+        <h2 class="govuk-heading-m">Set up your service</h2>
+
+          {# as options objects are different for completed vs incomplete #}
+          {# we set them here to reuse them later #}
+          {% set completed_status = {"text": "Completed"} %}
+          {% set incomplete_status = {"tag": {"text": "Incomplete"}} %}
+
+          {% set task_list_items =
+            [{
+              "title": {
+                "text": "Read the terms of the free text message allowance",
+                "classes": "govuk-link--no-visited-state",
+              },
+              "href": url_for('main.service_confirm_free_allowance_terms', service_id=current_service.id),
+              "status": completed_status if current_service.confirmed_unique else incomplete_status,
+            }]
+          %}
+          {% if current_service.shouldnt_use_govuk_as_sms_sender %}
+            {% do task_list_items.append(
+              {
+                "title": {
+                  "text": "Change your Text message sender ID",
+                  "classes": "govuk-link--no-visited-state",
+                },
+                "href": url_for('main.service_sms_senders', service_id=current_service.id),
+                "status": completed_status if not current_service.sms_sender_is_govuk else incomplete_status,
+              }
+          )%}
+          {% endif %}
+
+        {{ govukTaskList({"items": task_list_items}) }}
+        <p class="govuk-body">
+          You must complete all the tasks before you can send text messages.
         </p>
+        {% call form_wrapper(action=url_for('.enable_sms_channel', service_id=current_service.id)) %}
+          {{ page_footer('Start sending text messages') }}
+        {% endcall %}
+      {% endif %}
+
     </div>
   </div>
 
