@@ -50,7 +50,7 @@
         transition: box-shadow 0.6s ease-out;
       }
 
-      box-shadow: inset -1px 0 0 0 govuk-functional-colour(border), inset -3px 0 0 0 rgb(govuk-functional-colour(border), 0.2);
+      box-shadow: inset -1px 0 0 0 govuk-functional-colour(border), inset -3px 0 0 0 color-mix(in srgb, govuk-functional-colour(border) 20%, transparent);
 
     }
 
@@ -142,7 +142,8 @@
     .govuk-table__header:first-child,
     tbody th.table-field {
       transition: box-shadow 0.3s ease-in-out;
-      box-shadow: 1px 0 0 0 govuk-functional-colour(border), 3px 0 0 0 rgb(govuk-functional-colour(border), 0.2);
+      box-shadow: inset -1px 0 0 0 govuk-functional-colour(border), inset -3px 0 0 0 color-mix(in srgb, govuk-functional-colour(border) 20%, transparent);
+
     }
 
   }
