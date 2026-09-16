@@ -66,12 +66,12 @@
     {% do table_rows.append(current_row) %}
   {% endfor %}
 
-  <div class="spreadsheet" data-notify-module="fullscreen-table">
+  <div data-notify-module="fullscreen-table">
     {{ govukTable({
       "caption": "Example",
       "captionClasses": "govuk-visually-hidden",
       "firstCellIsHeader": true,
-      "classes": "notify-table notify-table--body-small",
+      "classes": "notify-table notify-table--body-small notify-table--spreadsheet",
       "head": table_headers,
       "rows": table_rows
     }) }}
