@@ -473,6 +473,21 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
     }
   }
 }
+// spreadsheet table with fullscreen JS ehancement
+.fullscreen-fixed-table .notify-table--spreadsheet {
+  
+  .govuk-table__header:first-child {
+    background: govuk-colour('black', $variant: "tint-95");
+  }
+}
+
+.fullscreen-scrollable-table .notify-table--spreadsheet {
+
+  .govuk-table__cell {
+    min-width: 183px;
+    border-right: 1px solid govuk-functional-colour(border);
+  }
+}
 
 // govuk-table overrides
 .govuk-table__cell--default {
