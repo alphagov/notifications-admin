@@ -135,3 +135,39 @@ def test_get_consistent_data_retention_period(
 
 def test_no_duplicate_service_permissions():
     assert len(set(Service.ALL_PERMISSIONS)) == len(Service.ALL_PERMISSIONS), "Duplicate permissions"
+
+
+def test_update_status_with_no_permissions_to_remove(notify_admin, service_one, mocker):
+    mock_update = mocker.patch("app.service_api_client.update_status")
+
+    service = Service(service_one)
+    service.update_status(live="off")
+
+    mock_update.assert_called_once_with(service.id, live="off")
+
+
+@pytest.mark.parametrize(
+    "permissions_to_remove,expected_permissions",
+    [
+        (["email"], {"sms", "letter"}),
+        (["sms"], {"email", "letter"}),
+        (["sms", "email"], {"letter"}),
+        (["sms", "email", "letter"], set()),
+    ],
+)
+def test_update_status_removes_specified_permissions(
+    notify_admin,
+    service_one,
+    permissions_to_remove,
+    expected_permissions,
+    mocker,
+):
+    mock_update = mocker.patch("app.service_api_client.update_status")
+
+    service_one["permissions"] = ["email", "sms", "letter"]
+    service = Service(service_one)
+
+    service.update_status(live="off", permissions_to_remove=permissions_to_remove)
+
+    mock_update.assert_called_once_with(service.id, live="off", permissions=mocker.ANY)
+    assert set(mock_update.call_args_list[0].kwargs["permissions"]) == expected_permissions
