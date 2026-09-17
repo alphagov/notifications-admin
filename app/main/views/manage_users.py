@@ -124,6 +124,12 @@ def invite_user(service_id, user_id=None):
 
     if form.validate_on_submit():
         email_address = form.email_address.data
+        for team_member in current_service.team_members:
+            if not team_member.is_invited_user and team_member.email_address.lower() == email_address.lower():
+                return render_template(
+                    "views/user-already-team-member.html",
+                    user_to_invite=team_member,
+                )
         invited_user = InvitedUser.create(
             current_user.id,
             service_id,
