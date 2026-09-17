@@ -695,46 +695,34 @@ def test_post_org_member_make_service_live_decision(
 
 
 @pytest.mark.parametrize(
-    "query_args, post_data, email_volume, template_types, expect_email_to_be_turned_off",
+    "email_volume, template_types, expect_email_to_be_turned_off",
     (
         (
-            {"name": "ok", "unique": "yes"},
-            {"enabled": True},
             2000,
             ["email", "email", "sms", "letter"],
             False,
         ),
         (
-            {"name": "ok", "unique": "yes"},
-            {"enabled": True},
             2000,
             ["sms", "letter"],
             False,
         ),
         (
-            {"name": "ok", "unique": "yes"},
-            {"enabled": True},
             0,
             ["email", "email", "sms", "letter"],
             False,
         ),
         (
-            {"name": "ok", "unique": "yes"},
-            {"enabled": True},
             0,
             ["sms", "letter"],
             True,
         ),
         (
-            {"name": "ok", "unique": "yes"},
-            {"enabled": True},
             None,
             ["email", "email", "sms", "letter"],
             False,
         ),
         (
-            {"name": "ok", "unique": "yes"},
-            {"enabled": True},
             None,
             ["sms", "letter"],
             True,
@@ -748,8 +736,6 @@ def test_post_org_member_make_service_live_turns_email_off_if_no_expected_volume
     service_one,
     mock_get_organisation,
     mock_update_service,
-    query_args,
-    post_data,
     email_volume,
     template_types,
     expect_email_to_be_turned_off,
@@ -770,8 +756,9 @@ def test_post_org_member_make_service_live_turns_email_off_if_no_expected_volume
     client_request.post(
         "main.org_member_make_service_live_decision",
         service_id=SERVICE_ONE_ID,
-        **query_args,
-        _data=post_data,
+        name="ok",
+        unique=True,
+        _data={"enabled": True},
         _expected_redirect=url_for("main.organisation_dashboard", org_id=ORGANISATION_ID),
     )
 
