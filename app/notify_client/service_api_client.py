@@ -142,7 +142,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
         return self.post(endpoint, data)
 
     @cache.delete("live-service-and-organisation-counts")
-    def update_status(self, service_id, live):
+    def update_status(self, service_id, live, permissions=None):
         from flask import current_app
 
         def get_daily_limit(live, channel):
@@ -150,15 +150,19 @@ class ServiceAPIClient(NotifyAdminAPIClient):
                 return current_app.config["DEFAULT_LIVE_SERVICE_RATE_LIMITS"][channel]
             return current_app.config["DEFAULT_SERVICE_LIMIT"]
 
-        return self.update_service(
-            service_id,
-            email_message_limit=get_daily_limit(live, "email"),
-            sms_message_limit=get_daily_limit(live, "sms"),
-            letter_message_limit=get_daily_limit(live, "letter"),
-            restricted=(not live),
-            go_live_at=str_no_tz(datetime.now(UTC)) if live else None,
-            has_active_go_live_request=False,
-        )
+        data = {
+            "email_message_limit": get_daily_limit(live, "email"),
+            "sms_message_limit": get_daily_limit(live, "sms"),
+            "letter_message_limit": get_daily_limit(live, "letter"),
+            "restricted": (not live),
+            "go_live_at": str_no_tz(datetime.now(UTC)) if live else None,
+            "has_active_go_live_request": False,
+        }
+
+        if permissions is not None:
+            data["permissions"] = permissions
+
+        return self.update_service(service_id, **data)
 
     @cache.delete("live-service-and-organisation-counts")
     def update_count_as_live(self, service_id, count_as_live):

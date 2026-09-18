@@ -121,8 +121,22 @@ class Service(JSONModel):
     def update_count_as_live(self, count_as_live):
         return service_api_client.update_count_as_live(self.id, count_as_live=count_as_live)
 
-    def update_status(self, live):
-        return service_api_client.update_status(self.id, live=live)
+    def update_status(self, live, permissions_to_remove=None):
+        original_permissions = set(self._permissions)
+
+        if permissions_to_remove:
+            updated_permissions = original_permissions - set(permissions_to_remove)
+
+            return service_api_client.update_status(
+                self.id,
+                live=live,
+                permissions=list(updated_permissions),
+            )
+
+        return service_api_client.update_status(
+            self.id,
+            live=live,
+        )
 
     def switch_permission(self, permission):
         return self.force_permission(
