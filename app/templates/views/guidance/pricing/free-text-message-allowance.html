@@ -13,8 +13,6 @@ Free text message allowance
   <h1 class="heading-large">Free text message allowance</h1>
 
   <p class="govuk-body">Eligible services get an annual allowance of free text messages.</p>
-  <p class="govuk-body">You can keep sending messages once your service has used its allowance, you’ll just be charged for each additional message that you send.</p>
-  <p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">text messages pricing</a>.</p>
   <p class="govuk-body">The size of the allowance depends on the organisation you work for.</p>
 
   <div class="bottom-gutter-3-2">
@@ -43,6 +41,9 @@ Free text message allowance
       {% endfor %}
     {% endcall %}
   </div>
+
+  <p class="govuk-body">You can keep sending messages once your service has used its allowance, you’ll just be charged for each additional message that you send.</p>
+  <p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">text messages pricing</a>.</p>
 
   <h2 class="heading-medium">Terms of the free allowance</h2>
 
