@@ -270,7 +270,7 @@ def uploaded_letter_preview(service_id, file_id):
 @user_has_permissions("send_messages")
 def view_letter_upload_as_preview(service_id, file_id):
     try:
-        page = int(request.args.get("page"))
+        page = int(request.args.get("page", ""))
     except ValueError:
         abort(400)
 
