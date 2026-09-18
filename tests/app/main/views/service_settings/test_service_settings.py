@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from functools import partial
 from unittest.mock import Mock, PropertyMock, call
 from urllib.parse import parse_qs, urlparse
@@ -62,6 +62,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Send files by email contact_us@gov.uk Manage sending files by email",
                 "Email limit 1,000 per day 1,234 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
@@ -81,6 +82,8 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Email ‘from’ name Test Service test.service@notifications.service.gov.uk Change email ‘from’ name",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Send text messages Off Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
+                "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses Not set Manage sender addresses",
@@ -102,6 +105,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Send files by email contact_us@gov.uk",
                 "Email limit 1,000 per day 1,234 sent today",
                 "Send text messages On",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",  # user will see manage button
                 "Start text messages with service name On",
                 "Receive text messages Off",
@@ -128,6 +132,7 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Send files by email contact_us@gov.uk Manage sending files by email",
                 "Email limit 1,000 per day 1,234 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
@@ -164,6 +169,8 @@ FAKE_TEMPLATE_ID = uuid4()
                 "Email ‘from’ name Test Service test.service@notifications.service.gov.uk Change email ‘from’ name",
                 "Reply-to email addresses Not set Manage reply-to email addresses",
                 "Send text messages Off Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
+                "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses Not set Manage sender addresses",
@@ -392,6 +399,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send files by email Not set up Manage sending files by email",
                 "Email limit 1,000 per day 0 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages On Change your settings for receiving text messages",
@@ -414,6 +422,7 @@ def test_send_files_by_email_row_on_settings_page(
                 "Send files by email Not set up Manage sending files by email",
                 "Email limit 1,000 per day 0 sent today Change daily email limit",
                 "Send text messages On Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
                 "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Start text messages with service name On Change your settings for starting text messages with service name",  # noqa
                 "Receive text messages Off Change your settings for receiving text messages",
@@ -432,6 +441,8 @@ def test_send_files_by_email_row_on_settings_page(
                 "Email ‘from’ name service one service.one@notifications.service.gov.uk Change email ‘from’ name",
                 "Reply-to email addresses test@example.com Manage reply-to email addresses",
                 "Send text messages Off Change your settings for sending text messages",
+                "Terms of the free text message allowance Not read View the terms of the free text message allowance",
+                "Text message sender IDs GOVUK Manage text message sender IDs",
                 "Send letters On Change your settings for sending letters",
                 "Send international letters Off Change your settings for sending international letters",
                 "Sender addresses 1 Example Street Manage sender addresses",
@@ -730,6 +741,62 @@ def test_switch_service_to_live_turns_email_off_if_no_expected_volumes_and_no_em
         assert "permissions" not in update_service_kwargs
 
 
+@pytest.mark.parametrize(
+    "sms_volume, template_types, expect_sms_to_be_turned_off",
+    (
+        (20000, ["email", "email", "sms", "letter"], False),
+        (30, ["email", "letter"], False),
+        (None, ["email", "sms", "sms", "letter"], False),
+        (0, ["email", "email", "sms", "letter"], False),
+        (None, ["email", "email", "letter"], True),
+        (0, ["letter"], True),
+    ),
+)
+def test_switch_service_to_live_turns_sms_off_if_no_expected_volumes_and_no_sms_templates(
+    client_request,
+    service_one,
+    platform_admin_user,
+    mock_get_service_organisation,
+    sms_volume,
+    template_types,
+    expect_sms_to_be_turned_off,
+    mocker,
+):
+    service_one["permissions"] = ["sms", "email", "letter"]
+    service_one["volume_sms"] = sms_volume
+    templates = [_template(template_type, f"Template {index}") for index, template_type in enumerate(template_types)]
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": templates})
+    mocker.patch("app.service_api_client.update_service")
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(agreement_signed=True),
+    )
+    client_request.login(platform_admin_user)
+    client_request.post(
+        "main.service_switch_live",
+        service_id=SERVICE_ONE_ID,
+        _data={"enabled": "True"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.service_settings",
+            service_id=SERVICE_ONE_ID,
+        ),
+    )
+
+    # update_service should always be called to make the service live
+    # if SMS aren't being used it's called again, to remove the 'sms' service permission
+    update_service_kwargs = app.service_api_client.update_service.call_args.kwargs
+    if expect_sms_to_be_turned_off:
+        assert app.service_api_client.update_service.call_count == 2
+        assert "permissions" in update_service_kwargs and set(update_service_kwargs["permissions"]) == {
+            "email",
+            "letter",
+        }
+    else:
+        assert app.service_api_client.update_service.call_count == 1
+        assert "permissions" not in update_service_kwargs
+
+
 def test_show_live_service(
     client_request,
     mock_get_live_service,
@@ -889,7 +956,6 @@ def test_should_redirect_after_service_name_change(
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
         name="New Name",
-        confirmed_unique=False,
         confirmed_service_name=False,
     )
 
@@ -1463,10 +1529,11 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
         "has_email_reply_to_address,"
         "shouldnt_use_govuk_as_sms_sender,"
         "sms_sender_is_govuk,"
+        "confirmed_unique,"
         "volume_email,"
         "volume_sms,"
         "volume_letter,"
-        "confirmed_unique,"
+        "confirmed_service_name,"
         "expected_readyness,"
         "agreement_signed,"
         "confirmed_email_sender_name,"
@@ -1480,6 +1547,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             True,
+            False,
             1,
             0,
             0,
@@ -1494,6 +1562,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             False,
             False,
+            True,
             True,
             True,
             1,
@@ -1512,6 +1581,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             False,
+            True,
             0,
             1,
             0,
@@ -1528,6 +1598,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             True,
+            True,
             0,
             1,
             0,
@@ -1535,6 +1606,23 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             False,
             True,
             False,
+        ),
+        (  # Needs to agree to terms of free allowance
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            False,
+            False,
+            0,
+            1,
+            0,
+            True,
+            False,
+            True,
+            True,
         ),
         (  # Needs team members
             False,
@@ -1544,6 +1632,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             False,
+            True,
             1,
             0,
             0,
@@ -1560,6 +1649,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             False,
+            True,
             0,
             1,
             0,
@@ -1568,7 +1658,8 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
         ),
-        (  # Just confirm unique service
+        (  # Needs service name to be confirmed
+            True,
             True,
             True,
             True,
@@ -1592,6 +1683,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             True,
             True,
             True,
+            True,
             1,
             0,
             0,
@@ -1608,6 +1700,7 @@ def test_should_not_default_to_zero_if_some_fields_dont_validate(
             False,
             False,
             True,
+            False,
             None,
             None,
             None,
@@ -1629,10 +1722,11 @@ def test_ready_to_go_live(
     has_email_reply_to_address,
     shouldnt_use_govuk_as_sms_sender,
     sms_sender_is_govuk,
+    confirmed_unique,
     volume_email,
     volume_sms,
     volume_letter,
-    confirmed_unique,
+    confirmed_service_name,
     expected_readyness,
     agreement_signed,
     confirmed_email_sender_name,
@@ -1667,8 +1761,9 @@ def test_ready_to_go_live(
     service = app.models.service.Service(
         {
             "id": SERVICE_ONE_ID,
-            "confirmed_unique": confirmed_unique,
+            "confirmed_service_name": confirmed_service_name,
             "confirmed_email_sender_name": confirmed_email_sender_name,
+            "confirmed_unique": confirmed_unique,
         }
     )
 
@@ -3983,10 +4078,10 @@ def test_unknown_channel_404s(
             "sms",
             "You have a free allowance of 250,000 text messages each financial year.",
             "Send text messages",
-            [],
-            "False",
+            ["sms", "email", "letter"],
             "True",
-            ["sms"],
+            "False",
+            ["email", "letter"],
         ),
         pytest.param(
             "email",
@@ -4009,7 +4104,7 @@ def test_unknown_channel_404s(
         ),
     ],
 )
-def test_switch_service_channels_on_and_off(
+def test_switch_service_channels_on_and_off_when_form_is_shown(
     client_request,
     service_one,
     mocker,
@@ -4203,6 +4298,178 @@ def test_switch_email_on_from_tasklist_form(
         assert not mock_update_service.called
 
     assert normalize_spaces(page.select_one("h1").text) == expected_page_title
+
+
+@pytest.mark.parametrize("terms_read", [True, False])
+@pytest.mark.parametrize(
+    "org_type,sms_sender,sms_sender_task_shown,sms_sender_task_status",
+    [
+        ("local", "GOVUK", True, "Incomplete"),
+        ("local", "my sender", True, "Completed"),
+        ("central", "GOVUK", False, None),
+        ("central", "my sender", False, None),
+    ],
+)
+def test_set_sms_page_markup(
+    client_request,
+    mock_get_sms_rate,
+    mock_get_free_sms_fragment_limit,
+    mock_get_letter_rates,
+    service_one,
+    terms_read,
+    org_type,
+    sms_sender,
+    sms_sender_task_shown,
+    sms_sender_task_status,
+    mocker,
+):
+    service_one["permissions"] = ["email"]
+    service_one["confirmed_unique"] = terms_read
+    service_one["organisation_type"] = org_type
+
+    mocker.patch(
+        "app.service_api_client.get_sms_senders",
+        return_value=[
+            {
+                "id": "1234",
+                "service_id": SERVICE_ONE_ID,
+                "sms_sender": sms_sender,
+                "is_default": True,
+                "created_at": datetime.now(UTC),
+                "inbound_number_id": None,
+                "updated_at": None,
+            }
+        ],
+    )
+
+    page = client_request.get(
+        "main.service_set_channel",
+        service_id=SERVICE_ONE_ID,
+        channel="sms",
+    )
+
+    assert (
+        normalize_spaces(
+            find_element_by_tag_and_partial_text(page, tag=".govuk-task-list__item", string="Read the terms").text
+        )
+        == f"Read the terms of the free text message allowance {'Completed' if terms_read else 'Incomplete'}"
+    )
+
+    if sms_sender_task_shown:
+        assert (
+            normalize_spaces(
+                find_element_by_tag_and_partial_text(
+                    page, tag=".govuk-task-list__item", string="Change your Text message sender ID"
+                ).text
+            )
+            == f"Change your Text message sender ID {sms_sender_task_status}"
+        )
+    else:
+        assert "Change your Text message sender ID" not in normalize_spaces(page.text)
+
+    assert normalize_spaces(page.select("form button")[0].text) == "Start sending text messages"
+    assert page.select_one("form")["action"] == url_for("main.enable_sms_channel", service_id=SERVICE_ONE_ID)
+
+
+@pytest.mark.parametrize(
+    "org_type,sms_sender",
+    [
+        ("local", "my sender"),
+        ("central", "GOVUK"),
+    ],
+)
+def test_switch_sms_on_from_tasklist_form_when_tasks_are_complete(
+    client_request,
+    mock_get_sms_rate,
+    mock_get_free_sms_fragment_limit,
+    mock_get_letter_rates,
+    mock_get_service_settings_page_common,
+    mock_get_service_data_retention,
+    single_reply_to_email_address,
+    mock_update_service,
+    service_one,
+    org_type,
+    sms_sender,
+    mocker,
+):
+    service_one["permissions"] = ["email"]
+    service_one["confirmed_unique"] = True
+    service_one["organisation_type"] = org_type
+
+    mocker.patch(
+        "app.service_api_client.get_sms_senders",
+        return_value=[
+            {
+                "id": "1234",
+                "service_id": SERVICE_ONE_ID,
+                "sms_sender": sms_sender,
+                "is_default": True,
+                "created_at": datetime.now(UTC),
+                "inbound_number_id": None,
+                "updated_at": None,
+            }
+        ],
+    )
+
+    page = client_request.post(
+        "main.enable_sms_channel", service_id=SERVICE_ONE_ID, channel="sms", _follow_redirects=True
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "Settings"
+    assert mock_update_service.call_count == 1
+    assert set(mock_update_service.call_args_list[0].kwargs["permissions"]) == {"sms", "email"}
+
+
+@pytest.mark.parametrize(
+    "terms_read,org_type,sms_sender",
+    [
+        (False, "local", "my sender"),
+        (False, "local", "GOVUK"),
+        (False, "central", "my sender"),
+        (True, "local", "GOVUK"),
+    ],
+)
+def test_switch_sms_on_from_tasklist_form_when_tasks_are_not_complete(
+    client_request,
+    mock_get_free_sms_fragment_limit,
+    mock_get_sms_rate,
+    mock_get_letter_rates,
+    mock_update_service,
+    service_one,
+    terms_read,
+    org_type,
+    sms_sender,
+    mocker,
+):
+    service_one["permissions"] = ["email"]
+    service_one["confirmed_unique"] = terms_read
+    service_one["organisation_type"] = org_type
+
+    mocker.patch(
+        "app.service_api_client.get_sms_senders",
+        return_value=[
+            {
+                "id": "1234",
+                "service_id": SERVICE_ONE_ID,
+                "sms_sender": sms_sender,
+                "is_default": True,
+                "created_at": datetime.now(UTC),
+                "inbound_number_id": None,
+                "updated_at": None,
+            }
+        ],
+    )
+
+    page = client_request.post(
+        "main.enable_sms_channel", service_id=SERVICE_ONE_ID, channel="sms", _follow_redirects=True
+    )
+
+    assert normalize_spaces(page.select_one(".banner-dangerous h2").text) == ("There is a problem")
+    assert normalize_spaces(page.select_one(".banner-dangerous p").text) == (
+        "Some of the tasks on this page are incomplete"
+    )
+    assert normalize_spaces(page.select_one("h1").text) == "Send text messages"
+    assert not mock_update_service.called
 
 
 @pytest.mark.parametrize(
@@ -5180,6 +5447,40 @@ class TestSetAuthTypeForUsers:
             assert mock_update_user_attribute.call_args_list == []
         else:
             assert mock_update_user_attribute.call_args_list != []
+
+
+@pytest.mark.parametrize(
+    "terms_read, row_description",
+    [
+        (True, "Read"),
+        (False, "Not read"),
+    ],
+)
+def test_service_settings_page_when_terms_of_free_allowance_have_been_agreed(
+    client_request,
+    single_reply_to_email_address,
+    single_sms_sender,
+    mock_get_service_data_retention,
+    service_one,
+    terms_read,
+    row_description,
+):
+    service_one["confirmed_unique"] = terms_read
+
+    page = client_request.get(
+        "main.service_settings",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    free_allowance_row = normalize_spaces(
+        find_element_by_tag_and_partial_text(
+            page, tag=".govuk-summary-list__row", string="Terms of the free text message allowance"
+        ).text
+    )
+
+    assert free_allowance_row == (
+        f"Terms of the free text message allowance {row_description} View the terms of the free text message allowance"
+    )
 
 
 def test_service_settings_page_loads_when_inbound_number_is_not_set(
