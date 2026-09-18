@@ -719,14 +719,14 @@ def test_switch_service_to_live_turns_email_off_if_no_expected_volumes_and_no_em
         ),
     )
 
-    # update_service should always be called to make the service live
-    # if emails aren't being used it's called again, to remove the 'emails' service permission
     update_service_kwargs = app.service_api_client.update_service.call_args.kwargs
+
+    assert app.service_api_client.update_service.call_count == 1
+    assert update_service_kwargs["restricted"] is False
+
     if expect_emails_to_be_turned_off:
-        assert app.service_api_client.update_service.call_count == 2
         assert "permissions" in update_service_kwargs and set(update_service_kwargs["permissions"]) == {"sms", "letter"}
     else:
-        assert app.service_api_client.update_service.call_count == 1
         assert "permissions" not in update_service_kwargs
 
 

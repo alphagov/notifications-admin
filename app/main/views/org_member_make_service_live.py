@@ -206,10 +206,12 @@ def org_member_make_service_live_decision(service_id):
                 "default",
             )
 
-        current_service.update_status(live=form.enabled.data)
+        permissions_to_remove = []
 
         if not current_service.has_email_templates and not bool(current_service.volume_email):
-            current_service.force_permission("email", on=False)
+            permissions_to_remove.append("email")
+
+        current_service.update_status(live=form.enabled.data, permissions_to_remove=permissions_to_remove)
 
         return redirect(url_for(".organisation_dashboard", org_id=current_service.organisation_id))
 
