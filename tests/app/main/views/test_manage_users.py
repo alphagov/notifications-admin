@@ -1380,6 +1380,44 @@ def test_invite_user(
     )
 
 
+def test_invite_user_with_email_of_existing_team_member_shows_friendly_page(
+    client_request,
+    active_user_with_permissions,
+    mocker,
+    sample_invite,
+    mock_get_template_folders,
+    mock_get_organisations,
+):
+    other_team_member = dict(
+        active_user_with_permissions,
+        id="9b5e6f5a-3c9e-4f8a-9b1c-2d3e4f5a6b7c",
+        name="Other Team Member",
+        email_address="other.member@example.gov.uk",
+    )
+
+    mocker.patch(
+        "app.models.user.Users._get_items",
+        return_value=[active_user_with_permissions, other_team_member],
+    )
+    mocker.patch("app.models.user.InvitedUsers._get_items", return_value=[])
+    create_invite = mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
+
+    page = client_request.post(
+        "main.invite_user",
+        service_id=SERVICE_ONE_ID,
+        _data={
+            # upper-cased to prove the duplicate check is case-insensitive
+            "email_address": other_team_member["email_address"].upper(),
+            "permissions_field": ["view_activity"],
+        },
+        _expected_status=200,
+    )
+
+    assert normalize_spaces(page.select_one("h1").text) == "This person is already a team member"
+    assert f"{other_team_member['name']} is already member of" in page.text.strip()
+    create_invite.assert_not_called()
+
+
 def test_invite_user_when_email_address_is_prefilled(
     client_request,
     service_one,
@@ -1397,6 +1435,10 @@ def test_invite_user_when_email_address_is_prefilled(
     mocker.patch(
         "app.models.user.user_api_client.get_user",
         return_value=active_user_with_permission_to_other_service,
+    )
+    mocker.patch(
+        "app.models.user.Users._get_items",
+        return_value=[active_user_with_permissions],
     )
     mocker.patch("app.invite_api_client.create_invite", return_value=sample_invite)
     client_request.post(
