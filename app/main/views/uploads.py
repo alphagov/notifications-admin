@@ -146,7 +146,9 @@ def upload_letter(service_id):
             page_count = pdf_page_count(BytesIO(pdf_file_bytes))
         except PdfReadError:
             current_app.logger.info("Invalid PDF uploaded for service %s", service_id, extra={"service_id": service_id})
-            form.file.errors.append("Notify cannot read this PDF - save a new copy and try again")
+            form.file.errors.append(  # type: ignore[attr-defined]  # is there a better way?
+                "Notify cannot read this PDF - save a new copy and try again"
+            )
 
         if not form.errors:
             original_filename = form.file.data.filename
@@ -270,7 +272,7 @@ def uploaded_letter_preview(service_id, file_id):
 @user_has_permissions("send_messages")
 def view_letter_upload_as_preview(service_id, file_id):
     try:
-        page = int(request.args.get("page"))
+        page = int(request.args.get("page") or "")
     except ValueError:
         abort(400)
 
@@ -491,7 +493,7 @@ def delete_contact_list(service_id, contact_list_id):
         )
 
     flash(
-        [
+        [  # type: ignore[arg-type]  # lists as messages is a notify hack
             f"Are you sure you want to delete ‘{contact_list.original_file_name}’?",
         ],
         "delete",
