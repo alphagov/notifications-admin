@@ -58,7 +58,7 @@ def generate_notifications_csv(**kwargs):
             template=get_sample_template(kwargs["template_type"]),
         )
         original_column_headers = original_upload.column_headers
-        fieldnames = ["Row number"] + original_column_headers + ["Template", "Type", "Job", "Status", "Time"]
+        fieldnames = ["Row number", *original_column_headers, "Template", "Type", "Job", "Status", "Time"]
     else:
         fieldnames = [
             "Recipient",
