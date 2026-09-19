@@ -482,16 +482,22 @@ def platform_admin_returned_letters():
     form = AdminReturnedLettersForm()
 
     if form.validate_on_submit():
+        assert form.references.data is not None  # type narrowing
         references = [re.sub("NOTIFY00[0-9]", "", r.strip()) for r in form.references.data.split("\n") if r.strip()]
 
         try:
             letter_jobs_client.submit_returned_letters(references)
         except HTTPError as error:
             if error.status_code == 400:
+                assert isinstance(error.message, dict)  # type narrowing
                 error_references = [
-                    re.match("references (.*) does not match", e["message"]).group(1) for e in error.message
+                    m.group(1)
+                    for m in (re.match("references (.*) does not match", e["message"]) for e in error.message)
+                    if m
                 ]
-                form.references.errors.append(f"Invalid references: {', '.join(error_references)}")
+                form.references.errors.append(  # type: ignore[attr-defined]  # is there a better way?
+                    f"Invalid references: {', '.join(error_references)}"
+                )
             else:
                 raise error
         else:
@@ -568,8 +574,9 @@ def clear_cache():
 
     if form.validate_on_submit():
         group_keys = form.model_type.data
-        groups = map(CACHE_KEYS.get, group_keys)
-        patterns = list(itertools.chain(*groups))
+        assert group_keys is not None  # type narrowing
+
+        patterns = list(itertools.chain.from_iterable(CACHE_KEYS[k] for k in group_keys))
 
         num_deleted = sum(redis_client.delete_by_pattern(pattern) for pattern in patterns)
         keys_deleted = ", ".join(group_keys).replace("_", " ").lower()
