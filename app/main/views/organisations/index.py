@@ -70,7 +70,7 @@ def add_organisation():
         except HTTPError as e:
             org_name_exists_message = "Organisation name already exists"
             if e.status_code == 400 and org_name_exists_message in e.message:
-                form.name.errors.append("This organisation name is already in use.")
+                form.name.errors.append("This organisation name is already in use.")  # type: ignore[attr-defined]  # is there a better way?
             else:
                 raise e
 
@@ -306,7 +306,7 @@ def edit_organisation_name(org_id):
         except HTTPError as http_error:
             error_msg = "Organisation name already exists"
             if http_error.status_code == 400 and error_msg in http_error.message:
-                form.name.errors.append("This organisation name is already in use")
+                form.name.errors.append("This organisation name is already in use")  # type: ignore[attr-defined]  # is there a better way?
             else:
                 raise http_error
         else:
@@ -541,7 +541,11 @@ def archive_organisation(org_id):
         try:
             organisations_client.archive_organisation(org_id)
         except HTTPError as e:
-            if e.status_code == 400 and ("team members" in e.message or "services" in e.message):
+            if (
+                e.status_code == 400
+                and isinstance(e.message, str)
+                and ("team members" in e.message or "services" in e.message)
+            ):
                 flash(e.message)
                 return organisation_settings(org_id)
             else:
