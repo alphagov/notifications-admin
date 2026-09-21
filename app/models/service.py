@@ -533,8 +533,6 @@ class Service(JSONModel):
 
     @cached_property
     def organisation(self):
-        if not self.organisation_id:
-            return None
         return Organisation.from_id(self.organisation_id)
 
     @property

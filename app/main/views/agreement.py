@@ -78,6 +78,5 @@ def public_agreement(variant):
 
     return render_template(
         "views/agreement/agreement-public.html",
-        owner=current_user.default_organisation.name,
         download_link=url_for(".public_download_agreement", variant=variant),
     )
