@@ -3331,7 +3331,7 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
         ],
     )
 
-    def validate_file(self, field):
+    def validate_file(self, field):  # noqa: C901
         if field.errors:
             return
 
@@ -3361,9 +3361,35 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
                 service_id=self.service_id, file_name=field.data.filename, file_bytes=field.data.read()
             )
             field.data.seek(0)  # reset for subsequent file scans ie during S3 upload
-
         except DocumentDownloadError as e:
             raise ValidationError(e.message) from e
+
+        if Spreadsheet.can_handle(field.data.filename):
+            try:
+                too_many_email_addresses = Spreadsheet.from_file(
+                    field.data, filename=field.data.filename
+                ).contains_many_email_addresses()
+            except (UnicodeDecodeError, BadZipFile, XLRDError) as e:
+                raise ValidationError("Notify cannot read this file - try using a different file type") from e
+            except SoftEventletTimeout as e:
+                raise ValidationError(
+                    "Your file took too long to process – try again, or remove any sheets, columns or "
+                    "rows that are not needed"
+                ) from e
+            except XLDateError as e:
+                raise ValidationError("Notify cannot read this file - try saving it as a CSV instead") from e
+            except Spreadsheet.TooManyColumnsError as e:
+                raise ValidationError("Your file has too many columns (Notify can check up to 1,000 columns)") from e
+            except Spreadsheet.TooManyRowsError as e:
+                raise ValidationError(
+                    "Your file has too many rows (Notify can check up to 100,000 rows at once)"
+                ) from e
+
+            if too_many_email_addresses:
+                raise ValidationError(
+                    "Your file contains too many email addresses. If you are trying to upload a list of recipients "
+                    "go back to your template and choose ‘Get ready to send’"
+                )
 
 
 class TemplateEmailFileLinkTextForm(StripWhitespaceForm):
