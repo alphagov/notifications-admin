@@ -89,10 +89,6 @@ class Organisation(JSONModel):
         return cls(organisations_client.get_organisation_by_domain(domain))
 
     @classmethod
-    def from_service(cls, service_id):
-        return cls(organisations_client.get_service_organisation(service_id))
-
-    @classmethod
     def create_from_form(cls, form):
         return cls.create(
             name=form.name.data,
