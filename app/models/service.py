@@ -16,7 +16,7 @@ from app.constants import (
 )
 from app.models import JSONModel
 from app.models.api_key import APIKeys
-from app.models.branding import EmailBranding, LetterBranding
+from app.models.branding import EmailBranding, EmailBrandingPool, LetterBranding, LetterBrandingPool
 from app.models.contact_list import ContactLists
 from app.models.job import ImmediateJobs, PaginatedJobs, PaginatedUploads, ScheduledJobs
 from app.models.organisation import Organisation
@@ -470,6 +470,8 @@ class Service(JSONModel):
         return User.from_id(self._dict["go_live_user"])
 
     def notify_organisation_users_of_request_to_go_live(self):
+        if not self.organisation:
+            return
         if self.organisation.can_approve_own_go_live_requests:
             return organisations_client.notify_users_of_request_to_go_live_for_service(self.id)
 
@@ -520,6 +522,8 @@ class Service(JSONModel):
 
     @cached_property
     def organisation(self):
+        if not self.organisation_id:
+            return None
         return Organisation.from_id(self.organisation_id)
 
     @property
@@ -528,7 +532,9 @@ class Service(JSONModel):
 
     @property
     def organisation_type(self):
-        return self.organisation.organisation_type or self._dict["organisation_type"]
+        if self.organisation:
+            return self.organisation.organisation_type
+        return self._dict["organisation_type"]
 
     @property
     def organisation_name(self):
@@ -621,10 +627,15 @@ class Service(JSONModel):
 
     @property
     def able_to_accept_agreement(self):
-        return self.organisation.agreement_signed is not None or self.organisation_type in {
+        if self.organisation_type in {
             Organisation.TYPE_NHS_GP,
             Organisation.TYPE_NHS_LOCAL,
-        }
+        }:
+            return True
+        if not self.organisation:
+            return False
+        if self.organisation.agreement_signed is not None:
+            return True
 
     @cached_property
     def returned_letter_statistics(self):
@@ -652,15 +663,21 @@ class Service(JSONModel):
 
     @property
     def email_branding_pool(self):
+        if not self.organisation:
+            return EmailBrandingPool(None)
         return self.organisation.email_branding_pool
 
     @property
     def letter_branding_pool(self):
+        if not self.organisation:
+            return LetterBrandingPool(None)
         return self.organisation.letter_branding_pool
 
     @property
     def can_use_govuk_branding(self):
-        return self.organisation_type == Organisation.TYPE_CENTRAL and not self.organisation.email_branding
+        if self.organisation and self.organisation.email_branding:
+            return False
+        return self.organisation_type == Organisation.TYPE_CENTRAL
 
     def get_message_limit(self, notification_type):
         return getattr(self, f"{notification_type}_message_limit")
