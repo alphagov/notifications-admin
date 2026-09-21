@@ -59,6 +59,8 @@ def add_service():
 @user_is_gov_user
 def name_service():
     default_organisation_type = current_user.default_organisation_type
+
+    form: CreateNhsNotifyServiceForm | CreateServiceForm
     if default_organisation_type == "nhs":
         form = CreateNhsServiceForm()
         default_organisation_type = None
