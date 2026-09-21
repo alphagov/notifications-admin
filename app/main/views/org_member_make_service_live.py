@@ -78,7 +78,7 @@ def org_member_make_service_live_service_name(service_id):
 
     if "unique" not in request.args:
         return redirect(url_for(".org_member_make_service_live_start", service_id=current_service.id))
-    elif (unique := request.args.get("unique").lower()) == "no":
+    elif (unique := request.args["unique"].lower()) == "no":
         return redirect(url_for(".org_member_make_service_live_decision", service_id=current_service.id, unique=unique))
 
     form = OnOffSettingForm(
@@ -94,11 +94,16 @@ def org_member_make_service_live_service_name(service_id):
         form.enabled.data = name == "ok"
 
     if form.validate_on_submit():
-        redirect_kwargs = {"name": "ok" if form.enabled.data else "bad", "unique": unique}
+        redirect_name = "ok" if form.enabled.data else "bad"
 
         if form.enabled.data and unique == "yes":
             return redirect(
-                url_for(".org_member_make_service_live_decision", service_id=current_service.id, **redirect_kwargs)
+                url_for(
+                    ".org_member_make_service_live_decision",
+                    service_id=current_service.id,
+                    name=redirect_name,
+                    unique=unique,
+                )
             )
 
         organisations_client.notify_org_member_about_next_steps_of_go_live_request(
@@ -110,7 +115,12 @@ def org_member_make_service_live_service_name(service_id):
         )
 
         return redirect(
-            url_for(".org_member_make_service_live_contact_user", service_id=current_service.id, **redirect_kwargs)
+            url_for(
+                ".org_member_make_service_live_contact_user",
+                service_id=current_service.id,
+                name=redirect_name,
+                unique=unique,
+            )
         )
 
     return render_template(
@@ -173,7 +183,7 @@ def org_member_make_service_live_decision(service_id):
     if "unique" not in request.args:
         return redirect(url_for(".org_member_make_service_live_start", service_id=current_service.id))
 
-    unique = request.args.get("unique").lower()
+    unique = request.args["unique"].lower()
     cannot_approve = unique == "no"
 
     form = ServiceGoLiveDecisionForm(
@@ -189,6 +199,7 @@ def org_member_make_service_live_decision(service_id):
         if form.enabled.data:
             flash("This service is now live. We’ll email the team to let them know.", "default_with_tick")
         else:
+            assert form.rejection_reason.data is not None  # type narrowing
             organisations_client.notify_service_member_of_rejected_go_live_request(
                 service_id=service_id,
                 service_member_name=current_service.go_live_user.name,
