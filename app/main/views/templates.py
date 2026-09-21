@@ -4,7 +4,7 @@ import math
 import uuid
 from functools import partial
 from io import BytesIO
-from typing import Literal
+from typing import Any, Literal, cast
 
 from flask import (
     abort,
@@ -173,6 +173,7 @@ def choose_template(service_id, template_type="all", template_folder_id=None):
         try:
             return process_folder_management_form(templates_and_folders_form, template_folder_id)
         except HTTPError as e:
+            assert isinstance(e.message, str)  # type narrowing
             flash(e.message)
     elif templates_and_folders_form.trying_to_add_unavailable_template_type:
         return redirect(
@@ -465,7 +466,7 @@ def copy_template(service_id, template_id):
     form = CopyTemplateForm(template_id=template.id, name=template.name, parent_folder_id=to_folder_id)
 
     if request.method == "POST":
-        files_to_copy = getattr(template, "email_files", False)
+        files_to_copy = getattr(template, "email_files", None)
         if template.template_type == "email" and files_to_copy and not current_service.contact_link:
             flash(
                 Markup(
@@ -487,14 +488,14 @@ def copy_template(service_id, template_id):
             has_unsubscribe_link=template.get_raw("has_unsubscribe_link"),
         )["data"]
         if template.template_type == "email" and files_to_copy:
-            for file in files_to_copy:
-                file.copy_file(
+            for file_ in files_to_copy:
+                file_.copy_file(
                     destination_template_id=new_template["id"],
                     source_service_id=from_service_id,
                     destination_service_id=current_service.id,
-                    retention_period=file.retention_period,
-                    validate_users_email=file.validate_users_email,
-                    link_text=file.link_text,
+                    retention_period=file_.retention_period,
+                    validate_users_email=file_.validate_users_email,
+                    link_text=file_.link_text,
                 )
         if template.template_type == "letter" and template.get_raw("letter_attachment"):
             _copy_letter_attachment(from_template=template, to_template=new_template)
@@ -568,13 +569,18 @@ def action_blocked(service_id, notification_type, return_to, template_id=None):
 @user_has_permissions("manage_templates")
 def manage_template_folder(service_id, template_folder_id):
     template_folder = current_service.get_template_folder_with_user_permission_or_403(template_folder_id, current_user)
+    all_service_users = [user for user in current_service.active_users if user.id != current_user.id]
     form = TemplateFolderForm(
         name=template_folder["name"],
         users_with_permission=template_folder.get("users_with_permission", None),
-        all_service_users=[user for user in current_service.active_users if user.id != current_user.id],
+        all_service_users=all_service_users,
     )
     if form.validate_on_submit():
-        if current_user.has_permissions("manage_service") and form.users_with_permission.all_service_users:
+        if (
+            current_user.has_permissions("manage_service")
+            and all_service_users
+            and form.users_with_permission.data is not None  # type narrowing
+        ):
             users_with_permission = form.users_with_permission.data + [current_user.id]
         else:
             users_with_permission = None
@@ -788,10 +794,11 @@ def edit_service_template(service_id, template_id, language=None):
                 "main.view_template",
                 service_id=service_id,
                 template_id=template_id,
-                **(
+                **cast(
+                    dict[str, Any],  # https://github.com/python/mypy/issues/5382
                     {"_anchor": "first-page-of-english-in-bilingual-letter"}
                     if editing_english_content_in_bilingual_letter
-                    else {}
+                    else {},
                 ),
             )
         )
@@ -872,7 +879,10 @@ def delete_service_template(service_id, template_id):
         else:
             raise e
 
-    flash([f"Are you sure you want to delete ‘{template.name}’?", message, template.name], "delete")
+    flash(
+        [f"Are you sure you want to delete ‘{template.name}’?", message, template.name],  # type: ignore[arg-type]  # lists as messages is a notify hack
+        "delete",
+    )
     return render_template(
         "views/templates/template.html",
         template=template,
@@ -1022,7 +1032,7 @@ def edit_template_postage(service_id, template_id):
 
 
 def get_template_sender_form_dict(service_id, template):
-    context = {
+    context: dict[str, Any] = {
         "email": {"field_name": "email_address"},
         "letter": {"field_name": "contact_block"},
         "sms": {"field_name": "sms_sender"},
@@ -1060,7 +1070,10 @@ def letter_template_attach_pages(service_id, template_id):
             return _process_letter_attachment_form(service_id, template, form, upload_id)
         except LetterAttachmentFormError as e:
             error = e.as_error_dict()
-            attachment_page_count = error.get("attachment_page_count", 0)
+            _apc = error.get("attachment_page_count") or 0
+            assert isinstance(_apc, int | float)  # type narrowing
+            attachment_page_count = int(_apc)
+
             letter_attachment_image_url = url_for(
                 "no_cookie.view_invalid_letter_attachment_as_preview",
                 service_id=service_id,
@@ -1314,7 +1327,7 @@ def _save_letter_attachment(*, service_id, template_id, upload_id, original_file
 @user_has_permissions("manage_templates")
 def view_invalid_letter_attachment_as_preview(service_id, file_id):
     try:
-        page = int(request.args.get("page"))
+        page = int(request.args.get("page", ""))
     except ValueError:
         abort(400)
 
@@ -1398,7 +1411,7 @@ def letter_template_confirm_remove_welsh(template_id, service_id):
         abort(404)
 
     if request.method == "POST" and request.form.get("confirm"):
-        _change_template_language(service_id, template, LetterLanguageOptions.english.value)
+        _change_template_language(service_id, template, LetterLanguageOptions.english)
         return redirect(url_for("main.view_template", service_id=service_id, template_id=template_id))
 
     return render_template(
