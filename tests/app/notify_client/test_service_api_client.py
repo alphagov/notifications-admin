@@ -680,3 +680,46 @@ def test_remove_service_inbound_sms_clears_cache(notify_admin, mocker):
     mock_redis_delete.assert_called_with_args(f"service-{service_id}")
     mock_redis_delete_by_pattern.assert_called_with_args(f"service-{service_id}-template-*")
     mock_post.assert_called_once_with(f"/service/{service_id}/inbound-sms/remove", data={"archive": True})
+
+
+def test_client_update_status_when_no_permissions_are_given(notify_admin, mocker):
+    client = ServiceAPIClient(mocker.MagicMock())
+    mock_post = mocker.patch.object(client, "post", return_value={"data": {"id": None}})
+    mocker.patch("app.notify_client.current_user", id="123")
+
+    client.update_status(SERVICE_ONE_ID, "on")
+
+    mock_post.assert_called_once_with(
+        f"/service/{SERVICE_ONE_ID}",
+        {
+            "created_by": "123",
+            "email_message_limit": 250000,
+            "sms_message_limit": 250000,
+            "letter_message_limit": 20000,
+            "restricted": False,
+            "go_live_at": mocker.ANY,
+            "has_active_go_live_request": False,
+        },
+    )
+
+
+def test_client_update_status_when_permissions_are_given(notify_admin, mocker):
+    client = ServiceAPIClient(mocker.MagicMock())
+    mock_post = mocker.patch.object(client, "post", return_value={"data": {"id": None}})
+    mocker.patch("app.notify_client.current_user", id="123")
+
+    client.update_status(SERVICE_ONE_ID, "off", permissions=["email"])
+
+    mock_post.assert_called_once_with(
+        f"/service/{SERVICE_ONE_ID}",
+        {
+            "created_by": "123",
+            "email_message_limit": 250000,
+            "sms_message_limit": 250000,
+            "letter_message_limit": 20000,
+            "restricted": False,
+            "go_live_at": mocker.ANY,
+            "has_active_go_live_request": False,
+            "permissions": ["email"],
+        },
+    )
