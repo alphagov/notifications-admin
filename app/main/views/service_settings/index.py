@@ -233,6 +233,9 @@ def service_switch_live(service_id):
         if not current_service.has_email_templates and not bool(current_service.volume_email):
             permissions_to_remove.append("email")
 
+        if not current_service.has_sms_templates and not bool(current_service.volume_sms):
+            permissions_to_remove.append("sms")
+
         current_service.update_status(live=form.enabled.data, permissions_to_remove=permissions_to_remove)
 
         return redirect(url_for(".service_settings", service_id=service_id))

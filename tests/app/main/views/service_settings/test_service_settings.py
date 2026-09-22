@@ -690,27 +690,31 @@ def test_switch_archived_service_to_live(
 
 
 @pytest.mark.parametrize(
-    "email_volume, template_types, expect_emails_to_be_turned_off",
+    "email_volume, sms_volume, template_types, final_permissions",
     (
-        (20000, ["email", "email", "sms", "letter"], False),
-        (None, ["email", "email", "sms", "letter"], False),
-        (None, ["sms", "sms", "sms"], True),
-        (0, ["email", "email", "sms", "letter"], False),
-        (0, ["letter"], True),
+        (None, 100, ["sms", "sms", "sms"], {"sms", "letter"}),
+        (0, 100, ["letter"], {"sms", "letter"}),
+        (100, None, ["email", "email", "email"], {"email", "letter"}),
+        (None, None, ["letter", "letter"], {"letter"}),
+        (0, 0, ["letter"], {"letter"}),
+        (100, 0, ["letter"], {"email", "letter"}),
     ),
 )
-def test_switch_service_to_live_turns_email_off_if_no_expected_volumes_and_no_email_templates(
+def test_switch_service_to_live_turns_permission_off_if_no_expected_volumes_and_no_relevant_templates(
     client_request,
     service_one,
     platform_admin_user,
     mock_get_service_organisation,
-    mocker,
     email_volume,
+    sms_volume,
     template_types,
-    expect_emails_to_be_turned_off,
+    final_permissions,
+    mocker,
 ):
     service_one["permissions"] = ["sms", "email", "letter"]
     service_one["volume_email"] = email_volume
+    service_one["volume_sms"] = sms_volume
+
     templates = [_template(template_type, f"Template {index}") for index, template_type in enumerate(template_types)]
     mocker.patch("app.service_api_client.get_service_templates", return_value={"data": templates})
     mocker.patch("app.service_api_client.update_service")
@@ -735,10 +739,65 @@ def test_switch_service_to_live_turns_email_off_if_no_expected_volumes_and_no_em
     assert app.service_api_client.update_service.call_count == 1
     assert update_service_kwargs["restricted"] is False
 
-    if expect_emails_to_be_turned_off:
-        assert "permissions" in update_service_kwargs and set(update_service_kwargs["permissions"]) == {"sms", "letter"}
-    else:
-        assert "permissions" not in update_service_kwargs
+    assert "permissions" in update_service_kwargs and set(update_service_kwargs["permissions"]) == final_permissions
+
+
+@pytest.mark.parametrize(
+    "email_volume, sms_volume, template_types",
+    (
+        (20000, 100, ["email", "sms", "letter"]),
+        (20000, 100, ["email", "letter"]),
+        (20000, 100, ["sms", "letter"]),
+        (0, 100, ["email", "sms", "letter"]),
+        (0, 100, ["email", "letter"]),
+        (None, 100, ["email", "sms", "letter"]),
+        (None, 100, ["email", "letter"]),
+        (10000, 0, ["email", "sms", "letter"]),
+        (10000, 0, ["sms", "letter"]),
+        (20000, None, ["email", "sms", "letter"]),
+        (20000, None, ["sms", "letter"]),
+        (0, 0, ["email", "sms", "letter"]),
+        (None, None, ["email", "sms", "letter"]),
+    ),
+)
+def test_switch_service_to_live_turns_does_not_turn_permission_off_if_expected_volumes_and_relevant_templates(
+    client_request,
+    service_one,
+    platform_admin_user,
+    mock_get_service_organisation,
+    email_volume,
+    sms_volume,
+    template_types,
+    mocker,
+):
+    service_one["permissions"] = ["sms", "email", "letter"]
+    service_one["volume_email"] = email_volume
+    service_one["volume_sms"] = sms_volume
+
+    templates = [_template(template_type, f"Template {index}") for index, template_type in enumerate(template_types)]
+    mocker.patch("app.service_api_client.get_service_templates", return_value={"data": templates})
+    mocker.patch("app.service_api_client.update_service")
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(agreement_signed=True),
+    )
+    client_request.login(platform_admin_user)
+    client_request.post(
+        "main.service_switch_live",
+        service_id=SERVICE_ONE_ID,
+        _data={"enabled": "True"},
+        _expected_status=302,
+        _expected_redirect=url_for(
+            "main.service_settings",
+            service_id=SERVICE_ONE_ID,
+        ),
+    )
+
+    update_service_kwargs = app.service_api_client.update_service.call_args.kwargs
+
+    assert app.service_api_client.update_service.call_count == 1
+    assert update_service_kwargs["restricted"] is False
+    assert "permissions" not in update_service_kwargs
 
 
 def test_show_live_service(
