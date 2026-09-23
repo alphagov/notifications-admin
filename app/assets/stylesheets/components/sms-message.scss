@@ -80,6 +80,11 @@ $tail-angle: 20deg;
   display: block;
 }
 
+.sms-message-status--error {
+  color: govuk-functional-colour(error);
+  @include govuk-typography-weight-bold;
+}
+
 .sms-message-status-outbound {
   text-align: right;
 }
