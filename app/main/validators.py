@@ -128,10 +128,12 @@ class ValidPhoneNumber:
         self,
         allow_international_sms=False,
         allow_sms_to_uk_landlines=False,
+        block_ofcom_protected_blocks=False,
         message=None,
     ):
         self.allow_international_sms = allow_international_sms
         self.allow_sms_to_uk_landlines = allow_sms_to_uk_landlines
+        self.block_ofcom_protected_blocks = block_ofcom_protected_blocks
         self.message = message
 
     _error_summary_messages_map = {
@@ -150,6 +152,7 @@ class ValidPhoneNumber:
                 number.validate(
                     allow_international_number=self.allow_international_sms,
                     allow_uk_landline=self.allow_sms_to_uk_landlines,
+                    block_ofcom_protected_blocks=self.block_ofcom_protected_blocks,
                 )
         except InvalidPhoneError as e:
             error_message = str(e)
