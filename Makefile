@@ -49,6 +49,7 @@ generate-version-file: ## Generates the app version file
 lint: ## Run static analysis
 	ruff check .
 	ruff format --check .
+	grep '^\*\*/\.git/config$$' ./.dockerignore > /dev/null
 
 .PHONY: check-types
 check-types: ## Run static type checking
