@@ -1,7 +1,7 @@
 The user’s email address has changed
 ====================================
 
-1. Open the GOV.UK Notify support manual: https://docs.google.com/document/d/1F41AxZdwjebI4yCIhUQvs72ozHfG2aqCnhelSYu_Wi0/edit?usp=sharing.
+1. Open the GOV.UK Notify support manual: https://beisgov.sharepoint.com/:w:/r/sites/Govuknotify/Shared%20Documents/General/Support/Support%20manual,%20guidance%20and%20tools%20(2026)/New%20support%20manual%20DRAFT.docx?d=w5f750dc82b88405a8a28c96306005fa8&csf=1&web=1&e=Tazgls
 2. Search for ‘User’s email address has changed’.
 
 Old email address: {{ old_email_address }}
