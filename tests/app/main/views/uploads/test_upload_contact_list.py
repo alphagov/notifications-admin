@@ -247,7 +247,7 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
         "Your file has too many rows Notify can store files up to 1,234 rows in size. Your file has 4,567 rows."
     )
     assert len(page.select("tbody tr")) == 50
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 rows"
+    assert normalize_spaces(page.select_one(".more-items-available-text").text) == "Only showing the first 50 rows"
 
 
 def test_upload_csv_shows_error_with_invalid_extension(
@@ -345,7 +345,7 @@ def test_upload_csv_shows_ok_page(client_request, mock_get_live_service, fake_uu
     assert normalize_spaces(page.select_one("thead").text) == "Row in file 1 email address"
     assert len(page.select("tbody tr")) == 50
     assert normalize_spaces(page.select_one("tbody tr").text) == "2 test@example.com"
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 rows"
+    assert normalize_spaces(page.select_one(".more-items-available-text").text) == "Only showing the first 50 rows"
 
 
 def test_save_contact_list(
