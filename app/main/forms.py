@@ -3299,6 +3299,7 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
         self.existing_file_names = template.filenames
         self.placeholders_in_subject = UtilsField(template._subject).placeholders
         self.service_id = service_id
+        self.template_id = template.id
         super().__init__(*args, **kwargs)
 
     allowed_file_formats = {
@@ -3332,6 +3333,8 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
     )
 
     def validate_file(self, field):  # noqa: C901
+        from flask import current_app
+
         if field.errors:
             return
 
@@ -3386,6 +3389,16 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
                 ) from e
 
             if too_many_email_addresses:
+                current_app.logger.warning(
+                    "Too many email addresses in %s uploaded to template %s",
+                    field.data.filename,
+                    self.template_id,
+                    exc_info=True,
+                    extra={
+                        "file_name": field.data.filename,
+                        "template_id": self.template_id,
+                    },
+                )
                 raise ValidationError(
                     "Your file contains too many email addresses. If you are trying to upload a list of recipients "
                     "go back to your template and choose ‘Get ready to send’"
