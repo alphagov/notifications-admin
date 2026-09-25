@@ -1,4 +1,5 @@
 import io
+import logging
 import uuid
 from io import BytesIO
 from unittest.mock import ANY, Mock, call
@@ -608,6 +609,7 @@ def test_create_file_redirects_to_manage_files_page(
 
 
 def test_cannot_upload_file_with_lots_of_email_addresses(
+    caplog,
     client_request,
     service_one,
     fake_uuid,
@@ -638,13 +640,14 @@ def test_cannot_upload_file_with_lots_of_email_addresses(
     )
 
     with open("tests/spreadsheet_files/excessive/too_many_email_addresses.csv", "rb") as file:
-        page = client_request.post(
-            "main.upload_template_email_files",
-            service_id=SERVICE_ONE_ID,
-            template_id=fake_uuid,
-            _data={"file": file},
-            _expected_status=200,
-        )
+        with caplog.at_level(logging.WARNING):
+            page = client_request.post(
+                "main.upload_template_email_files",
+                service_id=SERVICE_ONE_ID,
+                template_id=fake_uuid,
+                _data={"file": file},
+                _expected_status=200,
+            )
     assert mock_create_file.call_args_list == []
     assert normalize_spaces(page.select_one(".govuk-error-summary").text) == (
         "There is a problem "
@@ -655,6 +658,10 @@ def test_cannot_upload_file_with_lots_of_email_addresses(
         "Your file contains too many email addresses. If you are trying to upload a list of "
         "recipients go back to your template and choose ‘Get ready to send’"
     )
+    assert (
+        f"Too many email addresses in tests/spreadsheet_files/excessive/too_many_email_addresses.csv uploaded to "
+        f"template {fake_uuid}"
+    ) in caplog.messages
 
 
 def test_make_live_is_post_only(client_request, service_one, fake_uuid):
