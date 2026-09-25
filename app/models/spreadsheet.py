@@ -1,7 +1,9 @@
 import csv
 import logging
+from contextlib import suppress
+from functools import lru_cache
 from io import BytesIO, StringIO
-from itertools import chain, compress, count, repeat
+from itertools import chain, compress, count, islice, repeat, zip_longest
 from os import path
 from time import sleep
 from typing import IO, Self, final
@@ -11,6 +13,8 @@ import openpyxl.reader.excel
 import pyexcel
 from notifications_utils.eventlet import greenlet_thread_time_ns, greenlet_thread_time_ns_max_continuous
 from notifications_utils.interruptible_io import InterruptibleIOZipFile
+from notifications_utils.recipient_validation.email_address import validate_email_address
+from notifications_utils.recipient_validation.errors import InvalidEmailError
 from openpyxl.utils import get_column_letter as openpyxl_get_column_letter
 from openpyxl.worksheet.dimensions import DimensionHolder as openpyxl_DimensionHolder
 
@@ -355,3 +359,25 @@ class Spreadsheet:
             filename,
             row_limit=row_limit,
         )
+
+    def contains_many_email_addresses(self) -> bool:
+        max_rows_to_check = 100
+        max_email_addresses_allowed_per_column = 5
+
+        csv_reader = csv.reader(self._csv_data.splitlines())
+
+        for column in zip_longest(*islice(csv_reader, 0, max_rows_to_check), fillvalue=""):
+            if sum(self.cell_contains_email_address(cell) for cell in column) > max_email_addresses_allowed_per_column:
+                return True
+
+        return False
+
+    @staticmethod
+    @lru_cache(
+        maxsize=(ABSOLUTE_COLUMN_LIMIT_DEFAULT_ARG * 100),
+        typed=False,
+    )
+    def cell_contains_email_address(cell_contents: str) -> bool:
+        with suppress(InvalidEmailError):
+            return bool(validate_email_address(cell_contents))
+        return False
