@@ -249,8 +249,10 @@ class PhoneNumber(GovukTextInputFieldMixin, TelField):
     input_type = "tel"
 
 
-def valid_phone_number(label="Mobile number", international=False, sms_to_uk_landline=False):
-    if not (sms_to_uk_landline or international):
+def valid_phone_number(
+    label="Mobile number", international=False, sms_to_uk_landline=False, block_ofcom_protected_blocks=False
+):
+    if not (sms_to_uk_landline or international or block_ofcom_protected_blocks):
         return PhoneNumber(
             label,
             validators=[
@@ -266,6 +268,7 @@ def valid_phone_number(label="Mobile number", international=False, sms_to_uk_lan
                 ValidPhoneNumber(
                     allow_sms_to_uk_landlines=sms_to_uk_landline,
                     allow_international_sms=international,
+                    block_ofcom_protected_blocks=block_ofcom_protected_blocks,
                 ),
             ],
         )
@@ -2592,6 +2595,7 @@ def get_placeholder_form_instance(
     template_type,
     allow_international_phone_numbers=False,
     allow_sms_to_uk_landline=False,
+    block_ofcom_protected_blocks=False,
 ):
     if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template_type == "email":
         field = make_email_address_field(label=placeholder_name, gov_user=False, thing="an email address")
@@ -2600,6 +2604,7 @@ def get_placeholder_form_instance(
             label=placeholder_name,
             international=allow_international_phone_numbers,
             sms_to_uk_landline=allow_sms_to_uk_landline,
+            block_ofcom_protected_blocks=block_ofcom_protected_blocks,
         )
     else:
         field = GovukTextInputField(placeholder_name, validators=[DataRequired(message="Cannot be empty")])
