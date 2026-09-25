@@ -6,7 +6,7 @@ from itertools import count, cycle, islice
 from unittest.mock import ANY, Mock
 
 import pytest
-from flask import g, make_response, url_for
+from flask import abort, g, make_response, url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 from requests import RequestException
@@ -4716,6 +4716,28 @@ def test_should_show_redact_template(
     )
 
     mock_redact_template.assert_called_once_with(SERVICE_ONE_ID, fake_uuid)
+
+
+def test_redact_template_checks_folder_permission_before_calling_api(
+    client_request,
+    mock_redact_template,
+    service_one,
+    fake_uuid,
+    mocker,
+):
+    mocker.patch(
+        "app.models.service.Service.get_template_with_user_permission_or_403",
+        side_effect=lambda *args, **kwargs: abort(403),
+    )
+
+    client_request.post(
+        "main.redact_template",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _expected_status=403,
+    )
+
+    mock_redact_template.assert_not_called()
 
 
 def test_should_show_hint_once_template_redacted(

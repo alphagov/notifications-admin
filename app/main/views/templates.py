@@ -916,6 +916,7 @@ def confirm_redact_template(service_id, template_id):
 @main.route("/services/<uuid:service_id>/templates/<uuid:template_id>/redact", methods=["POST"])
 @user_has_permissions("manage_templates")
 def redact_template(service_id, template_id):
+    current_service.get_template_with_user_permission_or_403(template_id, current_user)
     service_api_client.redact_service_template(service_id, template_id)
 
     flash("Personalised content will be hidden for messages sent with this template", "default_with_tick")
