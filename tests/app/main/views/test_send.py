@@ -678,14 +678,8 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
         "There’s a problem with example.csv You need to check you have content for the empty message in 1 row."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "3 No content for this message",
-        "+447700900986 no",
+        "3 No content for this message +447700900986 no",
     ]
-    assert normalize_spaces(page.select_one(".table-field-index").text) == "3"
-    assert page.select_one(".table-field-index")["rowspan"] == "2"
-    assert normalize_spaces(page.select("tbody tr td")[0].text) == "3"
-    assert normalize_spaces(page.select("tbody tr td")[1].text) == "No content for this message"
-    assert page.select("tbody tr td")[1]["colspan"] == "2"
 
 
 def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors(
@@ -727,17 +721,10 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
         "There’s a problem with example.csv You need to shorten the messages in 2 rows."
     )
-    assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "2 Message is too long",
-        f"+447700900986 {big_placeholder}",
-        "3 Message is too long",
-        f"+447700900987 {big_placeholder}",
+    assert [[normalize_spaces(cell.text) for cell in row.select("th, td")] for row in page.select("tbody tr")] == [
+        ["2", "Message is too long +447700900986", f"{big_placeholder}"],
+        ["3", "Message is too long +447700900987", f"{big_placeholder}"],
     ]
-    assert normalize_spaces(page.select_one(".table-field-index").text) == "2"
-    assert page.select_one(".table-field-index")["rowspan"] == "2"
-    assert normalize_spaces(page.select("tbody tr td")[0].text) == "2"
-    assert normalize_spaces(page.select("tbody tr td")[1].text) == "Message is too long"
-    assert page.select("tbody tr td")[1]["colspan"] == "2"
 
 
 def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
@@ -785,22 +772,23 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         "There’s a problem with example.csv You need to fix 8 addresses."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "2 The first 2 lines of the address must both include at least one alphanumeric character",
-        "..????? 123 Example St. SW1A 1AA",
-        "3 The first 2 lines of the address must both include at least one alphanumeric character",
-        "Firstname Lastname ..???? SW1A 1AA",
-        "5 Last line of the address must be a real UK postcode",
-        "Firstname Lastname 123 Example St. SW!A !AA",
-        "6 You do not have permission to send letters to other countries",
-        "Firstname Lastname 123 Example St. France",
-        "7 Address must be at least 3 lines long",
-        "123 Example St. SW!A !AA",
-        "8 Address must be no more than 7 lines long",
-        "1 2 3 4 5 6 7 8",
-        '9 Address lines must not start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~',
-        "=Firstname Lastname 123 Example St. SW1A 1AA",
-        "10 This is not a real address",
-        "Firstname Lastname NFA SW1A 1AA",
+        (
+            "2 The first 2 lines of the address must both include at least one alphanumeric character "
+            "..????? 123 Example St. SW1A 1AA"
+        ),
+        (
+            "3 The first 2 lines of the address must both include at least one alphanumeric character "
+            "Firstname Lastname ..???? SW1A 1AA"
+        ),
+        ("5 Last line of the address must be a real UK postcode Firstname Lastname 123 Example St. SW!A !AA"),
+        ("6 You do not have permission to send letters to other countries Firstname Lastname 123 Example St. France"),
+        "7 Address must be at least 3 lines long 123 Example St. SW!A !AA",
+        "8 Address must be no more than 7 lines long 1 2 3 4 5 6 7 8",
+        (
+            '9 Address lines must not start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~ '
+            "=Firstname Lastname 123 Example St. SW1A 1AA"
+        ),
+        "10 This is not a real address Firstname Lastname NFA SW1A 1AA",
     ]
 
 
@@ -841,8 +829,7 @@ def test_upload_csv_file_with_bad_bfpo_postal_address_shows_check_page_with_erro
         "There’s a problem with example.csv You need to fix 1 address."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "2 The last line of a BFPO address must not be a country.",
-        "Firstname Lastname BFPO1234 BF1 1AA USA",
+        "2 The last line of a BFPO address must not be a country. Firstname Lastname BFPO1234 BF1 1AA USA",
     ]
 
 
@@ -886,10 +873,14 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         "There’s a problem with example.csv You need to fix 2 addresses."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "4 Last line of the address must be a UK postcode or another country",
-        "Firstname Lastname 123 Example St. SW!A !AA",
-        "5 Last line of the address must be a UK postcode or another country",
-        "Firstname Lastname 123 Example St. Not France",
+        (
+            "4 Last line of the address must be a UK postcode or another country "
+            "Firstname Lastname 123 Example St. SW!A !AA"
+        ),
+        (
+            "5 Last line of the address must be a UK postcode or another country "
+            "Firstname Lastname 123 Example St. Not France"
+        ),
     ]
 
 
@@ -1081,8 +1072,8 @@ def test_upload_csv_file_limits_number_of_columns_displayed_when_error(
     assert "We found more than one column called ‘phone number’" in normalize_spaces(
         page.select_one(".banner-dangerous").text
     )
-    assert len(page.select("table th.table-field-heading")) == 512
-    assert len(page.select("table td")) == 1_024  # 512 × 2 rows of data
+    assert len(page.select(".govuk-table__head .govuk-table__header")) == 513  # 512 + visually-hidden 'Row in file'
+    assert len(page.select(".govuk-table__cell")) == 1_024  # 512 × 2 rows of data (roe header has a different class)
 
 
 def test_upload_csv_invalid_extension(
@@ -1213,10 +1204,10 @@ def test_upload_valid_csv_shows_preview_and_table(
     assert page.select_one(".sms-message-recipient").text.strip() == expected_recipient
     assert page.select_one(".sms-message-wrapper").text.strip() == expected_message
 
-    assert page.select_one("th.table-field").text.strip() == "2"
+    assert page.select_one(".govuk-table__body .govuk-table__header").text.strip() == "2"
 
     if expected_link_in_first_row:
-        assert page.select_one("th.table-field a")["href"] == url_for(
+        assert page.select_one(".govuk-table__body .govuk-table__header a")["href"] == url_for(
             "main.check_messages",
             service_id=SERVICE_ONE_ID,
             template_id=fake_uuid,
@@ -1225,46 +1216,40 @@ def test_upload_valid_csv_shows_preview_and_table(
             original_file_name="example.csv",
         )
     else:
-        assert not page.select_one("th.table-field").select_one("a")
+        assert not page.select_one(".govuk-table__cell").select_one("a")
 
     for row_index, row in enumerate(
         [
             (
-                '<td class="table-field-left-aligned"> <div class=""> 07700900001 </div> </td>',
-                '<td class="table-field-left-aligned"> <div class=""> A </div> </td>',
+                '<td class="govuk-table__cell"> 07700900001 </td>',
+                '<td class="govuk-table__cell"> A </td>',
                 (
-                    '<td class="table-field-left-aligned"> '
-                    '<div class="table-field-status-default"> '
+                    '<td class="govuk-table__cell govuk-table__cell--default"> '
                     "<ul> "
                     "<li>foo</li> <li>foo</li> <li>foo</li> "
                     "</ul> "
-                    "</div> "
                     "</td>"
                 ),
             ),
             (
-                '<td class="table-field-left-aligned"> <div class=""> 07700900002 </div> </td>',
-                '<td class="table-field-left-aligned"> <div class=""> B </div> </td>',
+                '<td class="govuk-table__cell"> 07700900002 </td>',
+                '<td class="govuk-table__cell"> B </td>',
                 (
-                    '<td class="table-field-left-aligned"> '
-                    '<div class="table-field-status-default"> '
+                    '<td class="govuk-table__cell govuk-table__cell--default"> '
                     "<ul> "
                     "<li>foo</li> <li>foo</li> <li>foo</li> "
                     "</ul> "
-                    "</div> "
                     "</td>"
                 ),
             ),
             (
-                '<td class="table-field-left-aligned"> <div class=""> 07700900003 </div> </td>',
-                '<td class="table-field-left-aligned"> <div class=""> C </div> </td>',
+                '<td class="govuk-table__cell"> 07700900003 </td>',
+                '<td class="govuk-table__cell"> C </td>',
                 (
-                    '<td class="table-field-left-aligned"> '
-                    '<div class="table-field-status-default"> '
+                    '<td class="govuk-table__cell govuk-table__cell--default"> '
                     "<ul> "
                     "<li>foo</li> <li>foo</li> "
                     "</ul> "
-                    "</div> "
                     "</td>"
                 ),
             ),
@@ -3750,7 +3735,7 @@ def test_check_messages_shows_trial_mode_error_for_letters(
     assert len(page.select(".letter img")) == 3
 
     if number_of_rows > 1:
-        assert page.select_one("th.table-field a").text == "3"
+        assert page.select_one(".govuk-table__body .govuk-table__header a").text == "3"
 
 
 @pytest.mark.parametrize("number_of_rows", [1, 11])
@@ -3836,7 +3821,7 @@ def test_check_messages_shows_data_errors_before_trial_mode_errors_for_letters(
     assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
         "There’s a problem with example.csv You need to fix 2 addresses."
     )
-    assert not page.select(".table-field-index a")
+    assert not page.select(".govuk-table__body .govuk-table__header a")
 
 
 @pytest.mark.parametrize(
