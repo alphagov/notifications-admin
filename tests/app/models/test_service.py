@@ -1,6 +1,5 @@
 import pytest
 
-from app.models.organisation import Organisation
 from app.models.service import Service
 from tests import organisation_json, service_json
 from tests.conftest import ORGANISATION_ID, create_folder, create_template
@@ -72,7 +71,7 @@ def test_service_without_organisation_doesnt_need_org_api(notify_admin, mocker, 
 
     assert service.organisation_id is None
     assert service.organisation_name is None
-    assert isinstance(service.organisation, Organisation)
+    assert service.organisation is None
 
     assert mock_redis_get.called is False
     assert mock_get_organisation.called is False

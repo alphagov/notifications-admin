@@ -372,7 +372,7 @@ class User(BaseUser, UserMixin):
         return self._dict["organisations"]
 
     @cached_property
-    def default_organisation(self):
+    def default_organisation(self) -> Organisation | None:
         return Organisation.from_domain(self.email_domain)
 
     @property
@@ -696,7 +696,7 @@ class AnonymousUser(AnonymousUserMixin):
 
     @property
     def default_organisation(self):
-        return Organisation(None)
+        return None
 
     @property
     def platform_admin(self):
