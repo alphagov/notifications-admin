@@ -7,9 +7,9 @@ Providers
 
 {% block platform_admin_content %}
 
-  <h1 class="heading-medium">Providers</h1>
+  <h1 class="govuk-heading-m">Providers</h1>
 
-  <h2 class="heading-medium">SMS</h2>
+  <h2 class="govuk-heading-m">SMS</h2>
 
   <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_sms_provider_ratio') }}">Change priority</a>
 
@@ -69,7 +69,7 @@ Providers
     <p class="govuk-body">No domestic sms providers</p>
     {% endif %}
 
-  <h2 class="heading-medium">Email</h2>
+  <h2 class="govuk-heading-m">Email</h2>
 
   {% if email_providers %}
     {% set table_headers = [
@@ -115,7 +115,7 @@ Providers
         <p class="govuk-body no-data">No email providers</p>
     {% endif %}
 
-  <h2 class="heading-medium">International SMS Providers</h2>
+  <h2 class="govuk-heading-m">International SMS Providers</h2>
 
   {% if intl_sms_providers %}
     {% set table_headers = [
