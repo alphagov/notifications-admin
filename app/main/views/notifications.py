@@ -145,7 +145,7 @@ def cancel_letter(service_id, notification_id):
         except HTTPError as e:
             message_fragments = ["already been cancelled", "too late to cancel"]
             if e.status_code == 400 and any(fragment in e.message for fragment in message_fragments):
-                flash(e.message)
+                flash(e.message)  # type: ignore[arg-type]  # lists as messages is a notify hack
             else:
                 raise e
         return redirect(url_for("main.view_notification", service_id=service_id, notification_id=notification_id))

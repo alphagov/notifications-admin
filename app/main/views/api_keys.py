@@ -111,7 +111,7 @@ def revoke_api_key(service_id, key_id):
     key = current_service.api_keys.get(key_id)
     if request.method == "GET":
         flash(
-            [
+            [  # type: ignore[arg-type]  # lists as messages is a notify hack
                 f"Are you sure you want to revoke ‘{key.name}’?",
                 "You will not be able to use this API key to connect to GOV.UK Notify.",
             ],

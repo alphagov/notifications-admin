@@ -142,7 +142,7 @@ def cancel_letter_job(service_id, job_id):
         try:
             number_of_letters = job.cancel()
         except HTTPError as e:
-            flash(e.message, "dangerous")
+            flash(e.message, "dangerous")  # type: ignore[arg-type]  # lists as messages is a notify hack
             return redirect(url_for("main.view_job", service_id=service_id, job_id=job_id))
         flash(
             f"Cancelled {format_thousands(number_of_letters)} letters from {job.original_file_name}",
