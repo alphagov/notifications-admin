@@ -363,7 +363,7 @@ class MainNavigation(Navigation):
         "make-your-service-live": {
             "add_organisation_from_gp_service",
             "add_organisation_from_nhs_local_service",
-            "confirm_service_is_unique",
+            "confirm_service_name",
             "estimate_usage",
             "request_to_go_live",
             "service_agreement",

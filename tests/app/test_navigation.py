@@ -65,7 +65,7 @@ EXCLUDED_ENDPOINTS = set(
             "confirm_edit_user_email",
             "confirm_edit_user_mobile_number",
             "confirm_redact_template",
-            "confirm_service_is_unique",
+            "confirm_service_name",
             "contact_list",
             "conversation_reply_with_template",
             "conversation_reply",

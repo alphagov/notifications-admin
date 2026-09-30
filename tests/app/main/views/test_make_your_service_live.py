@@ -1276,13 +1276,13 @@ def test_request_to_go_live_is_sent_to_organiation_if_can_be_approved_by_organis
     assert mock_notify_users_of_request_to_go_live_for_service.call_args_list == expected_call_args
 
 
-def test_confirm_service_name_is_unique_sets_confirmed_service_name_and_updates_name(
+def test_confirm_service_name_sets_confirmed_service_name_and_updates_name(
     client_request,
     mock_update_service,
     service_one,
 ):
     client_request.post(
-        "main.confirm_service_is_unique",
+        "main.confirm_service_name",
         service_id=SERVICE_ONE_ID,
         _data={"name": "Updated Service"},
         _expected_status=302,
@@ -1312,7 +1312,7 @@ def test_confirm_service_name_when_validation_fails(
     error_message,
 ):
     page = client_request.post(
-        "main.confirm_service_is_unique",
+        "main.confirm_service_name",
         service_id=SERVICE_ONE_ID,
         _data={"name": name},
         _expected_status=200,
@@ -1329,7 +1329,7 @@ def test_confirm_service_name_doesnt_suppress_api_errors(client_request, mocker,
     )
 
     client_request.post(
-        "main.confirm_service_is_unique",
+        "main.confirm_service_name",
         service_id=SERVICE_ONE_ID,
         _data={"name": "Whatever"},
         _expected_status=500,
@@ -1338,7 +1338,7 @@ def test_confirm_service_name_doesnt_suppress_api_errors(client_request, mocker,
 
 def test_confirm_service_name_prefills_name(client_request, service_one):
     page = client_request.get(
-        "main.confirm_service_is_unique",
+        "main.confirm_service_name",
         service_id=SERVICE_ONE_ID,
     )
 
