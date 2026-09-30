@@ -1,7 +1,7 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/table.html" import list_table, text_field, optional_text_field %}
 {% from "components/page-header.html" import page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% block per_page_title %}
   {{ provider_versions[0].display_name }}
@@ -22,40 +22,51 @@
       Only showing the latest 100 versions.
     </p>
 
-    {% call(item, row_number) list_table(
-        provider_versions,
-        caption='',
-        caption_visible=False,
-        empty_message='No history for this provider',
-        field_headings=['Version', 'Last Updated', 'Updated By', 'Priority', 'Active', 'Reason'],
-        field_headings_visible=True,
-        give_rows_ids=False,
-      ) %}
+    {% if provider_versions %}
+      {% set table_headers = [
+        { "text": "Version" },
+        { "text": "Last Updated" },
+        { "text": "Updated By" },
+        { "text": "Priority" },
+        { "text": "Active" },
+        { "text": "Reason" }
+      ] %}
 
-        {{ text_field(item.version) }}
+      {% set table_rows = [] %}
+      {% for item in provider_versions %}
+        {% do table_rows.append([
+          {
+            "text": item.version or ""
+          },
+          {
+            "text": item.updated_at|format_datetime_short if item.updated_at else "None"
+          },
+          {
+            "text": item.created_by.name if item.created_by else "None"
+          },
+          {
+            "text": item.priority or ""
+          },
+          {
+            "text": item.active or ""
+          },
+          {
+            "text": item.reason or "Not given",
+            "classes": "govuk-table__cell--default" if not item.reason
+          }
+        ]) %}
+      {% endfor %}
 
-        {% if item.updated_at %}
-            {{ text_field(item.updated_at|format_datetime_short) }}
-        {% else %}
-            {{ text_field('None') }}
-        {% endif %}
-
-        {% if item.created_by %}
-            {{ text_field(item.created_by.name) }}
-        {% else %}
-            {{ text_field('None') }}
-        {% endif %}
-
-
-        {{ text_field(item.priority) }}
-
-        {{ text_field(item.active) }}
-
-        {{ optional_text_field(item.reason, default='Not given') }}
-
-
-      {% endcall %}
-
+      {{ govukTable({
+        "caption": "Provider history",
+        "captionClasses": "govuk-visually-hidden",
+        "classes": "notify-table notify-table--body-small",
+        "head": table_headers,
+        "rows": table_rows
+      }) }}
+    {% else %}
+      <p class="govuk-body no-data">No history for this provider</p>
+    {% endif %}
     </div>
 </div>
 
