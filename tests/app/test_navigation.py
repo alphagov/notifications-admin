@@ -491,9 +491,7 @@ def test_excluded_endpoints_are_all_found_in_app():
 )
 def test_all_endpoints_are_covered(navigation_instance):
     covered_endpoints = (
-        set(navigation_instance.endpoints_with_navigation)
-        | EXCLUDED_ENDPOINTS
-        | {"static", "status.show_status", "metrics"}
+        set(navigation_instance.endpoints_with_navigation) | EXCLUDED_ENDPOINTS | {"static", "status.show_status"}
     )
     uncovered_endpoints = all_endpoints - covered_endpoints
     assert not uncovered_endpoints
