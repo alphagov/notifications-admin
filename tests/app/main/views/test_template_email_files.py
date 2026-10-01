@@ -608,6 +608,13 @@ def test_create_file_redirects_to_manage_files_page(
     )
 
 
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "tests/spreadsheet_files/excessive/too_many_email_addresses.csv",
+        "tests/spreadsheet_files/excessive/too many email addresses.xlsx",
+    ),
+)
 def test_cannot_upload_file_with_lots_of_email_addresses(
     caplog,
     client_request,
@@ -618,6 +625,7 @@ def test_cannot_upload_file_with_lots_of_email_addresses(
     active_user_with_permissions,
     mock_update_service,
     mock_get_service_email_template,
+    filename,
 ):
     service_one["contact_link"] = "htttps://example.gov.uk"
     active_user_with_permissions["permissions"][SERVICE_ONE_ID] = ["view_activity", "manage_templates"]
@@ -639,7 +647,7 @@ def test_cannot_upload_file_with_lots_of_email_addresses(
         },
     )
 
-    with open("tests/spreadsheet_files/excessive/too_many_email_addresses.csv", "rb") as file:
+    with open(filename, "rb") as file:
         with caplog.at_level(logging.WARNING):
             page = client_request.post(
                 "main.upload_template_email_files",
@@ -658,10 +666,7 @@ def test_cannot_upload_file_with_lots_of_email_addresses(
         "Your file contains too many email addresses. If you are trying to upload a list of "
         "recipients go back to your template and choose ‘Get ready to send’"
     )
-    assert (
-        f"Too many email addresses in tests/spreadsheet_files/excessive/too_many_email_addresses.csv uploaded to "
-        f"template {fake_uuid}"
-    ) in caplog.messages
+    assert (f"Too many email addresses in {filename} uploaded to template {fake_uuid}") in caplog.messages
 
 
 def test_make_live_is_post_only(client_request, service_one, fake_uuid):
