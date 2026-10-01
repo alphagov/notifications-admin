@@ -23,6 +23,4 @@ notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@13
 
 govuk-frontend-jinja~=4.1.0
 
-git+https://github.com/alphagov/gds_metrics_python.git@6f1840a57b6fb1ee40b7e84f2f18ec229de8aa72
-
 sentry-sdk[flask]~=2.63
