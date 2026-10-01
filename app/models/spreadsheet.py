@@ -55,13 +55,15 @@ class Spreadsheet:
         if csv_data and rows:
             raise TypeError("Spreadsheet must be created from either rows or CSV data")
 
-        self._csv_data = csv_data or ""
+        if csv_data is not None:
+            self._csv_data = csv_data
+
         self._rows = rows or []
         self._row_limit = row_limit
 
     @property
     def as_csv_data(self) -> str:
-        if not self._csv_data:
+        if not hasattr(self, "_csv_data"):
             with StringIO() as converted:
                 output = csv.writer(converted)
                 for i, row in enumerate(self._rows):
@@ -364,7 +366,7 @@ class Spreadsheet:
         max_rows_to_check = 100
         max_email_addresses_allowed_per_column = 5
 
-        csv_reader = csv.reader(self._csv_data.splitlines())
+        csv_reader = csv.reader(self.as_csv_data.splitlines())
 
         for column in zip_longest(*islice(csv_reader, 0, max_rows_to_check), fillvalue=""):
             if sum(self.cell_contains_email_address(cell) for cell in column) > max_email_addresses_allowed_per_column:

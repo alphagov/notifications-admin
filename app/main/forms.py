@@ -3369,9 +3369,10 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
 
         if Spreadsheet.can_handle(field.data.filename):
             try:
-                spreadsheet = Spreadsheet.from_file(field.data, filename=field.data.filename)
-                spreadsheet.as_csv_data  # noqa: B018
-                too_many_email_addresses = spreadsheet.contains_many_email_addresses()
+                too_many_email_addresses = Spreadsheet.from_file(
+                    field.data,
+                    filename=field.data.filename,
+                ).contains_many_email_addresses()
             except (UnicodeDecodeError, BadZipFile, XLRDError) as e:
                 raise ValidationError("Notify cannot read this file - try using a different file type") from e
             except SoftEventletTimeout as e:
