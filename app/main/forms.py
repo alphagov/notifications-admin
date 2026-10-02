@@ -1960,6 +1960,9 @@ class EstimateUsageForm(StripWhitespaceForm):
 
 
 class AdminProviderRatioForm(OrderableFieldsForm):
+
+    reason: GovukTextInputField
+
     def __init__(self, providers, *args, **kwargs):
         self._providers = providers
 
