@@ -1,5 +1,6 @@
 import csv
 import logging
+from collections.abc import Iterable
 from contextlib import suppress
 from functools import lru_cache
 from io import BytesIO, StringIO
@@ -80,19 +81,19 @@ class Spreadsheet:
         return self._csv_data
 
     @classmethod
-    def can_handle(cls, filename):
+    def can_handle(cls, filename) -> bool:
         return cls.get_extension(filename) in cls.ALLOWED_FILE_EXTENSIONS
 
     @staticmethod
-    def get_extension(filename):
+    def get_extension(filename: str) -> str:
         return path.splitext(filename)[1].lower().lstrip(".")
 
     @staticmethod
-    def normalise_newlines(file_content):
+    def normalise_newlines(file_content: IO) -> str:
         return "\r\n".join(file_content.read().decode("utf-8").splitlines())
 
     @classmethod
-    def from_rows(cls, rows, filename="", row_limit: int | None = None) -> Self:
+    def from_rows(cls, rows: Iterable, filename: str = "", row_limit: int | None = None) -> Self:
         return cls(rows=rows, filename=filename, row_limit=row_limit)
 
     @staticmethod
