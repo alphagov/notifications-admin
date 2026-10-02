@@ -219,7 +219,7 @@ class ScheduledJobs(ImmediateJobs):
 
 
 class PaginatedJobs(PaginatedModelList, ImmediateJobs):
-    statuses = None
+    statuses: set = set()
 
     @staticmethod
     def _get_items(*args, **kwargs):
@@ -229,7 +229,7 @@ class PaginatedJobs(PaginatedModelList, ImmediateJobs):
         super().__init__(
             service_id,
             contact_list_id=contact_list_id,
-            statuses=self.statuses,
+            statuses=self.statuses or None,
             page=page,
             limit_days=limit_days,
         )
