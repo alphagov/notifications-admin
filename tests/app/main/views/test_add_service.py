@@ -435,7 +435,7 @@ def test_add_service_sets_daily_sms_limit_to_zero_for_nhs_services_with_no_allow
     "name, error_message",
     [
         ("", "Enter a service name"),
-        (".", "Must include at least two alphanumeric characters"),
+        (".", "Service name must include at least 2 letters or numbers"),
         ("a" * 256, "Service name cannot be longer than 255 characters"),
     ],
 )
