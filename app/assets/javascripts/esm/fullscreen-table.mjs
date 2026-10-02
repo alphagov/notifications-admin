@@ -111,8 +111,8 @@ class FullscreenTable {
   }
 
   maintainWidth() {
-    const $scrollableIndexColumnHeader = this.$scrollableTable.querySelector('.table-field-heading-first');
-    const $fixedIndexColumnHeader = this.$fixedTable.querySelector('.table-field-heading-first');
+    const $scrollableIndexColumnHeader = this.$scrollableTable.querySelector('.govuk-table__header');
+    const $fixedIndexColumnHeader = this.$fixedTable.querySelector('.govuk-table__header');
 
     if ($scrollableIndexColumnHeader === null || $fixedIndexColumnHeader === null) return;
 
@@ -124,7 +124,7 @@ class FullscreenTable {
     }
 
     // Set the width of the fixed table container to match its first column
-    this.$fixedTable.style.width = `${$fixedIndexColumnHeader.getBoundingClientRect().width + 4}px`; // 4px for shadow
+    this.$fixedTable.style.width = `${$fixedIndexColumnHeader.getBoundingClientRect().width}px`; // shadow is now inset
   }
 
   toggleShadows() {

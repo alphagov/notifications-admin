@@ -40,11 +40,11 @@ describe('FullscreenTable', () => {
 
       headings.forEach((heading, idx) => {
         if (idx === 0) {
-          result += `<th scope="col" class="table-field-heading-first">
-                        <span class="visually-hidden">Row in file</span><span aria-hidden="true" class="table-field-invisible-error">${heading}</span>
+          result += `<th scope="col" class="govuk-table__header">Date</th>
+                        <span class="govuk-visually-hidden">Row in file</span><span aria-hidden="true" class="govuk-table__cell__error-marker--invisible">${heading}</span>
                       </th>`;
         } else {
-          result += `<th scope="col" class="table-field-heading">
+          result += `<th scope="col" class="govuk-table__header">
                       ${heading}
                       </th>`;
         }
@@ -58,16 +58,12 @@ describe('FullscreenTable', () => {
 
       Object.keys(cells).forEach((key, idx) => {
         if (idx === 0) {
-          result += `<td class="table-field-index">
-                      <span class="table-field-error">
-                        ${key}
-                      </span>
+          result += `<td class="govuk-table__cell">
+                      ${key}
                     </td>`;
         } else {
-          result += `<td class="table-field-left-aligned ">
-                      <div class="table-field-status-default">
+          result += `<td class="govuk-table__cell">
                         ${key}
-                      </div>
                     </td>`;
         }
       });
@@ -86,7 +82,7 @@ describe('FullscreenTable', () => {
       ];
 
       rows.forEach(row => {
-        result += `<tr class="table-row">${rowCells(row)}</tr>`;
+        result += `<tr class="govuk-table__row">${rowCells(row)}</tr>`;
       });
 
       return result;
@@ -104,16 +100,16 @@ describe('FullscreenTable', () => {
     document.body.innerHTML =
       `<main>
         <div class="fullscreen-content" data-notify-module="fullscreen-table">
-          <table class="table table-font-xsmall">
-            <caption class="heading-medium table-heading visuallyhidden">
+          <table class="govuk-table">
+            <caption class="govuk-table__caption govuk-visually-hidden">
               people.csv
             </caption>
-            <thead class="table-field-headings-visible">
-              <tr>
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
                 ${tableHeadings()}
               </tr>
             </thead>
-            <tbody>
+            <tbody class="govuk-table__body">
               ${tableRows()}
             </tbody>
           </table>
@@ -333,7 +329,7 @@ describe('FullscreenTable', () => {
       // set total width of column for row numbers in table to 40px
       screenMock.mockPositionAndDimension(
         'fixed-table-first-col-header',
-        '.fullscreen-fixed-table .table-field-heading-first',
+        '.fullscreen-fixed-table .govuk-table__header:first-child',
         {
           'offsetHeight': 50,
           'offsetWidth': 40,
@@ -359,8 +355,8 @@ describe('FullscreenTable', () => {
       // table should set its width to be that of `<main>`
       expect(window.getComputedStyle(tableFrame).width).toEqual('712px');
 
-      // table for number column has 4px extra to allow space for drop shadow
-      expect(window.getComputedStyle(numberColumnFrame)['width']).toEqual('44px');
+      // shadow is now inset
+      expect(window.getComputedStyle(numberColumnFrame)['width']).toEqual('40px');
 
     });
 
@@ -377,8 +373,8 @@ describe('FullscreenTable', () => {
       // table should set its width to be that of `<main>`
       expect(window.getComputedStyle(tableFrame)['width']).toEqual('668px');
 
-      // table for number column has 4px extra to allow space for drop shadow
-      expect(window.getComputedStyle(numberColumnFrame)['width']).toEqual('44px');
+      // table for number column now has inset shadow
+      expect(window.getComputedStyle(numberColumnFrame)['width']).toEqual('40px');
 
     });
 
@@ -411,8 +407,8 @@ describe('FullscreenTable', () => {
       // start module
        new FullscreenTable(document.querySelector('[data-notify-module="fullscreen-table"]'))
 
-      invisibleScrollableTopLeftCell = document.querySelector('.fullscreen-scrollable-table .table-field-heading-first');
-      fixedTopLeftHeaderCell = document.querySelector('.fullscreen-fixed-table .table-field-heading-first');
+      invisibleScrollableTopLeftCell = document.querySelector('.fullscreen-scrollable-table .govuk-table__header:first-child');
+      fixedTopLeftHeaderCell = document.querySelector('.fullscreen-fixed-table .govuk-table__header:first-child');
 
       screenMock.mockPositionAndDimension(
         'scrollable-table-first-col-header',

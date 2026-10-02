@@ -13,3 +13,17 @@
     separator=', '
   ) }}
 {%- endmacro %}
+
+{% macro render_list_or_string(value) %}
+ {% if value  is iterable and value is not string %}
+    <ul>
+      {% for sub_item in value %}
+        {% if sub_item %}
+          <li>{{ sub_item }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    {{ value or '' }}
+  {% endif %}
+{% endmacro %}

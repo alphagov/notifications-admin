@@ -1,8 +1,9 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
-{% from "components/table.html" import list_table, field, text_field, index_field %}
 {% from "components/file-upload.html" import file_upload %}
+{% from "/components/list.html" import render_list_or_string %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% block service_page_title %}
   Error
@@ -51,51 +52,78 @@
     <a href="#main-content" class="govuk-link govuk-link--no-visited-state back-to-top-link">Back to top</a>
   </div>
 
-  {% call(item, row_number) list_table(
-    recipients.displayed_rows,
-    caption=original_file_name,
-    caption_visible=False,
-    field_headings=[
-      '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true" class="table-field-invisible-error">1</span>'|safe
-    ] + recipients.column_headers
-  ) %}
-    {% call index_field() %}
-      <span class="{% if item.has_errors %}table-field-error{% endif %}">
-        {{ item.index + 2 }}
-      </span>
-    {% endcall %}
+  {% set table_headers = [
+    {
+      "html": '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true" class="govuk-table__cell__error-marker govuk-table__cell__error-marker--invisible">1</span>'
+    }
+  ] %}
+  {% for header in recipients.column_headers %}
+    {% do table_headers.append({ "html": header, "text": "" }) %}
+  {% endfor %}
+
+  {% set table_rows = [] %}
+  {% for item in recipients.displayed_rows %}
+    {% set current_row = [] %}
+
+    {% set index_class = 'govuk-table__cell__error-marker' if item.has_errors else '' %}
+    {% set index_html %}
+      <span class="{{ index_class }}">{{ item.index + 2 }}</span>
+    {% endset %}
+    {% do current_row.append({ "html": index_html, "text": "" }) %}
+
     {% for column in recipients.column_headers %}
       {% if item[column].error and not recipients.missing_column_headers %}
-        {% call field() %}
-          <span>
-            <span class="table-field-error-label">{{ item[column].error }}</span>
-            {{ item[column].data if item[column].data != None }}
-          </span>
-        {% endcall %}
-      {% elif item[column].ignore %}
-        {{ text_field(item[column].data or '', status='default') }}
+        {% set cell_error_html %}
+          <span class="govuk-table__cell__error-label">{{ item[column].error }}</span>
+          {{ render_list_or_string(item[column].data) }}
+        {% endset %}
+        {% do current_row.append({
+          "html": cell_error_html,
+        }) %}
       {% else %}
-        {{ text_field(item[column].data or '') }}
+        {% set cell_dict = {
+          "html": render_list_or_string(item[column].data),
+        } %}
+        {% if item[column].ignore %}
+          {% do cell_dict.update({ "classes": "govuk-table__cell--default" }) %}
+        {% endif %}
+        {% do current_row.append(cell_dict) %}
       {% endif %}
     {% endfor %}
+
     {% if item[None].data %}
       {% for column in item[None].data %}
-        {{ text_field(column, status='default') }}
+        {% do current_row.append({
+          "html": render_list_or_string(column),
+          "classes": "govuk-table__cell--default"
+        }) %}
       {% endfor %}
     {% endif %}
-  {% endcall %}
+
+    {% do table_rows.append(current_row) %}
+  {% endfor %}
+
+  <div class="fullscreen-content" data-notify-module="fullscreen-table">
+    {{ govukTable({
+      "caption": original_file_name,
+      "classes": "notify-table notify-table--body-small",
+      "captionClasses": "govuk-visually-hidden",
+      "firstCellIsHeader": true,
+      "head": table_headers,
+      "rows": table_rows
+    }) }}
+  </div>
 
   {% if recipients.displayed_rows|list|length < recipients|length %}
     {% if recipients.displayed_rows|list|length < recipients.rows_with_errors|list|length %}
-      <p class="table-show-more-link">
+      <p class="more-items-available-text">
         Only showing the first {{ recipients.displayed_rows|list|length }} rows with errors
       </p>
     {% else %}
-      <p class="table-show-more-link">
+      <p class="more-items-available-text">
         Only showing rows with errors
       </p>
     {% endif %}
   {% endif %}
-
 
 {% endblock %}
