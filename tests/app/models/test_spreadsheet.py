@@ -122,3 +122,26 @@ def test_spreadsheet_contains_many_email_addresses_is_efficient(mocker):
         call("Foo"),
         # No calls from the second or third columns because we found enough email addresses in the first
     ]
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "tests/spreadsheet_files/excessive/too_many_email_addresses.csv",
+        "tests/spreadsheet_files/excessive/too many email addresses.xlsx",
+    ),
+)
+def test_spreadsheet_contains_many_email_addresses_works_on_files(mocker, filename):
+    with open(filename, "rb") as file:
+        assert Spreadsheet.from_file(file, filename=filename).contains_many_email_addresses() is True
+
+
+def test_spreadsheet_csv_data_has_no_intial_value():
+    with open("tests/spreadsheet_files/excessive/too many email addresses.xlsx", "rb") as file:
+        spreadsheet = Spreadsheet.from_file(file, filename="example.xlsx")
+
+    with pytest.raises(AttributeError):
+        spreadsheet._csv_data  # noqa: B018
+
+    assert spreadsheet.as_csv_data.startswith("email address\r\ntest@example.com\r\n")
+    assert spreadsheet._csv_data.startswith("email address\r\ntest@example.com\r\n")
