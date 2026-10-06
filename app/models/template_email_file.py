@@ -2,7 +2,6 @@ import math
 import uuid
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
-from typing import Any
 
 import boto3
 from flask import abort, current_app, url_for
@@ -24,10 +23,10 @@ def _get_file_location(file_id: str, service_id: str) -> str:
 
 
 class TemplateEmailFile(JSONModel):
-    service_id: Any
-    template: Any
+    service_id: str
+    template: Template
     filename: str
-    link_text: str
+    link_text: str | None
     retention_period: int
     validate_users_email: bool
     pending: bool

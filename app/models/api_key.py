@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any
 
 from flask import abort
 
@@ -9,8 +8,8 @@ from app.notify_client.api_key_api_client import api_key_api_client
 
 class APIKey(JSONModel):
     created_at: datetime
-    created_by: Any
-    expiry_date: datetime
+    created_by: str
+    expiry_date: datetime | None
     key_type: str
     name: str
 
