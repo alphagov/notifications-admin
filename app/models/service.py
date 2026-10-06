@@ -36,17 +36,17 @@ from app.utils.user import is_gov_user
 
 class Service(JSONModel):
     active: bool
-    billing_contact_email_addresses: str
-    billing_contact_names: str
-    billing_reference: str
+    billing_contact_email_addresses: str | None
+    billing_contact_names: str | None
+    billing_reference: str | None
     confirmed_email_sender_name: Any
     confirmed_service_name: bool
     confirmed_unique: bool
-    contact_link: str
+    contact_link: str | None
     count_as_live: bool
-    custom_email_sender_name: str
+    custom_email_sender_name: str | None
     email_sender_local_part: str
-    go_live_at: datetime
+    go_live_at: datetime | None
     has_active_go_live_request: bool
     email_message_limit: int
     international_sms_message_limit: int
@@ -54,13 +54,13 @@ class Service(JSONModel):
     letter_message_limit: int
     rate_limit: int
     name: str
-    notes: str
+    notes: str | None
     prefix_sms: bool
-    purchase_order_number: str
+    purchase_order_number: str | None
     service_callback_api: Any
-    volume_email: int
-    volume_sms: int
-    volume_letter: int
+    volume_email: int | None
+    volume_sms: int | None
+    volume_letter: int | None
 
     __sort_attribute__ = "name"
 

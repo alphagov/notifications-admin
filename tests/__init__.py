@@ -594,7 +594,7 @@ def notification_json(  # noqa: C901
                 "template_version": template["version"],
                 "personalisation": personalisation or {},
                 "postage": postage,
-                "notification_type": template_type,
+                "notification_type": template["template_type"],
                 "reply_to_text": reply_to_text,
                 "client_reference": client_reference,
                 "created_by_name": created_by_name,

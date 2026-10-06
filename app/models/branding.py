@@ -23,10 +23,11 @@ class BrandingSerializedType(TypedDict):
 
 
 class Branding(JSONModel):
-    name: str
+    id: str | None
+    name: str | None
     created_by: Any
-    created_at: datetime
-    updated_at: datetime
+    created_at: datetime | None
+    updated_at: datetime | None
 
     __sort_attribute__ = "name"
 
@@ -45,11 +46,11 @@ class Branding(JSONModel):
 
 
 class EmailBranding(Branding):
-    colour: str
-    logo: str
-    alt_text: str
-    text: str
-    brand_type: str
+    colour: str | None
+    logo: str | None
+    alt_text: str | None
+    text: str | None
+    brand_type: str | None
 
     NHS_ID = "a7dc4e56-660b-4db7-8cff-12c37b12b5ea"
 
@@ -134,7 +135,7 @@ class EmailBranding(Branding):
 
 
 class LetterBranding(Branding):
-    filename: str
+    filename: str | None
 
     NHS_ID = "2cd354bb-6b85-eda3-c0ad-6b613150459f"
 
