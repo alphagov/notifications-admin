@@ -3090,6 +3090,44 @@ def test_upload_csvfile_with_sms_to_landline_validates(
     assert mock_recipients.call_args[1]["allow_sms_to_uk_landline"] == should_allow_sms_to_uk_landline
 
 
+@pytest.mark.parametrize("block_ofcom_protected_blocks", [True, False])
+def test_upload_csvfile_with_block_ofcom_protected_blocks_validates(
+    client_request,
+    mock_get_service_template,
+    mock_s3_set_metadata,
+    mock_s3_get_metadata,
+    mock_s3_upload,
+    mock_has_permissions,
+    mock_get_users_by_service,
+    mock_get_service_statistics,
+    mock_get_job_doesnt_exist,
+    mock_get_jobs,
+    fake_uuid,
+    block_ofcom_protected_blocks,
+    service_one,
+    mocker,
+):
+    if block_ofcom_protected_blocks:
+        service_one["permissions"] += ("sms", "block_ofcom_protected_block")
+    mocker.patch("app.service_api_client.get_service", return_value={"data": service_one})
+
+    mocker.patch("app.main.views.send.s3download", return_value="")
+    mock_recipients = mocker.patch(
+        "app.main.views.send.RecipientCSV",
+        return_value=RecipientCSV("", template=SMSPreviewTemplate({"content": "foo", "template_type": "sms"})),
+    )
+
+    client_request.post(
+        "main.send_messages",
+        service_id=fake_uuid,
+        template_id=fake_uuid,
+        _data={"file": (BytesIO(b""), "example.csv")},
+        _content_type="multipart/form-data",
+        _follow_redirects=True,
+    )
+    assert mock_recipients.call_args[1]["block_ofcom_protected_blocks"] == block_ofcom_protected_blocks
+
+
 def test_job_from_contact_list_knows_where_its_come_from(
     client_request,
     service_one,
