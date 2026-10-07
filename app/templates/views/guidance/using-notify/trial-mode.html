@@ -12,28 +12,37 @@
   <h1 class="heading-large">Trial mode</h1>
 
   <p class="govuk-body">When you add a new service it will start in trial mode.</p>
+
+  <p class="govuk-body">In trial mode there are limits on:</p>
+
+  <ul class="govuk-list govuk-list--bullet">
+    <li>who you can send messages to</li>
+    <li>how many messages you can send each day</li>
+  </ul>
+  <p class="govuk-body">To remove these restrictions, you’ll need to make your service live.</p>
+
+  <h2 class="heading-medium" id="restrictions">Trial mode restrictions</h2>
+
   <p class="govuk-body">While your service is in trial mode, you can only send messages to yourself and your team members.</p>
   <p class="govuk-body">There’s a daily limit of {{ email_and_sms_daily_limit | message_count('email') }} and {{ email_and_sms_daily_limit | message_count('sms') }}.</p>
   <p class="govuk-body">You cannot send any letters in trial mode, but you can still create letter templates and upload letters, to see how it works.</p>
 
-  <div class="govuk-inset-text"> 
-    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">GP surgeries and pharmacies</a> cannot send any text messages in trial mode.</p>
-  </div>
+    <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">GP surgeries</a> cannot send any text messages in trial mode.</p>
 
-  <h2 class="heading-medium" id="how-to-switch-off-trial-mode">How to switch off trial mode</h2>
+  <h2 class="heading-medium" id="how-to-make-your-service-live">How to make your service live</h2>
 
+  <p class="govuk-body">When you have finished testing your service:</p>
+
+  <ol class="govuk-list govuk-list--number">
   {% if current_service and current_service.trial_mode %}
-  <p class="govuk-body">Complete the tasks on the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">Make your service live</a> page.</p>  
+    <li>Go to the <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.request_to_go_live', service_id=current_service.id) }}">Make your service live</a> page.</li>  
   {% else %}
-  <p class="govuk-body">Complete the tasks on the <b class="govuk-!-font-weight-bold">Make your service live</b> page.</p>
+    <li>Go to the <b class="govuk-!-font-weight-bold">Make your service live</b> page.</li>
   {% endif %}
-  <p class="govuk-body">You’ll need to:</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>confirm your service is the only one of its kind in your organisation</li>
-    <li>add examples of the messages you want to send</li>
-    <li>update your settings so you’re ready to send and receive messages</li>
-  </ul>
-  <p class="govuk-body">If your organisation is new to GOV.UK Notify, we’ll ask you to accept our data processing and financial agreement.</p>
+    <li>Complete the tasks.</li>
+    <li>Select <b class="govuk-!-font-weight-bold">Send a request to go live</b>.</li>
+  </ol>
+
   <p class="govuk-body">It can take up to one working day to make your service live.</p>
   <p class="govuk-body">This is so we can check that you’ve met our terms of use.</p>
 
