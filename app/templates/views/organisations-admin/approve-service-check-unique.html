@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 
-{% set title = "Confirm this service is unique" %}
+{% set title = "Free text message allowance" %}
 
 {% block service_page_title %}
   {{ title }}
@@ -22,22 +22,59 @@
     <div class="govuk-grid-column-five-sixths">
 
       <p class="govuk-body">
-        ‘{{ current_service.name }}’ must be the only service of its kind in your organisation.
+        Follow the instructions on this page to confirm whether ‘{{ current_service.name }}’ needs an annual allowance of free text messages.
       </p>
 
-    <p class="govuk-body">
-      Before you continue, check the list of <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation.id) }}" class="govuk-link govuk-link--no-visited-state">{{ current_service.organisation.name }} services</a>.
-    </p>
+      <h2 class="heading-medium">Step 1: Does the service plan to send text messages?</h2>
 
-    <p class="govuk-body">
-      Look out for similar:
-    </p>
+      <p class="govuk-body">
+        {{ current_service.go_live_user.name }} estimates that their service will send N text messages per year.
+      </p>
+      <p class="govuk-body">
+        If they do not expect to send any text messages, go to step 2.
+      </p>
+      <p class="govuk-body">
+        If the expected volume is greater than zero, go to step 3.
+      </p>
 
+      <h2 class="heading-medium">Step 2: Does the service have any text message templates?</h2>
+
+      <p class="govuk-body">
+        Check if the service has any text message templates (opens in new tab).
+      </p>
+      <p class="govuk-body">
+        If it does, go to step 3.
+      </p>
+      <p class="govuk-body">
+        If there are no text message templates:
+      </p>
+
+      <ol class="govuk-list govuk-list--number">
+        <li>Select <b class="govuk-!-font-weight-bold">Yes or not applicable</b>.</li>
+        <li>Select <b class="govuk-!-font-weight-bold">Continue</b>.</li>
+      </ol>
+
+      <h2 class="heading-medium">Step 3: Confirm that the service is eligible for a free allowance</h2>
+
+      <p class="govuk-body">
+        Check the list of <a href="{{ url_for('.organisation_dashboard', org_id=current_service.organisation.id) }}" class="govuk-link govuk-link--no-visited-state">{{ current_service.organisation.name }} services (opens in new tab)</a>.
+      </p>
+      <p class="govuk-body">
+        Look out for similar:
+      </p>
+      
       <ul class="govuk-list govuk-list--bullet">
         <li>service names</li>
         <li>message templates</li>
         <li>team members</li>
       </ul>
+      
+      <p class="govuk-body">
+        To qualify for the free allowance, ‘{{ current_service.name }}’ must be the only service of its kind run by {{ current_service.organisation.name }}.
+      </p>
+      <p class="govuk-body">
+        Different campaigns or projects run by the same team or department do not qualify for a free allowance.
+      </p>
 
     {% call form_wrapper() %}
       {{ form.is_unique }}
