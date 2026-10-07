@@ -209,7 +209,7 @@ def test_get_org_member_make_service_live_service_name(
     )
 
     if expected_status == 200:
-        assert "Check the service name" in normalize_spaces(page.select_one("main").text)
+        assert "Check that the service name is descriptive" in normalize_spaces(page.select_one("main").text)
 
         form = page.select_one("form")
         button = form.select_one("button")

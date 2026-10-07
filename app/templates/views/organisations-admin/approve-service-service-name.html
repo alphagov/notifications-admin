@@ -5,7 +5,7 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 
-{% set title = "Check the service name" %}
+{% set title = "Service name" %}
 
 {% block service_page_title %}
   {{ title }}
@@ -22,11 +22,11 @@
     <div class="govuk-grid-column-five-sixths">
 
       <p class="govuk-body">
-        GOV.UK Notify needs to make sure that {{ organisation.name }} keeps to our <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.terms_of_use') }}" target="_blank">terms of use (opens in new tab)</a>.
+        Check that the service name is descriptive.
       </p>
 
       <p class="govuk-body">
-        We use the service name to do this.
+        It must be something that the GOV.UK Notify team can easily understand.
       </p>
 
       <p class="govuk-body">
@@ -35,7 +35,7 @@
 
       <ul class="govuk-list govuk-list--bullet">
         <li>acronyms, initialisms or abbreviations</li>
-        <li>your own name or the name of someone on your team</li>
+        <li>the name of any team members or individuals working on the service</li>
       </ul>
 
     {% call form_wrapper() %}
