@@ -1,4 +1,5 @@
 import base64
+from uuid import UUID
 
 import pytest
 from fido2 import cbor
@@ -58,7 +59,7 @@ def test_serialize_returns_valid_typeddict(webauthn_dev_server, datetime_string_
     # Create a test credential with known values
     credential = WebAuthnCredential(
         {
-            "id": "123",
+            "id": str(UUID(version=4, int=123)),
             "name": "Test Key",
             "credential_data": "test_credential_data",
             "registration_response": "test_response",

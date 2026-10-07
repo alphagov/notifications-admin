@@ -148,7 +148,7 @@ def test_should_show_overview_page(
     other_user = copy.deepcopy(active_user_view_permissions)
     other_user["email_address"] = "zzzzzzz@example.gov.uk"
     other_user["name"] = "ZZZZZZZZ"
-    other_user["id"] = "zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz"
+    other_user["id"] = uuid.UUID(version=4, bytes=b"zzzzzzzzzzzzzzzz")
 
     existing_user = copy.deepcopy(active_user_view_permissions)
     # This should be further down the alphabet than all the invited users,

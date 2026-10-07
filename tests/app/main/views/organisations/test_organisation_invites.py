@@ -1,5 +1,6 @@
 from datetime import UTC, datetime, timedelta
 from unittest.mock import ANY
+from uuid import UUID
 
 import pytest
 from flask import url_for
@@ -465,9 +466,9 @@ class TestEditOrganisationUser:
             return organisation_json(
                 org_id,
                 {
-                    "o1": "Org 1",
-                    "o2": "Org 2",
-                    "o3": "Org 3",
+                    str(UUID(version=4, int=1)): "Org 1",
+                    str(UUID(version=4, int=2)): "Org 2",
+                    str(UUID(version=4, int=3)): "Org 3",
                 }.get(org_id, "Test organisation"),
                 can_approve_own_go_live_requests=True,
             )
