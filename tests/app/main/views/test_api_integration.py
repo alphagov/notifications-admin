@@ -309,6 +309,7 @@ def test_should_show_empty_api_keys_page(
 
     assert "You have not created any API keys yet" in page.text
     assert "Create an API key" in page.text
+    assert not page.select(".govuk-notification-banner")
     mock_get_no_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 
@@ -338,6 +339,12 @@ def test_should_show_api_keys_page(
     page = client_request.get("main.api_keys", service_id=SERVICE_ONE_ID)
     revoke_link = page.select_one("ul li a.govuk-link.govuk-link--destructive")
 
+    assert normalize_spaces(page.select_one(".govuk-notification-banner").text) == (
+        "Rotate your API key "
+        "Your API key is more than 12 months old. "
+        "Rotate this key at least once a year or remove it if you no longer need it."
+    )
+
     assert [normalize_spaces(item.text) for item in page.select("ul.api-key-list li")] == [
         (
             "another key name Revoked yesterday at midday Test – "
@@ -357,6 +364,25 @@ def test_should_show_api_keys_page(
         key_id=fake_uuid,
     )
 
+    mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@freeze_time("2027-09-14 12:00")
+def test_should_show_api_keys_page_with_multiple_old_keys(
+    client_request,
+    mock_get_api_keys,
+    fake_uuid,
+    mock_get_users_by_service,
+    api_user_active,
+    mocker,
+):
+    page = client_request.get("main.api_keys", service_id=SERVICE_ONE_ID)
+
+    assert normalize_spaces(page.select_one(".govuk-notification-banner").text) == (
+        "Rotate your API key "
+        "You have 3 API keys that are more than 12 months old. "
+        "Rotate these keys at least once a year or remove any you no longer need."
+    )
     mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 

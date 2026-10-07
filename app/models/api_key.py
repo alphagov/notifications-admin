@@ -1,7 +1,8 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from flask import abort
+from werkzeug.utils import cached_property
 
 from app.models import JSONModel, ModelList
 from app.notify_client.api_key_api_client import api_key_api_client
@@ -28,6 +29,10 @@ class APIKey(JSONModel):
     def revoke(self, *, service_id):
         api_key_api_client.revoke_api_key(service_id=service_id, key_id=self.id)
 
+    @property
+    def needs_rotating(self) -> bool:
+        return self.created_at < datetime.now(UTC).replace(year=datetime.now(UTC).year - 1)
+
 
 class APIKeys(ModelList):
     model = APIKey
@@ -41,3 +46,7 @@ class APIKeys(ModelList):
             if api_key.id == id:
                 return api_key
         abort(404)
+
+    @cached_property
+    def number_needing_rotation(self) -> int:
+        return len(tuple(api_key for api_key in self if api_key.needs_rotating))
