@@ -23,7 +23,7 @@
 
   <h2 class="heading-medium" id="restrictions">Trial mode restrictions</h2>
 
-  <p class="govuk-body">While your service is in trial mode, you can only send messages to yourself and your team members.</p>
+  <p class="govuk-body">While your service is in trial mode, you can only send messages to yourself and your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_team_members_and_permissions') }}">team members</a>.</p>
   <p class="govuk-body">There’s a daily limit of {{ email_and_sms_daily_limit | message_count('email') }} and {{ email_and_sms_daily_limit | message_count('sms') }}.</p>
   <p class="govuk-body">You cannot send any letters in trial mode, but you can still create letter templates and upload letters, to see how it works.</p>
 
