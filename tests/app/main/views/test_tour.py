@@ -368,7 +368,7 @@ def test_post_tour_step_raises_validation_error_for_form_error(
 
     assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == "To: 07700 900762"
 
-    #assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: hi ((two)) ((three))"
+    # assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: hi ((two)) ((three))"
 
     with client_request.session_transaction() as session:
         assert session["placeholders"] == {"one": "hi", "phone number": "07700 900762"}
@@ -477,7 +477,7 @@ def test_should_200_for_check_tour_notification(
     assert selected_hint_text == "The template pulls in the data you provide"
 
     assert normalize_spaces(page.select(".sms-message-recipient")[0].text) == "To: 07700 900762"
-    #assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: hello hi howdy"
+    # assert normalize_spaces(page.select(".sms-message-wrapper")[0].text) == "service one: hello hi howdy"
 
     # post to send_notification keeps help argument
     assert page.select_one("form").attrs["action"] == url_for(

@@ -292,7 +292,7 @@ def test_change_your_mobile_number_page_shows_delete_link_if_user_on_email_auth(
     assert "Delete your number" in page.text
 
 
-def test_change_your_mobile_number_page_doesnt_show_delete_link_if_user_has_no_mobile_number(client_request, mocker):
+def test_change_your_mobile_number_page_doesnt_show_delete_link_if_user_has_no_mobile_number(client_request, mocker, fake_uuid):
     user = create_user(id=fake_uuid, auth_type="email_auth", mobile_number=None)
     mocker.patch("app.user_api_client.get_user", return_value=user)
     page = client_request.get("main.your_account_mobile_number", _test_page_title=False)

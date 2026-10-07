@@ -1,4 +1,5 @@
 import pytest
+from uuid import UUID
 from flask import request
 from werkzeug.exceptions import Forbidden
 
@@ -40,10 +41,12 @@ def test_permissions(
     permissions,
     api_user_active,
 ):
-    request.view_args.update({"service_id": "foo"})
+    request.view_args.update({"service_id": str(UUID(version=4, int=1))})
 
-    api_user_active["permissions"] = {"foo": ["manage_users", "manage_templates", "manage_settings"]}
-    api_user_active["services"] = ["foo", "bar"]
+    api_user_active["permissions"] = {
+        str(UUID(version=4, int=1)): ["manage_users", "manage_templates", "manage_settings"]
+    }
+    api_user_active["services"] = [str(UUID(version=4, int=1)), str(UUID(version=4, int=2))]
 
     client_request.login(api_user_active)
 
@@ -59,7 +62,7 @@ def test_restrict_admin_usage(
     client_request,
     platform_admin_user,
 ):
-    request.view_args.update({"service_id": "foo"})
+    request.view_args.update({"service_id": str(UUID(version=4, int=1))})
     client_request.login(platform_admin_user)
 
     @user_has_permissions(restrict_admin_usage=True)
@@ -87,10 +90,10 @@ def test_user_belongs_to_organisation(
     client_request,
     api_user_active,
 ):
-    api_user_active["organisations"] = ["org_1", "org_2"]
+    api_user_active["organisations"] = [str(UUID(version=4, int=1)), str(UUID(version=4, int=2))]
     client_request.login(api_user_active)
 
-    request.view_args = {"org_id": "org_2"}
+    request.view_args = {"org_id": str(UUID(version=4, int=2))}
 
     @user_has_permissions()
     def index():
@@ -103,7 +106,7 @@ def test_user_belongs_to_organisation(
     "org_permissions",
     [
         pytest.param({}, marks=pytest.mark.xfail(raises=Forbidden)),  # doesn't have required permission
-        {"org_2": ["can_make_services_live"]},
+        {str(UUID(version=4, int=2)): ["can_make_services_live"]},
     ],
 )
 def test_user_has_permissions_for_organisation(
@@ -111,12 +114,12 @@ def test_user_has_permissions_for_organisation(
     api_user_active,
     org_permissions,
 ):
-    api_user_active["organisations"] = ["org_1", "org_2"]
+    api_user_active["organisations"] = [str(UUID(version=4, int=1)), str(UUID(version=4, int=2))]
     api_user_active["organisation_permissions"] = org_permissions
 
     client_request.login(api_user_active)
 
-    request.view_args = {"org_id": "org_2"}
+    request.view_args = {"org_id": str(UUID(version=4, int=2))}
 
     @user_has_permissions(org_permissions=["can_make_services_live"])
     def index():
@@ -132,7 +135,7 @@ def test_platform_admin_can_see_orgs_they_dont_have(
     platform_admin_user["organisations"] = []
     client_request.login(platform_admin_user)
 
-    request.view_args = {"org_id": "org_2"}
+    request.view_args = {"org_id": str(UUID(version=4, int=2))}
 
     @user_has_permissions()
     def index():
@@ -161,10 +164,10 @@ def test_user_doesnt_have_permissions_for_organisation(
     client_request,
     api_user_active,
 ):
-    api_user_active["organisations"] = ["org_1", "org_2"]
+    api_user_active["organisations"] = [str(UUID(version=4, int=1)), str(UUID(version=4, int=2))]
     client_request.login(api_user_active)
 
-    request.view_args = {"org_id": "org_3"}
+    request.view_args = {"org_id": str(UUID(version=4, int=3))}
 
     @user_has_permissions()
     def index():
@@ -178,10 +181,12 @@ def test_user_with_no_permissions_to_service_goes_to_templates(
     client_request,
     api_user_active,
 ):
-    api_user_active["permissions"] = {"foo": ["manage_users", "manage_templates", "manage_settings"]}
-    api_user_active["services"] = ["foo", "bar"]
+    api_user_active["permissions"] = {
+        str(UUID(version=4, int=1)): ["manage_users", "manage_templates", "manage_settings"]
+    }
+    api_user_active["services"] = [str(UUID(version=4, int=1)), str(UUID(version=4, int=2))]
     client_request.login(api_user_active)
-    request.view_args = {"service_id": "bar"}
+    request.view_args = {"service_id": str(UUID(version=4, int=2))}
 
     @user_has_permissions()
     def index():

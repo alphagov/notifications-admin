@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from functools import total_ordering
 from inspect import get_annotations
+from uuid import UUID
 
 from notifications_utils.serialised_model import SerialisedModel, SerialisedModelCollection
 from notifications_utils.template import Template
@@ -12,9 +13,20 @@ _NON_COERCIBLE_TYPES = {
 }
 
 
+class UUIDStr(str):
+    def __new__(self, value):
+        if isinstance(value, UUID):
+            return str(value)
+        try:
+            UUID(value)
+        except (ValueError, AttributeError):
+            raise ValueError(f"{value} is not a valid UUID")
+        return str(value)
+
+
 @total_ordering
 class JSONModel(SerialisedModel, ABC):
-    id: str
+    id: UUIDStr
 
     @property
     @abstractmethod

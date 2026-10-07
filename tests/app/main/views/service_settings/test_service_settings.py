@@ -1872,9 +1872,9 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
             "app.service_api_client.get_reply_to_email_addresses",
             create_multiple_email_reply_to_addresses(),
             [
-                "test@example.com (default) Change test@example.com ID: 1234",
-                "test2@example.com Change test2@example.com ID: 5678",
-                "test3@example.com Change test3@example.com ID: 9457",
+                "test@example.com (default) Change test@example.com ID: 00000000-0000-4000-8000-0000000004d2",
+                "test2@example.com Change test2@example.com ID: 00000000-0000-4000-8000-00000000162e",
+                "test3@example.com Change test3@example.com ID: 00000000-0000-4000-8000-0000000024f1",
             ],
         ),
         (
@@ -1883,9 +1883,9 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
             create_multiple_letter_contact_blocks(),
             [
                 "Blank Make default",
-                "1 Example Street (default) Change 1 Example Street ID: 1234",
-                "2 Example Street Change 2 Example Street ID: 5678",
-                "foo<bar>baz Change foo <bar> baz ID: 9457",
+                "1 Example Street (default) Change 1 Example Street ID: 00000000-0000-4000-8000-0000000004d2",
+                "2 Example Street Change 2 Example Street ID: 00000000-0000-4000-8000-00000000162e",
+                "foo<bar>baz Change foo <bar> baz ID: 00000000-0000-4000-8000-0000000024f1",
             ],
         ),
         (
@@ -1893,9 +1893,9 @@ def test_api_ids_dont_show_on_option_pages_with_a_single_sender(
             "app.service_api_client.get_sms_senders",
             create_multiple_sms_senders(),
             [
-                "Example (default and receives replies) Change Example ID: 1234",
-                "Example 2 Change Example 2 ID: 5678",
-                "Example 3 Change Example 3 ID: 9457",
+                "Example (default and receives replies) Change Example ID: 00000000-0000-4000-8000-0000000004d2",
+                "Example 2 Change Example 2 ID: 00000000-0000-4000-8000-00000000162e",
+                "Example 3 Change Example 3 ID: 00000000-0000-4000-8000-0000000024f1",
             ],
         ),
     ],
@@ -1940,7 +1940,7 @@ def test_remove_default_from_default_letter_contact_block(
 
     mock_update_letter_contact.assert_called_once_with(
         SERVICE_ONE_ID,
-        letter_contact_id="1234",
+        letter_contact_id=str(UUID(version=4, int=1234)),
         contact_block="1 Example Street",
         is_default=False,
     )
@@ -5016,10 +5016,16 @@ class TestSetAuthTypeForUsers:
             "app.models.user.Users._get_items",
             return_value=[
                 create_service_one_user(
-                    id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
+                    id=str(UUID(version=4, int=1)),
+                    name="Alpha",
+                    email_address="notify+1@notify.test",
+                    auth_type="sms_auth",
                 ),
                 create_service_one_user(
-                    id="b", name="Zulu", email_address="notify+2@notify.test", auth_type="email_auth"
+                    id=str(UUID(version=4, int=2)),
+                    name="Zulu",
+                    email_address="notify+2@notify.test",
+                    auth_type="email_auth",
                 ),
             ],
         )
@@ -5055,10 +5061,16 @@ class TestSetAuthTypeForUsers:
             "app.models.user.Users._get_items",
             return_value=[
                 create_service_one_user(
-                    id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
+                    id=str(UUID(version=4, int=1)),
+                    name="Alpha",
+                    email_address="notify+1@notify.test",
+                    auth_type="sms_auth",
                 ),
                 create_service_one_user(
-                    id="b", name="Zulu", email_address="notify+2@notify.test", auth_type="email_auth"
+                    id=str(UUID(version=4, int=2)),
+                    name="Zulu",
+                    email_address="notify+2@notify.test",
+                    auth_type="email_auth",
                 ),
             ],
         )
@@ -5067,10 +5079,17 @@ class TestSetAuthTypeForUsers:
         client_request.post(
             "main.service_set_auth_type_for_users",
             service_id=SERVICE_ONE_ID,
-            _data={"users": ["a", "b"]},
+            _data={
+                "users": [
+                    UUID(version=4, int=1),
+                    UUID(version=4, int=2),
+                ]
+            },
         )
 
-        assert mock_update_user_attribute.call_args_list == [mocker.call("a", auth_type="email_auth")]
+        assert mock_update_user_attribute.call_args_list == [
+            mocker.call(str(UUID(version=4, int=1)), auth_type="email_auth")
+        ]
 
     def test_sets_sms_auth_for_deselected_users(
         self,
@@ -5085,10 +5104,16 @@ class TestSetAuthTypeForUsers:
             "app.models.user.Users._get_items",
             return_value=[
                 create_service_one_user(
-                    id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
+                    id=str(UUID(version=4, int=1)),
+                    name="Alpha",
+                    email_address="notify+1@notify.test",
+                    auth_type="sms_auth",
                 ),
                 create_service_one_user(
-                    id="b", name="Zulu", email_address="notify+2@notify.test", auth_type="email_auth"
+                    id=str(UUID(version=4, int=2)),
+                    name="Zulu",
+                    email_address="notify+2@notify.test",
+                    auth_type="email_auth",
                 ),
             ],
         )
@@ -5102,7 +5127,9 @@ class TestSetAuthTypeForUsers:
             _data={"csrf": "token"},
         )
 
-        assert mock_update_user_attribute.call_args_list == [mocker.call("b", auth_type="sms_auth")]
+        assert mock_update_user_attribute.call_args_list == [
+            mocker.call(str(UUID(version=4, int=2)), auth_type="sms_auth")
+        ]
 
     def test_updates_invited_users(
         self,
@@ -5136,9 +5163,9 @@ class TestSetAuthTypeForUsers:
     @pytest.mark.parametrize(
         "form_data, should_fail",
         (
-            ({"users": ["a"]}, False),  # Change user a to email_auth
-            ({"users": []}, False),  # Change both user a and user b to sms_auth
-            ({"users": ["c"]}, True),  # Change user c to email_auth
+            ({"users": [str(UUID(version=4, int=1))]}, False),  # Change user 1 to email_auth
+            ({"users": []}, False),  # Change both user 1 and user 2 to sms_auth
+            ({"users": [str(UUID(version=4, int=3))]}, True),  # Change user 3 to email_auth
         ),
     )
     def test_user_with_webauthn_auth_not_listed_or_editable(
@@ -5156,13 +5183,22 @@ class TestSetAuthTypeForUsers:
             "app.models.user.Users._get_items",
             return_value=[
                 create_service_one_user(
-                    id="a", name="Alpha", email_address="notify+1@notify.test", auth_type="sms_auth"
+                    id=str(UUID(version=4, int=1)),
+                    name="Alpha",
+                    email_address="notify+1@notify.test",
+                    auth_type="sms_auth",
                 ),
                 create_service_one_user(
-                    id="b", name="Beta", email_address="notify+2@notify.test", auth_type="email_auth"
+                    id=str(UUID(version=4, int=2)),
+                    name="Beta",
+                    email_address="notify+2@notify.test",
+                    auth_type="email_auth",
                 ),
                 create_service_one_user(
-                    id="c", name="Charlie", email_address="notify+3@notify.test", auth_type="webauthn_auth"
+                    id=str(UUID(version=4, int=3)),
+                    name="Charlie",
+                    email_address="notify+3@notify.test",
+                    auth_type="webauthn_auth",
                 ),
             ],
         )
@@ -5946,7 +5982,7 @@ def test_should_set_default_org_email_branding_fails_if_branding_choice_is_not_o
     service = service_json(organisation_id=organisation["id"], organisation_type="local")
     mocker.patch(
         "app.organisations_client.get_organisation_services",
-        return_value=[service, service_json(id_="5678", restricted=True)],
+        return_value=[service, service_json(id_=str(UUID(version=4, int=5678)), restricted=True)],
     )
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
@@ -5956,11 +5992,11 @@ def test_should_set_default_org_email_branding_fails_if_branding_choice_is_not_o
 
 
 def test_should_set_default_org_email_branding_fails_if_org_already_has_a_default_branding(client_request, mocker):
-    organisation = organisation_json(email_branding_id="12345", organisation_type="local")
+    organisation = organisation_json(email_branding_id=str(UUID(version=4, int=12345)), organisation_type="local")
     service = service_json(organisation_id=organisation["id"], organisation_type="local")
     mocker.patch(
         "app.organisations_client.get_organisation_services",
-        return_value=[service, service_json(id_="5678", restricted=True)],
+        return_value=[service, service_json(id_=str(UUID(version=4, int=5678)), restricted=True)],
     )
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
@@ -5974,7 +6010,7 @@ def test_should_set_default_org_email_branding_fails_if_org_is_central(client_re
     service = service_json(organisation_id=organisation["id"], organisation_type="central")
     mocker.patch(
         "app.organisations_client.get_organisation_services",
-        return_value=[service, service_json(id_="5678", restricted=True)],
+        return_value=[service, service_json(id_=str(UUID(version=4, int=5678)), restricted=True)],
     )
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
@@ -5988,7 +6024,7 @@ def test_should_set_default_org_email_branding_fails_if_other_live_services_in_o
     service = service_json(organisation_id=organisation["id"], organisation_type="local")
     mocker.patch(
         "app.organisations_client.get_organisation_services",
-        return_value=[service, service_json(id_="5678", restricted=False)],
+        return_value=[service, service_json(id_=str(UUID(version=4, int=5678)), restricted=False)],
     )
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
@@ -6007,7 +6043,7 @@ def test_should_set_default_org_email_branding_succeeds_if_all_conditions_are_me
     service = service_json(organisation_id=organisation["id"], organisation_type="local", restricted=is_service_trial)
     mocker.patch(
         "app.organisations_client.get_organisation_services",
-        return_value=[service, service_json(id_="5678", restricted=True)],
+        return_value=[service, service_json(id_=str(UUID(version=4, int=5678)), restricted=True)],
     )
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)

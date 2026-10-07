@@ -160,11 +160,11 @@ def test_sender_session_is_present_after_selected(
         ".set_sender",
         service_id=service_one["id"],
         template_id=fake_uuid,
-        _data={"sender": "1234"},
+        _data={"sender": str(uuid.UUID(version=4, int=1234))},
     )
 
     with client_request.session_transaction() as session:
-        assert session["sender_id"] == "1234"
+        assert session["sender_id"] == str(uuid.UUID(version=4, int=1234))
 
 
 def test_set_sender_redirects_if_no_reply_to_email_addresses(
@@ -221,7 +221,7 @@ def test_set_sender_redirects_if_one_email_sender(
     )
 
     with client_request.session_transaction() as session:
-        assert session["sender_id"] == "1234"
+        assert session["sender_id"] == str(uuid.UUID(version=4, int=1234))
 
 
 def test_set_sender_redirects_if_one_sms_sender(
@@ -242,7 +242,7 @@ def test_set_sender_redirects_if_one_sms_sender(
     )
 
     with client_request.session_transaction() as session:
-        assert session["sender_id"] == "1234"
+        assert session["sender_id"] == str(uuid.UUID(version=4, int=1234))
 
 
 @pytest.mark.parametrize(

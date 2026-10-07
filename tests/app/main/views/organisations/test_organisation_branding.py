@@ -395,7 +395,11 @@ def test_change_default_org_email_branding_successfully_from_govuk(
     assert mock_update_organisation.call_args_list == [
         mocker.call(
             organisation_one["id"],
-            cached_service_ids=["12345", "67890", SERVICE_ONE_ID],
+            cached_service_ids=[
+                str(UUID(version=4, int=12345)),
+                str(UUID(version=4, int=67890)),
+                SERVICE_ONE_ID,
+            ],
             email_branding_id="email-branding-1-id",
         )
     ]
@@ -592,13 +596,13 @@ def test_organisation_letter_branding_page_shows_remove_links(
     mock_get_letter_branding_pool,
     mocker,
 ):
-    organisation_one["letter_branding_id"] = "9abc"
+    organisation_one["letter_branding_id"] = str(UUID(version=4, int=9012))
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
     mocker.patch(
         "app.models.branding.letter_branding_client.get_letter_branding",
         return_value={
-            "id": "9abc",
+            "id": str(UUID(version=4, int=9012)),
             "name": "Government Digital Service",
             "filename": "gds",
         },
@@ -617,10 +621,10 @@ def test_organisation_letter_branding_page_shows_remove_links(
     ]
 
     assert headers_and_remove_links[2].get("href") == url_for(
-        ".organisation_letter_branding", org_id=organisation_one["id"], remove_branding_id="1234"
+        ".organisation_letter_branding", org_id=organisation_one["id"], remove_branding_id=str(UUID(version=4, int=1234))
     )
     assert headers_and_remove_links[4].get("href") == url_for(
-        ".organisation_letter_branding", org_id=organisation_one["id"], remove_branding_id="5678"
+        ".organisation_letter_branding", org_id=organisation_one["id"], remove_branding_id=str(UUID(version=4, int=5678))
     )
 
 
@@ -636,7 +640,7 @@ def test_get_organisation_letter_branding_page_with_remove_param_shows_confirmat
     page = client_request.get(
         ".organisation_letter_branding",
         org_id=organisation_one["id"],
-        remove_branding_id="1234",
+        remove_branding_id=str(UUID(version=4, int=1234)),
     )
 
     assert "Are you sure you want to remove ‘Cabinet Office’ branding?" in page.text
@@ -658,11 +662,11 @@ def test_post_organisation_letter_branding_page_with_remove_param_calls_client_a
     page = client_request.post(
         ".organisation_letter_branding",
         org_id=organisation_one["id"],
-        remove_branding_id="1234",
+        remove_branding_id=str(UUID(version=4, int=1234)),
         _follow_redirects=True,
     )
 
-    assert remove_mock.call_args_list == [mocker.call(ORGANISATION_ID, "1234")]
+    assert remove_mock.call_args_list == [mocker.call(ORGANISATION_ID, str(UUID(version=4, int=1234)))]
 
     assert page.select_one("h1").text == "Letter branding"
     assert "Letter branding ‘Cabinet Office’ removed." in page.text
@@ -693,13 +697,13 @@ def test_organisation_letter_branding_page_shows_confirmation_when_making_none_d
     mock_get_letter_branding_pool,
     mocker,
 ):
-    organisation_one["letter_branding_id"] = "9abc"
+    organisation_one["letter_branding_id"] = str(UUID(version=4, int=9012))
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
     mocker.patch(
         "app.models.branding.letter_branding_client.get_letter_branding",
         return_value={
-            "id": "9abc",
+            "id": str(UUID(version=4, int=9012)),
             "name": "Government Digital Service",
             "filename": "gds",
         },
@@ -791,7 +795,7 @@ def test_change_default_org_letter_branding_shows_confirmation_question_when_cha
     page = client_request.post(
         ".organisation_letter_branding",
         org_id=organisation_one["id"],
-        _data={"letter_branding_id": "1234"},
+        _data={"letter_branding_id": str(UUID(version=4, int=1234))},
         _follow_redirects=True,
     )
 
@@ -822,12 +826,18 @@ def test_change_default_org_letter_branding_successfully_from_no_branding(
     client_request.post(
         ".organisation_letter_branding",
         org_id=organisation_one["id"],
-        new_default_branding_id="1234",
+        new_default_branding_id=str(UUID(version=4, int=1234)),
     )
 
     assert mock_update_organisation.call_args_list == [
         mocker.call(
-            organisation_one["id"], cached_service_ids=["12345", "67890", SERVICE_ONE_ID], letter_branding_id="1234"
+            organisation_one["id"],
+            cached_service_ids=[
+                str(UUID(version=4, int=12345)),
+                str(UUID(version=4, int=67890)),
+                SERVICE_ONE_ID
+            ],
+            letter_branding_id=str(UUID(version=4, int=1234))
         )
     ]
 
@@ -845,7 +855,7 @@ def test_change_default_org_letter_branding_successfully_from_explicit_brand(
         side_effect=lambda org_id: organisation_json(
             org_id,
             "Org 1",
-            letter_branding_id="1234",
+            letter_branding_id=str(UUID(version=4, int=1234)),
         ),
     )
 
@@ -854,11 +864,11 @@ def test_change_default_org_letter_branding_successfully_from_explicit_brand(
     client_request.post(
         ".organisation_letter_branding",
         org_id=organisation_one["id"],
-        _data={"letter_branding_id": "5678"},
+        _data={"letter_branding_id": str(UUID(version=4, int=5678))},
     )
 
     assert mock_update_organisation.call_args_list == [
-        mocker.call(organisation_one["id"], cached_service_ids=None, letter_branding_id="5678")
+        mocker.call(organisation_one["id"], cached_service_ids=None, letter_branding_id=str(UUID(version=4, int=5678)))
     ]
 
 
@@ -873,27 +883,27 @@ def test_add_organisation_letter_branding_options_shows_branding_not_in_branding
     # The first 3 items in all_letter_branding are in the pool, the last 2 are not
     all_letter_branding = [
         {
-            "id": "1234",
+            "id": str(UUID(version=4, int=1234)),
             "name": "Cabinet Office",
             "filename": "co",
         },
         {
-            "id": "5678",
+            "id": str(UUID(version=4, int=5678)),
             "name": "Department for Education",
             "filename": "dfe",
         },
         {
-            "id": "9abc",
+            "id": str(UUID(version=4, int=9012)),
             "name": "Government Digital Service",
             "filename": "gds",
         },
         {
-            "id": "abcd",
+            "id": str(UUID(version=4, bytes=b"abcdabcdabcdabcd")),
             "name": "Land Registry",
             "filename": "land-registry",
         },
         {
-            "id": "efgh",
+            "id": str(UUID(version=4, bytes=b"efghefghefghefgh")),
             "name": "Animal and Plant Health Agency",
             "filename": "apha",
         },
@@ -909,8 +919,8 @@ def test_add_organisation_letter_branding_options_shows_branding_not_in_branding
         (checkbox.text.strip(), checkbox.input["value"], checkbox.input.has_attr("checked"))
         for checkbox in page.select(".govuk-checkboxes__item")
     ] == [
-        ("Animal and Plant Health Agency", "efgh", False),
-        ("Land Registry", "abcd", False),
+        ("Animal and Plant Health Agency", str(UUID(version=4, bytes=b"efghefghefghefgh")), False),
+        ("Land Registry", str(UUID(version=4, bytes=b"abcdabcdabcdabcd")), False),
     ]
     assert normalize_spaces(page.select_one(".page-footer__button").text) == "Add selected options"
 

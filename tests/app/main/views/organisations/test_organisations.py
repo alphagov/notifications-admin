@@ -1,4 +1,5 @@
 import pytest
+from uuid import UUID
 from flask import url_for
 from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
@@ -65,9 +66,9 @@ def test_organisation_left_hand_nav_for_org_users(
 
 def test_organisation_page_shows_all_organisations(client_request, platform_admin_user, mocker):
     orgs = [
-        {"id": "A3", "name": "Test 3", "active": True, "count_of_live_services": 0},
-        {"id": "B1", "name": "Test 1", "active": True, "count_of_live_services": 1},
-        {"id": "C2", "name": "Test 2", "active": False, "count_of_live_services": 2},
+        {"id": str(UUID(version=4, int=3)), "name": "Test 3", "active": True, "count_of_live_services": 0},
+        {"id": str(UUID(version=4, int=1)), "name": "Test 1", "active": True, "count_of_live_services": 1},
+        {"id": str(UUID(version=4, int=2)), "name": "Test 2", "active": False, "count_of_live_services": 2},
     ]
 
     get_organisations = mocker.patch("app.models.organisation.AllOrganisations._get_items", return_value=orgs)
@@ -86,9 +87,9 @@ def test_organisation_page_shows_all_organisations(client_request, platform_admi
             page.select(".browse-list-item a"), page.select(".browse-list-item .browse-list-hint"), strict=True
         )
     ] == [
-        ("Test 1", "1 live service", url_for("main.organisation_dashboard", org_id="B1")),
-        ("Test 2", "2 live services", url_for("main.organisation_dashboard", org_id="C2")),
-        ("Test 3", "0 live services", url_for("main.organisation_dashboard", org_id="A3")),
+        ("Test 1", "1 live service", url_for("main.organisation_dashboard", org_id=str(UUID(version=4, int=1)))),
+        ("Test 2", "2 live services", url_for("main.organisation_dashboard", org_id=str(UUID(version=4, int=2)))),
+        ("Test 3", "0 live services", url_for("main.organisation_dashboard", org_id=str(UUID(version=4, int=3)))),
     ]
 
     archived = page.select_one(".browse-list-item__status.heading-medium")
@@ -308,11 +309,11 @@ def test_nhs_local_can_create_own_organisations(
     mocker.patch(
         "app.models.organisation.AllOrganisations._get_items",
         return_value=[
-            organisation_json("t3", "Trust 3", active=False, organisation_type="nhs_local"),
-            organisation_json("t2", "Trust 2", organisation_type="nhs_local"),
-            organisation_json("t1", "Trust 1", organisation_type="nhs_local"),
-            organisation_json("gp1", "GP 1", organisation_type="nhs_gp"),
-            organisation_json("c1", "Central 1"),
+            organisation_json(str(UUID(version=4, int=3)), "Trust 3", active=False, organisation_type="nhs_local"),
+            organisation_json(str(UUID(version=4, int=2)), "Trust 2", organisation_type="nhs_local"),
+            organisation_json(str(UUID(version=4, int=1)), "Trust 1", organisation_type="nhs_local"),
+            organisation_json(str(UUID(version=4, int=11)), "GP 1", organisation_type="nhs_gp"),
+            organisation_json(str(UUID(version=4, int=31)), "Central 1"),
         ],
     )
     service_one["organisation_type"] = organisation_type
@@ -336,8 +337,8 @@ def test_nhs_local_can_create_own_organisations(
         (normalize_spaces(radio.select_one("label").text), radio.select_one("input")["value"])
         for radio in page.select(".govuk-radios__item")
     ] == [
-        ("Trust 1", "t1"),
-        ("Trust 2", "t2"),
+        ("Trust 1", str(UUID(version=4, int=1))),
+        ("Trust 2", str(UUID(version=4, int=2))),
     ]
     assert normalize_spaces(page.select_one(".js-stick-at-bottom-when-scrolling button").text) == "Continue"
 
@@ -877,9 +878,9 @@ def test_organisation_trial_mode_services_shows_all_non_live_services(
     mocker.patch(
         "app.organisations_client.get_organisation_services",
         return_value=[
-            service_json(id_="1", name="1", restricted=False, active=True),  # live
-            service_json(id_="2", name="2", restricted=True, active=True),  # trial
-            service_json(id_="3", name="3", restricted=False, active=False),  # archived
+            service_json(id_=str(UUID(version=4, int=1)), name="1", restricted=False, active=True),  # live
+            service_json(id_=str(UUID(version=4, int=2)), name="2", restricted=True, active=True),  # trial
+            service_json(id_=str(UUID(version=4, int=3)), name="3", restricted=False, active=False),  # archived
         ],
     )
 
@@ -891,8 +892,8 @@ def test_organisation_trial_mode_services_shows_all_non_live_services(
 
     assert normalize_spaces(services[0].text) == "2"
     assert normalize_spaces(services[1].text) == "3"
-    assert services[0].find("a")["href"] == url_for("main.usage", service_id="2")
-    assert services[1].find("a")["href"] == url_for("main.usage", service_id="3")
+    assert services[0].find("a")["href"] == url_for("main.usage", service_id=str(UUID(version=4, int=2)))
+    assert services[1].find("a")["href"] == url_for("main.usage", service_id=str(UUID(version=4, int=3)))
 
 
 def test_organisation_trial_mode_services_is_visible_to_platform_admin(
@@ -946,9 +947,9 @@ def test_manage_org_users_shows_correct_link_next_to_each_user(
         return organisation_json(
             org_id,
             {
-                "o1": "Org 1",
-                "o2": "Org 2",
-                "o3": "Org 3",
+                str(UUID(version=4, int=1)): "Org 1",
+                str(UUID(version=4, int=2)): "Org 2",
+                str(UUID(version=4, int=3)): "Org 3",
             }.get(org_id, "Test organisation"),
             can_approve_own_go_live_requests=can_approve_own_go_live_requests,
         )
@@ -995,8 +996,12 @@ def test_manage_org_users_shows_correct_link_next_to_each_user(
     assert users[0].a["href"] == url_for(
         ".cancel_invited_org_user", org_id=ORGANISATION_ID, invited_user_id="73616d70-6c65-4f6f-b267-5f696e766974"
     )
-    assert users[1].a["href"] == url_for(".edit_organisation_user", org_id=ORGANISATION_ID, user_id="1234")
-    assert users[2].a["href"] == url_for(".edit_organisation_user", org_id=ORGANISATION_ID, user_id="5678")
+    assert users[1].a["href"] == url_for(
+        ".edit_organisation_user", org_id=ORGANISATION_ID, user_id=str(UUID(version=4, int=1234))
+    )
+    assert users[2].a["href"] == url_for(
+        ".edit_organisation_user", org_id=ORGANISATION_ID, user_id=str(UUID(version=4, int=5678))
+    )
 
 
 def test_manage_org_users_shows_no_link_for_cancelled_users(
@@ -1185,13 +1190,13 @@ def test_organisation_settings_table_shows_letter_branding_pool_with_brand_as_de
     organisation_one,
     mocker,
 ):
-    organisation_one["letter_branding_id"] = "5678"
+    organisation_one["letter_branding_id"] = str(UUID(version=4, int=5678))
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
 
     mocker.patch(
         "app.models.branding.letter_branding_client.get_letter_branding",
         return_value={
-            "id": "5678",
+            "id": str(UUID(version=4, int=5678)),
             "name": "Department for Education",
             "filename": "dfe",
         },
@@ -1617,7 +1622,9 @@ def test_update_organisation_sector_sends_service_id_data_to_api_client(
     )
 
     mock_update_organisation.assert_called_once_with(
-        organisation_one["id"], cached_service_ids=["12345", "67890", SERVICE_ONE_ID], organisation_type="central"
+        organisation_one["id"],
+        cached_service_ids=[str(UUID(version=4, int=12345)), str(UUID(version=4, int=67890)), SERVICE_ONE_ID],
+        organisation_type="central",
     )
 
 
@@ -2381,9 +2388,9 @@ def test_organisation_billing_page_not_accessible_if_not_platform_admin(
 @pytest.mark.parametrize(
     "signed_by_id, signed_by_name, expected_signatory",
     [
-        ("1234", None, "Test User"),
+        (str(UUID(version=4, int=1234)), None, "Test User"),
         (None, "The Org Manager", "The Org Manager"),
-        ("1234", "The Org Manager", "The Org Manager"),
+        (str(UUID(version=4, int=1234)), "The Org Manager", "The Org Manager"),
     ],
 )
 def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_person(
@@ -2396,7 +2403,7 @@ def test_organisation_billing_page_when_the_agreement_is_signed_by_a_known_perso
     signed_by_name,
     expected_signatory,
 ):
-    api_user_active["id"] = "1234"
+    api_user_active["id"] = str(UUID(version=4, int=1234))
 
     organisation_one["agreement_signed"] = True
     organisation_one["agreement_signed_version"] = 2.5
