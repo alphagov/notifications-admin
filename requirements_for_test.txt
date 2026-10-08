@@ -1315,7 +1315,7 @@ mypy-extensions==1.1.0 \
 notifications-python-client==12.2.0 \
     --hash=sha256:5552f83d26ca0bba2b69b8477c8db691645bfd53fd6e591421318c81fa077b7a
     # via -r requirements.txt
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@0a5d9e4252a1dc6d75451e679af893ed1a758110
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@c7cf01e45eec25e57d7c262f411a14309912a4f8
     # via -r requirements.txt
 openpyxl==3.1.5 \
     --hash=sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2 \
@@ -1750,6 +1750,7 @@ typing-extensions==4.16.0 \
     #   beautifulsoup4
     #   mypy
     #   opentelemetry-api
+    #   opentelemetry-semantic-conventions
 urllib3==2.8.0 \
     --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3 \
     --hash=sha256:63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63
