@@ -82,7 +82,7 @@ def created_by_json(id_, name="", email_address=""):
 
 
 def user_json(
-    id_="1234",
+    id_=str(uuid.UUID(version=4, int=1234)),
     name="Test User",
     email_address="test@gov.uk",
     mobile_number="+447700900986",
@@ -162,7 +162,7 @@ def invited_user(
 
 
 def service_json(
-    id_="1234",
+    id_=str(uuid.UUID(version=4, int=1234)),
     name="Test Service",
     users=None,
     email_message_limit=1000,
@@ -197,6 +197,15 @@ def service_json(
     confirmed_service_name=False,
     confirmed_email_sender_name=None,
 ):
+    from uuid import UUID
+
+    try:
+        UUID(id_)
+    except (ValueError, AttributeError) as e:
+        if isinstance(id_, UUID):
+            id_ = str(id_)
+        else:
+            raise type(e)(f"{id_} is not a UUID ({type(id_)=})") from e
     if users is None:
         users = []
     if permissions is None:
@@ -248,7 +257,7 @@ def service_json(
 
 
 def organisation_json(
-    id_="1234",
+    id_=str(uuid.UUID(version=4, int=1234)),
     name=False,
     users=None,
     active=True,
@@ -594,7 +603,7 @@ def notification_json(  # noqa: C901
                 "template_version": template["version"],
                 "personalisation": personalisation or {},
                 "postage": postage,
-                "notification_type": template_type,
+                "notification_type": template["template_type"],
                 "reply_to_text": reply_to_text,
                 "client_reference": client_reference,
                 "created_by_name": created_by_name,

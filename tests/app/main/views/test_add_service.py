@@ -1,4 +1,5 @@
 import pytest
+from uuid import UUID
 from flask import url_for
 from flask_login import current_user
 from freezegun import freeze_time
@@ -168,7 +169,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
 
     mock_create_service = mocker.patch(
         "app.notify_client.service_api_client.ServiceAPIClient.post",
-        return_value={"data": {"id": 101}},
+        return_value={"data": {"id": str(UUID(version=4, int=101))}},
     )
 
     client_request.post(
@@ -180,7 +181,7 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         _expected_status=302,
         _expected_redirect=url_for(
             "main.begin_tour",
-            service_id=101,
+            service_id=str(UUID(version=4, int=101)),
             template_id=fake_uuid,
         ),
     )
@@ -208,10 +209,10 @@ def test_should_add_service_and_redirect_to_tour_when_no_services(
         content=(
             "Hey ((name)), I’m trying out Notify. Today is ((day of week)) and my favourite colour is ((colour))."
         ),
-        service_id=101,
+        service_id=str(UUID(version=4, int=101)),
     )
     with client_request.session_transaction() as session:
-        assert session["service_id"] == 101
+        assert session["service_id"] == str(UUID(version=4, int=101))
 
 
 def test_add_service_has_to_choose_org_type(
@@ -305,7 +306,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
         _expected_status=302,
         _expected_redirect=url_for(
             "main.service_dashboard",
-            service_id=101,
+            service_id=str(UUID(version=4, int=101)),
         ),
     )
     assert mock_get_services.called
@@ -321,7 +322,7 @@ def test_should_add_service_and_redirect_to_dashboard_when_existing_service(
     )
     assert len(mock_create_service_template.call_args_list) == 0
     with client_request.session_transaction() as session:
-        assert session["service_id"] == 101
+        assert session["service_id"] == str(UUID(version=4, int=101))
 
 
 def test_add_service_for_nhs_notify_user_sets_nhs_notify_org_type_automatically_without_org_type_being_provided(
@@ -342,7 +343,7 @@ def test_add_service_for_nhs_notify_user_sets_nhs_notify_org_type_automatically_
         _expected_status=302,
         _expected_redirect=url_for(
             "main.service_dashboard",
-            service_id=101,
+            service_id=str(UUID(version=4, int=101)),
         ),
     )
 
@@ -356,7 +357,7 @@ def test_add_service_for_nhs_notify_user_sets_nhs_notify_org_type_automatically_
         letter_message_limit=50,
         restricted=True,
     )
-    mock_update_service.assert_called_once_with("101", sms_message_limit=0)
+    mock_update_service.assert_called_once_with(str(UUID(version=4, int=101)), sms_message_limit=0)
 
     assert mock_create_service_template.called is False
 
@@ -385,13 +386,13 @@ def test_add_service_sets_daily_sms_limit_to_zero_for_nhs_services_with_no_allow
         _expected_status=302,
         _expected_redirect=url_for(
             "main.service_dashboard",
-            service_id=101,
+            service_id=str(UUID(version=4, int=101)),
         ),
     )
     assert mock_get_services.called
     assert mock_create_service.called
 
-    mock_update_service.assert_called_once_with("101", sms_message_limit=0)
+    mock_update_service.assert_called_once_with(str(UUID(version=4, int=101)), sms_message_limit=0)
 
     assert mock_create_service_template.called is False
 
@@ -420,13 +421,13 @@ def test_add_service_sets_daily_sms_limit_to_zero_for_nhs_services_with_no_allow
         _expected_status=302,
         _expected_redirect=url_for(
             "main.service_dashboard",
-            service_id=101,
+            service_id=str(UUID(version=4, int=101)),
         ),
     )
     assert mock_get_services_with_no_services.called
     assert mock_create_service.called
 
-    mock_update_service.assert_called_once_with("101", sms_message_limit=0)
+    mock_update_service.assert_called_once_with(str(UUID(version=4, int=101)), sms_message_limit=0)
 
     assert mock_create_service_template.called is False
 
@@ -522,9 +523,9 @@ def test_email_auth_user_creates_service_with_email_auth_permission(
         _expected_status=302,
         _expected_redirect=url_for(
             "main.service_dashboard",
-            service_id=101,
+            service_id=str(UUID(version=4, int=101)),
         ),
     )
     assert mock_create_service.called
-    assert mock_update_service.call_args[0][0] == "101"
+    assert mock_update_service.call_args[0][0] == str(UUID(version=4, int=101))
     assert "email_auth" in mock_update_service.call_args[1]["permissions"]

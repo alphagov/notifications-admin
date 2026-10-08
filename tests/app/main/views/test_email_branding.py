@@ -1,7 +1,7 @@
 from io import BytesIO
 from unittest import mock
 from unittest.mock import call
-
+from uuid import UUID
 import pytest
 from flask import url_for
 from notifications_python_client.errors import HTTPError
@@ -82,11 +82,11 @@ def test_view_email_branding_with_services_but_no_orgs(
 
     link_1 = list_of_service_links[0].select_one("a")
     assert link_1.text.strip() == "service 1"
-    assert link_1["href"] == url_for(".service_settings", service_id="1234")
+    assert link_1["href"] == url_for(".service_settings", service_id=str(UUID(version=4, int=1234)))
 
     link_2 = list_of_service_links[1].select_one("a")
     assert link_2.text.strip() == "service 2"
-    assert link_2["href"] == url_for(".service_settings", service_id="5678")
+    assert link_2["href"] == url_for(".service_settings", service_id=str(UUID(version=4, int=5678)))
 
 
 def test_view_email_branding_with_org_but_no_services(
@@ -106,7 +106,7 @@ def test_view_email_branding_with_org_but_no_services(
 
     link_1 = list_of_organisation_links[0].select_one("a")
     assert link_1.text.strip() == "organisation 1"
-    assert link_1["href"] == url_for(".organisation_settings", org_id="1234")
+    assert link_1["href"] == url_for(".organisation_settings", org_id=str(UUID(version=4, int=1234)))
 
 
 @pytest.mark.parametrize(

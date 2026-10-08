@@ -1,4 +1,5 @@
 import pytest
+from uuid import UUID
 from flask import url_for
 
 from tests import user_json
@@ -7,8 +8,8 @@ from tests import user_json
 def user_with_orgs_and_services(num_orgs, num_services, platform_admin=False):
     return user_json(
         name="leo",
-        organisations=[f"org{i}" for i in range(1, num_orgs + 1)],
-        services=[f"service{i}" for i in range(1, num_services + 1)],
+        organisations=[str(UUID(version=4, int=i)) for i in range(1, num_orgs + 1)],
+        services=[str(UUID(version=4, int=i)) for i in range(1, num_services + 1)],
         platform_admin=platform_admin,
     )
 
@@ -21,10 +22,10 @@ def user_with_orgs_and_services(num_orgs, num_services, platform_admin=False):
         # assumption is that live service is part of user’s organisation
         # – real users shouldn’t have orphaned live services, or access to
         # services belonging to other organisations
-        (1, 1, ".organisation_dashboard", {"org_id": "org1"}),
+        (1, 1, ".organisation_dashboard", {"org_id": str(UUID(version=4, int=1))}),
         (2, 0, ".your_services", {}),
-        (0, 1, ".service_dashboard", {"service_id": "service1"}),
-        (1, 0, ".organisation_dashboard", {"org_id": "org1"}),
+        (0, 1, ".service_dashboard", {"service_id": str(UUID(version=4, int=1))}),
+        (1, 0, ".organisation_dashboard", {"org_id": str(UUID(version=4, int=1))}),
     ],
 )
 def test_show_accounts_or_dashboard_redirects_to_your_services_or_service_dashboard(
@@ -38,14 +39,14 @@ def test_show_accounts_or_dashboard_redirects_to_your_services_or_service_dashbo
 def test_show_accounts_or_dashboard_redirects_if_service_in_session(client_request, mock_get_service):
     client_request.login(user_with_orgs_and_services(num_orgs=1, num_services=1))
     with client_request.session_transaction() as session:
-        session["service_id"] = "service1"
+        session["service_id"] = str(UUID(version=4, int=1))
         session["organisation_id"] = None
 
     client_request.get(
         ".show_accounts_or_dashboard",
         _expected_redirect=url_for(
             "main.service_dashboard",
-            service_id="service1",
+            service_id=str(UUID(version=4, int=1)),
         ),
     )
 
@@ -54,13 +55,13 @@ def test_show_accounts_or_dashboard_redirects_if_org_in_session(client_request):
     client_request.login(user_with_orgs_and_services(num_orgs=1, num_services=1))
     with client_request.session_transaction() as session:
         session["service_id"] = None
-        session["organisation_id"] = "org1"
+        session["organisation_id"] = str(UUID(version=4, int=1))
 
     client_request.get(
         ".show_accounts_or_dashboard",
         _expected_redirect=url_for(
             "main.organisation_dashboard",
-            org_id="org1",
+            org_id=str(UUID(version=4, int=1)),
         ),
     )
 
@@ -70,11 +71,12 @@ def test_show_accounts_or_dashboard_doesnt_redirect_to_service_dashboard_if_user
 ):
     client_request.login(user_with_orgs_and_services(num_orgs=1, num_services=1))
     with client_request.session_transaction() as session:
-        session["service_id"] = "service2"
+        session["service_id"] = str(UUID(version=4, int=2))
         session["organisation_id"] = None
 
     client_request.get(
-        ".show_accounts_or_dashboard", _expected_redirect=url_for("main.organisation_dashboard", org_id="org1")
+        ".show_accounts_or_dashboard",
+        _expected_redirect=url_for("main.organisation_dashboard", org_id=str(UUID(version=4, int=1))),
     )
 
 
@@ -88,7 +90,8 @@ def test_show_accounts_or_dashboard_doesnt_redirect_to_org_dashboard_if_user_not
         session["organisation_id"] = "org2"
 
     client_request.get(
-        ".show_accounts_or_dashboard", _expected_redirect=url_for("main.organisation_dashboard", org_id="org1")
+        ".show_accounts_or_dashboard",
+        _expected_redirect=url_for("main.organisation_dashboard", org_id=str(UUID(version=4, int=1))),
     )
 
 
@@ -108,14 +111,14 @@ def test_show_accounts_or_dashboard_redirects_to_service_dashboard_if_platform_a
 ):
     client_request.login(user_with_orgs_and_services(num_orgs=1, num_services=1, platform_admin=True))
     with client_request.session_transaction() as session:
-        session["service_id"] = "service2"
+        session["service_id"] = str(UUID(version=4, int=2))
         session["organisation_id"] = None
 
     client_request.get(
         ".show_accounts_or_dashboard",
         _expected_redirect=url_for(
             "main.service_dashboard",
-            service_id="service2",
+            service_id=str(UUID(version=4, int=2)),
         ),
     )
 
@@ -126,12 +129,12 @@ def test_show_accounts_or_dashboard_redirects_to_org_dashboard_if_platform_admin
     client_request.login(user_with_orgs_and_services(num_orgs=1, num_services=1, platform_admin=True))
     with client_request.session_transaction() as session:
         session["service_id"] = None
-        session["organisation_id"] = "org2"
+        session["organisation_id"] = str(UUID(version=4, int=2))
 
     client_request.get(
         ".show_accounts_or_dashboard",
         _expected_redirect=url_for(
             "main.organisation_dashboard",
-            org_id="org2",
+            org_id=str(UUID(version=4, int=2)),
         ),
     )

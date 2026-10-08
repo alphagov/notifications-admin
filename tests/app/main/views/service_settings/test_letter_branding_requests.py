@@ -1,3 +1,4 @@
+from uuid import UUID
 from io import BytesIO
 from unittest.mock import ANY, PropertyMock
 
@@ -119,12 +120,12 @@ def test_letter_branding_options_shows_query_param_branding_choice_selected(
         "app.organisations_client.get_organisation",
         return_value=organisation_one,
     )
-    page = client_request.get(".letter_branding_options", service_id=SERVICE_ONE_ID, branding_choice="1234")
+    page = client_request.get(".letter_branding_options", service_id=SERVICE_ONE_ID, branding_choice=str(UUID(version=4, int=1234)))
 
     checked_radio_button = page.select(".govuk-radios__item input[checked]")
 
     assert len(checked_radio_button) == 1
-    assert checked_radio_button[0]["value"] == "1234"
+    assert checked_radio_button[0]["value"] == str(UUID(version=4, int=1234))
 
 
 @pytest.mark.parametrize(
@@ -173,12 +174,12 @@ def test_letter_branding_options_redirects_to_branding_preview_for_a_branding_po
     client_request.post(
         ".letter_branding_options",
         service_id=SERVICE_ONE_ID,
-        _data={"options": "1234"},
+        _data={"options": str(UUID(version=4, int=1234))},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
-            branding_choice="1234",
+            branding_choice=str(UUID(version=4, int=1234)),
             branding_type="letter",
         ),
     )
@@ -731,12 +732,12 @@ def test_letter_branding_option_preview_page_displays_preview_of_chosen_branding
     )
 
     page = client_request.get(
-        ".branding_option_preview", service_id=SERVICE_ONE_ID, branding_choice="1234", branding_type="letter"
+        ".branding_option_preview", service_id=SERVICE_ONE_ID, branding_choice=str(UUID(version=4, int=1234)), branding_type="letter"
     )
 
     assert page.select_one("main img")["src"] == url_for(
         "no_cookie.letter_branding_preview_image",
-        branding_style="1234",
+        branding_style=str(UUID(version=4, int=1234)),
     )
     assert page.select_one("main img")["alt"] == "Preview of new letter branding"
 
@@ -784,14 +785,14 @@ def test_letter_branding_option_preview_changes_letter_branding_when_user_confir
     page = client_request.post(
         ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
-        branding_choice="1234",
+        branding_choice=str(UUID(version=4, int=1234)),
         branding_type="letter",
         _follow_redirects=True,
     )
 
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        letter_branding="1234",
+        letter_branding=str(UUID(version=4, int=1234)),
     )
     assert page.select_one("h1").text == "Settings"
     assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your letter branding"
@@ -876,7 +877,7 @@ def test_should_set_default_org_letter_branding_fails_if_branding_choice_is_not_
     service = service_json(organisation_id=organisation["id"])
     mocker.patch(
         "app.organisations_client.get_organisation_services",
-        return_value=[service, service_json(id_="5678", restricted=True)],
+        return_value=[service, service_json(id_=str(UUID(version=4, int=5678)), restricted=True)],
     )
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
@@ -886,11 +887,11 @@ def test_should_set_default_org_letter_branding_fails_if_branding_choice_is_not_
 
 
 def test_should_set_default_org_letter_branding_fails_if_org_already_has_a_default_branding(client_request, mocker):
-    organisation = organisation_json(letter_branding_id="12345")
+    organisation = organisation_json(letter_branding_id=str(UUID(version=4, int=12345)))
     service = service_json(organisation_id=organisation["id"])
     mocker.patch(
         "app.organisations_client.get_organisation_services",
-        return_value=[service, service_json(id_="5678", restricted=True)],
+        return_value=[service, service_json(id_=str(UUID(version=4, int=5678)), restricted=True)],
     )
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
@@ -904,7 +905,7 @@ def test_should_set_default_org_letter_branding_fails_if_other_live_services_in_
     service = service_json(organisation_id=organisation["id"])
     mocker.patch(
         "app.organisations_client.get_organisation_services",
-        return_value=[service, service_json(id_="5678", restricted=False)],
+        return_value=[service, service_json(id_=str(UUID(version=4, int=5678)), restricted=False)],
     )
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)
@@ -923,7 +924,7 @@ def test_should_set_default_org_letter_branding_succeeds_if_all_conditions_are_m
     service = service_json(organisation_id=organisation["id"], restricted=is_service_trial)
     mocker.patch(
         "app.organisations_client.get_organisation_services",
-        return_value=[service, service_json(id_="5678", restricted=True)],
+        return_value=[service, service_json(id_=str(UUID(version=4, int=5678)), restricted=True)],
     )
 
     mocker.patch("app.organisations_client.get_organisation", return_value=organisation)

@@ -790,7 +790,7 @@ STATISTICS = {"sms": {"requested": 6, "failed": 2, "delivered": 1}}
 
 
 def test_get_status_filters_calculates_stats(client_request):
-    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS, None)
+    ret = get_status_filters(Service({"id": str(uuid.UUID(version=4, int=1))}), "sms", STATISTICS, None)
 
     assert {label: count for label, _option, _link, count in ret} == {
         "total": 6,
@@ -801,23 +801,26 @@ def test_get_status_filters_calculates_stats(client_request):
 
 
 def test_get_status_filters_in_right_order(client_request):
-    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS, None)
+    ret = get_status_filters(Service({"id": str(uuid.uuid4())}), "sms", STATISTICS, None)
 
     assert [label for label, _option, _link, _count in ret] == ["total", "delivering", "delivered", "failed"]
 
 
 def test_get_status_filters_constructs_links(client_request):
-    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS, None)
+    ret = get_status_filters(Service({"id": str(uuid.UUID(version=4, int=1))}), "sms", STATISTICS, None)
 
     link = ret[0][2]
-    assert link == "/services/foo/notifications/sms?status=sending,delivered,failed"
+    assert link == "/services/00000000-0000-4000-8000-000000000001/notifications/sms?status=sending,delivered,failed"
 
 
 def test_get_status_filters_constructs_search_query(client_request):
-    ret = get_status_filters(Service({"id": "foo"}), "sms", STATISTICS, "test_hash")
+    ret = get_status_filters(Service({"id": str(uuid.UUID(version=4, int=1))}), "sms", STATISTICS, "test_hash")
 
     link = ret[0][2]
-    assert link == "/services/foo/notifications/sms?status=sending,delivered,failed&search_query=test_hash"
+    assert (
+        link
+        == "/services/00000000-0000-4000-8000-000000000001/notifications/sms?status=sending,delivered,failed&search_query=test_hash"
+    )
 
 
 def test_html_contains_notification_id(

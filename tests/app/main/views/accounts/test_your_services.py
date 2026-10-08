@@ -13,17 +13,17 @@ SAMPLE_DATA = {
     "organisations": [
         {
             "name": "org_1",
-            "id": "o1",
+            "id": str(uuid.UUID(version=4, int=1)),
             "count_of_live_services": 1,
         },
         {
             "name": "org_2",
-            "id": "o2",
+            "id": str(uuid.UUID(version=4, int=2)),
             "count_of_live_services": 2,
         },
         {
             "name": "org_3",
-            "id": "o3",
+            "id": str(uuid.UUID(version=4, int=3)),
             "count_of_live_services": 0,
         },
     ],
@@ -32,19 +32,19 @@ SAMPLE_DATA = {
             "name": "org_service_1",
             "id": OS1,
             "restricted": False,
-            "organisation": "o1",
+            "organisation": str(uuid.UUID(version=4, int=1)),
         },
         {
             "name": "org_service_2",
             "id": OS2,
             "restricted": False,
-            "organisation": "o1",
+            "organisation": str(uuid.UUID(version=4, int=1)),
         },
         {
             "name": "org_service_3",
             "id": OS3,
             "restricted": True,
-            "organisation": "o1",
+            "organisation": str(uuid.UUID(version=4, int=1)),
         },
         {
             "name": "service_1",
@@ -95,17 +95,17 @@ def test_your_services_should_show_your_services_page(
 
     # first org
     assert org_list_items[0].a.text == "Org 1"
-    assert org_list_items[0].a["href"] == url_for(".organisation_dashboard", org_id="o1")
+    assert org_list_items[0].a["href"] == url_for(".organisation_dashboard", org_id=str(uuid.UUID(version=4, int=1)))
     assert normalize_spaces(org_list_items[0].select_one(".browse-list-hint").text) == "1 live service"
 
     # second org
     assert org_list_items[1].a.text == "Org 2"
-    assert org_list_items[1].a["href"] == url_for(".organisation_dashboard", org_id="o2")
+    assert org_list_items[1].a["href"] == url_for(".organisation_dashboard", org_id=str(uuid.UUID(version=4, int=2)))
     assert normalize_spaces(org_list_items[1].select_one(".browse-list-hint").text) == "2 live services"
 
     # third org
     assert org_list_items[2].a.text == "Org 3"
-    assert org_list_items[2].a["href"] == url_for(".organisation_dashboard", org_id="o3")
+    assert org_list_items[2].a["href"] == url_for(".organisation_dashboard", org_id=str(uuid.UUID(version=4, int=3)))
     assert normalize_spaces(org_list_items[2].select_one(".browse-list-hint").text) == "0 live services"
 
     # live services
@@ -116,20 +116,20 @@ def test_your_services_should_show_your_services_page(
     assert service_list_items[1].a.text == "Service 2"
     assert service_list_items[1].a["href"] == url_for(".service_dashboard", service_id=SERVICE_TWO_ID)
     assert service_list_items[2].a.text == "service one"
-    assert service_list_items[2].a["href"] == url_for(".service_dashboard", service_id="12345")
+    assert service_list_items[2].a["href"] == url_for(".service_dashboard", service_id=str(uuid.UUID(version=4, int=12345)))
     assert service_list_items[3].a.text == "service one (org 2)"
-    assert service_list_items[3].a["href"] == url_for(".service_dashboard", service_id="12345")
+    assert service_list_items[3].a["href"] == url_for(".service_dashboard", service_id=str(uuid.UUID(version=4, int=12345)))
     assert service_list_items[4].a.text == "service two (org 2)"
-    assert service_list_items[4].a["href"] == url_for(".service_dashboard", service_id="67890")
+    assert service_list_items[4].a["href"] == url_for(".service_dashboard", service_id=str(uuid.UUID(version=4, int=67890)))
 
     assert normalize_spaces(headings[2].text) == "Trial mode services"
 
     # trial services
     assert len(trial_services_list_items) == 3
     assert trial_services_list_items[0].a.text == "service three"
-    assert trial_services_list_items[0].a["href"] == url_for(".service_dashboard", service_id="abcde")
+    assert trial_services_list_items[0].a["href"] == url_for(".service_dashboard", service_id=str(uuid.UUID(version=4, int=99999)))
     assert trial_services_list_items[1].a.text == "service three"
-    assert trial_services_list_items[1].a["href"] == url_for(".service_dashboard", service_id="abcde")
+    assert trial_services_list_items[1].a["href"] == url_for(".service_dashboard", service_id=str(uuid.UUID(version=4, int=99999)))
 
     assert mock_get_organisation.call_args_list == []
 
@@ -284,7 +284,7 @@ def test_your_services_should_show_organisations_link_for_platform_admin(
                 "organisations": [
                     {
                         "name": "org_1",
-                        "id": "o1",
+                        "id": str(uuid.UUID(version=4, int=1)),
                         "count_of_live_services": 1,
                     }
                 ],

@@ -83,7 +83,7 @@ def multiple_reply_to_email_addresses(mocker):
     def _get(service_id):
         return [
             {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "service_id": service_id,
                 "email_address": "test@example.com",
                 "is_default": True,
@@ -91,7 +91,7 @@ def multiple_reply_to_email_addresses(mocker):
                 "updated_at": None,
             },
             {
-                "id": "5678",
+                "id": str(UUID(version=4, int=5678)),
                 "service_id": service_id,
                 "email_address": "test2@example.com",
                 "is_default": False,
@@ -99,7 +99,7 @@ def multiple_reply_to_email_addresses(mocker):
                 "updated_at": None,
             },
             {
-                "id": "9457",
+                "id": str(UUID(version=4, int=9457)),
                 "service_id": service_id,
                 "email_address": "test3@example.com",
                 "is_default": False,
@@ -127,7 +127,7 @@ def single_reply_to_email_address(notify_admin, mocker):
     def _get(service_id):
         return [
             {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "service_id": service_id,
                 "email_address": "test@example.com",
                 "is_default": True,
@@ -190,7 +190,7 @@ def multiple_letter_contact_blocks(notify_admin, mocker):
     def _get(service_id):
         return [
             {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "service_id": service_id,
                 "contact_block": "1 Example Street",
                 "is_default": True,
@@ -198,7 +198,7 @@ def multiple_letter_contact_blocks(notify_admin, mocker):
                 "updated_at": None,
             },
             {
-                "id": "5678",
+                "id": str(UUID(version=4, int=5678)),
                 "service_id": service_id,
                 "contact_block": "2 Example Street",
                 "is_default": False,
@@ -206,7 +206,7 @@ def multiple_letter_contact_blocks(notify_admin, mocker):
                 "updated_at": None,
             },
             {
-                "id": "9457",
+                "id": str(UUID(version=4, int=9457)),
                 "service_id": service_id,
                 "contact_block": "3 Example Street",
                 "is_default": False,
@@ -305,7 +305,7 @@ def multiple_sms_senders(notify_admin, mocker):
     def _get(service_id):
         return [
             {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "service_id": service_id,
                 "sms_sender": "07812398712",
                 "is_default": True,
@@ -314,7 +314,7 @@ def multiple_sms_senders(notify_admin, mocker):
                 "updated_at": None,
             },
             {
-                "id": "5678",
+                "id": str(UUID(version=4, int=5678)),
                 "service_id": service_id,
                 "sms_sender": "Example 2",
                 "is_default": False,
@@ -323,7 +323,7 @@ def multiple_sms_senders(notify_admin, mocker):
                 "updated_at": None,
             },
             {
-                "id": "9457",
+                "id": str(UUID(version=4, int=9457)),
                 "service_id": service_id,
                 "sms_sender": "Example 3",
                 "is_default": False,
@@ -341,7 +341,7 @@ def multiple_sms_senders_with_diff_default(notify_admin, mocker):
     def _get(service_id):
         return [
             {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "service_id": service_id,
                 "sms_sender": "Example",
                 "is_default": True,
@@ -350,7 +350,7 @@ def multiple_sms_senders_with_diff_default(notify_admin, mocker):
                 "updated_at": None,
             },
             {
-                "id": "5678",
+                "id": str(UUID(version=4, int=5678)),
                 "service_id": service_id,
                 "sms_sender": "Example 2",
                 "is_default": False,
@@ -359,7 +359,7 @@ def multiple_sms_senders_with_diff_default(notify_admin, mocker):
                 "updated_at": None,
             },
             {
-                "id": "9457",
+                "id": str(UUID(version=4, int=9457)),
                 "service_id": service_id,
                 "sms_sender": "Example 3",
                 "is_default": False,
@@ -377,7 +377,7 @@ def multiple_sms_senders_no_inbound(notify_admin, mocker):
     def _get(service_id):
         return [
             {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "service_id": service_id,
                 "sms_sender": "Example",
                 "is_default": True,
@@ -386,7 +386,7 @@ def multiple_sms_senders_no_inbound(notify_admin, mocker):
                 "updated_at": None,
             },
             {
-                "id": "5678",
+                "id": str(UUID(version=4, int=5678)),
                 "service_id": service_id,
                 "sms_sender": "Example 2",
                 "is_default": False,
@@ -412,7 +412,7 @@ def single_sms_sender(notify_admin, mocker):
     def _get(service_id):
         return [
             {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "service_id": service_id,
                 "sms_sender": "GOVUK",
                 "is_default": True,
@@ -429,7 +429,7 @@ def single_sms_sender(notify_admin, mocker):
 def get_default_sms_sender(notify_admin, mocker):
     def _get(service_id, sms_sender_id):
         return {
-            "id": "1234",
+            "id": str(UUID(version=4, int=1234)),
             "service_id": service_id,
             "sms_sender": "GOVUK",
             "is_default": True,
@@ -445,7 +445,7 @@ def get_default_sms_sender(notify_admin, mocker):
 def get_non_default_sms_sender(notify_admin, mocker):
     def _get(service_id, sms_sender_id):
         return {
-            "id": "1234",
+            "id": str(UUID(version=4, int=1234)),
             "service_id": service_id,
             "sms_sender": "GOVUK",
             "is_default": False,
@@ -655,7 +655,7 @@ def mock_create_service(notify_admin, mocker):
         user_id,
     ):
         service = service_json(
-            101,
+            str(UUID(version=4, int=101)),
             service_name,
             [user_id],
             restricted=restricted,
@@ -876,7 +876,7 @@ def mock_get_service_email_template(notify_admin, mocker):
 
 
 @pytest.fixture(scope="function")
-def mock_get_service_email_template_with_file(notify_admin, mocker):
+def mock_get_service_email_template_with_file(notify_admin, mocker, fake_uuid):
     def _get(service_id, template_id, version=None):
         email_files = [
             {
@@ -1466,7 +1466,7 @@ def mock_get_api_keys(notify_admin, mocker, fake_uuid):
                     created_at="2026-09-14 10:00:00.000000",
                 ),
                 api_key_json(
-                    id_="1234567",
+                    id_=str(UUID(version=4, int=1234567)),
                     name="another key name",
                     expiry_date="2026-09-13 11:00:00.000000",
                     key_type="test",
@@ -2659,17 +2659,17 @@ def mock_get_letter_branding_pool(mocker):
     def _get_branding_pool(org_id):
         return [
             {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "name": "Cabinet Office",
                 "filename": "co",
             },
             {
-                "id": "5678",
+                "id": str(UUID(version=4, int=5678)),
                 "name": "Department for Education",
                 "filename": "dfe",
             },
             {
-                "id": "9abc",
+                "id": str(UUID(version=4, int=9012)),
                 "name": "Government Digital Service",
                 "filename": "gds",
             },
@@ -3364,7 +3364,10 @@ def mock_get_orgs_and_services_associated_with_branding_no_orgs(notify_admin, mo
     def _get(email_branding_id):
         return {
             "data": {
-                "services": [{"name": "service 1", "id": "1234"}, {"name": "service 2", "id": "5678"}],
+                "services": [
+                    {"name": "service 1", "id": str(UUID(version=4, int=1234))},
+                    {"name": "service 2", "id": str(UUID(version=4, int=5678))}
+                ],
                 "organisations": [],
             }
         }
@@ -3375,7 +3378,7 @@ def mock_get_orgs_and_services_associated_with_branding_no_orgs(notify_admin, mo
 @pytest.fixture(scope="function")
 def mock_get_orgs_and_services_associated_with_branding_no_services(notify_admin, mocker):
     def _get(email_branding_id):
-        return {"data": {"services": [], "organisations": [{"name": "organisation 1", "id": "1234"}]}}
+        return {"data": {"services": [], "organisations": [{"name": "organisation 1", "id": str(UUID(version=4, int=1234))}]}}
 
     return mocker.patch("app.email_branding_client.get_orgs_and_services_associated_with_branding", side_effect=_get)
 
@@ -3538,9 +3541,9 @@ def mock_get_organisation(notify_admin, mocker):
         return organisation_json(
             org_id,
             {
-                "o1": "Org 1",
-                "o2": "Org 2",
-                "o3": "Org 3",
+                str(UUID(version=4, int=1)): "Org 1",
+                str(UUID(version=4, int=2)): "Org 2",
+                str(UUID(version=4, int=3)): "Org 3",
             }.get(org_id, "Test organisation"),
         )
 
@@ -3597,21 +3600,21 @@ def mock_update_service_organisation(notify_admin, mocker):
 
 
 def _get_organisation_services(organisation_id):
-    if organisation_id == "o1":
+    if organisation_id == str(UUID(version=4, int=1)):
         return [
-            service_json("12345", "service one", restricted=False),
-            service_json("67890", "service two"),
-            service_json("abcde", "service three"),
+            service_json(str(UUID(version=4, int=12345)), "service one", restricted=False),
+            service_json(str(UUID(version=4, int=67890)), "service two"),
+            service_json(str(UUID(version=4, int=99999)), "service three"),
         ]
-    if organisation_id == "o2":
+    if organisation_id == str(UUID(version=4, int=2)):
         return [
-            service_json("12345", "service one (org 2)", restricted=False),
-            service_json("67890", "service two (org 2)", restricted=False),
-            service_json("abcde", "service three"),
+            service_json(str(UUID(version=4, int=12345)), "service one (org 2)", restricted=False),
+            service_json(str(UUID(version=4, int=67890)), "service two (org 2)", restricted=False),
+            service_json(str(UUID(version=4, int=99999)), "service three"),
         ]
     return [
-        service_json("12345", "service one"),
-        service_json("67890", "service two"),
+        service_json(str(UUID(version=4, int=12345)), "service one"),
+        service_json(str(UUID(version=4, int=67890)), "service two"),
         service_json(SERVICE_ONE_ID, "service one", [sample_uuid()]),
     ]
 
@@ -3636,8 +3639,8 @@ def mock_notify_users_of_request_to_go_live_for_service(notify_admin, mocker, ap
 def mock_get_users_for_organisation(mocker):
     def _get_users_for_organisation(org_id):
         return [
-            user_json(id_="1234", name="Test User 1"),
-            user_json(id_="5678", name="Test User 2", email_address="testt@gov.uk"),
+            user_json(id_=str(UUID(version=4, int=1234)), name="Test User 1"),
+            user_json(id_=str(UUID(version=4, int=5678)), name="Test User 2", email_address="testt@gov.uk"),
         ]
 
     return mocker.patch("app.models.user.OrganisationUsers._get_items", side_effect=_get_users_for_organisation)
@@ -3767,22 +3770,24 @@ def mock_get_non_empty_organisations_and_services_for_user(notify_admin, mocker,
             "organisations": [
                 {
                     "name": "Org 1",
-                    "id": "o1",
+                    "id": str(UUID(version=4, int=1)),
                     "count_of_live_services": 1,
                 },
                 {
                     "name": "Org 2",
-                    "id": "o2",
+                    "id": str(UUID(version=4, int=2)),
                     "count_of_live_services": 2,
                 },
                 {
                     "name": "Org 3",
-                    "id": "o3",
+                    "id": str(UUID(version=4, int=3)),
                     "count_of_live_services": 0,
                 },
             ],
             "services": (
-                _get_organisation_services("o1") + _get_organisation_services("o2") + _make_services("Service")
+                _get_organisation_services(str(UUID(version=4, int=1)))
+                + _get_organisation_services(str(UUID(version=4, int=2)))
+                + _make_services("Service")
             ),
         }
 
@@ -4144,7 +4149,12 @@ def create_user(**overrides):
 
 
 def create_reply_to_email_address(
-    id_="1234", service_id="abcd", email_address="test@example.com", is_default=True, created_at=None, updated_at=None
+    id_=str(UUID(version=4, int=1234)),
+    service_id=str(UUID(version=4, int=5678)),
+    email_address="test@example.com",
+    is_default=True,
+    created_at=None,
+    updated_at=None,
 ):
     return {
         "id": id_,
@@ -4156,10 +4166,10 @@ def create_reply_to_email_address(
     }
 
 
-def create_multiple_email_reply_to_addresses(service_id="abcd"):
+def create_multiple_email_reply_to_addresses(service_id=str(UUID(version=4, int=1234))):
     return [
         {
-            "id": "1234",
+            "id": str(UUID(version=4, int=1234)),
             "service_id": service_id,
             "email_address": "test@example.com",
             "is_default": True,
@@ -4167,7 +4177,7 @@ def create_multiple_email_reply_to_addresses(service_id="abcd"):
             "updated_at": None,
         },
         {
-            "id": "5678",
+            "id": str(UUID(version=4, int=5678)),
             "service_id": service_id,
             "email_address": "test2@example.com",
             "is_default": False,
@@ -4175,7 +4185,7 @@ def create_multiple_email_reply_to_addresses(service_id="abcd"):
             "updated_at": None,
         },
         {
-            "id": "9457",
+            "id": str(UUID(version=4, int=9457)),
             "service_id": service_id,
             "email_address": "test3@example.com",
             "is_default": False,
@@ -4186,8 +4196,8 @@ def create_multiple_email_reply_to_addresses(service_id="abcd"):
 
 
 def create_sms_sender(
-    id_="1234",
-    service_id="abcd",
+    id_=str(UUID(version=4, int=1234)),
+    service_id=str(UUID(version=4, bytes=b"abcdabcdabcdabcd")),
     sms_sender="GOVUK",
     is_default=True,
     created_at=None,
@@ -4205,10 +4215,10 @@ def create_sms_sender(
     }
 
 
-def create_multiple_sms_senders(service_id="abcd"):
+def create_multiple_sms_senders(service_id=str(UUID(version=4, bytes=b"abcdabcdabcdabcd"))):
     return [
         {
-            "id": "1234",
+            "id": str(UUID(version=4, int=1234)),
             "service_id": service_id,
             "sms_sender": "Example",
             "is_default": True,
@@ -4217,7 +4227,7 @@ def create_multiple_sms_senders(service_id="abcd"):
             "updated_at": None,
         },
         {
-            "id": "5678",
+            "id": str(UUID(version=4, int=5678)),
             "service_id": service_id,
             "sms_sender": "Example 2",
             "is_default": False,
@@ -4226,7 +4236,7 @@ def create_multiple_sms_senders(service_id="abcd"):
             "updated_at": None,
         },
         {
-            "id": "9457",
+            "id": str(UUID(version=4, int=9457)),
             "service_id": service_id,
             "sms_sender": "Example 3",
             "is_default": False,
@@ -4238,8 +4248,8 @@ def create_multiple_sms_senders(service_id="abcd"):
 
 
 def create_letter_contact_block(
-    id_="1234",
-    service_id="abcd",
+    id_=str(UUID(version=4, int=1234)),
+    service_id=str(UUID(version=4, bytes=b"abcdabcdabcdabcd")),
     contact_block="1 Example Street",
     is_default=True,
     created_at=None,
@@ -4255,10 +4265,10 @@ def create_letter_contact_block(
     }
 
 
-def create_multiple_letter_contact_blocks(service_id="abcd"):
+def create_multiple_letter_contact_blocks(service_id=str(UUID(version=4, bytes=b"abcdabcdabcdabcd"))):
     return [
         {
-            "id": "1234",
+            "id": str(UUID(version=4, int=1234)),
             "service_id": service_id,
             "contact_block": "1 Example Street",
             "is_default": True,
@@ -4266,7 +4276,7 @@ def create_multiple_letter_contact_blocks(service_id="abcd"):
             "updated_at": None,
         },
         {
-            "id": "5678",
+            "id": str(UUID(version=4, int=5678)),
             "service_id": service_id,
             "contact_block": "2 Example Street",
             "is_default": False,
@@ -4274,7 +4284,7 @@ def create_multiple_letter_contact_blocks(service_id="abcd"):
             "updated_at": None,
         },
         {
-            "id": "9457",
+            "id": str(UUID(version=4, int=9457)),
             "service_id": service_id,
             "contact_block": "foo\n\n<bar>\n\nbaz",
             "is_default": False,
@@ -4286,7 +4296,7 @@ def create_multiple_letter_contact_blocks(service_id="abcd"):
 
 def create_notification(
     notification_id=None,
-    service_id="abcd",
+    service_id=str(UUID(version=4, int=999)),
     notification_status="delivered",
     redact_personalisation=False,
     template_type=None,

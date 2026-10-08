@@ -1,7 +1,7 @@
 import pytest
 from flask import url_for
 from freezegun import freeze_time
-
+from uuid import UUID
 from tests import organisation_json, service_json
 from tests.conftest import (
     ORGANISATION_ID,
@@ -29,7 +29,7 @@ def test_join_service_choose_service(
         return_value=[
             service_json(SERVICE_ONE_ID, "service one", restricted=False),
             service_json(SERVICE_TWO_ID, "service two", restricted=False),
-            service_json("1234", "service three (trial mode)"),
+            service_json(str(UUID(version=4, int=1234)), "service three (trial mode)"),
         ],
     )
     page = client_request.get(
@@ -98,11 +98,11 @@ def test_cannot_join_service_for_different_organisation(
     service_one["organisation"] = fake_uuid
     mocker.patch(
         "app.organisations_client.get_organisation_by_domain",
-        return_value=organisation_json(id_="1234", can_ask_to_join_a_service=True),
+        return_value=organisation_json(id_=str(UUID(version=4, int=1234)), can_ask_to_join_a_service=True),
     )
     mocker.patch(
         "app.organisations_client.get_organisation",
-        return_value=organisation_json(id_="4321", can_ask_to_join_a_service=True),
+        return_value=organisation_json(id_=str(UUID(version=4, int=4321)), can_ask_to_join_a_service=True),
     )
     client_request.get(
         "main.join_service_ask",
