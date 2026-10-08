@@ -69,21 +69,23 @@ def design_content():
 @main.route("/_email")
 def email_template():
     branding_style = request.args.get("branding_style")
-    subject = request.args.get("title", default="Preview of email branding")
     email_branding_preview = request.args.get("email_branding_preview", False)
 
     if not branding_style or branding_style in {"govuk", FieldWithNoneOption.NONE_OPTION_VALUE}:
         branding = EmailBranding.govuk_branding()
 
     elif branding_style == "custom":
-        branding = EmailBranding.with_default_values(**request.args)
+        if not current_user.is_authenticated:
+            branding = EmailBranding.govuk_branding()
+        else:
+            branding = EmailBranding.with_default_values(**request.args)
 
     else:
         branding = EmailBranding.from_id(branding_style)
 
     template = {
         "template_type": "email",
-        "subject": subject,
+        "subject": "Preview of email branding",
         "content": render_template(
             "example-email.md" if not email_branding_preview else "email-branding-preview-example-email.md"
         ),

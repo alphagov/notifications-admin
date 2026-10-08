@@ -313,10 +313,6 @@ def test_resources_that_use_asset_path_variable_have_correct_path(client_request
             False,
         ),
         (
-            {"branding_style": "custom", "type": "org"},
-            False,
-        ),
-        (
             {"branding_style": sample_uuid()},
             True,
         ),
@@ -331,19 +327,6 @@ def test_email_branding_preview(
     page = client_request.get("main.email_template", _test_page_title=False, **extra_args)
     assert page.select_one("title").text == "Preview of email branding"
     assert mock_get_email_branding.called is email_branding_retrieved
-
-
-def test_email_branding_preview_allows_custom_page_title(
-    client_request,
-):
-    page = client_request.get(
-        "main.email_template",
-        _test_page_title=False,
-        branding_style="custom",
-        type="org",
-        title="Preview of new email branding",
-    )
-    assert page.select_one("title").text == "Preview of new email branding"
 
 
 def test_letter_spec_redirect(client_request):

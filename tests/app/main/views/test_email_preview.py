@@ -112,3 +112,21 @@ def test_displays_custom_brand_through_query_params(client_request, mocker):
         page.select("body > table:nth-of-type(1) > tr:nth-of-type(1) > td:nth-of-type(2)")[0].get_text().strip()
         == "Some text"
     )
+
+
+def test_displays_custom_brand_is_only_for_authenticated_users(client_request, mocker):
+    mocker.patch("app.email_branding_client.get_email_branding")
+
+    client_request.logout()
+
+    page = client_request.get(
+        "main.email_template",
+        _test_page_title=False,
+        branding_style="custom",
+        text="Some text",
+        colour="#abcdef",
+        logo="example.png",
+        brand_type="org",
+    )
+    assert page.select_one("a")["href"] == "https://www.gov.uk"
+    assert "Some text" not in page.select_one("body").text
