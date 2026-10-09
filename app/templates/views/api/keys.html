@@ -3,6 +3,7 @@
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/tag/macro.html" import govukTag %}
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
 
 {% block service_page_title %}
   API keys
@@ -13,6 +14,29 @@
 {% endblock %}
 
 {% block maincolumn_content %}
+
+  {% if current_service.api_keys.number_needing_rotation %}
+    {% call govukNotificationBanner({
+      "titleText": "Rotate your API key" if current_service.api_keys.number_needing_rotation == 1 else "Rotate your API key",
+      "classes": "govuk-!-margin-bottom-6"
+    }) %}
+      {% if current_service.api_keys.number_needing_rotation == 1 %}
+        <p class="govuk-body govuk-!-font-weight-bold">
+          Your API key is more than 12 months old.  
+        </p>
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+          Rotate this key at least once a year or remove it if you no longer need it.  
+        </p>
+      {% else %}
+        <p class="govuk-body govuk-!-font-weight-bold">
+          You have {{ current_service.api_keys.number_needing_rotation }} API keys that are more than 12 months old.   
+        </p>
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+          Rotate these keys at least once a year or remove any you no longer need.  
+        </p>
+      {% endif %}
+    {% endcall %}
+  {% endif %}
 
   {{ page_header('API keys') }}
 
