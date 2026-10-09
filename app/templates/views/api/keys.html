@@ -17,7 +17,7 @@
 
   {% if current_service.api_keys.number_needing_rotation %}
     {% call govukNotificationBanner({
-      "titleText": "Rotate your API key" if current_service.api_keys.number_needing_rotation == 1 else "Rotate your API key",
+      "titleText": "Rotate your API key" if current_service.api_keys.number_needing_rotation == 1 else "Rotate your API keys",
       "classes": "govuk-!-margin-bottom-6"
     }) %}
       {% if current_service.api_keys.number_needing_rotation == 1 %}

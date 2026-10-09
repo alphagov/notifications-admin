@@ -379,7 +379,7 @@ def test_should_show_api_keys_page_with_multiple_old_keys(
     page = client_request.get("main.api_keys", service_id=SERVICE_ONE_ID)
 
     assert normalize_spaces(page.select_one(".govuk-notification-banner").text) == (
-        "Rotate your API key "
+        "Rotate your API keys "
         "You have 3 API keys that are more than 12 months old. "
         "Rotate these keys at least once a year or remove any you no longer need."
     )
