@@ -20,6 +20,7 @@ from app.utils.time import is_less_than_days_ago
 
 
 class Job(JSONModel):
+    id: str | None
     service: Any
     template_name: str
     template_version: int
@@ -29,8 +30,8 @@ class Job(JSONModel):
     created_by: Any
     template_type: Any
     recipient: Any
-    processing_started: datetime
-    scheduled_for: datetime
+    processing_started: datetime | None
+    scheduled_for: datetime | None
 
     __sort_attribute__ = "original_file_name"
 
