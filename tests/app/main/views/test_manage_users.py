@@ -2254,7 +2254,7 @@ def service_join_request_get_data(request_id, status, mock_requester, status_cha
         "service_id": SERVICE_ONE_ID,
         "created_at": datetime.now(UTC),
         "status": status,
-        "status_changed_at": datetime.now(UTC),
+        "status_changed_at": datetime.now(UTC) if status_changed_by else None,
         "status_changed_by": (
             {"id": status_changed_by.get("id"), "name": status_changed_by.get("name"), "belongs_to_service": []}
             if status_changed_by

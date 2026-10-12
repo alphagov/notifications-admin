@@ -752,7 +752,7 @@ class ServiceJoinRequest(JSONModel):
     requester: Any
     service_id: Any
     created_at: datetime
-    status_changed_at: datetime
+    status_changed_at: datetime | None
     status_changed_by: Any
     reason: str
     status: str
