@@ -52,10 +52,10 @@ class User(BaseUser, UserMixin):
     auth_type: Any
     current_session_id: Any
     failed_login_count: int
-    email_access_validated_at: datetime
-    logged_in_at: datetime
-    mobile_number: str
-    password_changed_at: datetime
+    email_access_validated_at: datetime | None
+    logged_in_at: datetime | None
+    mobile_number: str | None
+    password_changed_at: datetime | None
     receives_new_features_email: bool
     state: str
     take_part_in_research: bool

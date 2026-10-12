@@ -14,10 +14,10 @@ class UnsubscribeRequestsReport(JSONModel):
     count: int
     batch_id: Any
     is_a_batched_report: bool
-    will_be_archived_at: datetime
+    will_be_archived_at: datetime | None
     earliest_timestamp: datetime
     latest_timestamp: datetime
-    processed_by_service_at: datetime
+    processed_by_service_at: datetime | None
 
     __sort_attribute__ = "earliest_timestamp"
 

@@ -81,9 +81,9 @@ def test_model_doesnt_swallow_attribute_errors(json_response):
 
 def test_dynamic_properties_are_introspectable():
     class Custom(JSONModel):
-        foo: str
-        bar: str
-        baz: str
+        foo: str | None
+        bar: str | None
+        baz: str | None
         __sort_attribute__ = "foo"
 
     model = Custom({"foo": None, "bar": None, "baz": None})

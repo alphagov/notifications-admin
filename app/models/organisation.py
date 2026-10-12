@@ -55,24 +55,24 @@ class Organisation(JSONModel):
 
     name: str
     active: bool
-    crown: bool
+    crown: bool | None
     organisation_type: Any
-    letter_branding_id: Any
-    email_branding_id: Any
-    agreement_signed: bool
-    agreement_signed_at: datetime
-    agreement_signed_by_id: Any
-    agreement_signed_version: str
-    agreement_signed_on_behalf_of_name: str
-    agreement_signed_on_behalf_of_email_address: str
+    letter_branding_id: str | None
+    email_branding_id: str | None
+    agreement_signed: bool | None
+    agreement_signed_at: datetime | None
+    agreement_signed_by_id: str | None
+    agreement_signed_version: str | None
+    agreement_signed_on_behalf_of_name: str | None
+    agreement_signed_on_behalf_of_email_address: str | None
     domains: list
-    request_to_go_live_notes: str
+    request_to_go_live_notes: str | None
     count_of_live_services: int
-    billing_contact_email_addresses: str
-    billing_contact_names: str
-    billing_reference: str
-    purchase_order_number: str
-    notes: str
+    billing_contact_email_addresses: str | None
+    billing_contact_names: str | None
+    billing_reference: str | None
+    purchase_order_number: str | None
+    notes: str | None
     can_approve_own_go_live_requests: bool
     permissions: list
 

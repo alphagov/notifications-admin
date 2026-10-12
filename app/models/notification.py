@@ -22,22 +22,22 @@ from app.utils.templates import EmailPreviewTemplate
 class Notification(JSONModel):
     to: str
     recipient: str
-    template: Any
-    sent_at: datetime
+    template: dict
+    sent_at: datetime | None
     created_at: datetime
-    created_by: Any
-    updated_at: datetime
-    job_row_number: int
-    service: Any
+    created_by: dict | None
+    updated_at: datetime | None
+    job_row_number: int | None
+    service: str
     template_version: int
-    postage: str
+    postage: str | None
     notification_type: str
-    reply_to_text: str
-    client_reference: str
-    created_by_name: str
-    created_by_email_address: str
-    job_name: str
-    api_key_name: str
+    reply_to_text: str | None
+    client_reference: str | None
+    created_by_name: str | None
+    created_by_email_address: str | None
+    job_name: str | None
+    api_key_name: str | None
 
     __sort_attribute__ = "created_at"
 
@@ -152,7 +152,7 @@ class Notification(JSONModel):
 
 
 class APINotification(Notification):
-    key_name: str
+    key_name: str | None
 
     @property
     def status(self):

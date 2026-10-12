@@ -3,6 +3,13 @@ from functools import total_ordering
 from inspect import get_annotations
 
 from notifications_utils.serialised_model import SerialisedModel, SerialisedModelCollection
+from notifications_utils.template import Template
+
+_NON_COERCIBLE_TYPES = {
+    # These are types for which we assume the field already contains
+    # the correct type and therefore do not need coercion
+    Template,
+}
 
 
 @total_ordering
@@ -42,7 +49,10 @@ class JSONModel(SerialisedModel, ABC):
         self._dict = _dict or {}
         for property, type_ in get_annotations(type(self)).items():
             if property in self._dict:
-                value = self.coerce_value_to_type(self._dict[property], type_)
+                if type_ in _NON_COERCIBLE_TYPES:
+                    value = self._dict[property]
+                else:
+                    value = self.coerce_value_to_type(property, self._dict[property], type_)
                 setattr(self, property, value)
 
     def __bool__(self):
