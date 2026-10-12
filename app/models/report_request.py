@@ -16,7 +16,7 @@ class ReportRequest(JSONModel):
     status: str
     parameter: Any
     created_at: datetime
-    updated_at: datetime
+    updated_at: datetime | None
 
     __sort_attribute__ = "created_at"
 
