@@ -2,7 +2,7 @@ from flask import abort, flash, redirect, render_template, request, url_for
 
 from app import current_service, current_user, organisations_client
 from app.main import main
-from app.main.forms import OnOffSettingForm, ServiceGoLiveDecisionForm, UniqueServiceForm
+from app.main.forms import OnOffSettingForm, ServiceEligibleForFreeAllowanceForm, ServiceGoLiveDecisionForm
 from app.utils.user import user_has_permissions
 
 
@@ -33,7 +33,7 @@ def org_member_make_service_live_check_unique(service_id):
     if not current_user.can_make_service_live(current_service):
         abort(403)
 
-    form = UniqueServiceForm(service_name=current_service.name)
+    form = ServiceEligibleForFreeAllowanceForm(service_name=current_service.name)
 
     # Re-populate the form field data from URL query args, if present. This allows backlinks to take a user back to
     # this page and display the state the page was on when they submitted the form previously.

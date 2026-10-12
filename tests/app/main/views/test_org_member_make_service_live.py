@@ -461,7 +461,7 @@ def test_post_org_member_make_service_live_unique_service_error_summary(
 
     error_summary = page.select_one(".govuk-error-summary")
     assert "There is a problem" in error_summary.text
-    assert "Select ‘yes’ if this service is unique" in error_summary.text
+    assert "Select ‘yes’ if this service is eligible for a free allowance" in error_summary.text
 
 
 @pytest.mark.parametrize(
