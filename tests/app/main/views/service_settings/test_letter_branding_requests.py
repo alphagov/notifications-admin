@@ -27,13 +27,13 @@ from tests.conftest import (
             "nhs_central",
             True,
             [
-                {"id": "1234", "name": "Brand 1", "filename": "brand_1"},
-                {"id": "5678", "name": "Brand 2", "filename": "brand_2"},
+                {"id": str(UUID(version=4, int=1234)), "name": "Brand 1", "filename": "brand_1"},
+                {"id": str(UUID(version=4, int=5678)), "name": "Brand 2", "filename": "brand_2"},
             ],
             [
                 (LetterBranding.NHS_ID, "NHS"),
-                ("1234", "Brand 1"),
-                ("5678", "Brand 2"),
+                (str(UUID(version=4, int=1234)), "Brand 1"),
+                (str(UUID(version=4, int=5678)), "Brand 2"),
                 ("something_else", "Something else"),
             ],
         ),

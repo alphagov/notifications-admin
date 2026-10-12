@@ -14,7 +14,7 @@ from app.constants import (
     SIGN_IN_METHOD_TEXT,
     SIGN_IN_METHOD_TEXT_OR_EMAIL,
 )
-from app.models import JSONModel
+from app.models import JSONModel, UUIDStr
 from app.models.api_key import APIKeys
 from app.models.branding import EmailBranding, LetterBranding
 from app.models.contact_list import ContactLists
@@ -750,7 +750,7 @@ class Services(SerialisedModelCollection):
 
 class ServiceJoinRequest(JSONModel):
     requester: Any
-    service_id: Any
+    service_id: UUIDStr
     created_at: datetime
     status_changed_at: datetime | None
     status_changed_by: Any

@@ -143,7 +143,7 @@ def single_reply_to_email_address(notify_admin, mocker):
 def get_default_reply_to_email_address(notify_admin, mocker):
     def _get(service_id, reply_to_email_id):
         return {
-            "id": "1234",
+            "id": str(UUID(version=4, int=1234)),
             "service_id": service_id,
             "email_address": "test@example.com",
             "is_default": True,
@@ -158,7 +158,7 @@ def get_default_reply_to_email_address(notify_admin, mocker):
 def get_non_default_reply_to_email_address(notify_admin, mocker):
     def _get(service_id, reply_to_email_id):
         return {
-            "id": "1234",
+            "id": str(UUID(version=4, int=1234)),
             "service_id": service_id,
             "email_address": "test@example.com",
             "is_default": False,
@@ -231,7 +231,7 @@ def single_letter_contact_block(notify_admin, mocker):
     def _get(service_id):
         return [
             {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "service_id": service_id,
                 "contact_block": "1 Example Street",
                 "is_default": True,
@@ -248,7 +248,7 @@ def injected_letter_contact_block(notify_admin, mocker):
     def _get(service_id):
         return [
             {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "service_id": service_id,
                 "contact_block": "foo\nbar<script>alert(1);</script>",
                 "is_default": True,
@@ -264,7 +264,7 @@ def injected_letter_contact_block(notify_admin, mocker):
 def get_default_letter_contact_block(notify_admin, mocker):
     def _get(service_id, letter_contact_id):
         return {
-            "id": "1234",
+            "id": str(UUID(version=4, int=1234)),
             "service_id": service_id,
             "contact_block": "1 Example Street",
             "is_default": True,
@@ -280,7 +280,7 @@ def mock_add_letter_contact(notify_admin, mocker):
     def _add_letter_contact(service_id, contact_block, is_default=False):
         return {
             "data": {
-                "id": "1234",
+                "id": str(UUID(version=4, int=1234)),
                 "service_id": service_id,
                 "contact_block": "1 Example Street",
                 "is_default": True,
@@ -2580,7 +2580,7 @@ def mock_send_already_registered_email(notify_admin, mocker):
 def create_email_brandings(number_of_brandings, non_standard_values=None, shuffle=False):
     brandings = [
         {
-            "id": str(idx),
+            "id": str(UUID(version=4, int=idx)),
             "name": f"org {idx}",
             "text": f"org {idx}",
             "colour": None,
@@ -2727,7 +2727,7 @@ def create_email_branding_pool(additional_values=None):
             "name": "Email branding name 1",
             "alt_text": "Alt text",
             "text": "Email branding text 1",
-            "id": "email-branding-1-id",
+            "id": str(UUID(version=4, int=1)),
             "colour": "#f00",
             "brand_type": "org",
         },
@@ -2736,7 +2736,7 @@ def create_email_branding_pool(additional_values=None):
             "name": "Email branding name 2",
             "alt_text": "Alt text",
             "text": "Email branding text 2",
-            "id": "email-branding-2-id",
+            "id": str(UUID(version=4, int=2)),
             "colour": "#f00",
             "brand_type": "org",
         },

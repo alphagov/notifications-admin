@@ -2307,7 +2307,7 @@ def test_letter_template_preview_returns_400_if_both_branding_style_and_filename
 ):
     client_request.get(
         "no_cookie.letter_branding_preview_image",
-        branding_style="some-branding",
+        branding_style=uuid.UUID(version=4, bytes=b"some-branding-id"),
         filename="some-filename",
         _test_page_title=False,
         _expected_status=400,
@@ -4785,7 +4785,7 @@ def test_set_template_sender(
     single_letter_contact_block,
 ):
     data = {
-        "sender": "1234",
+        "sender": str(uuid.UUID(version=4, int=1234)),
     }
 
     client_request.post(
@@ -4798,7 +4798,7 @@ def test_set_template_sender(
     mock_update_service_template_sender.assert_called_once_with(
         SERVICE_ONE_ID,
         fake_uuid,
-        "1234",
+        str(uuid.UUID(version=4, int=1234)),
     )
 
 

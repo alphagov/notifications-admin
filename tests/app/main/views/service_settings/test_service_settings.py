@@ -2409,7 +2409,7 @@ def test_add_letter_contact_when_coming_from_template(
     mock_update_service_template_sender.assert_called_once_with(
         SERVICE_ONE_ID,
         fake_uuid,
-        "1234",
+        str(UUID(version=4, int=1234)),
     )
 
 
@@ -3278,23 +3278,23 @@ def test_service_preview_letter_branding_saves(
             None,
             [
                 "__NONE__",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
+                str(UUID(version=4, int=1)),
+                str(UUID(version=4, int=2)),
+                str(UUID(version=4, int=3)),
+                str(UUID(version=4, int=4)),
+                str(UUID(version=4, int=5)),
             ],
             ["GOV.UK", "org 1", "org 2", "org 3", "org 4", "org 5"],
         ),
         (
-            "5",
+            str(UUID(version=4, int=5)),
             [
-                "5",
+                str(UUID(version=4, int=5)),
                 "__NONE__",
-                "1",
-                "2",
-                "3",
-                "4",
+                str(UUID(version=4, int=1)),
+                str(UUID(version=4, int=2)),
+                str(UUID(version=4, int=3)),
+                str(UUID(version=4, int=4)),
             ],
             [
                 "org 5",
@@ -3369,10 +3369,13 @@ def test_should_send_branding_and_organisations_to_preview(
     client_request.post(
         "main.service_set_branding",
         branding_type="email",
-        _data={"branding_type": "org", "branding_style": "1"},
+        _data={"branding_type": "org", "branding_style": str(UUID(version=4, int=1))},
         _expected_status=302,
         _expected_location=url_for(
-            "main.service_preview_branding", branding_type="email", branding_style="1", **extra_args
+            "main.service_preview_branding",
+            branding_type="email",
+            branding_style=str(UUID(version=4, int=1)),
+            **extra_args,
         ),
         **extra_args,
     )
@@ -3424,14 +3427,14 @@ def test_should_preview_email_branding(
             "174",
         ),
         (
-            "email-branding-1-id",  # Already in the pool
+            str(UUID(version=4, int=1)),  # Already in the pool
             True,
             partial(
                 url_for,
                 "main.service_settings",
                 service_id=SERVICE_ONE_ID,
             ),
-            "email-branding-1-id",
+            str(UUID(version=4, int=1)),
         ),
         (
             "__NONE__",  # update to no branding, showing as GOV.UK branding

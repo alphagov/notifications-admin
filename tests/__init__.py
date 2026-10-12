@@ -93,7 +93,7 @@ def user_json(
     logged_in_at=None,
     state="active",
     platform_admin=False,
-    current_session_id="1234",
+    current_session_id=None,
     organisations=None,
     services=None,
 ):
@@ -126,16 +126,16 @@ def user_json(
         "logged_in_at": logged_in_at or datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f"),
         "state": state,
         "platform_admin": platform_admin,
-        "current_session_id": current_session_id,
+        "current_session_id": current_session_id or str(uuid.UUID(version=4, int=1234)),
         "organisations": organisations or [],
         "services": services,
     }
 
 
 def invited_user(
-    _id="1234",
+    _id=None,
     service=None,
-    from_user="1234",
+    from_user=None,
     email_address="testinviteduser@gov.uk",
     permissions=None,
     status="pending",
@@ -144,8 +144,8 @@ def invited_user(
     organisation=None,
 ):
     data = {
-        "id": _id,
-        "from_user": from_user,
+        "id": _id or str(uuid.UUID(version=4, int=1234)),
+        "from_user": from_user or str(uuid.UUID(version=4, int=1234)),
         "email_address": email_address,
         "status": status,
         "created_at": created_at or datetime.now(UTC),

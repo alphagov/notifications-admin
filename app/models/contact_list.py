@@ -7,7 +7,7 @@ from notifications_utils.formatters import strip_all_whitespace
 from notifications_utils.recipients import RecipientCSV
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel, ModelList
+from app.models import JSONModel, ModelList, UUIDStr
 from app.models.job import PaginatedJobsAndScheduledJobs
 from app.notify_client.contact_list_api_client import contact_list_api_client
 from app.s3_client.s3_csv_client import (
@@ -24,7 +24,7 @@ class ContactList(JSONModel):
     created_by: Any
     has_jobs: bool
     recent_job_count: int
-    service_id: Any
+    service_id: UUIDStr
     original_file_name: str
     row_count: int
     template_type: Any

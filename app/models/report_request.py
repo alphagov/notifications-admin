@@ -5,13 +5,13 @@ from flask import current_app
 from notifications_utils.s3 import s3download
 
 from app import report_request_api_client
-from app.models import JSONModel
+from app.models import JSONModel, UUIDStr
 from app.s3_client import check_s3_object_exists
 
 
 class ReportRequest(JSONModel):
-    user_id: Any
-    service_id: Any
+    user_id: UUIDStr
+    service_id: UUIDStr
     report_type: str
     status: str
     parameter: Any

@@ -36,11 +36,11 @@ def test_email_branding_page_shows_full_branding_list(client_request, platform_a
         "org 5",
     ]
     assert hrefs == [
-        url_for(".platform_admin_view_email_branding", branding_id=1),
-        url_for(".platform_admin_view_email_branding", branding_id=2),
-        url_for(".platform_admin_view_email_branding", branding_id=3),
-        url_for(".platform_admin_view_email_branding", branding_id=4),
-        url_for(".platform_admin_view_email_branding", branding_id=5),
+        url_for(".platform_admin_view_email_branding", branding_id=str(UUID(version=4, int=1))),
+        url_for(".platform_admin_view_email_branding", branding_id=str(UUID(version=4, int=2))),
+        url_for(".platform_admin_view_email_branding", branding_id=str(UUID(version=4, int=3))),
+        url_for(".platform_admin_view_email_branding", branding_id=str(UUID(version=4, int=4))),
+        url_for(".platform_admin_view_email_branding", branding_id=str(UUID(version=4, int=5))),
     ]
 
 
