@@ -2,6 +2,7 @@ import json
 import uuid
 from io import BytesIO
 
+import pytest
 from flask import url_for
 from notifications_python_client.errors import HTTPError
 
@@ -72,13 +73,15 @@ def test_report_request_download_when_report_is_in_wrong_status(client_request, 
     )
 
 
+@pytest.mark.parametrize("updated_at", (None, "2026-10-12T14:56:49.702856+00:00"))
 def test_report_request_renders_preparing_template_if_report_in_progress(
-    client_request, fake_uuid, mocker, mock_get_service_data_retention
+    client_request, fake_uuid, updated_at, mocker, mock_get_service_data_retention
 ):
     request = create_report_request(
         user_id=fake_uuid,
         status="in_progress",
         parameter={"notification_type": "sms", "notification_status": "sending"},
+        updated_at=updated_at,
     )
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
 
