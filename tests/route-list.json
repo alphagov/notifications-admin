@@ -283,6 +283,7 @@
     "/services/<uuid:service_id>/service-settings/set-message-limit/international-sms",
     "/services/<uuid:service_id>/service-settings/set-rate-limit",
     "/services/<uuid:service_id>/service-settings/set-reply-to-email",
+    "/services/<uuid:service_id>/service-settings/set-sms/on",
     "/services/<uuid:service_id>/service-settings/sms-prefix",
     "/services/<uuid:service_id>/service-settings/sms-sender",
     "/services/<uuid:service_id>/service-settings/sms-sender/<uuid:sms_sender_id>/delete",

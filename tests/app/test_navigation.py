@@ -125,6 +125,7 @@ EXCLUDED_ENDPOINTS = set(
             "email_not_received",
             "email_template",
             "enable_email_channel",
+            "enable_sms_channel",
             "setup_template_email_files",
             "upload_template_email_files",
             "template_email_files",
