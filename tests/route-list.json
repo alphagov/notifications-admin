@@ -59,7 +59,6 @@
     "/letter-branding/<uuid:branding_id>",
     "/letter-branding/<uuid:branding_id>/edit",
     "/letter-branding/create",
-    "/metrics",
     "/new-password/<path:token>",
     "/new-terms-of-use",
     "/organisation-invitation/<string:token>",
