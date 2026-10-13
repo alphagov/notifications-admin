@@ -23,6 +23,16 @@ from app.utils.user_permissions import (
     translate_permissions_from_db_to_ui,
 )
 
+# The session is cleared when a user logs in. If you add a session key that is set
+# before login and still needed after it, it needs to be added here or it will be lost.
+SESSION_KEYS_KEPT_ON_LOGIN = (
+    "current_session_id",
+    "invited_user_id",
+    "invited_org_user_id",
+    "service_id",
+    "organisation_id",
+)
+
 
 def _get_service_id_from_view_args() -> str | None:
     return str((request.view_args or {}).get("service_id", "")) or None
@@ -188,6 +198,10 @@ class User(BaseUser, UserMixin):
             return self
 
     def login(self):
+        preserved = {key: session[key] for key in SESSION_KEYS_KEPT_ON_LOGIN if key in session}
+        session.clear()
+        session.update(preserved)
+        session.permanent = True
         login_user(self)
         session["user_id"] = self.id
         session["session_start"] = datetime.now(UTC).isoformat()

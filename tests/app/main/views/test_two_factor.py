@@ -8,7 +8,9 @@ from flask import url_for
 from app.utils.login import encrypt_new_password
 from tests.app.test_event_handlers import event_dict
 from tests.conftest import (
+    ORGANISATION_ID,
     SERVICE_ONE_ID,
+    USER_ONE_ID,
     normalize_spaces,
     set_config,
     url_for_endpoint_with_token,
@@ -425,6 +427,29 @@ def test_valid_two_factor_email_link_logs_in_user(
     )
 
 
+def test_two_factor_email_link_clears_old_session_data_on_login(
+    client_request,
+    valid_token,
+    fake_uuid,
+    mock_get_user,
+    mocker,
+):
+    client_request.logout()
+    mocker.patch("app.user_api_client.check_verify_code", return_value=(True, ""))
+
+    with client_request.session_transaction() as session:
+        session["csrf_token"] = "old-csrf-token"
+
+    client_request.post_url(
+        url_for_endpoint_with_token("main.two_factor_email", token=valid_token),
+        _expected_redirect=url_for("main.show_accounts_or_dashboard"),
+    )
+
+    with client_request.session_transaction() as session:
+        assert "csrf_token" not in session
+        assert session["user_id"] == fake_uuid
+
+
 @pytest.mark.parametrize(
     "redirect_url",
     [
@@ -507,3 +532,39 @@ def test_two_factor_email_link_used_when_user_already_logged_in(client_request, 
         url_for_endpoint_with_token("main.two_factor_email", token=valid_token),
         _expected_redirect=url_for("main.show_accounts_or_dashboard"),
     )
+
+
+def test_two_factor_sms_login_clears_session_but_keeps_some_keys(
+    client_request,
+    api_user_active,
+    mock_email_validated_recently,
+    fake_uuid,
+):
+    client_request.logout()
+
+    with client_request.session_transaction() as session:
+        session["user_details"] = {"id": api_user_active["id"], "email": api_user_active["email_address"]}
+        session["csrf_token"] = "old-csrf-token"
+        session["placeholders"] = {"name": "Jo"}
+        session["invited_user_id"] = USER_ONE_ID
+        session["invited_org_user_id"] = fake_uuid
+        session["service_id"] = SERVICE_ONE_ID
+        session["organisation_id"] = ORGANISATION_ID
+
+    client_request.post(
+        "main.two_factor_sms",
+        _data={"sms_code": "12345"},
+        _expected_redirect=url_for("main.show_accounts_or_dashboard"),
+    )
+
+    with client_request.session_transaction() as session:
+        assert "csrf_token" not in session
+        assert "placeholders" not in session
+        assert "user_details" not in session
+        assert session["invited_user_id"] == USER_ONE_ID
+        assert session["invited_org_user_id"] == fake_uuid
+        assert session["service_id"] == SERVICE_ONE_ID
+        assert session["organisation_id"] == ORGANISATION_ID
+        assert session["current_session_id"] == api_user_active["current_session_id"]
+        assert session["user_id"] == api_user_active["id"]
+        assert session.permanent is True

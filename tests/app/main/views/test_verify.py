@@ -87,6 +87,31 @@ def test_should_activate_user_after_verify(
     assert mock_activate_user.called
 
 
+def test_verify_clears_old_session_data_on_login(
+    client_request,
+    mocker,
+    api_user_active,
+    mock_check_verify_code,
+    mock_get_organisation_by_domain,
+):
+    client_request.logout()
+    mocker.patch("app.user_api_client.get_user", return_value=api_user_active)
+
+    with client_request.session_transaction() as session:
+        session["user_details"] = {"email_address": api_user_active["email_address"], "id": api_user_active["id"]}
+        session["csrf_token"] = "old-csrf-token"
+
+    client_request.post(
+        "main.verify",
+        _data={"sms_code": "12345"},
+        _expected_redirect=url_for("main.add_service"),
+    )
+
+    with client_request.session_transaction() as session:
+        assert "csrf_token" not in session
+        assert session["user_id"] == api_user_active["id"]
+
+
 def test_should_return_200_when_sms_code_is_wrong(
     client_request,
     api_user_active,
