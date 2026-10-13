@@ -25,7 +25,7 @@ class Config:
     DEBUG = False
     NOTIFY_REQUEST_LOG_LEVEL = os.getenv("NOTIFY_REQUEST_LOG_LEVEL", "INFO")
 
-    NOTIFY_EVENTLET_STATS = os.getenv("NOTIFY_EVENTLET_STATS", "0") == "1"
+    NOTIFY_GREENLET_STATS = os.getenv("NOTIFY_GREENLET_STATS", "0") == "1"
 
     ADMIN_CLIENT_USER_NAME = "notify-admin"
 
