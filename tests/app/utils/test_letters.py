@@ -131,6 +131,17 @@ def test_get_letter_validation_error_for_unknown_error():
             ),
         ),
         (
+            "encroaching-text-on-notify-tag-area",
+            [1],
+            "Your content is outside the printable area",
+            "There's a problem with content at the top of your letter on page 1."
+            " It cannot be printed.For help with this,  contact us.",
+            (
+                "Validation failed because there's a problem with content at the top of your letter."
+                " It cannot be printed.For help with this,  contact us."
+            ),
+        ),
+        (
             "letter-too-long",
             None,
             "Your letter is too long",
@@ -234,8 +245,14 @@ def test_get_letter_validation_error_for_known_errors(
 
     assert detail.text == expected_content
     if detail.select_one("a"):
-        assert detail.select_one("a")["href"] == url_for("main.guidance_upload_a_letter")
+        if error_message == "encroaching-text-on-notify-tag-area":
+            assert detail.select_one("a")["href"] == url_for("main.support")
+        else:
+            assert detail.select_one("a")["href"] == url_for("main.guidance_upload_a_letter")
 
     assert summary.text == expected_summary
     if summary.select_one("a"):
-        assert summary.select_one("a")["href"] == url_for("main.guidance_upload_a_letter")
+        if error_message == "encroaching-text-on-notify-tag-area":
+            assert summary.select_one("a")["href"] == url_for("main.support")
+        else:
+            assert summary.select_one("a")["href"] == url_for("main.guidance_upload_a_letter")
