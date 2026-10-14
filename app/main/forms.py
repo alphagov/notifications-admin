@@ -1,4 +1,5 @@
 import weakref
+from collections.abc import Callable
 from contextlib import suppress
 from copy import deepcopy
 from datetime import UTC, datetime, timedelta
@@ -168,20 +169,24 @@ class RadioField(WTFormsRadioField):
 
     def pre_validate(self, form):
         super().pre_validate(form)
-        if self.data not in dict(self.choices).keys():
+        if not self.choices:
+            return
+        if self.data not in (key for key, *_ in self.choices):
             raise ValidationError(f"Select {self.thing}")
 
 
 def make_email_address_field(label="Email address", *, gov_user: bool, required=True, thing=None):
+    validators: list[Callable] = []
+
     if thing:
-        validators = [
+        validators.append(
             ValidEmail(message=f"Enter {thing} in the correct format, like name@example.gov.uk"),
-        ]
+        )
     else:
         # FIXME: being deprecated; remove this when all form fields have been transferred across to `thing`.
-        validators = [
+        validators.append(
             ValidEmail(),
-        ]
+        )
 
     if gov_user:
         validators.append(ValidGovEmail())
@@ -1052,7 +1057,7 @@ class PermissionsForm(StripWhitespaceForm):
 
     @property
     def permissions(self):
-        return set(self.permissions_field.data)
+        return set(self.permissions_field.data or ())
 
     @classmethod
     def from_user_and_service(cls, user, service):
@@ -1117,7 +1122,7 @@ class OrganisationUserPermissionsForm(StripWhitespaceForm):
 
     @property
     def permissions(self):
-        return set(self.permissions_field.data)
+        return set(self.permissions_field.data or ())
 
     @classmethod
     def from_user_and_organisation(cls, user, organisation, **kwargs):
@@ -1637,7 +1642,7 @@ class LetterUploadPostageForm(StripWhitespaceForm):
 
     @property
     def show_postage(self):
-        return len(self.postage.choices) > 1
+        return len(self.postage.choices or ()) > 1
 
     postage = GovukRadiosField(
         "Choose the postage for this letter",
@@ -1969,7 +1974,7 @@ class AdminProviderRatioForm(OrderableFieldsForm):
         self._providers = providers
 
         # hack: https://github.com/wtforms/wtforms/issues/736
-        fields = [
+        fields: list[tuple[str, Field]] = [
             (
                 provider["identifier"],
                 GovukIntegerField(
@@ -3443,6 +3448,8 @@ class DocumentDownloadConfirmEmailAddressForm(StripWhitespaceForm):
     )
 
     def validate_email_address(self, field):
+        if self.email_address.data is None:
+            return
         try:
             validate_email_address(self.email_address.data)
         except InvalidEmailError as e:

@@ -39,6 +39,7 @@ def join_service_ask(service_to_join_id):
         users=service.active_users_with_permission("manage_service"),
     )
     if form.validate_on_submit():
+        assert form.users.data is not None  # type narrowing
         service.create_service_join_request(
             current_user,
             service_id=service.id,
