@@ -53,21 +53,18 @@ def test_from_registration_encodes_as_unicode(webauthn_dev_server):
     assert isinstance(serialized_credential["registration_response"], str)
 
 
-def test_serialize_returns_valid_typeddict(webauthn_dev_server):
+@pytest.mark.parametrize("datetime_string_or_none", (None, "2026-10-14T14:58:47.927117+00:00"))
+def test_serialize_returns_valid_typeddict(webauthn_dev_server, datetime_string_or_none):
     # Create a test credential with known values
-    from datetime import datetime
-
-    now = datetime.now()
-
     credential = WebAuthnCredential(
         {
             "id": "123",
             "name": "Test Key",
             "credential_data": "test_credential_data",
             "registration_response": "test_response",
-            "created_at": now,
-            "updated_at": now,
-            "logged_in_at": None,  # Test the Optional case
+            "created_at": "2026-10-14T14:58:47.927117+00:00",
+            "updated_at": datetime_string_or_none,
+            "logged_in_at": datetime_string_or_none,
         }
     )
 
