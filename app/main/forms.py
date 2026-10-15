@@ -3197,17 +3197,17 @@ class PlatformAdminUsersListForm(StripWhitespaceForm):
         return super().validate(extra_validators=extra_validators)
 
 
-class UniqueServiceForm(StripWhitespaceForm):
+class ServiceEligibleForFreeAllowanceForm(StripWhitespaceForm):
     is_unique = GovukRadiosField(
-        label="Is the service unique?",
-        choices=[("yes", "Yes"), ("no", "No"), ("unsure", "I‘m not sure")],
-        validators=[DataRequired(message="Select ‘yes’ if this service is unique")],
+        label="Is the service eligible for a free allowance?",
+        choices=[("yes", "Yes or not applicable"), ("no", "No"), ("unsure", "I’m not sure")],
+        validators=[DataRequired(message="Select ‘yes’ if this service is eligible for a free allowance")],
     )
 
     def __init__(self, service_name, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.is_unique.label.text = f"Is ‘{service_name}’ unique?"
+        self.is_unique.label.text = f"Is ‘{service_name}’ eligible for a free allowance?"
 
 
 class ServiceGoLiveDecisionForm(OnOffSettingForm):

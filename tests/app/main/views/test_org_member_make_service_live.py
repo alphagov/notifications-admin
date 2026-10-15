@@ -209,7 +209,7 @@ def test_get_org_member_make_service_live_service_name(
     )
 
     if expected_status == 200:
-        assert "Check the service name" in normalize_spaces(page.select_one("main").text)
+        assert "Check that the service name is descriptive" in normalize_spaces(page.select_one("main").text)
 
         form = page.select_one("form")
         button = form.select_one("button")
@@ -382,11 +382,53 @@ def test_get_org_member_make_service_live_unique_service(
     )
 
     if expected_status == 200:
-        assert "Confirm this service is unique" in normalize_spaces(page.select_one("main").text)
+        assert "Free text message allowance" in normalize_spaces(page.select_one("main").text)
 
         form = page.select_one("form")
         button = form.select_one("button")
         assert button.text.strip() == "Continue"
+
+
+@pytest.mark.parametrize(
+    "volume_sms,sms_volume_description,next_step",
+    [
+        (0, "said that this service will not send any text messages", "2"),
+        (None, "said that this service will not send any text messages", "2"),
+        (1, "said that this service will send 1 text message per year", "3"),
+        (100, "said that this service will send 100 text messages per year", "3"),
+    ],
+)
+def test_get_org_member_make_service_live_unique_service_displays_estimated_volumes_and_next_step(
+    client_request,
+    organisation_one,
+    service_one,
+    volume_sms,
+    sms_volume_description,
+    next_step,
+    mocker,
+):
+    user = create_user(
+        id=sample_uuid(),
+        organisations=[ORGANISATION_ID],
+        organisation_permissions={ORGANISATION_ID: [PERMISSION_CAN_MAKE_SERVICES_LIVE]},
+    )
+    organisation_one["can_approve_own_go_live_requests"] = True
+    mocker.patch("app.organisations_client.get_organisation", return_value=organisation_one)
+
+    service_one["has_active_go_live_request"] = True
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["volume_sms"] = volume_sms
+
+    client_request.login(user)
+
+    page = client_request.get(
+        "main.org_member_make_service_live_check_unique",
+        service_id=SERVICE_ONE_ID,
+    )
+
+    normalized_page_text = normalize_spaces(page.text)
+    assert sms_volume_description in normalized_page_text
+    assert f"Go to step {next_step}." in normalized_page_text
 
 
 def test_post_org_member_make_service_live_unique_service_error_summary(
@@ -419,7 +461,7 @@ def test_post_org_member_make_service_live_unique_service_error_summary(
 
     error_summary = page.select_one(".govuk-error-summary")
     assert "There is a problem" in error_summary.text
-    assert "Select ‘yes’ if this service is unique" in error_summary.text
+    assert "Select ‘yes’ if this service is eligible for a free allowance" in error_summary.text
 
 
 @pytest.mark.parametrize(
