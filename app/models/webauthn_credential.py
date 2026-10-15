@@ -1,14 +1,11 @@
 import base64
+import json
 from datetime import datetime
 from typing import TypedDict
 
 from fido2 import cbor
 from fido2.cose import UnsupportedKey
-from fido2.webauthn import (
-    AttestationObject,
-    AttestedCredentialData,
-    CollectedClientData,
-)
+from fido2.webauthn import AttestedCredentialData
 from flask import current_app
 
 from app.models import JSONModel, ModelList
@@ -40,12 +37,9 @@ class WebAuthnCredential(JSONModel):
         server = current_app.webauthn_server
 
         try:
-            auth_data = server.register_complete(
-                state,
-                CollectedClientData(response["clientDataJSON"]),
-                AttestationObject(response["attestationObject"]),
-            )
-        except ValueError as e:
+            # fido2 v2 parses the browser's PublicKeyCredential.toJSON() output itself
+            auth_data = server.register_complete(state, response)
+        except (ValueError, KeyError, TypeError) as e:
             raise RegistrationError(e) from e
 
         if isinstance(auth_data.credential_data.public_key, UnsupportedKey):
@@ -57,8 +51,9 @@ class WebAuthnCredential(JSONModel):
                 "credential_data": base64.b64encode(
                     cbor.encode(auth_data.credential_data),
                 ).decode("utf-8"),
+                # now the JSON the browser sent, rather than CBOR (only stored for auditing)
                 "registration_response": base64.b64encode(
-                    cbor.encode(response),
+                    json.dumps(response).encode("utf-8"),
                 ).decode("utf-8"),
             }
         )

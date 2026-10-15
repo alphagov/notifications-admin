@@ -15,9 +15,7 @@ pyexcel-xls~=0.7
 pyexcel-odsr~=0.6
 
 notifications-python-client~=12.1
-# currently locked at v1 until this card is played: https://trello.com/c/V1pA36gF/560-bump-fido2-to-v2
-fido2~=1.1
-
+fido2~=2.2
 # Run `make bump-utils` to update to the latest version
 notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@133.0.0
 

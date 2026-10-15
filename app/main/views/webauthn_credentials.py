@@ -1,14 +1,6 @@
-from collections.abc import Mapping
-
-from fido2 import cbor
 from fido2.server import Fido2Server
-from fido2.webauthn import (
-    AuthenticatorData,
-    CollectedClientData,
-    PublicKeyCredentialUserEntity,
-    UserVerificationRequirement,
-)
-from flask import abort, current_app, flash, redirect, request, session, url_for
+from fido2.webauthn import PublicKeyCredentialUserEntity, UserVerificationRequirement
+from flask import abort, current_app, flash, jsonify, redirect, request, session, url_for
 
 from app import current_user
 from app.main import main
@@ -39,19 +31,19 @@ def webauthn_begin_register():
     )
 
     session["webauthn_registration_state"] = state
-    return cbor.encode(registration_data)
+    return jsonify(dict(registration_data))
 
 
 @main.route("/webauthn/register", methods=["POST"])
 @user_is_logged_in
 def webauthn_complete_register():
     if "webauthn_registration_state" not in session:
-        return cbor.encode("No registration in progress"), 400
+        return jsonify({"message": "No registration in progress"}), 400
 
     try:
         credential = WebAuthnCredential.from_registration(
             session.pop("webauthn_registration_state"),
-            cbor.decode(request.get_data()),
+            request.get_json(),
         )
     except RegistrationError as e:
         current_app.logger.info(
@@ -70,7 +62,7 @@ def webauthn_complete_register():
         "default_with_tick",
     )
 
-    return cbor.encode("")
+    return jsonify({})
 
 
 @main.route("/webauthn/authenticate", methods=["GET"])
@@ -98,7 +90,7 @@ def webauthn_begin_authentication():
         user_verification=UserVerificationRequirement.DISCOURAGED,  # don't ask for PIN
     )
     session["webauthn_authentication_state"] = state
-    return cbor.encode(authentication_data)
+    return jsonify(dict(authentication_data))
 
 
 @main.route("/webauthn/authenticate", methods=["POST"])
@@ -117,7 +109,7 @@ def webauthn_complete_authentication():
     webauthn_credential_used_for_login = _verify_webauthn_authentication(user_to_login)
     redirect = _complete_webauthn_login_attempt(user_to_login, webauthn_credential_used_for_login.id)
 
-    return cbor.encode({"redirect_url": redirect.location}), 200
+    return jsonify({"redirect_url": redirect.location}), 200
 
 
 def _verify_webauthn_authentication(user):
@@ -126,21 +118,19 @@ def _verify_webauthn_authentication(user):
     we're trying to log in.
     """
     state = session.pop("webauthn_authentication_state")
-    request_data = cbor.decode(request.get_data())
+    request_data = request.get_json(silent=True)
 
     try:
-        if not isinstance(request_data, Mapping):  # type narrowing
-            raise ValueError("Decoded request data is not a Mapping")
+        if not isinstance(request_data, dict):  # type narrowing
+            raise ValueError("Request data is not a JSON object")
 
         server: Fido2Server = current_app.webauthn_server  # type: ignore[attr-defined]
 
+        # fido2 v2 parses the browser's PublicKeyCredential.toJSON() output itself
         attested_credential_data = server.authenticate_complete(
             state=state,
             credentials=user.webauthn_credentials.as_cbor,
-            credential_id=request_data["credentialId"],
-            client_data=CollectedClientData(request_data["clientDataJSON"]),
-            auth_data=AuthenticatorData(request_data["authenticatorData"]),
-            signature=request_data["signature"],
+            response=request_data,
         )
 
         # find the cred used - Fido2Server returns the attested credential that it matched with the login request,
@@ -152,7 +142,7 @@ def _verify_webauthn_authentication(user):
         )
         return webauthn_credential_used_for_login
 
-    except ValueError as exc:
+    except (ValueError, KeyError, TypeError) as exc:
         # We don't expect to reach this case in normal situations - normally errors (such as using the wrong
         # security key) will be caught in the browser inside `window.navigator.credentials.get`, and the js will
         # error first meaning it doesn't send the POST request to this method. If this method is called but the key
