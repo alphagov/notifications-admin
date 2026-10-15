@@ -23,13 +23,13 @@
     <div class="js-stick-at-bottom-when-scrolling">
       <span class="email-files-selected-counter">
       {% if template.email_files | length == 0 %}
-        No files added
+        No files
       {% elif template.email_files | length == 1 %}
-        1 file added
+        1 file 
       {% else %}
-        {{ template.email_files | length }} files added
+        {{ template.email_files | length }} files
       {% endif %}
-
+      attached
       </span>
 
         {{ govukButton({

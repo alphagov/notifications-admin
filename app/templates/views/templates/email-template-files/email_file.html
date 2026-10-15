@@ -100,7 +100,7 @@
     }}
 {% if template_email_file.pending %}
   {% call form_wrapper(action=url_for('main.make_file_live',service_id=service_id,template_id=template_id,template_email_file_id=template_email_file.id,)) %}
-    {{ page_footer("Add to template") }}
+    {{ page_footer("Attach to template") }}
   {% endcall %}
 {% else %}
   {{ page_footer(
