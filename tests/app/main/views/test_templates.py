@@ -5116,7 +5116,7 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
             None,
             "Attach files",
             "main.template_email_files",
-            "No files added",
+            "No files attached",
         ),
         (
             "email",
@@ -5130,7 +5130,7 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
             ],
             "Manage files",
             "main.template_email_files",
-            "1 file added",
+            "1 file attached",
         ),
         (
             "email",
@@ -5150,7 +5150,7 @@ def test_letter_attachment_preview_image_shows_overlay_when_content_outside_prin
             ],
             "Manage files",
             "main.template_email_files",
-            "2 files added",
+            "2 files attached",
         ),
         (
             "sms",
