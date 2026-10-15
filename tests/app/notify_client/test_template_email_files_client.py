@@ -15,12 +15,14 @@ from tests.utils import RedisClientMock
             "created_by_id": str(uuid.uuid4()),
             "retention_period": 90,
             "validate_users_email": True,
+            "link_text": "test",
         },
         {
             "file_id": str(uuid.uuid4()),
             "filename": "test.pdf",
             "created_by_id": str(uuid.uuid4()),
             "retention_period": 90,
+            "link_text": "test",
         },
     ],
 )

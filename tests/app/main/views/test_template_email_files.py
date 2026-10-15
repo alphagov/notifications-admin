@@ -1061,6 +1061,7 @@ def test_upload_file_does_not_update_template_content(
                 "created_by_id": AnyStringMatching(UUID4_REGEX_PATTERN),
                 "retention_period": 26,
                 "validate_users_email": True,
+                "link_text": "one_page_pdf",
             },
         ),
     ]
