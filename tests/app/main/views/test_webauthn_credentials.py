@@ -383,6 +383,29 @@ def test_verify_webauthn_login_signs_user_in(
     mock_create_event.assert_called_once_with("sucessful_login", ANY)
 
 
+def test_verify_webauthn_login_clears_old_session_data(
+    client_request,
+    mocker,
+    mock_create_event,
+    platform_admin_user,
+):
+    client_request.logout()
+    mocker.patch("app.user_api_client.get_user", return_value=platform_admin_user)
+    mocker.patch("app.main.views.webauthn_credentials._verify_webauthn_authentication")
+    mocker.patch("app.user_api_client.complete_webauthn_login_attempt", return_value=(True, None))
+    mocker.patch("app.models.user.User.email_needs_revalidating", new_callable=PropertyMock, return_value=False)
+
+    with client_request.session_transaction() as session:
+        session["user_details"] = {"id": platform_admin_user["id"], "email": platform_admin_user["email_address"]}
+        session["csrf_token"] = "old-csrf-token"
+
+    client_request.post_response("main.webauthn_complete_authentication", _expected_status=200)
+
+    with client_request.session_transaction() as session:
+        assert "csrf_token" not in session
+        assert session["user_id"] == platform_admin_user["id"]
+
+
 def test_verify_webauthn_login_signs_user_in_doesnt_sign_user_in_if_api_rejects(
     client_request,
     mocker,
