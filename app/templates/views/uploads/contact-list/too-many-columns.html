@@ -1,8 +1,9 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
-{% from "components/table.html" import list_table, text_field, row_heading %}
 {% from "components/file-upload.html" import file_upload %}
+{% from "/components/list.html" import render_list_or_string %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% block service_page_title %}
   Error
@@ -69,35 +70,55 @@
 
     <h2 class="heading-medium" id="file-preview">{{ original_file_name }}</h2>
 
-    <div class="fullscreen-content" data-notify-module="fullscreen-table">
-      {% call(item, row_number) list_table(
-        recipients.displayed_rows,
-        caption=original_file_name,
-        caption_visible=False,
-        field_headings=[
-          '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true">1</span>'|safe
-        ] + recipients._raw_column_headers[:512]
-      ) %}
-        {% call row_heading() %}
-        {{ item.index + 2 }}
-        {% endcall %}
-        {% for column in column_headers %}
-          {% if item[column].ignore %}
-            {{ text_field(item[column].data or '', status='default') }}
-          {% else %}
-            {{ text_field(item[column].data or '') }}
-          {% endif %}
-        {% endfor %}
-        {% if item[None].data %}
-          {% for column in item[None].data %}
-            {{ text_field(column, status='default') }}
-          {% endfor %}
+    {% set table_headers = [
+      {
+        "html": '<span class="govuk-visually-hidden">Row in file</span> <span aria-hidden="true">1</span>',
+      }
+    ] %}
+    {% for header in column_headers %}
+      {% do table_headers.append({ "html": header, "text": "" }) %}
+    {% endfor %}
+
+    {% set table_rows = [] %}
+    {% for item in recipients.displayed_rows %}
+      {% set current_row = [] %}
+      {% do current_row.append({ "text": item.index + 2 }) %}
+
+      {% for column in column_headers %}
+        {% set cell_dict = {
+          "html": render_list_or_string(item[column].data)
+        } %}
+        {% if item[column].ignore %}
+          {% do cell_dict.update({ "classes": "govuk-table__cell--default" }) %}
         {% endif %}
-      {% endcall %}
-  </div>
+        {% do current_row.append(cell_dict) %}
+      {% endfor %}
+
+      {% if item[None].data %}
+        {% for column in item[None].data %}
+          {% do current_row.append({
+            "html": render_list_or_string(column),
+            "classes": "govuk-table__cell--default"
+          }) %}
+        {% endfor %}
+      {% endif %}
+
+      {% do table_rows.append(current_row) %}
+    {% endfor %}
+
+    <div class="fullscreen-content" data-notify-module="fullscreen-table">
+      {{ govukTable({
+        "caption": original_file_name,
+        "classes": "notify-table notify-table--body-small",
+        "captionClasses": "govuk-visually-hidden",
+        "firstCellIsHeader": true,
+        "head": table_headers,
+        "rows": table_rows
+      }) }}
+    </div>
 
   {% if recipients.displayed_rows|list|length < recipients|length %}
-    <p class="table-show-more-link">
+    <p class="more-items-available-text">
       Only showing the first {{ recipients.displayed_rows|list|length }} rows
     </p>
   {% endif %}
