@@ -78,10 +78,9 @@ def submit_request_to_go_live(service_id):
     return redirect(url_for(".request_to_go_live", service_id=service_id))
 
 
-# TODO: Rename route and function to remove references to service uniqueness
 @main.route("/services/<uuid:service_id>/make-your-service-live/confirm-service-unique", methods=["GET", "POST"])
 @user_has_permissions("manage_service")
-def confirm_service_is_unique(service_id):
+def confirm_service_name(service_id):
     form = RenameServiceForm(name=current_service.name)
     back_link = url_for(".request_to_go_live", service_id=service_id)
 
@@ -99,7 +98,7 @@ def confirm_service_is_unique(service_id):
             return redirect(back_link)
 
     return render_template(
-        "views/confirm-your-service-is-unique.html",
+        "views/confirm-your-service-name.html",
         form=form,
         back_link=back_link,
         error_summary_enabled=True,
