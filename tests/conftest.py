@@ -1464,6 +1464,7 @@ def mock_get_api_keys(notify_admin, mocker, fake_uuid):
                     key_type="normal",
                     created_by=fake_uuid,
                     created_at="2026-09-14 10:00:00.000000",
+                    last_used=str(datetime.now(UTC) - timedelta(minutes=70)),
                 ),
                 api_key_json(
                     id_="1234567",
@@ -1472,6 +1473,7 @@ def mock_get_api_keys(notify_admin, mocker, fake_uuid):
                     key_type="test",
                     created_by=str(uuid4()),
                     created_at="2026-09-02 12:00:00.000000",
+                    last_used=None,
                 ),
                 api_key_json(
                     id_=str(uuid4()),
@@ -1479,6 +1481,7 @@ def mock_get_api_keys(notify_admin, mocker, fake_uuid):
                     key_type="team",
                     created_by=str(uuid4()),
                     created_at="2024-04-04 04:04:04.000000",
+                    last_used=str(datetime.now(UTC) - timedelta(days=600)),
                 ),
             ]
         }

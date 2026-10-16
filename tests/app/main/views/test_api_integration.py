@@ -296,7 +296,7 @@ def test_api_documentation_page_should_redirect(
     )
 
 
-def test_should_show_empty_api_keys_page(
+def test_api_keys_page_empty_when_no_api_keys_set_up(
     client_request,
     api_user_active,
     mock_login,
@@ -314,7 +314,7 @@ def test_should_show_empty_api_keys_page(
 
 
 @freeze_time("2026-09-14 12:00")
-def test_should_show_api_keys_page(
+def test_api_keys_page_shows_api_keys_with_creation_and_usage_info(
     client_request,
     mock_get_api_keys,
     fake_uuid,
@@ -337,26 +337,40 @@ def test_should_show_api_keys_page(
     )
 
     page = client_request.get("main.api_keys", service_id=SERVICE_ONE_ID)
-    revoke_link = page.select_one("ul li a.govuk-link.govuk-link--destructive")
 
+    # show banner reminding users to rotate an API key
     assert normalize_spaces(page.select_one(".govuk-notification-banner").text) == (
         "Rotate your API key "
         "Your API key is more than 12 months old. "
         "Rotate this key at least once a year or remove it if you no longer need it."
     )
 
+    # show list of api keys, who created them, and when they were last used
     assert [normalize_spaces(item.text) for item in page.select("ul.api-key-list li")] == [
         (
-            "another key name Revoked yesterday at midday Test – "
-            "pretends to send messages Created by Test User 12 days ago"
+            "another key name "
+            "Revoked yesterday at midday "
+            "Test – pretends to send messages "
+            "Created by Test User 12 days ago "
+            "Never used"
         ),
-        ("some key name Revoke some key name API key Live – sends to anyone Created by Test User 2 hours ago"),
         (
-            "third key Revoke third key API key Team and guest list – "
-            "limits who you can send to Created by an archived user 2 years ago"
+            "some key name"
+            "Revoke some key name "
+            "API key Live – sends to anyone "
+            "Created by Test User 2 hours ago "
+            "Last used today"
+        ),
+        (
+            "third key "
+            "Revoke third key "
+            "API key Team and guest list – limits who you can send to "
+            "Created by an archived user 2 years ago"
+            "Last used more than 3 months ago"
         ),
     ]
 
+    revoke_link = page.select_one("ul li a.govuk-link.govuk-link--destructive")
     assert normalize_spaces(revoke_link.text) == "Revoke some key name API key"
     assert revoke_link["href"] == url_for(
         "main.revoke_api_key",
@@ -368,7 +382,7 @@ def test_should_show_api_keys_page(
 
 
 @freeze_time("2027-09-14 12:00")
-def test_should_show_api_keys_page_with_multiple_old_keys(
+def test_api_keys_page_with_multiple_old_keys(
     client_request,
     mock_get_api_keys,
     fake_uuid,
