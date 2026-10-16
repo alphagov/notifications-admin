@@ -12,7 +12,7 @@ from typing import IO, Self, final
 import openpyxl
 import openpyxl.reader.excel
 import pyexcel
-from notifications_utils.eventlet import greenlet_thread_time_ns, greenlet_thread_time_ns_max_continuous
+from notifications_utils.greenlet import greenlet_thread_time_ns, greenlet_thread_time_ns_max_continuous
 from notifications_utils.interruptible_io import InterruptibleIOZipFile
 from notifications_utils.recipient_validation.email_address import validate_email_address
 from notifications_utils.recipient_validation.errors import InvalidEmailError
@@ -117,7 +117,7 @@ class Spreadsheet:
         """
 
         thread_times = {}
-        thread_time_start = greenlet_thread_time_ns() or 0  # returns None if not using eventlet
+        thread_time_start = greenlet_thread_time_ns() or 0  # returns None if not using eventlet/gevent
 
         book = openpyxl.load_workbook(
             file_content,
@@ -132,10 +132,11 @@ class Spreadsheet:
         if not sheet:
             return cls.from_rows(iter(()), filename)  # empty spreadsheet
 
-        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet
+        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet/gevent
         thread_times["load_workbook"] = {
             "elapsed_since_prev": thread_time_end - thread_time_start,
-            "max_cont_running": greenlet_thread_time_ns_max_continuous() or 0,  # returns None if not using eventlet
+            "max_cont_running": greenlet_thread_time_ns_max_continuous()
+            or 0,  # returns None if not using eventlet/gevent
         }
         thread_time_start = thread_time_end
 
@@ -154,10 +155,11 @@ class Spreadsheet:
         except StopIteration:
             raise cls.AllRowsHiddenError("Didn't find a non-hidden row before row limit reached") from None
 
-        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet
+        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet/gevent
         thread_times["calc_first_visible_row"] = {
             "elapsed_since_prev": thread_time_end - thread_time_start,
-            "max_cont_running": greenlet_thread_time_ns_max_continuous() or 0,  # returns None if not using eventlet
+            "max_cont_running": greenlet_thread_time_ns_max_continuous()
+            or 0,  # returns None if not using eventlet/gevent
         }
         thread_time_start = thread_time_end
 
@@ -176,10 +178,11 @@ class Spreadsheet:
                 ).strip():
                     header_last_nonempty_column = col_index
 
-        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet
+        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet/gevent
         thread_times["calc_header_last_nonempty_column"] = {
             "elapsed_since_prev": thread_time_end - thread_time_start,
-            "max_cont_running": greenlet_thread_time_ns_max_continuous() or 0,  # returns None if not using eventlet
+            "max_cont_running": greenlet_thread_time_ns_max_continuous()
+            or 0,  # returns None if not using eventlet/gevent
         }
         thread_time_start = thread_time_end
 
@@ -203,10 +206,11 @@ class Spreadsheet:
             for col_letter in (openpyxl_get_column_letter(col_index) for col_index in range(1, column_limit + 1))
         )
 
-        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet
+        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet/gevent
         thread_times["calc_visible_column_map"] = {
             "elapsed_since_prev": thread_time_end - thread_time_start,
-            "max_cont_running": greenlet_thread_time_ns_max_continuous() or 0,  # returns None if not using eventlet
+            "max_cont_running": greenlet_thread_time_ns_max_continuous()
+            or 0,  # returns None if not using eventlet/gevent
         }
         thread_time_start = thread_time_end
 
@@ -238,10 +242,11 @@ class Spreadsheet:
                 max_row_within_limit = max(max_row_within_limit, row_index)
                 max_col_within_limit = max(max_col_within_limit, col_index)
 
-        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet
+        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet/gevent
         thread_times["calc_max_within_limit"] = {
             "elapsed_since_prev": thread_time_end - thread_time_start,
-            "max_cont_running": greenlet_thread_time_ns_max_continuous() or 0,  # returns None if not using eventlet
+            "max_cont_running": greenlet_thread_time_ns_max_continuous()
+            or 0,  # returns None if not using eventlet/gevent
         }
         thread_time_start = thread_time_end
 
@@ -266,10 +271,11 @@ class Spreadsheet:
             )
         )
 
-        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet
+        thread_time_end = greenlet_thread_time_ns() or 0  # returns None if not using eventlet/gevent
         thread_times["calc_merged_cell_map"] = {
             "elapsed_since_prev": thread_time_end - thread_time_start,
-            "max_cont_running": greenlet_thread_time_ns_max_continuous() or 0,  # returns None if not using eventlet
+            "max_cont_running": greenlet_thread_time_ns_max_continuous()
+            or 0,  # returns None if not using eventlet/gevent
         }
         thread_time_start = thread_time_end
 
