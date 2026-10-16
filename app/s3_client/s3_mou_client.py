@@ -1,7 +1,7 @@
 import botocore
 from flask import current_app
-from notifications_utils.eventlet import EventletTimeout
 from notifications_utils.exception_handling import extract_reraise_chained_exception
+from notifications_utils.greenlet import RequestHandlingTimeout
 
 from app.s3_client import get_s3_object
 
@@ -14,7 +14,7 @@ def get_mou(organisation_is_crown):
     )
     try:
         key = get_s3_object(bucket, filename)
-        with extract_reraise_chained_exception(EventletTimeout):
+        with extract_reraise_chained_exception(RequestHandlingTimeout):
             return {
                 "path_or_file": key.get()["Body"],
                 "download_name": attachment_filename,

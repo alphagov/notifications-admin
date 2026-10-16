@@ -3,8 +3,8 @@ import urllib
 import botocore
 from boto3 import resource
 from flask import current_app
-from notifications_utils.eventlet import EventletTimeout
 from notifications_utils.exception_handling import extract_reraise_chained_exception
+from notifications_utils.greenlet import RequestHandlingTimeout
 from notifications_utils.json import RelaxedContainerJSONEncoder as RCJSONEncoder
 from notifications_utils.s3 import s3upload as utils_s3upload
 
@@ -72,7 +72,7 @@ def get_letter_s3_object(service_id, file_id):
     try:
         file_location = get_transient_letter_file_location(service_id, file_id)
         s3 = resource("s3")
-        with extract_reraise_chained_exception(EventletTimeout):
+        with extract_reraise_chained_exception(RequestHandlingTimeout):
             return s3.Object(current_app.config["S3_BUCKET_TRANSIENT_UPLOADED_LETTERS"], file_location).get()
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchKey":
