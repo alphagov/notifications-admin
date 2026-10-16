@@ -1,3 +1,5 @@
+from uuid import UUID
+
 import pytest
 
 
@@ -49,9 +51,9 @@ def test_displays_both_branding(client_request, mock_get_email_branding_with_bot
 
 def test_displays_org_branding(client_request, mock_get_email_branding):
     # mock_get_email_branding has 'brand_type' of 'org'
-    page = client_request.get("main.email_template", branding_style="1", _test_page_title=False)
+    page = client_request.get("main.email_template", branding_style=str(UUID(version=4, int=1)), _test_page_title=False)
 
-    mock_get_email_branding.assert_called_once_with("1")
+    mock_get_email_branding.assert_called_once_with(str(UUID(version=4, int=1)))
 
     assert not any(a["href"] == "https://www.gov.uk" for a in page.select("a"))
     assert page.select_one("img")["src"] == "https://static-logos.test.com/example.png"

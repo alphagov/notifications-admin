@@ -82,7 +82,7 @@ def created_by_json(id_, name="", email_address=""):
 
 
 def user_json(
-    id_="1234",
+    id_=None,
     name="Test User",
     email_address="test@gov.uk",
     mobile_number="+447700900986",
@@ -93,7 +93,7 @@ def user_json(
     logged_in_at=None,
     state="active",
     platform_admin=False,
-    current_session_id="1234",
+    current_session_id=None,
     organisations=None,
     services=None,
 ):
@@ -115,7 +115,7 @@ def user_json(
         services = [str(service_id) for service_id in permissions.keys()]
 
     return {
-        "id": id_,
+        "id": id_ or str(uuid.UUID(version=4, int=1234)),
         "name": name,
         "email_address": email_address,
         "mobile_number": mobile_number,
@@ -126,16 +126,16 @@ def user_json(
         "logged_in_at": logged_in_at or datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S.%f"),
         "state": state,
         "platform_admin": platform_admin,
-        "current_session_id": current_session_id,
+        "current_session_id": current_session_id or str(uuid.UUID(version=4, int=1234)),
         "organisations": organisations or [],
         "services": services,
     }
 
 
 def invited_user(
-    _id="1234",
+    _id=None,
     service=None,
-    from_user="1234",
+    from_user=None,
     email_address="testinviteduser@gov.uk",
     permissions=None,
     status="pending",
@@ -144,8 +144,8 @@ def invited_user(
     organisation=None,
 ):
     data = {
-        "id": _id,
-        "from_user": from_user,
+        "id": _id or str(uuid.UUID(version=4, int=1234)),
+        "from_user": from_user or str(uuid.UUID(version=4, int=1234)),
         "email_address": email_address,
         "status": status,
         "created_at": created_at or datetime.now(UTC),
@@ -162,7 +162,7 @@ def invited_user(
 
 
 def service_json(
-    id_="1234",
+    id_=None,
     name="Test Service",
     users=None,
     email_message_limit=1000,
@@ -204,7 +204,7 @@ def service_json(
     if service_callback_api is None:
         service_callback_api = []
     return {
-        "id": id_,
+        "id": str(uuid.UUID(version=4, int=1234)) if id_ is None else str(id_),
         "name": name,
         "users": users,
         "email_message_limit": email_message_limit,
@@ -248,7 +248,7 @@ def service_json(
 
 
 def organisation_json(
-    id_="1234",
+    id_=None,
     name=False,
     users=None,
     active=True,
@@ -283,7 +283,7 @@ def organisation_json(
     if can_ask_to_join_a_service:
         permissions.extend(["can_ask_to_join_a_service"])
     return {
-        "id": id_,
+        "id": id_ or str(uuid.UUID(version=4, int=1234)),
         "name": "Test Organisation" if name is False else name,
         "active": active,
         "users": users,

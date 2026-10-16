@@ -1,5 +1,6 @@
 from datetime import datetime
 from unittest.mock import PropertyMock
+from uuid import UUID
 
 import pytest
 
@@ -48,7 +49,7 @@ def test_get_choices_service_not_assigned_to_org(
         ),
         (
             "central",
-            "some-branding-id",
+            str(UUID(version=4, bytes=b"some-branding-id")),
             [
                 ("govuk", "GOV.UK"),  # central orgs can switch back to GOV.UK
                 ("govuk_and_org", "GOV.UK and Test Organisation"),
@@ -56,7 +57,7 @@ def test_get_choices_service_not_assigned_to_org(
             ],
         ),
         ("local", None, [("organisation", "Test Organisation")]),
-        ("local", "some-branding-id", [("organisation", "Test Organisation")]),
+        ("local", UUID(version=4, bytes=b"some-branding-id"), [("organisation", "Test Organisation")]),
         (
             "nhs_central",
             None,
@@ -132,7 +133,11 @@ def test_get_email_choices_org_has_default_branding(
         "app.organisations_client.get_organisation",
         return_value=organisation_json(organisation_type=org_type),
     )
-    mocker.patch("app.models.service.Service.email_branding_id")
+    mocker.patch(
+        "app.models.service.Service.email_branding_id",
+        new_callable=PropertyMock,
+        return_value=str(UUID(version=4, int=999)),
+    )
 
     options = get_email_choices(service)
     assert list(options) == expected_options
@@ -175,11 +180,11 @@ def test_get_email_choices_branding_name_in_use(
     mocker.patch(
         "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value="some-branding-id",
+        return_value=str(UUID(version=4, bytes=b"some-branding-id")),
     )
     mocker.patch(
         "app.email_branding_client.get_email_branding",
-        return_value=create_email_branding("_id", {"name": branding_name}),
+        return_value=create_email_branding(str(UUID(version=4, int=999)), {"name": branding_name}),
     )
 
     options = get_email_choices(service)
@@ -196,7 +201,7 @@ def test_get_email_choices_branding_name_in_use(
                     "logo": "example_1.png",
                     "name": "Email branding name 1",
                     "text": "Email branding text 1",
-                    "id": "email-branding-1-id",
+                    "id": str(UUID(version=4, int=1)),
                     "colour": "#f00",
                     "brand_type": "org",
                 },
@@ -204,7 +209,7 @@ def test_get_email_choices_branding_name_in_use(
                     "logo": "example_2.png",
                     "name": "Email branding name 2",
                     "text": "Email branding text 2",
-                    "id": "email-branding-2-id",
+                    "id": str(UUID(version=4, int=2)),
                     "colour": "#f00",
                     "brand_type": "org",
                 },
@@ -212,7 +217,7 @@ def test_get_email_choices_branding_name_in_use(
             [
                 ("govuk", "GOV.UK"),
                 ("govuk_and_org", "GOV.UK and Test Organisation"),
-                ("email-branding-2-id", "Email branding name 2"),
+                (str(UUID(version=4, int=2)), "Email branding name 2"),
             ],
         ),
         (
@@ -221,14 +226,14 @@ def test_get_email_choices_branding_name_in_use(
                     "logo": "example_1.png",
                     "name": "GOV.UK and test organisation",
                     "text": "test organisation",
-                    "id": "govuk-and-org-id",
+                    "id": str(UUID(version=4, bytes=b"govuk-and-org-id")),
                     "colour": None,
                     "brand_type": "both",
                 },
             ],
             [
                 ("govuk", "GOV.UK"),
-                ("govuk-and-org-id", "GOV.UK and test organisation"),
+                (str(UUID(version=4, bytes=b"govuk-and-org-id")), "GOV.UK and test organisation"),
             ],
         ),
     ),
@@ -251,7 +256,7 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
     mocker.patch(
         "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value="email-branding-1-id",
+        return_value=str(UUID(version=4, int=1)),
     )
 
     mocker.patch("app.models.branding.EmailBrandingPool._get_items", return_value=branding_pool)
@@ -265,7 +270,7 @@ def test_current_email_branding_is_not_displayed_in_email_branding_pool_options(
     [
         ("central", None, [("organisation", "Test Organisation")]),
         ("local", None, [("organisation", "Test Organisation")]),
-        ("local", "some-random-branding", [("organisation", "Test Organisation")]),
+        ("local", str(UUID(version=4, int=1)), [("organisation", "Test Organisation")]),
         ("nhs_central", None, [(LetterBranding.NHS_ID, "NHS"), ("organisation", "Test Organisation")]),
     ],
 )
@@ -305,10 +310,15 @@ def test_get_letter_choices_shows_org_branding_if_org_has_empty_pool(
 
     mocker.patch(
         "app.organisations_client.get_organisation",
-        return_value=organisation_json(organisation_type="central", letter_branding_id="org-branding-id"),
+        return_value=organisation_json(
+            organisation_type="central",
+            letter_branding_id=str(UUID(version=4, bytes=b"org-branding-id-")),
+        ),
     )
     mocker.patch(
-        "app.models.service.Service.letter_branding_id", new_callable=PropertyMock, return_value="some-branding-id"
+        "app.models.service.Service.letter_branding_id",
+        new_callable=PropertyMock,
+        return_value=UUID(version=4, bytes=b"some-branding-id"),
     )
     options = get_letter_choices(service)
     assert list(options) == [
@@ -352,7 +362,7 @@ def test_get_letter_choices_shows_nhs_branding_for_nhs_services(
     mocker.patch(
         "app.models.service.Service.letter_branding_id",
         new_callable=PropertyMock,
-        return_value="org-branding-id",
+        return_value=str(UUID(version=4, bytes=b"org-branding-id-")),
     )
     mocker.patch("app.letter_branding_client.get_letter_branding", return_value={"name": branding_name})
 
@@ -375,25 +385,25 @@ def test_current_letter_branding_is_not_displayed_in_letter_branding_pool_option
     mocker.patch(
         "app.models.service.Service.letter_branding_id",
         new_callable=PropertyMock,
-        side_effect=["letter-branding-1-id"],
+        side_effect=[str(UUID(version=4, int=1))],
     )
 
     branding_pool = [
         {
             "filename": "example_1.png",
             "name": "Letter branding name 1",
-            "id": "letter-branding-1-id",
+            "id": str(UUID(version=4, int=1)),
         },
         {
             "filename": "example_2.png",
             "name": "Letter branding name 2",
-            "id": "letter-branding-2-id",
+            "id": str(UUID(version=4, int=2)),
         },
     ]
 
     # note: no organisation option visible since the org already has a branding pool
     expected_options = [
-        ("letter-branding-2-id", "Letter branding name 2"),
+        (str(UUID(version=4, int=2)), "Letter branding name 2"),
     ]
     mocker.patch("app.models.branding.LetterBrandingPool._get_items", return_value=branding_pool)
 
@@ -403,7 +413,7 @@ def test_current_letter_branding_is_not_displayed_in_letter_branding_pool_option
 
 def test_branding_serialize_returns_expected_dict_and_is_a_copy():
     data = {
-        "id": "br-123",
+        "id": str(UUID(version=4, int=123)),
         "name": "My brand",
         "created_by": None,
         "created_at": datetime(2020, 1, 1, 0, 0),
