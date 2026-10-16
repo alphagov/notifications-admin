@@ -16,9 +16,9 @@ def test_user_information_page_shows_information_about_user(
     fake_uuid,
 ):
     client_request.login(platform_admin_user)
-    user_service_one = uuid.uuid4()
-    user_service_two = uuid.uuid4()
-    user_organisation = uuid.uuid4()
+    user_service_one = str(uuid.uuid4())
+    user_service_two = str(uuid.uuid4())
+    user_organisation = str(uuid.uuid4())
     mocker.patch(
         "app.user_api_client.get_user",
         return_value=user_json(name="Apple Bloom", services=[user_service_one, user_service_two]),
@@ -176,7 +176,7 @@ def test_user_information_page_shows_if_user_is_platform_admin(
     mocker,
 ):
     client_request.login(platform_admin_user)
-    other_platform_admin_user = create_user(platform_admin=True, id=uuid.uuid4())
+    other_platform_admin_user = create_user(platform_admin=True, id=str(uuid.uuid4()))
     mocker.patch("app.user_api_client.get_user", return_value=other_platform_admin_user)
 
     page = client_request.get("main.user_information", user_id=other_platform_admin_user["id"])

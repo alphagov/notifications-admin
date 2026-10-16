@@ -7,7 +7,7 @@ from flask import url_for
 from tests import organisation_json
 from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, normalize_spaces
 
-OS1, OS2, OS3, S1, S2, S3 = repeat(uuid.uuid4(), 6)
+OS1, OS2, OS3, S1, S2, S3 = repeat(str(uuid.uuid4()), 6)
 
 SAMPLE_DATA = {
     "organisations": [

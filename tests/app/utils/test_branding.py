@@ -49,7 +49,7 @@ def test_get_choices_service_not_assigned_to_org(
         ),
         (
             "central",
-            UUID(version=4, bytes=b"some-branding-id"),
+            str(UUID(version=4, bytes=b"some-branding-id")),
             [
                 ("govuk", "GOV.UK"),  # central orgs can switch back to GOV.UK
                 ("govuk_and_org", "GOV.UK and Test Organisation"),
@@ -180,11 +180,11 @@ def test_get_email_choices_branding_name_in_use(
     mocker.patch(
         "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value=UUID(version=4, bytes=b"some-branding-id"),
+        return_value=str(UUID(version=4, bytes=b"some-branding-id")),
     )
     mocker.patch(
         "app.email_branding_client.get_email_branding",
-        return_value=create_email_branding(UUID(version=4, int=999), {"name": branding_name}),
+        return_value=create_email_branding(str(UUID(version=4, int=999)), {"name": branding_name}),
     )
 
     options = get_email_choices(service)

@@ -4135,6 +4135,7 @@ def create_service_two_user_with_permissions(with_unique_id=False):
 
 def create_user(**overrides):
     user_data = {
+        "id": str(uuid4()),
         "name": "Test User",
         "password": "somepassword",
         "email_address": "test@user.gov.uk",

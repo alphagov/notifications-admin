@@ -204,7 +204,7 @@ def service_json(
     if service_callback_api is None:
         service_callback_api = []
     return {
-        "id": id_ or str(uuid.UUID(version=4, int=1234)),
+        "id": str(uuid.UUID(version=4, int=1234)) if id_ is None else str(id_),
         "name": name,
         "users": users,
         "email_message_limit": email_message_limit,

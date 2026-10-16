@@ -468,7 +468,7 @@ def test_should_show_overview_for_service_with_more_things_set(
     client_request.login(active_user_with_permissions)
     service_one["permissions"] = permissions
     service_one["restricted"] = False
-    service_one["email_branding"] = uuid4()
+    service_one["email_branding"] = str(uuid4())
     page = client_request.get("main.service_settings", service_id=service_one["id"])
     assert [
         " ".join(row.text.split()) for row in page.select(".notify-summary-list .govuk-summary-list__row")[0:]

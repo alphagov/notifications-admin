@@ -16,7 +16,7 @@ _NON_COERCIBLE_TYPES = {
 class UUIDStr(str):
     def __new__(self, value):
         if isinstance(value, UUID):
-            return str(value)
+            raise TypeError(f"{value} of {self} is a UUID object but should be serialised to str")
         try:
             UUID(value)
         except (ValueError, AttributeError) as e:
