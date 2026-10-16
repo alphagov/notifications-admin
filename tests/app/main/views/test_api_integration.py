@@ -355,18 +355,18 @@ def test_api_keys_page_shows_api_keys_with_creation_and_usage_info(
             "Never used"
         ),
         (
-            "some key name"
+            "some key name "
             "Revoke some key name "
             "API key Live – sends to anyone "
             "Created by Test User 2 hours ago "
-            "Last used today"
+            "Last used 1 hour ago"
         ),
         (
             "third key "
             "Revoke third key "
             "API key Team and guest list – limits who you can send to "
-            "Created by an archived user 2 years ago"
-            "Last used more than 3 months ago"
+            "Created by an archived user 2 years ago "
+            "Last used 1 year, 8 months ago"
         ),
     ]
 
