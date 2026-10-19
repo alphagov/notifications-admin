@@ -26,13 +26,13 @@ from itsdangerous import BadSignature
 from notifications_python_client.errors import HTTPError
 from notifications_utils import request_helper
 from notifications_utils.asset_fingerprinter import asset_fingerprinter
-from notifications_utils.eventlet import EventletTimeout
 from notifications_utils.file_types import format_file_type
 from notifications_utils.formatters import (
     format_file_size,
     formatted_list,
     get_lines_with_normalised_whitespace,
 )
+from notifications_utils.greenlet import RequestHandlingTimeout
 from notifications_utils.json import FlaskRelaxedContainerJSONProvider
 from notifications_utils.logging import flask as utils_logging
 from notifications_utils.safe_string import make_string_safe_for_email_local_part, make_string_safe_for_id
@@ -558,8 +558,8 @@ def register_errorhandlers(application):  # noqa (C901 too complex)
             raise error
         return _error_response(500, failsafe=True)
 
-    @application.errorhandler(EventletTimeout)
-    def eventlet_timeout(error):
+    @application.errorhandler(RequestHandlingTimeout)
+    def request_handling_timeout(error):
         application.logger.exception(error)
         return _error_response(504, error_page_template=500, failsafe=True)
 
