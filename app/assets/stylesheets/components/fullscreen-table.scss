@@ -202,3 +202,22 @@
     outline: none;
   }
 }
+
+// base styles for cells following the error row
+.fullscreen-content .govuk-table__body tr:has(th[rowspan], td[colspan]) + tr th.govuk-table__header:first-child {
+  color: govuk-functional-colour(text);
+  border-color: govuk-functional-colour(border);
+  font-weight: normal;
+}
+
+// last header with rowspan
+.fullscreen-content .govuk-table__body tr:nth-last-child(2) th.govuk-table__header[rowspan],
+.fullscreen-content .govuk-table__body tr:has(th[rowspan]):last-of-type th[rowspan] {
+  border-bottom-color: transparent;
+}
+
+// last header without rowspan
+.fullscreen-content .govuk-table__body tr:last-child th.govuk-table__header:first-child,
+.fullscreen-content .govuk-table__body tr:has(th[rowspan], td[colspan]) + tr:last-child th.govuk-table__header {
+  border-bottom-color: transparent;
+}
