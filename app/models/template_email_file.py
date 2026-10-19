@@ -2,6 +2,7 @@ import math
 import uuid
 from contextlib import suppress
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import boto3
 from flask import abort, current_app, url_for
@@ -47,6 +48,7 @@ class TemplateEmailFile(JSONModel):
             template_id=template_id,
             filename=filename,
             created_by_id=current_user.id,
+            link_text=Path(filename).stem,
         )
         return file_id
 
