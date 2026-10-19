@@ -186,7 +186,7 @@
       {% for column in column_headers %}
         {% if item[column].error and not recipients.missing_column_headers %}
           {% set error_html %}
-            <span class="govuk-table__cell__error-label">{{ item[column].error }}</span>
+            <span class="govuk-table__cell__error-label"><span class="govuk-visually-hidden">Error:</span> {{ item[column].error }}</span>
             {{ render_list_or_string(item[column].data) }}
           {% endset %}
           {% do current_row.append({

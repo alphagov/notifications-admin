@@ -73,6 +73,7 @@
 
       {% set error_msg_html %}
         <span class="govuk-table__cell__error-label">
+          <span class="govuk-visually-hidden">Error:</span>
           {% if item.message_empty %}
             No content for this message
           {% elif item.message_too_long %}
@@ -121,7 +122,7 @@
   {% for column in recipients.column_headers %}
     {% if item[column].error and not recipients.missing_column_headers %}
       {% set cell_error_html %}
-        <span class="govuk-table__cell__error-label">{{ item[column].error }}</span>
+        <span class="govuk-table__cell__error-label"><span class="govuk-visually-hidden">Error:</span> {{ item[column].error }}</span>
         {{ render_list_or_string(item[column].data) }}
       {% endset %}
       {% do current_row.append({

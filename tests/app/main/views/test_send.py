@@ -635,7 +635,7 @@ def test_upload_csv_file_with_errors_shows_check_page_with_errors(
 
     assert "There’s a problem with example.csv" in page.text
     assert "+447700900986" in page.text
-    assert "Missing" in page.text
+    assert "Error: Missing" in page.text
     assert normalize_spaces(page.select_one("input[type=file]")["data-button-text"]) == "Upload your file again"
 
 
@@ -678,12 +678,12 @@ def test_upload_csv_file_with_empty_message_shows_check_page_with_errors(
         "There’s a problem with example.csv You need to check you have content for the empty message in 1 row."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "3 No content for this message",
+        "3 Error: No content for this message",
         "+447700900986 no",
     ]
     assert normalize_spaces(page.select_one("tbody tr th").text) == "3"
     assert page.select_one("tbody tr th")["rowspan"] == "2"
-    assert normalize_spaces(page.select("tbody tr td")[0].text) == "No content for this message"
+    assert normalize_spaces(page.select("tbody tr td")[0].text) == "Error: No content for this message"
     assert page.select("tbody tr td")[0]["colspan"] == "2"
 
 
@@ -727,14 +727,14 @@ def test_upload_csv_file_with_very_long_placeholder_shows_check_page_with_errors
         "There’s a problem with example.csv You need to shorten the messages in 2 rows."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "2 Message is too long",
+        "2 Error: Message is too long",
         f"+447700900986 {big_placeholder}",
-        "3 Message is too long",
+        "3 Error: Message is too long",
         f"+447700900987 {big_placeholder}",
     ]
     assert normalize_spaces(page.select_one("tbody tr th").text) == "2"
     assert page.select_one("tbody tr th")["rowspan"] == "2"
-    assert normalize_spaces(page.select("tbody tr td")[0].text) == "Message is too long"
+    assert normalize_spaces(page.select("tbody tr td")[0].text) == "Error: Message is too long"
     assert page.select("tbody tr td")[0]["colspan"] == "2"
 
 
@@ -783,21 +783,21 @@ def test_upload_csv_file_with_bad_postal_address_shows_check_page_with_errors(
         "There’s a problem with example.csv You need to fix 8 addresses."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "2 The first 2 lines of the address must both include at least one alphanumeric character",
+        "2 Error: The first 2 lines of the address must both include at least one alphanumeric character",
         "..????? 123 Example St. SW1A 1AA",
-        "3 The first 2 lines of the address must both include at least one alphanumeric character",
+        "3 Error: The first 2 lines of the address must both include at least one alphanumeric character",
         "Firstname Lastname ..???? SW1A 1AA",
-        "5 Last line of the address must be a real UK postcode",
+        "5 Error: Last line of the address must be a real UK postcode",
         "Firstname Lastname 123 Example St. SW!A !AA",
-        "6 You do not have permission to send letters to other countries",
+        "6 Error: You do not have permission to send letters to other countries",
         "Firstname Lastname 123 Example St. France",
-        "7 Address must be at least 3 lines long",
+        "7 Error: Address must be at least 3 lines long",
         "123 Example St. SW!A !AA",
-        "8 Address must be no more than 7 lines long",
+        "8 Error: Address must be no more than 7 lines long",
         "1 2 3 4 5 6 7 8",
-        '9 Address lines must not start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~',
+        '9 Error: Address lines must not start with any of the following characters: @ ( ) = [ ] " \\ / , < > ~',
         "=Firstname Lastname 123 Example St. SW1A 1AA",
-        "10 This is not a real address",
+        "10 Error: This is not a real address",
         "Firstname Lastname NFA SW1A 1AA",
     ]
 
@@ -839,7 +839,7 @@ def test_upload_csv_file_with_bad_bfpo_postal_address_shows_check_page_with_erro
         "There’s a problem with example.csv You need to fix 1 address."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "2 The last line of a BFPO address must not be a country.",
+        "2 Error: The last line of a BFPO address must not be a country.",
         "Firstname Lastname BFPO1234 BF1 1AA USA",
     ]
 
@@ -884,9 +884,9 @@ def test_upload_csv_file_with_international_letters_permission_shows_appropriate
         "There’s a problem with example.csv You need to fix 2 addresses."
     )
     assert [normalize_spaces(row.text) for row in page.select("tbody tr")] == [
-        "4 Last line of the address must be a UK postcode or another country",
+        "4 Error: Last line of the address must be a UK postcode or another country",
         "Firstname Lastname 123 Example St. SW!A !AA",
-        "5 Last line of the address must be a UK postcode or another country",
+        "5 Error: Last line of the address must be a UK postcode or another country",
         "Firstname Lastname 123 Example St. Not France",
     ]
 

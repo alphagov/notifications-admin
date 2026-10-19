@@ -67,7 +67,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to fix 1 email address.",
             "Row in file 1 email address",
-            "2 Not a valid email address +447700900986",
+            "2 Error: Not a valid email address +447700900986",
         ),
         (
             """
@@ -76,7 +76,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to fix 1 phone number.",
             "Row in file 1 phone number",
-            "2 Mobile numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + - test@example.com",
+            "2 Error: Mobile numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + - test@example.com",
         ),
         (
             """
@@ -128,7 +128,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to enter missing data in 1 row.",
             "Row in file 1 phone number",
-            "3 Missing",
+            "3 Error: Missing",
         ),
         (
             """
@@ -137,7 +137,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to fix 1 phone number.",
             "Row in file 1 phone number",
-            "2 Mobile number is too short +44770",
+            "2 Error: Mobile number is too short +44770",
         ),
         (
             """
@@ -148,7 +148,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to fix 2 email addresses.",
             "Row in file 1 email address",
-            "3 Not a valid email address bad@example1 4 Not a valid email address bad@example2",
+            "3 Error: Not a valid email address bad@example1 4 Error: Not a valid email address bad@example2",
         ),
     ],
 )
