@@ -781,7 +781,7 @@ class TestTemplatedLetterImageTemplate:
                 type_="letter",
                 letter_attachment=(
                     {
-                        "id": "abc",
+                        "id": str(UUID(version=4, int=123)),
                         "original_filename": "blah.pdf",
                         "page_count": mocker_kwargs["attachment_page_count"],
                     }

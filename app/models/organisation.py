@@ -5,7 +5,7 @@ from flask import abort
 from werkzeug.utils import cached_property
 
 from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
-from app.models import JSONModel, ModelList, SerialisedModelCollection
+from app.models import JSONModel, ModelList, SerialisedModelCollection, UUIDStr
 from app.models.branding import (
     EmailBranding,
     EmailBrandingPool,
@@ -57,11 +57,11 @@ class Organisation(JSONModel):
     active: bool
     crown: bool | None
     organisation_type: Any
-    letter_branding_id: str | None
-    email_branding_id: str | None
+    letter_branding_id: UUIDStr | None
+    email_branding_id: UUIDStr | None
     agreement_signed: bool | None
     agreement_signed_at: datetime | None
-    agreement_signed_by_id: str | None
+    agreement_signed_by_id: UUIDStr | None
     agreement_signed_version: str | None
     agreement_signed_on_behalf_of_name: str | None
     agreement_signed_on_behalf_of_email_address: str | None

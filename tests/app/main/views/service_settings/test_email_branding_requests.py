@@ -4,6 +4,7 @@ from textwrap import dedent
 from unittest import mock
 from unittest.mock import ANY, PropertyMock
 from urllib.parse import parse_qs, urlparse
+from uuid import UUID, uuid4
 
 import pytest
 from flask import url_for
@@ -45,18 +46,19 @@ def test_email_branding_options_page_shows_branding_if_set(
     mock_get_empty_email_branding_pool,
     mock_get_email_branding,
     mock_get_service_organisation,
+    fake_uuid,
     mocker,
 ):
     mocker.patch(
         "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value="some-random-branding",
+        return_value=fake_uuid,
     )
 
     page = client_request.get(".email_branding_options", service_id=SERVICE_ONE_ID)
     assert page.select_one("iframe")["src"] == url_for(
         "main.email_template",
-        branding_style="some-random-branding",
+        branding_style=fake_uuid,
         title="Preview of current email branding",
         email_branding_preview=True,
     )
@@ -113,13 +115,13 @@ def test_email_branding_options_shows_query_param_branding_choice_selected(
         return_value=organisation_one,
     )
     page = client_request.get(
-        ".email_branding_options", service_id=SERVICE_ONE_ID, branding_choice="email-branding-2-id"
+        ".email_branding_options", service_id=SERVICE_ONE_ID, branding_choice=str(UUID(version=4, int=2))
     )
 
     checked_radio_button = page.select(".govuk-radios__item input[checked]")
 
     assert len(checked_radio_button) == 1
-    assert checked_radio_button[0]["value"] == "email-branding-2-id"
+    assert checked_radio_button[0]["value"] == str(UUID(version=4, int=2))
 
 
 @pytest.mark.parametrize(
@@ -129,8 +131,8 @@ def test_email_branding_options_shows_query_param_branding_choice_selected(
             "nhs_central",
             [
                 (EmailBranding.NHS_ID, "NHS"),
-                ("email-branding-1-id", "Email branding name 1"),
-                ("email-branding-2-id", "Email branding name 2"),
+                (str(UUID(version=4, int=1)), "Email branding name 1"),
+                (str(UUID(version=4, int=2)), "Email branding name 2"),
                 ("something_else", "Something else"),
             ],
         ),
@@ -139,16 +141,16 @@ def test_email_branding_options_shows_query_param_branding_choice_selected(
             [
                 ("govuk", "GOV.UK"),
                 ("govuk_and_org", "GOV.UK and organisation one"),
-                ("email-branding-1-id", "Email branding name 1"),
-                ("email-branding-2-id", "Email branding name 2"),
+                (str(UUID(version=4, int=1)), "Email branding name 1"),
+                (str(UUID(version=4, int=2)), "Email branding name 2"),
                 ("something_else", "Something else"),
             ],
         ),
         (
             "other",
             [
-                ("email-branding-1-id", "Email branding name 1"),
-                ("email-branding-2-id", "Email branding name 2"),
+                (str(UUID(version=4, int=1)), "Email branding name 1"),
+                (str(UUID(version=4, int=2)), "Email branding name 2"),
                 ("something_else", "Something else"),
             ],
         ),
@@ -176,7 +178,7 @@ def test_email_branding_options_page_shows_branding_pool_options_if_branding_poo
     mocker.patch(
         "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value="some-random-branding",
+        return_value=str(uuid4()),
     )
 
     page = client_request.get(".email_branding_options", service_id=SERVICE_ONE_ID)
@@ -265,8 +267,8 @@ def test_email_branding_options_does_not_show_nhs_branding_twice(
         for radio in page.select("input[type=radio]")
     ] == [
         (EmailBranding.NHS_ID, "NHS"),
-        ("email-branding-1-id", "Email branding name 1"),
-        ("email-branding-2-id", "Email branding name 2"),
+        (str(UUID(version=4, int=1)), "Email branding name 1"),
+        (str(UUID(version=4, int=2)), "Email branding name 2"),
         ("something_else", "Something else"),
     ]
 
@@ -276,13 +278,14 @@ def test_email_branding_options_page_shows_preview_if_something_else_is_only_opt
     client_request,
     mock_get_email_branding,
     mock_get_empty_email_branding_pool,
+    fake_uuid,
     mocker,
 ):
     service_one["organisation_type"] = "other"
     mocker.patch(
         "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value="some-random-branding",
+        return_value=fake_uuid,
     )
 
     page = client_request.get(
@@ -400,13 +403,14 @@ def test_email_branding_options_page_redirects_to_choose_banner_type_page_if_som
     client_request,
     mock_get_email_branding,
     mock_get_empty_email_branding_pool,
+    fake_uuid,
     mocker,
 ):
     service_one["organisation_type"] = "other"
     mocker.patch(
         "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value="some-random-branding",
+        return_value=fake_uuid,
     )
 
     client_request.post(
@@ -464,6 +468,7 @@ def test_email_branding_options_redirects_to_branding_preview_for_a_branding_poo
     client_request,
     mock_get_email_branding,
     mock_get_email_branding_pool,
+    fake_uuid,
     mocker,
 ):
     organisation_one["organisation_type"] = "central"
@@ -477,18 +482,18 @@ def test_email_branding_options_redirects_to_branding_preview_for_a_branding_poo
     mocker.patch(
         "app.models.service.Service.email_branding_id",
         new_callable=PropertyMock,
-        return_value="some-random-branding",
+        return_value=fake_uuid,
     )
 
     client_request.post(
         ".email_branding_options",
         service_id=SERVICE_ONE_ID,
-        _data={"options": "email-branding-1-id"},
+        _data={"options": str(UUID(version=4, int=1))},
         _expected_status=302,
         _expected_redirect=url_for(
             "main.branding_option_preview",
             service_id=SERVICE_ONE_ID,
-            branding_choice="email-branding-1-id",
+            branding_choice=str(UUID(version=4, int=1)),
             branding_type="email",
         ),
     )
@@ -508,13 +513,13 @@ def test_email_branding_option_preview_page_displays_preview_of_chosen_branding(
     page = client_request.get(
         ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
-        branding_choice="email-branding-1-id",
+        branding_choice=str(UUID(version=4, int=1)),
         branding_type="email",
     )
 
     assert page.select_one("iframe")["src"] == url_for(
         "main.email_template",
-        branding_style="email-branding-1-id",
+        branding_style=str(UUID(version=4, int=1)),
         title="Preview of new email branding",
         email_branding_preview=True,
     )
@@ -563,14 +568,14 @@ def test_email_branding_option_preview_changes_email_branding_when_user_confirms
     page = client_request.post(
         ".branding_option_preview",
         service_id=SERVICE_ONE_ID,
-        branding_choice="email-branding-1-id",
+        branding_choice=str(UUID(version=4, int=1)),
         branding_type="email",
         _follow_redirects=True,
     )
 
     mock_update_service.assert_called_once_with(
         SERVICE_ONE_ID,
-        email_branding="email-branding-1-id",
+        email_branding=str(UUID(version=4, int=1)),
     )
     assert page.select_one("h1").text == "Settings"
     assert normalize_spaces(page.select_one(".banner-default").text) == "You’ve updated your email branding"
@@ -875,12 +880,18 @@ def test_GET_email_branding_enter_government_identity_logo_text(client_request, 
             None,
         ),
         (
-            [{"idx": 3, "id": "dfe1234", "name": "Department for Education - National Apprenticeship Service"}],
+            [
+                {
+                    "idx": 3,
+                    "id": str(UUID(version=4, int=1234)),
+                    "name": "Department for Education - National Apprenticeship Service",
+                }
+            ],
             None,
         ),
         (
-            [{"idx": 3, "id": "dfe1234", "name": "Department for EDUCATION"}],
-            "dfe1234",
+            [{"idx": 3, "id": str(UUID(version=4, int=1234)), "name": "Department for EDUCATION"}],
+            str(UUID(version=4, int=1234)),
         ),
     ),
 )

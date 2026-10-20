@@ -127,7 +127,7 @@ def test_404_if_not_email_template(
         [],
         [
             {
-                "id": UUID(int=1, version=4),
+                "id": str(UUID(int=1, version=4)),
                 "filename": "invite.pdf",
                 "link_text": None,
                 "retention_period": 90,

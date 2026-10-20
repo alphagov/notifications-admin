@@ -50,7 +50,7 @@ def test_report_request_download_when_report_does_not_exist(client_request, fake
 
 
 def test_report_request_download_for_wrong_user(client_request, mocker):
-    request = create_report_request(service_id=SERVICE_ONE_ID, user_id=uuid.uuid4())
+    request = create_report_request(service_id=SERVICE_ONE_ID, user_id=str(uuid.uuid4()))
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
 
     client_request.get(
@@ -151,7 +151,7 @@ def test_report_request_renders_unavailable_template_if_report_not_found(client_
 
 
 def test_report_request_raises_403_for_unauthorized_user(client_request, mocker):
-    request = create_report_request(user_id=uuid.uuid4(), status="in_progress")
+    request = create_report_request(user_id=str(uuid.uuid4()), status="in_progress")
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
 
     response = client_request.get_response(
@@ -229,7 +229,7 @@ def test_report_ready_redirects_to_report_request_if_report_not_found(client_req
 
 
 def test_report_ready_raises_403_for_unauthorized_user(client_request, mocker):
-    request = create_report_request(user_id=uuid.uuid4(), status="stored")
+    request = create_report_request(user_id=str(uuid.uuid4()), status="stored")
     mocker.patch("app.report_request_api_client.get_report_request", return_value={"data": request})
     mocker.patch.object(ReportRequest, "exists_in_s3", return_value=True)
 

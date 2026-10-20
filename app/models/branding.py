@@ -7,7 +7,7 @@ from flask import current_app
 from notifications_utils.safe_string import make_string_safe
 
 from app import asset_fingerprinter, current_user
-from app.models import JSONModel, ModelList
+from app.models import JSONModel, ModelList, UUIDStr
 from app.notify_client.email_branding_client import email_branding_client
 from app.notify_client.letter_branding_client import letter_branding_client
 from app.notify_client.organisations_api_client import organisations_client
@@ -23,7 +23,7 @@ class BrandingSerializedType(TypedDict):
 
 
 class Branding(JSONModel):
-    id: str | None
+    id: UUIDStr | None
     name: str | None
     created_by: Any
     created_at: datetime | None

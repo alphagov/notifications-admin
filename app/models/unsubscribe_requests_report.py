@@ -1,18 +1,17 @@
 from datetime import datetime
-from typing import Any
 
 from flask import abort
 
 from app.formatters import format_date_human, format_time, get_human_day
-from app.models import JSONModel, ModelList
+from app.models import JSONModel, ModelList, UUIDStr
 from app.notify_client.service_api_client import service_api_client
 from app.utils.time import to_utc_string
 
 
 class UnsubscribeRequestsReport(JSONModel):
-    service_id: Any
+    service_id: UUIDStr
     count: int
-    batch_id: Any
+    batch_id: UUIDStr | None
     is_a_batched_report: bool
     will_be_archived_at: datetime | None
     earliest_timestamp: datetime

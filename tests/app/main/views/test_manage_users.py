@@ -148,14 +148,14 @@ def test_should_show_overview_page(
     other_user = copy.deepcopy(active_user_view_permissions)
     other_user["email_address"] = "zzzzzzz@example.gov.uk"
     other_user["name"] = "ZZZZZZZZ"
-    other_user["id"] = "zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz"
+    other_user["id"] = str(uuid.UUID(version=4, bytes=b"zzzzzzzzzzzzzzzz"))
 
     existing_user = copy.deepcopy(active_user_view_permissions)
     # This should be further down the alphabet than all the invited users,
     # who have email addresses which look like user_0@testnotify.gov.uk.
     # This forces Python to do more sorting.
     existing_user["email_address"] = "user_z@testnotify.gov.uk"
-    existing_user["id"] = uuid.uuid4()
+    existing_user["id"] = str(uuid.uuid4())
 
     mock_get_users = mocker.patch(
         "app.models.user.Users._get_items",
@@ -227,7 +227,6 @@ def test_manage_users_shows_add_team_member_banner(
     other_user_emails,
 ):
     current_user = create_user(
-        id=uuid.uuid4(),
         email_address=current_user_email,
         services=[SERVICE_ONE_ID],
         permissions={SERVICE_ONE_ID: ["manage_service"]},
@@ -237,7 +236,6 @@ def test_manage_users_shows_add_team_member_banner(
 
     for email in other_user_emails:
         other_user = create_user(
-            id=uuid.uuid4(),
             email_address=email,
             services=[SERVICE_ONE_ID],
             permissions={SERVICE_ONE_ID: ["manage_service"]},
@@ -284,7 +282,7 @@ def test_should_show_change_details_link(
     current_user = active_user_with_permissions
 
     other_user = active_caseworking_user
-    other_user["id"] = uuid.uuid4()
+    other_user["id"] = str(uuid.uuid4())
     other_user["email_address"] = "zzzzzzz@example.gov.uk"
     other_user["state"] = state
 
@@ -360,7 +358,7 @@ def test_should_show_caseworker_on_overview_page(
     current_user = active_user_view_permissions
 
     other_user = active_caseworking_user
-    other_user["id"] = uuid.uuid4()
+    other_user["id"] = str(uuid.uuid4())
     other_user["email_address"] = "zzzzzzz@example.gov.uk"
 
     mocker.patch(

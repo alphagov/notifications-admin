@@ -8,7 +8,7 @@ from werkzeug.utils import cached_property
 
 from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.event_handlers import Events
-from app.models import JSONModel, ModelList
+from app.models import JSONModel, ModelList, UUIDStr
 from app.models.organisation import Organisation, Organisations
 from app.models.webauthn_credential import WebAuthnCredentials
 from app.notify_client import InviteTokenError
@@ -50,7 +50,7 @@ class User(BaseUser, UserMixin):
     can_use_webauthn: bool
     name: Any
     auth_type: Any
-    current_session_id: Any
+    current_session_id: UUIDStr | None
     failed_login_count: int
     email_access_validated_at: datetime | None
     logged_in_at: datetime | None

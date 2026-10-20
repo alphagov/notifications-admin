@@ -12,7 +12,7 @@ from notifications_utils.s3 import s3download
 from notifications_utils.serialised_model import SerialisedModelCollection
 from notifications_utils.template import Template
 
-from app.models import JSONModel
+from app.models import JSONModel, UUIDStr
 from app.s3_client.s3_template_email_file_upload_client import (
     download_template_email_file_from_s3,
     upload_template_email_file_to_s3,
@@ -24,7 +24,7 @@ def _get_file_location(file_id: str, service_id: str) -> str:
 
 
 class TemplateEmailFile(JSONModel):
-    service_id: str
+    service_id: UUIDStr
     template: Template
     filename: str
     link_text: str | None

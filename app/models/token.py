@@ -1,12 +1,11 @@
 import json
 from datetime import datetime
-from typing import Any
 
-from app.models import JSONModel
+from app.models import JSONModel, UUIDStr
 
 
 class Token(JSONModel):
-    user_id: Any
+    user_id: UUIDStr
     email: str
     created_at: datetime
     secret_code: str
