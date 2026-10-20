@@ -67,7 +67,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to fix 1 email address.",
             "Row in file 1 email address",
-            "2 Not a valid email address +447700900986",
+            "2 Error: Not a valid email address +447700900986",
         ),
         (
             """
@@ -76,7 +76,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to fix 1 phone number.",
             "Row in file 1 phone number",
-            "2 Mobile numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + - test@example.com",
+            "2 Error: Mobile numbers can only include: 0 1 2 3 4 5 6 7 8 9 ( ) + - test@example.com",
         ),
         (
             """
@@ -128,7 +128,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to enter missing data in 1 row.",
             "Row in file 1 phone number",
-            "3 Missing",
+            "3 Error: Missing",
         ),
         (
             """
@@ -137,7 +137,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to fix 1 phone number.",
             "Row in file 1 phone number",
-            "2 Mobile number is too short +44770",
+            "2 Error: Mobile number is too short +44770",
         ),
         (
             """
@@ -148,7 +148,7 @@ def test_upload_contact_list_page(client_request):
         """,
             "There’s a problem with invalid.csv You need to fix 2 email addresses.",
             "Row in file 1 email address",
-            "3 Not a valid email address bad@example1 4 Not a valid email address bad@example2",
+            "3 Error: Not a valid email address bad@example1 4 Error: Not a valid email address bad@example2",
         ),
     ],
 )
@@ -247,7 +247,7 @@ def test_upload_csv_file_shows_error_banner_for_too_many_rows(
         "Your file has too many rows Notify can store files up to 1,234 rows in size. Your file has 4,567 rows."
     )
     assert len(page.select("tbody tr")) == 50
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 rows"
+    assert normalize_spaces(page.select_one(".more-items-available-text").text) == "Only showing the first 50 rows"
 
 
 def test_upload_csv_shows_error_with_invalid_extension(
@@ -345,7 +345,7 @@ def test_upload_csv_shows_ok_page(client_request, mock_get_live_service, fake_uu
     assert normalize_spaces(page.select_one("thead").text) == "Row in file 1 email address"
     assert len(page.select("tbody tr")) == 50
     assert normalize_spaces(page.select_one("tbody tr").text) == "2 test@example.com"
-    assert normalize_spaces(page.select_one(".table-show-more-link").text) == "Only showing the first 50 rows"
+    assert normalize_spaces(page.select_one(".more-items-available-text").text) == "Only showing the first 50 rows"
 
 
 def test_save_contact_list(

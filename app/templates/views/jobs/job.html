@@ -2,8 +2,9 @@
 {% from "components/banner.html" import banner %}
 {% from "components/ajax-block.html" import ajax_block %}
 {% from "components/page-header.html" import page_header %}
+{% from "/components/list.html" import render_list_or_string %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
-{% from "components/table.html" import list_table, text_field, row_heading %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% block service_page_title %}
   {{ job.original_file_name }}
@@ -29,41 +30,57 @@
 
     {% if scheduled_recipients %}
       <div data-notify-module="remove-in-presence-of" data-target-element-id="job-notifications">
-        <div class="fullscreen-content" data-notify-module="fullscreen-table">
-          {% call(item, row_number) list_table(
-            scheduled_recipients.displayed_rows,
-            caption=job.original_file_name,
-            caption_visible=False,
-            field_headings=[
-              '<span class="govuk-visually-hidden">Row in file</span><span aria-hidden="true">1</span>'|safe
-            ] + scheduled_recipients.column_headers
-          ) %}
-            {% call row_heading() %}
-              <span>
-                {{ item.index + 2 }}
-              </span>
-            {% endcall %}
-            {% for column in scheduled_recipients.column_headers %}
-              {% if item[column].ignore %}
-                {{ text_field(item[column].data or '', status='default') }}
-              {% else %}
-                {{ text_field(item[column].data or '') }}
-              {% endif %}
-            {% endfor %}
-            {% if item[None].data %}
-              {% for column in item[None].data %}
-                {{ text_field(column, status='default') }}
-              {% endfor %}
-            {% endif %}
-          {% endcall %}
-        </div>
+        {% set table_headers = [
+          {
+            "html": '<span class="govuk-visually-hidden">Row in file</span><span aria-hidden="true">1</span>'
+          }
+        ] %}
+        {% for header in scheduled_recipients.column_headers %}
+          {% do table_headers.append({ "html": header, "text": "" }) %}
+        {% endfor %}
 
-        <div class="table-show-more-link">
-          {% if scheduled_recipients|length > scheduled_recipients.displayed_rows|list|length %}
-            <p class="govuk-!-margin-bottom-1">Only showing the first {{ scheduled_recipients.displayed_rows|list|length }} rows</p>
+        {% set table_rows = [] %}
+        {% for item in scheduled_recipients.displayed_rows %}
+          {% set current_row = [] %}
+          {% do current_row.append({ "text": item.index + 2 }) %}
+
+          {% for column in scheduled_recipients.column_headers %}
+            {% set cell_dict = {
+              "html": render_list_or_string(item[column].data)
+            } %}
+            {% if item[column].ignore %}
+              {% do cell_dict.update({ "classes": "govuk-table__cell--default" }) %}
+            {% endif %}
+            {% do current_row.append(cell_dict) %}
+          {% endfor %}
+
+          {% if item[None].data %}
+            {% for column in item[None].data %}
+              {% do current_row.append({
+                "html": render_list_or_string(column),
+                "classes": "govuk-table__cell--default"
+              }) %}
+            {% endfor %}
           {% endif %}
-          <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job_original_file_csv', service_id=current_service.id, job_id=job.id) }}">Download this file (CSV)</a>
+
+          {% do table_rows.append(current_row) %}
+        {% endfor %}
+        <div class="fullscreen-content" data-notify-module="fullscreen-table">
+          {{ govukTable({
+            "classes": "notify-table notify-table--body-small",
+            "caption": job.original_file_name,
+            "captionClasses": "govuk-visually-hidden",
+            "firstCellIsHeader": true,
+            "head": table_headers,
+            "rows": table_rows
+          }) }}
         </div>
+        <p class="more-items-available-text">
+          {% if scheduled_recipients|length > scheduled_recipients.displayed_rows|list|length %}
+            <span class="govuk-!-display-block govuk-!-margin-bottom-3">Only showing the first {{ scheduled_recipients.displayed_rows|list|length }} rows</span>
+          {% endif %}
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_job_original_file_csv', service_id=current_service.id, job_id=job.id) }}">Download this file (CSV)</a>
+        </p>
       </div>
     {% endif %}
 

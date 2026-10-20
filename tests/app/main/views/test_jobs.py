@@ -484,7 +484,7 @@ def test_should_show_scheduled_job(
         ["3", "+447700900986", "Smith"],
     ]
 
-    download_link = page.select_one(".table-show-more-link a")
+    download_link = page.select_one(".more-items-available-text a")
     assert normalize_spaces(download_link.text) == "Download this file (CSV)"
     assert download_link["href"] == url_for(
         "main.view_job_original_file_csv",
