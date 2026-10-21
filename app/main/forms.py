@@ -3,6 +3,7 @@ from contextlib import suppress
 from copy import deepcopy
 from datetime import UTC, datetime, timedelta
 from functools import partial
+from io import BytesIO
 from itertools import chain, repeat
 from math import ceil
 from numbers import Number
@@ -3373,11 +3374,10 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
             field.data.seek(0)  # reset for subsequent file scans ie during S3 upload
         except DocumentDownloadError as e:
             raise ValidationError(e.message) from e
-
         if Spreadsheet.can_handle(field.data.filename):
             try:
                 too_many_email_addresses = Spreadsheet.from_file(
-                    field.data,
+                    BytesIO(bytes(field.data.read())),
                     filename=field.data.filename,
                 ).contains_many_email_addresses()
             except (UnicodeDecodeError, BadZipFile, XLRDError) as e:
@@ -3395,6 +3395,8 @@ class TemplateEmailFilesUploadForm(StripWhitespaceForm):
                 raise ValidationError(
                     "Your file has too many rows (Notify can check up to 100,000 rows at once)"
                 ) from e
+            finally:
+                field.data.seek(0)  # reset just in case
 
             if too_many_email_addresses:
                 current_app.logger.warning(

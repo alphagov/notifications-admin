@@ -609,6 +609,58 @@ def test_create_file_redirects_to_manage_files_page(
 
 
 @pytest.mark.parametrize(
+    "file_contents",
+    (
+        b"                            ",
+        b"number,colour\none, blue\ntwo,red\nthree,turquoise\n",
+    ),
+)
+def test_files_are_not_mutated_by_form(
+    caplog,
+    client_request,
+    service_one,
+    fake_uuid,
+    test_template_email_files_data,
+    mocker,
+    active_user_with_permissions,
+    mock_update_service,
+    mock_get_service_email_template,
+    file_contents,
+):
+    service_one["contact_link"] = "htttps://example.gov.uk"
+    active_user_with_permissions["permissions"][SERVICE_ONE_ID] = ["view_activity", "manage_templates"]
+    client_request.login(active_user_with_permissions)
+    file_id = uuid.uuid4()
+    mocker.patch("app.document_download_api_client.file_check_and_antivirus_scan")
+    mocker.patch("app.notify_client.template_email_file_client.TemplateEmailFileClient.create_file")
+    mock_s3 = mocker.patch("app.s3_client.s3_template_email_file_upload_client.utils_s3upload")
+    filename = "some_spreadsheet.csv"
+    mocker.patch(
+        "app.notify_client.template_email_file_client.TemplateEmailFileClient.get_file_by_id",
+        return_value={
+            "data": {
+                "filename": filename,
+                "id": str(file_id),
+                "link_text": None,
+                "retention_period": 78,
+                "validate_users_email": False,
+                "pending": True,
+            }
+        },
+    )
+    file_stream = BytesIO(file_contents)
+    mock_file = FileStorage(stream=file_stream, filename=filename, name="file", content_type="text/csv")
+    client_request.post(
+        "main.upload_template_email_files",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        _data={"file": mock_file},
+        _expected_status=302,
+    )
+    assert mock_s3.call_args_list[0][1].get("filedata") == file_contents
+
+
+@pytest.mark.parametrize(
     "filename",
     (
         "tests/spreadsheet_files/excessive/too_many_email_addresses.csv",
