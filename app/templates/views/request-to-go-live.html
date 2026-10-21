@@ -34,7 +34,7 @@
               "text": "Confirm your service name",
               "classes": "govuk-link--no-visited-state",
             },
-            "href": url_for('main.confirm_service_is_unique', service_id=current_service.id),
+            "href": url_for('main.confirm_service_name', service_id=current_service.id),
             "status": completed_status if current_service.confirmed_service_name else incomplete_status,
           },
           {
