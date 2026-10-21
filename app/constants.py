@@ -1,5 +1,6 @@
 # Organisation user permission codes
 import enum
+from datetime import UTC, datetime
 
 JSON_UPDATES_BLUEPRINT_NAME = "json_updates"
 NO_COOKIE_BLUEPRINT_NAME = "no_cookie"
@@ -27,6 +28,11 @@ REPORT_REQUEST_DELETED = "deleted"
 
 # Allow upto 800,000 notifications to be requested in a report for phase 1a
 REPORT_REQUEST_MAX_NOTIFICATIONS = 800_000
+
+# First recorded usage for later endpoints is on 15 October 2026, 11:00:00
+# meaning the deploy happened somewhere between 11am and 12pm UTC.
+# So setting this to 12pm UTC just to be sure.
+API_KEY_USAGE_START_DATE = datetime(2026, 10, 15, 12, 0, 0, tzinfo=UTC)
 
 
 # Language options supported for bilingual letter templates

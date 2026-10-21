@@ -7,7 +7,7 @@ from app import (
     current_user,
     service_api_client,
 )
-from app.constants import ServiceCallbackTypes
+from app.constants import API_KEY_USAGE_START_DATE, ServiceCallbackTypes
 from app.main import main
 from app.main.forms import CallbackForm, CreateKeyForm, GuestList
 from app.models.api_key import APIKey
@@ -62,7 +62,11 @@ def guest_list(service_id):
 @main.route("/services/<uuid:service_id>/api/keys")
 @user_has_permissions("manage_api_keys")
 def api_keys(service_id):
-    return render_template("views/api/keys.html", user_getter=current_service.active_users.get_name_from_id)
+    return render_template(
+        "views/api/keys.html",
+        user_getter=current_service.active_users.get_name_from_id,
+        api_key_usage_start_date=API_KEY_USAGE_START_DATE,
+    )
 
 
 @main.route("/services/<uuid:service_id>/api/keys/create", methods=["GET", "POST"])
@@ -117,7 +121,11 @@ def revoke_api_key(service_id, key_id):
             ],
             "revoke this API key",
         )
-        return render_template("views/api/keys.html", user_getter=current_service.active_users.get_name_from_id)
+        return render_template(
+            "views/api/keys.html",
+            user_getter=current_service.active_users.get_name_from_id,
+            api_key_usage_start_date=API_KEY_USAGE_START_DATE,
+        )
     elif request.method == "POST":
         key.revoke(service_id=service_id)
         flash(f"‘{key.name}’ was revoked", "default_with_tick")

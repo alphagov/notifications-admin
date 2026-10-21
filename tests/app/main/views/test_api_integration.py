@@ -313,7 +313,7 @@ def test_api_keys_page_empty_when_no_api_keys_set_up(
     mock_get_no_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 
-@freeze_time("2026-09-14 12:00")
+@freeze_time("2026-10-21 12:00")
 def test_api_keys_page_shows_api_keys_with_creation_and_usage_info(
     client_request,
     mock_get_api_keys,
@@ -352,21 +352,21 @@ def test_api_keys_page_shows_api_keys_with_creation_and_usage_info(
             "Revoked yesterday at midday "
             "Test – pretends to send messages "
             "Created by Test User 12 days ago "
-            "Never used"
+            "Not used in the last 6 days"
         ),
         (
             "some key name "
             "Revoke some key name "
             "API key Live – sends to anyone "
             "Created by Test User 2 hours ago "
-            "Last used 1 hour ago"
+            "Never used"
         ),
         (
             "third key "
             "Revoke third key "
             "API key Team and guest list – limits who you can send to "
             "Created by an archived user 2 years ago "
-            "Last used 1 year, 8 months ago"
+            "Last used 1 hour ago"
         ),
     ]
 
@@ -381,7 +381,7 @@ def test_api_keys_page_shows_api_keys_with_creation_and_usage_info(
     mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID)
 
 
-@freeze_time("2027-09-14 12:00")
+@freeze_time("2027-10-25 12:00")
 def test_api_keys_page_with_multiple_old_keys(
     client_request,
     mock_get_api_keys,
