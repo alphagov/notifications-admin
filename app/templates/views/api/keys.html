@@ -81,7 +81,7 @@
             {% if not item.last_used %}
               Never used
             {% else %}
-              Last used <time datetime="{{ item.last_used }}">{{ item.last_used|format_delta }}</time>
+              Last used <time datetime="{{ item.last_used }}">{{ item.last_used|format_delta_hours }}</time>
             {% endif %}
           </p>
         </li>

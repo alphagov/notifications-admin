@@ -128,6 +128,13 @@ def format_delta(date):
     return naturaltime_without_indefinite_article(delta)
 
 
+def format_delta_hours(date):
+    delta = datetime.now(UTC) - utc_string_to_aware_gmt_datetime(date)
+    if delta < timedelta(minutes=60):
+        return "in the last hour"
+    return naturaltime_without_indefinite_article(delta)
+
+
 def format_delta_days(date, numeric_prefix=""):
     now = datetime.now(UTC)
     date = utc_string_to_aware_gmt_datetime(date)
