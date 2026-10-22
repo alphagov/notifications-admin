@@ -600,7 +600,7 @@ def test_create_file_redirects_to_manage_files_page(
             template_id=fake_uuid,
         ),
     ]
-    assert normalize_spaces(page.select_one("form .govuk-button")) == "Add to template"
+    assert normalize_spaces(page.select_one("form .govuk-button")) == "Attach to template"
     assert page.select_one("form").get("method") == "post"
     assert (
         page.select_one("form").get("action")
@@ -796,7 +796,7 @@ def test_make_live_endpoint_calls_update_with_correct_args(
     assert mock_template_update.call_args_list == expected_calls
     assert mock_template_email_file_update.call_args_list == [call(pending=False)]
     assert normalize_spaces(page.select_one("h1.folder-heading")) == "sample template"
-    assert normalize_spaces(page.select_one(".banner-default-with-tick")) == "‘test_file_1.csv’ added to template"
+    assert normalize_spaces(page.select_one(".banner-default-with-tick")) == "‘test_file_1.csv’ attached to template"
 
 
 @pytest.mark.parametrize("pending", [True, False])
