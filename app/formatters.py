@@ -122,7 +122,7 @@ def naturaltime_without_indefinite_article(date):
 def naturaltime_without_indefinite_article_no_ago(date):
     return re.sub(
         "an? (.*)",
-        lambda match: f"1 {match.group(1)}",
+        lambda match: f"{match.group(1)}",
         humanize.naturaltime(date).replace(" ago", ""),
     )
 
