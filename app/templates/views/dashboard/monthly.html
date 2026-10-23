@@ -1,7 +1,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/pill.html" import pill %}
-{% from "components/table.html" import list_table, field, row_heading %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% extends "withnav_template.html" %}
 
@@ -21,47 +21,70 @@
     ) }}
   </div>
   {% if months %}
-    <div class="body-copy-table" id='pill-selected-item'>
-      {% call(month, row_index) list_table(
-        months,
-        caption="Total spend",
-        caption_visible=False,
-        empty_message='',
-        field_headings=[
-          'Month',
-          'Emails',
-          'Text messages',
-          'letters',
-        ],
-        field_headings_visible=False,
-        equal_length=True
-      ) %}
-        {% if not month.future %}
-          {% call row_heading() %}
-            {{ month.name }}
-          {% endcall %}
-          {% for counts, template_type in [
-            (month.email_counts, 'email'),
-            (month.sms_counts, 'sms'),
-            (month.letter_counts, 'letter')
-          ] %}
-            {% call field(align='left') %}
-              {{ big_number(
-                counts.requested,
-                counts.requested|message_count_label(template_type, suffix=''),
-                smallest=True,
-              ) }}
-              {% if counts.requested %}
-                <span class="{{ 'failure-highlight' if counts.show_warning else '' }}">
-                  {{ counts.failed|format_thousands }} failed
-                </span>
-              {% else %}
-                –
-              {% endif %}
-            {% endcall %}
-          {% endfor %}
-        {% endif %}
-      {% endcall %}
+    <div id='pill-selected-item'>
+      {% set table_headers = [
+      { 
+        "html": '<span class="govuk-visually-hidden">Month</span>',
+        "classes": "govuk-table__header--width-25"
+      },
+      {
+        "html": '<span class="govuk-visually-hidden">Emails</span>',
+        "classes": "govuk-table__header--width-25"
+      },
+      {
+        "html": '<span class="govuk-visually-hidden">Text messages</span>',
+        "classes": "govuk-table__header--width-25"
+      },
+      {
+        "html": '<span class="govuk-visually-hidden">Letters</span>',
+        "classes": "govuk-table__header--width-25"
+      }
+    ] %}
+
+    {% set table_rows = [] %}
+    {% for month in months %}
+      {% if not month.future %}
+        {% set current_row = [] %}
+
+        {% do current_row.append({
+          "text": month.name or ""
+        }) %}
+
+        {% for counts, template_type in [
+          (month.email_counts, 'email'),
+          (month.sms_counts, 'sms'),
+          (month.letter_counts, 'letter')
+        ] %}
+          {% set count_cell_html %}
+            {{ big_number(
+              counts.requested,
+              counts.requested|message_count_label(template_type, suffix=''),
+              smallest=True
+            ) }}
+            {% if counts.requested %}
+              <span class="{{ 'failure-highlight' if counts.show_warning else '' }}">
+                {{ counts.failed|format_thousands }} failed
+              </span>
+            {% else %}
+              –
+            {% endif %}
+          {% endset %}
+
+          {% do current_row.append({
+            "html": count_cell_html
+          }) %}
+        {% endfor %}
+
+        {% do table_rows.append(current_row) %}
+      {% endif %}
+    {% endfor %}
+
+      {{ govukTable({
+        "caption": "Total spend",
+        "captionClasses": "govuk-visually-hidden",
+        "head": table_headers,
+        "rows": table_rows
+      }) }}
     </div>
   {% endif %}
 

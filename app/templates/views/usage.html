@@ -1,7 +1,7 @@
 {% from "components/big-number.html" import big_number %}
-{% from "components/table.html" import list_table, field, hidden_field_heading, row_heading %}
 {% from "components/page-header.html" import page_header %}
 {% from "components/pill.html" import pill %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% extends "withnav_template.html" %}
 
@@ -85,34 +85,29 @@
       </div>
 
       {% if months %}
-        <div class="dashboard-table usage-table body-copy-table">
-          {% call(item, row_index) list_table(
-            months,
-            caption="Total spend",
-            caption_visible=False,
-            empty_message='',
-            field_headings=[
-              'By month',
-              hidden_field_heading('Cost'),
-            ],
-            field_headings_visible=True
-          ) %}
-            {% call row_heading() %}
-              {{ item.month }}
-            {% endcall %}
-            {% call field(align='left') %}
-              {{ big_number(
-                item.sms_cost + item.letter_cost,
-                currency="£",
-                smallest=True
-              ) }}
-              <ul class="govuk-list">
+        {% set table_headers = [
+          { "text": "By month" },
+          {
+            "html": '<span class="govuk-visually-hidden">Cost</span>'
+          }
+        ] %}
+
+        {% set table_rows = [] %}
+        {% for item in months %}
+
+          {% set cost_cell_html %}
+            {{ big_number(
+              item.sms_cost + item.letter_cost,
+              currency="£",
+              smallest=True
+            ) }}
+            <ul class="govuk-list">
               {% if item.sms_free_allowance_used %}
                 <li class="govuk-!-font-tabular-numbers">{{ item.sms_free_allowance_used|format_thousands }} free {{ item.sms_free_count|message_count_label('sms', suffix='') }}</li>
               {% endif %}
               {% for sms in item.sms_breakdown %}
-                  <li class="govuk-!-font-tabular-numbers">{{ sms.charged_units|message_count('sms') }} at
-                  {{- ' {:.2f}p'.format(sms.rate * 100) }}</li>
+                <li class="govuk-!-font-tabular-numbers">{{ sms.charged_units|message_count('sms') }} at
+                {{- ' {:.2f}p'.format(sms.rate * 100) }}</li>
               {% endfor %}
               {% for letter in item.letter_breakdown %}
                 {% if letter.sent %}
@@ -123,11 +118,27 @@
               {% if not (item.sms_free_allowance_used or item.sms_cost or item.letter_breakdown) %}
                 <li aria-hidden="true">–</li>
               {% endif %}
-              </ul>
-            {% endcall %}
-          {% endcall %}
-        </div>
-      {% endif %}
+            </ul>
+          {% endset %}
+
+          {% do table_rows.append([
+            {
+              "text": item.month or ""
+            },
+            {
+              "html": cost_cell_html,
+            }
+            ]) %}
+        {% endfor %}
+
+          {{ govukTable({
+            "caption": "Total spend",
+            "captionClasses": "govuk-visually-hidden",
+            "head": table_headers,
+            "rows": table_rows
+          }) }}
+
+        {% endif %}
     </div>
 
     <div class="govuk-grid-row">

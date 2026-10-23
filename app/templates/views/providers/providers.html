@@ -1,5 +1,5 @@
 {% extends "views/platform-admin/_base_template.html" %}
-{% from "components/table.html" import list_table, text_field, link_field, optional_text_field %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% block per_page_title %}
 Providers
@@ -13,80 +13,152 @@ Providers
 
   <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.edit_sms_provider_ratio') }}">Change priority</a>
 
-  {% call(item, row_number) list_table(
-      domestic_sms_providers,
-      caption="Domestic SMS providers",
-      caption_visible=False,
-      empty_message='No domestic sms providers',
-      field_headings=['Provider', 'Priority', '% monthly traffic', 'Active', 'Last Updated', 'Updated By', 'Reason'],
-      field_headings_visible=True,
-      give_rows_ids=False,
-  ) %}
+  {% if domestic_sms_providers %}
+    {% set table_headers = [
+        { "text": "Provider" },
+        { "text": "Priority" },
+        { "text": "% monthly traffic" },
+        { "text": "Active" },
+        { "text": "Last Updated" },
+        { "text": "Updated By" },
+        { "text": "Reason" }
+    ] %}
 
-      {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}
+    {% set table_rows = [] %}
+    {% for item in domestic_sms_providers %}
 
-      {{ optional_text_field(item.priority if item.active, default='None') }}
+        {% set provider_link_html %}
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_provider', provider_id=item.id) }}">
+            {{ item.display_name }}
+        </a>
+        {% endset %}
 
-      {{ text_field(item.monthly_traffic) }}
+        {% do table_rows.append([
+            {
+                "html": provider_link_html
+            },
+            {
+                "text": (item.priority if item.active else None) or "None"
+            },
+            {
+                "text": item.monthly_traffic or ""
+            },
+            {
+                "text": item.active
+            },
+            {
+                "text": item.updated_at|format_datetime_short if item.updated_at else "None"
+            },
+            {
+                "text": item.created_by_name or "None"
+            },
+            {
+                "text": item.reason or "None"
+            }
+        ]) %}
+    {% endfor %}
 
-      {{ text_field(item.active) }}
-
-      {{ optional_text_field(
-          item.updated_at|format_datetime_short if item.updated_at,
-          default='None'
-      ) }}
-
-      {{ optional_text_field(item.created_by_name, default='None') }}
-
-      {{ optional_text_field(item.reason, default='None') }}
-
-  {% endcall %}
+    {{ govukTable({
+        "caption": "Domestic SMS providers",
+        "captionClasses": "govuk-visually-hidden",
+        "classes": "notify-table notify-table--body-small",
+        "head": table_headers,
+        "rows": table_rows
+    }) }}
+    {% else %}
+    <p class="govuk-body">No domestic sms providers</p>
+    {% endif %}
 
   <h2 class="heading-medium">Email</h2>
 
-  {% call(item, row_number) list_table(
-      email_providers,
-      caption="Email providers",
-      caption_visible=False,
-      empty_message='No email providers',
-      field_headings=['Provider', 'Active', 'Last Updated', 'Updated By'],
-      field_headings_visible=True
-  ) %}
+  {% if email_providers %}
+    {% set table_headers = [
+        { "text": "Provider" },
+        { "text": "Active" },
+        { "text": "Last Updated" },
+        { "text": "Updated By" }
+    ] %}
 
-      {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}
+    {% set table_rows = [] %}
+    {% for item in email_providers %}
 
-      {{ text_field(item.active) }}
+        {% set email_provider_link_html %}
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_provider', provider_id=item.id) }}">
+                {{ item.display_name }}
+            </a>
+        {% endset %}
+        
+        {% do table_rows.append([
+            {
+                "html": email_provider_link_html
+            },
+            {
+                "text": item.active
+            },
+            {
+                "text": item.updated_at|format_datetime_short if item.updated_at else "None"
+            },
+            {
+                "text": item.created_by_name or "None"
+            }
+        ]) %}
+    {% endfor %}
 
-      {{ optional_text_field(
-        item.updated_at|format_datetime_short if item.updated_at,
-        default='None'
-      ) }}
-
-      {{ optional_text_field(item.created_by_name, default='None') }}
-  {% endcall %}
+    {{ govukTable({
+        "caption": "Email providers",
+        "captionClasses": "govuk-visually-hidden",
+        "classes": "notify-table notify-table--body-small",
+        "head": table_headers,
+        "rows": table_rows
+    }) }}
+    {% else %}
+        <p class="govuk-body no-data">No email providers</p>
+    {% endif %}
 
   <h2 class="heading-medium">International SMS Providers</h2>
 
-  {% call(item, row_number) list_table(
-      intl_sms_providers,
-      caption="International SMS providers",
-      caption_visible=False,
-      empty_message='No international sms providers',
-      field_headings=['Provider', 'Active', 'Last Updated', 'Updated By'],
-      field_headings_visible=True
-  ) %}
+  {% if intl_sms_providers %}
+    {% set table_headers = [
+        { "text": "Provider" },
+        { "text": "Active" },
+        { "text": "Last Updated" },
+        { "text": "Updated By" }
+    ] %}
 
-      {{ link_field(item.display_name, url_for('main.view_provider', provider_id=item.id)) }}
+    {% set table_rows = [] %}
+    {% for item in intl_sms_providers %}
 
-      {{ text_field(item.active) }}
+        {% set sms_provider_link_html %}
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.view_provider', provider_id=item.id) }}">
+            {{ item.display_name }}
+        </a>
+        {% endset %}
 
-      {{ optional_text_field(
-        item.updated_at|format_datetime_short if item.updated_at,
-        default='None'
-      ) }}
+        {% do table_rows.append([
+            {
+                "html": sms_provider_link_html
+            },
+            {
+                "text": item.active
+            },
+            {
+                "text": item.updated_at|format_datetime_short if item.updated_at else "None"
+            },
+            {
+                "text": item.created_by_name or "None"
+            }
+        ]) %}
+    {% endfor %}
 
-      {{ optional_text_field(item.created_by_name, default='None') }}
-
-  {% endcall %}
+    {{ govukTable({
+        "caption": "International SMS providers",
+        "captionClasses": "govuk-visually-hidden",
+        "classes": "notify-table notify-table--body-small",
+        "head": table_headers,
+        "rows": table_rows
+    }) }}
+    {% else %}
+        <p class="govuk-body no-data">No international sms providers</p>
+    {% endif %}
 
 {% endblock %}
