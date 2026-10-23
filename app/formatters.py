@@ -119,12 +119,27 @@ def naturaltime_without_indefinite_article(date):
     )
 
 
+def naturaltime_without_indefinite_article_no_ago(date):
+    return re.sub(
+        "an? (.*)",
+        lambda match: f"{match.group(1)}",
+        humanize.naturaltime(date).replace(" ago", ""),
+    )
+
+
 def format_delta(date):
     delta = datetime.now(UTC) - utc_string_to_aware_gmt_datetime(date)
     if delta < timedelta(seconds=30):
         return "just now"
     if delta < timedelta(seconds=60):
         return "in the last minute"
+    return naturaltime_without_indefinite_article(delta)
+
+
+def format_delta_hours(date):
+    delta = datetime.now(UTC) - utc_string_to_aware_gmt_datetime(date)
+    if delta < timedelta(minutes=60):
+        return "in the last hour"
     return naturaltime_without_indefinite_article(delta)
 
 
@@ -136,6 +151,13 @@ def format_delta_days(date, numeric_prefix=""):
     if date.strftime("%Y-%m-%d") == (now - timedelta(days=1)).strftime("%Y-%m-%d"):
         return "yesterday"
     return numeric_prefix + naturaltime_without_indefinite_article(now - date)
+
+
+def format_delta_days_no_ago(date):
+    delta = datetime.now(UTC) - utc_string_to_aware_gmt_datetime(date)
+    if delta < timedelta(days=1):
+        return "day"
+    return naturaltime_without_indefinite_article_no_ago(delta)
 
 
 def valid_phone_number(phone_number):
