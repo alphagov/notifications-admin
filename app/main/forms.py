@@ -1345,7 +1345,7 @@ class CreateServiceForm(StripWhitespaceForm):
         "Enter a service name",
         validators=[
             DataRequired(message="Enter a service name"),
-            MustContainAlphanumericCharacters(),
+            MustContainAlphanumericCharacters(thing="service name"),
             Length(max=255, thing="service name"),
         ],
     )
@@ -1357,7 +1357,7 @@ class CreateNhsNotifyServiceForm(StripWhitespaceForm):
         "Enter a service name",
         validators=[
             DataRequired(message="Enter a service name"),
-            MustContainAlphanumericCharacters(),
+            MustContainAlphanumericCharacters(thing="service name"),
             Length(max=255, thing="service name"),
         ],
     )
