@@ -31,7 +31,7 @@
           </ul>
         {% else %}
           <p class="hint">
-            No organisations
+            Not a member of any organisations
           </p>
         {% endif %}
       </nav>
@@ -73,14 +73,14 @@
       <p class="govuk-body">Signs in with {{ user.auth_type | format_auth_type(with_indefinite_article=True) }}</p>
       {% if user.auth_type != 'webauthn_auth' %}
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.change_user_auth', user_id=user.id) }}">
-          Change authentication for this user
+          Change the sign-in method for this user
         </a>
       {% endif %}
 
       {% if not user.logged_in_at %}
-      <p class="hint">This person has never logged in</p>
+      <p class="hint">This person has never signed in</p>
       {% else %}
-      <p class="govuk-body">Last logged in
+      <p class="govuk-body">Last signed in
         <time data-notify-module="update-relative-time" datetime="{{ user.logged_in_at }}">
           {{ user.logged_in_at|format_delta }}
         </time>
@@ -89,7 +89,7 @@
 
       <h2 class="heading-medium">Preferences</h2>
       <p class="govuk-body">
-        {{ "Wants" if user.receives_new_features_email else "Does not want"}} to receive new features email
+        {{ "Wants" if user.receives_new_features_email else "Does not want"}} to receive new features emails
       </p>
       <p class="govuk-body">
         {{ "Wants" if user.take_part_in_research else "Does not want"}} to take part in user research
