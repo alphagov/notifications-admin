@@ -869,7 +869,8 @@ def test_monthly_has_equal_length_tables(
 ):
     page = client_request.get("main.monthly", service_id=service_one["id"])
 
-    assert "govuk-table__header--width-25" in page.select_one(".govuk-table__head th")["class"]
+    assert "govuk-table__cell--width-25" in page.select_one(".govuk-table__cell")["class"]
+    assert "govuk-table__header--width-25" in page.select_one(".govuk-table__header")["class"]
 
 
 @freeze_time("2016-01-01 11:09:00.061258")

@@ -515,3 +515,9 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
     width: 50%;
   }
 }
+
+// setting cell width for tables that
+// don't have headers like mthly usage
+.govuk-table__cell--width-25 {
+  width: 25%;
+}
