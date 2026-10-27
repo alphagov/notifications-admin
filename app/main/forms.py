@@ -176,9 +176,15 @@ class RadioField(WTFormsRadioField):
             raise ValidationError(f"Select {self.thing}")
 
 
-def make_email_address_field(label="Email address", *, gov_user: bool, required=True, thing=None):
+def make_email_address_field(
+    label="Email address",
+    *,
+    gov_user: bool,
+    required=True,
+    thing=None,
+    param_extensions=None,
+):
     validators: list[Callable] = []
-
     if thing:
         validators.append(
             ValidEmail(message=f"Enter {thing} in the correct format, like name@example.gov.uk"),
@@ -199,7 +205,7 @@ def make_email_address_field(label="Email address", *, gov_user: bool, required=
             # FIXME: being deprecated; prefer to pass in `thing`.
             validators.append(DataRequired(message="Cannot be empty"))
 
-    return GovukEmailField(label, validators)
+    return GovukEmailField(label, validators, param_extensions=param_extensions or {})
 
 
 class RequiredValidatorsMixin(Field):
@@ -256,7 +262,11 @@ class PhoneNumber(GovukTextInputFieldMixin, TelField):
 
 
 def valid_phone_number(
-    label="Mobile number", international=False, sms_to_uk_landline=False, block_ofcom_protected_blocks=False
+    label="Mobile number",
+    international=False,
+    sms_to_uk_landline=False,
+    block_ofcom_protected_blocks=False,
+    param_extensions=None,
 ):
     if not (sms_to_uk_landline or international or block_ofcom_protected_blocks):
         return PhoneNumber(
@@ -265,6 +275,7 @@ def valid_phone_number(
                 DataRequired(message="Cannot be empty"),
                 ValidPhoneNumber(allow_international_sms=international),
             ],
+            param_extensions=param_extensions or {},
         )
     else:
         return PhoneNumber(
@@ -277,6 +288,7 @@ def valid_phone_number(
                     block_ofcom_protected_blocks=block_ofcom_protected_blocks,
                 ),
             ],
+            param_extensions=param_extensions or {},
         )
 
 
@@ -2606,18 +2618,28 @@ def get_placeholder_form_instance(
     block_ofcom_protected_blocks=False,
 ):
     if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template.template_type == "email":
-        field = make_email_address_field(label=placeholder_name, gov_user=False, thing="an email address")
+        field = make_email_address_field(
+            label=placeholder_name,
+            gov_user=False,
+            thing="an email address",
+            param_extensions={"classes": "govuk-!-width-full"},
+        )
     elif InsensitiveDict.make_key(placeholder_name) == "phonenumber" and template.template_type == "sms":
         field = valid_phone_number(
             label=placeholder_name,
             international=allow_international_phone_numbers,
             sms_to_uk_landline=allow_sms_to_uk_landline,
             block_ofcom_protected_blocks=block_ofcom_protected_blocks,
+            param_extensions={"classes": "govuk-!-width-full govuk-input--extra-letter-spacing"},
         )
     elif template.placeholder_is_only_used_conditionally(placeholder_name):
         field = OnOffField(placeholder_name, choices=[("yes", "Yes"), ("no", "No")])
     else:
-        field = GovukTextInputField(placeholder_name, validators=[DataRequired(message="Cannot be empty")])
+        field = GovukTextInputField(
+            placeholder_name,
+            validators=[DataRequired(message="Cannot be empty")],
+            param_extensions={"classes": "govuk-!-width-full"},
+        )
 
     PlaceholderForm.placeholder_value = field
 
