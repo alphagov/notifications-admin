@@ -2633,7 +2633,11 @@ def get_placeholder_form_instance(
             param_extensions={"classes": "govuk-!-width-full govuk-input--extra-letter-spacing"},
         )
     elif template.placeholder_is_only_used_conditionally(placeholder_name):
-        field = OnOffField(placeholder_name, choices=[("yes", "Yes"), ("no", "No")])
+        field = OnOffField(
+            placeholder_name,
+            choices=[("yes", "Yes"), ("no", "No")],
+            param_extensions={"classes": "govuk-radios--inline"},
+        )
     else:
         field = GovukTextInputField(
             placeholder_name,

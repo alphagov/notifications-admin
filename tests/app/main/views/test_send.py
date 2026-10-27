@@ -2054,6 +2054,7 @@ def test_send_one_off_step_shows_radios_for_conditional(
     )
 
     assert not page.select("input[type=text]")
+    assert "govuk-radios--inline" in page.select_one(".govuk-radios")["class"]
     assert normalize_spaces(page.select_one("#placeholder_value legend").text) == "Under 18"
     assert [
         (
