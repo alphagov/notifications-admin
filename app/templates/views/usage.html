@@ -86,7 +86,10 @@
 
       {% if months %}
         {% set table_headers = [
-          { "text": "By month" },
+          { 
+             "html": '<span class="govuk-visually-hidden">Month</span>',
+             "classes": "govuk-table__header--width-35"
+          },
           {
             "html": '<span class="govuk-visually-hidden">Cost</span>'
           }
@@ -132,7 +135,7 @@
         {% endfor %}
 
           {{ govukTable({
-            "caption": "Total spend",
+            "caption": "Total spend by month",
             "captionClasses": "govuk-visually-hidden",
             "head": table_headers,
             "rows": table_rows
