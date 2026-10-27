@@ -2600,20 +2600,22 @@ class SMSPrefixForm(StripWhitespaceForm):
 def get_placeholder_form_instance(
     placeholder_name,
     dict_to_populate_from,
-    template_type,
+    template,
     allow_international_phone_numbers=False,
     allow_sms_to_uk_landline=False,
     block_ofcom_protected_blocks=False,
 ):
-    if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template_type == "email":
+    if InsensitiveDict.make_key(placeholder_name) == "emailaddress" and template.template_type == "email":
         field = make_email_address_field(label=placeholder_name, gov_user=False, thing="an email address")
-    elif InsensitiveDict.make_key(placeholder_name) == "phonenumber" and template_type == "sms":
+    elif InsensitiveDict.make_key(placeholder_name) == "phonenumber" and template.template_type == "sms":
         field = valid_phone_number(
             label=placeholder_name,
             international=allow_international_phone_numbers,
             sms_to_uk_landline=allow_sms_to_uk_landline,
             block_ofcom_protected_blocks=block_ofcom_protected_blocks,
         )
+    elif template.placeholder_is_only_used_conditionally(placeholder_name):
+        field = OnOffField(placeholder_name, choices=[("yes", "Yes"), ("no", "No")])
     else:
         field = GovukTextInputField(placeholder_name, validators=[DataRequired(message="Cannot be empty")])
 
