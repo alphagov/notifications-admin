@@ -345,6 +345,7 @@ def test_api_keys_page_shows_api_keys_with_creation_and_usage_info(
         "Rotate this key at least once a year or remove it if you no longer need it."
     )
 
+    # fmt: off
     # show list of api keys, who created them, and when they were last used
     assert [normalize_spaces(item.text) for item in page.select("ul.api-key-list li")] == [
         (
@@ -358,7 +359,7 @@ def test_api_keys_page_shows_api_keys_with_creation_and_usage_info(
             "some key name "
             "Revoke some key name "
             "API key Live – sends to anyone "
-            "Created by Test User 2 hours ago "
+            "Created by Test User today "
             "Never used"
         ),
         (
@@ -366,9 +367,10 @@ def test_api_keys_page_shows_api_keys_with_creation_and_usage_info(
             "Revoke third key "
             "API key Team and guest list – limits who you can send to "
             "Created by an archived user 2 years ago "
-            "Last used 1 hour ago"
+            "Last used today"
         ),
     ]
+    # fmt: on
 
     revoke_link = page.select_one("ul li a.govuk-link.govuk-link--destructive")
     assert normalize_spaces(revoke_link.text) == "Revoke some key name API key"
