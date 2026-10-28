@@ -13,7 +13,6 @@
 // to GOVUK Frontend, and so no longer need these styles
 // https://github.com/alphagov/govuk_elements
 @use 'govuk-elements/elements-typography';
-@use 'govuk-elements/tables';
 
 // Specific to this application
 @use 'local/typography';
@@ -22,7 +21,6 @@
 @use 'components/placeholder';
 @use 'components/sms-message';
 @use 'components/page-footer';
-@use 'components/table';
 @use 'components/navigation';
 @use 'components/big-number';
 @use 'components/banner';

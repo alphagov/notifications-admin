@@ -498,3 +498,26 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 .govuk-table__cell__error-marker--invisible {
   border-left: 5px solid transparent;
 }
+
+// table column width setting
+// scoped to table header as
+// that affects cells in rows 
+.govuk-table__head {
+  .govuk-table__header--width-25 {
+    width: 25%;
+  }
+
+  .govuk-table__header--width-35 {
+    width: 35%;
+  }
+
+  .govuk-table__header--width-50 {
+    width: 50%;
+  }
+}
+
+// setting cell width for tables that
+// don't have headers like mthly usage
+.govuk-table__cell--width-25 {
+  width: 25%;
+}

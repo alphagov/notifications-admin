@@ -2,9 +2,9 @@
 
 // Styles specific to the performance page
 
-$gutter-with-14px-text: 1.696em;
-$gutter-with-16px-text: 1.484em;
-$gutter-with-19px-text: 1.25em;
+// One fixed gutter shared by the totals, table headers and table cells,
+// so columns line up regardless of font size
+$gutter: 20px;
 
 .totals__all,
 .totals__set-type {
@@ -29,47 +29,42 @@ $gutter-with-19px-text: 1.25em;
   width: 100%;
 }
 
-// Dashboard tables apply padding to the right of all table headers and cells except the last
-//
-// We reverse this, so the first table header and cell have no padding that could be considered as
-// part of their width
-.performance .dashboard-table .table-field-headings-visible th,
-.performance .table-font-xsmall td {
+// Table gutters: same value for headers and cells
+.performance-table .govuk-table__header,
+.performance-table .govuk-table__cell {
   padding-right: 0;
+  padding-left: $gutter;
 }
 
-// Set gutters for table headers on
-.performance .dashboard-table .table-field-headings-visible th {
-  padding-left: $gutter-with-16px-text;
-}
-
-// Set gutters for table cells to match table headers
-.performance .table-font-xsmall td {
-  padding-left: $gutter-with-14px-text;
+.performance-table .govuk-table__header {
+  vertical-align: middle; // overrides govuk-frontend table
 }
 
 // Cancel padding for gutters on first table headers and cells
-.performance .dashboard-table .table-field-headings-visible th:first-of-type,
-.performance .table-font-xsmall td:first-of-type {
+.performance-table .govuk-table__cell:first-of-type,
+.performance-table .govuk-table__header:first-of-type {
   padding-left: 0;
 }
 
-.performance .dashboard-table--4-column .table-field-headings-visible th:first-of-type,
-.performance .dashboard-table--4-column .table-font-xsmall td:first-of-type {
-  width: 40%; // 40% is the lowest width the first column works at with the smaller text
-}
-
-.performance .dashboard-table--2-column .table-field-headings-visible th:first-of-type,
-.performance .dashboard-table--2-column .table-font-xsmall td:first-of-type {
+// 2-column table: 52.5% first column at all viewports
+.performance-table--2-columns .govuk-table__header:first-of-type,
+.performance-table--2-columns .govuk-table__cell:first-of-type {
   width: 52.5%;
 }
 
 // Totals use block-level elements so will fill the width and stack by default
 // Make them display as a table on larger screens, to match the data table below
 @include govuk-media-query($from: tablet) {
+  // Fixed layout: first column gets an explicit width, the remaining
+  // columns split the leftover space equally, in both blocks
+  .totals,
+  .performance-table {
+    table-layout: fixed;
+    width: 100%;
+  }
+
   .totals {
     display: table;
-    width: 100%;
   }
 
   .totals > .totals__all,
@@ -79,42 +74,30 @@ $gutter-with-19px-text: 1.25em;
 
   .totals__all {
     padding-bottom: 0;
-    padding-left: 0; // Remove padding-left now applied to all totals
+    padding-left: 0;
   }
 
   .totals > .totals__set-type {
     width: auto; // reset width, set to 100% by default
+    padding-left: $gutter;
   }
 
-  // Give totals and table headers the same gutters
-  .totals__set-type,
-  .performance .dashboard-table .table-field-headings-visible th {
-    padding-left: $gutter-with-19px-text;
-  }
-
-  // Give table cells the same gutters
-  .performance .table-font-xsmall td {
-    padding-left: $gutter-with-16px-text;
-  }
-}
-
-// Handle other screen sizes from tablet up, making totals match tables as much as possible
-.totals--4-column > .totals__all,
-.performance .dashboard-table--4-column .table-field-headings-visible th:first-of-type,
-.performance .dashboard-table--4-column .table-font-xsmall td:first-of-type {
-  // 640-730px has the larger text but less space so needs a smaller first-column width
-  @include govuk-media-query($from: tablet, $until: 730px) {
-    width: 35%;
-  }
-
-  // 900px upwards works with the default of 52.5%
-  @include govuk-media-query($from: 900px) {
+  // 2-column totals and table: 52.5% first column at all viewports
+  .totals--2-column > .totals__all,
+  .performance-table--2-columns .govuk-table__header:first-of-type,
+  .performance-table--2-columns .govuk-table__cell:first-of-type {
     width: 52.5%;
   }
-}
 
-.totals--2-column > .totals__all,
-.performance .dashboard-table--2-column .table-field-headings-visible th:first-of-type,
-.performance .dashboard-table--2-column .table-font-xsmall td:first-of-type {
-  width: 52.5%;
+  // 4-column totals and table: narrower first column on tablet
+  // 52.5% on larger viewports
+  .totals--4-column > .totals__all,
+  .performance-table--4-columns .govuk-table__header:first-of-type,
+  .performance-table--4-columns .govuk-table__cell:first-of-type {
+    width: 40%;
+
+    @include govuk-media-query($from: 900px) {
+      width: 52.5%;
+    }
+  }
 }

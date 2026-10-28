@@ -1,7 +1,7 @@
 {% extends "content_template.html" %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/page-header.html" import page_header %}
-{% from "components/table.html" import field, list_table %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% set navigation_label_prefix = 'Features' %}
 {% set content_column_width = 'three-quarters' %}
@@ -50,37 +50,43 @@
       ) }}
     </p>
   </div>
+  {% if notifications_by_type %}
+    {% set table_headers = [
+      { "text": "Date" },
+      { "text": 99|message_count_noun('email')|capitalize },
+      { "text": 99|message_count_noun('sms')|capitalize },
+      { "text": 99|message_count_noun('letter')|capitalize }
+    ] %}
 
-  <div class="dashboard-table dashboard-table--4-column">
-    {% call(item, row_number) list_table(
-      notifications_by_type|reverse,
-      caption='Messages sent since May 2016',
-      caption_visible=False,
-      field_headings=[
-        'Date',
-        99|message_count_noun('email')|capitalize,
-        99|message_count_noun('sms')|capitalize,
-        99|message_count_noun('letter')|capitalize,
-      ],
-      empty_message='No data to show'
-    ) %}
-      {% call field() %}
-        {{ item.date | format_date_normal }}
-      {% endcall %}
-      {% call field() %}
-        {{ item.emails|format_thousands }}
-      {% endcall %}
-      {% call field() %}
-        {{ item.sms|format_thousands }}
-      {% endcall %}
-      {% call field() %}
-        {{ item.letters|format_thousands }}
-      {% endcall %}
-    {% endcall %}
-    <p class="table-show-more-link">
-      Only showing the last {{ notifications_by_type|length }} days
-    </p>
-  </div>
+    {% set table_rows = [] %}
+    {% for item in notifications_by_type|reverse %}
+      {% do table_rows.append([
+        {
+          "text": item.date | format_date_normal
+        },
+        {
+          "text": item.emails|format_thousands
+        },
+        {
+          "text": item.sms|format_thousands
+        },
+        {
+          "text": item.letters|format_thousands
+        }
+      ])%}
+    {% endfor %}
+
+    {{ govukTable({
+      "caption": "Messages sent in the last 7 days",
+      "captionClasses": "govuk-visually-hidden",
+      "classes": "notify-table notify-table--body-small performance-table performance-table--4-columns",
+      "head": table_headers,
+      "rows": table_rows
+    }) }}
+    <p class="govuk-body more-items-available-text">Only showing the last {{ notifications_by_type|length }} days</p>  
+  {% else %}
+    <p class="govuk-body no-data govuk-!-text-align-centre">No data to show</p>
+  {% endif %}
 
   <h2 class="govuk-heading-m" id='messages-sent-within-10-seconds'>
     Messages sent within 10 seconds
@@ -93,27 +99,38 @@
       ) }}
     </div>
   </div>
-  <div class="dashboard-table dashboard-table--2-column">
-    {% call(item, row_number) list_table(
-      processing_time | reverse,
-      caption='Messages sent within 10 seconds',
-      caption_visible=False,
-      field_headings=[
-        'Date', 'Percentage'
-      ],
-      empty_message='No data to show'
-    ) %}
-      {% call field() %}
-        {{ item.date | format_date_normal }}
-      {% endcall %}
-      {% call field() %}
-        {{ '{:.2f}%'.format(item.percentage_under_10_seconds) }}
-      {% endcall %}
-    {% endcall %}
-    <p class="table-show-more-link">
+  {% if processing_time %}
+    {% set table_headers = [
+      { "text": "Date" },
+      { "text": "Percentage" }
+    ] %}
+
+    {% set table_rows = [] %}
+    {% for item in processing_time | reverse %}
+      {% do table_rows.append([
+        {
+          "text": item.date | format_date_normal
+        },
+        {
+        "text": '{:.2f}%'.format(item.percentage_under_10_seconds)
+        }
+
+      ])%}
+    {% endfor %}
+
+    {{ govukTable({
+      "caption": "Messages sent within 10 seconds",
+      "captionClasses": "govuk-visually-hidden",
+      "classes": "notify-table notify-table--body-small performance-table performance-table--2-columns",
+      "head": table_headers,
+      "rows": table_rows
+    }) }}
+    <p class="govuk-body more-items-available-text">
       Only showing the last {{ processing_time|length }} days
     </p>
-  </div>
+  {% else %}
+    <p class="govuk-body no-data govuk-!-text-align-centre">No data to show</p>
+  {% endif %}
 
   <h2 class="govuk-heading-m" id='organisations-using-notify'>
     Organisations using Notify
@@ -131,23 +148,34 @@
       <span class="govuk-visually-hidden">using Notify.</span>
     </span>
   </p>
-  <div class="dashboard-table dashboard-table--2-column">
-    {% call(item, row_number) list_table(
-      organisations_using_notify,
-      caption='Organisations using Notify',
-      caption_visible=False,
-      field_headings=[
-        'Organisation', 'Number of live services'
-      ],
-      empty_message='No data to show'
-    ) %}
-      {% call field() %}
-        {{ item.organisation_name }}
-      {% endcall %}
-      {% call field() %}
-        {{ item.count_of_live_services }}
-      {% endcall %}
-    {% endcall %}
-  </div>
+
+  {% if organisations_using_notify %}
+    {% set table_headers = [
+      { "text": "Organisation" },
+      { "text": "Number of live services" }
+    ] %}
+
+    {% set table_rows = [] %}
+    {% for item in organisations_using_notify %}
+      {% do table_rows.append([
+        {
+          "text": item.organisation_name
+        },
+        {
+        "text": item.count_of_live_services
+        }
+      ]) %}
+    {% endfor %}
+
+    {{ govukTable({
+      "caption": "Organisations using Notify",
+      "captionClasses": "govuk-visually-hidden",
+      "classes": "notify-table notify-table--body-small performance-table performance-table--2-columns",
+      "head": table_headers,
+      "rows": table_rows
+    }) }}
+  {% else %}
+    <p class="govuk-body no-data govuk-!-text-align-centre">No data to show</p>
+  {% endif %}
 
 {% endblock %}

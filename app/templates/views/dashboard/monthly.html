@@ -1,7 +1,7 @@
 {% from "components/page-header.html" import page_header %}
 {% from "components/big-number.html" import big_number %}
 {% from "components/pill.html" import pill %}
-{% from "components/table.html" import list_table, field, row_heading %}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 {% extends "withnav_template.html" %}
 
@@ -21,35 +21,28 @@
     ) }}
   </div>
   {% if months %}
-    <div class="body-copy-table" id='pill-selected-item'>
-      {% call(month, row_index) list_table(
-        months,
-        caption="Total spend",
-        caption_visible=False,
-        empty_message='',
-        field_headings=[
-          'Month',
-          'Emails',
-          'Text messages',
-          'letters',
-        ],
-        field_headings_visible=False,
-        equal_length=True
-      ) %}
+    <div id='pill-selected-item'>
+      {% set table_rows = [] %}
+      {% for month in months %}
         {% if not month.future %}
-          {% call row_heading() %}
-            {{ month.name }}
-          {% endcall %}
+          {% set current_row = [] %}
+
+          {# applying font regular ovveride to the header cell #}
+          {% do current_row.append({
+            "text": month.name,
+            "classes": "govuk-table__header--width-25 govuk-!-font-weight-regular"
+          }) %}
+
           {% for counts, template_type in [
             (month.email_counts, 'email'),
             (month.sms_counts, 'sms'),
             (month.letter_counts, 'letter')
           ] %}
-            {% call field(align='left') %}
+            {% set count_cell_html %}
               {{ big_number(
                 counts.requested,
                 counts.requested|message_count_label(template_type, suffix=''),
-                smallest=True,
+                smallest=True
               ) }}
               {% if counts.requested %}
                 <span class="{{ 'failure-highlight' if counts.show_warning else '' }}">
@@ -58,10 +51,24 @@
               {% else %}
                 –
               {% endif %}
-            {% endcall %}
+            {% endset %}
+
+            {% do current_row.append({
+              "html": count_cell_html,
+              "classes": "govuk-table__cell--width-25"
+            }) %}
           {% endfor %}
+
+          {% do table_rows.append(current_row) %}
         {% endif %}
-      {% endcall %}
+      {% endfor %}
+
+      {{ govukTable({
+        "caption": "Total spend by month",
+        "captionClasses": "govuk-visually-hidden",
+        "firstCellIsHeader": true,
+        "rows": table_rows
+      }) }}
     </div>
   {% endif %}
 

@@ -831,7 +831,7 @@ def test_monthly_shows_letters_in_breakdown(
 ):
     page = client_request.get("main.monthly", service_id=service_one["id"])
 
-    columns = page.select(".table-field-left-aligned .big-number-label")
+    columns = page.select(".govuk-table__cell .big-number-label")
 
     assert normalize_spaces(columns[0].text) == "emails"
     assert normalize_spaces(columns[1].text) == "text messages"
@@ -869,7 +869,8 @@ def test_monthly_has_equal_length_tables(
 ):
     page = client_request.get("main.monthly", service_id=service_one["id"])
 
-    assert page.select_one(".table-field-headings th").get("width") == "25%"
+    assert "govuk-table__cell--width-25" in page.select_one(".govuk-table__cell")["class"]
+    assert "govuk-table__header--width-25" in page.select_one(".govuk-table__header")["class"]
 
 
 @freeze_time("2016-01-01 11:09:00.061258")
@@ -1212,7 +1213,7 @@ def test_usage_page_monthly_breakdown_shows_months_so_far(
 ):
     with now:
         page = client_request.get("main.usage", service_id=SERVICE_ONE_ID)
-        rows = page.select_one("table").select("tr.table-row")
+        rows = page.select_one("table").select("tbody .govuk-table__row")
         assert len(rows) == expected_number_of_months
 
 
@@ -1225,7 +1226,7 @@ def test_usage_page_letter_breakdown_ordered_by_postage_and_rate(
     mock_get_free_sms_fragment_limit,
 ):
     page = client_request.get("main.usage", service_id=SERVICE_ONE_ID)
-    row_for_feb = page.select_one("table").select("tr.table-row")[10]
+    row_for_feb = page.select_one("table").select("tbody .govuk-table__row")[10]
     postage_details = row_for_feb.select(r"li.govuk-\!-font-tabular-numbers")
 
     assert normalize_spaces(postage_details[3].text) == "5 first class letters at 33p"
