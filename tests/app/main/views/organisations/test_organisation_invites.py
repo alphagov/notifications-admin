@@ -443,6 +443,49 @@ def test_verified_org_user_redirects_to_dashboard(
     )
 
 
+@pytest.mark.parametrize(
+    "permissions",
+    (
+        [],
+        [PERMISSION_CAN_MAKE_SERVICES_LIVE],
+    ),
+)
+def test_new_user_accepting_org_invite_gets_permissions_from_invite(
+    client_request,
+    mocker,
+    api_user_pending,
+    sample_org_invite,
+    mock_check_verify_code,
+    mock_activate_user,
+    mock_get_invited_org_user_by_id,
+    mock_add_user_to_organisation,
+    permissions,
+):
+    client_request.logout()
+    sample_org_invite["permissions"] = permissions
+    mocker.patch("app.user_api_client.get_user", return_value=api_user_pending)
+
+    with client_request.session_transaction() as session:
+        session["user_details"] = {"email": api_user_pending["email_address"], "id": api_user_pending["id"]}
+        session["invited_org_user_id"] = sample_org_invite["id"]
+        session["organisation_id"] = sample_org_invite["organisation"]
+
+    client_request.post(
+        "main.verify",
+        _data={"sms_code": "12345"},
+        _expected_redirect=url_for(
+            "main.organisation_dashboard",
+            org_id=ORGANISATION_ID,
+        ),
+    )
+
+    mock_add_user_to_organisation.assert_called_once_with(
+        ORGANISATION_ID,
+        api_user_pending["id"],
+        permissions=permissions,
+    )
+
+
 class TestEditOrganisationUser:
     @pytest.fixture
     def _other_user(self):

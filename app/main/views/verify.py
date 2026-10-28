@@ -4,7 +4,6 @@ from markupsafe import Markup
 from notifications_utils.url_safe_token import check_token
 
 from app import user_api_client
-from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.main import main
 from app.main.forms import TwoFactorForm
 from app.models.token import Token
@@ -81,8 +80,8 @@ def activate_user(user_id):
 
     invited_org_user = InvitedOrgUser.from_session()
     if invited_org_user:
-        user_api_client.add_user_to_organisation(
-            invited_org_user.organisation, user_id, permissions=[PERMISSION_CAN_MAKE_SERVICES_LIVE]
+        activated_user.add_to_organisation(
+            organisation_id=invited_org_user.organisation, permissions=invited_org_user.permissions
         )
 
     if organisation_id:
