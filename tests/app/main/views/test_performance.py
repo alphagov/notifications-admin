@@ -146,7 +146,7 @@ def test_should_render_performance_page(
         "987.7 million text messages "
         "1.2 million letters "
         ""
-        "Messages sent since May 2016 "
+        "Messages sent in the last 7 days "
         "Date Emails Text messages Letters "
         "27 February 2021 1 2 3 "
         "26 February 2021 1 2 3 "
