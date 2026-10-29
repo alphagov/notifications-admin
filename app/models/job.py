@@ -9,7 +9,7 @@ from notifications_utils.letter_timings import (
 )
 from werkzeug.utils import cached_property
 
-from app.models import JSONModel, ModelList, PaginatedModelList
+from app.models import JSONModel, ModelList, PaginatedModelList, UUIDStr
 from app.models.notification import Notifications
 from app.notify_client.job_api_client import JobApiClient, job_api_client
 from app.notify_client.notification_api_client import notification_api_client
@@ -20,7 +20,10 @@ from app.utils.time import is_less_than_days_ago
 
 
 class Job(JSONModel):
-    id: str | None
+    # A day of uploaded letters is a special kind of job which doesn’t have an `id`, see
+    # https://github.com/alphagov/notifications-api/blob/eb265b9a501f0d503d4776fa01ae65845496dbea/app/dao/uploads_dao.py#L111
+    id: UUIDStr | None  # type: ignore[assignment]
+
     service: Any
     template_name: str
     template_version: int

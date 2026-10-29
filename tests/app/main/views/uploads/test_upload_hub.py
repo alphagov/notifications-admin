@@ -1,3 +1,5 @@
+from uuid import UUID
+
 import pytest
 from flask import url_for
 from freezegun import freeze_time
@@ -119,8 +121,8 @@ def test_get_upload_hub_page(
     assert normalize_spaces(uploads[1].text.strip()) == (
         "some.csv Sent 1 January 2016 at 11:09am 0 delivering 8 delivered 2 failed"
     )
-    assert (
-        uploads[1].select_one("a.notify-summary-list__filename")["href"] == f"/services/{SERVICE_ONE_ID}/jobs/job_id_1"
+    assert (uploads[1].select_one("a.notify-summary-list__filename")["href"]) == (
+        f"/services/{SERVICE_ONE_ID}/jobs/{str(UUID(version=4, int=1))}"
     )
 
     assert normalize_spaces(uploads[2].text.strip()) == (
@@ -130,7 +132,7 @@ def test_get_upload_hub_page(
         '<p class="govuk-body letter-recipient-summary"> Firstname Lastname<br/> 123 Example Street<br/> </p>'
     )
     assert uploads[2].select_one("a.notify-summary-list__filename")["href"] == (
-        f"/services/{SERVICE_ONE_ID}/notification/letter_id_1"
+        f"/services/{SERVICE_ONE_ID}/notification/{str(UUID(version=4, bytes=b'uploadedletter_1'))}"
     )
 
 
