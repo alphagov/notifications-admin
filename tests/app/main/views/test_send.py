@@ -2018,6 +2018,57 @@ def test_link_to_upload_not_offered_when_entering_personalisation(
 
 
 @pytest.mark.parametrize(
+    "template_content",
+    (
+        pytest.param("Hello ((Under 18??You are a child))"),
+        pytest.param(
+            "Hello ((Under 18))",
+            marks=pytest.mark.xfail(raises=AssertionError),
+        ),
+    ),
+)
+def test_send_one_off_step_shows_radios_for_conditional(
+    client_request,
+    fake_uuid,
+    template_content,
+    mocker,
+):
+    mocker.patch(
+        "app.service_api_client.get_service_template",
+        return_value={
+            "data": template_json(
+                id_=fake_uuid, service_id=SERVICE_ONE_ID, name="Two week reminder", content=template_content
+            )
+        },
+    )
+
+    with client_request.session_transaction() as session:
+        session["recipient"] = "07900900900"
+        session["placeholders"] = {"phone number": "07900900900"}
+
+    page = client_request.get(
+        "main.send_one_off_step",
+        service_id=SERVICE_ONE_ID,
+        template_id=fake_uuid,
+        step_index=1,
+    )
+
+    assert not page.select("input[type=text]")
+    assert "govuk-radios--inline" in page.select_one(".govuk-radios")["class"]
+    assert normalize_spaces(page.select_one("#placeholder_value legend").text) == "Under 18"
+    assert [
+        (
+            radio["value"],
+            normalize_spaces(page.select_one(f"label[for={radio['id']}]").text),
+        )
+        for radio in page.select("input[type=radio][name=placeholder_value]")
+    ] == [
+        ("yes", "Yes"),
+        ("no", "No"),
+    ]
+
+
+@pytest.mark.parametrize(
     "user",
     (
         create_active_user_with_permissions(),

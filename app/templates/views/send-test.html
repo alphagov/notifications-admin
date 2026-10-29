@@ -23,9 +23,7 @@
   ) %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        {{ form.placeholder_value(param_extensions={
-          "classes": "govuk-!-width-full govuk-input--extra-letter-spacing" if form.placeholder_value.label.text == "phone number" else "govuk-!-width-full"
-        }) }}
+        {{ form.placeholder_value() }}
       </div>
       {% if skip_link or link_to_upload %}
         <div class="govuk-grid-column-full">

@@ -1,12 +1,14 @@
 import pytest
+from notifications_utils.template import SMSPreviewTemplate
 
 from app.main.forms import get_placeholder_form_instance
 
 
 def test_form_class_not_mutated(notify_admin):
+    template = SMSPreviewTemplate({"content": "((name)) ((city))", "template_type": "sms"})
     with notify_admin.test_request_context(method="POST", data={"placeholder_value": ""}):
-        form1 = get_placeholder_form_instance("name", {}, "sms")
-        form2 = get_placeholder_form_instance("city", {}, "sms")
+        form1 = get_placeholder_form_instance("name", {}, template)
+        form2 = get_placeholder_form_instance("city", {}, template)
 
         assert not form1.validate_on_submit()
         assert not form2.validate_on_submit()
@@ -91,11 +93,19 @@ def test_validates_recipients(
     block_ofcom_protected_blocks,
     expected_error,
 ):
+    class FakeTemplate:
+        @property
+        def template_type(self):
+            return template_type
+
+        def placeholder_is_only_used_conditionally(self, placeholder_name):
+            return False
+
     with notify_admin.test_request_context(method="POST", data={"placeholder_value": value}):
         form = get_placeholder_form_instance(
             placeholder_name,
             {},
-            template_type,
+            FakeTemplate(),
             allow_international_phone_numbers=service_can_send_international_sms,
             allow_sms_to_uk_landline=send_to_uk_landlines,
             block_ofcom_protected_blocks=block_ofcom_protected_blocks,
