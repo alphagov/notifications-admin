@@ -491,7 +491,7 @@ class ServiceAPIClient(NotifyAdminAPIClient):
     def get_returned_letters(self, service_id, reported_at):
         return self.get(f"service/{service_id}/returned-letters?reported_at={reported_at}")
 
-    def get_notification_count(self, service_id, notification_type):
+    def get_notification_count(self, service_id, notification_type) -> int:
         # if cache is not set return 0
         count = redis_client.get(daily_limit_cache_key(service_id, notification_type=notification_type)) or 0
         return int(count)
