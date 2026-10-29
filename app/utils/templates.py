@@ -19,7 +19,6 @@ from ordered_set import OrderedSet
 
 from app.extensions import redis_client
 from app.models import JSONModel
-from app.models.template_email_file import TemplateEmailFiles
 from app.notify_client import cache
 
 
@@ -288,6 +287,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
 
     @property
     def email_files(self):
+        from app.models.template_email_file import TemplateEmailFiles
         return TemplateEmailFiles(self)
 
     @property
