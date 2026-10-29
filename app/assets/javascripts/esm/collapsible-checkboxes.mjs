@@ -145,7 +145,7 @@ class CollapsibleCheckboxes  {
     const $heading = document.createElement(`H${safeLevel}`); 
     
     const $legend = this.$fieldset.querySelector('legend');    
-    $heading.classList.add('heading-small');    
+    $heading.classList.add('govuk-heading-s','govuk-!-margin-bottom-1');    
     $heading.textContent = `${this.legendText}`;
 
     this.$fieldset.before($heading);
