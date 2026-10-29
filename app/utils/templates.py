@@ -288,6 +288,7 @@ class EmailPreviewTemplate(BaseEmailTemplate):
     @property
     def email_files(self):
         from app.models.template_email_file import TemplateEmailFiles
+
         return TemplateEmailFiles(self)
 
     @property

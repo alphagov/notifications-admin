@@ -10,13 +10,13 @@ from notifications_utils.base64_uuid import uuid_to_base64
 from notifications_utils.file_types import mime_type_from_extension
 from notifications_utils.s3 import s3download
 from notifications_utils.serialised_model import SerialisedModelCollection
-from app.utils.templates import EmailPreviewTemplate
 
 from app.models import JSONModel, UUIDStr
 from app.s3_client.s3_template_email_file_upload_client import (
     download_template_email_file_from_s3,
     upload_template_email_file_to_s3,
 )
+from app.utils.templates import EmailPreviewTemplate
 
 
 def _get_file_location(file_id: str, service_id: str) -> str:
