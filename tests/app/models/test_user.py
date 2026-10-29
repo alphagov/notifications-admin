@@ -1,4 +1,5 @@
 import datetime
+from uuid import UUID
 
 import pytest
 
@@ -26,7 +27,7 @@ def test_anonymous_user(notify_admin):
 
 def test_user(notify_admin):
     user_data = {
-        "id": 1,
+        "id": str(UUID(version=4, int=1)),
         "name": "Test User",
         "email_address": "test@user.gov.uk",
         "mobile_number": "+4412341234",
@@ -36,7 +37,7 @@ def test_user(notify_admin):
     }
     user = User(user_data)
 
-    assert user.id == "1"
+    assert user.id == str(UUID(version=4, int=1))
     assert user.name == "Test User"
     assert user.email_address == "test@user.gov.uk"
     assert user.mobile_number == "+4412341234"
@@ -57,7 +58,7 @@ def test_user(notify_admin):
 
 def test_nhs_notify_user_with_generic_nhs_email_address_has_org_type_as_nhs_notify():
     user_data = {
-        "id": 1,
+        "id": str(UUID(version=4, int=1)),
         "name": "Test User",
         "email_address": "test@nhs.uk",
         "mobile_number": "+4412341234",

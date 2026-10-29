@@ -1,6 +1,7 @@
 from functools import partial
 from io import BytesIO
 from unittest.mock import call
+from uuid import UUID
 
 import pytest
 from flask import url_for
@@ -487,7 +488,7 @@ def test_confirm_agreement_page_persists(
         ),
     )
     mock_update_organisation.assert_called_once_with(
-        "1234",
+        str(UUID(version=4, int=1234)),
         agreement_signed=True,
         agreement_signed_at="2012-01-01 01:01:00",
         agreement_signed_by_id=fake_uuid,
