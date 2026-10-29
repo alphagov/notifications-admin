@@ -22,14 +22,14 @@
     <div id='pill-selected-item'>
       <div class='govuk-grid-row'>
         <div class='govuk-grid-column-one-third'>
-          <h2 class='heading-small'>Emails</h2>
+          <h2 class='govuk-heading-s govuk-!-margin-bottom-1'>Emails</h2>
           <div class="keyline-block">
             {{ big_number(emails_sent, 'sent', **big_number_kwargs) }}
             {{ big_number("Unlimited", 'free allowance', **big_number_kwargs) }}
           </div>
         </div>
         <div class='govuk-grid-column-one-third'>
-          <h2 class='heading-small'>Text messages</h2>
+          <h2 class='govuk-heading-s govuk-!-margin-bottom-1'>Text messages</h2>
           <div class="keyline-block">
             {{ big_number(sms_sent, 'sent', **big_number_kwargs) }}
             {{ big_number(sms_free_allowance, 'free allowance', **big_number_kwargs) }}
@@ -48,7 +48,7 @@
           </div>
         </div>
         <div class='govuk-grid-column-one-third'>
-          <h2 class='heading-small'>Letters</h2>
+          <h2 class='govuk-heading-s govuk-!-margin-bottom-1'>Letters</h2>
           <div class="keyline-block">
             {{ big_number(letter_sent, 'sent', **big_number_kwargs) }}
           </div>
