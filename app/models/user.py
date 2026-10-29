@@ -144,11 +144,11 @@ class User(BaseUser, UserMixin):
 
     def update(self, **kwargs):
         response = user_api_client.update_user_attribute(self.id, **kwargs)
-        self.__init__(response)
+        self = type(self)(response)
 
     def update_password(self, password):
         response = user_api_client.update_password(self.id, password)
-        self.__init__(response)
+        self = type(self)(response)
 
     def update_email_access_validated_at(self):
         self.update(email_access_validated_at=isoformat_no_tz(datetime.now(UTC)))
