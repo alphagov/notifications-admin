@@ -384,7 +384,7 @@ def template_version_json(service_id, id_, created_by, version=1, created_at=Non
     return template
 
 
-def api_key_json(id_, name, expiry_date=None, key_type="normal", created_by=None, created_at=None):
+def api_key_json(id_, name, expiry_date=None, key_type="normal", created_by=None, created_at=None, last_used=None):
     return {
         "id": id_,
         "name": name,
@@ -392,6 +392,7 @@ def api_key_json(id_, name, expiry_date=None, key_type="normal", created_by=None
         "key_type": key_type,
         "created_by": created_by or sample_uuid(),
         "created_at": created_at,
+        "last_used": last_used,
     }
 
 

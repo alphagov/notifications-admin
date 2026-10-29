@@ -12,6 +12,7 @@ class APIKey(JSONModel):
     created_by: UUIDStr
     expiry_date: datetime | None
     key_type: str
+    last_used: datetime | None
     name: str
 
     __sort_attribute__ = "name"

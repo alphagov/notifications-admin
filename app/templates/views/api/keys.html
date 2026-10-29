@@ -22,17 +22,17 @@
     }) %}
       {% if current_service.api_keys.number_needing_rotation == 1 %}
         <p class="govuk-body govuk-!-font-weight-bold">
-          Your API key is more than 12 months old.  
+          Your API key is more than 12 months old.
         </p>
         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">
-          Rotate this key at least once a year or remove it if you no longer need it.  
+          Rotate this key at least once a year or remove it if you no longer need it.
         </p>
       {% else %}
         <p class="govuk-body govuk-!-font-weight-bold">
-          You have {{ current_service.api_keys.number_needing_rotation }} API keys that are more than 12 months old.   
+          You have {{ current_service.api_keys.number_needing_rotation }} API keys that are more than 12 months old.
         </p>
         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">
-          Rotate these keys at least once a year or remove any you no longer need.  
+          Rotate these keys at least once a year or remove any you no longer need.
         </p>
       {% endif %}
     {% endcall %}
@@ -44,7 +44,7 @@
     <ul class="govuk-list api-key-list" aria-label="API keys">
       {% for item in current_service.api_keys|sort %}
         <li class="api-key-list__item api-key">
-          
+
           <div class="api-key__header">
             <h3 class="govuk-heading-s api-key__name">{{ item.name }}</h3>
             {% if item.expiry_date %}
@@ -75,7 +75,16 @@
 
           <p class="api-key__metadata">
             Created by {{ user_getter(item.created_by, capitalise_unknown=False) }}
-            <time datetime="{{ item.created_at }}">{{ item.created_at|format_delta }}</time>
+            <time datetime="{{ item.created_at }}">{{ item.created_at|format_delta_days }}</time>
+          </p>
+          <p class="api-key__metadata">
+            {% if not item.last_used and item.created_at > api_key_usage_start_date %}
+              Never used
+            {% elif not item.last_used and item.created_at <= api_key_usage_start_date %}
+              Not used in the last <time datetime="{{ api_key_usage_start_date }}">{{ api_key_usage_start_date|format_delta_days_no_ago }}</time>
+            {% else %}
+              Last used <time datetime="{{ item.last_used }}">{{ item.last_used|format_delta_days }}</time>
+            {% endif %}
           </p>
         </li>
       {% endfor %}
