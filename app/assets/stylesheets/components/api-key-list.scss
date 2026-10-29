@@ -3,12 +3,13 @@
 
 .api-key-list {
   border-top: 1px solid govuk-functional-colour(border);
+  margin-bottom: govuk-spacing(6);
 }
 
 .api-key-list__item {
   border-bottom: 1px solid govuk-functional-colour(border);
   padding-top: govuk-spacing(3);
-  padding-bottom: govuk-spacing(4);
+  padding-bottom: govuk-spacing(3);
 }
 
 .api-key__header {
