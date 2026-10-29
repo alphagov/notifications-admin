@@ -6,7 +6,7 @@ humanize~=4.4
 Flask-WTF~=1.2
 Flask-Login~=0.6
 
-Pillow~=12.1
+Pillow~=13.0
 
 openpyxl~=3.1
 pyexcel~=0.7
