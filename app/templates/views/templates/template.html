@@ -79,9 +79,9 @@
     {{ copy_to_clipboard(template.id, name="Template ID", thing='template ID') }}
   </div>
 
-  <div class="govuk-!-margin-bottom-3">
+  <div class="govuk-!-margin-bottom-3 govuk-!-padding-top-4">
     {% if template._template.updated_at %}
-      <h2 class="heading-small bottom-gutter-2-3 heading-inline">
+      <h2 class="govuk-heading-s heading-inline">
         Last edited
         <time data-notify-module="update-relative-time" datetime="{{ template._template.updated_at }}">
           {{ template._template.updated_at|format_delta }}
