@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import total_ordering
-from inspect import get_annotations
+from inspect import get_annotations, isclass
 from uuid import UUID
 
 from notifications_utils.serialised_model import SerialisedModel, SerialisedModelCollection
@@ -61,7 +61,9 @@ class JSONModel(SerialisedModel, ABC):
         self._dict = _dict or {}
         for property, type_ in get_annotations(type(self)).items():
             if property in self._dict:
-                if type_ in _NON_COERCIBLE_TYPES:
+                if isclass(type_) and any(
+                    issubclass(type_, non_coercible_type) for non_coercible_type in _NON_COERCIBLE_TYPES
+                ):
                     value = self._dict[property]
                 else:
                     value = self.coerce_value_to_type(property, self._dict[property], type_)
