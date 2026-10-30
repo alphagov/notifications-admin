@@ -7,7 +7,7 @@
 {% block platform_admin_content %}
   <div class="govuk-grid-row bottom-gutter">
     <div class="govuk-grid-column-full">
-      <h1 class="heading-large">
+      <h1 class="govuk-heading-l">
         {{ user.name }}
       </h1>
       {% if user.platform_admin %}
@@ -20,7 +20,7 @@
       <p class="govuk-body">{{ user.email_address }}</p>
       <p class="{{ '' if user.mobile_number else 'hint' }}">{{ user.mobile_number or 'No mobile number'}}</p>
 
-      <h2 class="heading-medium">Organisations</h2>
+      <h2 class="govuk-heading-m">Organisations</h2>
       <nav class="browse-list">
         {% if user.organisations %}
           <ul>
@@ -36,7 +36,7 @@
         {% endif %}
       </nav>
 
-      <h2 class="heading-medium">Live services</h2>
+      <h2 class="govuk-heading-m">Live services</h2>
       <nav class="browse-list">
         {% if user.live_services %}
           <ul>
@@ -52,7 +52,7 @@
           </p>
         {% endif %}
       </nav>
-      <h2 class="heading-medium">Trial mode services</h2>
+      <h2 class="govuk-heading-m">Trial mode services</h2>
       <nav class="browse-list">
         {% if user.trial_mode_services %}
           <ul>
@@ -69,7 +69,7 @@
         {% endif %}
       </nav>
 
-      <h2 class="heading-medium">Authentication</h2>
+      <h2 class="govuk-heading-m">Authentication</h2>
       <p class="govuk-body">Signs in with {{ user.auth_type | format_auth_type(with_indefinite_article=True) }}</p>
       {% if user.auth_type != 'webauthn_auth' %}
         <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.change_user_auth', user_id=user.id) }}">
@@ -87,7 +87,7 @@
       </p>
       {% endif %}
 
-      <h2 class="heading-medium">Preferences</h2>
+      <h2 class="govuk-heading-m">Preferences</h2>
       <p class="govuk-body">
         {{ "Wants" if user.receives_new_features_email else "Does not want"}} to receive new features email
       </p>

@@ -18,7 +18,7 @@ $item-top-padding: govuk-spacing(3);
       overflow: hidden;
       overflow-wrap: break-word;
 
-      .heading-small {
+      > span {
         color: govuk-functional-colour(text);
       }
 

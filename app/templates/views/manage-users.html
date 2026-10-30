@@ -53,7 +53,7 @@
           <div class="govuk-grid-column-three-quarters">
             <h2 class="user-list-item-heading" title="{{ user.email_address }}">
               {%- if user.name -%}
-                <span class="heading-small live-search-relevant">
+                <span class="govuk-!-font-weight-bold live-search-relevant">
                   {% if current_user.platform_admin and not user.is_invited_user %}
                     <a class="govuk-link govuk-link--text-colour" href="{{ url_for('main.user_information', user_id=user.id) }}">
                       {{ user.name }}

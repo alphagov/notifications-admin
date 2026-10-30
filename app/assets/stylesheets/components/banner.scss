@@ -99,8 +99,11 @@
     box-shadow: 0 -1px 0 0 mix(black, govuk-colour("blue"), 10%);
   }
 
-  .heading-medium {
+  &__heading {
     @include govuk-font(24);
+    margin-top: 0;
+    margin-bottom: govuk-spacing(6);
+    color: govuk-functional-colour(inverse-text);
   }
 
   p {

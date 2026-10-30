@@ -18,7 +18,7 @@ def test_should_200_for_tour_start(
         template_id=fake_uuid,
     )
 
-    assert normalize_spaces(page.select(".banner-tour .heading-medium")[0].text) == (
+    assert normalize_spaces(page.select(".banner-tour .banner-tour__heading")[0].text) == (
         "Try sending yourself this example"
     )
     selected_hint = page.select(".banner-tour .govuk-grid-row")[0]
@@ -127,7 +127,7 @@ def test_should_200_for_get_tour_step(
     page = client_request.get("main.tour_step", service_id=SERVICE_ONE_ID, template_id=fake_uuid, step_index=1)
 
     assert "Example text message" in normalize_spaces(page.select_one("title").text)
-    assert normalize_spaces(page.select(".banner-tour .heading-medium")[0].text) == (
+    assert normalize_spaces(page.select(".banner-tour .banner-tour__heading")[0].text) == (
         "Try sending yourself this example"
     )
     selected_hint = page.select(".banner-tour .govuk-grid-row")[1]
@@ -468,7 +468,7 @@ def test_should_200_for_check_tour_notification(
         template_id=fake_uuid,
     )
 
-    assert normalize_spaces(page.select(".banner-tour .heading-medium")[0].text) == (
+    assert normalize_spaces(page.select(".banner-tour .banner-tour__heading")[0].text) == (
         "Try sending yourself this example"
     )
     selected_hint = page.select(".banner-tour .govuk-grid-row")[1]

@@ -25,7 +25,7 @@
 
   <div class="govuk-grid-row bottom-gutter">
     <div class="govuk-grid-column-one-third">
-      <h2 class="heading-small">Emails</h2>
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Emails</h2>
       <div class="keyline-block">
         {{ big_number(
           total_emails_sent,
@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="govuk-grid-column-one-third">
-      <h2 class="heading-small">Text messages</h2>
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Text messages</h2>
       <div class="keyline-block">
         {{ big_number(
           total_sms_cost,
@@ -46,7 +46,7 @@
       </div>
     </div>
     <div class="govuk-grid-column-one-third">
-      <h2 class="heading-small">Letters</h2>
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-1">Letters</h2>
       <div class="keyline-block">
         {{ big_number(
           total_letter_cost,
@@ -69,7 +69,7 @@
     </div>
   {% endif %}
 
-  <h2 class="heading-small {% if _search_form %}govuk-visually-hidden{% endif %}">By service</h2>
+  <h2 class="govuk-heading-s govuk-!-margin-bottom-1 {% if _search_form %}govuk-visually-hidden{% endif %}">By service</h2>
 
   {% for service in services %}
     <div class="keyline-block govuk-!-margin-top-2 organisation-service">

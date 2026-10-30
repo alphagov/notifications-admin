@@ -503,7 +503,7 @@ describe('Live search', () => {
       users.forEach(user => result += `
         <div class="user-list-item">
           <h2 class="user-list-item-heading" title="${user.email}">
-            <span class="heading-small live-search-relevant">
+            <span class="govuk-!-font-weight-bold live-search-relevant">
 
               <a class="govuk-link govuk-link--text-colour" href="/users/c943487c-63ff-4a56-bcdd-b2c06e0ea3e7">
                 ${user.label}
