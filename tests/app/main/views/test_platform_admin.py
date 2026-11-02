@@ -5,6 +5,7 @@ from unittest.mock import ANY, call
 import pytest
 from flask import url_for
 from freezegun import freeze_time
+from notifications_python_client.errors import HTTPError
 
 from app.main.views.platform_admin import build_live_service_permissions_for_users_list
 from tests.conftest import SERVICE_ONE_ID, SERVICE_TWO_ID, create_user, normalize_spaces
@@ -144,6 +145,41 @@ def test_platform_admin_submit_empty_returned_letters(
     assert not mock_client.called
 
     assert "Enter the returned letter references" in page.text
+
+
+def test_platform_admin_submit_returned_letters_shows_errors_for_invalid_references(
+    client_request,
+    platform_admin_user,
+    mocker,
+):
+    mocker.patch(
+        "app.letter_jobs_client.submit_returned_letters",
+        side_effect=HTTPError(
+            response=mocker.Mock(
+                status_code=400,
+                json={
+                    "errors": [
+                        {"error": "ValidationError", "message": "references AAAB does not match ^[0-9A-Z]{16}$"},
+                        {"error": "ValidationError", "message": "references AAD does not match ^[0-9A-Z]{16}$"},
+                    ],
+                    "status_code": 400,
+                },
+            ),
+            message=[
+                {"error": "ValidationError", "message": "references AAAB does not match ^[0-9A-Z]{16}$"},
+                {"error": "ValidationError", "message": "references AAD does not match ^[0-9A-Z]{16}$"},
+            ],
+        ),
+    )
+
+    client_request.login(platform_admin_user)
+    page = client_request.post(
+        "main.platform_admin_returned_letters", _data={"references": "AAAB\nAAD"}, _follow_redirects=True
+    )
+
+    assert normalize_spaces(page.select_one("h1")) == "Submit returned letters"
+    error_summary = page.select_one(".govuk-error-summary")
+    assert normalize_spaces(error_summary.text) == "There is a problem Invalid references: AAAB, AAD"
 
 
 def test_clear_cache_shows_form(
