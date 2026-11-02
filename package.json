@@ -36,7 +36,7 @@
     "@rollup/plugin-commonjs": "29.0.3",
     "@rollup/plugin-node-resolve": "16.0.3",
     "@rollup/plugin-terser": "1.0.0",
-    "@web/rollup-plugin-copy": "^1.0.0",
+    "@web/rollup-plugin-copy": "1.0.0",
     "better-npm-audit": "3.11.0",
     "del-cli": "8.0.1",
     "eslint": "10.13.0",
