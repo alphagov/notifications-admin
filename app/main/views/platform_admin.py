@@ -489,7 +489,7 @@ def platform_admin_returned_letters():
             letter_jobs_client.submit_returned_letters(references)
         except HTTPError as error:
             if error.status_code == 400:
-                assert isinstance(error.message, dict)  # type narrowing
+                assert isinstance(error.message, list)  # type narrowing
                 error_references = [
                     m.group(1)
                     for m in (re.match("references (.*) does not match", e["message"]) for e in error.message)
