@@ -4323,9 +4323,12 @@ def create_notification(
     postage=None,
     sent_one_off=True,
     reply_to_text=None,
+    content="hello ((name))",
+    to=None,
 ):
     noti = notification_json(
         service_id or SERVICE_ONE_ID,
+        to=to,
         rows=1,
         status=notification_status,
         template_type=template_type,
@@ -4340,7 +4343,7 @@ def create_notification(
     noti["template"] = template_json(
         service_id=service_id or str(UUID(version=4, int=999)),
         id_="5407f4db-51c7-4150-8758-35412d42186a",
-        content="hello ((name))",
+        content=content,
         subject="blah",
         redact_personalisation=redact_personalisation,
         type_=template_type,

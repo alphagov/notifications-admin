@@ -122,6 +122,68 @@ def test_notification_status_page_formats_email_and_sms_status_correctly(
 
 
 @pytest.mark.parametrize(
+    "content, recipient, expected_count",
+    [
+        ("a", "07900900123", "Charged as 1 text message"),
+        ("a" * 161, "07900900123", "Charged as 2 text messages"),
+        ("🇫🇷" * 50, "+33(0)5-12-34-56-78", "Charged as 6 text messages"),
+    ],
+)
+@pytest.mark.parametrize(
+    "user",
+    [
+        create_active_user_with_permissions(),
+        pytest.param(create_active_caseworking_user(), marks=pytest.mark.xfail(raises=AttributeError)),
+    ],
+)
+@pytest.mark.parametrize(
+    "notification_type",
+    [
+        "sms",
+        pytest.param("email", marks=pytest.mark.xfail(raises=AttributeError)),
+    ],
+)
+@pytest.mark.parametrize(
+    "notification_status",
+    [
+        "sending",
+        "delivered",
+        "temporary-failure",
+        "permanent-failure",
+        pytest.param("technical-failure", marks=pytest.mark.xfail(raises=AttributeError)),
+    ],
+)
+@freeze_time("2016-01-01 11:09:00.061258")
+def test_notification_status_page_shows_cost_of_text_message(
+    client_request,
+    mocker,
+    service_one,
+    fake_uuid,
+    user,
+    content,
+    recipient,
+    expected_count,
+    notification_type,
+    notification_status,
+):
+    mocker.patch("app.user_api_client.get_user", return_value=user)
+    mocker.patch(
+        "app.notification_api_client.get_notification",
+        return_value=create_notification(
+            content=content,
+            to=recipient,
+            template_type=notification_type,
+            notification_status=notification_status,
+        ),
+    )
+
+    client_request.login(user)
+    page = client_request.get("main.view_notification", service_id=service_one["id"], notification_id=fake_uuid)
+
+    assert normalize_spaces(page.select_one("[role=status] .govuk-hint").text) == expected_count
+
+
+@pytest.mark.parametrize(
     "template_redaction_setting, expected_content",
     [
         (False, "service one: hello Jo"),

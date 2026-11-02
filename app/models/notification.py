@@ -4,6 +4,7 @@ from typing import Any
 from markupsafe import Markup
 from notifications_utils.interruptible_io import InterruptibleIterableMixin
 from notifications_utils.letter_timings import LetterTimings, letter_can_be_cancelled
+from notifications_utils.recipient_validation.phone_number import PhoneNumber
 from notifications_utils.template import (
     LetterPreviewTemplate,
     SMSBodyPreviewTemplate,
@@ -149,6 +150,20 @@ class Notification(JSONModel):
     @property
     def finished(self):
         return self.status in (DELIVERED_STATUSES + FAILURE_STATUSES)
+
+    @property
+    def rate_multiplier(self) -> int | None:
+        if self.template["template_type"] != "sms":
+            return None
+        if self.status == "technical-failure":
+            return None
+        return PhoneNumber(self.to).get_international_phone_info().rate_multiplier
+
+    @property
+    def fragment_count(self) -> int | None:
+        if self.template["template_type"] != "sms":
+            return None
+        return SMSBodyPreviewTemplate(self.template, self.personalisation).fragment_count
 
 
 class APINotification(Notification):

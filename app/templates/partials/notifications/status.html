@@ -28,4 +28,9 @@
       (test)
     {% endif %}
   </p>
+  {% if current_user.has_permissions("manage_service", "manage_templates") and notification.rate_multiplier %}
+    <p class="govuk-hint">
+      Charged as {{ (notification.fragment_count * notification.rate_multiplier) | message_count(notification.template.template_type) }}
+    </p>
+  {% endif %}  
 </div>
