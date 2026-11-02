@@ -1,7 +1,7 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import terser from '@rollup/plugin-terser';
-import copy from 'rollup-plugin-copy';
+import { copy } from '@web/rollup-plugin-copy';
 import styles from "rollup-plugin-styler";
 import postCSSReplace from 'postcss-replace';
 
@@ -12,12 +12,6 @@ const paths = {
   govuk_frontend: 'node_modules/govuk-frontend/dist/'
 };
 
-const govukFrontendAssetPaths = {
-  images: `${paths.govuk_frontend}govuk/assets/images/**/*`,
-  fonts: `${paths.govuk_frontend}govuk/assets/fonts/**/*`,
-  manifest: `${paths.govuk_frontend}govuk/assets/manifest.json`,
-};
-
 const isDevelopment = Boolean(process.env.NOTIFY_ENVIRONMENT === 'development')
 
 export default [
@@ -25,8 +19,8 @@ export default [
   {
     input: paths.src + 'javascripts/esm/all-esm.mjs',
     output: {
-      dir: paths.dist + 'javascripts/',
-      entryFileNames: 'all-esm.mjs',
+      dir: paths.dist,
+      entryFileNames: 'javascripts/all-esm.mjs',
       format: 'es',
       sourcemap: true
     },
@@ -34,16 +28,16 @@ export default [
       commonjs(),
       nodeResolve(),
       terser(),
-      // copy images, error pages and govuk-frontend static assets
+      // copy images and error pages
       copy({
-        targets: [
-          { src: paths.src + 'error_pages/**/*', dest: paths.dist + 'error_pages/' },
-          { src: paths.src + 'images/**/*', dest: paths.dist + 'images/' },
-          { src: govukFrontendAssetPaths.images, dest: paths.dist + 'images/' },
-          { src: govukFrontendAssetPaths.fonts, dest: paths.dist + 'fonts/' },
-          { src: govukFrontendAssetPaths.manifest, dest: paths.dist }
-        ]
+        rootDir: paths.src,
+        patterns: ['error_pages/**/*', 'images/**/*']
       }),
+      // govuk-frontend static assets
+      copy({
+        rootDir: `${paths.govuk_frontend}govuk/assets/`,
+        patterns: ['images/**/*', 'fonts/**/*', 'manifest.json']
+      })
     ]
   },
   // SCSS compilation
