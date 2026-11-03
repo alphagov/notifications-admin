@@ -31,30 +31,30 @@ def test_still_processing(notify_admin, job_status, num_notifications_created, e
 @pytest.mark.parametrize(
     "failed, delivered, expected_failure_rate", [(0, 0, 0), (0, 1, 0), (1, 1, 50), (1, 0, 100), (1, 4, 20)]
 )
-def test_add_rate_to_job_calculates_rate(failed, delivered, expected_failure_rate):
+def test_add_rate_to_job_calculates_rate(failed, delivered, expected_failure_rate, fake_uuid):
     resp = Job(
         {
             "statistics": [
                 {"status": "failed", "count": failed},
                 {"status": "delivered", "count": delivered},
             ],
-            "id": "foo",
+            "id": fake_uuid,
         }
     )
 
     assert resp.failure_rate == expected_failure_rate
 
 
-def test_add_rate_to_job_preserves_initial_fields():
+def test_add_rate_to_job_preserves_initial_fields(fake_uuid):
     resp = Job(
         {
             "statistics": [
                 {"status": "failed", "count": 0},
                 {"status": "delivered", "count": 0},
             ],
-            "id": "foo",
+            "id": fake_uuid,
         }
     )
 
     assert resp.notifications_failed == resp.notifications_delivered == resp.failure_rate == 0
-    assert resp.id == "foo"
+    assert resp.id == fake_uuid
