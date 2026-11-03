@@ -220,7 +220,7 @@ class ScheduledJobs(ImmediateJobs):
 
 
 class PaginatedJobs(PaginatedModelList, ImmediateJobs):
-    statuses: set = set()
+    statuses: set[str] = set()
 
     @staticmethod
     def _get_items(*args, **kwargs):
