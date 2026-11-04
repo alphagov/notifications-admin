@@ -30,10 +30,7 @@ class JobApiClient(NotifyAdminAPIClient):
     FINISHED_JOB_STATUSES = {FINISHED_JOB_STATUS, FINISHED_ALL_NOTIFICATIONS_CREATED_JOB_STATUS}
 
     def get_job(self, service_id, job_id):
-        params = {}
-        job = self.get(url=f"/service/{service_id}/job/{job_id}", params=params)
-
-        return job
+        return self.get(url=f"/service/{service_id}/job/{job_id}", params={})
 
     def get_jobs(self, service_id, *, limit_days=None, contact_list_id=None, statuses=None, page=1):
         params = {"page": page}
