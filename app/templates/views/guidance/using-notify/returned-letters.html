@@ -14,27 +14,17 @@
   <p class="govuk-body">Undelivered letters are returned to our print provider and destroyed.</p>
   <p class="govuk-body">You can see a report of returned letters on the dashboard.</p>
   <h2 id="identify-returned-letters" class="heading-medium">Identify the returned letters</h2>
- <p class="govuk-body">To help you identify what letters are returned, the report will show details such as the:
- </p>
- <ul class="govuk-list govuk-list--bullet">
-   <li>template ID</li>
-   <li>date the letter was sent</li>
-   <li>a reference for each letter if you include either:
-       <ul class="govuk-list govuk-list--bullet">
-<p class="govuk-body">To help you identify which letters have been returned, the report will show details such as:</p>
-<ul class="govuk-list govuk-list--bullet">
-<li>the template ID</li>
-<li>the date the letter was sent</li>
-<li>a reference for each letter (optional)</li>
-</ul>
-
-<p class="govuk-body">If you want the returned letters report to include a reference, you must include either:</p>
-<ul class="govuk-list govuk-list--bullet">
-<li>a column called ‘reference’ in the list of addresses you upload</li>
-<li>the <code class="lang-py">reference</code> argument in your API call</li>
-       </ul>
-   </li>
- </ul>
+  <p class="govuk-body">To help you identify which letters have been returned, the report will show details such as:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>the template ID</li>
+    <li>the date the letter was sent</li>
+    <li>a reference for each letter (optional)</li>
+  </ul>
+  <p class="govuk-body">If you want the returned letters report to include a reference, you must include either:</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>a column called ‘reference’ in the list of addresses you upload</li>
+    <li>the <code class="lang-py">reference</code> argument in your API call</li>
+  </ul>
   <p class="govuk-body">You should keep a copy of the references in your own system, along with details of the letters they refer to. This will let you match the references in the returned letter report to the ones in your own system.</p>
   <h2 id="automate-identifying-returned-letters" class="heading-medium">Automate identifying the returned letters</h2>
   <p class="govuk-body">Use the Notify API to get the returned letters report and identify the letters. Follow the instructions in our <a class="govuk-link govuk-link--no-visited-state" href="https://www.notifications.service.gov.uk/using-notify/api-documentation">API documentation</a>.</p>
