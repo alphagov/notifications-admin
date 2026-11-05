@@ -372,6 +372,53 @@ def test_api_keys_page_shows_api_keys_with_creation_and_usage_info(
     ]
     # fmt: on
 
+    # Check the correct datetime metadata is on the keys
+    assert [
+        tuple(
+            (normalize_spaces(time_element), time_element["datetime"], time_element.get("title", None))
+            for time_element in key.select("time")
+        )
+        for key in page.select("ul.api-key-list li")
+    ] == [
+        (
+            # Created
+            (
+                "12 days ago",
+                "2026-10-09 12:00:00+00:00",
+                "2026-10-09 12:00:00+00:00",
+            ),
+            # Not used in the last…
+            (
+                "6 days",
+                "6d",
+                None,
+            ),
+        ),
+        (
+            # Created
+            (
+                "today",
+                "2026-10-21 10:00:00+00:00",
+                "2026-10-21 10:00:00+00:00",
+            ),
+            # Never used
+        ),
+        (
+            # Created
+            (
+                "2 years ago",
+                "2024-04-04 04:04:04+00:00",
+                "2024-04-04 04:04:04+00:00",
+            ),
+            # Last used
+            (
+                "today",
+                "2026-10-21",
+                "2026-10-21",
+            ),
+        ),
+    ]
+
     revoke_link = page.select_one("ul li a.govuk-link.govuk-link--destructive")
     assert normalize_spaces(revoke_link.text) == "Revoke some key name API key"
     assert revoke_link["href"] == url_for(
