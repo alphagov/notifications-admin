@@ -153,6 +153,25 @@ def format_delta_days_no_ago(date):
     return naturaltime_without_indefinite_article_no_ago(delta)
 
 
+def format_delta_as_html_duration(date):
+    periods = (
+        ("w", 60 * 60 * 24 * 7),
+        ("d", 60 * 60 * 24),
+        ("h", 60 * 60),
+        ("m", 60),
+        ("s", 1),
+    )
+    seconds = abs(datetime.now(UTC) - utc_string_to_aware_gmt_datetime(date)).total_seconds()
+
+    strings = []
+    for period_name, period_seconds in periods:
+        if seconds > period_seconds:
+            period_value, seconds = divmod(seconds, period_seconds)
+            strings.append(f"{int(period_value)}{period_name}")
+
+    return " ".join(strings)
+
+
 def valid_phone_number(phone_number):
     try:
         PhoneNumber(phone_number)

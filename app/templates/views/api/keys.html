@@ -75,15 +75,15 @@
 
           <p class="api-key__metadata">
             Created by {{ user_getter(item.created_by, capitalise_unknown=False) }}
-            <time datetime="{{ item.created_at }}">{{ item.created_at|format_delta_days }}</time>
+            <time datetime="{{ item.created_at }}" title="{{ item.created_at }}">{{ item.created_at|format_delta_days }}</time>
           </p>
           <p class="api-key__metadata">
             {% if not item.last_used and item.created_at > api_key_usage_start_date %}
               Never used
             {% elif not item.last_used and item.created_at <= api_key_usage_start_date %}
-              Not used in the last <time datetime="{{ api_key_usage_start_date }}">{{ api_key_usage_start_date|format_delta_days_no_ago }}</time>
+              Not used in the last <time datetime="{{ api_key_usage_start_date|format_delta_as_html_duration }}">{{ api_key_usage_start_date|format_delta_days_no_ago }}</time>
             {% else %}
-              Last used <time datetime="{{ item.last_used }}">{{ item.last_used|format_delta_days }}</time>
+              Last used <time datetime="{{ item.last_used|format_date_numeric }}" title="{{ item.last_used|format_date_numeric }}">{{ item.last_used|format_delta_days }}</time>
             {% endif %}
           </p>
         </li>
