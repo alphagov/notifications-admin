@@ -47,7 +47,7 @@ Text message pricing
 
   <p class="govuk-body">It does not cost you anything to <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_receive_text_messages') }}">receive text messages</a>.</p>
 
-  <h2 class="heading-medium" id="long-text-messages">Long text messages</h2>
+  <h2 class="govuk-heading-m" id="long-text-messages">Long text messages</h2>
   <p class="govuk-body">If a text message is longer than 160 characters (including spaces), it counts as more than one message.</p>
 
   <div class="bottom-gutter-3-2">
@@ -86,7 +86,7 @@ Text message pricing
     }) }}
   </div>
 
-<h2 class="heading-medium" id="language-other-than-english">Text messages in a language other than English</h2>
+<h2 class="govuk-heading-m" id="language-other-than-english">Text messages in a language other than English</h2>
 <p class="govuk-body">Most English language text messages use a set of <a class="govuk-link govuk-link--no-visited-state" href="#standard">standard letters and symbols</a>.</p>
 <p class="govuk-body">Languages such as Welsh, Arabic and Mandarin use non-standard characters.</p>
 <p class="govuk-body">Including a non-standard character in a text message changes the way we have to charge for it.</p>
@@ -127,7 +127,7 @@ Text message pricing
     }) }}
   </div>
 
-<h3 class="heading-small" id="standard">Standard letters and symbols</h3>
+<h3 class="govuk-heading-s" id="standard">Standard letters and symbols</h3>
 <p class="govuk-body">Characters that do not affect the cost of a text message include:</p>
  <ul class="govuk-list govuk-list--bullet">
    <li>uppercase letters A to Z</li>
@@ -144,7 +144,7 @@ Text message pricing
     <span class="extended-gsm-characters">[]{}^\|~€</span>
   </p>
     
-  <h2 class="heading-medium" id="international-numbers">Sending text messages to international numbers</h2>
+  <h2 class="govuk-heading-m" id="international-numbers">Sending text messages to international numbers</h2>
   <p class="govuk-body">It might cost more to send text messages to international numbers than UK ones, depending on the country.</p>
   {% set smsIntRates %}
     {{ live_search(target_selector='#international-pricing .govuk-table__body .govuk-table__row', show=True, form=_search_form, label='Search by country name or code') }}
