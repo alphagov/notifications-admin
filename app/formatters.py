@@ -1,7 +1,7 @@
 import decimal
 import re
 import urllib
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from numbers import Number
 
 import ago
@@ -27,13 +27,6 @@ def convert_to_boolean(value):
             return False
 
     return value
-
-
-def format_datetime(date: str | datetime) -> str:
-    """
-    Thursday, 1 January 1970
-    """
-    return f"{format_date(date)} at {format_time(date)}"
 
 
 def format_datetime_normal(date: str | datetime) -> str:
@@ -104,7 +97,7 @@ def get_human_day(time: datetime | str, date_prefix="", include_day_of_week=Fals
     day_of_week = date.strftime("%A ") if include_day_of_week else ""
     year = date.strftime(" %Y") if date.strftime("%Y") != now.strftime("%Y") else ""
 
-    return f"{date_prefix}{day_of_week}{_format_datetime_short(date)}{year}"
+    return f"{date_prefix}{day_of_week}{format_date_short(time)}{year}"
 
 
 def format_time(date: str | datetime) -> str:
@@ -138,7 +131,7 @@ def format_date_short(date: str | datetime) -> str:
     """
     1 January
     """
-    return _format_datetime_short(utc_string_to_aware_gmt_datetime(date))
+    return utc_string_to_aware_gmt_datetime(date).strftime("%d %B").lstrip("0")
 
 
 def format_date_human(date: str | datetime) -> str:
@@ -164,13 +157,6 @@ def format_day_of_week(date: str | datetime) -> str:
     Thursday
     """
     return utc_string_to_aware_gmt_datetime(date).strftime("%A")
-
-
-def _format_datetime_short(date: date | datetime) -> str:
-    """
-    1 January
-    """
-    return date.strftime("%d %B").lstrip("0")
 
 
 def naturaltime_without_indefinite_article(date: datetime | timedelta | float) -> str:
