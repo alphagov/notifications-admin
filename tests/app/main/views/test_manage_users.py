@@ -6,6 +6,7 @@ from unittest.mock import Mock
 import pytest
 from flask import url_for
 from flask_login import current_user
+from freezegun import freeze_time
 from notifications_python_client.errors import HTTPError
 
 import app
@@ -24,6 +25,7 @@ from tests.conftest import (
     create_active_user_manage_template_permissions,
     create_active_user_view_permissions,
     create_active_user_with_permissions,
+    create_service_one_admin,
     create_service_one_user,
     create_user,
     normalize_spaces,
@@ -42,7 +44,8 @@ from tests.conftest import (
                 "Can See dashboard "
                 "Can Send messages "
                 "Can Add and edit templates "
-                "Can Manage API integration"
+                "Can Manage API integration "
+                "This person has never signed in"
             ),
             (
                 "ZZZZZZZZ zzzzzzz@example.gov.uk "
@@ -51,6 +54,7 @@ from tests.conftest import (
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
                 "Cannot Manage API integration "
+                "This person has never signed in "
                 "Change details for ZZZZZZZZ zzzzzzz@example.gov.uk"
             ),
         ),
@@ -62,7 +66,8 @@ from tests.conftest import (
                 "Cannot See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage API integration"
+                "Cannot Manage API integration "
+                "This person has never signed in"
             ),
             (
                 "ZZZZZZZZ zzzzzzz@example.gov.uk "
@@ -70,7 +75,8 @@ from tests.conftest import (
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage API integration"
+                "Cannot Manage API integration "
+                "This person has never signed in"
             ),
         ),
         (
@@ -81,7 +87,8 @@ from tests.conftest import (
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage API integration"
+                "Cannot Manage API integration "
+                "This person has never signed in"
             ),
             (
                 "ZZZZZZZZ zzzzzzz@example.gov.uk "
@@ -89,7 +96,8 @@ from tests.conftest import (
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage API integration"
+                "Cannot Manage API integration "
+                "This person has never signed in"
             ),
         ),
         (
@@ -100,7 +108,8 @@ from tests.conftest import (
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Can Add and edit templates "
-                "Cannot Manage API integration"
+                "Cannot Manage API integration "
+                "This person has never signed in"
             ),
             (
                 "ZZZZZZZZ zzzzzzz@example.gov.uk "
@@ -108,7 +117,8 @@ from tests.conftest import (
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage API integration"
+                "Cannot Manage API integration "
+                "This person has never signed in"
             ),
         ),
         (
@@ -119,7 +129,8 @@ from tests.conftest import (
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Can Add and edit templates "
-                "Cannot Manage API integration"
+                "Cannot Manage API integration "
+                "This person has never signed in"
             ),
             (
                 "ZZZZZZZZ zzzzzzz@example.gov.uk "
@@ -127,7 +138,8 @@ from tests.conftest import (
                 "Can See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage API integration"
+                "Cannot Manage API integration "
+                "This person has never signed in"
             ),
         ),
     ],
@@ -379,7 +391,8 @@ def test_should_show_caseworker_on_overview_page(
         "Can See dashboard "
         "Cannot Send messages "
         "Cannot Add and edit templates "
-        "Cannot Manage API integration"
+        "Cannot Manage API integration "
+        "This person has never signed in"
     )
     # [1:5] are invited users
     assert normalize_spaces(page.select(".user-list-item")[6].text) == (
@@ -388,7 +401,8 @@ def test_should_show_caseworker_on_overview_page(
         "Cannot See dashboard "
         "Can Send messages "
         "Cannot Add and edit templates "
-        "Cannot Manage API integration"
+        "Cannot Manage API integration "
+        "This person has never signed in"
     )
 
 
@@ -559,7 +573,53 @@ def test_manage_users_page_shows_member_auth_type_if_service_has_email_auth_acti
     if service_has_email_auth:
         service_one["permissions"].append("email_auth")
     page = client_request.get("main.manage_users", service_id=service_one["id"])
-    assert bool(page.select_one(".tick-cross__hint")) == displays_auth_type
+    hint_text = normalize_spaces(page.select_one(".tick-cross__hint").text)
+    if displays_auth_type:
+        assert hint_text == "Signs in with a text message code (this person has never signed in)"
+    else:
+        assert hint_text == "This person has never signed in"
+
+
+@freeze_time("2026-11-05 12:12:12")
+def test_manage_users_shows_last_logged_in_date_when_service_does_not_have_email_auth_enabled(
+    client_request,
+    service_one,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    mocker,
+):
+    user_one = create_service_one_admin(email_address="1@gov.uk", logged_in_at="2022-08-18 10:31:58.065679")
+    user_two = create_service_one_user(email_address="2@gov.uk", logged_in_at="2026-01-18 10:31:58.065679")
+    mocker.patch("app.models.user.Users._get_items", return_value=[user_one, user_two])
+
+    page = client_request.get("main.manage_users", service_id=service_one["id"])
+    sign_in_hint_text = page.select(".tick-cross__hint")
+
+    assert normalize_spaces(sign_in_hint_text[0]) == "Last signed in 4 years ago"
+    assert normalize_spaces(sign_in_hint_text[1]) == "Last signed in 10 months ago"
+
+
+@freeze_time("2026-11-05 12:12:12")
+def test_manage_users_shows_last_logged_in_date_when_service_has_email_auth_enabled(
+    client_request,
+    service_one,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    mocker,
+):
+    service_one["permissions"].append("email_auth")
+
+    user_one = create_service_one_admin(email_address="1@gov.uk", logged_in_at="2022-08-18 10:31:58.065679")
+    user_two = create_service_one_user(email_address="2@gov.uk", logged_in_at="2026-01-18 10:31:58.065679")
+    mocker.patch("app.models.user.Users._get_items", return_value=[user_one, user_two])
+
+    page = client_request.get("main.manage_users", service_id=service_one["id"])
+    sign_in_hint_text = page.select(".tick-cross__hint")
+
+    # There's a newline character before the closing ")" which the tests need to account for, but when viewed on the
+    # page this doesn't show, so visually appears as "ago)"
+    assert normalize_spaces(sign_in_hint_text[0]) == "Signs in with a text message code (last signed in 4 years ago )"
+    assert normalize_spaces(sign_in_hint_text[1]) == "Signs in with a text message code (last signed in 10 months ago )"
 
 
 def test_manage_users_page_does_not_link_to_user_profile_page_if_not_platform_admins(
@@ -1524,6 +1584,7 @@ def test_cancel_invited_user_doesnt_work_if_user_not_invited_to_this_service(
                 "Can Send messages "
                 "Cannot Add and edit templates "
                 "Can Manage API integration "
+                "This person has never signed in "
                 "Cancel invitation for invited_user@test.gov.uk"
             ),
         ),
@@ -1536,7 +1597,8 @@ def test_cancel_invited_user_doesnt_work_if_user_not_invited_to_this_service(
                 "Cannot See dashboard "
                 "Cannot Send messages "
                 "Cannot Add and edit templates "
-                "Cannot Manage API integration"
+                "Cannot Manage API integration "
+                "This person has never signed in"
             ),
         ),
     ],
@@ -1646,7 +1708,8 @@ def test_manage_user_page_shows_how_many_folders_user_can_view(
     page = client_request.get("main.manage_users", service_id=service_one["id"])
 
     user_div = page.select_one("h2[title='notify@digital.cabinet-office.gov.uk']").parent
-    assert user_div.select_one(".tick-cross__hint:last-child").text.strip() == expected_message
+    assert normalize_spaces(user_div.select(".tick-cross__hint")[0].text) == expected_message
+    assert normalize_spaces(user_div.select(".tick-cross__hint")[1].text) == "This person has never signed in"
 
 
 def test_manage_user_page_doesnt_show_folder_hint_if_service_has_no_folders(
