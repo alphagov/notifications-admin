@@ -43,6 +43,17 @@
 
     {% include 'views/manage-users/permissions.html' %}
 
+    <h2 class="heading-small">Last signed in</h2>
+      {% if not user.logged_in_at %}
+      <p class="hint">This person has never signed in</p>
+      {% else %}
+      <p class="govuk-body">
+        <time data-notify-module="update-relative-time" datetime="{{ user.logged_in_at }}">
+          {{ user.logged_in_at|format_delta|capitalize }}
+        </time>
+      </p>
+      {% endif %}
+
     {{ page_footer(
       'Save',
       delete_link=url_for('main.edit_user_permissions', service_id=current_service.id, user_id=user.id, delete='yes'),

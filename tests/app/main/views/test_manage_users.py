@@ -12,6 +12,7 @@ from notifications_python_client.errors import HTTPError
 import app
 from app.constants import SERVICE_JOIN_REQUEST_APPROVED, SERVICE_JOIN_REQUEST_REJECTED
 from app.formatters import format_date_short
+from app.models.user import User
 from app.utils.user import is_gov_user
 from app.utils.user_permissions import permission_mappings, translate_permissions_from_ui_to_db
 from tests import organisation_json, service_json
@@ -819,6 +820,29 @@ def test_should_not_show_page_for_non_team_member(
         user_id=USER_ONE_ID,
         _expected_status=404,
     )
+
+
+@freeze_time("2025-07-01 10:59:00.061258")
+@pytest.mark.parametrize(
+    "last_logged_in_at, signed_in_decription",
+    [(None, "This person has never signed in"), ("2025-07-01 10:59:00", "Last signed in Just now")],
+)
+def test_edit_user_permissions_page_shows_last_signed_in_date(
+    client_request,
+    service_one,
+    mock_get_invites_for_service,
+    mock_get_template_folders,
+    mock_get_users_by_service,
+    last_logged_in_at,
+    signed_in_decription,
+    mocker,
+):
+    user_one = create_service_one_admin(email_address="1@gov.uk", logged_in_at=last_logged_in_at)
+    mocker.patch("app.models.service.Service.get_team_member", return_value=User(user_one))
+
+    page = client_request.get("main.edit_user_permissions", service_id=service_one["id"], user_id=user_one["id"])
+
+    assert signed_in_decription in normalize_spaces(page.text)
 
 
 @pytest.mark.parametrize(
