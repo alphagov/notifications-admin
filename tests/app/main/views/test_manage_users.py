@@ -469,14 +469,14 @@ def test_download_csv_of_users(
     response = client_request.get_response("main.manage_users_download", service_id=SERVICE_ONE_ID)
 
     assert response.get_data(as_text=True) == (
-        'Email address,Name,"Manage settings, team and usage",See dashboard,Send messages,Add and edit templates,Manage API integration,Sign in method\r\n'  # noqa: E501
-        "caseworker@example.gov.uk,Test User,No,No,Yes,No,No,Text message code\r\n"
-        "test@user.gov.uk,Test User With Permissions,No,Yes,No,No,No,Text message code\r\n"
-        "user_0@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
-        "user_1@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
-        "user_2@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
-        "user_3@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
-        "user_4@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code\r\n"
+        'Email address,Name,"Manage settings, team and usage",See dashboard,Send messages,Add and edit templates,Manage API integration,Sign in method,Service name,Organisation name\r\n'  # noqa: E501
+        "caseworker@example.gov.uk,Test User,No,No,Yes,No,No,Text message code,service one,\r\n"
+        "test@user.gov.uk,Test User With Permissions,No,Yes,No,No,No,Text message code,service one,\r\n"
+        "user_0@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code,service one,\r\n"
+        "user_1@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code,service one,\r\n"
+        "user_2@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code,service one,\r\n"
+        "user_3@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code,service one,\r\n"
+        "user_4@testnotify.gov.uk,(invited),Yes,Yes,Yes,No,Yes,Text message code,service one,\r\n"
     )
 
     client_request.login(active_user_view_permissions)
@@ -484,6 +484,21 @@ def test_download_csv_of_users(
         "main.manage_users_download",
         service_id=SERVICE_ONE_ID,
         _expected_status=403,
+    )
+
+
+def test_download_csv_of_users_includes_organisation_name(
+    client_request,
+    mock_get_invites_for_service,
+    mock_get_users_by_service,
+    mock_get_service_organisation,
+):
+    response = client_request.get_response("main.manage_users_download", service_id=SERVICE_ONE_ID)
+
+    assert response.get_data(as_text=True).splitlines()[1] == (
+        "notify@digital.cabinet-office.gov.uk,Test User,"
+        "Yes,Yes,Yes,Yes,Yes,Text message code,"
+        "service one,Test organisation"
     )
 
 
