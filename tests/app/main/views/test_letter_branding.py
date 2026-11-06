@@ -167,7 +167,7 @@ def test_view_letter_branding_shows_created_by_and_helpful_dates_if_available(
     assert created_by_link["href"] == url_for(".user_information", user_id=user["id"])
 
     if created_at:
-        assert "on Tuesday 06 December 2022" in page.select("p")[-2].text
+        assert "on Tuesday 6 December 2022" in page.select("p")[-2].text
 
     if updated_at:
         assert "on Friday 20 January 2023" in page.select("p")[-1].text

@@ -119,7 +119,7 @@ def format_date(date: str | datetime) -> str:
     """
     Thursday 1 January 1970
     """
-    return utc_string_to_aware_gmt_datetime(date).strftime("%A %d %B %Y")
+    return f"{format_day_of_week(date)} {format_date_normal(date)}"
 
 
 def format_date_normal(date: str | datetime) -> str:
