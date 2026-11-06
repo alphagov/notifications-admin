@@ -1,7 +1,7 @@
 import decimal
 import re
 import urllib
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from numbers import Number
 
 import ago
@@ -29,35 +29,35 @@ def convert_to_boolean(value):
     return value
 
 
-def format_datetime(date):
+def format_datetime(date: str | datetime) -> str:
     return f"{format_date(date)} at {format_time(date)}"
 
 
-def format_datetime_normal(date):
+def format_datetime_normal(date: str | datetime) -> str:
     return f"{format_date_normal(date)} at {format_time(date)}"
 
 
-def format_datetime_short(date):
+def format_datetime_short(date: str | datetime) -> str:
     return f"{format_date_short(date)} at {format_time(date)}"
 
 
-def format_datetime_relative(date):
+def format_datetime_relative(date: str | datetime) -> str:
     return f"{get_human_day(date)} at {format_time(date)}"
 
 
-def format_datetime_numeric(date):
+def format_datetime_numeric(date: str | datetime) -> str:
     return f"{format_date_numeric(date)} {format_time_24h(date)}"
 
 
-def format_date_numeric(date):
+def format_date_numeric(date: str | datetime) -> str:
     return utc_string_to_aware_gmt_datetime(date).strftime("%Y-%m-%d")
 
 
-def format_time_24h(date):
+def format_time_24h(date: str | datetime) -> str:
     return utc_string_to_aware_gmt_datetime(date).strftime("%H:%M")
 
 
-def get_human_day(time, date_prefix="", include_day_of_week=False):
+def get_human_day(time: datetime | str, date_prefix="", include_day_of_week=False) -> str:
     #  Add 1 minute to transform 00:00 into ‘midnight today’ instead of ‘midnight tomorrow’
     date = (utc_string_to_aware_gmt_datetime(time) - timedelta(minutes=1)).date()
     now = datetime.now(UTC)
@@ -76,42 +76,42 @@ def get_human_day(time, date_prefix="", include_day_of_week=False):
     return f"{date_prefix}{day_of_week}{_format_datetime_short(date)}{year}"
 
 
-def format_time(date):
+def format_time(date: str | datetime) -> str:
     return {"12:00AM": "Midnight", "12:00PM": "Midday"}.get(
         utc_string_to_aware_gmt_datetime(date).strftime("%-I:%M%p"),
         utc_string_to_aware_gmt_datetime(date).strftime("%-I:%M%p"),
     ).lower()
 
 
-def format_date(date):
+def format_date(date: str | datetime) -> str:
     return utc_string_to_aware_gmt_datetime(date).strftime("%A %d %B %Y")
 
 
-def format_date_normal(date):
+def format_date_normal(date: str | datetime) -> str:
     return utc_string_to_aware_gmt_datetime(date).strftime("%d %B %Y").lstrip("0")
 
 
-def format_date_short(date):
+def format_date_short(date: str | datetime) -> str:
     return _format_datetime_short(utc_string_to_aware_gmt_datetime(date))
 
 
-def format_date_human(date):
+def format_date_human(date: str | datetime) -> str:
     return get_human_day(date)
 
 
-def format_datetime_human(date, date_prefix="on", separator="at"):
+def format_datetime_human(date: str | datetime, date_prefix="on", separator="at") -> str:
     return f"{get_human_day(date, date_prefix=date_prefix)} {separator} {format_time(date)}"
 
 
-def format_day_of_week(date):
+def format_day_of_week(date: str | datetime) -> str:
     return utc_string_to_aware_gmt_datetime(date).strftime("%A")
 
 
-def _format_datetime_short(datetime):
-    return datetime.strftime("%d %B").lstrip("0")
+def _format_datetime_short(date: date | datetime) -> str:
+    return date.strftime("%d %B").lstrip("0")
 
 
-def naturaltime_without_indefinite_article(date):
+def naturaltime_without_indefinite_article(date: datetime | timedelta | float) -> str:
     return re.sub(
         "an? (.*) ago",
         lambda match: f"1 {match.group(1)} ago",
@@ -119,7 +119,7 @@ def naturaltime_without_indefinite_article(date):
     )
 
 
-def naturaltime_without_indefinite_article_no_ago(date):
+def naturaltime_without_indefinite_article_no_ago(date: datetime | timedelta | float) -> str:
     return re.sub(
         "an? (.*)",
         lambda match: f"{match.group(1)}",
@@ -127,7 +127,7 @@ def naturaltime_without_indefinite_article_no_ago(date):
     )
 
 
-def format_delta(date):
+def format_delta(date: str | datetime) -> str:
     delta = datetime.now(UTC) - utc_string_to_aware_gmt_datetime(date)
     if delta < timedelta(seconds=30):
         return "just now"
@@ -136,7 +136,7 @@ def format_delta(date):
     return naturaltime_without_indefinite_article(delta)
 
 
-def format_delta_days(date, numeric_prefix=""):
+def format_delta_days(date: str | datetime, numeric_prefix="") -> str:
     now = datetime.now(UTC)
     date = utc_string_to_aware_gmt_datetime(date)
     if date.strftime("%Y-%m-%d") == now.strftime("%Y-%m-%d"):
@@ -146,14 +146,14 @@ def format_delta_days(date, numeric_prefix=""):
     return numeric_prefix + naturaltime_without_indefinite_article(now - date)
 
 
-def format_delta_days_no_ago(date):
+def format_delta_days_no_ago(date: str | datetime) -> str:
     delta = datetime.now(UTC) - utc_string_to_aware_gmt_datetime(date)
     if delta < timedelta(days=1):
         return "day"
     return naturaltime_without_indefinite_article_no_ago(delta)
 
 
-def format_delta_as_html_duration(date):
+def format_delta_as_html_duration(date: str | datetime) -> str:
     periods = (
         ("w", 60 * 60 * 24 * 7),
         ("d", 60 * 60 * 24),
