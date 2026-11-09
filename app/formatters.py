@@ -183,7 +183,7 @@ def naturaltime_without_indefinite_article_no_ago(date: datetime | timedelta | f
     return re.sub(
         "an? (.*)",
         lambda match: f"{match.group(1)}",
-        humanize.naturaltime(date).replace(" ago", ""),
+        humanize.naturaldelta(date),
     )
 
 
@@ -611,7 +611,7 @@ def format_retention_period(weeks):
         return "1 week after sending"
     if weeks < 9:
         return f"{weeks} weeks after sending"
-    delta = humanize.naturaltime(timedelta(weeks=weeks)).replace(" ago", "")
+    delta = humanize.naturaldelta(timedelta(weeks=weeks))
     return Markup(f"""
         {weeks} weeks after sending<br>
         <span class='govuk-hint'>(about {delta})</span>
