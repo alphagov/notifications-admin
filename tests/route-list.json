@@ -57,6 +57,7 @@
     "/join-a-service/choose",
     "/letter-branding",
     "/letter-branding/<uuid:branding_id>",
+    "/letter-branding/<uuid:branding_id>/archive",
     "/letter-branding/<uuid:branding_id>/edit",
     "/letter-branding/create",
     "/new-password/<path:token>",

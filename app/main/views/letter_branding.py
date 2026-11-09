@@ -1,5 +1,5 @@
 from botocore.exceptions import ClientError as BotoClientError
-from flask import current_app, redirect, render_template, request, url_for
+from flask import current_app, flash, redirect, render_template, request, url_for
 from notifications_python_client.errors import HTTPError
 
 from app import current_user, letter_branding_client, logo_client
@@ -26,9 +26,20 @@ def letter_branding():
 
 
 @main.route("/letter-branding/<uuid:branding_id>", methods=["GET", "POST"])
+@main.route(
+    "/letter-branding/<uuid:branding_id>/archive",
+    methods=["GET"],
+    endpoint="platform_admin_confirm_archive_letter_branding",
+)
 @user_is_platform_admin
 def platform_admin_view_letter_branding(branding_id):
     letter_branding = LetterBranding.from_id(branding_id)
+
+    if request.endpoint == "main.platform_admin_confirm_archive_letter_branding":
+        if letter_branding.is_used_by_orgs_or_services:
+            flash("This letter branding is in use. You cannot delete it.")
+        else:
+            flash("Are you sure you want to delete this letter branding?", "delete")
 
     return render_template(
         "views/letter-branding/view-branding.html",
@@ -161,3 +172,10 @@ def create_letter_branding():
         logo=temporary_logo_key,
         error_summary_enabled=True,
     )
+
+
+@main.route("/letter-branding/<uuid:branding_id>/archive", methods=["POST"])
+@user_is_platform_admin
+def platform_admin_archive_letter_branding(branding_id):
+    letter_branding_client.archive_letter_branding(branding_id=branding_id)
+    return redirect(url_for(".letter_branding"))

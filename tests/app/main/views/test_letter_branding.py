@@ -194,6 +194,10 @@ def test_view_letter_branding_bottom_links(
     assert edit_link.text.strip() == "Edit this branding"
     assert edit_link["href"] == url_for(".update_letter_branding", branding_id=fake_uuid)
 
+    archive_link = bottom_links[1].select_one("a")
+    assert archive_link.text.strip() == "Delete this branding"
+    assert archive_link["href"] == url_for(".platform_admin_confirm_archive_letter_branding", branding_id=fake_uuid)
+
 
 def test_update_letter_branding_shows_the_current_letter_brand(
     client_request,
@@ -678,3 +682,56 @@ def test_create_letter_branding_shows_database_errors_on_name_fields(
     assert mock_save_permanent.called is True, (
         "The logo should be persisted to S3 before the DB call so that we know it's there before creating the branding."
     )
+
+
+def test_platform_admin_confirm_archive_letter_branding(
+    client_request,
+    platform_admin_user,
+    mock_get_letter_branding_by_id,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_letter_branding_empty,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_confirm_archive_letter_branding", branding_id=fake_uuid)
+
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
+        "Are you sure you want to delete this letter branding? Yes, delete"
+    )
+    assert "action" not in page.select_one(".banner-dangerous form")
+    assert page.select_one(".banner-dangerous form")["method"] == "post"
+
+
+def test_platform_admin_confirm_archive_letter_branding_that_is_in_use(
+    client_request,
+    platform_admin_user,
+    mock_get_letter_branding_by_id,
+    fake_uuid,
+    mock_get_orgs_and_services_associated_with_letter_branding_no_orgs,
+):
+    client_request.login(platform_admin_user)
+
+    page = client_request.get(".platform_admin_confirm_archive_letter_branding", branding_id=fake_uuid)
+
+    assert normalize_spaces(page.select_one(".banner-dangerous").text) == (
+        "This letter branding is in use. You cannot delete it."
+    )
+
+
+def test_platform_admin_archive_letter_branding(
+    client_request,
+    platform_admin_user,
+    mocker,
+    fake_uuid,
+    mock_get_letter_branding_by_id,
+):
+    mock_archive = mocker.patch("app.letter_branding_client.archive_letter_branding")
+
+    client_request.login(platform_admin_user)
+
+    client_request.post(
+        ".platform_admin_archive_letter_branding",
+        branding_id=fake_uuid,
+        _expected_redirect=url_for(".letter_branding"),
+    )
+    mock_archive.assert_called_once_with(branding_id=fake_uuid)
