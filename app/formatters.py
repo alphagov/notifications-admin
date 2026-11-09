@@ -161,29 +161,33 @@ def format_day_of_week(date: str | datetime) -> str:
     return utc_string_to_aware_gmt_datetime(date).strftime("%A")
 
 
-def naturaltime_without_indefinite_article(date: datetime | timedelta | float) -> str:
+def naturaltime_without_indefinite_article(delta: timedelta) -> str:
     """
     1 hour ago
     3 weeks ago
     5 years ago
     """
+    if 14 <= delta.days < 30:
+        return f"{round(delta.days / 7)} weeks ago"
     return re.sub(
         "an? (.*) ago",
         lambda match: f"1 {match.group(1)} ago",
-        humanize.naturaltime(date),
+        humanize.naturaltime(delta),
     )
 
 
-def naturaltime_without_indefinite_article_no_ago(date: datetime | timedelta | float) -> str:
+def naturaltime_without_indefinite_article_no_ago(delta: timedelta) -> str:
     """
     hour
     3 weeks
     5 years
     """
+    if 14 <= delta.days < 30:
+        return f"{round(delta.days / 7)} weeks"
     return re.sub(
         "an? (.*)",
         lambda match: f"{match.group(1)}",
-        humanize.naturaldelta(date),
+        humanize.naturaldelta(delta),
     )
 
 
