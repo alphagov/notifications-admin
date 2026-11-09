@@ -62,6 +62,8 @@ def manage_users_download(service_id):
         + list(dict(permission_options).values())
         + [
             "Sign in method",
+            "Service name",
+            "Organisation name",
         ],
     ] + [
         [
@@ -74,6 +76,8 @@ def manage_users_download(service_id):
         ]
         + [
             format_auth_type(user.auth_type),
+            current_service.name,
+            current_service.organisation.name if current_service.organisation else "",
         ]
         for user in sorted(current_service.team_members)
     ]
