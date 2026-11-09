@@ -263,6 +263,28 @@ def test_should_redirect_to_user_profile_when_user_confirms_email_link(
         ),
         _expected_redirect=url_for("main.your_account"),
     )
+    mock_update_user_attribute.assert_called_once_with(api_user_active["id"], email_address="new_email@gov.uk")
+
+
+def test_email_confirm_rejects_token_for_a_different_user(
+    notify_admin,
+    client_request,
+    mock_update_user_attribute,
+):
+    other_user_id = "11111111-1111-1111-1111-111111111111"
+    token = generate_token(
+        payload=json.dumps({"user_id": other_user_id, "email": "attacker@example.gov.uk"}),
+        secret=notify_admin.config["SECRET_KEY"],
+        salt=notify_admin.config["DANGEROUS_SALT"],
+    )
+    client_request.get_url(
+        url_for_endpoint_with_token(
+            "main.your_account_email_confirm",
+            token=token,
+        ),
+        _expected_status=403,
+    )
+    assert not mock_update_user_attribute.called
 
 
 def test_should_show_mobile_number_page(
