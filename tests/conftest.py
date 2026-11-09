@@ -2658,6 +2658,14 @@ def mock_get_letter_branding_by_id(notify_admin, mocker):
 
 
 @pytest.fixture(scope="function")
+def mock_get_orgs_and_services_associated_with_letter_branding_empty(notify_admin, mocker):
+    def _get(letter_branding_id):
+        return {"data": {"services": [], "organisations": []}}
+
+    return mocker.patch("app.letter_branding_client.get_orgs_and_services_associated_with_branding", side_effect=_get)
+
+
+@pytest.fixture(scope="function")
 def mock_get_letter_branding_pool(mocker):
     def _get_branding_pool(org_id):
         return [
@@ -2679,6 +2687,32 @@ def mock_get_letter_branding_pool(mocker):
         ]
 
     return mocker.patch("app.models.branding.LetterBrandingPool._get_items", side_effect=_get_branding_pool)
+
+
+@pytest.fixture(scope="function")
+def mock_get_letter_branding(notify_admin, mocker, fake_uuid):
+    def _get_letter_branding(id):
+        return create_letter_branding(id)
+
+    return mocker.patch(
+        "app.models.branding.letter_branding_client.get_letter_branding", side_effect=_get_letter_branding
+    )
+
+
+@pytest.fixture(scope="function")
+def mock_get_orgs_and_services_associated_with_letter_branding_no_orgs(notify_admin, mocker):
+    def _get(letter_branding_id):
+        return {
+            "data": {
+                "services": [
+                    {"name": "service 1", "id": str(UUID(version=4, int=1234))},
+                    {"name": "service 2", "id": str(UUID(version=4, int=5678))},
+                ],
+                "organisations": [],
+            }
+        }
+
+    return mocker.patch("app.letter_branding_client.get_orgs_and_services_associated_with_branding", side_effect=_get)
 
 
 @pytest.fixture(scope="function")

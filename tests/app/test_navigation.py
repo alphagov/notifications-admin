@@ -264,6 +264,8 @@ EXCLUDED_ENDPOINTS = set(
             "platform_admin_update_email_branding",
             "platform_admin_view_email_branding",
             "platform_admin_view_letter_branding",
+            "platform_admin_archive_letter_branding",
+            "platform_admin_confirm_archive_letter_branding",
             "privacy",
             "public_agreement",
             "public_download_agreement",
