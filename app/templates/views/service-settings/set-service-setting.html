@@ -16,15 +16,25 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       {% call form_wrapper() %}
-        {{ form.enabled(param_extensions={
-          "fieldset": {
-            "classes": "govuk-!-margin-top-3",
-            "legend": {
-              "isPageHeading": True,
-              "classes": "govuk-fieldset__legend--l"
-            }
+        {% set fieldset = {
+          "classes": "govuk-!-margin-top-3",
+          "legend": {
+            "isPageHeading": True,
+            "classes": "govuk-fieldset__legend--l"
           }
-        }) }}
+        } %}
+        {% if hint %}
+          {{ form.enabled(param_extensions={
+            "fieldset": fieldset,
+            "hint": {
+              "text": hint
+            }
+          }) }}
+        {% else %}
+          {{ form.enabled(param_extensions={
+            "fieldset": fieldset
+          }) }}
+        {% endif %}
         {{ page_footer('Save') }}
       {% endcall %}
     </div>

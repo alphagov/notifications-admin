@@ -166,7 +166,9 @@ class Organisation(JSONModel):
 
     @property
     def live_services(self):
-        return [s for s in self.services if s.active and s.live]
+        # Same rule as the public list of live services: leave out services with count_as_live off,
+        # so people asking to join an organisation do not see them.
+        return [s for s in self.services if s.active and s.live and getattr(s, "count_as_live", True)]
 
     @property
     def trial_services(self):
