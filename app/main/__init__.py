@@ -52,8 +52,8 @@ from app.main.views import (  # noqa
     your_account,
     your_services,
 )
-from app.main.views.organisations import branding, index  # noqa
-from app.main.views.service_settings import branding, index  # noqa
+from app.main.views.organisations import branding, index as organisation_index  # noqa
+from app.main.views.service_settings import branding, index as service_settings_index  # noqa
 
 
 def make_session_permanent():
