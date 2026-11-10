@@ -196,6 +196,7 @@ def service_json(
     confirmed_unique=False,
     confirmed_service_name=False,
     confirmed_email_sender_name=None,
+    count_as_live=True,
 ):
     if users is None:
         users = []
@@ -232,7 +233,7 @@ def service_json(
         "volume_sms": 222222,
         "volume_letter": 333333,
         "consent_to_research": True,
-        "count_as_live": True,
+        "count_as_live": count_as_live,
         "organisation": organisation_id,
         "notes": notes,
         "billing_contact_email_addresses": billing_contact_email_addresses,

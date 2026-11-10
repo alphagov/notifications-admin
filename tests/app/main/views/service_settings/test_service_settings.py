@@ -880,6 +880,11 @@ def test_show_switch_service_to_count_as_live_page(
     )
     assert page.select_one("[checked]")["value"] == selected
     assert page.select_one(f"label[for={page.select_one('[checked]')['id']}]").text.strip() == labelled
+    assert normalize_spaces(page.select_one(".govuk-hint").text) == (
+        "Choosing ‘no’ leaves this service out of the public list of live services and the list of "
+        "services people can ask to join. If you made this service live only to test something, put "
+        "it back into trial mode instead."
+    )
 
 
 @pytest.mark.parametrize(
