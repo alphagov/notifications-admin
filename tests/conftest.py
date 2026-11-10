@@ -1742,7 +1742,7 @@ def mock_get_uploads(mocker, api_user_active):
                 "upload_type": "letter_day",
             },
             {
-                "id": "job_id_1",
+                "id": str(UUID(version=4, int=1)),
                 "original_file_name": "some.csv",
                 "notification_count": 10,
                 "created_at": "2016-01-01 11:09:00.061258",
@@ -1752,7 +1752,7 @@ def mock_get_uploads(mocker, api_user_active):
                 "recipient": None,
             },
             {
-                "id": "letter_id_1",
+                "id": str(UUID(version=4, bytes=b"uploadedletter_1")),
                 "original_file_name": "some.pdf",
                 "notification_count": 1,
                 "created_at": "2016-01-01 11:09:00.061258",

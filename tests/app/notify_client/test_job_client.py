@@ -89,7 +89,7 @@ def test_client_gets_jobs_with_page_parameter(mocker):
 
 def test_client_parses_job_stats(mocker, notify_admin):
     service_id = "service_id"
-    job_id = "job_id"
+    job_id = str(uuid.uuid4())
     expected_data = {
         "data": {
             "status": "finished",
@@ -135,7 +135,7 @@ def test_client_parses_job_stats(mocker, notify_admin):
 
 def test_client_parses_empty_job_stats(mocker, notify_admin):
     service_id = "service_id"
-    job_id = "job_id"
+    job_id = str(uuid.uuid4())
     expected_data = {
         "data": {
             "status": "finished",
@@ -172,8 +172,8 @@ def test_client_parses_empty_job_stats(mocker, notify_admin):
 
 def test_client_parses_job_stats_for_service(mocker, notify_admin):
     service_id = "service_id"
-    job_1_id = "job_id_1"
-    job_2_id = "job_id_2"
+    job_1_id = str(uuid.uuid4())
+    job_2_id = str(uuid.uuid4())
     expected_data = {
         "data": [
             {
@@ -254,8 +254,8 @@ def test_client_parses_job_stats_for_service(mocker, notify_admin):
 
 def test_client_parses_empty_job_stats_for_service(mocker, notify_admin):
     service_id = "service_id"
-    job_1_id = "job_id_1"
-    job_2_id = "job_id_2"
+    job_1_id = str(uuid.uuid4())
+    job_2_id = str(uuid.uuid4())
     expected_data = {
         "data": [
             {
