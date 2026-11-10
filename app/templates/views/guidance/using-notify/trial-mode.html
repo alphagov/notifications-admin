@@ -21,7 +21,7 @@
   </ul>
   <p class="govuk-body">To remove these restrictions, you’ll need to make your service live.</p>
 
-  <h2 class="heading-medium" id="restrictions">Trial mode restrictions</h2>
+  <h2 class="govuk-heading-m" id="restrictions">Trial mode restrictions</h2>
 
   <p class="govuk-body">While your service is in trial mode, you can only send messages to yourself and your <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_team_members_and_permissions') }}">team members</a>.</p>
   <p class="govuk-body">There’s a daily limit of {{ email_and_sms_daily_limit | message_count('email') }} and {{ email_and_sms_daily_limit | message_count('sms') }}.</p>
@@ -29,7 +29,7 @@
 
     <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_who_can_use_notify') }}">GP surgeries</a> cannot send any text messages in trial mode.</p>
 
-  <h2 class="heading-medium" id="how-to-make-your-service-live">How to make your service live</h2>
+  <h2 class="govuk-heading-m" id="how-to-make-your-service-live">How to make your service live</h2>
 
   <p class="govuk-body">When you have finished testing your service:</p>
 

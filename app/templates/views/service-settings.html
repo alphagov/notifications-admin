@@ -626,19 +626,19 @@
 
     <h1 class="heading-medium">Settings</h1>
     <div class="bottom-gutter-3-2">
-      <h2 class="heading-medium govuk-visually-hidden">General</h2>
+      <h2 class="govuk-heading-m govuk-visually-hidden">General</h2>
       {{ service_base_settings }}
-      <h2 class="heading-medium">Email settings</h2>
+      <h2 class="govuk-heading-m">Email settings</h2>
       {{ service_email_settings }}
-      <h2 class="heading-medium">Text message settings</h2>
+      <h2 class="govuk-heading-m">Text message settings</h2>
       {{ service_text_message_settings }}
-      <h2 class="heading-medium">Letter settings</h2>
+      <h2 class="govuk-heading-m">Letter settings</h2>
       {{ service_letter_settings }}
 
     </div>
 
     {% if current_service.live %}
-      <h2 class="heading-medium top-gutter-0">Your service is live</h2>
+      <h2 class="govuk-heading-m">Your service is live</h2>
       <p class="govuk-body">
         To delete this service, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.support') }}">contact us</a>.
       </p>

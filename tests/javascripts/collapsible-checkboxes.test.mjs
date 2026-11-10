@@ -88,7 +88,7 @@ describe('Collapsible checkboxes', () => {
     test("adds a heading before the selected fieldset", () => {
 
       const heading = element(fieldset).getPreviousSibling(
-        el => (el.nodeName === 'h2') && (el.hasClass('heading-small'))
+        el => (el.nodeName === 'h2') && (el.hasClass('govuk-heading-s'))
       );
 
       expect(heading).not.toBeNull();
