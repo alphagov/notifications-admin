@@ -95,10 +95,26 @@
                 {% endif%}
               </p>
             {% endif %}
+
+            {% if not user.logged_in_at %}
+              {% set last_logged_in_description = 'this person has never signed in' %}
+            {% else %}
+              {%- set last_logged_in_description -%}
+                last signed in
+                <time data-notify-module="update-relative-time" datetime="{{ user.logged_in_at }}">
+                  {{ user.logged_in_at|format_delta }}
+                </time>
+              {%- endset -%}
+            {% endif %}
+
             {% if current_service.has_permission('email_auth') %}
               <p class="govuk-body tick-cross__hint">
                 Signs in with
-                {{ user.auth_type | format_auth_type(with_indefinite_article=True) }}
+                {{ user.auth_type | format_auth_type(with_indefinite_article=True) }} ({{last_logged_in_description}})
+              </p>
+            {% else %}
+              <p class="govuk-body tick-cross__hint">
+                {{ last_logged_in_description|capitalize }}
               </p>
             {% endif %}
             </div>
