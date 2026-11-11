@@ -97,8 +97,13 @@ class UpdateRelativeTime {
     }
 
     const diffInDays = Math.round(diffInHours / 24);
-    if (Math.abs(diffInDays) < 27) { // 22h to 26d
+    if (Math.abs(diffInDays) < 14) { // 22h to 13d
       return UpdateRelativeTime.relativeFormatter.format(diffInDays, 'day');
+    }
+
+    const diffInWeeks = Math.round(diffInHours / 24 / 7);
+    if (Math.abs(diffInDays) < 29) { // 14d to 28d
+      return UpdateRelativeTime.relativeFormatter.format(diffInWeeks, 'week');
     }
 
     // for months and years, we use the calendar date logic as lengths are different

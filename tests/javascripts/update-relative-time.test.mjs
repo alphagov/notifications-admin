@@ -122,8 +122,11 @@ describe('UpdateRelativeTime', () => {
       { label: 'hours (at 45m boundary)', offset: 45 * 60000, expected: '1 hour ago' },
       { label: 'hours (21h)', offset: 21 * 3600000, expected: '21 hours ago' },
       { label: 'yesterday (at 22h boundary)', offset: 22 * 3600000, expected: 'yesterday' },
-      { label: 'days (26 days)', offset: 26 * 86400000, expected: '26 days ago' },
-      { label: 'last month', offset: 30 * 86400000, expected: 'last month' },
+      { label: 'days (13 days)', offset: 13 * 86400000, expected: '13 days ago' },
+      { label: 'weeks (14 days)', offset: 14 * 86400000, expected: '2 weeks ago' },
+      { label: 'weeks (28 days)', offset: 28 * 86400000, expected: '4 weeks ago' },
+      { label: 'last month', offset: 29 * 86400000, expected: 'last month' },
+      { label: 'last month', offset: 90 * 86400000, expected: '3 months ago' },
       { label: 'last year', offset: 365 * 86400000, expected: 'last year' },
     ];
 
