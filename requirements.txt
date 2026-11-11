@@ -1032,7 +1032,7 @@ mistune==0.8.4 \
 notifications-python-client==12.2.0 \
     --hash=sha256:5552f83d26ca0bba2b69b8477c8db691645bfd53fd6e591421318c81fa077b7a
     # via -r requirements.in
-notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@2a3cc1820d00e00ce2f6ff69b531f42ba904209c
+notifications-utils @ git+https://github.com/alphagov/notifications-utils.git@e9fce683b39f5a368e0c00cafa668e4323368020
     # via -r requirements.in
 openpyxl==3.1.5 \
     --hash=sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2 \
