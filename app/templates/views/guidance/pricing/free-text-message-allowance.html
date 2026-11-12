@@ -1,5 +1,6 @@
 {% extends "content_template.html" %}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Free text message allowance' %}
@@ -10,7 +11,7 @@ Free text message allowance
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Free text message allowance</h1>
+  {{ govuk_page_header('Free text message allowance') }}
 
   <p class="govuk-body">Eligible services get an annual allowance of free text messages.</p>
   <p class="govuk-body">The size of the allowance depends on the organisation you work for.</p>
@@ -58,7 +59,7 @@ Free text message allowance
   <p class="govuk-body">You can keep sending messages once your service has used its allowance, you’ll just be charged for each additional message that you send.</p>
   <p class="govuk-body">See <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.guidance_pricing_text_messages') }}">text messages pricing</a>.</p>
 
-  <h2 class="heading-medium">Terms of the free allowance</h2>
+  <h2 class="govuk-heading-m">Terms of the free allowance</h2>
 
   <p class="govuk-body">The free text message allowance is discretionary.</p>
 
