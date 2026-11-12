@@ -1,7 +1,8 @@
 {% extends "content_template.html" %}
 {% from "components/big-number.html" import big_number %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% set navigation_label_prefix = 'Features' %}
 {% set content_column_width = 'three-quarters' %}
@@ -13,9 +14,9 @@
 
 {% block content_column_content %}
 
-  <div class="govuk-grid-row govuk-!-margin-bottom-8">
+  <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <div class="govuk-grid-column-two-thirds">
-      {{ page_header('Performance data') }}
+      {{ govuk_page_header('Performance data') }}
     </div>
   </div>
 
