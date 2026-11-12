@@ -1,5 +1,6 @@
 {% from "components/content-metadata.html" import content_metadata %}
 {% extends "content_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'About Notify' %}
@@ -10,7 +11,7 @@
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Terms of use</h1>
+  {{ govuk_page_header('Terms of use') }}
 
   {{ content_metadata(
     data={
