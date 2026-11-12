@@ -1,4 +1,5 @@
 {% extends "content_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -9,7 +10,7 @@
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Documentation</h1>
+  {{ govuk_page_header('Documentation') }}
     <p class="govuk-body">This documentation is for developers who want to integrate the GOV.UK Notify API with a web application or back office system.</p>
   <h2 class="govuk-heading-m" id="client-libraries">Client libraries</h2>
     <p class="govuk-body">Links to documentation open in a new tab.</p>
