@@ -2,6 +2,7 @@
 
 {% from "components/service-link.html" import service_link %}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = "Using Notify" %}
@@ -12,7 +13,7 @@
 
 {% block content_column_content %}
 
-<h1 class="heading-large">Daily limits</h1>
+{{ govuk_page_header('Daily limits') }}
 <div class="bottom-gutter-3-2">
   <p class="govuk-body">There’s a limit to the number of messages you can send each day. </p>
   <p class="govuk-body">If you need to discuss these limits, <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.support") }}">contact us</a>.</p>

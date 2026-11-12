@@ -1,5 +1,6 @@
 {% from "components/service-link.html" import service_link %}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% extends "content_template.html" %}
 
@@ -12,7 +13,7 @@
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Delivery times</h1>
+  {{ govuk_page_header('Delivery times') }}
 
   <p class="govuk-body">The {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }} lets you check the status of a message, to see when it was delivered.</p>
   <p class="govuk-body">To <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("main.guidance_security") }}">keep recipient data safe</a>, this information is only available for 7 days after a message has been sent. You can download a report, including a list of sent messages, for your own records.</p>
