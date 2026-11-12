@@ -111,6 +111,9 @@ def your_account_email_confirm(token):
         current_app.config["TOKEN_SECRET_KEY"],
     )
     token = Token(token_data)
+    # Signing proves we issued the token, not that the signed-in user is its subject.
+    if str(token.user_id) != str(current_user.id):
+        abort(403)
     user = User.from_id(token.user_id)
     user.update(email_address=token.email)
     session.pop(NEW_EMAIL, None)
