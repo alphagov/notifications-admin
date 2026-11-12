@@ -28,6 +28,8 @@
 
 .api-key__name {
   margin-bottom: 0;
+  word-break: break-word;
+
   @include govuk-media-query($from: tablet) {
     max-width: 50%;
   }
