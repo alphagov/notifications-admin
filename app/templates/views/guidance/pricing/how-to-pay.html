@@ -1,6 +1,6 @@
 {% extends "content_template.html" %}
 
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Pricing information' %}
@@ -11,7 +11,7 @@
 
 {% block content_column_content %}
 
-    {{ page_header('How to pay') }}
+    {{ govuk_page_header('How to pay') }}
 
     <p class="govuk-body">
       You must send GOV.UK Notify a purchase order (PO) before you spend any money on text messages or letters.
