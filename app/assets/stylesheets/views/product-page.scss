@@ -68,6 +68,27 @@
 
   }
 
+  &-emergency-banner {
+
+    margin: 0;
+    background: govuk-functional-colour(brand);
+    color: govuk-functional-colour(inverse-text);
+    padding-top: govuk-spacing(6);
+
+    // TODO: Remove once incident is over
+    .govuk-notification-banner {
+
+      border: solid white 5px;
+
+      .govuk-notification-banner__title {
+        @include govuk-font($size: 19, $weight: bold);
+        margin-bottom: 0;
+      }
+
+    }
+
+  }
+
   &-big-number {
     @include govuk-font(48, $weight: bold, $tabular: true);
     margin: 0 0 0 0;
