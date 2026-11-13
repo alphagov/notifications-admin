@@ -39,7 +39,7 @@ def submit_request_to_go_live(service_id):
         return redirect(url_for(".request_to_go_live", service_id=service_id))
 
     ticket_message = render_template("support-tickets/go-live-request.txt") + "\n"
-    if current_service.organisation.can_approve_own_go_live_requests:
+    if current_service.organisation and current_service.organisation.can_approve_own_go_live_requests:
         subject = f"Self approve go live request - {current_service.name}"
         notify_task_type = "notify_task_go_live_request_self_approve"
     else:
