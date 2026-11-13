@@ -65,7 +65,7 @@ def redirect_if_logged_in(f):
     return wrapped
 
 
-# see https://stackoverflow.com/questions/60532973/how-do-i-get-a-is-safe-url-function-to-use-with-flask-and-how-does-it-work  # noqa
+# see https://stackoverflow.com/questions/60532973/how-do-i-get-a-is-safe-url-function-to-use-with-flask-and-how-does-it-work
 def is_safe_redirect_url(target):
     from urllib.parse import urljoin, urlparse
 
