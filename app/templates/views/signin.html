@@ -2,8 +2,6 @@
 {% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
-{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
-
 
 {% block per_page_title %}
   {% if again %}
@@ -30,19 +28,6 @@
         </p>
       {% endif %}
     {% else %}
-      {% call govukNotificationBanner({}) %}
-        <p class="govuk-notification-banner__heading">
-          A global Microsoft outage is causing sign in problems for some GOV.UK&nbsp;Notify teams
-        </p>
-        <p class="govuk-body">
-          <a class="govuk-link govuk-link--no-visited-state" href="https://status.notifications.service.gov.uk/">Visit our system status page</a> if you:
-        </p>
-        <ul class="govuk-list govuk-list--bullet">
-          <li>use Outlook</li>
-          <li>are not receiving your sign-in emails</li>
-        </ul>
-      {% endcall %}
-
       {{ govuk_page_header("Sign in") }}
       <p class="govuk-body">
         If you do not have an account, you can
