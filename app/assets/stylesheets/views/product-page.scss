@@ -78,7 +78,7 @@
     // TODO: Remove once incident is over
     .govuk-notification-banner {
 
-      border: solid white 1px;
+      border: 1px solid govuk-functional-colour(surface-border);
 
       .govuk-notification-banner__title {
         @include govuk-font($size: 19, $weight: bold);
