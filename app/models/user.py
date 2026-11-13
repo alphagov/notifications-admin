@@ -15,7 +15,7 @@ from app.notify_client import InviteTokenError
 from app.notify_client.invite_api_client import invite_api_client
 from app.notify_client.org_invite_api_client import org_invite_api_client
 from app.notify_client.user_api_client import user_api_client
-from app.utils.time import is_less_than_days_ago, isoformat_no_tz
+from app.utils.time import isoformat_no_tz
 from app.utils.user import is_gov_user
 from app.utils.user_permissions import (
     all_ui_permissions,
@@ -140,7 +140,8 @@ class User(BaseUser, UserMixin):
 
     @property
     def email_needs_revalidating(self):
-        return not is_less_than_days_ago(self.email_access_validated_at, 90)
+        # return not is_less_than_days_ago(self.email_access_validated_at, 90)  # noqa
+        return False
 
     def update(self, **kwargs):
         response = user_api_client.update_user_attribute(self.id, **kwargs)

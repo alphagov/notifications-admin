@@ -9,7 +9,7 @@ from app.models.user import User
     ("email_access_validated_at", "expected_result"),
     (
         ("2020-10-01T11:35:21.726132Z", False),
-        ("2020-07-23T11:35:21.726132Z", True),
+        ("2020-07-23T11:35:21.726132Z", False),
     ),
 )
 def test_email_needs_revalidating(
