@@ -43,6 +43,12 @@ class LetterBrandingClient(NotifyAdminAPIClient):
     def get_orgs_and_services_associated_with_branding(self, branding_id):
         return self.get(url=f"/letter-branding/{branding_id}/orgs_and_services")
 
+    @cache.delete("letter_branding")
+    @cache.delete("letter_branding-{branding_id}")
+    @cache.delete_by_pattern("organisation-*-letter-branding-pool")
+    def archive_letter_branding(self, branding_id):
+        return self.post(url=f"/letter-branding/{branding_id}/archive", data=None)
+
 
 _letter_branding_client_context_var: ContextVar[LetterBrandingClient | None] = ContextVar("letter_branding_client")
 get_letter_branding_client: LazyLocalGetter[LetterBrandingClient] = LazyLocalGetter(

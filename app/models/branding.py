@@ -181,6 +181,12 @@ class LetterBranding(Branding):
             return user_api_client.get_user(self.created_by)
         return None
 
+    @property
+    def is_used_by_orgs_or_services(self):
+        orgs_and_services = letter_branding_client.get_orgs_and_services_associated_with_branding(self.id)["data"]
+
+        return len(orgs_and_services["services"]) > 0 or len(orgs_and_services["organisations"]) > 0
+
 
 class AllBranding(ModelList):
     class NotFound(Exception):

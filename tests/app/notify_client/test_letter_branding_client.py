@@ -86,3 +86,19 @@ def test_update_letter_branding(mocker, fake_uuid):
         "letter_branding",
     )
     mock_redis_delete_by_pattern.assert_called_with_args("organisation-*-letter-branding-pool")
+
+
+def test_archive_letter_branding(mocker, fake_uuid):
+    mock_post = mocker.patch("app.notify_client.letter_branding_client.LetterBrandingClient.post")
+    mock_redis_delete = mocker.patch("app.extensions.RedisClient.delete", new_callable=RedisClientMock)
+    mock_redis_delete_by_pattern = mocker.patch(
+        "app.extensions.RedisClient.delete_by_pattern", new_callable=RedisClientMock
+    )
+
+    LetterBrandingClient(mocker.MagicMock()).archive_letter_branding(
+        branding_id=fake_uuid,
+    )
+
+    mock_post.assert_called_once_with(url=f"/letter-branding/{fake_uuid}/archive", data=None)
+    mock_redis_delete.assert_called_with_args(f"letter_branding-{fake_uuid}", "letter_branding")
+    mock_redis_delete_by_pattern.assert_called_with_args("organisation-*-letter-branding-pool")
