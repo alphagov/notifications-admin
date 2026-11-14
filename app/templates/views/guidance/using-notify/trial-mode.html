@@ -1,4 +1,5 @@
 {% extends "content_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -9,7 +10,7 @@
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Trial mode</h1>
+  {{ govuk_page_header('Trial mode') }}
 
   <p class="govuk-body">When you add a new service it will start in trial mode.</p>
 

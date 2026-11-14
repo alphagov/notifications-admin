@@ -3,6 +3,7 @@
 {% from "components/pill.html" import pill %}
 {% from "components/service-link.html" import service_link %}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -14,7 +15,7 @@
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">{{ page_title }}</h1>
+  {{ govuk_page_header(page_title) }}
 
   <p class="govuk-body">Use the {{ service_link(current_service, 'main.service_dashboard', 'dashboard') }} to check the status of a message.</p>
       <p class="govuk-body">This page describes the statuses you’ll see when you’re signed-in to GOV.UK Notify.</p>

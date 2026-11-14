@@ -2,6 +2,7 @@
 
 {% from "components/service-link.html" import service_link %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -12,7 +13,7 @@
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Upload a letter</h1>
+  {{ govuk_page_header('Upload a letter') }}
 
   <p class="govuk-body">Upload a PDF of a single letter and Notify will print, pack and post it for you.</p>
   <p class="govuk-body">You can use this feature if you send a lot of one-off letters or if our reusable letter templates do not meet your needs.</p>

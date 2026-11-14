@@ -1,6 +1,6 @@
 {% extends "content_template.html" %}
 
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'About Notify' %}
@@ -11,9 +11,7 @@
 
 {% block content_column_content %}
 
-  {{ page_header(
-    'Who can use Notify'
-  ) }}
+  {{ govuk_page_header('Who can use Notify') }}
 
   <p class="govuk-body">
     Only public sector organisations can accept our data processing and financial agreement.
