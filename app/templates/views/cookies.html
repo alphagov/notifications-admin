@@ -1,5 +1,6 @@
-{% extends "withoutnav_template.html" %}
+{% extends "content_template.html" %}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% block per_page_title %}
   Cookies
@@ -7,11 +8,9 @@
 
 {% block cookie_message %}{% endblock %}
 
-{% block maincolumn_content %}
+{% block content_column_content %}
 
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <h1 class="heading-large">Cookies</h1>
+ {{ govuk_page_header('Cookies') }}
     <p class="summary">
       Cookies are small files saved on your phone, tablet or computer when you visit a website.
     </p>
@@ -49,7 +48,5 @@
         ]
       ]
     }) }}
-  </div>
-</div>
 
 {% endblock %}

@@ -1,15 +1,13 @@
-{% extends "withoutnav_template.html" %}
+{% extends "content_template.html" %}
 {% from "components/content-metadata.html" import content_metadata %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% block per_page_title %}
   Privacy notice: how we use your data
 {% endblock %}
 
-{% block maincolumn_content %}
-
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <h1 class="heading-large">Privacy notice: how we use your data</h1>
+{% block content_column_content %}
+    {{ govuk_page_header('Privacy notice: how we use your data') }}
 
     {{ content_metadata(
       data={
@@ -159,9 +157,5 @@
         </p>
       </li>
     </ol>
-
-
-  </div>
-</div>
 
 {% endblock %}
