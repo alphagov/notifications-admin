@@ -1,0 +1,21 @@
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+
+{% set mailbox_meta = [{
+    "key": {
+      "html": "Subject"
+    },
+    "value": {
+      "classes": "" if subject else "govuk-hint",
+      "html": subject or "Subject missing",
+    }
+}] %}
+
+<div class="email-message">
+  {{ govukSummaryList({
+    "classes": "email-message-meta",
+    "rows": mailbox_meta
+  }) }}
+  <div class="email-message-body">
+    {{ body }}
+  </div>
+</div>

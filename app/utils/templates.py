@@ -320,6 +320,71 @@ class EmailPreviewTemplate(BaseEmailTemplate):
         return self.all_placeholders - self.filenames
 
 
+class MailboxPreviewTemplate(BaseEmailTemplate):
+    template_type: str = "mailbox"
+
+    def __init__(
+        self,
+        template,
+        values=None,
+        redact_missing_personalisation=False,
+    ):
+        super().__init__(template, values, redact_missing_personalisation=redact_missing_personalisation)
+        self.version = template.get("version")
+
+    def __str__(self):
+        return Markup(
+            self.jinja_template.render(
+                {
+                    "body": self.html_body,
+                    "subject": self.subject,
+                }
+            )
+        )
+
+    @property
+    def jinja_template(self):
+        return current_app.jinja_env.get_template("partials/templates/mailbox_preview_template.jinja2")
+
+    @property
+    def subject(self):
+        return (
+            Take(
+                Field(
+                    self._subject,
+                    self.values,
+                    html="escape",
+                    redact_missing_personalisation=self.redact_missing_personalisation,
+                )
+            )
+            .then(do_nice_typography)
+            .then(normalise_whitespace)
+        )
+
+    @property
+    def values(self):
+        return super().values
+
+    @values.setter
+    def values(self, value):
+        # Assigning to super().values doesn’t work here. We need to get
+        # the property object instead, which has the special method
+        # fset, which invokes the setter as if we were
+        # assigning to it outside this class.
+        super(MailboxPreviewTemplate, type(self)).values.fset(self, value)
+
+    @property
+    def all_placeholders(self):
+        """
+        Returns normal placeholders and file placeholders
+        """
+        return super().placeholders
+
+    @property
+    def placeholders(self):
+        return self.all_placeholders
+
+
 class LetterAttachment(JSONModel):
     original_filename: Any
     page_count: Any
@@ -347,6 +412,10 @@ def get_template(
     sms_sender=None,
     include_letter_edit_ui_overlay=False,
 ):
+    if "mailbox" == template["template_type"]:
+        return MailboxPreviewTemplate(
+            template,
+        )
     if "email" == template["template_type"]:
         return EmailPreviewTemplate(
             template,
