@@ -1,6 +1,7 @@
 {% extends "content_template.html" %}
 
 {% from "components/service-link.html" import service_link %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {# Used by the content_template.html layout, prefixes the "navigation" accessible name #}
 {% set navigation_label_prefix = 'Using Notify' %}
@@ -11,7 +12,7 @@
 
 {% block content_column_content %}
 
-  <h1 class="heading-large">Attach pages to a letter template</h1>
+  {{ govuk_page_header('Attach pages to a letter template') }}
 
     <p class="govuk-body">Upload a PDF and we’ll print it as part of your letter.</p>
     <p class="govuk-body">You can attach pages with complex layouts. For example, forms, tables or Direct Debit mandates.</p>
