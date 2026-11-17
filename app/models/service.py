@@ -68,6 +68,7 @@ class Service(JSONModel):
         "email",
         "sms",
         "letter",
+        "mailbox",
     )
 
     ALL_PERMISSIONS: Sequence[str] = TEMPLATE_TYPES + (
