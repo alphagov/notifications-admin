@@ -266,7 +266,7 @@ def valid_phone_number(phone_number):
 
 
 def format_notification_type(notification_type):
-    return {"email": "Email", "sms": "Text message", "letter": "Letter"}[notification_type]
+    return {"email": "Email", "sms": "Text message", "letter": "Letter", "mailbox": "Mailbox"}[notification_type]
 
 
 def format_notification_status(status, template_type):
