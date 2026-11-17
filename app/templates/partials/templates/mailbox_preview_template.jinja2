@@ -1,0 +1,21 @@
+{% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+
+<div class="email-message">
+  {% if show_recipient %}
+    {{ govukSummaryList({
+      "classes": "email-message-meta",
+      "rows": [{
+        "key": {
+          "html": "To"
+        },
+        "value": {
+          "classes": "email-message-meta__send-to",
+          "html": recipient
+        }
+      }]
+    }) }}
+  {% endif %}
+  <div class="email-message-body">
+    {{ body }}
+  </div>
+</div>

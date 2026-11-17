@@ -5,7 +5,15 @@ from flask import current_app, render_template, url_for
 from markupsafe import Markup
 from notifications_utils.countries import Postage
 from notifications_utils.field import Field
-from notifications_utils.formatters import escape_html, formatted_list, normalise_whitespace
+from notifications_utils.formatters import (
+    autolink_urls,
+    escape_html,
+    formatted_list,
+    nl2br,
+    normalise_multiple_newlines,
+    normalise_whitespace,
+    normalise_whitespace_and_newlines,
+)
 from notifications_utils.insensitive_dict import InsensitiveSet
 from notifications_utils.json import RelaxedContainerJSONEncoder as RCJSONEncoder
 from notifications_utils.take import Take
@@ -13,6 +21,7 @@ from notifications_utils.template import (
     BaseEmailTemplate,
     BaseLetterTemplate,
     SMSPreviewTemplate,
+    Template,
     do_nice_typography,
 )
 from ordered_set import OrderedSet
@@ -320,6 +329,61 @@ class EmailPreviewTemplate(BaseEmailTemplate):
         return self.all_placeholders - self.filenames
 
 
+class BaseMailboxTemplate(Template):
+    """
+    A mailbox message is a plain-text body (no markdown) and no subject.
+
+    Only depends on notifications_utils so it can move there later.
+    """
+
+    template_type = "mailbox"
+
+    @property
+    def body(self):
+        return Markup(
+            Take(
+                Field(
+                    self.content,
+                    self.values,
+                    html="escape",
+                    redact_missing_personalisation=self.redact_missing_personalisation,
+                )
+            )
+            .then(normalise_whitespace_and_newlines, preserve_zero_width_joiner=True)
+            .then(normalise_multiple_newlines)
+            .then(str.strip)
+            .then(nl2br)
+            .then(autolink_urls, classes="govuk-link govuk-link--no-visited-state")
+        )
+
+
+class MailboxPreviewTemplate(BaseMailboxTemplate):
+    def __init__(
+        self,
+        template,
+        values=None,
+        show_recipient=True,
+        redact_missing_personalisation=False,
+    ):
+        super().__init__(template, values, redact_missing_personalisation=redact_missing_personalisation)
+        self.show_recipient = show_recipient
+
+    def __str__(self):
+        return Markup(
+            self.jinja_template.render(
+                {
+                    "body": self.body,
+                    "recipient": Field("((mailbox identifier))", self.values, with_brackets=False, html="escape"),
+                    "show_recipient": self.show_recipient,
+                }
+            )
+        )
+
+    @property
+    def jinja_template(self):
+        return current_app.jinja_env.get_template("partials/templates/mailbox_preview_template.jinja2")
+
+
 class LetterAttachment(JSONModel):
     original_filename: Any
     page_count: Any
@@ -334,6 +398,8 @@ def get_sample_template(template_type):
         return SMSPreviewTemplate({"content": "any", "template_type": "sms"})
     if template_type == "letter":
         return TemplatedLetterImageTemplate({"content": "any", "subject": "", "template_type": "letter"})
+    if template_type == "mailbox":
+        return MailboxPreviewTemplate({"content": "any", "template_type": "mailbox"})
 
 
 def get_template(
@@ -377,6 +443,12 @@ def get_template(
             image_url=letter_preview_url,
             contact_block=template["reply_to_text"],
             include_letter_edit_ui_overlay=include_letter_edit_ui_overlay,
+        )
+    if "mailbox" == template["template_type"]:
+        return MailboxPreviewTemplate(
+            template,
+            show_recipient=show_recipient,
+            redact_missing_personalisation=redact_missing_personalisation,
         )
 
 
