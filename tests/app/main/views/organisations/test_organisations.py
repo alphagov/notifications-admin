@@ -558,7 +558,7 @@ def test_organisation_services_shows_live_services_and_usage(
     assert normalize_spaces(usage_rows[8].text) == "£0.00 spent on letters"
 
     # Ensure there’s no ‘this org has no services message’
-    heading_aside = page.select(".heading-aside")
+    heading_aside = page.select(".govuk-heading__aside")
     assert len(heading_aside) == 1
     assert heading_aside[0].text == "Last updated today at 8:00pm"
 
