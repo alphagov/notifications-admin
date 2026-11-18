@@ -246,6 +246,7 @@ def get_template_nav_label(value):
         "sms": "Text message",
         "email": "Email",
         "letter": "Letter",
+        "mailbox": "Mailbox",
     }[value]
 
 
