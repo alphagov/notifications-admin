@@ -1577,6 +1577,17 @@ class EmailTemplateForm(BaseTemplateForm, TemplateNameMixin):
             raise ValidationError("You cannot put a file in the subject")
 
 
+class MailboxTemplateForm(BaseTemplateForm, TemplateNameMixin):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    subject = GovukTextareaField("Subject", validators=[NotifyDataRequired(thing="the subject of the message")])
+
+    def validate_subject(self, field):
+        if field.errors:
+            return
+
+
 class LetterTemplateForm(BaseTemplateForm, TemplateNameMixin):
     subject = GovukTextareaField("Heading", validators=[NotifyDataRequired(thing="a main heading for your letter")])
     template_content = GovukTextareaField(

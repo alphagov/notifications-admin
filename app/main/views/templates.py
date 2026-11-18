@@ -51,6 +51,7 @@ from app.main.forms import (
     SearchTemplatesForm,
     SetTemplateSenderForm,
     SMSTemplateForm,
+    MailboxTemplateForm,
     TemplateAndFoldersSelectionForm,
     TemplateFolderForm,
     WelshLetterTemplateForm,
@@ -78,7 +79,7 @@ from app.utils.user import user_has_permissions
 
 
 def get_template_form(
-    template_type: Literal["email", "sms", "letter"],
+    template_type: Literal["email", "sms", "letter", "mailbox"],
     email_file_filenames=None,
     language: Literal["welsh"] | None = None,
 ):
@@ -86,6 +87,8 @@ def get_template_form(
         return partial(EmailTemplateForm, email_file_filenames=email_file_filenames)
     elif template_type == "sms":
         return SMSTemplateForm
+    elif template_type == "mailbox":
+        return MailboxTemplateForm
     else:
         if language == "welsh":
             return WelshLetterTemplateForm
