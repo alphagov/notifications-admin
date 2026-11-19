@@ -214,6 +214,7 @@ class MainNavigation(Navigation):
             "returned_letter_summary",
             "returned_letters",
             "service_dashboard",
+            "service_dashboard_live",
             "unsubscribe_request_reports_summary",
             "unsubscribe_request_report",
             "download_unsubscribe_request_report",

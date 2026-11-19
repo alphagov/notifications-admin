@@ -16,6 +16,13 @@ class TemplateStatisticsApiClient(NotifyAdminAPIClient):
 
         return self.get(url=f"/service/{service_id}/template-statistics", params=params)["data"]
 
+    def get_template_statistics_for_service_live(self, service_id, limit_days=None):
+        params = {}
+        if limit_days is not None:
+            params["limit_days"] = limit_days
+
+        return self.get(url=f"/service/{service_id}/template-statistics/live", params=params)["data"]
+
     def get_monthly_template_usage_for_service(self, service_id, year):
         return self.get(url=f"/service/{service_id}/notifications/templates_usage/monthly?year={year}")["stats"]
 

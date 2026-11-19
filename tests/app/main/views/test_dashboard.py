@@ -664,6 +664,50 @@ def test_dashboard_shows_no_unsubscribe_requests_statistics_when_there_are_no_un
     assert not page.select("#total-unsubscribe-requests")
 
 
+def test_live_dashboard_page_uses_live_updates_url(
+    client_request,
+    mock_get_service_templates,
+    mock_get_jobs,
+    mock_get_scheduled_job_stats,
+    mock_get_service_statistics,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+    mock_get_template_statistics,
+    mock_get_unsubscribe_requests_statistics,
+    mock_get_annual_usage_for_service,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary,
+):
+    page = client_request.get("main.service_dashboard_live", service_id=SERVICE_ONE_ID)
+
+    assert page.select_one("[data-resource]")["data-resource"] == url_for(
+        "json_updates.service_dashboard_live_updates", service_id=SERVICE_ONE_ID
+    )
+
+
+def test_live_dashboard_updates_use_live_template_statistics(
+    client_request,
+    mocker,
+    mock_get_service_templates,
+    mock_has_no_jobs,
+    mock_get_service_statistics,
+    mock_get_unsubscribe_requests_statistics,
+    mock_get_annual_usage_for_service,
+    mock_get_free_sms_fragment_limit,
+    mock_get_inbound_sms_summary,
+    mock_get_returned_letter_statistics_with_no_returned_letters,
+):
+    mock_live_stats = mocker.patch(
+        "app.template_statistics_client.get_template_statistics_for_service_live",
+        return_value=copy.deepcopy(stub_template_stats),
+    )
+    mock_stats = mocker.patch("app.template_statistics_client.get_template_statistics_for_service")
+
+    client_request.get_response("json_updates.service_dashboard_live_updates", service_id=SERVICE_ONE_ID)
+
+    mock_live_stats.assert_called_once_with(SERVICE_ONE_ID, limit_days=7)
+    assert not mock_stats.called
+
+
 def test_should_show_recent_templates_on_dashboard(
     client_request,
     mocker,
