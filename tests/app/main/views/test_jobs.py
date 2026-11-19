@@ -614,13 +614,13 @@ def test_should_not_show_cancel_link_for_letter_job_if_too_late(
     job_created_at,
     expected_fragment,
 ):
-    job_id = uuid.uuid4()
+    job_id = str(uuid.uuid4())
     job = job_json(SERVICE_ONE_ID, active_user_with_permissions, job_id=job_id, created_at=job_created_at)
     notifications_json = notification_json(SERVICE_ONE_ID, job=job, status="created", template_type="letter")
     mocker.patch("app.job_api_client.get_job", side_effect=[{"data": job}])
     mocker.patch("app.models.notification.Notifications._get_items", return_value=notifications_json)
 
-    page = client_request.get("main.view_job", service_id=SERVICE_ONE_ID, job_id=str(job_id))
+    page = client_request.get("main.view_job", service_id=SERVICE_ONE_ID, job_id=job_id)
 
     assert "Cancel sending these letters" not in page
     assert page.select_one("p#printing-info").text.strip() == f"Printed {expected_fragment} at 5:30pm"
@@ -636,7 +636,7 @@ def test_should_show_cancel_link_for_letter_job(
     job_status,
     mocker,
 ):
-    job_id = uuid.uuid4()
+    job_id = str(uuid.uuid4())
     job = job_json(
         SERVICE_ONE_ID,
         active_user_with_permissions,
@@ -651,7 +651,7 @@ def test_should_show_cancel_link_for_letter_job(
         return_value=notifications_json,
     )
 
-    page = client_request.get("main.view_job", service_id=SERVICE_ONE_ID, job_id=str(job_id))
+    page = client_request.get("main.view_job", service_id=SERVICE_ONE_ID, job_id=job_id)
 
     cancel_link = page.select_one(".page-footer-delete-link-without-button a.govuk-link.govuk-link--destructive")
     assert normalize_spaces(cancel_link.text) == "Cancel sending these letters"
@@ -670,7 +670,7 @@ def test_dont_cancel_letter_job_when_too_early_to_cancel(
     number_of_processed_notifications,
     mocker,
 ):
-    job_id = uuid.uuid4()
+    job_id = str(uuid.uuid4())
     job = job_json(
         SERVICE_ONE_ID,
         active_user_with_permissions,
@@ -693,7 +693,7 @@ def test_dont_cancel_letter_job_when_too_early_to_cancel(
     page = client_request.post(
         "main.cancel_letter_job",
         service_id=SERVICE_ONE_ID,
-        job_id=str(job_id),
+        job_id=job_id,
         _expected_status=200,
     )
     assert mock_cancel.called is False
