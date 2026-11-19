@@ -18,6 +18,7 @@ docker run -it --rm \
   -e REDIS_URL=$REDIS_URL \
   -e ADMIN_BASE_URL=${ADMIN_BASE_URL:-"http://host.docker.internal:6012"} \
   -e API_HOST_NAME=${API_HOST_NAME:-"http://host.docker.internal:6011"} \
+  -e DOCUMENT_DOWNLOAD_API_HOST_NAME_INTERNAL=${DOCUMENT_DOWNLOAD_API_HOST_NAME_INTERNAL:-"http://host.docker.internal:7000"} \
   -e TEMPLATE_PREVIEW_API_HOST=${TEMPLATE_PREVIEW_API_HOST:-"http://host.docker.internal:6013"} \
   -e ANTIVIRUS_API_HOST=${ANTIVIRUS_API_HOST:-"http://host.docker.internal:6016"} \
   -e AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID:-$(aws configure get aws_access_key_id)} \
