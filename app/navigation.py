@@ -133,6 +133,8 @@ class HeaderNavigation(Navigation):
             "platform_admin_update_email_branding",
             "platform_admin_view_email_branding",
             "update_letter_branding",
+            "platform_admin_archive_letter_branding",
+            "platform_admin_confirm_archive_letter_branding",
             "user_information",
             "view_provider",
             "view_providers",

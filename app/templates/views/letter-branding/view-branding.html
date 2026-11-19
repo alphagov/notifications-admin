@@ -81,6 +81,13 @@
                     href="{{ url_for('main.update_letter_branding', branding_id=letter_branding.id) }}">
                     Edit this branding</a>
             </span>
+            &emsp;
+            <span class="page-footer-link page-footer-delete-link-without-button bottom-gutter-2-3">
+                <a class="govuk-link govuk-link--destructive"
+                    href="{{ url_for('main.platform_admin_confirm_archive_letter_branding', branding_id=letter_branding.id) }}">
+                    Delete this branding</a>
+            </span>
+            &emsp;
         </div>
     </div>
 </div>
