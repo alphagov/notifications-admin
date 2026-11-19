@@ -26,6 +26,9 @@ def join_service_choose_service():
 def join_service_ask(service_to_join_id):
     service = Service.from_id(service_to_join_id)
 
+    if not service.organisation:
+        abort(403)
+
     if not service.organisation.can_ask_to_join_a_service:
         abort(403)
 

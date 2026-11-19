@@ -17,7 +17,9 @@
       This is usually the full name of your organisation.
       <br/>
       <br/>
-      For example, {{ current_service.organisation.name }}
+      {% if current_service.organisation %}
+        For example, {{ current_service.organisation.name }}
+      {% endif %}
     {% endset %}
     {{
       form.logo_text(
