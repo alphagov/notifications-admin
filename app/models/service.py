@@ -64,7 +64,7 @@ class Service(JSONModel):
 
     __sort_attribute__ = "name"
 
-    TEMPLATE_TYPES: Sequence[str] = (
+    TEMPLATE_TYPES: tuple[str, ...] = (
         "email",
         "sms",
         "letter",
@@ -683,7 +683,7 @@ class Service(JSONModel):
 
     def sent_today(self, notification_type):
         if not hasattr(self, "_sent_today"):
-            self._sent_today = {}
+            self._sent_today: dict[str, int] = {}
         if notification_type not in self._sent_today:
             self._sent_today[notification_type] = service_api_client.get_notification_count(
                 self.id, notification_type=notification_type
