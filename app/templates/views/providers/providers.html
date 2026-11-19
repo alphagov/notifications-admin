@@ -1,5 +1,6 @@
 {% extends "views/platform-admin/_base_template.html" %}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% block per_page_title %}
 Providers
@@ -7,7 +8,7 @@ Providers
 
 {% block platform_admin_content %}
 
-  <h1 class="govuk-heading-m">Providers</h1>
+  {{ govuk_page_header("Providers", size="m") }}
 
   <h2 class="govuk-heading-m">SMS</h2>
 

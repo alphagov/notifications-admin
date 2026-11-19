@@ -2,6 +2,7 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% block per_page_title %}
   Volumes by service report
@@ -9,9 +10,7 @@
 
 {% block platform_admin_content %}
 
-  <h1 class="govuk-heading-l">
-    Volumes by service Report
-  </h1>
+  {{ govuk_page_header("Volumes by service Report") }}
 
   {% call form_wrapper() %}
     {{ form.start_date(param_extensions={"hint": {"text": "Use the format YYYY-MM-DD"}}) }}

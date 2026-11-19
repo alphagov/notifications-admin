@@ -2,14 +2,17 @@
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "components/branding-preview.html" import email_branding_preview, letter_branding_preview %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
+
+{% set page_title = "Preview " + notification_type + " branding" %}
 {% block per_page_title %}
-  Preview {{ notification_type }} branding
+  {{ page_title }}
 {% endblock %}
 
 {% block platform_admin_content %}
 
-  <h1 class="govuk-heading-l">Preview {{ notification_type }} branding</h1>
+  {{ govuk_page_header(page_title) }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       {% if notification_type == 'email' %}
