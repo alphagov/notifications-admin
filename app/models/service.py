@@ -87,7 +87,7 @@ class Service(JSONModel):
 
     @property
     def _permissions(self):
-        return self._dict.get("permissions", self.TEMPLATE_TYPES)
+        return self.ALL_PERMISSIONS
 
     @property
     def permissions(self):
