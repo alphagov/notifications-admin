@@ -40,7 +40,7 @@
               {% if row.charged_units > 0 %}
                 {{ big_number(
                   row.charged_units,
-                  'at {:.2f} pence per message'.format(row.rate * 100),
+                  'at {:.3f} pence per message'.format(row.rate * 100),
                   **big_number_kwargs
                 ) }}
               {% endif %}
