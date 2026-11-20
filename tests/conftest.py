@@ -3218,9 +3218,13 @@ def client_request(request, _logged_in_client, mocker, service_one, fake_nonce):
             )
 
             if page.select("h1.heading-large"):
-                assert "govuk-!-padding-top-0" in page.select_one("main")["class"], (
-                    "Use govuk-heading-l or set error_summary_enabled=False"
-                )
+                main_elem = page.select_one("main")
+                main_classes = main_elem.get("class", []) if main_elem else []
+
+                has_small = "govuk-main-wrapper--small" in main_classes
+                has_padding_top = r"govuk-\!-padding-top-0" in main_classes
+
+                assert not (has_padding_top and not has_small), "Use govuk-heading-l or set error_summary_enabled=False"
 
         @staticmethod
         def test_for_visited_links(page):

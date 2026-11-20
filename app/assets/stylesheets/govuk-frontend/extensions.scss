@@ -521,3 +521,31 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
 .govuk-table__cell--width-25 {
   width: 25%;
 }
+
+// govuk wrapper variant
+// allowing gradual migration of legacy
+// heading classes
+.govuk-main-wrapper--small {
+  // default small padding
+  padding-top: govuk-spacing(3);
+
+  // zero padding if the direct first child is a div
+  &:has(> div:first-child) {
+    padding-top: 0;
+  }
+
+  // zero padding if the direct first child is a heading-large or heading-medium
+  &:has(> :first-child:is(.heading-large, .heading-medium)) {
+    padding-top: 0;
+  }
+
+  // if that first div contains a heading that DOES need padding (like govuk-heading-l)
+  &:has(> div:first-child:has(.govuk-heading-l, .govuk-heading-m)) {
+    padding-top: govuk-spacing(3);
+  }
+
+  // override app/assets/stylesheets/_app.scss until both can be removed
+  &:has(> form:first-child .govuk-fieldset__legend--l .govuk-fieldset__heading) {
+    padding-top: 0;
+  }
+}
