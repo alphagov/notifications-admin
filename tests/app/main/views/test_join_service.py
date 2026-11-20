@@ -32,6 +32,12 @@ def test_join_service_choose_service(
             service_json(SERVICE_ONE_ID, "service one", restricted=False),
             service_json(SERVICE_TWO_ID, "service two", restricted=False),
             service_json(str(UUID(version=4, int=1234)), "service three (trial mode)"),
+            service_json(
+                str(UUID(version=4, int=1235)),
+                "notify team test",
+                restricted=False,
+                count_as_live=False,
+            ),
         ],
     )
     page = client_request.get(
@@ -47,6 +53,30 @@ def test_join_service_choose_service(
         url_for("main.join_service_ask", service_to_join_id=SERVICE_ONE_ID),
         url_for("main.join_service_ask", service_to_join_id=SERVICE_TWO_ID),
     ]
+
+
+def test_cannot_ask_to_join_service_that_does_not_count_as_live(
+    client_request,
+    service_one,
+    mocker,
+):
+    service_one["organisation"] = ORGANISATION_ID
+    service_one["count_as_live"] = False
+    service_one["restricted"] = False
+    mocker.patch(
+        "app.organisations_client.get_organisation",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+    mocker.patch(
+        "app.organisations_client.get_organisation_by_domain",
+        return_value=organisation_json(id_=ORGANISATION_ID, can_ask_to_join_a_service=True),
+    )
+    client_request.login(create_service_two_user_with_permissions())
+    client_request.get(
+        "main.join_service_ask",
+        service_to_join_id=SERVICE_ONE_ID,
+        _expected_status=403,
+    )
 
 
 def test_cannot_join_service_without_organisation(client_request):

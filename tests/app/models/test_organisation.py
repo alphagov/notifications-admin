@@ -1,8 +1,10 @@
+from uuid import UUID
+
 import pytest
 
 from app.constants import PERMISSION_CAN_MAKE_SERVICES_LIVE
 from app.models.organisation import Organisation
-from tests import organisation_json
+from tests import organisation_json, service_json
 
 
 @pytest.mark.parametrize(
@@ -11,6 +13,26 @@ from tests import organisation_json
 def test_organisation_billing_details(purchase_order_number, expected_result):
     organisation = Organisation(organisation_json(purchase_order_number=purchase_order_number))
     assert organisation.billing_details == expected_result
+
+
+def test_live_services_leaves_out_services_that_do_not_count_as_live(notify_admin, mocker):
+    mocker.patch(
+        "app.models.organisation.organisations_client.get_organisation_services",
+        return_value=[
+            service_json(id_=str(UUID(version=4, int=1)), name="Live service", restricted=False),
+            service_json(
+                id_=str(UUID(version=4, int=2)),
+                name="Notify team test",
+                restricted=False,
+                count_as_live=False,
+            ),
+            service_json(id_=str(UUID(version=4, int=3)), name="Trial service", restricted=True),
+        ],
+    )
+
+    organisation = Organisation(organisation_json())
+
+    assert [service.name for service in organisation.live_services] == ["Live service"]
 
 
 @pytest.mark.parametrize("can_approve_own_go_live_requests", (True, False))

@@ -263,6 +263,11 @@ def service_switch_count_as_live(service_id):
         "views/service-settings/set-service-setting.html",
         title="Count in list of live services",
         form=form,
+        hint=(
+            "Choosing ‘no’ leaves this service out of the public list of live services and the list of "
+            "services people can ask to join. If you made this service live only to test something, put "
+            "it back into trial mode instead."
+        ),
     )
 
 
