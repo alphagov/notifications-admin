@@ -1,5 +1,5 @@
 {% extends "org_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/live-search.html" import live_search %}
 {% from "components/form.html" import form_wrapper %}
@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Add email branding options") }}
+  {{ govuk_page_header("Add email branding options") }}
   {{ live_search(target_selector='.govuk-checkboxes__item', show=True, form=_search_form, autofocus=True) }}
 
   {% call form_wrapper(module='add-branding-options-form') %}

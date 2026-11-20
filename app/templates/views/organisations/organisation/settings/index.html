@@ -1,12 +1,14 @@
 {% extends "org_template.html" %}
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% block org_page_title %}
   Settings
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-medium">Settings</h1>
+  {{ govuk_page_header("Settings", size="m") }}
+
   <div class="bottom-gutter-3-2">
 
     {% set billing_details_html %}

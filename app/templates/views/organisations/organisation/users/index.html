@@ -2,15 +2,14 @@
 {% from "components/live-search.html" import live_search %}
 {% from "components/tick-cross.html" import tick_cross %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% block org_page_title %}
   Team members
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-medium">
-    Team members
-  </h1>
+  {{ govuk_page_header("Team members", size="m") }}
 
   {% if show_search_box %}
     <div data-notify-module="autofocus">

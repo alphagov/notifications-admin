@@ -1,7 +1,7 @@
 {% extends "org_template.html" %}
 {% from "components/form.html" import form_wrapper %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block org_page_title %}
@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Edit request to go live notes") }}
+  {{ govuk_page_header("Edit request to go live notes") }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       <p class="govuk-body">
