@@ -3,6 +3,7 @@
 {% from "components/page-footer.html" import page_footer %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% block per_page_title %}
     Users List
@@ -10,9 +11,7 @@
 
 {% block platform_admin_content %}
 
-<h1 class="govuk-heading-l">
-    Export Users List
-</h1>
+{{ govuk_page_header("Export Users List") }}
 
 <p class="govuk-body">
     Filter and download the list of users.

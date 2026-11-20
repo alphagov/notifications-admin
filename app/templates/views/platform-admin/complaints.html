@@ -1,6 +1,7 @@
 {% extends "views/platform-admin/_base_template.html" %}
 {% from "components/previous-next-navigation.html" import previous_next_navigation %}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% block per_page_title %}
   Email complaints
@@ -8,9 +9,7 @@
 
 {% block platform_admin_content %}
 
-  <h1 class="govuk-heading-m">
-    Email complaints
-  </h1>
+  {{ govuk_page_header(" Email complaints", size="m") }}
 
   {% if complaints %}
     {% set table_headers = [
