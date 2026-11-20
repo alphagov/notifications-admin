@@ -212,6 +212,7 @@ def view_notifications(service_id, message_type=None):
             "email": ["email address"],
             "sms": ["phone number"],
             "letter": ["postal address", "file name"],
+            "mailbox": ["citizen identifier"],
             # We say recipient here because combining all 3 types, plus
             # reference gets too long for the hint text
             None: ["recipient"],
