@@ -1,6 +1,6 @@
 {% extends "org_template.html" %}
 {% from "components/page-footer.html" import page_footer %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "components/list-entry.html" import list_entry %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  {{ page_header("Known email domains") }}
+  {{ govuk_page_header("Known email domains") }}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
       <p class="govuk-body">

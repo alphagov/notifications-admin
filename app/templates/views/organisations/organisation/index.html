@@ -12,10 +12,10 @@
 
 {% block maincolumn_content %}
 
-  <div class="heading-with-aside heading-with-aside--heading-medium">
-    <h1 class="heading-medium" id="page-header">Usage</h1>
+  <div class="govuk-heading-wrapper">
+    <h1 class="govuk-heading-m govuk-heading--with-aside" id="page-header">Usage</h1>
     {% if updated_at %}
-      <p class="heading-aside">Last updated {{ updated_at | format_datetime_relative }}</p>
+      <p class="govuk-heading__aside">Last updated {{ updated_at | format_datetime_relative }}</p>
     {% endif %}
   </div>
 

@@ -522,6 +522,38 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
   width: 25%;
 }
 
+// heading with an aside text
+.govuk-heading-wrapper {
+  margin-bottom: govuk-spacing(4);
+
+  @include govuk-media-query($from: tablet) {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    column-gap: govuk-spacing(6);
+    row-gap: govuk-spacing(2);
+  }
+
+  .govuk-heading--with-aside {
+    margin-bottom: govuk-spacing(2);
+
+    @include govuk-media-query($from: tablet) {
+      margin-bottom: 0;
+    }
+  }
+
+  .govuk-heading__aside {
+    @include govuk-font(16);
+    color: govuk-functional-colour(secondary-text);
+    margin: 0;
+
+    @include govuk-media-query($from: tablet) {
+     width: auto;
+    }
+  }
+}
+
 // govuk wrapper variant
 // allowing gradual migration of legacy
 // heading classes
