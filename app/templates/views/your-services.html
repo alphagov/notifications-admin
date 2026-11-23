@@ -1,5 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% macro service_list(
   heading,
@@ -69,9 +70,7 @@
 {% endblock %}
 
 {% block maincolumn_content %}
-  <h1 class="heading-large">
-    Your {{ thing_to_choose_between }}
-  </h1>
+  {{ govuk_page_header("Your " + thing_to_choose_between) }}
 
   <nav class="browse-list">
     {% if current_user.platform_admin %}
