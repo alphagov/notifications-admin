@@ -36,7 +36,7 @@
     </ol>
   {% endif %}
     {% set folder = folders | last %}
-    <{{ root_element }} class="heading-medium folder-heading"{% if root_element == 'h1' %} id="page-header"{% endif %}>
+    <{{ root_element }} class="govuk-heading-m folder-heading"{% if root_element == 'h1' %} id="page-header"{% endif %}>
       {% if link_current_item and current_user.has_template_folder_permission(folder, service=service) %}
         <a href="{{ url_for('main.choose_template', service_id=service.id, template_type=template_type, template_folder_id=folder.id) }}" class="govuk-link govuk-link--no-visited-state folder-heading-folder" title="{{ folder.name }}">
           {{ svgs.folder(classes="folder-heading-folder__icon") }}

@@ -332,8 +332,26 @@ a {
     display: inline;
   }
 
+  &--with-aside,
   &-container {
-    margin: govuk-spacing(3) 0 govuk-spacing(4);
+    margin-bottom: govuk-spacing(4);
+  }
+
+  &--with-aside {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    row-gap: govuk-spacing(3);
+    column-gap: govuk-spacing(6);
+    flex-direction: column;
+
+    @include govuk-media-query($from: tablet) {
+      flex-direction: row;
+    }
+
+    > .folder-heading-container {
+      margin-bottom: 0;
+    }
   }
 
   &-breadcrumb {
@@ -387,14 +405,6 @@ a {
     @include govuk-media-query($from: tablet) {
       top: 3px;
     }
-  }
-
-  &-manage-link {
-    display: block;
-    text-align: right;
-    padding: govuk-spacing(4) 0 0 0;
-    position: relative;
-    top: -6px;
   }
 
 }
