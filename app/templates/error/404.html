@@ -1,11 +1,10 @@
 {% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% block per_page_title %}Page not found{% endblock %}
 {% block maincolumn_content %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        <h1 class="heading-large">
-          Page not found
-        </h1>
+        {{ govuk_page_header("Page not found") }}
         <p class="govuk-body">
           If you typed the web address, check it is correct.
         </p>
