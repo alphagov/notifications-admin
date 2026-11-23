@@ -3,7 +3,7 @@
 
 {% extends "admin_template.html" %}
 
-{% set mainClasses = "govuk-!-padding-top-0 govuk-!-padding-bottom-0" %}
+{% set mainClasses = "govuk-!-padding-bottom-0" %}
 
 {% block per_page_title %}
   {% block service_page_title %}{% endblock %} – {{ current_service.name }}
@@ -28,7 +28,7 @@
         {% block containerStart %}
           {% block backLink %}{% endblock %}
         {% endblock %}
-        <main class="govuk-main-wrapper column-main {{ mainClasses }}" id="main-content" role="main">
+        <main class="govuk-main-wrapper govuk-main-wrapper--small column-main {{ mainClasses }}" id="main-content" role="main">
         {% block content %}
           {% include 'flash_messages.html' %}
           {% block errorSummary %}
