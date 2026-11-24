@@ -1,11 +1,10 @@
 {% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% block per_page_title %}The invitation you were sent has been cancelled{% endblock %}
 {% block maincolumn_content %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        <h1 class="heading-large">
-          The invitation you were sent has been cancelled
-        </h1>
+        {{ govuk_page_header("The invitation you were sent has been cancelled") }}
         <p class="govuk-body">
           {{ from_user }} decided to cancel this invitation.
         </p>
