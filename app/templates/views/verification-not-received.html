@@ -1,6 +1,7 @@
 {% extends "withoutnav_template.html" %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% block per_page_title %}
   If you do not receive a security code
@@ -10,7 +11,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="heading-large">If you do not receive a security code</h1>
+    {{ govuk_page_header("If you do not receive a security code") }}
     
     <ol class="govuk-list govuk-list--number">
       <li>Check that you can receive text messages from other numbers.</li>
