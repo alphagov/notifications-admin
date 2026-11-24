@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
@@ -16,7 +16,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header(title) }}
+  {{ govuk_page_header(title) }}
 
    {% set files = [] %}
     {%  if template.email_files %}
