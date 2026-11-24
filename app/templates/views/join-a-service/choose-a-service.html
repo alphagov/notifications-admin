@@ -2,6 +2,7 @@
 {% from "components/live-search.html" import live_search %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/details/macro.html" import govukDetails %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% set heading = 'Choose the service you want to join' %}
 
@@ -16,9 +17,7 @@
 {% block maincolumn_content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    <h1 class="heading-large">
-      {{ heading }}
-    </h1>
+    {{ govuk_page_header(heading) }}
     <p class="govuk-body govuk-!-margin-bottom-6">
       {{ current_user.default_organisation.name }} has {{ current_user.default_organisation.live_services | length }} live service{{ '' if current_user.default_organisation.live_services | length == 1 else 's' }}</p>
 

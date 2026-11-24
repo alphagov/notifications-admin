@@ -1,5 +1,5 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% set heading = 'You have asked to join an existing service' %}
 {% set number_of_users_emailed = request.args.get('number_of_users_emailed') %}
@@ -11,7 +11,7 @@
 {% block maincolumn_content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
-      {{ page_header(heading) }}
+      {{ govuk_page_header(heading) }}
       <p class="govuk-body">
         We have sent your request to {{ number_of_users_emailed }} member{{ '' if number_of_users_emailed == '1' else 's' }} of ‘{{ service.name }}’.
       </p>
