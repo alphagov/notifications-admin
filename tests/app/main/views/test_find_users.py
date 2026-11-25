@@ -45,12 +45,12 @@ def test_user_information_page_shows_information_about_user(
         "test@gov.uk",
         "+447700900986",
         "Signs in with a text message code",
-        "Last logged in just now",
+        "Last signed in just now",
         "Does not want to receive new features email",
         "Does not want to take part in user research",
     ]
 
-    assert "0 failed login attempts" not in page.text
+    assert "0 failed attempts to sign in" not in page.text
 
     assert [normalize_spaces(h2.text) for h2 in page.select("main h2")] == [
         "Organisations",
@@ -165,7 +165,7 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
     )
     page = client_request.get("main.user_information", user_id=fake_uuid)
 
-    assert normalize_spaces(page.select("main p")[-1].text) == "2 failed login attempts"
+    assert normalize_spaces(page.select("main p")[-1].text) == "2 failed attempts to sign in"
 
 
 def test_user_information_page_shows_if_user_is_platform_admin(
