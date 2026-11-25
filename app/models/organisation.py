@@ -79,14 +79,17 @@ class Organisation(JSONModel):
     __sort_attribute__ = "name"
 
     @classmethod
-    def from_id(cls, org_id):
+    def from_id(cls, org_id) -> "Organisation | None":
         if not org_id:
-            return cls({})
+            return None
         return cls(organisations_client.get_organisation(org_id))
 
     @classmethod
-    def from_domain(cls, domain):
-        return cls(organisations_client.get_organisation_by_domain(domain))
+    def from_domain(cls, domain) -> "Organisation | None":
+        organisation = organisations_client.get_organisation_by_domain(domain)
+        if organisation is None:
+            return None
+        return cls(organisation)
 
     @classmethod
     def create_from_form(cls, form):
@@ -110,23 +113,6 @@ class Organisation(JSONModel):
                 agreement_signed=agreement_signed,
             )
         )
-
-    def __init__(self, _dict):
-        super().__init__(_dict)
-
-        if self._dict == {}:
-            self.id = None
-            self.name = None
-            self.crown = None
-            self.agreement_signed = None
-            self.agreement_signed_by_id = None
-            self.domains = []
-            self.organisation_type = None
-            self.request_to_go_live_notes = None
-            self.email_branding_id = None
-            self.letter_branding_id = None
-            self.can_approve_own_go_live_requests = False
-            self.permissions = []
 
     @property
     def organisation_type_label(self):

@@ -14,7 +14,7 @@
     </h1>
 
     <p class="govuk-body">
-      <a class="govuk-link govuk-link--no-visited-state" href="{{ download_link }}">Download the agreement (PDF)</a>{% if owner %} for {{ owner }}{% endif %}.
+      <a class="govuk-link govuk-link--no-visited-state" href="{{ download_link }}">Download the agreement (PDF)</a>{% if current_user.default_organisation %} for {{ current_user.default_organisation.name }}{% endif %}.
     </p>
     <p class="govuk-body">
       The agreement contains commercially sensitive information. Do not share it outside your organisation.
