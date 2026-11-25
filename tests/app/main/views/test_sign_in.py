@@ -49,7 +49,7 @@ def test_sign_in_explains_other_browser(client_request, api_user_active, mocker)
 
     page = client_request.get("main.sign_in", next="/foo")
 
-    assert "We signed you out because you logged in to Notify on another device" in page.text
+    assert "We signed you out because you signed in to Notify on another device" in page.text
 
 
 def test_doesnt_redirect_to_sign_in_if_no_session_info(
