@@ -96,7 +96,7 @@
 
       {% if user.failed_login_count > 0 %}
       <p style="color:#d4351c;">
-        {{ user.failed_login_count }} failed login attempts
+        {{ user.failed_login_count }} failed attempts to sign in
       </p>
       {% endif %}
       {% if user.state == 'active' %}
