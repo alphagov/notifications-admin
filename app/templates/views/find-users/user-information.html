@@ -77,9 +77,9 @@
       {% endif %}
 
       {% if not user.logged_in_at %}
-      <p class="hint">This person has never logged in</p>
+      <p class="hint">This person has never signed in</p>
       {% else %}
-      <p class="govuk-body">Last logged in
+      <p class="govuk-body">Last signed in
         <time data-notify-module="update-relative-time" datetime="{{ user.logged_in_at }}">
           {{ user.logged_in_at|format_delta }}
         </time>
