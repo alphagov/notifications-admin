@@ -25,10 +25,17 @@
   {% if letter_rates.last_updated | format_date_numeric < date_new_letter_rates_go_live %}
     <div class="govuk-inset-text">
       <p class="govuk-body">
-        Letter prices for economy mail and second class post may go up on 7 December 2026. This is because Royal Mail is increasing its rates.
+        Royal mail is increasing its rates. 
       </p>
+    <p class="govuk-body">On 7 December 2026:</p>
+    <ul class="govuk-list govuk-list--bullet">
+     <li>economy mail will go up by between 10.2 and 11.1 pence</li>
+     <li>second class postage will go up by between 9 and 11 pence</li>
+     <li>first class postage will go up by between 25 and 30 pence</li>
+      <li>international mail will go down by between 87 and 89 pence</li>
+    </ul>
       <p class="govuk-body">
-        The cost will depend on the number of pages in your letter.
+        The cost will depend on the number of pages in your letter. The changes listed do not include VAT.
       </p>
     </div>
   {% endif %}
