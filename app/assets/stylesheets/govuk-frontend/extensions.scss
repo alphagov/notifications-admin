@@ -572,7 +572,7 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
   }
 
   // if that first div contains a heading that DOES need padding (like govuk-heading-l)
-  &:has(> div:first-child:has(.govuk-heading-l, .govuk-heading-m)) {
+  &:has(> div:first-child :is(.govuk-heading-l, .govuk-heading-m)) {
     padding-top: govuk-spacing(3);
   }
 

@@ -1,3 +1,4 @@
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "components/folder-path.html" import copy_folder_path %}
 {% from "components/live-search.html" import live_search %}
 {% import "components/svgs.html" as svgs %}
@@ -11,10 +12,8 @@
 
 {% block maincolumn_content %}
 
-    <div class="bottom-gutter-1-2">
-      <h1 class="heading-large">{{ page_title }}</h1>
-      {{ copy_folder_path(template_folder_path, current_service.id, from_service, current_user, to_folder_id) }}
-    </div>
+    {{ govuk_page_header(page_title) }}
+    {{ copy_folder_path(template_folder_path, current_service.id, from_service, current_user, to_folder_id) }}
     {% if not services_templates_and_folders.templates_to_show %}
       <p class="template-list-empty">
         This folder is empty

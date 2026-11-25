@@ -1,5 +1,5 @@
 {% extends "withnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/form.html" import form_wrapper %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
@@ -16,7 +16,7 @@
 
 {% block maincolumn_content %}
 
-  {{ page_header(title) }}
+  {{ govuk_page_header(title) }}
 
   <p class="govuk-body">
     Upload a file, then send your recipients an email with a link to download it.
@@ -24,7 +24,7 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-five-sixths">
-      <h2 class="heading-medium">
+      <h2 class="govuk-heading-m">
         Before you can send files by email
       </h2>
       <p class="govuk-body">

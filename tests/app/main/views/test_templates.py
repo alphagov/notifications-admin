@@ -2874,7 +2874,7 @@ def test_post_copy_template_with_email_files_without_contact_link_redirects(
         normalize_spaces(page.select_one(".banner-dangerous"))
         == "You need to add contact details for your service. Add contact details for your service"
     )
-    assert normalize_spaces(page.select_one(".heading-large")) == "Choose an existing template to copy"
+    assert normalize_spaces(page.select_one(".govuk-heading-l")) == "Choose an existing template to copy"
 
 
 @pytest.mark.parametrize("copy_to_different_service", [True, False])

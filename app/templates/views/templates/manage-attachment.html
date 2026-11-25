@@ -1,6 +1,6 @@
 {% extends "withnav_template.html" %}
 {% from "components/banner.html" import banner_wrapper %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/page-footer.html" import page_footer %}
 {% from "components/file-upload.html" import file_upload %}
@@ -28,7 +28,7 @@
             {% endcall %}
         </div>
     {% else %}
-        {{ page_header(page_title) }}
+        {{ govuk_page_header(page_title) }}
     {% endif %}
 
     {% set attachment_spec %}
