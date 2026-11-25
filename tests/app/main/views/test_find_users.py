@@ -165,7 +165,7 @@ def test_user_information_page_displays_if_there_are_failed_login_attempts(
     )
     page = client_request.get("main.user_information", user_id=fake_uuid)
 
-    assert normalize_spaces(page.select("main p")[-1].text) == "2 failed login attempts"
+    assert normalize_spaces(page.select("main p")[-1].text) == "2 failed attempts to sign in"
 
 
 def test_user_information_page_shows_if_user_is_platform_admin(
