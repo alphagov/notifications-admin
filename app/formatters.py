@@ -271,6 +271,12 @@ def format_notification_type(notification_type):
 
 def format_notification_status(status, template_type):
     return {
+        "mailbox": {
+            "failed": "Failed",
+            "delivered": "Delivered",
+            "sending": "Delivering",
+            "created": "Delivering",
+        },
         "email": {
             "failed": "Failed",
             "technical-failure": "Technical failure",

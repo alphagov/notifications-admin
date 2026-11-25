@@ -42,5 +42,17 @@
         smaller=True,
       ) }}
     </div>
+    <div id="total-mailbox" class="govuk-grid-column-one-third">
+      {{ big_number_with_status(
+        loading_indicator(1),
+        'mailbox ' + 999|message_count_label('mailbox', suffix='sent'),
+        whitespace,
+        whitespace + hidden_label,
+        False,
+        failure_link=url_for("main.view_notifications", service_id=current_service.id, message_type='mailbox', status='failed'),
+        link=url_for("main.view_notifications", service_id=current_service.id, message_type='mailbox', status='sending,delivered,failed'),
+        smaller=True,
+      ) }}
+    </div>
   </div>
 </div>

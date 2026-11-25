@@ -212,6 +212,7 @@ def view_notifications(service_id, message_type=None):
             "email": ["email address"],
             "sms": ["phone number"],
             "letter": ["postal address", "file name"],
+            "mailbox": ["citizen identifier"],
             # We say recipient here because combining all 3 types, plus
             # reference gets too long for the hint text
             None: ["recipient"],
@@ -529,7 +530,7 @@ def aggregate_notifications_stats(template_statistics):
     template_statistics = filter_out_cancelled_stats(template_statistics)
     notifications = {
         template_type: dict.fromkeys(("requested", "delivered", "failed"), 0)
-        for template_type in ["sms", "email", "letter"]
+        for template_type in ["sms", "email", "letter", "mailbox"]
     }
     for stat in template_statistics:
         notifications[stat["template_type"]]["requested"] += stat["count"]
