@@ -1,5 +1,5 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
@@ -14,7 +14,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    {{ page_header("If you did not receive a security code") }}
+    {{ govuk_page_header("If you did not receive a security code") }}
 
     <p class="govuk-body">
       Make sure that there are no issues with your device or network.

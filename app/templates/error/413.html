@@ -1,11 +1,10 @@
 {% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% block per_page_title %}Your request was too large{% endblock %}
 {% block maincolumn_content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="heading-large">
-        Your request was too large
-      </h1>
+      {{ govuk_page_header("Your request was too large") }}
       <p class="govuk-body">
         Try again with a smaller request.
       </p>

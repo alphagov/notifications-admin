@@ -1,5 +1,5 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
@@ -12,7 +12,7 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Send us an email')}}
+    {{ govuk_page_header('Send us an email')}}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <p class="govuk-body">
@@ -22,7 +22,7 @@
           When you contact our emergency email address we’ll reply within 30 minutes.
         </p>
 
-        <h2 class="heading-medium">Do not use our emergency email address</h2>
+        <h2 class="govuk-heading-m">Do not use our emergency email address</h2>
 
         <ul class="govuk-list govuk-list--bullet">
         <li>

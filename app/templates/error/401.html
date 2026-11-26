@@ -1,9 +1,10 @@
 {% extends "withoutnav_template.html" %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% block per_page_title %}You’re not authorised to see this page{% endblock %}
 {% block maincolumn_content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-    <h1>You’re not authorised to see this page</h1>
+      {{ govuk_page_header("You’re not authorised to see this page") }}
       <p class="govuk-body"><a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('main.sign_in' )}}">Sign in</a> to GOV.UK Notify and try again.</p>
   </div>
 {% endblock %}

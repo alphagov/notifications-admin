@@ -581,3 +581,18 @@ $govuk-touch-target-size: ($govuk-checkboxes-size + $govuk-touch-target-gutter);
     padding-top: 0;
   }
 }
+
+// helper for withoutnav pages
+// TODO: can be removed when all pages extending from withoutnav_template
+// have their headings updated
+.govuk-main-wrapper--regular {
+  // zero padding if the direct first child is a heading-large or heading-medium
+  &:has(> :first-child:is(.heading-large, .heading-medium)) {
+    padding-top: 0;
+  }
+
+  // if that first div contains legacy headings that where padding isn't required
+  &:has(> div:first-child :is(.heading-large, .heading-medium)) {
+    padding-top: 0;
+  }
+}

@@ -1,5 +1,5 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "components/webauthn-api-check.html" import webauthn_api_check %}
@@ -69,7 +69,7 @@
     {% if credentials %}
       <div class="govuk-grid-column-five-sixths">
         {{ errorSummaries }}
-        {{ page_header(page_title) }}
+        {{ govuk_page_header(page_title) }}
 
         {% set credentials_list = [] %}
         {% for credential in credentials %}
@@ -108,7 +108,7 @@
       </div>
     {% else %}
       <div class="govuk-grid-column-one-half">
-        {{ page_header(page_title) }}
+        {{ govuk_page_header(page_title) }}
         <p class="govuk-body">
           Security keys are an alternative way of signing in to Notify,
           instead of getting a code in a text message

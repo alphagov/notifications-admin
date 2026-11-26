@@ -1,5 +1,5 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
@@ -12,7 +12,7 @@
 
 {% block maincolumn_content %}
 
-    {{ page_header('Thanks for contacting us') }}
+    {{ govuk_page_header('Thanks for contacting us') }}
     <p class="govuk-body">
       {% if emergency_ticket %}
         We’ll reply in the next 30 minutes.

@@ -1,5 +1,6 @@
 {% extends "withoutnav_template.html" %}
 {% from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 
 {% block per_page_title %}
   Your account
@@ -7,7 +8,7 @@
 
 {% block maincolumn_content %}
 
-  <h1 class="heading-large">Your account</h1>
+  {{ govuk_page_header("Your account") }}
 
   {% if can_see_edit %}
     {% set email_address_row =

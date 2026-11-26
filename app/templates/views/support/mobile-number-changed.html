@@ -1,5 +1,5 @@
 {% extends "withoutnav_template.html" %}
-{% from "components/page-header.html" import page_header %}
+{% from "components/govuk-page-header.html" import govuk_page_header %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block per_page_title %}
@@ -14,7 +14,7 @@
 
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
-    {{ page_header("If your mobile number has changed") }}
+    {{ govuk_page_header("If your mobile number has changed") }}
 
     <p class="govuk-body">
       Ask a member of your team with the ‘Manage settings, team and usage’ permission to update your mobile number.
