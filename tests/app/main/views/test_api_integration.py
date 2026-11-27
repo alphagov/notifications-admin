@@ -5,7 +5,7 @@ import pytest
 from flask import url_for
 from freezegun import freeze_time
 
-from tests import generate_uuid, validate_route_permission
+from tests import api_key_json, generate_uuid, validate_route_permission
 from tests.conftest import SERVICE_ONE_ID, create_notifications, create_user, normalize_spaces
 
 
@@ -443,10 +443,52 @@ def test_api_keys_page_with_multiple_old_keys(
 
     assert normalize_spaces(page.select_one(".govuk-notification-banner").text) == (
         "Rotate your API keys "
-        "You have 3 API keys that are more than 12 months old. "
+        "You have 2 API keys that are more than 12 months old. "
         "Rotate these keys at least once a year or remove any you no longer need."
     )
     mock_get_api_keys.assert_called_once_with(SERVICE_ONE_ID)
+
+
+@freeze_time("2027-10-25 12:00")
+@pytest.mark.parametrize(
+    "expiry_date",
+    (
+        # Just revoked
+        "2027-10-20 11:59",
+        # Right now it’s not possible for keys to have future expiry dates, but
+        # just in case this is something we do in the future, let’s test for it
+        # here
+        "2027-10-20 12:01",
+    ),
+)
+def test_api_keys_page_with_just_revoked_key(
+    client_request,
+    mock_get_api_keys,
+    fake_uuid,
+    mock_get_users_by_service,
+    api_user_active,
+    mocker,
+    expiry_date,
+):
+    mocker.patch(
+        "app.models.api_key.api_key_api_client.get_api_keys",
+        return_value={
+            "apiKeys": [
+                api_key_json(
+                    id_=fake_uuid,
+                    name="some key name",
+                    key_type="normal",
+                    created_by=fake_uuid,
+                    created_at="2020-10-20 00:00",  # a long time ago
+                    expiry_date=expiry_date,
+                    last_used=None,
+                ),
+            ]
+        },
+    )
+    page = client_request.get("main.api_keys", service_id=SERVICE_ONE_ID)
+
+    assert not page.select_one(".govuk-notification-banner")
 
 
 @pytest.mark.parametrize(
