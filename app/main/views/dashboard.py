@@ -62,10 +62,33 @@ def service_dashboard(service_id):
     )
 
 
+@main.route("/services/<uuid:service_id>/live")
+@user_has_permissions()
+def service_dashboard_live(service_id):
+    if session.get("invited_user_id"):
+        session.pop("invited_user_id", None)
+        session["service_id"] = service_id
+
+    if not current_user.has_permissions("view_activity"):
+        return redirect(url_for("main.choose_template", service_id=service_id))
+
+    return render_template(
+        "views/dashboard/dashboard.html",
+        updates_url=url_for("json_updates.service_dashboard_live_updates", service_id=service_id),
+        partials=get_dashboard_partials_lazy(),
+    )
+
+
 @json_updates.route("/services/<uuid:service_id>/dashboard.json")
 @user_has_permissions("view_activity")
 def service_dashboard_updates(service_id):
     return jsonify(**get_dashboard_partials())
+
+
+@json_updates.route("/services/<uuid:service_id>/dashboard-live.json")
+@user_has_permissions("view_activity")
+def service_dashboard_live_updates(service_id):
+    return jsonify(**get_dashboard_partials(live=True))
 
 
 @json_updates.route("/services/<uuid:service_id>/dashboard-usage.json")
@@ -551,8 +574,13 @@ def get_dashboard_partials_lazy():
     }
 
 
-def get_dashboard_partials():
-    all_statistics = template_statistics_client.get_template_statistics_for_service(current_service.id, limit_days=7)
+def get_dashboard_partials(live=False):
+    get_statistics = (
+        template_statistics_client.get_template_statistics_for_service_live
+        if live
+        else template_statistics_client.get_template_statistics_for_service
+    )
+    all_statistics = get_statistics(current_service.id, limit_days=7)
     template_statistics = aggregate_template_usage(all_statistics)
     stats = aggregate_notifications_stats(all_statistics)
 
