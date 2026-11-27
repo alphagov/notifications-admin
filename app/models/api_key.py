@@ -30,7 +30,13 @@ class APIKey(JSONModel):
         api_key_api_client.revoke_api_key(service_id=service_id, key_id=self.id)
 
     @property
+    def revoked(self) -> bool:
+        return self.expiry_date and self.expiry_date < datetime.now(UTC)
+
+    @property
     def needs_rotating(self) -> bool:
+        if self.revoked:
+            return False
         return self.created_at < datetime.now(UTC).replace(year=datetime.now(UTC).year - 1)
 
 
