@@ -1072,8 +1072,8 @@ def test_usage_page(
     assert "250,000 free allowance" in sms_column
     assert "0 free allowance remaining" in sms_column
     assert "£29.85 spent" in sms_column
-    assert "1,500 at 1.65 pence" in sms_column
-    assert "300 at 1.70 pence" in sms_column
+    assert "1,500 at 1.650 pence" in sms_column
+    assert "300 at 1.700 pence" in sms_column
 
     letter_column = normalize_spaces(annual_usage[2].text + annual_usage[5].text)
     assert "Letters" in letter_column
